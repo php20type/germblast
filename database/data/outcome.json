@@ -1,0 +1,86 @@
+[
+    {
+        "outcome_id": 1,
+        "outcome": "Lost - Any reason"
+    },
+    {
+        "outcome_id": 2,
+        "outcome": "Budgetary Constraints"
+    },
+    {
+        "outcome_id": 3,
+        "outcome": "Client decided to \"do it themselves"
+    },
+    {
+        "outcome_id": 4,
+        "outcome": "Client purchased equipment"
+    },
+    {
+        "outcome_id": 5,
+        "outcome": "FTFT"
+    },
+    {
+        "outcome_id": 6,
+        "outcome": "GermBlast Performance Outcomes"
+    },
+    {
+        "outcome_id": 7,
+        "outcome": "Lack of Admin/Corporate Approval"
+    },
+    {
+        "outcome_id": 8,
+        "outcome": "Lack of Board Approval"
+    },
+    {
+        "outcome_id": 9,
+        "outcome": "Lack of lead follow through"
+    },
+    {
+        "outcome_id": 10,
+        "outcome": "Lack of Physician Support"
+    },
+    {
+        "outcome_id": 11,
+        "outcome": "Lost to Competitor"
+    },
+    {
+        "outcome_id": 12,
+        "outcome": "No longer needs/changed mind"
+    },
+    {
+        "outcome_id": 13,
+        "outcome": "Cancelled - Any reason"
+    },
+    {
+        "outcome_id": 14,
+        "outcome": "Cancelled - Merged"
+    },
+    {
+        "outcome_id": 15,
+        "outcome": "Changed their mind"
+    },
+    {
+        "outcome_id": 16,
+        "outcome": "Communication severed by client"
+    },
+    {
+        "outcome_id": 17,
+        "outcome": "Duplicate"
+    },
+    {
+        "outcome_id": 18,
+        "outcome": "FTFT"
+    },
+    {
+        "outcome_id": 19,
+        "outcome": "Lack of lead follow through"
+    },
+    {
+        "outcome_id": 20,
+        "outcome": "Not interested in a site survey at this time"
+    },
+    {
+        "outcome_id": 21,
+        "outcome": "Won"
+    }
+]

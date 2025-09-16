@@ -1,0 +1,158 @@
+[
+  {
+    "id": 1,
+    "tag_id": 1,
+    "name": "COVID",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 2,
+    "tag_id": 1,
+    "name": "Flooring",
+    "color": "rgb(200, 200, 233)"
+  },
+  {
+    "id": 3,
+    "tag_id": 1,
+    "name": "GB - Wash",
+    "color": "rgb(196, 238, 204)"
+  },
+  {
+    "id": 4,
+    "tag_id": 1,
+    "name": "IAQ",
+    "color": "rgb(192, 224, 242)"
+  },
+  {
+    "id": 5,
+    "tag_id": 1,
+    "name": "New Business - 2025",
+    "color": "rgb(255, 204, 178)"
+  },
+  {
+    "id": 6,
+    "tag_id": 1,
+    "name": "Response",
+    "color": "rgb(255, 178, 187)"
+  },
+  {
+    "id": 7,
+    "tag_id": 2,
+    "name": "ui[ ar `145",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 8,
+    "tag_id": 2,
+    "name": "2020 TASBO Annual",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 9,
+    "tag_id": 2,
+    "name": "AIR",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 10,
+    "tag_id": 2,
+    "name": "AIR21",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 11,
+    "tag_id": 2,
+    "name": "ga tag",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 12,
+    "tag_id": 2,
+    "name": "Harmony School of Excellence El Paso",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 13,
+    "tag_id": 2,
+    "name": "Harmony School of Innovation El Paso",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 14,
+    "tag_id": 2,
+    "name": "Harmony Science Academy El Paso",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 15,
+    "tag_id": 2,
+    "name": "Harmony Science Academy Lubbock",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 16,
+    "tag_id": 2,
+    "name": "Harmony Science Academy Odessa",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 17,
+    "tag_id": 2,
+    "name": "Midwinter2020",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 18,
+    "tag_id": 2,
+    "name": "NMSBA Legislative Conferene 2020 Santa Fe",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 19,
+    "tag_id": 2,
+    "name": "Parker Colorado",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 20,
+    "tag_id": 2,
+    "name": "Test",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 21,
+    "tag_id": 2,
+    "name": "test tag",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 22,
+    "tag_id": 3,
+    "name": "Billing contact",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 23,
+    "tag_id": 3,
+    "name": "Marketing Contact",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 24,
+    "tag_id": 3,
+    "name": "Mid-Confernce 2020",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 25,
+    "tag_id": 3,
+    "name": "NM Legislative Confernce 2020",
+    "color": "rgb(235, 232, 232)"
+  },
+  {
+    "id": 26,
+    "tag_id": 3,
+    "name": "Scheduling Contact",
+    "color": "rgb(235, 232, 232)"
+  }
+]

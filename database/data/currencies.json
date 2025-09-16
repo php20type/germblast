@@ -1,0 +1,752 @@
+[
+    {
+        "code": "USD",
+        "name": "United States dollar",
+        "USDexchangerate": 840
+    },
+    {
+        "code": "AED",
+        "name": "United Arab Emirates dirham",
+        "USDexchangerate": 784
+    },
+    {
+        "code": "AFN",
+        "name": "Afghan afghani",
+        "USDexchangerate": 971
+    },
+    {
+        "code": "ALL",
+        "name": "Albanian lek",
+        "USDexchangerate": 8
+    },
+    {
+        "code": "AMD",
+        "name": "Armenian dram",
+        "USDexchangerate": 51
+    },
+    {
+        "code": "ANG",
+        "name": "Netherlands Antillean guilder",
+        "USDexchangerate": 532
+    },
+    {
+        "code": "AOA",
+        "name": "Angolan kwanza",
+        "USDexchangerate": 973
+    },
+    {
+        "code": "ARS",
+        "name": "Argentine peso",
+        "USDexchangerate": 32
+    },
+    {
+        "code": "AUD",
+        "name": "Australian dollar",
+        "USDexchangerate": 36
+    },
+    {
+        "code": "AWG",
+        "name": "Aruban florin",
+        "USDexchangerate": 533
+    },
+    {
+        "code": "AZN",
+        "name": "Azerbaijani manat",
+        "USDexchangerate": 944
+    },
+    {
+        "code": "BAM",
+        "name": "Bosnia and Herzegovina convertible mark",
+        "USDexchangerate": 977
+    },
+    {
+        "code": "BBD",
+        "name": "Barbados dollar",
+        "USDexchangerate": 52
+    },
+    {
+        "code": "BDT",
+        "name": "Bangladeshi taka",
+        "USDexchangerate": 50
+    },
+    {
+        "code": "BGN",
+        "name": "Bulgarian lev",
+        "USDexchangerate": 975
+    },
+    {
+        "code": "BHD",
+        "name": "Bahraini dinar",
+        "USDexchangerate": 48
+    },
+    {
+        "code": "BIF",
+        "name": "Burundian franc",
+        "USDexchangerate": 108
+    },
+    {
+        "code": "BMD",
+        "name": "Bermudian dollar (customarily known as Bermuda dollar)",
+        "USDexchangerate": 60
+    },
+    {
+        "code": "BND",
+        "name": "Brunei dollar",
+        "USDexchangerate": 96
+    },
+    {
+        "code": "BOB",
+        "name": "Boliviano",
+        "USDexchangerate": 68
+    },
+    {
+        "code": "BRL",
+        "name": "Brazilian real",
+        "USDexchangerate": 986
+    },
+    {
+        "code": "BSD",
+        "name": "Bahamian dollar",
+        "USDexchangerate": 44
+    },
+    {
+        "code": "BTN",
+        "name": "Bhutanese ngultrum",
+        "USDexchangerate": 64
+    },
+    {
+        "code": "BWP",
+        "name": "Botswana pula",
+        "USDexchangerate": 72
+    },
+    {
+        "code": "BZD",
+        "name": "Belize dollar",
+        "USDexchangerate": 84
+    },
+    {
+        "code": "CAD",
+        "name": "Canadian dollar",
+        "USDexchangerate": 124
+    },
+    {
+        "code": "CDF",
+        "name": "Congolese franc",
+        "USDexchangerate": 976
+    },
+    {
+        "code": "CHF",
+        "name": "Swiss franc",
+        "USDexchangerate": 756
+    },
+    {
+        "code": "CLP",
+        "name": "Chilean peso",
+        "USDexchangerate": 152
+    },
+    {
+        "code": "CNY",
+        "name": "Chinese yuan",
+        "USDexchangerate": 156
+    },
+    {
+        "code": "COP",
+        "name": "Colombian peso",
+        "USDexchangerate": 170
+    },
+    {
+        "code": "CRC",
+        "name": "Costa Rican colon",
+        "USDexchangerate": 188
+    },
+    {
+        "code": "CUP",
+        "name": "Cuban peso",
+        "USDexchangerate": 192
+    },
+    {
+        "code": "CVE",
+        "name": "Cape Verde escudo",
+        "USDexchangerate": 132
+    },
+    {
+        "code": "CZK",
+        "name": "Czech koruna",
+        "USDexchangerate": 203
+    },
+    {
+        "code": "DJF",
+        "name": "Djiboutian franc",
+        "USDexchangerate": 262
+    },
+    {
+        "code": "DKK",
+        "name": "Danish krone",
+        "USDexchangerate": 208
+    },
+    {
+        "code": "DOP",
+        "name": "Dominican peso",
+        "USDexchangerate": 214
+    },
+    {
+        "code": "DZD",
+        "name": "Algerian dinar",
+        "USDexchangerate": 12
+    },
+    {
+        "code": "EGP",
+        "name": "Egyptian pound",
+        "USDexchangerate": 818
+    },
+    {
+        "code": "ERN",
+        "name": "Eritrean nakfa",
+        "USDexchangerate": 232
+    },
+    {
+        "code": "ETB",
+        "name": "Ethiopian birr",
+        "USDexchangerate": 230
+    },
+    {
+        "code": "EUR",
+        "name": "Euro",
+        "USDexchangerate": 978
+    },
+    {
+        "code": "FJD",
+        "name": "Fiji dollar",
+        "USDexchangerate": 242
+    },
+    {
+        "code": "FKP",
+        "name": "Falkland Islands pound",
+        "USDexchangerate": 238
+    },
+    {
+        "code": "GBP",
+        "name": "Pound sterling",
+        "USDexchangerate": 826
+    },
+    {
+        "code": "GEL",
+        "name": "Georgian lari",
+        "USDexchangerate": 981
+    },
+    {
+        "code": "GHS",
+        "name": "Ghanaian cedi",
+        "USDexchangerate": 936
+    },
+    {
+        "code": "GIP",
+        "name": "Gibraltar pound",
+        "USDexchangerate": 292
+    },
+    {
+        "code": "GMD",
+        "name": "Gambian dalasi",
+        "USDexchangerate": 270
+    },
+    {
+        "code": "GNF",
+        "name": "Guinean franc",
+        "USDexchangerate": 324
+    },
+    {
+        "code": "GTQ",
+        "name": "Guatemalan quetzal",
+        "USDexchangerate": 320
+    },
+    {
+        "code": "GYD",
+        "name": "Guyanese dollar",
+        "USDexchangerate": 328
+    },
+    {
+        "code": "HKD",
+        "name": "Hong Kong dollar",
+        "USDexchangerate": 344
+    },
+    {
+        "code": "HNL",
+        "name": "Honduran lempira",
+        "USDexchangerate": 340
+    },
+    {
+        "code": "HRK",
+        "name": "Croatian kuna",
+        "USDexchangerate": 191
+    },
+    {
+        "code": "HTG",
+        "name": "Haitian gourde",
+        "USDexchangerate": 332
+    },
+    {
+        "code": "HUF",
+        "name": "Hungarian forint",
+        "USDexchangerate": 348
+    },
+    {
+        "code": "IDR",
+        "name": "Indonesian rupiah",
+        "USDexchangerate": 360
+    },
+    {
+        "code": "ILS",
+        "name": "Israeli new shekel",
+        "USDexchangerate": 376
+    },
+    {
+        "code": "INR",
+        "name": "Indian rupee",
+        "USDexchangerate": 356
+    },
+    {
+        "code": "IQD",
+        "name": "Iraqi dinar",
+        "USDexchangerate": 368
+    },
+    {
+        "code": "IRR",
+        "name": "Iranian rial",
+        "USDexchangerate": 364
+    },
+    {
+        "code": "ISK",
+        "name": "Icelandic króna",
+        "USDexchangerate": 352
+    },
+    {
+        "code": "JMD",
+        "name": "Jamaican dollar",
+        "USDexchangerate": 388
+    },
+    {
+        "code": "JOD",
+        "name": "Jordanian dinar",
+        "USDexchangerate": 400
+    },
+    {
+        "code": "JPY",
+        "name": "Japanese yen",
+        "USDexchangerate": 392
+    },
+    {
+        "code": "KES",
+        "name": "Kenyan shilling",
+        "USDexchangerate": 404
+    },
+    {
+        "code": "KGS",
+        "name": "Kyrgyzstani som",
+        "USDexchangerate": 417
+    },
+    {
+        "code": "KHR",
+        "name": "Cambodian riel",
+        "USDexchangerate": 116
+    },
+    {
+        "code": "KMF",
+        "name": "Comoro franc",
+        "USDexchangerate": 174
+    },
+    {
+        "code": "KRW",
+        "name": "South Korean won",
+        "USDexchangerate": 410
+    },
+    {
+        "code": "KWD",
+        "name": "Kuwaiti dinar",
+        "USDexchangerate": 414
+    },
+    {
+        "code": "KYD",
+        "name": "Cayman Islands dollar",
+        "USDexchangerate": 136
+    },
+    {
+        "code": "KZT",
+        "name": "Kazakhstani tenge",
+        "USDexchangerate": 398
+    },
+    {
+        "code": "LAK",
+        "name": "Lao kip",
+        "USDexchangerate": 418
+    },
+    {
+        "code": "LBP",
+        "name": "Lebanese pound",
+        "USDexchangerate": 422
+    },
+    {
+        "code": "LKR",
+        "name": "Sri Lankan rupee",
+        "USDexchangerate": 144
+    },
+    {
+        "code": "LRD",
+        "name": "Liberian dollar",
+        "USDexchangerate": 430
+    },
+    {
+        "code": "LSL",
+        "name": "Lesotho loti",
+        "USDexchangerate": 426
+    },
+    {
+        "code": "LYD",
+        "name": "Libyan dinar",
+        "USDexchangerate": 434
+    },
+    {
+        "code": "MAD",
+        "name": "Moroccan dirham",
+        "USDexchangerate": 504
+    },
+    {
+        "code": "MDL",
+        "name": "Moldovan leu",
+        "USDexchangerate": 498
+    },
+    {
+        "code": "MGA",
+        "name": "Malagasy ariary",
+        "USDexchangerate": 969
+    },
+    {
+        "code": "MKD",
+        "name": "Macedonian denar",
+        "USDexchangerate": 807
+    },
+    {
+        "code": "MMK",
+        "name": "Myanma kyat",
+        "USDexchangerate": 104
+    },
+    {
+        "code": "MNT",
+        "name": "Mongolian tugrik",
+        "USDexchangerate": 496
+    },
+    {
+        "code": "MOP",
+        "name": "Macanese pataca",
+        "USDexchangerate": 446
+    },
+    {
+        "code": "MUR",
+        "name": "Mauritian rupee",
+        "USDexchangerate": 480
+    },
+    {
+        "code": "MVR",
+        "name": "Maldivian rufiyaa",
+        "USDexchangerate": 462
+    },
+    {
+        "code": "MWK",
+        "name": "Malawian kwacha",
+        "USDexchangerate": 454
+    },
+    {
+        "code": "MXN",
+        "name": "Mexican peso",
+        "USDexchangerate": 484
+    },
+    {
+        "code": "MYR",
+        "name": "Malaysian ringgit",
+        "USDexchangerate": 458
+    },
+    {
+        "code": "MZN",
+        "name": "Mozambican metical",
+        "USDexchangerate": 943
+    },
+    {
+        "code": "NAD",
+        "name": "Namibian dollar",
+        "USDexchangerate": 516
+    },
+    {
+        "code": "NGN",
+        "name": "Nigerian naira",
+        "USDexchangerate": 566
+    },
+    {
+        "code": "NIO",
+        "name": "Nicaraguan córdoba",
+        "USDexchangerate": 558
+    },
+    {
+        "code": "NOK",
+        "name": "Norwegian krone",
+        "USDexchangerate": 578
+    },
+    {
+        "code": "NPR",
+        "name": "Nepalese rupee",
+        "USDexchangerate": 524
+    },
+    {
+        "code": "NZD",
+        "name": "New Zealand dollar",
+        "USDexchangerate": 554
+    },
+    {
+        "code": "OMR",
+        "name": "Omani rial",
+        "USDexchangerate": 512
+    },
+    {
+        "code": "PAB",
+        "name": "Panamanian balboa",
+        "USDexchangerate": 590
+    },
+    {
+        "code": "PEN",
+        "name": "Peruvian nuevo sol",
+        "USDexchangerate": 604
+    },
+    {
+        "code": "PGK",
+        "name": "Papua New Guinean kina",
+        "USDexchangerate": 598
+    },
+    {
+        "code": "PHP",
+        "name": "Philippine peso",
+        "USDexchangerate": 608
+    },
+    {
+        "code": "PKR",
+        "name": "Pakistani rupee",
+        "USDexchangerate": 586
+    },
+    {
+        "code": "PLN",
+        "name": "Polish złoty",
+        "USDexchangerate": 985
+    },
+    {
+        "code": "PYG",
+        "name": "Paraguayan guaraní",
+        "USDexchangerate": 600
+    },
+    {
+        "code": "QAR",
+        "name": "Qatari riyal",
+        "USDexchangerate": 634
+    },
+    {
+        "code": "RON",
+        "name": "Romanian new leu",
+        "USDexchangerate": 946
+    },
+    {
+        "code": "RSD",
+        "name": "Serbian dinar",
+        "USDexchangerate": 941
+    },
+    {
+        "code": "RUB",
+        "name": "Russian rouble",
+        "USDexchangerate": 643
+    },
+    {
+        "code": "RWF",
+        "name": "Rwandan franc",
+        "USDexchangerate": 646
+    },
+    {
+        "code": "SAR",
+        "name": "Saudi riyal",
+        "USDexchangerate": 682
+    },
+    {
+        "code": "SBD",
+        "name": "Solomon Islands dollar",
+        "USDexchangerate": 90
+    },
+    {
+        "code": "SCR",
+        "name": "Seychelles rupee",
+        "USDexchangerate": 690
+    },
+    {
+        "code": "SDG",
+        "name": "Sudanese pound",
+        "USDexchangerate": 938
+    },
+    {
+        "code": "SEK",
+        "name": "Swedish krona\/kronor",
+        "USDexchangerate": 752
+    },
+    {
+        "code": "SGD",
+        "name": "Singapore dollar",
+        "USDexchangerate": 702
+    },
+    {
+        "code": "SHP",
+        "name": "Saint Helena pound",
+        "USDexchangerate": 654
+    },
+    {
+        "code": "SLL",
+        "name": "Sierra Leonean leone",
+        "USDexchangerate": 694
+    },
+    {
+        "code": "SOS",
+        "name": "Somali shilling",
+        "USDexchangerate": 706
+    },
+    {
+        "code": "SRD",
+        "name": "Surinamese dollar",
+        "USDexchangerate": 968
+    },
+    {
+        "code": "SSP",
+        "name": "South Sudanese pound",
+        "USDexchangerate": 728
+    },
+    {
+        "code": "SYP",
+        "name": "Syrian pound",
+        "USDexchangerate": 760
+    },
+    {
+        "code": "SZL",
+        "name": "Swazi lilangeni",
+        "USDexchangerate": 748
+    },
+    {
+        "code": "THB",
+        "name": "Thai baht",
+        "USDexchangerate": 764
+    },
+    {
+        "code": "TJS",
+        "name": "Tajikistani somoni",
+        "USDexchangerate": 972
+    },
+    {
+        "code": "TMT",
+        "name": "Turkmenistani manat",
+        "USDexchangerate": 934
+    },
+    {
+        "code": "TND",
+        "name": "Tunisian dinar",
+        "USDexchangerate": 788
+    },
+    {
+        "code": "TOP",
+        "name": "Tongan paʻanga",
+        "USDexchangerate": 776
+    },
+    {
+        "code": "TRY",
+        "name": "Turkish lira",
+        "USDexchangerate": 949
+    },
+    {
+        "code": "TTD",
+        "name": "Trinidad and Tobago dollar",
+        "USDexchangerate": 780
+    },
+    {
+        "code": "TWD",
+        "name": "New Taiwan dollar",
+        "USDexchangerate": 901
+    },
+    {
+        "code": "TZS",
+        "name": "Tanzanian shilling",
+        "USDexchangerate": 834
+    },
+    {
+        "code": "UAH",
+        "name": "Ukrainian hryvnia",
+        "USDexchangerate": 980
+    },
+    {
+        "code": "UGX",
+        "name": "Ugandan shilling",
+        "USDexchangerate": 800
+    },
+    {
+        "code": "UYU",
+        "name": "Uruguayan peso",
+        "USDexchangerate": 858
+    },
+    {
+        "code": "UZS",
+        "name": "Uzbekistan som",
+        "USDexchangerate": 860
+    },
+    {
+        "code": "VND",
+        "name": "Vietnamese dong",
+        "USDexchangerate": 704
+    },
+    {
+        "code": "VUV",
+        "name": "Vanuatu vatu",
+        "USDexchangerate": 548
+    },
+    {
+        "code": "WST",
+        "name": "Samoan tala",
+        "USDexchangerate": 882
+    },
+    {
+        "code": "XAF",
+        "name": "CFA franc BEAC",
+        "USDexchangerate": 950
+    },
+    {
+        "code": "XCD",
+        "name": "East Caribbean dollar",
+        "USDexchangerate": 951
+    },
+    {
+        "code": "XDR",
+        "name": "Special drawing rights",
+        "USDexchangerate": 960
+    },
+    {
+        "code": "XOF",
+        "name": "CFA franc BCEAO",
+        "USDexchangerate": 952
+    },
+    {
+        "code": "XPF",
+        "name": "CFP franc",
+        "USDexchangerate": 953
+    },
+    {
+        "code": "YER",
+        "name": "Yemeni rial",
+        "USDexchangerate": 886
+    },
+    {
+        "code": "ZAR",
+        "name": "South African rand",
+        "USDexchangerate": 710
+    },
+    {
+        "code": "ZMW",
+        "name": "Zambian kwacha",
+        "USDexchangerate": 967
+    }
+]
