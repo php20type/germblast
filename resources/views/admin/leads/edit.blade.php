@@ -20,6 +20,12 @@
                                             {{ $leads->name }}
                                         </h1>
                                         <div class="project-id">{{ $leads->id }}</div>
+                                        <div class="mt-3">
+                                            <span class="badge-customer">
+                                                {{-- {{ $leads->leadTags->name ?? 'N/A' }} --}}
+                                                {{ $leads->leadTags->first()->tag->name ?? 'N/A' }}
+                                            </span>
+                                        </div>
                                     </div>
                                     <div class="amount">$2</div>
                                 </div>
@@ -27,8 +33,11 @@
                                 <div class="my-3">
                                     <select class="form-select d-inline-block w-100" aria-label="Default select example">
                                         <option selected="">Add tags...</option>
-                                        <option value="1">Type 1</option>
-                                        <option value="2">Type 2</option>
+                                        {{-- <option value="1">Type 1</option>
+                                        <option value="2">Type 2</option> --}}
+                                        @foreach ($tags as $tag)
+                                            <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
 
@@ -503,7 +512,7 @@
                                         <div class="form-check">
                                             <input class="form-check-input lead-flag" name="lead_flag" type="checkbox"
                                                 value="watching" id="checkbox1" data-lead-id="{{ $leads->id }}"
-                                              @if (is_array($leads->lead_flags) && in_array('watching', $leads->lead_flags)) checked @endif>
+                                                @if (is_array($leads->lead_flags) && in_array('watching', $leads->lead_flags)) checked @endif>
                                             <label class="form-check-label" for="checkbox1"><b>Watching</b></label>
                                         </div>
                                     </div>
@@ -511,7 +520,7 @@
                                         <div class="form-check">
                                             <input class="form-check-input lead-flag" name="lead_flag" type="checkbox"
                                                 value="hot" id="checkbox2" data-lead-id="{{ $leads->id }}"
-                                               @if (is_array($leads->lead_flags) && in_array('hot', $leads->lead_flags)) checked @endif>
+                                                @if (is_array($leads->lead_flags) && in_array('hot', $leads->lead_flags)) checked @endif>
                                             <label class="form-check-label" for="checkbox2"><b>Hot</b></label>
                                         </div>
                                     </div>
@@ -533,9 +542,15 @@
                         <hr>
 
                         <div class="sidebar-section">
-                            <h6 class="mb-2 text-uppercase">Companies</h6>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="text-uppercase">Companies</h6>
+                                <div id="toggleAddCompany" class="text-warning" style="cursor: pointer;">
+                                    Add a company
+                                </div>
+                            </div>
+
                             @foreach ($leads->companies as $leadCompany)
-                                <div class="company-list mb-3">
+                                <div class="company-list d-flex justify-content-between align-items-center mb-3">
                                     <div class="row">
                                         <div class="col-2">
                                             <div class="company-icon">
@@ -545,46 +560,112 @@
                                         </div>
                                         <div class="col-10">
                                             <div class="company-name">
-                                                <p><b>{{ $leadCompany->name ?? 'N/A' }}</b> <br>MatrixID: 1900</p>
-                                                <p>{{ $leadCompany->phone ?? 'N/A' }}</p>
-                                                <p>{{ $leadCompany->address ?? 'N/A' }}</p>
+                                                <p><b>{{ $leadCompany->name ?? 'N/A' }}</b></p>
+                                                <p>{{ $leadCompany->description ?? 'N/A' }}</p>
+                                                <p>{{ $leadCompany->companyAddress->address ?? 'N/A' }}</p>
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div id="delete-company">
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            {{-- onclick="deleteField('{{ $company->id }}', '{{ $email['selected'] }}', 'email')"> --}}
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+
                                 </div>
                             @endforeach
-                            <h6 class="mb-2 text-uppercase">Peoples</h6>
+
+                            <div id="addCompanyInlineForm" class="mt-3 p-3 border rounded bg-light d-none">
+                                <div class="row">
+                                    <div class="col-md-12 mb-2">
+                                        <label>Company Name</label>
+                                        <input type="text" name="inline_company_name" class="form-control">
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <label>Description</label>
+                                        <input type="email" name="inline_description" class="form-control">
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <label>Location</label>
+                                        <input type="text" name="inline_address" class="form-control">
+                                    </div>
+
+                                </div>
+                                <button type="button" class="btn btn-success mt-2" id="submitAddCompany">Add
+                                    Company</button>
+                            </div>
+
+
+                            <div class="d-flex justify-content-between align-items-center mb-2 mt-3">
+                                <h6 class="text-uppercase">Peoples</h6>
+                                <div id="toggleAddPerson" class="text-warning" style="cursor: pointer;">
+                                    Add a people
+                                </div>
+                            </div>
                             @foreach ($leads->peoples as $person)
-                                <div class="company-list mb-3">
+                                <div class="company-list d-flex justify-content-between align-items-center mb-3">
                                     <div class="row">
                                         <div class="col-2">
                                             <div class="company-icon">
-                                                <img src="{{ asset('img/home/companyimages1.png') }}" alt="Company Logo"
+                                                <img src="{{ asset('img/home/profile-image.png') }}" alt="People Logo"
                                                     class="img-fluid">
                                             </div>
                                         </div>
                                         <div class="col-10">
                                             <div class="company-name">
                                                 <p><strong>{{ $person->name }}</strong></p>
-                                                <p>{{ $person->job_title ?? 'N/A' }}</p>
-                                                <p>{{ $person->phone ?? 'N/A' }}</p>
-                                                <p>{{ $person->email ?? 'N/A' }}</p>
+                                                <p>{{ $person->bio ?? 'N/A' }}</p>
+                                                <p>{{ $person->peoplePhone->phone ?? 'N/A' }}</p>
+                                                <p>{{ $person->peopleEmail->email ?? 'N/A' }}</p>
                                                 <p class="text-warning">Contacted 8 Feb 2022</p>
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div id="delete-people">
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            {{-- onclick="deleteField('{{ $company->id }}', '{{ $email['selected'] }}', 'email')"> --}}
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+
                                 </div>
                             @endforeach
 
+                            <div id="addPersonInlineForm" class="mt-3 p-3 border rounded bg-light d-none">
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <label>Name</label>
+                                        <input type="text" name="inline_name" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <label>Email</label>
+                                        <input type="email" name="inline_email" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <label>Phone</label>
+                                        <input type="text" name="inline_phone" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <label>Code</label>
+                                        <input type="text" name="inline_code" class="form-control" required>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-success mt-2" id="submitAddPerson">Add
+                                    Person</button>
+                            </div>
 
-                            <div class="company-add-btn">
-                                {{-- <a href="#" id="toggleAddPerson" class="btn btn-primary w-100 mb-2">
+
+                            {{-- <div class="company-add-btn"> --}}
+                            {{-- <a href="#" id="toggleAddPerson" class="btn btn-primary w-100 mb-2">
                                     Add Person <i class="fas fa-plus me-2"></i>
                                 </a> --}}
-                                <div id="toggleAddPerson" class="btn btn-primary w-100 mb-2">
+                            {{-- <div id="toggleAddPerson" class="btn btn-primary w-100 mb-2">
                                     Add Person <i class="fas fa-plus me-2"></i>
-                                </div>
-                                <div id="addPersonInlineForm" class="mt-3 p-3 border rounded bg-light d-none">
+                                </div> --}}
+                            {{-- <div id="addPersonInlineForm" class="mt-3 p-3 border rounded bg-light d-none">
                                     <div class="row">
                                         <div class="col-md-6 mb-2">
                                             <label>Name</label>
@@ -605,15 +686,15 @@
                                     </div>
                                     <button type="button" class="btn btn-success mt-2" id="submitAddPerson">Add
                                         Person</button>
-                                </div>
+                                </div> --}}
 
-                                {{-- <a href="#" id="toggleAddCompany" class="btn btn-primary w-100">
+                            {{-- <a href="#" id="toggleAddCompany" class="btn btn-primary w-100">
                                     Add a company <i class="fas fa-plus me-2"></i>
                                 </a> --}}
-                                <div id="toggleAddCompany" class="btn btn-primary w-100 mt-3">
+                            {{-- <div id="toggleAddCompany" class="btn btn-primary w-100 mt-3">
                                     Add a company <i class="fas fa-plus me-2"></i>
-                                </div>
-                                <div id="addCompanyInlineForm" class="mt-3 p-3 border rounded bg-light d-none">
+                                </div> --}}
+                            {{-- <div id="addCompanyInlineForm" class="mt-3 p-3 border rounded bg-light d-none">
                                     <div class="row">
                                         <div class="col-md-12 mb-2">
                                             <label>Company Name</label>
@@ -631,69 +712,214 @@
                                     </div>
                                     <button type="button" class="btn btn-success mt-2" id="submitAddCompany">Add
                                         Company</button>
-                                </div>
-                            </div>
+                                </div> --}}
+                            {{-- </div> --}}
                         </div>
 
                         <hr>
-                        <form class="url-form" id="urlForm">
+
+                        <div class="sidebar-section">
+                            {{-- Product --}}
                             <div class="form-group mb-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <label for="urlInput" class="form-label text-uppercase"><b>Products</b> </label>
-                                    <a href="#" class="text-muted">U.S. (USD) Market</a>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    {{-- <label for="urlInput" class="form-label text-uppercase">
+                                        <b>Products</b> U.S. (USD)
+                                    </label> --}}
+                                    <h6 class="text-uppercase">
+                                        Products <span style="font-weight: normal;"> U.S. (USD)</span>
+                                    </h6>
+                                    <div id="toggle-add-product" class="text-warning" style="cursor: pointer;">
+                                        Add a product
+                                    </div>
                                 </div>
-                                <select class="form-select" id="urlInput">
-                                    @foreach ($products as $product)
-                                        <option value="{{ $product->id }}">
-                                            {{ $product->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+
+                                {{-- <div id="add-product" class="mb-3 d-none">
+                                    <select class="form-select" id="urlInput">
+                                        @foreach ($products as $product)
+                                            <option value="{{ $product->id }}">
+                                                {{ $product->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div> --}}
+                                <div id="add-product" class="mb-3 p-3 border rounded bg-light d-none">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-2">
+                                            <label>Name</label>
+                                            <input type="text" name="inline_name" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label>Qty</label>
+                                            <input type="number" name="inline_qty" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label>Price</label>
+                                            <input type="text" name="inline_price" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-success mt-2" id="submitAddPerson">Add Product</button>
+                                </div>
+
+                                @foreach ($leads->leadProducts as $leadProduct)
+                                    <div class="company-list d-flex justify-content-between align-items-center mb-3">
+                                        <div class="row">
+                                            <div class="col-2">
+                                                <div class="company-icon">
+                                                    <img src="{{ asset('img/icons/menu-icon8.svg') }}" alt="Product Logo"
+                                                        class="img-fluid">
+                                                </div>
+                                            </div>
+                                            <div class="col-10">
+                                                <div class="company-name">
+                                                    <p><b>{{ $leadProduct->product->name ?? 'N/A' }}</b></p>
+                                                    <p>{{ $leadProduct->price }} * {{ $leadProduct->qty }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div id="delete-product">
+                                            <button class="btn btn-sm btn-outline-secondary">
+                                                {{-- onclick="deleteField('{{ $company->id }}', '{{ $email['selected'] }}', 'email')"> --}}
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                @endforeach
+
                             </div>
+
+
+                            {{-- Competitors --}}
                             <div class="form-group mb-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <label for="urlInput" class="form-label text-uppercase"><b>Quotes</b> </label>
-                                    <a href="#" class="text-warning">Learn more</a>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    {{-- <label for="urlInput" class="form-label text-uppercase">
+                                        <b>Competitors</b>
+                                    </label> --}}
+                                    <h6 class="text-uppercase">
+                                        Competitors
+                                    </h6>
+                                    <div id="toggle-add-competitor" class="text-warning" style="cursor: pointer;">
+                                        Add a competitor
+                                    </div>
                                 </div>
-                                <select class="form-select" id="urlInput">
-                                    <option selected>Add a quotes</option>
-                                    <option value="1">Add a quotes</option>
-                                </select>
+
+                                <div id="add-competitor" class="mb-3 d-none">
+                                    <select class="form-select" id="urlInput">
+                                        <option selected>Add a Competitors</option>
+                                        @foreach ($competitors as $competitor)
+                                            <option value="{{ $competitor->id }}">
+                                                {{ $competitor->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                @foreach ($leads->leadCompetitors as $leadCompetitor)
+                                <div class="company-list d-flex justify-content-between align-items-center mb-3">
+                                        <div class="row">
+                                            <div class="col-2">
+                                                <div class="company-icon">
+                                                    <img src="{{ asset('img/icons/menu-icon12.svg') }}"
+                                                        alt="Competitor Logo" class="img-fluid">
+                                                </div>
+                                            </div>
+                                            <div class="col-10">
+                                                <div class="company-name">
+                                                    <p><b>{{ $leadCompetitor->competitor->name ?? 'N/A' }}</b></p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div id="delete-competitor">
+                                            <button class="btn btn-sm btn-outline-secondary">
+                                                {{-- onclick="deleteField('{{ $company->id }}', '{{ $email['selected'] }}', 'email')"> --}}
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                @endforeach
+
                             </div>
+
+                            {{-- Sources --}}
                             <div class="form-group mb-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <label for="urlInput" class="form-label text-uppercase"><b>Competitors</b> </label>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    {{-- <label for="urlInput" class="form-label text-uppercase">
+                                        <b>Sources</b>
+                                    </label> --}}
+                                    <h6 class="text-uppercase">
+                                        Sources
+                                    </h6>
+                                    <div id="toggle-add-source" class="text-warning" style="cursor: pointer;">
+                                        Add a source
+                                    </div>
                                 </div>
-                                <select class="form-select" id="urlInput">
-                                    <option selected>Add a Competitors</option>
-                                    @foreach ($competitors as $competitor)
-                                        <option value="{{ $competitor->id }}">
-                                            {{ $competitor->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
+
+                                <div id="add-source" class="mb-3 d-none">
+                                    <select class="form-select" id="urlInput">
+                                        <option selected>Add a Source</option>
+                                        @foreach ($sources as $source)
+                                            <option value="{{ $source->id }}">
+                                                {{ $source->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                @foreach ($leads->leadSources as $leadSource)
+                                    <div class="company-list d-flex justify-content-between align-items-center mb-3">
+                                        <div class="row">
+                                            <div class="col-2">
+                                                <div class="company-icon">
+                                                    <img src="{{ asset('img/icons/menu-icon13.svg') }}" alt="Source Logo"
+                                                    class="img-fluid">
+                                                </div>
+                                            </div>
+                                            <div class="col-10">
+                                                <div class="company-name">
+                                                    <p><b>{{ $leadSource->source->name ?? 'N/A' }}</b></p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div id="delete-source">
+                                            <button class="btn btn-sm btn-outline-secondary">
+                                                {{-- onclick="deleteField('{{ $company->id }}', '{{ $email['selected'] }}', 'email')"> --}}
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                @endforeach
+
                             </div>
+
+                            {{-- Quotes --}}
                             <div class="form-group mb-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <label for="urlInput" class="form-label text-uppercase"><b>Sources</b> </label>
-                                    <a href="#" class="text-warning">Add a channel</a>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    {{-- <label for="urlInput" class="form-label text-uppercase">
+                                        <b>Quotes</b>
+                                    </label> --}}
+                                    <h6 class="text-uppercase">
+                                        Quotes
+                                    </h6>
+                                    <div id="add-quote" class="text-warning" style="cursor: pointer;">
+                                        Add a quote
+                                    </div>
                                 </div>
-                                <select class="form-select" id="urlInput">
-                                    <option selected>Add a Source</option>
-                                    @foreach ($sources as $source)
-                                        <option value="{{ $source->id }}">
-                                            {{ $source->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
                             </div>
+
+                            {{-- Attached Files --}}
                             <div class="form-group mb-3">
                                 <label class="form-label"><b>ATTACHED FILES</b> </label>
                                 <button class="btn btn-outline-secondary w-100">
                                     <i class="fas fa-upload me-2"></i>Upload File
                                 </button>
                             </div>
-                        </form>
+
+                        </div>
 
                     </div>
                 </div>
@@ -1103,6 +1329,21 @@
                 $(document).on('click', '.remove-participant', function(e) {
                     e.preventDefault();
                     $(this).closest('.participant-entry').remove();
+                });
+
+                // Toggle the Add Product
+                $('#toggle-add-product').on('click', function() {
+                    $('#add-product').toggleClass('d-none');
+                });
+
+                // Toggle the Add Competitor
+                $('#toggle-add-competitor').on('click', function() {
+                    $('#add-competitor').toggleClass('d-none');
+                });
+
+                // Toggle the Add Source
+                $('#toggle-add-source').on('click', function() {
+                    $('#add-source').toggleClass('d-none');
                 });
 
                 // Toggle the Add Person form and Add Company

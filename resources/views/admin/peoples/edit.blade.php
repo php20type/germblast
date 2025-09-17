@@ -531,7 +531,7 @@
                                 <label for="territorySelect" class="form-label"><b>TERRITORY</b> </label>
                                 <select class="form-select people-update" data-field="territory_id" id="territorySelect">
                                     <option selected>Select territory</option>
-                                   @foreach ($territories as $territory)
+                                    @foreach ($territories as $territory)
                                         <option value="{{ $territory->id }}"
                                             {{ $peoples->territory_id == $territory->id ? 'selected' : '' }}>
                                             {{ $territory->name }}
@@ -1080,8 +1080,10 @@
                                         <select id="person_select" name="person_id[]" class="form-select" multiple>
                                             <option value="">-- Select Person --</option>
                                             @foreach ($allpeoples as $allpeople)
-                                                <option value="{{ $allpeople->id }}">{{ $allpeople->name }}
-                                                    ({{ $allpeople->email }})
+                                                <option value="{{ $allpeople->id }}"
+                                                    {{ $allpeople->id == $peoples->id ? 'selected' : '' }}>
+                                                    {{ $allpeople->name }}
+                                                    ({{ $allpeople->peopleEmail->email }})
                                                 </option>
                                             @endforeach
                                         </select>
@@ -1150,6 +1152,18 @@
                                                 <option value="{{ $competitor->id }}">
                                                     {{ $competitor->name }}
                                                 </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-label">Tags</label>
+                                        <select name="tag_id" class="form-select">
+                                            <option value="">Select tag</option>
+                                            @foreach ($persontags as $persontag)
+                                                <option value="{{ $persontag->id }}">{{ $persontag->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -1434,7 +1448,7 @@
         });
 
 
-         function deleteField(people_id, type, fieldName) {
+        function deleteField(people_id, type, fieldName) {
             Swal.fire({
                 title: 'Are you sure?',
                 text: `This ${fieldName} will be removed from the people record!`,
@@ -1780,6 +1794,9 @@
                 },
                 "competitors_id[]": {
                     required: true
+                },
+                tag_id: {
+                    required: true
                 }
             },
             messages: {
@@ -1815,6 +1832,9 @@
                 },
                 "competitors_id[]": {
                     required: "Please select a competitor."
+                },
+                tag_id: {
+                    required: "Please select the tag."
                 }
             },
             errorElement: 'span',

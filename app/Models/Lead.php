@@ -25,6 +25,8 @@ class Lead extends Model
         'created_at'
     ];
 
+     protected $with = ['leadCompanies', 'leadProducts', 'leadPeople', 'leadSources', 'leadCompetitors', 'leadTags', 'leadTask'];
+
     protected $casts = [
         'close_date' => 'datetime',
         'lead_flags' => 'array',

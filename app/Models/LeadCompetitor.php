@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class LeadCompetitor extends Model
 {
 
-    protected $table = 'lead_competitor';
+    protected $table = 'lead_competitors';
 
     protected $fillable = [
         'lead_id',

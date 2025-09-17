@@ -84,7 +84,7 @@ class LeadController extends Controller
             'peoples',
             'sources',
             'competitors',
-            'stage'
+            'stages'
         ])->get();
 
         $user = auth()->user();
@@ -217,7 +217,7 @@ class LeadController extends Controller
             'peoples',
             'sources',
             'competitors',
-            'stage'
+            'stages'
         ]);
 
         // AJAX filters
@@ -360,7 +360,7 @@ class LeadController extends Controller
             'peoples',
             'sources',
             'competitors',
-            'stage'
+            'stages'
         ])->where('assignee_id', $id);
 
         // AJAX filters
@@ -1308,7 +1308,7 @@ class LeadController extends Controller
     public function show($id)
 {
     // Fetch lead with all pivot relations
-    $lead = Lead::with([
+    $leads = Lead::with([
         'assignee',
         'creator',
         'companies',
@@ -1320,6 +1320,12 @@ class LeadController extends Controller
         'stages',
         'market',
         'outcome',
+        'leadCompanies',
+        'leadProducts',
+        'leadPeople',
+        'leadSources',
+        'leadCompetitors',
+        'leadTags',
         'leadTask'
     ])->findOrFail($id);
 
@@ -1330,16 +1336,16 @@ class LeadController extends Controller
     $competitors = Competitor::all();
     $users = User::all();
     $industries = Industry::all();
-    $allPeoples = People::all();
+    $allpeoples = People::all();
     $products = Product::all();
     $tags = Tag::where('tag_id', 1)->get();
     $markets = Market::all();
     $outcomes = Outcome::all();
 
     return view('admin.leads.edit', compact(
-        'lead',
+        'leads',
         'users',
-        'allPeoples',
+        'allpeoples',
         'industries',
         'activity_types',
         'competitors',

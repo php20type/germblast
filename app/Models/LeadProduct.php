@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class LeadProduct extends Model
 {
-    protected $table = 'lead_product';
+    protected $table = 'lead_products';
 
     protected $fillable = [
         'lead_id',

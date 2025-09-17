@@ -30,11 +30,6 @@ class Company extends Model
     //     return $this->hasMany(People::class, 'company_id');
     // }
 
-    public function leadSource()
-    {
-        return $this->hasMany(LeadSource::class, 'source_id');
-    }
-
     // New relation according to the new migration
     // ===============================================================
 

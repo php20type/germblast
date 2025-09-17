@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('lead_number')->nullable();
             $table->string('name');
-            $table->text('description');
+            $table->text('description')->nullable();
 
             $table->string('lead_status')->nullable()->comment('open,won,lost,cancelled,pending');
             $table->json('lead_flags')->nullable()->comment('watching, hot');

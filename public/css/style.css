@@ -3912,7 +3912,13 @@ title {
 
 h4[contenteditable="true"],
 div[contenteditable="true"] {
+    width: 35vw;
+}
+
+h4[contenteditable="true"]:focus,
+div[contenteditable="true"]:focus {
     border: none;
+    border-bottom: 2px solid lightgrey;
     outline: none;
     padding: 3px;
     width: 35vw;

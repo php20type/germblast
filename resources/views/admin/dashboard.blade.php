@@ -466,7 +466,7 @@
                                     <select id="person_select" name="person_id[]" class="form-select select2" multiple>
                                         @foreach ($peoples as $people)
                                             <option value="{{ $people->id }}">{{ $people->name }}
-                                                ({{ $people->email }})
+                                                ({{ $people->peopleEmail->email }})
                                             </option>
                                         @endforeach
                                     </select>

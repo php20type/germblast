@@ -32,6 +32,7 @@
                                             contenteditable="true">
                                             {{ $company->description }}
                                         </div>
+
                                         <div class="star-rating">
                                             <i class="fas fa-star"></i>
                                             <i class="fas fa-star"></i>
@@ -665,8 +666,6 @@
                                                             onclick="deleteField('{{ $company->id }}', '{{ $email['selected'] }}', 'email')">
                                                             <i class="fas fa-times"></i>
                                                         </button>
-
-
                                                     </div>
 
                                                 </div>
@@ -1112,15 +1111,12 @@
                                     @error('company_id')
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
-                                    {{-- <select name="company_id[]" id="companySelect" class="form-select">
-                                        @foreach ($companies as $company)
-                                        <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                        @endforeach
-                                    </select> --}}
                                     <select name="company_id[]" id="companySelect" class="form-select" multiple>
                                         <option value="">Choose Company</option>
-                                        @foreach ($companies as $company)
-                                            <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                        @foreach ($companies as $c)
+                                            <option value="{{ $c->id }}"
+                                                {{ $c->id == $company->id ? 'selected' : '' }}>{{ $c->name }}
+                                            </option>
                                         @endforeach
                                     </select>
 
@@ -1136,7 +1132,7 @@
                                         <option value="">-- Select Person --</option>
                                         @foreach ($allpeoples as $allpeople)
                                             <option value="{{ $allpeople->id }}">{{ $allpeople->name }}
-                                                ({{ $allpeople->email }})
+                                                ({{ $allpeople->peopleEmail->email }})
                                             </option>
                                         @endforeach
                                     </select>
@@ -1204,6 +1200,18 @@
                                             <option value="{{ $competitor->id }}">
                                                 {{ $competitor->name }}
                                             </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Tags</label>
+                                    <select name="tag_id" class="form-select">
+                                        <option value="">Select tag</option>
+                                        @foreach ($companytags as $companytag)
+                                            <option value="{{ $companytag->id }}">{{ $companytag->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -1423,31 +1431,31 @@
             $('#AddLead').modal('show');
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            //  Select2 script
+        $(document).ready(function() {
             $('#AddLead').on('shown.bs.modal', function() {
                 $('#companySelect').select2({
                     dropdownParent: $('#AddLead'),
                     placeholder: '-- Select a company --',
                     allowClear: true
                 });
+
                 $('#person_select').select2({
                     dropdownParent: $('#AddLead'),
                     placeholder: '-- Select a person --',
                     allowClear: true
                 });
+
                 $('#source_select').select2({
                     dropdownParent: $('#AddLead'),
                     placeholder: 'Choose...',
                     allowClear: true
                 });
+
                 $('#competitor_select').select2({
                     dropdownParent: $('#AddLead'),
                     placeholder: 'Choose...',
                     allowClear: true
-
                 });
-
             });
         });
 
@@ -1835,6 +1843,9 @@
                 },
                 "competitors_id[]": {
                     required: true
+                },
+                tag_id: {
+                    required: true
                 }
             },
             messages: {
@@ -1870,6 +1881,9 @@
                 },
                 "competitors_id[]": {
                     required: "Please select a competitor."
+                },
+                tag_id: {
+                    required: "Please select the tag."
                 }
             },
             errorElement: 'span',

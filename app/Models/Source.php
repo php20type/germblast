@@ -22,7 +22,6 @@ class Source extends Model
             ->withTimestamps();
     }
 
-
     public function channel()
     {
         return $this->belongsTo(Channel::class, 'channel_id');

@@ -153,7 +153,7 @@
                                                     <td><input type="checkbox" class="form-check-input row-checkbox"></td>
 
                                                     <td>
-                                                        <div class="company-details">
+                                                        <div class="company-name">
                                                             <a href="{{ route('admin.leads.show', $lead['id']) }}"
                                                                 class="text-decoration-none text-dark">
                                                                 {{ $lead['name'] }}
