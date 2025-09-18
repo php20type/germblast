@@ -444,17 +444,11 @@
                                     @error('company_id')
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
-                                    {{-- <select name="company_id[]" id="companySelect" class="form-select">
-                                        @foreach ($companies as $company)
-                                        <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                        @endforeach
-                                    </select> --}}
                                     <select name="company_id[]" id="companySelect" class="form-select select2" multiple>
                                         @foreach ($companies as $company)
                                             <option value="{{ $company->id }}">{{ $company->name }}</option>
                                         @endforeach
                                     </select>
-
                                 </div>
                             </div>
                             <div class="col-lg-12">
@@ -470,41 +464,8 @@
                                             </option>
                                         @endforeach
                                     </select>
-
-                                    {{-- Toggle Button --}}
-                                    <button type="button" id="toggleAddPerson" class="btn btn-sm btn-link text-primary">
-                                        + Add New Person
-                                    </button>
-
-                                    {{-- ====== --}}
-                                    <div id="addPersonInlineForm" class="mt-3 p-3 border rounded bg-light d-none">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-2">
-                                                <label>Name</label>
-                                                <input type="text" name="inline_name" class="form-control">
-                                            </div>
-                                            <div class="col-md-6 mb-2">
-                                                <label>Email</label>
-                                                <input type="email" name="inline_email" class="form-control">
-                                            </div>
-                                            <div class="col-md-6 mb-2">
-                                                <label>Phone</label>
-                                                <input type="text" name="inline_phone" class="form-control">
-                                            </div>
-                                            <div class="col-md-6 mb-2">
-                                                <label>Postal Code</label>
-                                                <input type="text" name="inline_code" class="form-control">
-                                            </div>
-                                        </div>
-                                        <button type="button" class="btn btn-success mt-2" id="submitAddPerson">Add
-                                            Person</button>
-                                    </div>
-
-
-                                    {{-- ===== --}}
                                 </div>
                             </div>
-
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label class="form-label">Sources</label>
@@ -793,11 +754,6 @@
                 $(this).closest('.participant-entry').remove();
             });
 
-            // Toggle the Add Person form
-            $('#toggleAddPerson').on('click', function() {
-                $('#addPersonInlineForm').toggleClass('d-none');
-            });
-
             // Product row logic
             $('#addProductRow').click(function() {
                 var row = $('.product-row:first').clone(); // Clone the first row
@@ -813,51 +769,6 @@
                 } else {
                     alert('At least one product row is required.');
                 }
-            });
-
-
-
-            // Submit Add Person via AJAX
-            $('#submitAddPerson').on('click', function() {
-                let formData = {
-                    _token: $('meta[name="csrf-token"]').attr('content'),
-                    name: $('input[name="inline_name"]').val(),
-                    email: $('input[name="inline_email"]').val(),
-                    phone: $('input[name="inline_phone"]').val(),
-                    code: $('input[name="inline_code"]').val(),
-                };
-
-                $.ajax({
-                    url: "{{ route('admin.people.ajax.store') }}",
-                    method: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        if (response.success) {
-                            toastr.success('Person added successfully!');
-                            $('input[name="inline_name"], input[name="inline_email"], input[name="inline_phone"], input[name="inline_code"]')
-                                .val('');
-                            $('#addPersonInlineForm').addClass('d-none');
-
-                            const newPerson = response.people;
-                            const option = new Option(newPerson.email, newPerson.id);
-                            $('#person_select').append(option);
-
-                        } else {
-                            console.log(response);
-                            toastr.error('Failed to add person. Please try again.');
-                        }
-                    },
-                    error: function(xhr) {
-                        if (xhr.responseJSON?.errors) {
-                            let messages = Object.values(xhr.responseJSON.errors).flat().join(
-                                '\n');
-                            toastr.error(messages, 'Validation Error');
-                        } else {
-                            console.log(xhr.responseText);
-                            toastr.error("Something went wrong.");
-                        }
-                    }
-                });
             });
 
 

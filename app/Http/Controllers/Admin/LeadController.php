@@ -22,6 +22,7 @@ use App\Models\Market;
 use App\Models\Outcome;
 use Carbon\Carbon;
 use App\Models\Industry;
+use App\Models\Company;
 use App\Models\Source;
 use App\Models\Product;
 
@@ -1334,6 +1335,7 @@ class LeadController extends Controller
     $activity_types = ActivityType::all();
     $sources = Source::all();
     $competitors = Competitor::all();
+    $companies = Company::all();
     $users = User::all();
     $industries = Industry::all();
     $allpeoples = People::all();
@@ -1349,6 +1351,7 @@ class LeadController extends Controller
         'industries',
         'activity_types',
         'competitors',
+        'companies',
         'leadStages',
         'sources',
         'products',
