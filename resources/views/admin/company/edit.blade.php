@@ -671,7 +671,7 @@
                                                 </div>
                                             </div>
                                         @empty
-                                            <p class="small">N/A</p>
+                                            <p class="small m-2">N/A</p>
                                         @endforelse
                                     </div>
                                 </div>
@@ -756,7 +756,7 @@
                                                 </div>
                                             </div>
                                         @empty
-                                            <p class="small">N/A</p>
+                                            <p class="small m-2">N/A</p>
                                         @endforelse
                                     </div>
                                 </div>
@@ -843,7 +843,7 @@
                                                 </div>
                                             </div>
                                         @empty
-                                            <p class="small">N/A</p>
+                                            <p class="small m-2">N/A</p>
                                         @endforelse
                                     </div>
                                 </div>
@@ -929,7 +929,7 @@
                                                 </div>
                                             </div>
                                         @empty
-                                            <p class="small">N/A</p>
+                                            <p class="small m-2">N/A</p>
                                         @endforelse
                                     </div>
                                 </div>

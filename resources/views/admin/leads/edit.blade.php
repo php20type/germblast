@@ -15,16 +15,29 @@
                             <div class="project-header">
                                 <div class="title-row">
                                     <div class="title-section">
-                                        <h1>
-                                            <i class="fas fa-star star-icon"></i>
-                                            {{ $leads->name }}
-                                        </h1>
-                                        <div class="project-id">{{ $leads->id }}</div>
+                                        <div class="d-flex justify-content-between align-items-center">
+
+                                            <img src="{{ $leadStatusIcon }}" alt="Lead Status" id="lead-status-icon">
+                                            {{-- <i class="fas fa-star star-icon"></i> --}}
+
+                                            <h1 contenteditable="true">
+                                                {{ $leads->name }}
+                                            </h1>
+                                        </div>
+                                        <div class="project-id">#{{ $leads->id }}</div>
                                         <div class="mt-3">
-                                            <span class="badge-customer">
-                                                {{-- {{ $leads->leadTags->name ?? 'N/A' }} --}}
-                                                {{ $leads->leadTags->first()->tag->name ?? 'N/A' }}
-                                            </span>
+
+                                            <div class="d-flex justify-content-left align-items-center flex-wrap">
+                                                @foreach ($leads->leadTags as $leadTag)
+                                                    <div class="badge-customer me-2 mb-2 d-flex align-items-center">
+                                                        <span class="me-1">{{ $leadTag->tag->name }}</span>
+                                                        <span class="btn btn-sm delete-item p-0">
+                                                            <i class="fas fa-times"></i>
+                                                        </span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+
                                         </div>
                                     </div>
                                     <div class="amount">$2</div>
@@ -51,7 +64,7 @@
                                         <p>{{ \Carbon\Carbon::parse($leads->created_at)->format('j F Y') }}</p>
                                     </div>
                                     <div class="info-item">
-                                        <h6>Closed on</h6>
+                                        <h6>Expected to close</h6>
                                         <p>{{ \Carbon\Carbon::parse($leads->close_date)->format('j F Y') }}</p>
                                     </div>
                                     <div class="info-item">
@@ -78,7 +91,6 @@
                                             {{ $leadStage->name }}
                                         </li>
                                     @endforeach
-
                                 </ul>
                             </div>
                             <div class="pipeline-section">
@@ -554,7 +566,7 @@
                             <div class="sidebar-section">
 
                                 {{-- Companies --}}
-                                <div id="company-section">
+                                <div id="company-container">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <h6 class="text-uppercase">Companies</h6>
                                         <div id="toggle-add-company" class="text-warning" style="cursor: pointer;">
@@ -563,7 +575,8 @@
                                     </div>
 
                                     <div class="d-none mb-3" id="add-company">
-                                        <select class="form-select" id="companySelect">
+                                        <select class="form-select update-field-select" data-type="company"
+                                            id="companySelect">
                                             <option selected>Add a company</option>
                                             @foreach ($companies as $company)
                                                 <option value="{{ $company->id }}">
@@ -573,38 +586,46 @@
                                         </select>
                                     </div>
 
-                                    @foreach ($leads->companies as $leadCompany)
-                                        <div class="company-list d-flex justify-content-between align-items-center mb-3"  id="company-{{ $leadCompany->id }}">
-                                            <div class="row">
-                                                <div class="col-2">
-                                                    <div class="company-icon">
-                                                        <img src="{{ asset('img/home/companyimages1.png') }}"
-                                                            alt="Company Logo" class="img-fluid">
+                                    <div id="company-list">
+                                        @foreach ($leads->companies as $leadCompany)
+                                            <div class="company-list d-flex justify-content-between align-items-center mb-3"
+                                                id="company-{{ $leadCompany->id }}">
+                                                <div class="row">
+                                                    <div class="col-2">
+                                                        <div class="company-icon">
+                                                            <img src="{{ asset('img/home/companyimages1.png') }}"
+                                                                alt="Company Logo" class="img-fluid">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-10">
+                                                        <div class="company-name">
+                                                            <p><b>{{ $leadCompany->name ?? 'N/A' }}</b></p>
+                                                            <p>{{ $leadCompany->description ?? 'N/A' }}</p>
+                                                            <p>{{ $leadCompany->companyAddress->address ?? 'N/A' }}</p>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-10">
-                                                    <div class="company-name">
-                                                        <p><b>{{ $leadCompany->name ?? 'N/A' }}</b></p>
-                                                        <p>{{ $leadCompany->description ?? 'N/A' }}</p>
-                                                        <p>{{ $leadCompany->companyAddress->address ?? 'N/A' }}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
 
-                                            <div id="delete-company">
-                                                <button class="btn btn-sm btn-outline-secondary"
+                                                <div id="delete-company">
+                                                    {{-- <button class="btn btn-sm btn-outline-secondary"
                                                     onclick="deleteField('{{ $leads->id }}', '{{ $leadCompany->id }}', 'company')">
                                                     <i class="fas fa-times"></i>
-                                                </button>
-                                            </div>
+                                                </button> --}}
+                                                    <button class="btn btn-sm btn-outline-secondary delete-item"
+                                                        data-lead="{{ $leads->id }}" data-id="{{ $leadCompany->id }}"
+                                                        data-type="company" data-target="company-{{ $leadCompany->id }}">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
 
-                                        </div>
-                                    @endforeach
+                                            </div>
+                                        @endforeach
+                                    </div>
 
                                 </div>
 
                                 {{-- Peoples --}}
-                                <div id="people-section">
+                                <div id="people-container">
                                     <div class="d-flex justify-content-between align-items-center mb-2 mt-3">
                                         <h6 class="text-uppercase">Peoples</h6>
                                         <div id="toggle-add-person" class="text-warning" style="cursor: pointer;">
@@ -613,7 +634,8 @@
                                     </div>
 
                                     <div class="d-none mb-3" id="add-person">
-                                        <select class="form-select" id="personSelect">
+                                        <select class="form-select update-field-select" data-type="people"
+                                            id="personSelect">
                                             <option selected>Add a person</option>
                                             @foreach ($allpeoples as $allpeople)
                                                 <option value="{{ $allpeople->id }}">
@@ -623,35 +645,43 @@
                                         </select>
                                     </div>
 
-                                    @foreach ($leads->peoples as $person)
-                                        <div class="company-list d-flex justify-content-between align-items-center mb-3">
-                                            <div class="row">
-                                                <div class="col-2">
-                                                    <div class="company-icon">
-                                                        <img src="{{ asset('img/home/profile-image.png') }}"
-                                                            alt="People Logo" class="img-fluid">
+                                    <div id="people-list">
+                                        @foreach ($leads->peoples as $person)
+                                            <div class="company-list d-flex justify-content-between align-items-center mb-3"
+                                                id="person-{{ $person->id }}">
+                                                <div class="row">
+                                                    <div class="col-2">
+                                                        <div class="company-icon">
+                                                            <img src="{{ asset('img/home/profile-image.png') }}"
+                                                                alt="People Logo" class="img-fluid">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-10">
+                                                        <div class="company-name">
+                                                            <p><strong>{{ $person->name }}</strong></p>
+                                                            <p>{{ $person->bio ?? 'N/A' }}</p>
+                                                            <p>{{ $person->peoplePhone->phone ?? 'N/A' }}</p>
+                                                            <p>{{ $person->peopleEmail->email ?? 'N/A' }}</p>
+                                                            <p class="text-warning">Contacted 8 Feb 2022</p>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-10">
-                                                    <div class="company-name">
-                                                        <p><strong>{{ $person->name }}</strong></p>
-                                                        <p>{{ $person->bio ?? 'N/A' }}</p>
-                                                        <p>{{ $person->peoplePhone->phone ?? 'N/A' }}</p>
-                                                        <p>{{ $person->peopleEmail->email ?? 'N/A' }}</p>
-                                                        <p class="text-warning">Contacted 8 Feb 2022</p>
-                                                    </div>
+
+                                                <div id="delete-people">
+                                                    {{-- <button class="btn btn-sm btn-outline-secondary" {{-- onclick="deleteField('{{ $company->id }}', '{{ $email['selected'] }}', 'email')"> --}
+                                                        onclick="deleteField('{{ $leads->id }}', '{{ $person->id }}', 'people')">
+                                                        <i class="fas fa-times"></i>
+                                                    </button> --}}
+                                                    <button class="btn btn-sm btn-outline-secondary delete-item"
+                                                        data-lead="{{ $leads->id }}" data-id="{{ $person->id }}"
+                                                        data-type="people" data-target="person-{{ $person->id }}">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
                                                 </div>
-                                            </div>
 
-                                            <div id="delete-people">
-                                                <button class="btn btn-sm btn-outline-secondary">
-                                                    {{-- onclick="deleteField('{{ $company->id }}', '{{ $email['selected'] }}', 'email')"> --}}
-                                                    <i class="fas fa-times"></i>
-                                                </button>
                                             </div>
-
-                                        </div>
-                                    @endforeach
+                                        @endforeach
+                                    </div>
                                 </div>
 
                             </div>
@@ -660,7 +690,7 @@
 
                             <div class="sidebar-section">
                                 {{-- Product --}}
-                                <div class="form-group mb-3">
+                                <div class="form-group mb-3" id="product-container">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <h6 class="text-uppercase">
                                             Products <span style="font-weight: normal;"> U.S. (USD)</span>
@@ -695,37 +725,41 @@
                                             Product</button>
                                     </div>
 
-                                    @foreach ($leads->leadProducts as $leadProduct)
-                                        <div class="company-list d-flex justify-content-between align-items-center mb-3">
-                                            <div class="row">
-                                                <div class="col-2">
-                                                    <div class="company-icon">
-                                                        <img src="{{ asset('img/icons/menu-icon8.svg') }}"
-                                                            alt="Product Logo" class="img-fluid">
+                                    <div id="product-list">
+                                        @foreach ($leads->leadProducts as $leadProduct)
+                                            <div class="company-list d-flex justify-content-between align-items-center mb-3"
+                                                id="product-{{ $leadProduct->id }}">
+                                                <div class="row">
+                                                    <div class="col-2">
+                                                        <div class="company-icon">
+                                                            <img src="{{ asset('img/icons/menu-icon8.svg') }}"
+                                                                alt="Product Logo" class="img-fluid">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-10">
+                                                        <div class="company-name">
+                                                            <p><b>{{ $leadProduct->product->name ?? 'N/A' }}</b></p>
+                                                            <p>{{ $leadProduct->price }} * {{ $leadProduct->qty }}</p>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-10">
-                                                    <div class="company-name">
-                                                        <p><b>{{ $leadProduct->product->name ?? 'N/A' }}</b></p>
-                                                        <p>{{ $leadProduct->price }} * {{ $leadProduct->qty }}</p>
-                                                    </div>
+
+                                                <div id="delete-product">
+                                                    <button class="btn btn-sm btn-outline-secondary delete-item"
+                                                        data-lead="{{ $leads->id }}" data-id="{{ $leadProduct->id }}"
+                                                        data-type="product" data-target="product-{{ $leadProduct->id }}">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
                                                 </div>
-                                            </div>
 
-                                            <div id="delete-product">
-                                                <button class="btn btn-sm btn-outline-secondary">
-                                                    {{-- onclick="deleteField('{{ $company->id }}', '{{ $email['selected'] }}', 'email')"> --}}
-                                                    <i class="fas fa-times"></i>
-                                                </button>
                                             </div>
-
-                                        </div>
-                                    @endforeach
+                                        @endforeach
+                                    </div>
 
                                 </div>
 
                                 {{-- Competitors --}}
-                                <div class="form-group mb-3">
+                                <div class="form-group mb-3" id="competitor-container">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <h6 class="text-uppercase">
                                             Competitors
@@ -736,7 +770,8 @@
                                     </div>
 
                                     <div id="add-competitor" class="mb-3 d-none">
-                                        <select class="form-select" id="urlInput">
+                                        <select class="form-select update-field-select" data-type="competitor"
+                                            id="urlInput">
                                             <option selected>Add a Competitors</option>
                                             @foreach ($competitors as $competitor)
                                                 <option value="{{ $competitor->id }}">
@@ -746,36 +781,44 @@
                                         </select>
                                     </div>
 
-                                    @foreach ($leads->leadCompetitors as $leadCompetitor)
-                                        <div class="company-list d-flex justify-content-between align-items-center mb-3">
-                                            <div class="row">
-                                                <div class="col-2">
-                                                    <div class="company-icon">
-                                                        <img src="{{ asset('img/icons/menu-icon12.svg') }}"
-                                                            alt="Competitor Logo" class="img-fluid">
+                                    <div id="competitor-list">
+                                        @foreach ($leads->leadCompetitors as $leadCompetitor)
+                                            <div class="company-list d-flex justify-content-between align-items-center mb-3"
+                                                id="competitor-{{ $leadCompetitor->id }}">
+                                                <div class="row">
+                                                    <div class="col-2">
+                                                        <div class="company-icon">
+                                                            <img src="{{ asset('img/icons/menu-icon12.svg') }}"
+                                                                alt="Competitor Logo" class="img-fluid">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-10">
+                                                        <div class="company-name">
+                                                            <p><b>{{ $leadCompetitor->competitor->name ?? 'N/A' }}</b></p>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-10">
-                                                    <div class="company-name">
-                                                        <p><b>{{ $leadCompetitor->competitor->name ?? 'N/A' }}</b></p>
-                                                    </div>
-                                                </div>
-                                            </div>
 
-                                            <div id="delete-competitor">
-                                                <button class="btn btn-sm btn-outline-secondary">
-                                                    {{-- onclick="deleteField('{{ $company->id }}', '{{ $email['selected'] }}', 'email')"> --}}
+                                                <div id="delete-competitor">
+                                                    {{-- <button class="btn btn-sm btn-outline-secondary">
                                                     <i class="fas fa-times"></i>
-                                                </button>
-                                            </div>
+                                                </button> --}}
+                                                    <button class="btn btn-sm btn-outline-secondary delete-item"
+                                                        data-lead="{{ $leads->id }}"
+                                                        data-id="{{ $leadCompetitor->id }}" data-type="competitor"
+                                                        data-target="competitor-{{ $leadCompetitor->id }}">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
 
-                                        </div>
-                                    @endforeach
+                                            </div>
+                                        @endforeach
+                                    </div>
 
                                 </div>
 
                                 {{-- Sources --}}
-                                <div class="form-group mb-3">
+                                <div class="form-group mb-3" id="source-container">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <h6 class="text-uppercase">
                                             Sources
@@ -786,7 +829,8 @@
                                     </div>
 
                                     <div id="add-source" class="mb-3 d-none">
-                                        <select class="form-select" id="urlInput">
+                                        <select class="form-select update-field-select" data-type="source"
+                                            id="urlInput">
                                             <option selected>Add a Source</option>
                                             @foreach ($sources as $source)
                                                 <option value="{{ $source->id }}">
@@ -796,36 +840,43 @@
                                         </select>
                                     </div>
 
-                                    @foreach ($leads->leadSources as $leadSource)
-                                        <div class="company-list d-flex justify-content-between align-items-center mb-3">
-                                            <div class="row">
-                                                <div class="col-2">
-                                                    <div class="company-icon">
-                                                        <img src="{{ asset('img/icons/menu-icon13.svg') }}"
-                                                            alt="Source Logo" class="img-fluid">
+                                    <div id="source-list">
+                                        @foreach ($leads->leadSources as $leadSource)
+                                            <div class="company-list d-flex justify-content-between align-items-center mb-3"
+                                                id="source-{{ $leadSource->id }}">
+                                                <div class="row">
+                                                    <div class="col-2">
+                                                        <div class="company-icon">
+                                                            <img src="{{ asset('img/icons/menu-icon13.svg') }}"
+                                                                alt="Source Logo" class="img-fluid">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-10">
+                                                        <div class="company-name">
+                                                            <p><b>{{ $leadSource->source->name ?? 'N/A' }}</b></p>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-10">
-                                                    <div class="company-name">
-                                                        <p><b>{{ $leadSource->source->name ?? 'N/A' }}</b></p>
-                                                    </div>
-                                                </div>
-                                            </div>
 
-                                            <div id="delete-source">
-                                                <button class="btn btn-sm btn-outline-secondary">
-                                                    {{-- onclick="deleteField('{{ $company->id }}', '{{ $email['selected'] }}', 'email')"> --}}
+                                                <div id="delete-source">
+                                                    {{-- <button class="btn btn-sm btn-outline-secondary">
                                                     <i class="fas fa-times"></i>
-                                                </button>
-                                            </div>
+                                                </button> --}}
+                                                    <button class="btn btn-sm btn-outline-secondary delete-item"
+                                                        data-lead="{{ $leads->id }}" data-id="{{ $leadSource->id }}"
+                                                        data-type="source" data-target="source-{{ $leadSource->id }}">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
 
-                                        </div>
-                                    @endforeach
+                                            </div>
+                                        @endforeach
+                                    </div>
 
                                 </div>
 
                                 {{-- Quotes --}}
-                                <div class="form-group mb-3">
+                                <div class="form-group mb-3" id="quote-container">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         {{-- <label for="urlInput" class="form-label text-uppercase">
                                         <b>Quotes</b>
@@ -979,7 +1030,6 @@
 
                             </div>
 
-
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -996,7 +1046,7 @@
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        <script>
+        {{-- <script>
             document.addEventListener("DOMContentLoaded", function() {
 
                 // common ajax update function
@@ -1056,10 +1106,111 @@
                 }
 
             });
-        </script>
+        </script> --}}
 
         <script>
-            function deleteField(lead_id, related_id, type) {
+            document.addEventListener("DOMContentLoaded", function() {
+
+                // common ajax update function
+                function updateLead(data, onSuccess) {
+                    fetch("{{ route('admin.leads.ajax_update') }}", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                            },
+                            body: JSON.stringify(data)
+                        })
+                        .then(response => response.json())
+                        .then(resp => {
+                            if (resp.success) {
+                                if (typeof onSuccess === "function") onSuccess();
+                            } else {
+                                Swal.fire("Error", "Failed to update lead!", "error");
+                            }
+                        })
+                        .catch(err => console.error(err));
+                }
+
+                // Handle flag checkboxes
+                document.querySelectorAll(".lead-flag").forEach((flagSelect) => {
+                    flagSelect.addEventListener("change", function() {
+                        let leadId = this.dataset.leadId;
+
+                        // Collect all checked flags for this lead
+                        let checkedFlags = [];
+                        document.querySelectorAll('.lead-flag[data-lead-id="' + leadId + '"]:checked')
+                            .forEach(cb => checkedFlags.push(cb.value));
+
+                        updateLead({
+                                lead_flags: checkedFlags,
+                                lead_id: leadId
+                            },
+                            () => {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Updated!",
+                                    text: "Lead flags updated successfully.",
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            }
+                        );
+                    });
+                });
+
+                // status dropdown handler
+                let statusSelect = document.getElementById("leadStatusSelect");
+                if (statusSelect) {
+                    statusSelect.addEventListener("change", function() {
+                        let leadId = this.dataset.leadId;
+                        let leadStatus = this.value;
+
+                        updateLead({
+                                lead_status: leadStatus,
+                                lead_id: leadId
+                            },
+                            () => {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Updated!",
+                                    text: "Lead status updated successfully.",
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            }
+                        );
+                    });
+                }
+
+            });
+        </script>
+
+
+        <script>
+            // Sidebar records delete functionalities
+            $(document).on("click", ".delete-item", function(e) {
+                e.preventDefault();
+
+                let leadId = $(this).data("lead");
+                let relatedId = $(this).data("id");
+                let type = $(this).data("type");
+                let target = $(this).data("target");
+
+                // Use the new container-list structure
+                let container = $(`#${type}-container`);
+                let list = container.find(`#${type}-list`);
+                let count = list.children().length;
+
+                if (count <= 1) {
+                    toastr.warning(`At least one ${type} is required.`);
+                    return false;
+                }
+
                 Swal.fire({
                     title: 'Are you sure?',
                     text: `This ${type} will be removed from the lead record!`,
@@ -1072,31 +1223,69 @@
                     if (result.isConfirmed) {
                         $.ajax({
                             url: "{{ route('admin.leads.delete-field') }}",
-                            type: 'POST',
+                            type: "POST",
                             data: {
-                                lead_id: lead_id,
-                                related_id: related_id, // <-- send the company/person id
-                                type: type, // e.g. "company" or "people"
-                                _token: $('meta[name="csrf-token"]').attr('content')
+                                _token: "{{ csrf_token() }}",
+                                lead_id: leadId,
+                                related_id: relatedId,
+                                type: type
                             },
                             success: function(response) {
-                                toastr.success(response.message);
-
-                                // remove only the deleted company/person from DOM
-                                if (type === 'company') {
-                                    $('#company-' + related_id).remove();
-                                } else if (type === 'people') {
-                                    $('#person-' + related_id).remove();
+                                if (response.success) {
+                                    $("#" + target).remove(); // Remove the specific DOM element
+                                    toastr.success(response.message);
+                                } else {
+                                    toastr.error(response.message || "Delete failed.");
                                 }
                             },
                             error: function(xhr) {
-                                toastr.error(`Failed to delete ${type}.`);
+                                toastr.error("Something went wrong.");
                                 console.error(xhr.responseText);
                             }
                         });
                     }
                 });
-            }
+            });
+
+
+            // Unified update for all select fields
+            $(document).on("change", ".update-field-select", function() {
+                let relatedId = $(this).val(); // selected item id
+                let type = $(this).data("type"); // type: company | people | source | competitor | product
+                let leadId = "{{ $leads->id }}"; // current lead
+
+                if (!relatedId) return; // do nothing if no selection
+
+                $.ajax({
+                    url: "{{ route('admin.leads.update-field') }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        lead_id: leadId,
+                        related_id: relatedId,
+                        type: type
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Updated!',
+                                text: response.message,
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => location.reload());
+                        } else {
+                            toastr.error(response.message || "Failed to update " + type + ".");
+                        }
+                    },
+                    error: function(xhr) {
+                        toastr.error("Something went wrong.");
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+
+
 
 
             const toggleTaskBtn = document.getElementById('toggleAddTask');

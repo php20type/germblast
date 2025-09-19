@@ -40,44 +40,6 @@ class CompanyController extends Controller
         return compact('myCompaniesCount', 'totalCompanies', 'formattedTotalCompanies');
     }
 
-    // public function index(Request $request)
-    // {
-    //     $query = Company::with('user', 'companyType', 'tag', 'person');
-    //     $peoples = People::all();
-    //     $company_types = CompanyType::all();
-
-    //     if ($request->ajax()) {
-    //         // Search by lead name or people name
-    //         if ($request->filled('search')) {
-    //             $search = $request->search;
-    //             $query->where('name', 'like', "%$search%");
-    //         }
-
-    //         // Filter by people id / assigneed to
-    //         if ($request->filled('people_id')) {
-    //             $query->where('people_id', $request->people_id);
-    //         }
-
-    //         // Filter by company type
-    //         if ($request->filled('company_type_id')) {
-    //             $query->where('company_type_id', $request->company_type_id);
-    //         }
-    //     }
-
-    //     $companies = $query->get();
-
-    //     $sidebarStats = $this->getSidebarStats();
-
-    //     if ($request->ajax()) {
-    //         return view('admin.company.partials.company-table-rows', compact('companies'))->render();
-    //     }
-
-    //     return view('admin.company.index', array_merge(
-    //         compact('companies', 'peoples', 'company_types'),
-    //         $sidebarStats
-    //     ));
-    // }
-
     public function index(Request $request)
     {
         $query = Company::with([
@@ -127,67 +89,6 @@ class CompanyController extends Controller
             $sidebarStats
         ));
     }
-
-    // public function my_companies(Request $request, $id)
-    // {
-    //     $query = Company::with('user', 'companyType', 'tag', 'person')
-    //         ->where('user_id', $id);
-
-    //     $peoples = People::all();
-    //     $company_types = CompanyType::all();
-
-    //     if ($request->ajax()) {
-    //         // Search by lead name or people name
-    //         if ($request->filled('search')) {
-    //             $search = $request->search;
-    //             $query->where('name', 'like', "%$search%");
-    //         }
-
-    //         // Filter by people id / assigneed to
-    //         if ($request->filled('people_id')) {
-    //             $query->where('people_id', $request->people_id);
-    //         }
-
-    //         // Filter by company type
-    //         if ($request->filled('company_type_id')) {
-    //             $query->where('company_type_id', $request->company_type_id);
-    //         }
-    //     }
-
-    //     $companies = $query->get();
-
-    //     $sidebarStats = $this->getSidebarStats();
-
-    //     if ($request->ajax()) {
-    //         return view('admin.company.partials.company-table-rows', compact('companies'))->render();
-    //     }
-
-    //     return view('admin.company.my-companies', array_merge(
-    //         compact('companies', 'peoples', 'company_types'),
-    //         $sidebarStats
-    //     ));
-    // }
-
-    // public function store(Request $request)
-    // {
-
-    //     Company::create([
-    //         'user_id' => $request->user_id,
-    //         'name' => $request->name,
-    //         'description' => $request->description,
-    //         'email' => $request->email,
-    //         'phone' => $request->phone,
-    //         'address' => $request->address,
-    //         'people_id' => $request->people_id,
-    //         'url' => $request->url,
-    //         'tag_id' => $request->tag_id,
-    //         'company_type_id' => $request->company_type_id,
-    //         'industry_id' => $request->industry_id,
-    //         'territory_id' => $request->territory_id,
-    //     ]);
-    //     return redirect()->back()->with('success', 'Company created successfully!');
-    // }
-
 
     public function my_companies(Request $request, $id)
     {
@@ -299,48 +200,6 @@ class CompanyController extends Controller
         return redirect()->back()->with('success', 'Company created successfully!');
     }
 
-
-    // public function ajax_store(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'name' => 'required|string|max:255',
-    //         'description' => 'required',
-    //         'address' => 'required',
-    //     ]);
-
-    //     $data = [
-    //         'name' => $validated['name'],
-    //         'description' => $validated['description'] ?? null,
-    //         'address' => $validated['address'] ?? null,
-    //         'user_id' => auth()->id(),
-    //     ];
-
-    //     if (!empty($request->phone)) {
-    //         $data['phone'] = $request->phone;
-    //     }
-
-    //     if (!empty($request->email)) {
-    //         $data['email'] = $request->email;
-    //     }
-
-    //     if (!empty($request->url)) {
-    //         $data['url'] = $request->url;
-    //     }
-
-    //     $company = Company::create($data);
-
-    //     if ($request->ajax()) {
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Company added successfully.',
-    //             'company' => $company
-    //         ]);
-    //     }
-
-    //     return redirect()->back()->with('success', 'Company added successfully.');
-    // }
-
-
     public function ajax_store(Request $request)
     {
         $validated = $request->validate([
@@ -426,55 +285,6 @@ class CompanyController extends Controller
 
         return redirect()->back()->with('success', 'Company added successfully.');
     }
-
-    // public function show($id)
-    // {
-    //     $activity_types = ActivityType::all(); // fetch all activities
-    //     $products = Product::all();
-    //     $company = Company::with('user', 'companyType', 'industry')->findOrFail($id);
-    //     $companies = Company::all();
-    //     $users = User::all();
-    //     $companytags = Tag::where('tag_id', 2)->get();
-    //     $competitors = Competitor::all();
-    //     $sources = Source::all();
-    //     $company_types = CompanyType::all();
-    //     $industries = Industry::all();
-    //     $peoples = People::where('company_id', $id)->get();
-    //     $allpeoples = People::all();
-
-    //     return view('admin.company.edit', compact('company', 'users', 'company_types', 'companytags', 'activity_types', 'competitors', 'sources', 'companies', 'products', 'peoples', 'allpeoples', 'industries'));
-    // }
-
-    // public function activity_store(Request $request)
-    // {
-
-
-    //     $data = [
-    //         'title' => $request->title,
-    //         'activity_type_id' => $request->activity_type_id,
-    //         'date' => $request->date,
-    //         'start_time' => Carbon::parse($request->start_time)->format('H:i:s'),
-    //         'end_time' => Carbon::parse($request->end_time)->format('H:i:s'),
-    //         'all_day' => $request->all_day ?? 0,
-    //         'location' => $request->location,
-    //         'agenda' => $request->agenda,
-    //     ];
-
-
-    //     $activity = Activity::create($data);
-
-    //     if ($request->ajax()) {
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Activity added successfully.',
-    //             'people' => $activity
-    //         ]);
-    //     }
-
-    //     return redirect()->back()->with('success', 'Activity added successfully.');
-
-    // }
-
 
     public function show($id)
     {
