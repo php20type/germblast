@@ -25,11 +25,12 @@
                                 <div class="d-flex">
                                     <img src="{{ asset('img/home/image25.png') }}" alt="Company" class="company-logo me-3">
                                     <div>
-                                        <h4 class="mb-1" contenteditable="true" id="company-name">{{ $company->name }}
+                                        <h4 class="mb-1" contenteditable="true" spellcheck="false" id="company-name">
+                                            {{ $company->name }}
                                         </h4>
 
                                         <div class="d-flex align-items-center mb-2" id="company-description"
-                                            contenteditable="true">
+                                            contenteditable="true" spellcheck="false">
                                             {{ $company->description }}
                                         </div>
 
@@ -41,14 +42,14 @@
                                             <i class="fas fa-star star-empty"></i>
                                         </div>
                                     </div>
+
+
                                 </div>
                                 <button class="delete-btn">
                                     <i class="fas fa-trash me-2"></i>DELETE
                                 </button>
                             </div>
                             <div class="mt-3">
-                                {{-- <small class="text-muted">Created by <span class="text-warning">
-                                    </span> 3 years ago</small> --}}
                                 <small class="text-muted">Created by <span
                                         class="text-warning">{{ $company->user->name }}</span>
                                     {{ $company->created_at->diffForHumans() }}</small>
@@ -104,46 +105,21 @@
                             @endforeach
 
                             <!-- Slide Toggle Form -->
-                            <div id="addPeopleForm" class="mt-3" style="display: none;">
+                            {{-- <div id="addPeopleForm" class="mt-3" style="display: none;">
                                 <form id="addPeopleAjaxForm" method="POST">
-                                    @csrf
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-2">
-                                                <input type="hidden" name="company_id" value="{{ $company->id }}">
-                                                <input type="text" class="form-control" placeholder="Contact Name"
-                                                    name="name"required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-2">
-                                                <input type="text" class="form-control" placeholder="Job Title"
-                                                    name="job_title">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-2">
-                                                <input type="tel" class="form-control" name="phone"
-                                                    placeholder="Phone Number">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-2">
-                                                <input type="email" class="form-control" placeholder="Email"
-                                                    name="email">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="mb-2">
-                                                <textarea rows="3" placeholder="Description" class="form-control" name="description"></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <button type="submit" class="btn btn-warning btn-sm">Add
-                                                Person</button>
-                                        </div>
-                                    </div>
                                 </form>
+                            </div> --}}
+                            <div id="addPeopleForm" class="mt-3" style="display: none;">
+                                <div class="mb-3">
+                                    <select class="form-select people-update" data-field="" id="peopleSelect">
+                                        <option selected>Add People</option>
+                                        @foreach ($availablePeoples as $allpeople)
+                                            <option value="{{ $allpeople->id }}">
+                                                {{ $allpeople->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -564,7 +540,6 @@
                             <div class="form-group mb-3">
                                 <label class="form-label"><b>COMPANY Type</b></label>
                                 <select class="form-select company-update" data-field="company_type_id">
-                                    <option value="">Select company type</option>
                                     @foreach ($company_types as $company_type)
                                         <option value="{{ $company_type->id }}"
                                             {{ $company->company_type_id == $company_type->id ? 'selected' : '' }}>
@@ -575,7 +550,6 @@
                             <div class="form-group mb-3">
                                 <label class="form-label"><b>INDUSTRY</b></label>
                                 <select class="form-select company-update" data-field="industry_id">
-                                    <option selected>Select industry</option>
                                     @foreach ($industries as $industry)
                                         <option value="{{ $industry->id }}"
                                             {{ $company->industry_id == $industry->id ? 'selected' : '' }}>
@@ -587,7 +561,6 @@
                             <div class="form-group mb-3">
                                 <label class="form-label"><b>ASSIGNEE</b></label>
                                 <select class="form-select company-update" data-field="user_id">
-                                    <option selected>Select an assignee</option>
                                     @foreach ($users as $user)
                                         <option value="{{ $user->id }}"
                                             {{ $company->user_id == $user->id ? 'selected' : '' }}>
@@ -599,7 +572,6 @@
                             <div class="form-group mb-3">
                                 <label class="form-label"><b>TERRITORY</b></label>
                                 <select class="form-select company-update" data-field="territory_id">
-                                    <option selected>Select territory</option>
                                     @foreach ($territories as $territory)
                                         <option value="{{ $territory->id }}"
                                             {{ $company->territory_id == $territory->id ? 'selected' : '' }}>
@@ -640,7 +612,7 @@
                                 </div>
 
                                 <div class="col-12 inline-detail-input">
-                                    <div class="row g-2">
+                                    <div class="row g-2" id="email-list">
                                         @forelse($emails as $email)
                                             <div class="col-12 mb-2">
                                                 <div class="row g-2">
@@ -726,7 +698,7 @@
                                 </div>
 
                                 <div class="col-12 inline-detail-input">
-                                    <div class="row g-2">
+                                    <div class="row g-2" id="address-list">
                                         @forelse($addresses as $address)
                                             <div class="col-12 mb-2">
                                                 <div class="row g-2">
@@ -751,8 +723,8 @@
                                                             onclick="deleteField('{{ $company->id }}', '{{ $address['selected'] }}', 'address')">
                                                             <i class="fas fa-times"></i>
                                                         </button>
-
                                                     </div>
+
                                                 </div>
                                             </div>
                                         @empty
@@ -813,7 +785,7 @@
                                 </div>
 
                                 <div class="col-12 inline-detail-input">
-                                    <div class="row g-2">
+                                    <div class="row g-2" id="phone-list">
                                         @forelse($phones as $phone)
                                             <div class="col-12 mb-2">
                                                 <div class="row g-2">
@@ -899,7 +871,7 @@
                                 </div>
 
                                 <div class="col-12 inline-detail-input">
-                                    <div class="row g-2">
+                                    <div class="row g-2" id="url-list">
                                         @forelse($urls as $url)
                                             <div class="col-12 mb-2">
                                                 <div class="row g-2">
@@ -1370,72 +1342,24 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Handle checkbox selection
-        // const selectAllCheckbox = document.getElementById('selectAll');
-        // const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-        // const actionBar = document.getElementById('actionBar');
-        // const selectedCount = document.getElementById('selectedCount');
-
-        // function updateActionBar() {
-        //     const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
-        //     if (checkedBoxes.length > 0) {
-        //         actionBar.classList.add('show');
-        //         selectedCount.textContent = checkedBoxes.length;
-        //     } else {
-        //         actionBar.classList.remove('show');
-        //     }
-        // }
-
-        // // Initialize with first row checked
-        // updateActionBar();
-
-        // selectAllCheckbox.addEventListener('change', function () {
-        //     rowCheckboxes.forEach(checkbox => {
-        //         checkbox.checked = selectAllCheckbox.checked;
-        //     });
-        //     updateActionBar();
-        // });
-
-        // rowCheckboxes.forEach(checkbox => {
-        //     checkbox.addEventListener('change', function () {
-        //         const allChecked = Array.from(rowCheckboxes).every(cb => cb.checked);
-        //         const someChecked = Array.from(rowCheckboxes).some(cb => cb.checked);
-
-        //         selectAllCheckbox.checked = allChecked;
-        //         selectAllCheckbox.indeterminate = someChecked && !allChecked;
-
-        //         updateActionBar();
-        //     });
-        // });
-
-        // // Table row hover effects
-        // const tableRows = document.querySelectorAll('tbody tr');
-        // tableRows.forEach(row => {
-        //     row.addEventListener('mouseenter', function () {
-        //         this.style.backgroundColor = '#f8f9fa';
-        //     });
-        //     row.addEventListener('mouseleave', function () {
-        //         this.style.backgroundColor = '';
-        //     });
-        // });
-
-        // $(document).on('click', '.remove-participant', function(e) {
-        //     e.preventDefault();
-        //     $(this).closest('.participant-entry').remove();
-        // });
-
         // =============== Create a lead related logic STARTS =============================
-
         function addLead() {
             $('#AddLead').modal('show');
         }
 
         $(document).ready(function() {
+
+            // Optional: handle form submit via AJAX
+            $('#editCompanyForm').on('submit', function(e) {
+                e.preventDefault();
+            });
+
             $('#AddLead').on('shown.bs.modal', function() {
                 $('#companySelect').select2({
                     dropdownParent: $('#AddLead'),
                     placeholder: '-- Select a company --',
-                    allowClear: true
+                    allowClear: true,
+
                 });
 
                 $('#person_select').select2({
@@ -1529,6 +1453,15 @@
         });
 
         function deleteField(company_id, type, fieldName) {
+
+            let list = $(`#${fieldName}-list`);
+            let count = list.children().length;
+
+            if (count <= 1) {
+                toastr.warning(`At least one ${fieldName} is required.`);
+                return false;
+            }
+
             Swal.fire({
                 title: 'Are you sure?',
                 text: `This ${fieldName} will be removed from the company record!`,
@@ -1560,7 +1493,6 @@
                 }
             });
         }
-
 
         $('#email-submit').on('click', function() {
             let container = $(this).closest('.inline-detail-email');

@@ -3,28 +3,26 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Competitor;
-use App\Models\Product;
+use App\Models\Activity;
+use App\Models\ActivityType;
+use App\Models\Company;
 use App\Models\CompanyAddress;
 use App\Models\CompanyEmail;
 use App\Models\CompanyPeople;
 use App\Models\CompanyPhone;
-use App\Models\CompanyTask;
-use App\Models\CompanyUrl;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use App\Models\People;
-use Illuminate\Http\Request;
-use App\Models\Company;
-use App\Models\User;
-use App\Models\ActivityType;
-use App\Models\Industry;
-use App\Models\Territory;
-use App\Models\Tag;
-use Carbon\Carbon;
-use App\Models\Source;
-use App\Models\Activity;
 use App\Models\CompanyType;
+use App\Models\CompanyUrl;
+use App\Models\Competitor;
+use App\Models\Industry;
+use App\Models\People;
+use App\Models\Product;
+use App\Models\Source;
+use App\Models\Tag;
+use App\Models\Territory;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CompanyController extends Controller
 {
@@ -46,11 +44,12 @@ class CompanyController extends Controller
             'user',
             'companyType',
             'tag',
-            'peoples',       // <-- updated from "person"
+            'peoples',
             'companyEmail',
             'companyPhone',
             'companyAddress',
-            'companyUrl'
+            'companyUrl',
+            'companyPeople',
         ]);
 
         $peoples = People::all();
@@ -101,7 +100,7 @@ class CompanyController extends Controller
             'companyEmail',
             'companyPhone',
             'companyAddress',
-            'companyUrl'
+            'companyUrl',
         ])->where('user_id', $id);
 
         $peoples = People::all();
@@ -139,7 +138,6 @@ class CompanyController extends Controller
             $sidebarStats
         ));
     }
-
 
     public function store(Request $request)
     {
@@ -278,8 +276,8 @@ class CompanyController extends Controller
                     'companyPhone',
                     'companyAddress',
                     'companyUrl',
-                    'peoples'
-                ])
+                    'peoples',
+                ]),
             ]);
         }
 
@@ -302,7 +300,7 @@ class CompanyController extends Controller
             'companyPhone',
             'companyAddress',
             'companyUrl',
-            'peoples' // <-- fetch related people via pivot
+            'peoples', // <-- fetch related people via pivot
         ])->findOrFail($id);
 
         $companies = Company::all();
@@ -317,6 +315,9 @@ class CompanyController extends Controller
         $peoples = $company->peoples;
         $allpeoples = People::all();
 
+        $assignedPeopleIds = $company->peoples->pluck('id');
+        $availablePeoples = People::whereNotIn('id', $assignedPeopleIds)->get();
+
         $emails = [];
 
         $emailTypes = [
@@ -328,7 +329,7 @@ class CompanyController extends Controller
 
         if ($company->companyEmail) {
             foreach ($emailTypes as $field => $label) {
-                if (!empty($company->companyEmail->$field)) {
+                if (! empty($company->companyEmail->$field)) {
                     $emails[] = [
                         'selected' => $field,
                         'value' => $company->companyEmail->$field,
@@ -352,7 +353,7 @@ class CompanyController extends Controller
         $addressRecord = $company->companyAddress;
         if ($addressRecord) {
             foreach ($addressTypes as $field => $label) {
-                if (!empty($addressRecord->$field)) {
+                if (! empty($addressRecord->$field)) {
                     $addresses[] = [
                         'selected' => $field, // which option should be selected
                         'value' => $addressRecord->$field,
@@ -374,7 +375,7 @@ class CompanyController extends Controller
         $phoneRecord = $company->companyPhone;
         if ($phoneRecord) {
             foreach ($phoneTypes as $field => $label) {
-                if (!empty($phoneRecord->$field)) {
+                if (! empty($phoneRecord->$field)) {
                     $phones[] = [
                         'selected' => $field,   // which option should be selected
                         'value' => $phoneRecord->$field,
@@ -394,7 +395,7 @@ class CompanyController extends Controller
         $urlRecord = $company->companyUrl;
         if ($urlRecord) {
             foreach ($urlTypes as $field => $label) {
-                if (!empty($urlRecord->$field)) {
+                if (! empty($urlRecord->$field)) {
                     $urls[] = [
                         'selected' => $field, // which option should be selected
                         'value' => $urlRecord->$field,
@@ -415,6 +416,7 @@ class CompanyController extends Controller
             'products',
             'peoples',
             'allpeoples',
+            'availablePeoples',
             'industries',
             'territories',
             'emails',
@@ -482,13 +484,11 @@ class CompanyController extends Controller
             'participant_id' => $validated['participant_id'],
         ]);
 
-
         return redirect()->back()->with('success', 'Login Activity Added Successfully.');
 
     }
 
     // app/Http/Controllers/CompanyController.php
-
     public function updateField(Request $request, Company $company)
     {
         $request->validate([
@@ -498,12 +498,12 @@ class CompanyController extends Controller
 
         $allowed = ['company_type_id', 'industry_id', 'territory_id', 'user_id', 'annual_revenue', 'employees_count'];
 
-        if (!in_array($request->field, $allowed)) {
+        if (! in_array($request->field, $allowed)) {
             return response()->json(['error' => 'Invalid field'], 422);
         }
 
         $company->update([
-            $request->field => $request->value
+            $request->field => $request->value,
         ]);
 
         return response()->json(['success' => true, 'field' => $request->field, 'value' => $request->value]);
@@ -605,13 +605,12 @@ class CompanyController extends Controller
     //     ]);
     // }
 
-
     public function deleteField(Request $request)
     {
         $request->validate([
             'company_id' => 'required|exists:companies,id',
             'type' => 'required|string',
-            'field_name' => 'required|string' // email, address, phone, url
+            'field_name' => 'required|string', // email, address, phone, url
         ]);
 
         // Map field_name to model and allowed types
@@ -622,20 +621,20 @@ class CompanyController extends Controller
             'url' => [CompanyUrl::class, ['url', 'blog_url', 'twitter_url']],
         ];
 
-        if (!isset($models[$request->field_name])) {
+        if (! isset($models[$request->field_name])) {
             return response()->json(['status' => 'error', 'message' => 'Invalid field name'], 400);
         }
 
         [$modelClass, $allowedTypes] = $models[$request->field_name];
 
-        if (!in_array($request->type, $allowedTypes)) {
+        if (! in_array($request->type, $allowedTypes)) {
             return response()->json(['status' => 'error', 'message' => 'Invalid type'], 400);
         }
 
         $record = $modelClass::where('company_id', $request->company_id)->first();
 
-        if (!$record) {
-            return response()->json(['status' => 'error', 'message' => ucfirst($request->field_name) . ' record not found'], 404);
+        if (! $record) {
+            return response()->json(['status' => 'error', 'message' => ucfirst($request->field_name).' record not found'], 404);
         }
 
         $record->{$request->type} = null;
@@ -643,26 +642,25 @@ class CompanyController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => ucfirst(str_replace('_', ' ', $request->type)) . ' deleted successfully',
-            'data' => $record
+            'message' => ucfirst(str_replace('_', ' ', $request->type)).' deleted successfully',
+            'data' => $record,
         ]);
     }
-
     public function updateCompanyEmail(Request $request)
     {
         // Validate request
         $request->validate([
             'company_id' => 'required|exists:companies,id',
             'type' => 'required|in:email,personal_email,support_email,work_email',
-            'value' => 'required|email'
+            'value' => 'required|email',
         ]);
 
         // Find the company_emails row for this person
         $emailRecord = CompanyEmail::where('company_id', $request->company_id)->first();
 
-        if (!$emailRecord) {
+        if (! $emailRecord) {
             // If row doesn't exist, create new
-            $emailRecord = new CompanyEmail();
+            $emailRecord = new CompanyEmail;
             $emailRecord->company_id = $request->company_id;
         }
 
@@ -673,8 +671,8 @@ class CompanyController extends Controller
         // Return JSON response
         return response()->json([
             'status' => 'success',
-            'message' => ucfirst(str_replace('_', ' ', $request->type)) . ' updated successfully',
-            'data' => $emailRecord
+            'message' => ucfirst(str_replace('_', ' ', $request->type)).' updated successfully',
+            'data' => $emailRecord,
         ]);
     }
 
@@ -684,15 +682,15 @@ class CompanyController extends Controller
         $request->validate([
             'company_id' => 'required|exists:companies,id',
             'type' => 'required|in:address,main_address,work_address,home_address,billing_address,mailing_address',
-            'value' => 'required|string'
+            'value' => 'required|string',
         ]);
 
         // Find the company_addresses row for this person
         $addressRecord = CompanyAddress::where('company_id', $request->company_id)->first();
 
-        if (!$addressRecord) {
+        if (! $addressRecord) {
             // If row doesn't exist, create new
-            $addressRecord = new CompanyAddress();
+            $addressRecord = new CompanyAddress;
             $addressRecord->company_id = $request->company_id;
         }
 
@@ -702,8 +700,8 @@ class CompanyController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => ucfirst(str_replace('_', ' ', $request->type)) . ' updated successfully',
-            'data' => $addressRecord
+            'message' => ucfirst(str_replace('_', ' ', $request->type)).' updated successfully',
+            'data' => $addressRecord,
         ]);
     }
 
@@ -713,15 +711,15 @@ class CompanyController extends Controller
         $request->validate([
             'company_id' => 'required|exists:companies,id',
             'type' => 'required|in:phone,home_phones,mobile_phones,work_phones,fax_phones',
-            'value' => 'required|string'
+            'value' => 'required|string',
         ]);
 
         // Find the company_phones row for this person
         $phoneRecord = CompanyPhone::where('company_id', $request->company_id)->first();
 
-        if (!$phoneRecord) {
+        if (! $phoneRecord) {
             // If row doesn't exist, create new
-            $phoneRecord = new CompanyPhone();
+            $phoneRecord = new CompanyPhone;
             $phoneRecord->company_id = $request->company_id;
         }
 
@@ -731,8 +729,8 @@ class CompanyController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => ucfirst(str_replace('_', ' ', $request->type)) . ' updated successfully',
-            'data' => $phoneRecord
+            'message' => ucfirst(str_replace('_', ' ', $request->type)).' updated successfully',
+            'data' => $phoneRecord,
         ]);
     }
 
@@ -742,15 +740,15 @@ class CompanyController extends Controller
         $request->validate([
             'company_id' => 'required|exists:companies,id',
             'type' => 'required|in:url,blog_url,twitter_url',
-            'value' => 'required|url'
+            'value' => 'required|url',
         ]);
 
         // Find the company_urls row for this person
         $urlRecord = CompanyUrl::where('company_id', $request->company_id)->first();
 
-        if (!$urlRecord) {
+        if (! $urlRecord) {
             // If row doesn't exist, create new
-            $urlRecord = new CompanyUrl();
+            $urlRecord = new CompanyUrl;
             $urlRecord->company_id = $request->company_id;
         }
 
@@ -760,9 +758,11 @@ class CompanyController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => ucfirst(str_replace('_', ' ', $request->type)) . ' updated successfully',
-            'data' => $urlRecord
+            'message' => ucfirst(str_replace('_', ' ', $request->type)).' updated successfully',
+            'data' => $urlRecord,
         ]);
     }
+
+
 
 }

@@ -20,7 +20,7 @@
                                             <img src="{{ $leadStatusIcon }}" alt="Lead Status" id="lead-status-icon">
                                             {{-- <i class="fas fa-star star-icon"></i> --}}
 
-                                            <h1 contenteditable="true">
+                                            <h1 contenteditable="true" spellcheck="false">
                                                 {{ $leads->name }}
                                             </h1>
                                         </div>

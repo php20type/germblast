@@ -79,7 +79,8 @@
                                                                 src="{{ asset('img/icons/filter.svg') }}"
                                                                 alt=""></button>
                                                         <button class="btn btn-primary"><img
-                                                                src="{{ asset('img/icons/bar.svg') }}" alt=""></button>
+                                                                src="{{ asset('img/icons/bar.svg') }}"
+                                                                alt=""></button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -92,7 +93,8 @@
                                                     <thead>
                                                         <tr>
                                                             <th class="checkbox-cell">
-                                                                <input type="checkbox" class="form-check-input" id="selectAll">
+                                                                <input type="checkbox" class="form-check-input"
+                                                                    id="selectAll">
                                                             </th>
                                                             <th>
                                                                 <img src="{{ asset('img/icons/down-vector.svg') }}"
@@ -144,20 +146,20 @@
                                                                         </a>
                                                                     </div>
                                                                     <div class="company-name">
-                                                                        {{ $people->company->name ?? 'N/A' }}
+                                                                        {{ $people->companiesAlt->first()->name ?? 'N/A' }}
                                                                     </div>
                                                                 </td>
                                                                 <td>
                                                                     {{ \Carbon\Carbon::parse($people->created_at)->format('j F Y') }}
                                                                 </td>
                                                                 <td>
-                                                                    {{ $people->email ?? 'N/A' }}
+                                                                    {{ $people->peopleEmail->email ?? 'N/A' }}
                                                                 </td>
                                                                 <td>
-                                                                    {{ $people->phone ?? 'N/A' }}
+                                                                    {{ $people->peoplePhone->phone ?? 'N/A' }}
                                                                 </td>
                                                                 <td>
-                                                                    {{ $people->address ?? 'N/A' }}
+                                                                    {{ $people->peopleAddress->address ?? 'N/A' }}
                                                                 </td>
                                                                 <td>
                                                                     <span class="badge-customer">
@@ -177,7 +179,8 @@
                                     </div>
 
                                     <!-- MAP Tab Content -->
-                                    <div class="tab-pane fade" id="map-content" role="tabpanel" aria-labelledby="map-tab">
+                                    <div class="tab-pane fade" id="map-content" role="tabpanel"
+                                        aria-labelledby="map-tab">
                                         <div class="mx-3">
                                             <div id="google-map" class="mt-3 w-100 border rounded">
                                                 <iframe
@@ -226,7 +229,7 @@
                         method: "GET",
                         data: {
                             search: search,
-                            marketing_status : marketing_status,
+                            marketing_status: marketing_status,
                         },
                         success: function(data) {
                             $('table tbody').html(data);

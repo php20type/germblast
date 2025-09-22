@@ -82,10 +82,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/company/ajax', [CompanyController::class, 'ajax_store'])->name('company.ajax.store');
     Route::post('/companies/{company}/update-field', [CompanyController::class, 'updateField'])->name('company.update.field');
     Route::post('companies/delete-field', [CompanyController::class, 'deleteField'])->name('companies.delete-field');
-    // Route::post('companies/delete-email', [CompanyController::class, 'deleteEmail'])->name('companies.delete-email');
-    // Route::post('companies/delete-address', [CompanyController::class, 'deleteAddress'])->name('companies.delete-address');
-    // Route::post('companies/delete-phone', [CompanyController::class, 'deletePhone'])->name('companies.delete-phone');
-    // Route::post('companies/delete-url', [CompanyController::class, 'deleteUrl'])->name('companies.delete-url');
     Route::post('/update-company-email', [CompanyController::class, 'updateCompanyEmail'])->name('update.company.email');
     Route::post('/update-company-address', [CompanyController::class, 'updateCompanyAddress'])->name('update.company.address');
     Route::post('/update-company-phone', [CompanyController::class, 'updateCompanyPhone'])->name('update.company.phone');

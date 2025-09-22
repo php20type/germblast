@@ -26,8 +26,16 @@
                                     <img src="{{ asset('img/home/profile-image.png') }}" alt="Company"
                                         class="company-logo me-3">
                                     <div>
-                                        <h4 class="mb-2 text-transform-uppercase">{{ $peoples->name ?? 'N/A' }}</h4>
-                                        <h6 class="mb-2">{{ $peoples->bio ?? 'N/A' }}</h6>
+                                        {{-- <h4 class="mb-2 text-transform-uppercase">{{ $peoples->name ?? 'N/A' }}</h4>
+                                        <h6 class="mb-2">{{ $peoples->bio ?? 'N/A' }}</h6> --}}
+                                        <h4 class="mb-2" contenteditable="true" spellcheck="false" id="company-name">
+                                            {{ $peoples->name ?? 'N/A' }}
+                                        </h4>
+
+                                        <div class="d-flex align-items-center mb-2" id="company-description"
+                                            contenteditable="true" spellcheck="false">
+                                            {{ $peoples->bio ?? 'N/A' }}
+                                        </div>
                                         <div class="star-rating">
                                             <i class="fas fa-star"></i>
                                             <i class="fas fa-star"></i>
@@ -70,13 +78,13 @@
                             </div>
 
 
-                            <div class="people-card mb-3">
+                            {{-- <div class="people-card mb-3">
                                 <div class="d-flex align-items-center">
                                     <img src="{{ asset('img/home/companyimages1.png') }}" alt="Paul Blake"
                                         class="person-avatar me-3">
                                     <div>
-                                        <h6 class="mb-0">{{ $peoples->company?->name ?? 'N/A' }}</h6>
-                                        <small class="text-warning">{{ $peoples->company?->description ?? 'N/A' }}</small>
+                                        <h6 class="mb-0">{{ $peoples->companyAlt?->name ?? 'N/A' }}</h6>
+                                        <small class="text-warning">{{ $peoples->companyAlt?->description ?? 'N/A' }}</small>
                                     </div>
                                 </div>
                                 <div>
@@ -90,52 +98,48 @@
                                         </button>
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- Slide Toggle Form -->
-                            <div id="addCompanyForm" class="mt-3" style="display: none;">
-                                <form id="addCompanyAjaxForm" action="{{ route('admin.companies.store') }}" post="POST">
-                                    @csrf
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-2">
-                                                <input type="text" class="form-control" placeholder="Company Name"
-                                                    name="name"required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-2">
-                                                <input type="email" class="form-control" name="email"
-                                                    placeholder="Email" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-2">
-                                                <input type="text" class="form-control" placeholder="Phone Number"
-                                                    name="phone" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="mb-2">
-                                                <input type="text" class="form-control" placeholder="https://"
-                                                    name="url" required>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="mb-2">
-                                                <textarea rows="3" placeholder="Description" class="form-control" name="description" required></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="mb-2">
-                                                <textarea rows="3" placeholder="Address" class="form-control" name="address" required></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <button type="submit" class="btn btn-warning btn-sm">Add Company</button>
+                            </div> --}}
+                            @foreach ($peoples->companiesAlt as $company)
+                                <div class="people-card mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ asset('img/home/companyimages1.png') }}" alt="{{ $company->name }}"
+                                            class="person-avatar me-3">
+                                        <div>
+                                            <h6 class="mb-0">{{ $company->name ?? 'N/A' }}</h6>
+                                            <small class="text-warning">{{ $company->description ?? 'N/A' }}</small>
                                         </div>
                                     </div>
+
+                                    <div class="d-flex gap-3 align-items-center mt-2">
+                                        <div class="text-end">
+                                            <div>{{ $company->companyPhone->phone ?? 'N/A' }}</div>
+                                            <div class="text-muted">{{ $company->companyAddress->address ?? 'N/A' }}</div>
+                                        </div>
+
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                            onclick="deleteCompany({{ $company->id }})">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            @endforeach
+
+
+                            <!-- Slide Toggle Form -->
+                            {{-- <div id="addCompanyForm" class="mt-3" style="display: none;">
+                                <form id="addCompanyAjaxForm" action="{{ route('admin.companies.store') }}" post="POST">
                                 </form>
+                            </div> --}}
+
+                            <div id="addCompanyForm" class="mt-3" style="display: none;">
+                                <div class="mb-3">
+                                    <select class="form-select company-update" data-field="" id="companySelect">
+                                        <option selected>Add Company</option>
+                                        @foreach ($availableCompanies as $company)
+                                            <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
 
                         </div>
@@ -552,7 +556,7 @@
                             </div>
 
                             <div class="col-12 inline-detail-input">
-                                <div class="row g-2">
+                                <div class="row g-2" id="email-list">
                                     @forelse($emails as $email)
                                         <div class="col-12 mb-2">
                                             <div class="row g-2">
@@ -572,10 +576,6 @@
                                                 <div class="col-md-8 d-flex gap-3 align-items-center">
                                                     <input type="text" name="detail_value[]" class="form-control"
                                                         value="{{ $email['value'] }}" placeholder="Enter email" disabled>
-                                                    {{-- <button class="btn btn-sm btn-outline-secondary"
-                                                        onclick="deleteEmail()">
-                                                        <i class="fas fa-times"></i>
-                                                    </button> --}}
                                                     <button class="btn btn-sm btn-outline-secondary"
                                                         onclick="deleteField('{{ $peoples->id }}', '{{ $email['selected'] }}', 'email')">
                                                         <i class="fas fa-times"></i>
@@ -639,7 +639,7 @@
                             </div>
 
                             <div class="col-12 inline-detail-input">
-                                <div class="row g-2">
+                                <div class="row g-2" id="address-list">
                                     @forelse($addresses as $address)
                                         <div class="col-12 mb-2">
                                             <div class="row g-2">
@@ -660,10 +660,6 @@
                                                     <input type="text" name="address_value[]" class="form-control"
                                                         value="{{ $address['value'] }}" placeholder="Enter address"
                                                         disabled>
-                                                    {{-- <button class="btn btn-sm btn-outline-secondary"
-                                                        onclick="deleteAddress()">
-                                                        <i class="fas fa-times"></i>
-                                                    </button> --}}
                                                     <button class="btn btn-sm btn-outline-secondary"
                                                         onclick="deleteField('{{ $peoples->id }}', '{{ $address['selected'] }}', 'address')">
                                                         <i class="fas fa-times"></i>
@@ -728,7 +724,7 @@
                             </div>
 
                             <div class="col-12 inline-detail-input">
-                                <div class="row g-2">
+                                <div class="row g-2" id="phone-list">
                                     @forelse($phones as $phone)
                                         <div class="col-12 mb-2">
                                             <div class="row g-2">
@@ -749,10 +745,6 @@
                                                     <input type="text" name="phone_value[]" class="form-control"
                                                         value="{{ $phone['value'] }}" placeholder="Enter phone number"
                                                         disabled>
-                                                    {{-- <button class="btn btn-sm btn-outline-secondary"
-                                                        onclick="deletePhone()">
-                                                        <i class="fas fa-times"></i>
-                                                    </button> --}}
                                                     <button class="btn btn-sm btn-outline-secondary"
                                                         onclick="deleteField('{{ $peoples->id }}', '{{ $phone['selected'] }}', 'phone')">
                                                         <i class="fas fa-times"></i>
@@ -816,7 +808,7 @@
                             </div>
 
                             <div class="col-12 inline-detail-input">
-                                <div class="row g-2">
+                                <div class="row g-2" id="url-list">
                                     @forelse($urls as $url)
                                         <div class="col-12 mb-2">
                                             <div class="row g-2">
@@ -836,10 +828,6 @@
                                                 <div class="col-md-8 d-flex gap-3 align-items-center">
                                                     <input type="text" name="url_value[]" class="form-control"
                                                         value="{{ $url['value'] }}" placeholder="Enter URL" disabled>
-                                                    {{-- <button class="btn btn-sm btn-outline-secondary"
-                                                        onclick="deleteUrl()">
-                                                        <i class="fas fa-times"></i>
-                                                    </button> --}}
                                                     <button class="btn btn-sm btn-outline-secondary"
                                                         onclick="deleteField('{{ $peoples->id }}', '{{ $url['selected'] }}', 'url')">
                                                         <i class="fas fa-times"></i>
@@ -1447,8 +1435,37 @@
             }
         });
 
+        function deleteCompany(company_id) {
+            // var deleteurl = "{{ route('admin.people.delete', ':people_id') }}".replace(':people_id', person_id);
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to undo this action!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirect to the delete route
+                    window.location.href = deleteurl;
+                }
+            });
+        }
+
+
 
         function deleteField(people_id, type, fieldName) {
+
+            let list = $(`#${fieldName}-list`);
+            let count = list.children().length;
+
+            if (count <= 1) {
+                toastr.warning(`At least one ${fieldName} is required.`);
+                return false;
+            }
+
             Swal.fire({
                 title: 'Are you sure?',
                 text: `This ${fieldName} will be removed from the people record!`,

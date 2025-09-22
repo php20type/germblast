@@ -107,7 +107,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {{-- @foreach ($companies as $company)
+                                        @foreach ($companies as $company)
                                             <tr>
                                                 <td>
                                                     <input type="checkbox" class="form-check-input row-checkbox">
@@ -120,55 +120,23 @@
                                                         </a>
                                                     </div>
                                                     <div class="company-name">
-                                                        {{ $company->person?->name ?? 'N/A' }}
+                                                        {{ $company->peoples->first()?->name ?? 'N/A' }}
                                                     </div>
-                                                    {{-- Assuming relation --}
-                                                </td>
-                                                <td>{{ $company->person?->name ?? 'N/A' }}</td>
-                                                {{-- peoples of that
-                                        company info --}
-                                                <td>{{ \Carbon\Carbon::parse($company->created_at)->format('d F Y') }}</td>
-                                                <td>
-                                                    {{ $company->address }}
-                                                </td>
-                                                <td><span class="badge-customer">
-                                                        {{ $company->companyType?->type ?? 'N/A' }}
-                                                    </span></td> {{-- You can make this dynamic if needed --}
-                                                <td>
-                                                    <span class="badge-customer">
-                                                        {{ $company->tag?->name ?? 'N/A' }}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        @endforeach --}}
-                                          @foreach ($companies as $company)
-                                            <tr>
-                                                <td>
-                                                    <input type="checkbox" class="form-check-input row-checkbox">
                                                 </td>
                                                 <td>
-                                                    <div class="company-name">
-                                                        <a href="{{ route('admin.companies.show', $company->id) }}"
-                                                            class="text-decoration-none text-dark">
-                                                            {{ $company->name ?? 'N/A' }}
-                                                        </a>
-                                                    </div>
-                                                    <div class="company-name">
-                                                        {{ $company->person?->name ?? 'N/A' }}</div>
-                                                    {{-- Assuming relation --}}
+                                                    {{ $company->peoples->pluck('name')->join(', ') ?: 'N/A' }}
                                                 </td>
-                                                <td>{{ $company->person?->name ?? 'N/A' }}</td>
                                                 {{-- peoples of that company info --}}
                                                 <td>{{ \Carbon\Carbon::parse($company->created_at)->format('d F Y') }}</td>
                                                 <td>
-                                                    {{ $company->address }}
+                                                    {{ $company->companyAddress->address ?? 'N/A' }}
                                                 </td>
                                                 <td><span class="badge-customer">
-                                                        {{ $company->companyType?->type ?? 'N/A' }}
-                                                    </span></td> {{-- You can make this dynamic if needed --}}
+                                                        {{ $company->companyType->type ?? 'N/A' }}
+                                                    </span></td>
                                                 <td>
                                                     <span class="badge-customer">
-                                                        {{ $company->tag?->name ?? 'N/A' }}
+                                                        {{ $company->tag->name ?? 'N/A' }}
                                                     </span>
                                                 </td>
                                             </tr>

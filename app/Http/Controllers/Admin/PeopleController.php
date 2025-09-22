@@ -3,26 +3,24 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Territory;
-use Illuminate\Http\Request;
-use App\Models\People;
-use App\Models\User;
 use App\Models\ActivityType;
-use App\Models\Source;
+use App\Models\Company;
 use App\Models\Competitor;
+use App\Models\Industry;
+use App\Models\Lead;
+use App\Models\People;
 use App\Models\PeopleAddress;
+use App\Models\PeopleCompany;
 use App\Models\PeopleEmail;
 use App\Models\PeoplePhone;
-use App\Models\PeopleCompany;
 use App\Models\PeopleUrl;
-use App\Models\Industry;
 use App\Models\Product;
-use App\Models\Company;
-use App\Models\Lead;
+use App\Models\Source;
 use App\Models\Tag;
+use App\Models\Territory;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-
 
 class PeopleController extends Controller
 {
@@ -41,7 +39,7 @@ class PeopleController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $query = People::with(['companies', 'tag', 'user']);
+        $query = People::with(['companies', 'tag', 'user', 'peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany']);
 
         // AJAX filters
         if ($request->ajax()) {
@@ -87,7 +85,7 @@ class PeopleController extends Controller
         $users = User::all();
 
         // Base query: people assigned to the given user
-        $query = People::with(['companies', 'tag', 'user'])
+        $query = People::with(['companies', 'tag', 'user', 'peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany'])
             ->where('user_id', $id);
 
         // AJAX filters
@@ -129,7 +127,7 @@ class PeopleController extends Controller
         $users = User::all();
 
         // Fetch people assigned to current user with updated relationships
-        $peoples = People::with(['companies', 'tag', 'user'])
+        $peoples = People::with(['companies', 'tag', 'user', 'peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany'])
             ->where('user_id', $user->id)
             ->get();
 
@@ -202,7 +200,7 @@ class PeopleController extends Controller
             'leadPeople',
             'leads',
             'companyPeople',
-            'companies'
+            'companies',
         ])->findOrFail($id);
 
         // Fetch related data
@@ -217,6 +215,9 @@ class PeopleController extends Controller
         $products = Product::all();
         $companies = Company::all();
 
+        $assignedCompanyIds = $peoples->companiesAlt->pluck('id'); // already linked company IDs
+        $availableCompanies = Company::whereNotIn('id', $assignedCompanyIds)->get();
+
         // Fetch all leads with their relations
         $leads = Lead::with([
             'assignee',
@@ -224,9 +225,8 @@ class PeopleController extends Controller
             'products',
             'peoples',
             'sources',
-            'competitors'
+            'competitors',
         ])->get();
-
 
         $emailTypes = [
             'email' => 'Email',
@@ -239,7 +239,7 @@ class PeopleController extends Controller
         $emailRecord = $peoples->peopleEmail; // hasOne → single record
         if ($emailRecord) {
             foreach ($emailTypes as $field => $label) {
-                if (!empty($emailRecord->$field)) {
+                if (! empty($emailRecord->$field)) {
                     $emails[] = [
                         'id' => $emailRecord->id,
                         'selected' => $field,   // which option should be selected
@@ -263,7 +263,7 @@ class PeopleController extends Controller
         $addressRecord = $peoples->peopleAddress; // hasOne → single record
         if ($addressRecord) {
             foreach ($addressTypes as $field => $label) {
-                if (!empty($addressRecord->$field)) {
+                if (! empty($addressRecord->$field)) {
                     $addresses[] = [
                         'id' => $addressRecord->id,
                         'selected' => $field,   // which option should be selected
@@ -286,7 +286,7 @@ class PeopleController extends Controller
         $phoneRecord = $peoples->peoplePhone; // hasOne → single record
         if ($phoneRecord) {
             foreach ($phoneTypes as $field => $label) {
-                if (!empty($phoneRecord->$field)) {
+                if (! empty($phoneRecord->$field)) {
                     $phones[] = [
                         'id' => $phoneRecord->id,
                         'selected' => $field,   // which option should be selected
@@ -307,7 +307,7 @@ class PeopleController extends Controller
         $urlRecord = $peoples->peopleUrl; // hasOne → single record
         if ($urlRecord) {
             foreach ($urlTypes as $field => $label) {
-                if (!empty($urlRecord->$field)) {
+                if (! empty($urlRecord->$field)) {
                     $urls[] = [
                         'id' => $urlRecord->id,
                         'selected' => $field, // which option should be selected
@@ -327,6 +327,7 @@ class PeopleController extends Controller
             'users',
             'industries',
             'territories',
+            'availableCompanies',
             'allpeoples',
             'products',
             'companies',
@@ -391,7 +392,6 @@ class PeopleController extends Controller
 
     //     return redirect()->back()->with('success', 'People added successfully.');
     // }
-
 
     public function store(Request $request)
     {
@@ -469,7 +469,7 @@ class PeopleController extends Controller
         ]);
 
         // Step 2: Store Email in people_emails table
-        if (!empty($validated['email'])) {
+        if (! empty($validated['email'])) {
             DB::table('people_emails')->insert([
                 'people_id' => $people->id,
                 'email' => $validated['email'],
@@ -488,6 +488,7 @@ class PeopleController extends Controller
     public function delete(Request $request)
     {
         People::where('id', $request->people_id)->delete();
+
         return redirect()->back();
     }
 
@@ -496,7 +497,7 @@ class PeopleController extends Controller
         $request->validate([
             'people_id' => 'required|exists:people,id',
             'type' => 'required|string',
-            'field_name' => 'required|string' // email, address, phone, url
+            'field_name' => 'required|string', // email, address, phone, url
         ]);
 
         // Map field_name to model and allowed types
@@ -507,20 +508,20 @@ class PeopleController extends Controller
             'url' => [PeopleUrl::class, ['url', 'blog_url', 'twitter_url']],
         ];
 
-        if (!isset($models[$request->field_name])) {
+        if (! isset($models[$request->field_name])) {
             return response()->json(['status' => 'error', 'message' => 'Invalid field name'], 400);
         }
 
         [$modelClass, $allowedTypes] = $models[$request->field_name];
 
-        if (!in_array($request->type, $allowedTypes)) {
+        if (! in_array($request->type, $allowedTypes)) {
             return response()->json(['status' => 'error', 'message' => 'Invalid type'], 400);
         }
 
         $record = $modelClass::where('people_id', $request->people_id)->first();
 
-        if (!$record) {
-            return response()->json(['status' => 'error', 'message' => ucfirst($request->field_name) . ' record not found'], 404);
+        if (! $record) {
+            return response()->json(['status' => 'error', 'message' => ucfirst($request->field_name).' record not found'], 404);
         }
 
         $record->{$request->type} = null;
@@ -528,12 +529,12 @@ class PeopleController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => ucfirst(str_replace('_', ' ', $request->type)) . ' deleted successfully',
-            'data' => $record
+            'message' => ucfirst(str_replace('_', ' ', $request->type)).' deleted successfully',
+            'data' => $record,
         ]);
     }
 
-     public function updateField(Request $request, Company $company)
+    public function updateField(Request $request, Company $company)
     {
         $request->validate([
             'field' => 'required|string',
@@ -542,12 +543,12 @@ class PeopleController extends Controller
 
         $allowed = ['territory_id', 'user_id'];
 
-        if (!in_array($request->field, $allowed)) {
+        if (! in_array($request->field, $allowed)) {
             return response()->json(['error' => 'Invalid field'], 422);
         }
 
         $company->update([
-            $request->field => $request->value
+            $request->field => $request->value,
         ]);
 
         return response()->json(['success' => true, 'field' => $request->field, 'value' => $request->value]);
@@ -559,15 +560,15 @@ class PeopleController extends Controller
         $request->validate([
             'people_id' => 'required|exists:people,id',
             'type' => 'required|in:email,personal_email,support_email,work_email',
-            'value' => 'required|email'
+            'value' => 'required|email',
         ]);
 
         // Find the people_emails row for this person
         $emailRecord = PeopleEmail::where('people_id', $request->people_id)->first();
 
-        if (!$emailRecord) {
+        if (! $emailRecord) {
             // If row doesn't exist, create new
-            $emailRecord = new PeopleEmail();
+            $emailRecord = new PeopleEmail;
             $emailRecord->people_id = $request->people_id;
         }
 
@@ -578,8 +579,8 @@ class PeopleController extends Controller
         // Return JSON response
         return response()->json([
             'status' => 'success',
-            'message' => ucfirst(str_replace('_', ' ', $request->type)) . ' updated successfully',
-            'data' => $emailRecord
+            'message' => ucfirst(str_replace('_', ' ', $request->type)).' updated successfully',
+            'data' => $emailRecord,
         ]);
     }
 
@@ -589,15 +590,15 @@ class PeopleController extends Controller
         $request->validate([
             'people_id' => 'required|exists:people,id',
             'type' => 'required|in:address,main_address,work_address,home_address,billing_address,mailing_address',
-            'value' => 'required|string'
+            'value' => 'required|string',
         ]);
 
         // Find the people_addresses row for this person
         $addressRecord = PeopleAddress::where('people_id', $request->people_id)->first();
 
-        if (!$addressRecord) {
+        if (! $addressRecord) {
             // If row doesn't exist, create new
-            $addressRecord = new PeopleAddress();
+            $addressRecord = new PeopleAddress;
             $addressRecord->people_id = $request->people_id;
         }
 
@@ -607,8 +608,8 @@ class PeopleController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => ucfirst(str_replace('_', ' ', $request->type)) . ' updated successfully',
-            'data' => $addressRecord
+            'message' => ucfirst(str_replace('_', ' ', $request->type)).' updated successfully',
+            'data' => $addressRecord,
         ]);
     }
 
@@ -618,15 +619,15 @@ class PeopleController extends Controller
         $request->validate([
             'people_id' => 'required|exists:people,id',
             'type' => 'required|in:phone,home_phones,mobile_phones,work_phones,fax_phones',
-            'value' => 'required|string'
+            'value' => 'required|string',
         ]);
 
         // Find the people_phones row for this person
         $phoneRecord = PeoplePhone::where('people_id', $request->people_id)->first();
 
-        if (!$phoneRecord) {
+        if (! $phoneRecord) {
             // If row doesn't exist, create new
-            $phoneRecord = new PeoplePhone();
+            $phoneRecord = new PeoplePhone;
             $phoneRecord->people_id = $request->people_id;
         }
 
@@ -636,11 +637,10 @@ class PeopleController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => ucfirst(str_replace('_', ' ', $request->type)) . ' updated successfully',
-            'data' => $phoneRecord
+            'message' => ucfirst(str_replace('_', ' ', $request->type)).' updated successfully',
+            'data' => $phoneRecord,
         ]);
     }
-
 
     public function updatePersonUrl(Request $request)
     {
@@ -648,15 +648,15 @@ class PeopleController extends Controller
         $request->validate([
             'people_id' => 'required|exists:people,id',
             'type' => 'required|in:url,blog_url,twitter_url',
-            'value' => 'required|url'
+            'value' => 'required|url',
         ]);
 
         // Find the people_urls row for this person
         $urlRecord = PeopleUrl::where('people_id', $request->people_id)->first();
 
-        if (!$urlRecord) {
+        if (! $urlRecord) {
             // If row doesn't exist, create new
-            $urlRecord = new PeopleUrl();
+            $urlRecord = new PeopleUrl;
             $urlRecord->people_id = $request->people_id;
         }
 
@@ -666,11 +666,8 @@ class PeopleController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => ucfirst(str_replace('_', ' ', $request->type)) . ' updated successfully',
-            'data' => $urlRecord
+            'message' => ucfirst(str_replace('_', ' ', $request->type)).' updated successfully',
+            'data' => $urlRecord,
         ]);
     }
-
-
-
 }

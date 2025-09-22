@@ -10,21 +10,23 @@
                  </a>
              </div>
              <div class="company-name">
-                 {{ $company->person?->name ?? 'N/A' }}</div>
-             {{-- Assuming relation --}}
+                 {{ $company->peoples->first()?->name ?? 'N/A' }}
+             </div>
          </td>
-         <td>{{ $company->person?->name ?? 'N/A' }}</td>
+         <td>
+             {{ $company->peoples->pluck('name')->join(', ') ?: 'N/A' }}
+         </td>
          {{-- peoples of that company info --}}
          <td>{{ \Carbon\Carbon::parse($company->created_at)->format('d F Y') }}</td>
          <td>
-             {{ $company->address }}
+             {{ $company->companyAddress->address ?? 'N/A' }}
          </td>
          <td><span class="badge-customer">
-                 {{ $company->companyType?->type ?? 'N/A' }}
-             </span></td> {{-- You can make this dynamic if needed --}}
+                 {{ $company->companyType->type ?? 'N/A' }}
+             </span></td>
          <td>
              <span class="badge-customer">
-                 {{ $company->tag?->name ?? 'N/A' }}
+                 {{ $company->tag->name ?? 'N/A' }}
              </span>
          </td>
      </tr>

@@ -144,20 +144,20 @@
                                                                     </a>
                                                                 </div>
                                                                 <div class="company-name">
-                                                                    {{ $people->company->name ?? 'N/A' }}
+                                                                    {{ $people->companiesAlt->first()->name ?? 'N/A' }}
                                                                 </div>
                                                             </td>
                                                             <td>
                                                                 {{ \Carbon\Carbon::parse($people->created_at)->format('j F Y') }}
                                                             </td>
                                                             <td>
-                                                                {{ $people->email ?? 'N/A' }}
+                                                                {{ $people->peopleEmail->email ?? 'N/A' }}
                                                             </td>
                                                             <td>
-                                                                {{ $people->phone ?? 'N/A' }}
+                                                                {{ $people->peoplePhone->phone ?? 'N/A' }}
                                                             </td>
                                                             <td>
-                                                                {{ $people->address ?? 'N/A' }}
+                                                                {{ $people->peopleAddress->address ?? 'N/A' }}
                                                             </td>
                                                             <td>
                                                                 <span class="badge-customer">
