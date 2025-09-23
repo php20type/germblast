@@ -10,7 +10,7 @@ use App\Http\Controllers\Admin\PeopleController;
 use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\Admin\LeadController;
 use App\Models\User;
-use App\Models\people;
+use App\Models\People;
 use App\Models\Company;
 use App\Models\Source;
 use App\Models\Product;
