@@ -12,6 +12,7 @@ use App\Models\LeadCompany;
 use App\Models\LeadCompetitor;
 use App\Models\LeadPeople;
 use App\Models\LeadProduct;
+use App\Models\LeadTask;
 use App\Models\LeadSource;
 use App\Models\LeadStage;
 use App\Models\Market;
@@ -684,6 +685,9 @@ class LeadController extends Controller
             'leadTask',
         ])->findOrFail($id);
 
+        $pending_tasks = $leads->leadTask->whereNull('completed_user_id');
+        $completed_tasks = $leads->leadTask->whereNotNull('completed_user_id');
+
         $leadStatusIcon = '';
 
         $status = strtolower($leads->lead_status);
@@ -728,6 +732,8 @@ class LeadController extends Controller
         return view('admin.leads.edit', compact(
             'leads',
             'leadStatusIcon',
+            'pending_tasks',
+            'completed_tasks',
             'users',
             'allpeoples',
             'industries',
@@ -919,4 +925,49 @@ class LeadController extends Controller
             'message' => ucfirst($request->type).' added successfully.',
         ]);
     }
+
+
+    public function addTask(Request $request, $leadId)
+    {
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'due_date' => 'required|string', // will parse manually
+            'user_id' => 'required|exists:users,id',
+            'description' => 'nullable|string',
+        ]);
+
+        $assignee = User::findOrFail($request->user_id);
+
+        // Convert the due_date from "2025-09-24 6:30 PM" → "2025-09-24 18:30:00"
+        $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
+
+        // Create the task
+        $task = LeadTask::create([
+            'lead_id' => $leadId,
+            'title' => $request->title,
+            'description' => $request->description,
+            'created_time' => now(),
+            'due_time' => $dueTime,
+            'assignee_id' => $assignee->id,
+            'assignee_name' => $assignee->name,
+            'subject_type' => 'lead',
+            'subject_legacy_id' => $leadId,
+        ]);
+
+        // Return JSON response for AJAX
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Task added successfully',
+            'task' => $task,
+        ]);
+    }
+
+
+    public function deleteTask($task_id)
+{
+    LeadTask::where('id', $task_id)->delete();
+    return redirect()->back();
+}
+
 }

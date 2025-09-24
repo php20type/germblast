@@ -10,6 +10,7 @@ use App\Models\CompanyAddress;
 use App\Models\CompanyEmail;
 use App\Models\CompanyPeople;
 use App\Models\CompanyPhone;
+use App\Models\CompanyTask;
 use App\Models\CompanyType;
 use App\Models\CompanyUrl;
 use App\Models\Competitor;
@@ -299,11 +300,15 @@ class CompanyController extends Controller
             'companyPeople',
             'companyPhone',
             'companyAddress',
+            'companyTask',
             'companyUrl',
             'peoples', // <-- fetch related people via pivot
         ])->findOrFail($id);
 
         $companies = Company::all();
+        $pending_tasks = $company->companyTask->whereNull('completed_user_id');
+        $completed_tasks = $company->companyTask->whereNotNull('completed_user_id');
+
         $users = User::all();
         $companytags = Tag::where('tag_id', 2)->get();
         $competitors = Competitor::all();
@@ -406,6 +411,8 @@ class CompanyController extends Controller
 
         return view('admin.company.edit', compact(
             'company',
+            'pending_tasks',
+            'completed_tasks',
             'users',
             'company_types',
             'companytags',
@@ -646,6 +653,7 @@ class CompanyController extends Controller
             'data' => $record,
         ]);
     }
+
     public function updateCompanyEmail(Request $request)
     {
         // Validate request
@@ -763,6 +771,47 @@ class CompanyController extends Controller
         ]);
     }
 
+    public function addTask(Request $request, $companyId)
+    {
 
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'due_date' => 'required|string', // will parse manually
+            'user_id' => 'required|exists:users,id',
+            'description' => 'nullable|string',
+        ]);
+
+        $assignee = User::findOrFail($request->user_id);
+
+        // Convert the due_date from "2025-09-24 6:30 PM" → "2025-09-24 18:30:00"
+        $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
+
+        // Create the task
+        $task = CompanyTask::create([
+            'company_id' => $companyId,
+            'title' => $request->title,
+            'description' => $request->description,
+            'created_time' => now(),
+            'due_time' => $dueTime,
+            'assignee_id' => $assignee->id,
+            'assignee_name' => $assignee->name,
+            'subject_type' => 'company',
+            'subject_legacy_id' => $companyId,
+        ]);
+
+        // Return JSON response for AJAX
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Task added successfully',
+            'task' => $task,
+        ]);
+    }
+
+
+    public function deleteTask($task_id)
+{
+    CompanyTask::where('id', $task_id)->delete();
+    return redirect()->back();
+}
 
 }

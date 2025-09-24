@@ -144,28 +144,72 @@
 
                         </div>
 
-                        <!-- Tasks Section -->
-                        {{-- <div class="section-card">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5>TASKS</h5>
-                            <a href="#" class="text-warning">Add A Task</a>
-                        </div>
-                        <div class="d-flex align-items-start">
-                            <div class="task-icon me-3">
-                                <i class="fas fa-list"></i>
-                            </div>
-                            <div class="flex-1">
-                                <h6>NO UPCOMING TASKS</h6>
-                                <p class="text-muted mb-0">Nice work! Now, add tasks to your leads like
-                                    "Mail a proposal" or "Send follow-up email" to be reminded here.</p>
-                            </div>
-                        </div>
-                    </div> --}}
+
+                         <!-- Tasks Section -->
                         <div class="section-card">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5>TASKS</h5>
                                 <a class="text-warning" href="javascript:void(0);" id="toggleAddTask">Add A Task</a>
                             </div>
+
+                            @foreach ($pending_tasks as $task)
+                                <div class="task-section">
+                                    <div class="company-list mb-3 border rounded p-3">
+                                        <div class="row align-items-start">
+                                            <div class="col-md-6">
+                                                <div class="company-name">
+                                                    <p><strong>{{ $task->title ?? 'N/A' }}</strong></p>
+                                                    <p class="text-secondary">
+                                                        Due
+                                                        {{ \Carbon\Carbon::parse($task->due_time)->format('M d, \a\t g:i a') }}
+                                                    </p>
+                                                    <p class="text-warning">{{ $task->assignee_name ?? 'N/A' }}</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 d-flex justify-content-end">
+                                                <div class="d-flex gap-2">
+                                                    <!-- Completed -->
+                                                    <button class="btn btn-sm btn-outline-success"
+                                                        onclick="markCompleted({{ $task->id }})"
+                                                        title="Mark as Completed">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+
+                                                    <!-- Edit -->
+                                                    {{-- <button class="btn btn-sm btn-outline-primary" id="toggleEditTask"
+                                                        onclick="editTask({{ $task->id }})" title="Edit Task">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button> --}}
+                                                    <button class="btn btn-sm btn-outline-primary toggleEditTask"
+                                                        data-id="{{ $task->id }}" data-title="{{ $task->title }}"
+                                                        data-due="{{ $task->due_time }}"
+                                                        data-user="{{ $task->assignee_id }}"
+                                                        data-description="{{ $task->description }}" title="Edit Task">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+
+
+                                                    <!-- Delete -->
+                                                    <button class="btn btn-sm btn-outline-secondary"
+                                                        onclick="deleteTask({{ $task->id }})" title="Delete Task">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-2">
+                                            <div class="col-12">
+                                                <div class="email-preview border rounded p-3 text-secondary">
+                                                    {{ $task->description ?? 'N/A' }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+
                             <div class="d-flex align-items-start">
                                 <div class="task-icon me-3">
                                     <i class="fas fa-list"></i>
@@ -181,7 +225,8 @@
                         {{-- Task form --}}
                         <div id="addTaskForm" class="my-3" style="display: none;">
 
-                            <form id="addTaskAjaxForm" action="{{ route('admin.tasks.store') }}" post="POST">
+                            <form id="addTaskAjaxForm" action="{{ route('admin.people.tasks.store', $peoples->id) }}"
+                                method="POST">
                                 @csrf
                                 <div class="row">
                                     <div class="col-md-6">
@@ -193,7 +238,8 @@
 
                                     <div class="col-md-6">
                                         <div class="mb-2">
-                                            <input type="datetime-local" name="due_date" class="form-control" required>
+                                            <input type="text" name="due_date" id="due_date" class="form-control"
+                                                placeholder="Select due date" required>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
@@ -223,6 +269,49 @@
                         </div>
 
 
+                        <div id="EditTaskForm" class="my-3" style="display: none;">
+
+                            <form id="editTaskAjaxForm" action="" method="POST">
+                                @csrf
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-2">
+                                            <input type="text" name="title" class="form-control"
+                                                placeholder="Add a Task" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="mb-2">
+                                            <input type="text" name="due_date" id="due_date" class="form-control"
+                                                placeholder="Select due date" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="mb-2">
+                                            <select class="form-select" name="user_id" required>
+                                                <option value="">-- Select User --</option>
+                                                @foreach ($users as $user)
+                                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="mb-2">
+                                            <textarea rows="3" placeholder="Include any description you need to help complete this task…"
+                                                name="description" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <button type="submit" class="btn btn-warning btn-sm">Update
+                                            Task</button>
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
 
 
                         <!-- Activities Section -->
@@ -1323,6 +1412,35 @@
 
         $(document).ready(function() {
 
+
+            $('.toggleEditTask').click(function() {
+                // Get data from button
+                var title = $(this).data('title');
+                var due = $(this).data('due');
+                var userId = $(this).data('user');
+                var description = $(this).data('description');
+
+                // Show the form
+                $('#EditTaskForm').toggle();
+
+                // Fill the form
+                $('#EditTaskForm input[name="title"]').val(title);
+                $('#EditTaskForm #due_date').val(due);
+                $('#EditTaskForm select[name="user_id"]').val(userId);
+                $('#EditTaskForm textarea[name="description"]').val(description);
+
+            });
+
+
+
+            flatpickr("#due_date", {
+                enableTime: true,
+                dateFormat: "Y-m-d h:i K", // h = 12-hour, K = AM/PM
+                minDate: "today",
+                defaultDate: new Date().setHours(18, 30, 0, 0), // today at 6:30 PM
+                time_24hr: false
+            });
+
             $('.toggle-inline-email').on('click', function() {
                 $('.inline-detail-email').toggle(); // smooth animation
             });
@@ -1387,9 +1505,26 @@
 
         });
 
+        function deleteTask(task_id) {
+            var deleteurl = "/admin/people/tasks/delete/" + task_id;
 
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to undo this action!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = deleteurl;
+                }
+            });
+        }
 
         $(document).ready(function() {
+
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -1979,7 +2114,7 @@
         });
 
 
-        $('#addTaskAjaxForm').submit(function(e) {
+       $('#addTaskAjaxForm').submit(function(e) {
             e.preventDefault();
 
             if (!$('#addTaskAjaxForm').valid()) {
@@ -1987,19 +2122,28 @@
             }
 
             $.ajax({
-                url: "{{ route('admin.tasks.store') }}",
+                url: "{{ route('admin.people.tasks.store', $peoples->id) }}",
                 method: "POST",
                 data: $(this).serialize(),
                 success: function(response) {
-                    alert('Task added successfully!');
-                    $('#addTaskAjaxForm')[0].reset();
-                    console.log(response);
-                    location.reload();
-
+                    console.log('Task Added successfully:', response);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(() => {
+                        location.reload(); // reload after popup closes
+                    });
                 },
                 error: function(xhr) {
-                    alert('Error: ' + xhr.responseText);
-                    toastr.error('Something went wrong while adding the task.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: xhr.responseText || 'Something went wrong while adding the task.'
+                    });
+                    console.error(xhr.responseText);
                 }
             });
         });

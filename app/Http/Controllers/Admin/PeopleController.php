@@ -13,12 +13,14 @@ use App\Models\PeopleAddress;
 use App\Models\PeopleCompany;
 use App\Models\PeopleEmail;
 use App\Models\PeoplePhone;
+use App\Models\PeopleTask;
 use App\Models\PeopleUrl;
 use App\Models\Product;
 use App\Models\Source;
 use App\Models\Tag;
 use App\Models\Territory;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -203,6 +205,9 @@ class PeopleController extends Controller
             'companies',
         ])->findOrFail($id);
 
+        $pending_tasks = $peoples->peopleTask->whereNull('completed_user_id');
+        $completed_tasks = $peoples->peopleTask->whereNotNull('completed_user_id');
+
         // Fetch related data
         $activity_types = ActivityType::all();
         $sources = Source::all();
@@ -321,6 +326,8 @@ class PeopleController extends Controller
             'peoples',
             'leads',
             'persontags',
+            'pending_tasks',
+            'completed_tasks',
             'activity_types',
             'sources',
             'competitors',
@@ -669,5 +676,48 @@ class PeopleController extends Controller
             'message' => ucfirst(str_replace('_', ' ', $request->type)).' updated successfully',
             'data' => $urlRecord,
         ]);
+    }
+
+    public function addTask(Request $request, $peopleId)
+    {
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'due_date' => 'required|string', // will parse manually
+            'user_id' => 'required|exists:users,id',
+            'description' => 'nullable|string',
+        ]);
+
+        $assignee = User::findOrFail($request->user_id);
+
+        // Convert the due_date from "2025-09-24 6:30 PM" → "2025-09-24 18:30:00"
+        $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
+
+        // Create the task
+        $task = PeopleTask::create([
+            'people_id' => $peopleId,
+            'title' => $request->title,
+            'description' => $request->description,
+            'created_time' => now(),
+            'due_time' => $dueTime,
+            'assignee_id' => $assignee->id,
+            'assignee_name' => $assignee->name,
+            'subject_type' => 'people',
+            'subject_legacy_id' => $peopleId,
+        ]);
+
+        // Return JSON response for AJAX
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Task added successfully',
+            'task' => $task,
+        ]);
+    }
+
+    public function deleteTask($task_id)
+    {
+        PeopleTask::where('id', $task_id)->delete();
+
+        return redirect()->back();
     }
 }
