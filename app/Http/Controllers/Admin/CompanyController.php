@@ -807,11 +807,78 @@ class CompanyController extends Controller
         ]);
     }
 
+    public function updateTask(Request $request, $taskId)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'due_date' => 'required|string', // will parse manually
+            'user_id' => 'required|exists:users,id',
+            'description' => 'nullable|string',
+        ]);
+
+        $task = CompanyTask::findOrFail($taskId);
+        $assignee = User::findOrFail($request->user_id);
+
+        // Convert the due_date from "2025-09-24 6:30 PM" → "2025-09-24 18:30:00"
+        $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
+
+        // Update the task
+        $task->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'due_time' => $dueTime,
+            'assignee_id' => $assignee->id,
+            'assignee_name' => $assignee->name,
+        ]);
+
+        // Return JSON response for AJAX
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Task updated successfully',
+            'task' => $task,
+        ]);
+    }
+
+    public function markCompleted($taskId)
+    {
+        $task = CompanyTask::findOrFail($taskId);
+
+        $user = auth()->user(); // logged-in user
+
+        $task->update([
+            'completed_time' => now(),
+            'completed_user_id' => $user->id,
+            'completed_user_name' => $user->name,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Task marked as completed successfully!',
+            'task' => $task,
+        ]);
+    }
+
+    public function reopenTask($taskId)
+    {
+        $task = CompanyTask::findOrFail($taskId);
+
+        $task->update([
+            'completed_time' => null,
+            'completed_user_id' => null,
+            'completed_user_name' => null,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Task reopened successfully',
+            'task' => $task,
+        ]);
+    }
 
     public function deleteTask($task_id)
-{
-    CompanyTask::where('id', $task_id)->delete();
-    return redirect()->back();
-}
+    {
+        CompanyTask::where('id', $task_id)->delete();
 
+        return redirect()->back();
+    }
 }

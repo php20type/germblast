@@ -124,15 +124,53 @@
                             </div>
                         </div>
 
-                         <!-- Tasks Section -->
+                        <!-- Tasks Section -->
                         <div class="section-card">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5>TASKS</h5>
                                 <a class="text-warning" href="javascript:void(0);" id="toggleAddTask">Add A Task</a>
                             </div>
 
+                            @foreach ($completed_tasks as $task)
+                                <div class="task-section mt-2">
+                                    <div class="company-list mb-3 border rounded p-3">
+                                        <div class="row align-items-start">
+                                            <div class="col-md-6">
+                                                <div class="company-name">
+                                                    <p><strong>{{ $task->title ?? 'N/A' }}</strong></p>
+                                                    <p class="text-secondary">
+                                                        Completed On
+                                                        {{ \Carbon\Carbon::parse($task->completed_time)->format('M d, \a\t g:i a') }}
+                                                    </p>
+                                                    <p class="text-warning">By {{ $task->completed_user_name ?? 'N/A' }}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 d-flex justify-content-end">
+                                                <div class="d-flex gap-2">
+                                                    <!-- Completed -->
+                                                    <button class="btn btn-sm btn-outline-warning"
+                                                        onclick="reopenTask({{ $task->id }})"
+                                                        title="Reopen Task">
+                                                        <i class="fas fa-undo"></i>
+                                                    </button>
+
+                                                    <!-- Delete -->
+                                                    <button class="btn btn-sm btn-outline-secondary"
+                                                        onclick="deleteTask({{ $task->id }})" title="Delete Task">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            @endforeach
+
                             @foreach ($pending_tasks as $task)
-                                <div class="task-section">
+                                <div class="task-section mt-2">
                                     <div class="company-list mb-3 border rounded p-3">
                                         <div class="row align-items-start">
                                             <div class="col-md-6">
@@ -210,7 +248,7 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-2">
-                                            <input type="text" name="title" class="form-control"
+                                            <input type="text" name="title" class="form-control" id="title"
                                                 placeholder="Add a Task" required>
                                         </div>
                                     </div>
@@ -233,8 +271,8 @@
                                     </div>
                                     <div class="col-md-12">
                                         <div class="mb-2">
-                                            <textarea rows="3" placeholder="Include any description you need to help complete this task…" name="description"
-                                                class="form-control"></textarea>
+                                            <textarea rows="3" placeholder="Include any description you need to help complete this task…"
+                                                name="description" class="form-control"></textarea>
                                         </div>
                                     </div>
 
@@ -366,7 +404,6 @@
                                                 <label class="form-label">DURATION</label>
                                                 <input type="hidden" name="start_time" id="start_time">
                                                 <input type="hidden" name="end_time" id="end_time">
-                                                {{-- <input type="hidden" name="participant_id" value={{ $peoples->id }}> --}}
 
                                                 <select class="form-select-custom" name="duration" id="duration">
                                                     <option value="">-- Select --</option>
@@ -928,8 +965,9 @@
                                                     <i class="fas fa-times"></i>
                                                 </button> --}}
                                                     <button class="btn btn-sm btn-outline-secondary delete-item"
-                                                        data-lead="{{ $leads->id }}" data-id="{{ $leadSource->id }}"
-                                                        data-type="source" data-target="source-{{ $leadSource->id }}">
+                                                        data-lead="{{ $leads->id }}"
+                                                        data-id="{{ $leadSource->id }}" data-type="source"
+                                                        data-target="source-{{ $leadSource->id }}">
                                                         <i class="fas fa-times"></i>
                                                     </button>
                                                 </div>
@@ -1059,6 +1097,21 @@
                                 <div class="col-lg-12">
                                     <div class="form-group mb-4">
                                         <label class="form-label">Participant </label>
+                                        <select id="participant_select" name="participant_id[]" class="form-select mt-2"
+                                            multiple>
+                                            <option value="">Choose...</option>
+                                            @foreach ($allpeoples as $people)
+                                                <option value="{{ $people->id }}">
+                                                    {{ $people->name }} ({{ $people->peopleEmail->email }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {{-- <div class="col-lg-12">
+                                    <div class="form-group mb-4">
+                                        <label class="form-label">Participant </label>
                                         <input type="text" placeholder="Type to search for participants…"
                                             class="form-control" name="search_participant" />
                                     </div>
@@ -1068,7 +1121,7 @@
                                             <div
                                                 class="d-flex align-items-center justify-content-between mb-3 participant-entry">
                                                 <div class="d-flex align-items-center">
-                                                    {{-- <img src="img/home/profile.png" alt="Paul Blake" class="person-avatar me-3"> --}}
+                                                    {{-- <img src="img/home/profile.png" alt="Paul Blake" class="person-avatar me-3"> --}
                                                     <div>
                                                         <input type="hidden" name="participant_id[]"
                                                             value="{{ $allpeople->id }}">
@@ -1086,7 +1139,7 @@
                                         @endforeach
 
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 <div class="col-lg-12">
                                     <textarea rows="5" placeholder="Add an agenda to share with your attendees" class="form-control"
@@ -1253,10 +1306,7 @@
                 }
 
             });
-        </script>
 
-
-        <script>
             // Sidebar records delete functionalities
             $(document).on("click", ".delete-item", function(e) {
                 e.preventDefault();
@@ -1351,19 +1401,41 @@
             });
 
 
-
-
             const toggleTaskBtn = document.getElementById('toggleAddTask');
             const formTaskDiv = document.getElementById('addTaskForm');
 
+            // toggleTaskBtn.addEventListener('click', function(e) {
+            //     e.preventDefault();
+            //     if (formTaskDiv.style.display === "none" || formTaskDiv.style.display === "") {
+            //         formTaskDiv.style.display = "block";
+            //     } else {
+            //         formTaskDiv.style.display = "none";
+            //     }
+            // });
             toggleTaskBtn.addEventListener('click', function(e) {
                 e.preventDefault();
+
                 if (formTaskDiv.style.display === "none" || formTaskDiv.style.display === "") {
                     formTaskDiv.style.display = "block";
+
+                    // Reset form
+                    const form = formTaskDiv.querySelector('form');
+                    form.reset();
+
+                    // Reset form action back to store route
+                    form.setAttribute('action', "{{ route('admin.leads.tasks.store', $leads->id) }}");
+
+                    // Reset button text and style
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    submitBtn.textContent = "Add Task";
+                    submitBtn.classList.remove('btn-primary');
+                    submitBtn.classList.add('btn-warning');
+
                 } else {
                     formTaskDiv.style.display = "none";
                 }
             });
+
 
             $("#addTaskAjaxForm").validate({
                 ignore: [],
@@ -1415,40 +1487,131 @@
             });
 
 
-           $('#addTaskAjaxForm').submit(function(e) {
-            e.preventDefault();
+            $('#addTaskAjaxForm').submit(function(e) {
+                e.preventDefault();
 
-            if (!$('#addTaskAjaxForm').valid()) {
-                return; // Stop if validation fails
+                if (!$('#addTaskAjaxForm').valid()) {
+                    return; // Stop if validation fails
+                }
+
+                let form = $(this);
+                let actionUrl = form.attr('action');
+                let method = form.attr('method');
+                let formData = form.serialize();
+
+                $.ajax({
+                    url: actionUrl,
+                    method: method,
+                    data: formData,
+                    success: function(response) {
+                        console.log('Task Added successfully:', response);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => {
+                            location.reload(); // reload after popup closes
+                        });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseText || 'Something went wrong while adding the task.'
+                        });
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+
+
+            function markCompleted(taskId) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to mark this task as completed?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, complete it!',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/admin/leads/tasks/' + taskId + '/complete',
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Completed',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(() => {
+                                    location.reload(); // ✅ reload after completion
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong while marking the task completed.'
+                                });
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                });
             }
 
-            $.ajax({
-                url: "{{ route('admin.leads.tasks.store', $leads->id) }}",
-                method: "POST",
-                data: $(this).serialize(),
-                success: function(response) {
-                    console.log('Task Added successfully:', response);
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: response.message,
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(() => {
-                        location.reload(); // reload after popup closes
+             function reopenTask(taskId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to re-open this task?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, re-open it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/admin/leads/tasks/' + taskId + '/reopen',
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Re-open',
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 2000
+                            }).then(() => {
+                                location.reload(); // refresh task state
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message ||
+                                    'Something went wrong while reopening this task.'
+                            });
+                            console.error(xhr.responseText);
+                        }
                     });
-                },
-                error: function(xhr) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: xhr.responseText || 'Something went wrong while adding the task.'
-                    });
-                    console.error(xhr.responseText);
                 }
             });
-        });
-
+        }
 
 
             // $('.step-menu li').click(function() {
@@ -1555,40 +1718,57 @@
             });
 
             function deleteTask(task_id) {
-            var deleteurl = "/admin/leads/tasks/delete/" + task_id;
+                var deleteurl = "/admin/leads/tasks/delete/" + task_id;
 
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to undo this action!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = deleteurl;
-                }
-            });
-        }
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to undo this action!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = deleteurl;
+                    }
+                });
+            }
 
             $(document).ready(function() {
 
+                $('#schedule-activity').on('shown.bs.modal', function() {
+                    $('#participant_select').select2({
+                        dropdownParent: $('#schedule-activity'),
+                        placeholder: 'Choose...',
+                        allowClear: true
+                    });
+                });
+
                 $('.toggleEditTask').click(function() {
+                    var taskId = $(this).data('id');
+
                     // Get data from button
                     var title = $(this).data('title');
                     var due = $(this).data('due');
                     var userId = $(this).data('user');
                     var description = $(this).data('description');
 
-                    // Show the form
-                    $('#EditTaskForm').toggle();
+                    // Show the form (FIX: lowercase "a")
+                    $('#addTaskForm').toggle();
 
                     // Fill the form
-                    $('#EditTaskForm input[name="title"]').val(title);
-                    $('#EditTaskForm #due_date').val(due);
-                    $('#EditTaskForm select[name="user_id"]').val(userId);
-                    $('#EditTaskForm textarea[name="description"]').val(description);
+                    $('#addTaskForm #title').val(title);
+                    $('#addTaskForm #due_date').val(due);
+                    $('#addTaskForm select[name="user_id"]').val(userId);
+                    $('#addTaskForm textarea[name="description"]').val(description);
+
+                    $('#addTaskAjaxForm').attr('method', 'PUT');
+                    // Change form action for update (FIX: point to update route)
+                    $('#addTaskAjaxForm').attr('action', '/admin/leads/tasks/' + taskId + '/update');
+
+                    // Optional: Change button text to "Update Task"
+                    $('#addTaskAjaxForm button[type="submit"]').text('Update Task');
 
                 });
 

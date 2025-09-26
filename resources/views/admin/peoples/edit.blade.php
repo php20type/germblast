@@ -145,15 +145,53 @@
                         </div>
 
 
-                         <!-- Tasks Section -->
+                        <!-- Tasks Section -->
                         <div class="section-card">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5>TASKS</h5>
                                 <a class="text-warning" href="javascript:void(0);" id="toggleAddTask">Add A Task</a>
                             </div>
 
+                            @foreach ($completed_tasks as $task)
+                                <div class="task-section mt-2">
+                                    <div class="company-list mb-3 border rounded p-3">
+                                        <div class="row align-items-start">
+                                            <div class="col-md-6">
+                                                <div class="company-name">
+                                                    <p><strong>{{ $task->title ?? 'N/A' }}</strong></p>
+                                                    <p class="text-secondary">
+                                                        Completed On
+                                                        {{ \Carbon\Carbon::parse($task->completed_time)->format('M d, \a\t g:i a') }}
+                                                    </p>
+                                                    <p class="text-warning">By {{ $task->completed_user_name ?? 'N/A' }}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 d-flex justify-content-end">
+                                                <div class="d-flex gap-2">
+                                                    <!-- Completed -->
+                                                    <button class="btn btn-sm btn-outline-warning"
+                                                        onclick="reopenTask({{ $task->id }})"
+                                                        title="Reopen Task">
+                                                        <i class="fas fa-undo"></i>
+                                                    </button>
+
+                                                    <!-- Delete -->
+                                                    <button class="btn btn-sm btn-outline-secondary"
+                                                        onclick="deleteTask({{ $task->id }})" title="Delete Task">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            @endforeach
+
                             @foreach ($pending_tasks as $task)
-                                <div class="task-section">
+                                <div class="task-section mt-2">
                                     <div class="company-list mb-3 border rounded p-3">
                                         <div class="row align-items-start">
                                             <div class="col-md-6">
@@ -231,7 +269,7 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-2">
-                                            <input type="text" name="title" class="form-control"
+                                            <input type="text" name="title" class="form-control"id="title"
                                                 placeholder="Add a Task" required>
                                         </div>
                                     </div>
@@ -242,6 +280,7 @@
                                                 placeholder="Select due date" required>
                                         </div>
                                     </div>
+
                                     <div class="col-md-12">
                                         <div class="mb-2">
                                             <select class="form-select" name="user_id" required>
@@ -1347,32 +1386,15 @@
                                 <div class="col-lg-12">
                                     <div class="form-group mb-4">
                                         <label class="form-label">Participant </label>
-                                        <input type="text" placeholder="Type to search for participants…"
-                                            class="form-control" name="search_participant" />
-                                    </div>
-                                    <div class="participant-list">
-
-                                        @foreach ($allpeoples as $allpeople)
-                                            <div
-                                                class="d-flex align-items-center justify-content-between mb-3 participant-entry">
-                                                <div class="d-flex align-items-center">
-                                                    {{-- <img src="img/home/profile.png" alt="Paul Blake" class="person-avatar me-3"> --}}
-                                                    <div>
-                                                        <input type="hidden" name="participant_id[]"
-                                                            value="{{ $allpeople->id }}">
-                                                        <h6 class="mb-0">{{ $allpeople->name }}</h6>
-                                                        <small class="text-warning">{{ $allpeople->email }}</small>
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex gap-3 align-items-center">
-                                                    <div class="text-end">
-                                                        <a href="#" class="remove-participant"><i
-                                                                class="fa-regular fa-xmark"></i></a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endforeach
-
+                                        <select id="participant_select" name="participant_id[]" class="form-select mt-2"
+                                            multiple>
+                                            <option value="">Choose...</option>
+                                            @foreach ($allpeoples as $people)
+                                                <option value="{{ $people->id }}">
+                                                    {{ $people->name }} ({{ $people->peopleEmail->email }})
+                                                </option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
 
@@ -1414,24 +1436,31 @@
 
 
             $('.toggleEditTask').click(function() {
+                var taskId = $(this).data('id');
+
                 // Get data from button
                 var title = $(this).data('title');
                 var due = $(this).data('due');
                 var userId = $(this).data('user');
                 var description = $(this).data('description');
 
-                // Show the form
-                $('#EditTaskForm').toggle();
+                // Show the form (FIX: lowercase "a")
+                $('#addTaskForm').toggle();
 
                 // Fill the form
-                $('#EditTaskForm input[name="title"]').val(title);
-                $('#EditTaskForm #due_date').val(due);
-                $('#EditTaskForm select[name="user_id"]').val(userId);
-                $('#EditTaskForm textarea[name="description"]').val(description);
+                $('#addTaskForm #title').val(title);
+                $('#addTaskForm #due_date').val(due);
+                $('#addTaskForm select[name="user_id"]').val(userId);
+                $('#addTaskForm textarea[name="description"]').val(description);
+
+                $('#addTaskAjaxForm').attr('method', 'PUT');
+                // Change form action for update (FIX: point to update route)
+                $('#addTaskAjaxForm').attr('action', '/admin/people/tasks/' + taskId + '/update');
+
+                // Optional: Change button text to "Update Task"
+                $('#addTaskAjaxForm button[type="submit"]').text('Update Task');
 
             });
-
-
 
             flatpickr("#due_date", {
                 enableTime: true,
@@ -1504,6 +1533,93 @@
 
 
         });
+
+        function markCompleted(taskId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to mark this task as completed?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, complete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/admin/people/tasks/' + taskId + '/complete',
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Completed',
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 2000
+                            }).then(() => {
+                                location.reload(); // reload after completion
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message ||
+                                    'Something went wrong while marking the task completed.'
+                            });
+                            console.error(xhr.responseText);
+                        }
+                    });
+                }
+            });
+        }
+
+        function reopenTask(taskId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to re-open this task?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, re-open it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/admin/people/tasks/' + taskId + '/reopen',
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Re-open',
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 2000
+                            }).then(() => {
+                                location.reload(); // refresh task state
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message ||
+                                    'Something went wrong while reopening this task.'
+                            });
+                            console.error(xhr.responseText);
+                        }
+                    });
+                }
+            });
+        }
+
 
         function deleteTask(task_id) {
             var deleteurl = "/admin/people/tasks/delete/" + task_id;
@@ -1836,6 +1952,14 @@
                 });
 
             });
+
+            $('#schedule-activity').on('shown.bs.modal', function() {
+                $('#participant_select').select2({
+                    dropdownParent: $('#schedule-activity'),
+                    placeholder: 'Choose...',
+                    allowClear: true
+                });
+            });
         });
 
         $(document).on('click', '.remove-participant', function(e) {
@@ -2055,14 +2179,38 @@
             }
         });
 
+        // toggleTaskBtn.addEventListener('click', function(e) {
+        //     e.preventDefault();
+        //     if (formTaskDiv.style.display === "none" || formTaskDiv.style.display === "") {
+        //         formTaskDiv.style.display = "block";
+        //     } else {
+        //         formTaskDiv.style.display = "none";
+        //     }
+        // });
         toggleTaskBtn.addEventListener('click', function(e) {
             e.preventDefault();
+
             if (formTaskDiv.style.display === "none" || formTaskDiv.style.display === "") {
                 formTaskDiv.style.display = "block";
+
+                // Reset form
+                const form = formTaskDiv.querySelector('form');
+                form.reset();
+
+                // Reset form action back to store route
+                form.setAttribute('action', "{{ route('admin.people.tasks.store', $peoples->id) }}");
+
+                // Reset button text and style
+                const submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.textContent = "Add Task";
+                submitBtn.classList.remove('btn-primary');
+                submitBtn.classList.add('btn-warning');
+
             } else {
                 formTaskDiv.style.display = "none";
             }
         });
+
 
         $("#addTaskAjaxForm").validate({
             ignore: [],
@@ -2114,17 +2262,22 @@
         });
 
 
-       $('#addTaskAjaxForm').submit(function(e) {
+        $('#addTaskAjaxForm').submit(function(e) {
             e.preventDefault();
 
             if (!$('#addTaskAjaxForm').valid()) {
                 return; // Stop if validation fails
             }
 
+            let form = $(this);
+            let actionUrl = form.attr('action');
+            let method = form.attr('method');
+            let formData = form.serialize();
+
             $.ajax({
-                url: "{{ route('admin.people.tasks.store', $peoples->id) }}",
-                method: "POST",
-                data: $(this).serialize(),
+                url: actionUrl,
+                method: method,
+                data: formData,
                 success: function(response) {
                     console.log('Task Added successfully:', response);
                     Swal.fire({

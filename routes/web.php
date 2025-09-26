@@ -80,6 +80,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::post('/companies/{company}/tasks', [CompanyController::class, 'addTask'])
         ->name('companies.tasks.store');
+    Route::put('companies/tasks/{task}/update', [CompanyController::class, 'updateTask'])->name('companies.tasks.update');
+    Route::post('companies/tasks/{task}/complete', [CompanyController::class, 'markCompleted'])->name('companies.tasks.complete');
+    Route::post('companies/tasks/{task}/reopen', [CompanyController::class, 'reopenTask'])->name('companies.tasks.reopen');
     Route::get('/companies/tasks/delete/{task_id}', [CompanyController::class, 'deleteTask'])->name('companies.task.delete');
 
     Route::get('companies/{company}', [CompanyController::class, 'show'])->name('companies.show');
@@ -96,6 +99,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::post('/people/{people}/tasks', [PeopleController::class, 'addTask'])
         ->name('people.tasks.store');
+    Route::put('people/tasks/{task}/update', [PeopleController::class, 'updateTask'])->name('people.tasks.update');
+    Route::post('people/tasks/{task}/complete', [PeopleController::class, 'markCompleted'])->name('people.tasks.complete');
+    Route::post('people/tasks/{task}/reopen', [PeopleController::class, 'reopenTask'])->name('people.tasks.reopen');
     Route::get('/people/tasks/delete/{task_id}', [PeopleController::class, 'deleteTask'])->name('people.task.delete');
 
     Route::get('/people/delete/{people_id}', [PeopleController::class, 'delete'])->name('people.delete');
@@ -125,6 +131,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::post('/leads/{lead}/tasks', [LeadController::class, 'addTask'])
         ->name('leads.tasks.store');
+    Route::put('leads/tasks/{task}/update', [LeadController::class, 'updateTask'])->name('leads.tasks.update');
+    Route::post('leads/tasks/{task}/complete', [LeadController::class, 'markCompleted'])->name('leads.tasks.complete');
+    Route::post('leads/tasks/{task}/reopen', [CompanyController::class, 'reopenTask'])->name('leads.tasks.reopen');
     Route::get('/leads/tasks/delete/{task_id}', [LeadController::class, 'deleteTask'])->name('leads.task.delete');
 
     Route::post('/leads/ajax-update', [LeadController::class, 'ajax_update'])->name('leads.ajax_update');

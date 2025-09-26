@@ -963,6 +963,73 @@ class LeadController extends Controller
         ]);
     }
 
+public function updateTask(Request $request, $taskId)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'due_date' => 'required|string', // will parse manually
+            'user_id' => 'required|exists:users,id',
+            'description' => 'nullable|string',
+        ]);
+
+        $assignee = User::findOrFail($request->user_id);
+
+        // Convert the due_date from "2025-09-24 6:30 PM" → "2025-09-24 18:30:00"
+        $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
+
+        // Find and update the task
+        $task = LeadTask::findOrFail($taskId);
+        $task->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'due_time' => $dueTime,
+            'assignee_id' => $assignee->id,
+            'assignee_name' => $assignee->name,
+        ]);
+
+        // Return JSON response for AJAX
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Task updated successfully',
+            'task' => $task,
+        ]);
+    }
+
+       public function markCompleted($taskId)
+    {
+        $task = LeadTask::findOrFail($taskId);
+
+        $user = auth()->user(); // logged-in user
+
+        $task->update([
+            'completed_time' => now(),
+            'completed_user_id' => $user->id,
+            'completed_user_name' => $user->name,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Task marked as completed successfully!',
+            'task' => $task,
+        ]);
+    }
+
+    public function reopenTask($taskId)
+    {
+        $task = LeadTask::findOrFail($taskId);
+
+        $task->update([
+            'completed_time' => null,
+            'completed_user_id' => null,
+            'completed_user_name' => null,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Task reopened successfully',
+            'task' => $task,
+        ]);
+    }
 
     public function deleteTask($task_id)
 {
