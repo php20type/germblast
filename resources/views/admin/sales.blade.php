@@ -346,6 +346,7 @@
                                                         <div class="progress-bar" role="progressbar"></div>
                                                     </div>
                                                 </div>
+
                                             </div>
                                         </div>
                                     </div>

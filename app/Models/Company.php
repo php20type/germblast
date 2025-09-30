@@ -138,4 +138,16 @@ class Company extends Model
             ->withTimestamps();
     }
 
+     // Tags pivot table
+    public function companyTags()
+    {
+        return $this->hasMany(CompanyTag::class, 'company_id');
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, 'company_tags')
+            ->withTimestamps();
+    }
+
 }

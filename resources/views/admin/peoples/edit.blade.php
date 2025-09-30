@@ -26,16 +26,42 @@
                                     <img src="{{ asset('img/home/profile-image.png') }}" alt="Company"
                                         class="company-logo me-3">
                                     <div>
-                                        {{-- <h4 class="mb-2 text-transform-uppercase">{{ $peoples->name ?? 'N/A' }}</h4>
-                                        <h6 class="mb-2">{{ $peoples->bio ?? 'N/A' }}</h6> --}}
-                                        <h4 class="mb-2" contenteditable="true" spellcheck="false" id="company-name">
-                                            {{ $peoples->name ?? 'N/A' }}
-                                        </h4>
-
-                                        <div class="d-flex align-items-center mb-2" id="company-description"
-                                            contenteditable="true" spellcheck="false">
-                                            {{ $peoples->bio ?? 'N/A' }}
+                                        <!-- People Name -->
+                                        <div class="d-flex align-items-center mb-2" style="gap: 5px;">
+                                            <h4 class="mb-1 editable-field" contenteditable="true" spellcheck="false"
+                                                id="people-update-name" data-people-id="{{ $peoples->id }}">
+                                                {{ $peoples->name ?? 'N/A' }}
+                                            </h4>
+                                            <button
+                                                class="btn btn-sm btn-outline-success editable-icon editable-submit d-none"
+                                                id="people-name-submit" title="Save People Name" data-field="name">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button
+                                                class="btn btn-sm btn-outline-danger editable-icon editable-cancel d-none"
+                                                id="people-name-cancel" title="Cancel">
+                                                <i class="fas fa-times"></i>
+                                            </button>
                                         </div>
+
+                                        <!-- People Bio -->
+                                        <div class="d-flex align-items-center mb-2" style="gap: 5px;">
+                                            <div class="editable-field" contenteditable="true" spellcheck="false"
+                                                id="people-update-bio" data-people-id="{{ $peoples->id }}">
+                                                {{ $peoples->bio ?? 'N/A' }}
+                                            </div>
+                                            <button
+                                                class="btn btn-sm btn-outline-success editable-icon editable-submit d-none"
+                                                id="people-bio-submit" title="Save People Bio" data-field="bio">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button
+                                                class="btn btn-sm btn-outline-danger editable-icon editable-cancel d-none"
+                                                id="people-bio-cancel" title="Cancel">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+
                                         <div class="star-rating">
                                             <i class="fas fa-star"></i>
                                             <i class="fas fa-star"></i>
@@ -55,14 +81,23 @@
                                     {{ $peoples->created_at->diffForHumans() }}</small>
                             </div>
                             <div class="mt-3">
-                                <span class="badge-customer">
+                                {{-- <span class="badge-customer">
                                     {{ $peoples->tag?->name ?? 'N/A' }}
-                                </span>
+                                </span> --}}
+                                @foreach ($peoples->tags as $tag)
+                                    <span class="badge-customer mx-1 px-2">
+                                        {{ $tag->name }}
+                                        <button class="btn btn-sm" onclick="deleteTag({{ $tag->id }})">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </span>
+                                @endforeach
                             </div>
 
-                            <div class="mt-4">
-                                <select class="form-select d-inline-block w-100" aria-label="Default select example">
-                                    <option selected>Add tags...</option>
+                            <div class="mt-4" id="addCompanyTag">
+                                <select class="form-select d-inline-block w-100 tag-update"
+                                    aria-label="Default select example" id="tagSelect">
+                                    <option value="">Add tags...</option>
                                     @foreach ($persontags as $persontag)
                                         <option value="{{ $persontag->id }}">{{ $persontag->name }}</option>
                                     @endforeach
@@ -133,7 +168,7 @@
 
                             <div id="addCompanyForm" class="mt-3" style="display: none;">
                                 <div class="mb-3">
-                                    <select class="form-select company-update" data-field="" id="companySelect">
+                                    <select class="form-select company-update" data-field="" id="companiesSelect">
                                         <option selected>Add Company</option>
                                         @foreach ($availableCompanies as $company)
                                             <option value="{{ $company->id }}">{{ $company->name }}</option>
@@ -172,8 +207,7 @@
                                                 <div class="d-flex gap-2">
                                                     <!-- Completed -->
                                                     <button class="btn btn-sm btn-outline-warning"
-                                                        onclick="reopenTask({{ $task->id }})"
-                                                        title="Reopen Task">
+                                                        onclick="reopenTask({{ $task->id }})" title="Reopen Task">
                                                         <i class="fas fa-undo"></i>
                                                     </button>
 
@@ -705,7 +739,8 @@
                                                     <input type="text" name="detail_value[]" class="form-control"
                                                         value="{{ $email['value'] }}" placeholder="Enter email" disabled>
                                                     <button class="btn btn-sm btn-outline-secondary"
-                                                        onclick="deleteField('{{ $peoples->id }}', '{{ $email['selected'] }}', 'email')">
+                                                        onclick="deleteField('{{ $peoples->id }}', '{{ $email['selected'] }}', 'email')"
+                                                        {{ $email['selected'] === 'email' ? 'disabled' : '' }}>
                                                         <i class="fas fa-times"></i>
                                                     </button>
                                                 </div>
@@ -789,7 +824,8 @@
                                                         value="{{ $address['value'] }}" placeholder="Enter address"
                                                         disabled>
                                                     <button class="btn btn-sm btn-outline-secondary"
-                                                        onclick="deleteField('{{ $peoples->id }}', '{{ $address['selected'] }}', 'address')">
+                                                        onclick="deleteField('{{ $peoples->id }}', '{{ $address['selected'] }}', 'address')"
+                                                        {{ $address['selected'] === 'address' ? 'disabled' : '' }}>
                                                         <i class="fas fa-times"></i>
                                                     </button>
                                                 </div>
@@ -874,7 +910,8 @@
                                                         value="{{ $phone['value'] }}" placeholder="Enter phone number"
                                                         disabled>
                                                     <button class="btn btn-sm btn-outline-secondary"
-                                                        onclick="deleteField('{{ $peoples->id }}', '{{ $phone['selected'] }}', 'phone')">
+                                                        onclick="deleteField('{{ $peoples->id }}', '{{ $phone['selected'] }}', 'phone')"
+                                                        {{ $phone['selected'] === 'phone' ? 'disabled' : '' }}>
                                                         <i class="fas fa-times"></i>
                                                     </button>
                                                 </div>
@@ -957,7 +994,8 @@
                                                     <input type="text" name="url_value[]" class="form-control"
                                                         value="{{ $url['value'] }}" placeholder="Enter URL" disabled>
                                                     <button class="btn btn-sm btn-outline-secondary"
-                                                        onclick="deleteField('{{ $peoples->id }}', '{{ $url['selected'] }}', 'url')">
+                                                        onclick="deleteField('{{ $peoples->id }}', '{{ $url['selected'] }}', 'url')"
+                                                        {{ $url['selected'] === 'url' ? 'disabled' : '' }}>
                                                         <i class="fas fa-times"></i>
                                                     </button>
                                                 </div>
@@ -1434,6 +1472,18 @@
 
         $(document).ready(function() {
 
+            $('.editable-field').on('focus', function() {
+                $(this).siblings('.editable-icon').removeClass('d-none');
+            });
+
+            $('.editable-field').on('blur', function() {
+                let $icons = $(this).siblings('.editable-icon');
+                // Delay hiding to allow click event on icons
+                setTimeout(() => {
+                    $icons.addClass('d-none');
+                }, 300); // 200ms delay
+            });
+
 
             $('.toggleEditTask').click(function() {
                 var taskId = $(this).data('id');
@@ -1533,6 +1583,202 @@
 
 
         });
+
+        $('.editable-submit').click(function() {
+            let $button = $(this);
+            let $field = $button.siblings('.editable-field');
+            let peopleId = $field.data('people-id');
+            let fieldName = $button.data('field'); // e.g., 'name' or 'description'
+            let newValue = $field.text().trim();
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Do you want to update the ${fieldName}?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: 'Yes, update'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post(`/admin/people/${peopleId}/update-detail`, {
+                            _token: '{{ csrf_token() }}',
+                            field: fieldName,
+                            value: newValue
+                        })
+                        .done(response => {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Updated',
+                                text: response.message,
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        })
+                        .fail(xhr => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message || 'Something went wrong.'
+                            });
+                            console.error(xhr.responseText);
+                        });
+                }
+            });
+        });
+
+        // Cancel button hides sibling buttons
+        $('.editable-cancel').click(function() {
+            $(this).siblings('.editable-icon').addClass('d-none');
+        });
+
+
+        // Adding company
+        $('#companiesSelect').change(function() {
+            let companyId = $(this).val();
+            let companyName = $("#companiesSelect option:selected").text();
+
+            if (!companyId || companyId === "Add Company") {
+                return; // ignore placeholder
+            }
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to add " + companyName + " to this person?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#28a745",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, Add"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/admin/people/{{ $peoples->id }}/company/add", // ✅ route
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            company_id: companyId
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Added",
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: xhr.responseJSON?.message ||
+                                    "Something went wrong."
+                            });
+                        }
+                    });
+                } else {
+                    // Reset dropdown back to default if cancelled
+                    $('#companiesSelect').val("Add Company");
+                }
+            });
+        });
+
+        // Adding tags
+        $('#tagSelect').change(function() {
+            let tagId = $(this).val();
+            let tagName = $("#tagSelect option:selected").text();
+
+            if (!tagId) {
+                return; // ignore placeholder
+            }
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to add the tag \"" + tagName + "\" to this person?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#28a745",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, Add"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/admin/people/{{ $peoples->id }}/tags/add", // ✅ new route for tags
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            tag_id: tagId
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Added",
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: xhr.responseJSON?.message ||
+                                    "Something went wrong."
+                            });
+                        }
+                    });
+                } else {
+                    // Reset dropdown back to default if cancelled
+                    $('#tagSelect').val("");
+                }
+            });
+        });
+
+        function deleteTag(tagId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to remove this tag from the person?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, Remove"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/admin/people/{{ $peoples->id }}/tags/" + tagId + "/remove",
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Removed",
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload(); // reload the page to update tags
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: xhr.responseJSON?.message || "Something went wrong."
+                            });
+                            console.error(xhr.responseText);
+                        }
+                    });
+                }
+            });
+        }
 
         function markCompleted(taskId) {
             Swal.fire({

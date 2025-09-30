@@ -38,5 +38,28 @@ class Tag extends Model
             ->withTimestamps();
     }
 
+    // Company Tags pivot table
+    public function companyTags()
+    {
+        return $this->hasMany(CompanyTag::class, 'tag_id');
+    }
+    public function companies()
+    {
+        return $this->belongsToMany(Company::class, 'company_tags')
+            ->withTimestamps();
+    }
+
+    // People Tags pivot table
+    public function peopleTags()
+    {
+        return $this->hasMany(PeopleTag::class, 'tag_id');
+    }
+    public function peoples()
+    {
+        return $this->belongsToMany(People::class, 'people_tags')
+            ->withTimestamps();
+    }
+
+
 
 }

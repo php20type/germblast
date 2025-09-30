@@ -22,10 +22,10 @@ class Lead extends Model
         'last_modified',
         'market_id',
         'outcome_id',
-        'created_at'
+        'created_at',
     ];
 
-     protected $with = ['leadCompanies', 'leadProducts', 'leadPeople', 'leadSources', 'leadCompetitors', 'leadTags', 'leadTask'];
+    protected $with = ['leadCompanies', 'leadProducts', 'leadPeople', 'leadSources', 'leadCompetitors', 'leadTags', 'leadTask'];
 
     protected $casts = [
         'close_date' => 'datetime',
@@ -37,6 +37,7 @@ class Lead extends Model
     {
         return $this->hasMany(LeadCompany::class, 'lead_id');
     }
+
     public function companies()
     {
         return $this->belongsToMany(Company::class, 'lead_companies')
@@ -48,6 +49,7 @@ class Lead extends Model
     {
         return $this->hasMany(LeadProduct::class, 'lead_id');
     }
+
     public function products()
     {
         return $this->belongsToMany(Product::class, 'lead_products')
@@ -60,6 +62,7 @@ class Lead extends Model
     {
         return $this->hasMany(LeadPeople::class, 'lead_id');
     }
+
     public function peoples()
     {
         return $this->belongsToMany(People::class, 'lead_peoples')
@@ -71,6 +74,7 @@ class Lead extends Model
     {
         return $this->hasMany(LeadSource::class, 'lead_id');
     }
+
     public function sources()
     {
         return $this->belongsToMany(Source::class, 'lead_sources')
@@ -82,6 +86,7 @@ class Lead extends Model
     {
         return $this->hasMany(LeadCompetitor::class, 'lead_id');
     }
+
     public function competitors()
     {
         return $this->belongsToMany(Competitor::class, 'lead_competitors')
@@ -93,6 +98,7 @@ class Lead extends Model
     {
         return $this->hasMany(LeadTag::class, 'lead_id');
     }
+
     public function tags()
     {
         return $this->belongsToMany(Tag::class, 'lead_tags')
@@ -104,24 +110,37 @@ class Lead extends Model
     {
         return $this->belongsTo(User::class, 'creator_id');
     }
+
     public function market()
     {
         return $this->belongsTo(Market::class, 'market_id');
     }
+
     public function outcome()
     {
         return $this->belongsTo(Outcome::class, 'outcome_id');
     }
+
     public function assignee()
     {
         return $this->belongsTo(User::class, 'assignee_id');
     }
+
     public function stages()
     {
         return $this->belongsTo(LeadStage::class, 'stage_id');
     }
+
     public function leadTask()
     {
         return $this->hasMany(LeadTask::class, 'lead_id');
+    }
+
+    // CUSTOM ACCESSORS
+    public function getTotalValueAttribute()
+    {
+        return $this->products->sum(function ($product) {
+            return $product->pivot->qty * $product->pivot->price;
+        });
     }
 }

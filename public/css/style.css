@@ -3933,6 +3933,25 @@ div[contenteditable="true"]:focus {
     width: 35vw;
 }
 
+#company-update-name,
+#company-update-description {
+    width: 35vw;
+}
+
+#people-update-name,
+#people-update-bio {
+    width: 35vw;
+}
+
+#lead-update-name {
+    width: 35vw;
+}
+
+.editable-icon {
+    cursor: pointer;
+    font-size: 1rem;
+}
+
 #lead-status-icon{
     margin-right: 10px;
     width: 50px;

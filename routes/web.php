@@ -87,6 +87,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::get('companies/{company}', [CompanyController::class, 'show'])->name('companies.show');
     Route::post('/company/ajax', [CompanyController::class, 'ajax_store'])->name('company.ajax.store');
+    Route::post('companies/{company}/update-detail', [CompanyController::class, 'updateDetail'])
+    ->name('companies.updateDetail');
+    Route::post('companies/{company}/people/add', [CompanyController::class, 'addPeople'])
+        ->name('companies.people.add');
+    Route::post('companies/{company}/tags/add', [CompanyController::class, 'addTag'])
+        ->name('companies.tags.add');
+    Route::post('companies/{company}/tags/{tag}/remove', [CompanyController::class, 'removeTag'])
+        ->name('companies.tags.remove');
     Route::post('/companies/{company}/update-field', [CompanyController::class, 'updateField'])->name('company.update.field');
     Route::post('companies/delete-field', [CompanyController::class, 'deleteField'])->name('companies.delete-field');
     Route::post('/update-company-email', [CompanyController::class, 'updateCompanyEmail'])->name('update.company.email');
@@ -106,8 +114,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/people/delete/{people_id}', [PeopleController::class, 'delete'])->name('people.delete');
     Route::post('/people/ajax', [PeopleController::class, 'ajax_store'])->name('people.ajax.store');
-    Route::post('/people/{person}/tasks', [PeopleController::class, 'addTask'])
-        ->name('people.tasks.store');
+    Route::post('people/{people}/update-detail', [PeopleController::class, 'updateDetail'])
+    ->name('people.updateDetail');
+    Route::post('people/{people}/company/add', [PeopleController::class, 'addCompany'])
+        ->name('people.companies.add');
+    Route::post('people/{people}/tags/add', [PeopleController::class, 'addTag'])
+        ->name('people.tags.add');
+    Route::post('people/{people}/tags/{tag}/remove', [PeopleController::class, 'removeTag'])
+        ->name('people.tags.remove');
+    // Route::post('/people/{person}/tasks', [PeopleController::class, 'addTask'])
+    //     ->name('people.tasks.store');
     Route::get('/people/index', [PeopleController::class, 'index'])->name('peoples.index');
     Route::get('/people/my-peoples/{id}', [PeopleController::class, 'my_peoples'])->name('peoples.my_peoples');
     Route::get('/people/animal-care', [PeopleController::class, 'animal_care'])->name('peoples.animal_care');

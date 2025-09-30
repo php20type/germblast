@@ -10,6 +10,7 @@ use App\Models\CompanyAddress;
 use App\Models\CompanyEmail;
 use App\Models\CompanyPeople;
 use App\Models\CompanyPhone;
+use App\Models\CompanyTag;
 use App\Models\CompanyTask;
 use App\Models\CompanyType;
 use App\Models\CompanyUrl;
@@ -149,7 +150,7 @@ class CompanyController extends Controller
                 'user_id' => $request->user_id,
                 'name' => $request->name,
                 'description' => $request->description,
-                'tag_id' => $request->tag_id,
+                // 'tag_id' => $request->tag_id,
                 'company_type_id' => $request->company_type_id,
                 'industry_id' => $request->industry_id,
                 'territory_id' => $request->territory_id,
@@ -192,6 +193,14 @@ class CompanyController extends Controller
                 CompanyPeople::create([
                     'company_id' => $company->id,
                     'people_id' => $request->people_id,
+                ]);
+            }
+
+            // Step 7: Store tags
+            if ($request->tag_id) {
+                CompanyTag::create([
+                    'company_id' => $company->id,
+                    'tag_id' => $request->tag_id,
                 ]);
             }
         });
@@ -295,7 +304,7 @@ class CompanyController extends Controller
             'user',
             'companyType',
             'industry',
-            'tag',
+            'tags',
             'companyEmail',
             'companyPeople',
             'companyPhone',
@@ -437,6 +446,105 @@ class CompanyController extends Controller
         ));
     }
 
+    public function addPeople(Request $request, $companyId)
+    {
+        $request->validate([
+            'people_id' => 'required|exists:people,id',
+        ]);
+
+        // Prevent duplicates
+        $exists = CompanyPeople::where('company_id', $companyId)
+            ->where('people_id', $request->people_id)
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'This person is already linked to the company.',
+            ], 422);
+        }
+
+        // Create new record
+        CompanyPeople::create([
+            'company_id' => $companyId,
+            'people_id' => $request->people_id,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Person added to company successfully!',
+        ]);
+    }
+
+    public function updateDetail(Request $request, $companyId)
+    {
+        $request->validate([
+            'field' => 'required|string|in:name,description',
+            'value' => 'nullable|string',
+        ]);
+
+        $company = Company::findOrFail($companyId);
+        $company->{$request->field} = $request->value;
+        $company->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => ucfirst($request->field).' updated successfully!',
+        ]);
+    }
+
+    public function addTag(Request $request, $companyId)
+    {
+        $request->validate([
+            'tag_id' => 'required|exists:tags,id',
+        ]);
+
+        // Prevent duplicates
+        $exists = CompanyTag::where('company_id', $companyId)
+            ->where('tag_id', $request->tag_id)
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'This tag is already linked to the company.',
+            ], 422);
+        }
+
+        // Create new record
+        CompanyTag::create([
+            'company_id' => $companyId,
+            'tag_id' => $request->tag_id,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Tag added to company successfully!',
+        ]);
+    }
+
+    public function removeTag(Request $request, $companyId, $tagId)
+    {
+        // Find the pivot record
+        $companyTag = CompanyTag::where('company_id', $companyId)
+            ->where('tag_id', $tagId)
+            ->first();
+
+        if (! $companyTag) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Tag not found for this company.',
+            ], 404);
+        }
+
+        $companyTag->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Tag removed from company successfully!',
+        ]);
+    }
+
     public function activity_store(Request $request)
     {
 
@@ -537,78 +645,6 @@ class CompanyController extends Controller
     //         'status' => 'success',
     //         'message' => ucfirst(str_replace('_', ' ', $request->type)) . ' deleted successfully',
     //         'data' => $emailRecord
-    //     ]);
-    // }
-
-    // public function deleteAddress(Request $request)
-    // {
-    //     $request->validate([
-    //         'company_id' => 'required|exists:companies,id',
-    //         'type' => 'required|in:address,main_address,work_address,home_address,billing_address,mailing_address'
-    //     ]);
-
-    //     $addressRecord = CompanyAddress::where('company_id', $request->company_id)->first();
-
-    //     if (!$addressRecord) {
-    //         return response()->json(['status' => 'error', 'message' => 'Address record not found'], 404);
-    //     }
-
-    //     // Clear the selected address type column
-    //     $addressRecord->{$request->type} = null;
-    //     $addressRecord->save();
-
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'message' => ucfirst(str_replace('_', ' ', $request->type)) . ' deleted successfully',
-    //         'data' => $addressRecord
-    //     ]);
-    // }
-
-    // public function deletePhone(Request $request)
-    // {
-    //     $request->validate([
-    //         'company_id' => 'required|exists:companies,id',
-    //         'type' => 'required|in:phone,home_phones,mobile_phones,work_phones,fax_phones'
-    //     ]);
-
-    //     $phoneRecord = CompanyPhone::where('company_id', $request->company_id)->first();
-
-    //     if (!$phoneRecord) {
-    //         return response()->json(['status' => 'error', 'message' => 'Phone record not found'], 404);
-    //     }
-
-    //     // Clear the selected phone type column
-    //     $phoneRecord->{$request->type} = null;
-    //     $phoneRecord->save();
-
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'message' => ucfirst(str_replace('_', ' ', $request->type)) . ' deleted successfully',
-    //         'data' => $phoneRecord
-    //     ]);
-    // }
-
-    // public function deleteUrl(Request $request)
-    // {
-    //     $request->validate([
-    //         'company_id' => 'required|exists:companies,id',
-    //         'type' => 'required|in:url,blog_url,twitter_url'
-    //     ]);
-
-    //     $urlRecord = CompanyUrl::where('company_id', $request->company_id)->first();
-
-    //     if (!$urlRecord) {
-    //         return response()->json(['status' => 'error', 'message' => 'URL record not found'], 404);
-    //     }
-
-    //     // Clear the selected URL type column
-    //     $urlRecord->{$request->type} = null;
-    //     $urlRecord->save();
-
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'message' => ucfirst(str_replace('_', ' ', $request->type)) . ' deleted successfully',
-    //         'data' => $urlRecord
     //     ]);
     // }
 

@@ -123,7 +123,17 @@ class People extends Model
             ->withTimestamps();
     }
 
+     // Tags pivot table
+    public function peopleTags()
+    {
+        return $this->hasMany(PeopleTag::class, 'people_id');
+    }
 
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, 'people_tags')
+            ->withTimestamps();
+    }
 
 }
 

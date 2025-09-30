@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Lead;
+use App\Models\People;
 use Carbon\Carbon;
 
 class SaleController extends Controller
@@ -12,6 +13,7 @@ class SaleController extends Controller
     public function index()
     {
         $leads = Lead::with('assignee', 'companies', 'products', 'peoples', 'sources', 'competitors')->get();
+        $peoples = People::with('')->get();
 
         // Get current week's Monday and Sunday
         // Section 1

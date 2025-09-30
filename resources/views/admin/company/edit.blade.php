@@ -25,14 +25,42 @@
                                 <div class="d-flex">
                                     <img src="{{ asset('img/home/image25.png') }}" alt="Company" class="company-logo me-3">
                                     <div>
-                                        <h4 class="mb-1" contenteditable="true" spellcheck="false" id="company-name">
-                                            {{ $company->name }}
-                                        </h4>
-
-                                        <div class="d-flex align-items-center mb-2" id="company-description"
-                                            contenteditable="true" spellcheck="false">
-                                            {{ $company->description }}
+                                        <!-- Company Name -->
+                                        <div class="d-flex align-items-center mb-2" style="gap: 5px;">
+                                            <h4 class="mb-1 editable-field" contenteditable="true" spellcheck="false"
+                                                id="company-update-name" data-company-id="{{ $company->id }}">
+                                                {{ $company->name ?? 'N/A' }}
+                                            </h4>
+                                            <button
+                                                class="btn btn-sm btn-outline-success editable-icon editable-submit d-none"
+                                                id="company-name-submit" title="Save Company Name" data-field="name">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button
+                                                class="btn btn-sm btn-outline-danger editable-icon editable-cancel d-none"
+                                                id="company-name-cancel" title="Cancel">
+                                                <i class="fas fa-times"></i>
+                                            </button>
                                         </div>
+
+                                        <!-- Company Description -->
+                                        <div class="d-flex align-items-center mb-2" style="gap: 5px;">
+                                            <div class="editable-field" contenteditable="true" spellcheck="false"
+                                                id="company-update-description" data-company-id="{{ $company->id }}">
+                                                {{ $company->description }}
+                                            </div>
+                                            <button
+                                                class="btn btn-sm btn-outline-success editable-icon editable-submit d-none"
+                                                id="company-description-submit" title="Save Company Description" data-field="description">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button
+                                                class="btn btn-sm btn-outline-danger editable-icon editable-cancel d-none"
+                                                id="company-description-cancel" title="Cancel">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+
 
                                         <div class="star-rating">
                                             <i class="fas fa-star"></i>
@@ -55,13 +83,19 @@
                                     {{ $company->created_at->diffForHumans() }}</small>
                             </div>
                             <div class="mt-3">
-                                <span class="badge-customer">
-                                    {{ $company->tag?->name ?? 'N/A' }}
-                                </span>
+                                @foreach ($company->tags as $tag)
+                                    <span class="badge-customer mx-1 px-2">
+                                        {{ $tag->name }}
+                                        <button class="btn btn-sm" onclick="deleteTag({{ $tag->id }})">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </span>
+                                @endforeach
                             </div>
 
-                            <div class="mt-4">
-                                <select class="form-select d-inline-block w-100" aria-label="Default select example">
+                            <div class="mt-4" id="addCompanyTag">
+                                <select class="form-select d-inline-block w-100 tag-update"
+                                    aria-label="Default select example" id="tagSelect">
                                     <option value="">Add tags...</option>
                                     @foreach ($companytags as $companytag)
                                         <option value="{{ $companytag->id }}">{{ $companytag->name }}</option>
@@ -79,7 +113,7 @@
                             </div>
 
                             @foreach ($company->peoples as $people)
-                                <div class="people-card">
+                                <div class="people-card mb-3">
                                     <div class="d-flex align-items-center">
                                         <img src="{{ asset('img/home/profile.png') }}" alt="{{ $people->name }}"
                                             class="person-avatar me-3">
@@ -722,7 +756,8 @@
                                                             value="{{ $email['value'] }}" placeholder="Enter email"
                                                             disabled>
                                                         <button class="btn btn-sm btn-outline-secondary"
-                                                            onclick="deleteField('{{ $company->id }}', '{{ $email['selected'] }}', 'email')">
+                                                            onclick="deleteField('{{ $company->id }}', '{{ $email['selected'] }}', 'email')"
+                                                            {{ $email['selected'] === 'email' ? 'disabled' : '' }}>
                                                             <i class="fas fa-times"></i>
                                                         </button>
                                                     </div>
@@ -807,7 +842,8 @@
                                                             value="{{ $address['value'] }}" placeholder="Enter address"
                                                             disabled>
                                                         <button class="btn btn-sm btn-outline-secondary"
-                                                            onclick="deleteField('{{ $company->id }}', '{{ $address['selected'] }}', 'address')">
+                                                            onclick="deleteField('{{ $company->id }}', '{{ $address['selected'] }}', 'address')"
+                                                            {{ $address['selected'] === 'address' ? 'disabled' : '' }}>
                                                             <i class="fas fa-times"></i>
                                                         </button>
                                                     </div>
@@ -894,7 +930,8 @@
                                                             value="{{ $phone['value'] }}"
                                                             placeholder="Enter phone number" disabled>
                                                         <button class="btn btn-sm btn-outline-secondary"
-                                                            onclick="deleteField('{{ $company->id }}', '{{ $phone['selected'] }}', 'phone')">
+                                                            onclick="deleteField('{{ $company->id }}', '{{ $phone['selected'] }}', 'phone')"
+                                                            {{ $phone['selected'] === 'phone' ? 'disabled' : '' }}>
                                                             <i class="fas fa-times"></i>
                                                         </button>
 
@@ -979,7 +1016,8 @@
                                                         <input type="text" name="url_value[]" class="form-control"
                                                             value="{{ $url['value'] }}" placeholder="Enter URL" disabled>
                                                         <button class="btn btn-sm btn-outline-secondary"
-                                                            onclick="deleteField('{{ $company->id }}', '{{ $url['selected'] }}', 'url')">
+                                                            onclick="deleteField('{{ $company->id }}', '{{ $url['selected'] }}', 'url')"
+                                                            {{ $url['selected'] === 'url' ? 'disabled' : '' }}>
                                                             <i class="fas fa-times"></i>
                                                         </button>
 
@@ -1419,6 +1457,19 @@
 
         $(document).ready(function() {
 
+            $('.editable-field').on('focus', function() {
+                $(this).siblings('.editable-icon').removeClass('d-none');
+            });
+
+            $('.editable-field').on('blur', function() {
+                let $icons = $(this).siblings('.editable-icon');
+                // Delay hiding to allow click event on icons
+                setTimeout(() => {
+                    $icons.addClass('d-none');
+                }, 300); // 200ms delay
+            });
+
+
             $('.toggleEditTask').click(function() {
                 var taskId = $(this).data('id');
 
@@ -1505,6 +1556,205 @@
             });
         });
 
+        // Update company details on change
+        // Add data-field to submit buttons, e.g., <button class="editable-submit" data-field="name">...</button>
+
+        $('.editable-submit').click(function() {
+            let $button = $(this);
+            let $field = $button.siblings('.editable-field');
+            let companyId = $field.data('company-id');
+            let fieldName = $button.data('field'); // e.g., 'name' or 'description'
+            let newValue = $field.text().trim();
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `Do you want to update the ${fieldName}?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: 'Yes, update'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post(`/admin/companies/${companyId}/update-detail`, {
+                            _token: '{{ csrf_token() }}',
+                            field: fieldName,
+                            value: newValue
+                        })
+                        .done(response => {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Updated',
+                                text: response.message,
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        })
+                        .fail(xhr => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message || 'Something went wrong.'
+                            });
+                            console.error(xhr.responseText);
+                        });
+                }
+            });
+        });
+
+        // Cancel button hides sibling buttons
+        $('.editable-cancel').click(function() {
+            $(this).siblings('.editable-icon').addClass('d-none');
+        });
+
+
+        // Adding people
+        $('#peopleSelect').change(function() {
+            let peopleId = $(this).val();
+            let peopleName = $("#peopleSelect option:selected").text();
+
+            if (!peopleId || peopleId === "Add People") {
+                return; // ignore placeholder
+            }
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to add " + peopleName + " to this company?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#28a745",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, Add"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/admin/companies/{{ $company->id }}/people/add", // ✅ route
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            people_id: peopleId
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Added",
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: xhr.responseJSON?.message ||
+                                    "Something went wrong."
+                            });
+                        }
+                    });
+                } else {
+                    // Reset dropdown back to default if cancelled
+                    $('#peopleSelect').val("Add People");
+                }
+            });
+        });
+
+        // Adding tags
+        $('#tagSelect').change(function() {
+            let tagId = $(this).val();
+            let tagName = $("#tagSelect option:selected").text();
+
+            if (!tagId) {
+                return; // ignore placeholder
+            }
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to add the tag \"" + tagName + "\" to this company?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#28a745",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, Add"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/admin/companies/{{ $company->id }}/tags/add", // ✅ new route for tags
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            tag_id: tagId
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Added",
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: xhr.responseJSON?.message ||
+                                    "Something went wrong."
+                            });
+                        }
+                    });
+                } else {
+                    // Reset dropdown back to default if cancelled
+                    $('#tagSelect').val("");
+                }
+            });
+        });
+
+
+        function deleteTag(tagId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to remove this tag from the company?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, Remove"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/admin/companies/{{ $company->id }}/tags/" + tagId + "/remove",
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Removed",
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload(); // reload the page to update tags
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: xhr.responseJSON?.message || "Something went wrong."
+                            });
+                            console.error(xhr.responseText);
+                        }
+                    });
+                }
+            });
+        }
 
         // Allow only numbers & decimal
         document.querySelectorAll('.only-numbers').forEach(el => {

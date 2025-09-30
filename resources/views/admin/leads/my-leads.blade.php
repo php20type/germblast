@@ -76,14 +76,14 @@
                                 <div class="row">
                                     <div class="col-lg-3 col-md-6">
                                         <div class="filter-card">
-                                            {{-- <h5>Total value:<span>${{ $formattedTotalValue }}</span></h5> --}}
-                                            <h5>Total value:<span>$45908</span></h5>
+                                            <h5>Total value:<span>${{ $formattedTotalValue }}</span></h5>
+                                            {{-- <h5>Total value:<span>$45908</span></h5> --}}
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
                                         <div class="filter-card">
-                                            {{-- <h5>Avg value:<span>${{ $formattedAvgValue }}k</span></h5> --}}
-                                            <h5>Avg value:<span>$2.5k</span></h5>
+                                            <h5>Avg value:<span>${{ $formattedAvgValue }}k</span></h5>
+                                            {{-- <h5>Avg value:<span>$2.5k</span></h5> --}}
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
@@ -93,8 +93,8 @@
                                     </div>
                                     <div class="col-lg-3 col-md-6">
                                         <div class="filter-card">
-                                            {{-- <h5>Win rate:<span>{{ $formattedAvgConfidence }}%</span></h5> --}}
-                                            <h5>Win rate:<span>100%</span></h5>
+                                            <h5>Win rate:<span>{{ $formattedAvgConfidence }}%</span></h5>
+                                            {{-- <h5>Win rate:<span>100%</span></h5> --}}
                                         </div>
                                     </div>
                                 </div>

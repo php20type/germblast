@@ -13,6 +13,7 @@ use App\Models\PeopleAddress;
 use App\Models\PeopleCompany;
 use App\Models\PeopleEmail;
 use App\Models\PeoplePhone;
+use App\Models\PeopleTag;
 use App\Models\PeopleTask;
 use App\Models\PeopleUrl;
 use App\Models\Product;
@@ -185,7 +186,7 @@ class PeopleController extends Controller
         // Fetch a single person with ALL its relations
         $peoples = People::with([
             'companies',
-            'tag',
+            'tags',
             'user',
             'country',
             'state',
@@ -400,6 +401,105 @@ class PeopleController extends Controller
     //     return redirect()->back()->with('success', 'People added successfully.');
     // }
 
+    public function addCompany(Request $request, $peopleId)
+    {
+        $request->validate([
+            'company_id' => 'required|exists:companies,id',
+        ]);
+
+        // Prevent duplicates
+        $exists = PeopleCompany::where('people_id', $peopleId)
+            ->where('company_id', $request->company_id)
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'This company is already linked to the person.',
+            ], 422);
+        }
+
+        // Create new record
+        PeopleCompany::create([
+            'people_id' => $peopleId,
+            'company_id' => $request->company_id,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Company added to people successfully!',
+        ]);
+    }
+
+    public function addTag(Request $request, $peopleId)
+    {
+        $request->validate([
+            'tag_id' => 'required|exists:tags,id',
+        ]);
+
+        // Prevent duplicates
+        $exists = PeopleTag::where('people_id', $peopleId)
+            ->where('tag_id', $request->tag_id)
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'This tag is already linked to the people.',
+            ], 422);
+        }
+
+        // Create new record
+        PeopleTag::create([
+            'people_id' => $peopleId,
+            'tag_id' => $request->tag_id,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Tag added to people successfully!',
+        ]);
+    }
+
+    public function removeTag(Request $request, $peopleId, $tagId)
+    {
+        // Find the pivot record
+        $peopleTag = PeopleTag::where('people_id', $peopleId)
+            ->where('tag_id', $tagId)
+            ->first();
+
+        if (! $peopleTag) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Tag not found for this person.',
+            ], 404);
+        }
+
+        $peopleTag->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Tag removed from people successfully!',
+        ]);
+    }
+
+    public function updateDetail(Request $request, $peopleId)
+    {
+        $request->validate([
+            'field' => 'required|string|in:name,bio',
+            'value' => 'nullable|string',
+        ]);
+
+        $people = People::findOrFail($peopleId);
+        $people->{$request->field} = $request->value;
+        $people->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => ucfirst($request->field).' updated successfully!',
+        ]);
+    }
+
     public function store(Request $request)
     {
         DB::transaction(function () use ($request) {
@@ -410,7 +510,7 @@ class PeopleController extends Controller
                 'name' => $request->name,
                 'bio' => $request->bio,
                 'territory_id' => $request->territory_id,
-                'tag_id' => $request->tag_id,
+                // 'tag_id' => $request->tag_id,
             ]);
 
             // Step 2: Store Emails
@@ -452,6 +552,15 @@ class PeopleController extends Controller
                     'company_id' => $request->company_id,
                 ]);
             }
+
+            // Step 7: Store Tags
+            if ($request->tag_id) {
+                PeopleTag::create([
+                    'people_id' => $people->id,
+                    'tag_id' => $request->tag_id,
+                ]);
+            }
+
         });
 
         return redirect()->back()->with('success', 'Person created successfully!');
@@ -746,7 +855,7 @@ class PeopleController extends Controller
         ]);
     }
 
-      public function markCompleted($taskId)
+    public function markCompleted($taskId)
     {
         $task = PeopleTask::findOrFail($taskId);
 

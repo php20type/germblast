@@ -12,9 +12,9 @@ use App\Models\LeadCompany;
 use App\Models\LeadCompetitor;
 use App\Models\LeadPeople;
 use App\Models\LeadProduct;
-use App\Models\LeadTask;
 use App\Models\LeadSource;
 use App\Models\LeadStage;
+use App\Models\LeadTask;
 use App\Models\Market;
 use App\Models\Outcome;
 use App\Models\People;
@@ -66,12 +66,15 @@ class LeadController extends Controller
 
         // Totals & Averages
         $totalLeads = $leads->count();
-        $totalValue = $leads->flatMap->products->sum(function ($product) {
-            return $product->pivot->price * ($product->pivot->qty ?? 1);
-        });
-        $avgValue = $leads->flatMap->products->avg(function ($product) {
-            return $product->pivot->price * ($product->pivot->qty ?? 1);
-        });
+        // $totalValue = $leads->flatMap->products->sum(function ($product) {
+        //     return $product->pivot->price * ($product->pivot->qty ?? 1);
+        // });
+        // $avgValue = $leads->flatMap->products->avg(function ($product) {
+        //     return $product->pivot->price * ($product->pivot->qty ?? 1);
+        // });
+        // $avgConfidence = $leads->avg('confidence');
+        $totalValue = $leads->sum('total_value');  // ✅ use accessor
+        $avgValue = $leads->avg('total_value');   // ✅ use accessor
         $avgConfidence = $leads->avg('confidence');
 
         // Formatting (optional: keep or remove the /1000 depending on how you want display)
@@ -141,9 +144,10 @@ class LeadController extends Controller
                 'name' => $lead->name,
                 'people_name' => $lead->peoples->first()->name ?? 'N/A',
                 'created_at' => $lead->created_at->diffForHumans(null, true),
-                'total_price' => $group->flatMap->products->sum(function ($product) {
-                    return $product->pivot->price * ($product->pivot->qty ?? 1);
-                }),
+                // 'total_price' => $group->flatMap->products->sum(function ($product) {
+                //     return $product->pivot->price * ($product->pivot->qty ?? 1);
+                // }),
+                'total_price' => $group->sum->total_value,
                 'assignee' => $lead->assignee->name ?? 'N/A',
                 'sources' => $group->flatMap->sources->pluck('name')->unique()->join(', ') ?: 'N/A',
                 'confidence' => round($group->avg('confidence')),
@@ -219,9 +223,10 @@ class LeadController extends Controller
                 'name' => $lead->name,
                 'people_name' => $lead->peoples->first()->name ?? 'N/A',
                 'created_at' => $lead->created_at->diffForHumans(null, true),
-                'total_price' => $group->flatMap->products->sum(function ($product) {
-                    return $product->pivot->price * ($product->pivot->qty ?? 1);
-                }),
+                // 'total_price' => $group->flatMap->products->sum(function ($product) {
+                //     return $product->pivot->price * ($product->pivot->qty ?? 1);
+                // }),
+                'total_price' => $group->sum->total_value,
                 'assignee' => $lead->assignee->name ?? 'Unassigned',
                 'sources' => $group->flatMap->sources->pluck('name')->unique()->join(', ') ?: 'N/A',
                 'confidence' => round($group->avg('confidence')),
@@ -288,9 +293,10 @@ class LeadController extends Controller
                 'name' => $lead->name,
                 'people_name' => optional($lead->peoples->first())->name ?? 'N/A',
                 'created_at' => $lead->created_at->diffForHumans(null, true),
-                'total_price' => $group->flatMap->products->sum(function ($product) {
-                    return $product->pivot->price * ($product->pivot->qty ?? 1);
-                }),
+                // 'total_price' => $group->flatMap->products->sum(function ($product) {
+                //     return $product->pivot->price * ($product->pivot->qty ?? 1);
+                // }),
+                'total_price' => $group->sum->total_value,
                 'assignee' => optional($lead->assignee)->name ?? 'Unassigned',
                 'sources' => $group->flatMap->sources->pluck('name')->unique()->join(', ') ?: 'N/A',
                 'confidence' => round($group->avg('confidence')),
@@ -356,9 +362,10 @@ class LeadController extends Controller
                 'name' => $lead->name,
                 'people_name' => optional($lead->peoples->first())->name ?? 'N/A',
                 'created_at' => $lead->created_at->diffForHumans(null, true),
-                'total_price' => $group->flatMap->products->sum(function ($product) {
-                    return $product->pivot->price * ($product->pivot->qty ?? 1);
-                }),
+                // 'total_price' => $group->flatMap->products->sum(function ($product) {
+                //     return $product->pivot->price * ($product->pivot->qty ?? 1);
+                // }),
+                'total_price' => $group->sum->total_value,
                 'assignee' => optional($lead->assignee)->name ?? 'Unassigned',
                 'sources' => $group->flatMap->sources->pluck('name')->unique()->join(', ') ?: 'N/A',
                 'confidence' => round($group->avg('confidence')),
@@ -424,9 +431,10 @@ class LeadController extends Controller
                 'name' => $lead->name,
                 'people_name' => optional($lead->peoples->first())->name ?? 'N/A',
                 'created_at' => $lead->created_at->diffForHumans(null, true),
-                'total_price' => $group->flatMap->products->sum(function ($product) {
-                    return $product->pivot->price * ($product->pivot->qty ?? 1);
-                }),
+                // 'total_price' => $group->flatMap->products->sum(function ($product) {
+                //     return $product->pivot->price * ($product->pivot->qty ?? 1);
+                // }),
+                'total_price' => $group->sum->total_value,
                 'assignee' => optional($lead->assignee)->name ?? 'Unassigned',
                 'sources' => $group->flatMap->sources->pluck('name')->unique()->join(', ') ?: 'N/A',
                 'confidence' => round($group->avg('confidence')),
@@ -494,9 +502,10 @@ class LeadController extends Controller
                 'name' => $lead->name,
                 'people_name' => optional($lead->peoples->first())->name ?? 'N/A',
                 'created_at' => $lead->created_at->diffForHumans(null, true),
-                'total_price' => $group->flatMap->products->sum(function ($product) {
-                    return $product->pivot->price * ($product->pivot->qty ?? 1);
-                }),
+                // 'total_price' => $group->flatMap->products->sum(function ($product) {
+                //     return $product->pivot->price * ($product->pivot->qty ?? 1);
+                // }),
+                'total_price' => $group->sum->total_value,
                 'assignee' => optional($lead->assignee)->name ?? 'Unassigned',
                 'sources' => $group->flatMap->sources->pluck('name')->unique()->join(', ') ?: 'N/A',
                 'confidence' => round($group->avg('confidence')),
@@ -564,9 +573,10 @@ class LeadController extends Controller
                 'name' => $lead->name,
                 'people_name' => optional($lead->peoples->first())->name ?? 'N/A',
                 'created_at' => $lead->created_at->diffForHumans(null, true),
-                'total_price' => $group->flatMap->products->sum(function ($product) {
-                    return $product->pivot->price * ($product->pivot->qty ?? 1);
-                }),
+                // 'total_price' => $group->flatMap->products->sum(function ($product) {
+                //     return $product->pivot->price * ($product->pivot->qty ?? 1);
+                // }),
+                'total_price' => $group->sum->total_value,
                 'assignee' => optional($lead->assignee)->name ?? 'Unassigned',
                 'sources' => $group->flatMap->sources->pluck('name')->unique()->join(', ') ?: 'N/A',
                 'confidence' => round($group->avg('confidence')),
@@ -926,7 +936,6 @@ class LeadController extends Controller
         ]);
     }
 
-
     public function addTask(Request $request, $leadId)
     {
 
@@ -963,7 +972,7 @@ class LeadController extends Controller
         ]);
     }
 
-public function updateTask(Request $request, $taskId)
+    public function updateTask(Request $request, $taskId)
     {
         $request->validate([
             'title' => 'required|string|max:255',
@@ -995,7 +1004,7 @@ public function updateTask(Request $request, $taskId)
         ]);
     }
 
-       public function markCompleted($taskId)
+    public function markCompleted($taskId)
     {
         $task = LeadTask::findOrFail($taskId);
 
@@ -1032,9 +1041,9 @@ public function updateTask(Request $request, $taskId)
     }
 
     public function deleteTask($task_id)
-{
-    LeadTask::where('id', $task_id)->delete();
-    return redirect()->back();
-}
+    {
+        LeadTask::where('id', $task_id)->delete();
 
+        return redirect()->back();
+    }
 }
