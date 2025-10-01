@@ -18,36 +18,50 @@
                                         <div class="d-flex justify-content-between align-items-center">
 
                                             <img src="{{ $leadStatusIcon }}" alt="Lead Status" id="lead-status-icon">
-                                            {{-- <i class="fas fa-star star-icon"></i> --}}
 
-                                            <h1 contenteditable="true" spellcheck="false">
-                                                {{ $leads->name }}
-                                            </h1>
-                                        </div>
-                                        <div class="project-id">#{{ $leads->id }}</div>
-                                        <div class="mt-3">
-
-                                            <div class="d-flex justify-content-left align-items-center flex-wrap">
-                                                @foreach ($leads->leadTags as $leadTag)
-                                                    <div class="badge-customer me-2 mb-2 d-flex align-items-center">
-                                                        <span class="me-1">{{ $leadTag->tag->name }}</span>
-                                                        <span class="btn btn-sm delete-item p-0">
-                                                            <i class="fas fa-times"></i>
-                                                        </span>
-                                                    </div>
-                                                @endforeach
+                                            <!-- Lead Name -->
+                                            <div class="d-flex align-items-center mb-2" style="gap: 5px;">
+                                                <h1 class="mb-1 editable-field" contenteditable="true" spellcheck="false"
+                                                    id="lead-update-name" data-lead-id="{{ $leads->id }}">
+                                                    {{ $leads->name ?? 'N/A' }}
+                                                </h1>
+                                                <button
+                                                    class="btn btn-sm btn-outline-success editable-icon editable-submit d-none"
+                                                    id="lead-name-submit" title="Save Lead Name" data-field="name">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button
+                                                    class="btn btn-sm btn-outline-danger editable-icon editable-cancel d-none"
+                                                    id="lead-name-cancel" title="Cancel">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
                                             </div>
 
                                         </div>
+                                        <div class="project-id">#{{ $leads->id }}</div>
+
+                                        <div class="mt-3">
+                                            <div class="d-flex justify-content-left align-items-center flex-wrap">
+                                                @foreach ($leads->tags as $tag)
+                                                    <span class="badge-customer mx-1 px-2">
+                                                        {{ $tag->name }}
+                                                        <button class="btn btn-sm" onclick="deleteTag({{ $tag->id }})">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+
                                     </div>
                                     <div class="amount">$2</div>
                                 </div>
 
-                                <div class="my-3">
-                                    <select class="form-select d-inline-block w-100" aria-label="Default select example">
-                                        <option selected="">Add tags...</option>
-                                        {{-- <option value="1">Type 1</option>
-                                        <option value="2">Type 2</option> --}}
+                                <div class="mt-4 my-3" id="addLeadTag">
+                                    <select class="form-select d-inline-block w-100 tag-update"
+                                        aria-label="Default select example" id="tagSelect">
+                                        <option value="">Add tags...</option>
                                         @foreach ($tags as $tag)
                                             <option value="{{ $tag->id }}">{{ $tag->name }}</option>
                                         @endforeach
@@ -120,6 +134,10 @@
                                         about your leads, benefiting both you and your company. Prioritize your
                                         top three fields here; the remaining fields will be accessible on the
                                         sidebar.</p>
+                                    <p class="text-muted mb-0">
+                                        Note: User will be redirected to settings > organization > custom fields
+                                        to create custom fields.
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -151,8 +169,7 @@
                                                 <div class="d-flex gap-2">
                                                     <!-- Completed -->
                                                     <button class="btn btn-sm btn-outline-warning"
-                                                        onclick="reopenTask({{ $task->id }})"
-                                                        title="Reopen Task">
+                                                        onclick="reopenTask({{ $task->id }})" title="Reopen Task">
                                                         <i class="fas fa-undo"></i>
                                                     </button>
 
@@ -1229,6 +1246,19 @@
         <script>
             document.addEventListener("DOMContentLoaded", function() {
 
+                // Icons show/hide beside name and description
+                $('.editable-field').on('focus', function() {
+                    $(this).siblings('.editable-icon').removeClass('d-none');
+                });
+
+                $('.editable-field').on('blur', function() {
+                    let $icons = $(this).siblings('.editable-icon');
+                    // Delay hiding to allow click event on icons
+                    setTimeout(() => {
+                        $icons.addClass('d-none');
+                    }, 300); // 200ms delay
+                });
+
                 // common ajax update function
                 function updateLead(data, onSuccess) {
                     fetch("{{ route('admin.leads.ajax_update') }}", {
@@ -1436,6 +1466,151 @@
                 }
             });
 
+            // Update lead details(name and description) on change
+            $('.editable-submit').click(function() {
+                let $button = $(this);
+                let $field = $button.siblings('.editable-field');
+                let leadId = $field.data('lead-id');
+                let fieldName = $button.data('field'); // e.g., 'name'
+                let newValue = $field.text().trim();
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `Do you want to update the ${fieldName}?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#dc3545',
+                    confirmButtonText: 'Yes, update'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.post(`/admin/leads/${leadId}/update-detail`, {
+                                _token: '{{ csrf_token() }}',
+                                field: fieldName,
+                                value: newValue
+                            })
+                            .done(response => {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Updated',
+                                    text: response.message,
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                            })
+                            .fail(xhr => {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON?.message || 'Something went wrong.'
+                                });
+                                console.error(xhr.responseText);
+                            });
+                    }
+                });
+            });
+
+            // Cancel button hides sibling buttons
+            $('.editable-cancel').click(function() {
+                $(this).siblings('.editable-icon').addClass('d-none');
+            });
+
+            // Adding tags tot the company
+            $('#tagSelect').change(function() {
+                let tagId = $(this).val();
+                let tagName = $("#tagSelect option:selected").text();
+
+                if (!tagId) {
+                    return; // ignore placeholder
+                }
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Do you want to add the tag \"" + tagName + "\" to this lead?",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonColor: "#28a745",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, Add"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/admin/leads/{{ $leads->id }}/tags/add", // ✅ new route for tags
+                            method: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                tag_id: tagId
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Added",
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: xhr.responseJSON?.message ||
+                                        "Something went wrong."
+                                });
+                            }
+                        });
+                    } else {
+                        // Reset dropdown back to default if cancelled
+                        $('#tagSelect').val("");
+                    }
+                });
+            });
+
+
+            // Removing the tag from the company
+            function deleteTag(tagId) {
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Do you want to remove this tag from the lead?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, Remove"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/admin/leads/{{ $leads->id }}/tags/" + tagId + "/remove",
+                            method: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Removed",
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload(); // reload the page to update tags
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: xhr.responseJSON?.message || "Something went wrong."
+                                });
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                });
+            }
+
 
             $("#addTaskAjaxForm").validate({
                 ignore: [],
@@ -1570,48 +1745,48 @@
                 });
             }
 
-             function reopenTask(taskId) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "Do you want to re-open this task?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ffc107',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, re-open it!',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '/admin/leads/tasks/' + taskId + '/reopen',
-                        method: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}'
-                        },
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Re-open',
-                                text: response.message,
-                                showConfirmButton: false,
-                                timer: 2000
-                            }).then(() => {
-                                location.reload(); // refresh task state
-                            });
-                        },
-                        error: function(xhr) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: xhr.responseJSON?.message ||
-                                    'Something went wrong while reopening this task.'
-                            });
-                            console.error(xhr.responseText);
-                        }
-                    });
-                }
-            });
-        }
+            function reopenTask(taskId) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to re-open this task?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ffc107',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, re-open it!',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/admin/leads/tasks/' + taskId + '/reopen',
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Re-open',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(() => {
+                                    location.reload(); // refresh task state
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong while reopening this task.'
+                                });
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                });
+            }
 
 
             // $('.step-menu li').click(function() {
@@ -1717,23 +1892,49 @@
                 });
             });
 
-            function deleteTask(task_id) {
-                var deleteurl = "/admin/leads/tasks/delete/" + task_id;
+            // Delete a task
+             function deleteTask(task_id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to undo this action!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/admin/leads/tasks/delete/" + task_id,
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: response.message || "Task deleted successfully.",
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                            // reload after swal closes
+                            location.reload();
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message || 'Something went wrong.'
+                            });
+                        }
+                    });
+                }
+            });
+        }
 
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to undo this action!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = deleteurl;
-                    }
-                });
-            }
+
+
 
             $(document).ready(function() {
 

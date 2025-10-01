@@ -73,28 +73,26 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // sales section
     Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
 
-    // companies section
+    // Company Section
     Route::get('/company', [CompanyController::class, 'index'])->name('company.index');
     Route::get('/company/my_companies/{id}', [CompanyController::class, 'my_companies'])->name('company.my_companies');
     Route::post('/companies/store', [CompanyController::class, 'store'])->name('companies.store');
 
-    Route::post('/companies/{company}/tasks', [CompanyController::class, 'addTask'])
-        ->name('companies.tasks.store');
+    // Company - Task Section
+    Route::post('/companies/{company}/tasks', [CompanyController::class, 'addTask'])->name('companies.tasks.store');
     Route::put('companies/tasks/{task}/update', [CompanyController::class, 'updateTask'])->name('companies.tasks.update');
     Route::post('companies/tasks/{task}/complete', [CompanyController::class, 'markCompleted'])->name('companies.tasks.complete');
     Route::post('companies/tasks/{task}/reopen', [CompanyController::class, 'reopenTask'])->name('companies.tasks.reopen');
-    Route::get('/companies/tasks/delete/{task_id}', [CompanyController::class, 'deleteTask'])->name('companies.task.delete');
+    Route::post('/companies/tasks/delete/{task_id}', [CompanyController::class, 'deleteTask'])->name('companies.task.delete');
 
+    // Company - Detail Section
     Route::get('companies/{company}', [CompanyController::class, 'show'])->name('companies.show');
     Route::post('/company/ajax', [CompanyController::class, 'ajax_store'])->name('company.ajax.store');
-    Route::post('companies/{company}/update-detail', [CompanyController::class, 'updateDetail'])
-    ->name('companies.updateDetail');
-    Route::post('companies/{company}/people/add', [CompanyController::class, 'addPeople'])
-        ->name('companies.people.add');
-    Route::post('companies/{company}/tags/add', [CompanyController::class, 'addTag'])
-        ->name('companies.tags.add');
-    Route::post('companies/{company}/tags/{tag}/remove', [CompanyController::class, 'removeTag'])
-        ->name('companies.tags.remove');
+    Route::post('companies/{company}/update-detail', [CompanyController::class, 'updateDetail'])->name('companies.updateDetail');
+    Route::post('companies/{company}/people/add', [CompanyController::class, 'addPeople'])->name('companies.people.add');
+    Route::post('companies/{company}/remove-person', [CompanyController::class, 'removePerson'])->name('companies.people.remove');
+    Route::post('companies/{company}/tags/add', [CompanyController::class, 'addTag'])->name('companies.tags.add');
+    Route::post('companies/{company}/tags/{tag}/remove', [CompanyController::class, 'removeTag'])->name('companies.tags.remove');
     Route::post('/companies/{company}/update-field', [CompanyController::class, 'updateField'])->name('company.update.field');
     Route::post('companies/delete-field', [CompanyController::class, 'deleteField'])->name('companies.delete-field');
     Route::post('/update-company-email', [CompanyController::class, 'updateCompanyEmail'])->name('update.company.email');
@@ -102,30 +100,27 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/update-company-phone', [CompanyController::class, 'updateCompanyPhone'])->name('update.company.phone');
     Route::post('/update-company-url', [CompanyController::class, 'updateCompanyUrl'])->name('update.company.url');
 
-    // peoples section
+    // People Section
+    Route::get('/people/index', [PeopleController::class, 'index'])->name('peoples.index');
+    Route::get('/people/my-peoples/{id}', [PeopleController::class, 'my_peoples'])->name('peoples.my_peoples');
     Route::post('/people/store', [PeopleController::class, 'store'])->name('people.store');
 
-    Route::post('/people/{people}/tasks', [PeopleController::class, 'addTask'])
-        ->name('people.tasks.store');
+    // People - Task Section
+    Route::post('/people/{people}/tasks', [PeopleController::class, 'addTask'])->name('people.tasks.store');
     Route::put('people/tasks/{task}/update', [PeopleController::class, 'updateTask'])->name('people.tasks.update');
     Route::post('people/tasks/{task}/complete', [PeopleController::class, 'markCompleted'])->name('people.tasks.complete');
     Route::post('people/tasks/{task}/reopen', [PeopleController::class, 'reopenTask'])->name('people.tasks.reopen');
-    Route::get('/people/tasks/delete/{task_id}', [PeopleController::class, 'deleteTask'])->name('people.task.delete');
+    Route::post('people/tasks/delete/{task_id}', [PeopleController::class, 'deleteTask'])->name('people.task.delete');
 
+    // People - Detail Section
     Route::get('/people/delete/{people_id}', [PeopleController::class, 'delete'])->name('people.delete');
     Route::post('/people/ajax', [PeopleController::class, 'ajax_store'])->name('people.ajax.store');
-    Route::post('people/{people}/update-detail', [PeopleController::class, 'updateDetail'])
-    ->name('people.updateDetail');
-    Route::post('people/{people}/company/add', [PeopleController::class, 'addCompany'])
-        ->name('people.companies.add');
-    Route::post('people/{people}/tags/add', [PeopleController::class, 'addTag'])
-        ->name('people.tags.add');
-    Route::post('people/{people}/tags/{tag}/remove', [PeopleController::class, 'removeTag'])
-        ->name('people.tags.remove');
-    // Route::post('/people/{person}/tasks', [PeopleController::class, 'addTask'])
-    //     ->name('people.tasks.store');
-    Route::get('/people/index', [PeopleController::class, 'index'])->name('peoples.index');
-    Route::get('/people/my-peoples/{id}', [PeopleController::class, 'my_peoples'])->name('peoples.my_peoples');
+    Route::post('people/{people}/update-detail', [PeopleController::class, 'updateDetail'])->name('people.updateDetail');
+    Route::post('people/{people}/company/add', [PeopleController::class, 'addCompany'])->name('people.companies.add');
+    Route::post('people/{people}/remove-company', [PeopleController::class, 'removeCompany'])->name('people.company.remove');
+    Route::post('people/{people}/tags/add', [PeopleController::class, 'addTag'])->name('people.tags.add');
+    Route::post('people/{people}/tags/{tag}/remove', [PeopleController::class, 'removeTag'])->name('people.tags.remove');
+
     Route::get('/people/animal-care', [PeopleController::class, 'animal_care'])->name('peoples.animal_care');
     Route::get('/people/marketing-contacts', [PeopleController::class, 'marketing_contacts'])->name('peoples.marketing_contacts');
     Route::get('/people/sequence-healthcare', [PeopleController::class, 'sequence_healthcare'])->name('peoples.sequence_healthcare');
@@ -137,22 +132,26 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/update-person-phone', [PeopleController::class, 'updatePersonPhone'])->name('update.person.phone');
     Route::post('/update-person-url', [PeopleController::class, 'updatePersonUrl'])->name('update.person.url');
 
-    // tasks sections
+    // Task Section
     Route::post('/tasks/store', [TaskController::class, 'store'])->name('tasks.store');
     Route::post('/tasks/ajax', [TaskController::class, 'ajax_store'])->name('task.ajax.store');
 
-    // leads section
+    // Lead Section
     Route::get('/leads/index', [LeadController::class, 'index'])->name('leads.index');
     Route::post('/leads', [LeadController::class, 'store'])->name('leads.store');
 
-    Route::post('/leads/{lead}/tasks', [LeadController::class, 'addTask'])
-        ->name('leads.tasks.store');
+    // Lead - Task Section
+    Route::post('/leads/{lead}/tasks', [LeadController::class, 'addTask'])->name('leads.tasks.store');
     Route::put('leads/tasks/{task}/update', [LeadController::class, 'updateTask'])->name('leads.tasks.update');
     Route::post('leads/tasks/{task}/complete', [LeadController::class, 'markCompleted'])->name('leads.tasks.complete');
     Route::post('leads/tasks/{task}/reopen', [CompanyController::class, 'reopenTask'])->name('leads.tasks.reopen');
-    Route::get('/leads/tasks/delete/{task_id}', [LeadController::class, 'deleteTask'])->name('leads.task.delete');
+    Route::post('leads/tasks/delete/{task_id}', [LeadController::class, 'deleteTask'])->name('leads.task.delete');
 
+    // Lead - Detail Section
     Route::post('/leads/ajax-update', [LeadController::class, 'ajax_update'])->name('leads.ajax_update');
+    Route::post('leads/{lead}/update-detail', [LeadController::class, 'updateDetail'])->name('lead.updateDetail');
+    Route::post('leads/{lead}/tags/add', [LeadController::class, 'addTag'])->name('leads.tags.add');
+    Route::post('leads/{lead}/tags/{tag}/remove', [LeadController::class, 'removeTag'])->name('leads.tags.remove');
     Route::get('/leads/my-leads/{id}', [LeadController::class, 'my_leads'])->name('leads.my_leads');
     Route::get('/leads/added-this-week', [LeadController::class, 'added_this_week'])->name('leads.added_this_week');
     Route::get('/leads/closing-this-week', [LeadController::class, 'closing_this_week'])->name('leads.closing_this_week');

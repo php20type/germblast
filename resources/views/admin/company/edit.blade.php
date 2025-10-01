@@ -51,7 +51,8 @@
                                             </div>
                                             <button
                                                 class="btn btn-sm btn-outline-success editable-icon editable-submit d-none"
-                                                id="company-description-submit" title="Save Company Description" data-field="description">
+                                                id="company-description-submit" title="Save Company Description"
+                                                data-field="description">
                                                 <i class="fas fa-check"></i>
                                             </button>
                                             <button
@@ -129,10 +130,11 @@
                                             <div class="text-muted">{{ $people->peopleEmail->email ?? 'N/A' }}</div>
                                         </div>
 
-                                        <button class="btn btn-sm btn-outline-secondary"
-                                            onclick="deletePerson({{ $people->id }})">
+                                        <button class="btn btn-sm btn-outline-secondary remove-person-btn"
+                                            data-people-id="{{ $people->id }}" data-company-id="{{ $company->id }}">
                                             <i class="fas fa-times"></i>
                                         </button>
+
                                     </div>
                                 </div>
                             @endforeach
@@ -792,16 +794,16 @@
                                         <!-- Buttons -->
                                         <div class="d-flex justify-content-end align-items-center mt-2"
                                             style="gap: 10px;">
-                                            <span id="email-submit" title="Save Email"
-                                                class="rounded-circle d-flex justify-content-center align-items-center"
-                                                style="width:28px;height:28px;background-color:#28a745;cursor:pointer;">
-                                                <i class="fa fa-check text-white"></i>
-                                            </span>
-                                            <span id="email-cancel" title="Cancel"
-                                                class="rounded-circle d-flex justify-content-center align-items-center"
-                                                style="width:28px;height:28px;background-color:#dc3545;cursor:pointer;">
-                                                <i class="fa fa-times text-white"></i>
-                                            </span>
+                                            <button
+                                                class="btn btn-sm btn-outline-success editable-icon"
+                                                id="email-submit" title="Save Email">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button
+                                                class="btn btn-sm btn-outline-danger editable-icon"
+                                                id="email-cancel" title="Cancel">
+                                                <i class="fas fa-times"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -880,16 +882,16 @@
                                         <!-- Buttons -->
                                         <div class="d-flex justify-content-end align-items-center mt-2"
                                             style="gap: 10px;">
-                                            <span id="address-submit" title="Save Address"
-                                                class="rounded-circle d-flex justify-content-center align-items-center"
-                                                style="width:28px;height:28px;background-color:#28a745;cursor:pointer;">
-                                                <i class="fa fa-check text-white"></i>
-                                            </span>
-                                            <span id="address-cancel" title="Cancel"
-                                                class="rounded-circle d-flex justify-content-center align-items-center"
-                                                style="width:28px;height:28px;background-color:#dc3545;cursor:pointer;">
-                                                <i class="fa fa-times text-white"></i>
-                                            </span>
+                                            <button
+                                                class="btn btn-sm btn-outline-success editable-icon"
+                                                id="address-submit" title="Save Address">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button
+                                                class="btn btn-sm btn-outline-danger editable-icon"
+                                                id="address-cancel" title="Cancel">
+                                                <i class="fas fa-times"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -967,16 +969,16 @@
                                         <!-- Buttons -->
                                         <div class="d-flex justify-content-end align-items-center mt-2"
                                             style="gap: 10px;">
-                                            <span id="phone-submit" title="Save Phone"
-                                                class="rounded-circle d-flex justify-content-center align-items-center"
-                                                style="width:28px;height:28px;background-color:#28a745;cursor:pointer;">
-                                                <i class="fa fa-check text-white"></i>
-                                            </span>
-                                            <span id="phone-cancel" title="Cancel"
-                                                class="rounded-circle d-flex justify-content-center align-items-center"
-                                                style="width:28px;height:28px;background-color:#dc3545;cursor:pointer;">
-                                                <i class="fa fa-times text-white"></i>
-                                            </span>
+                                            <button
+                                                class="btn btn-sm btn-outline-success editable-icon"
+                                                id="phone-submit" title="Save Phone">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button
+                                                class="btn btn-sm btn-outline-danger editable-icon"
+                                                id="phone-cancel" title="Cancel">
+                                                <i class="fas fa-times"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -1052,16 +1054,16 @@
                                         <!-- Buttons -->
                                         <div class="d-flex justify-content-end align-items-center mt-2"
                                             style="gap: 10px;">
-                                            <span id="url-submit" title="Save URL"
-                                                class="rounded-circle d-flex justify-content-center align-items-center"
-                                                style="width:28px;height:28px;background-color:#28a745;cursor:pointer;">
-                                                <i class="fa fa-check text-white"></i>
-                                            </span>
-                                            <span id="url-cancel" title="Cancel"
-                                                class="rounded-circle d-flex justify-content-center align-items-center"
-                                                style="width:28px;height:28px;background-color:#dc3545;cursor:pointer;">
-                                                <i class="fa fa-times text-white"></i>
-                                            </span>
+                                            <button
+                                                class="btn btn-sm btn-outline-success editable-icon"
+                                                id="url-submit" title="Save Url">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button
+                                                class="btn btn-sm btn-outline-danger editable-icon"
+                                                id="url-cancel" title="Cancel">
+                                                <i class="fas fa-times"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -1233,36 +1235,6 @@
                                         @endforeach
                                     </select>
 
-                                    {{-- Toggle Button --}}
-                                    <button type="button" id="toggleAddPerson" class="btn btn-sm btn-link text-primary">
-                                        + Add New Person
-                                    </button>
-
-                                    {{-- ====== --}}
-                                    <div id="addPersonInlineForm" class="mt-3 p-3 border rounded bg-light d-none">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-2">
-                                                <label>Name</label>
-                                                <input type="text" name="inline_name" class="form-control">
-                                            </div>
-                                            <div class="col-md-6 mb-2">
-                                                <label>Email</label>
-                                                <input type="email" name="inline_email" class="form-control">
-                                            </div>
-                                            <div class="col-md-6 mb-2">
-                                                <label>Phone</label>
-                                                <input type="text" name="inline_phone" class="form-control">
-                                            </div>
-                                            <div class="col-md-6 mb-2">
-                                                <label>Code</label>
-                                                <input type="text" name="inline_code" class="form-control">
-                                            </div>
-                                        </div>
-                                        <button type="button" class="btn btn-success mt-2" id="submitAddPerson">Add
-                                            Person</button>
-                                    </div>
-
-                                    {{-- ===== --}}
                                 </div>
                             </div>
 
@@ -1457,6 +1429,7 @@
 
         $(document).ready(function() {
 
+            // Icons show/hide beside name and description
             $('.editable-field').on('focus', function() {
                 $(this).siblings('.editable-icon').removeClass('d-none');
             });
@@ -1469,7 +1442,7 @@
                 }, 300); // 200ms delay
             });
 
-
+            // Toggle edit task form
             $('.toggleEditTask').click(function() {
                 var taskId = $(this).data('id');
 
@@ -1501,6 +1474,7 @@
             });
 
 
+            // Flatpickr for due date in task
             flatpickr("#due_date", {
                 enableTime: true,
                 dateFormat: "Y-m-d h:i K", // h = 12-hour, K = AM/PM
@@ -1515,6 +1489,7 @@
                 e.preventDefault();
             });
 
+            // Lead form select2 integration in the fields
             $('#AddLead').on('shown.bs.modal', function() {
                 $('#companySelect').select2({
                     dropdownParent: $('#AddLead'),
@@ -1556,9 +1531,7 @@
             });
         });
 
-        // Update company details on change
-        // Add data-field to submit buttons, e.g., <button class="editable-submit" data-field="name">...</button>
-
+        // Update company details(name and description) on change
         $('.editable-submit').click(function() {
             let $button = $(this);
             let $field = $button.siblings('.editable-field');
@@ -1608,7 +1581,7 @@
         });
 
 
-        // Adding people
+        // Adding people to the company
         $('#peopleSelect').change(function() {
             let peopleId = $(this).val();
             let peopleName = $("#peopleSelect option:selected").text();
@@ -1661,7 +1634,7 @@
             });
         });
 
-        // Adding tags
+        // Adding tags tot the company
         $('#tagSelect').change(function() {
             let tagId = $(this).val();
             let tagName = $("#tagSelect option:selected").text();
@@ -1715,6 +1688,7 @@
         });
 
 
+        // Removing the tag from the company
         function deleteTag(tagId) {
             Swal.fire({
                 title: "Are you sure?",
@@ -2045,11 +2019,6 @@
             $(this).closest('.participant-entry').remove();
         });
 
-        // Toggle the Add Person form
-        $('#toggleAddPerson').on('click', function() {
-            $('#addPersonInlineForm').toggleClass('d-none');
-        });
-
         // Product row logic
         $('#addProductRow').click(function() {
             var row = $('.product-row:first').clone(); // Clone the first row
@@ -2065,50 +2034,6 @@
             } else {
                 alert('At least one product row is required.');
             }
-        });
-
-
-        // Submit Add Person via AJAX
-        $('#submitAddPerson').on('click', function() {
-            let formData = {
-                _token: $('meta[name="csrf-token"]').attr('content'),
-                name: $('input[name="inline_name"]').val(),
-                email: $('input[name="inline_email"]').val(),
-                phone: $('input[name="inline_phone"]').val(),
-                code: $('input[name="inline_code"]').val(),
-            };
-
-            $.ajax({
-                url: "{{ route('admin.people.ajax.store') }}",
-                method: 'POST',
-                data: formData,
-                success: function(response) {
-                    if (response.success) {
-                        toastr.success('Person added successfully!');
-                        $('input[name="inline_name"], input[name="inline_email"], input[name="inline_phone"], input[name="inline_code"]')
-                            .val('');
-                        $('#addPersonInlineForm').addClass('d-none');
-
-                        const newPerson = response.people;
-                        const option = new Option(newPerson.email, newPerson.id);
-                        $('#person_select').append(option);
-
-                    } else {
-                        console.log(response);
-                        toastr.error('Failed to add person. Please try again.');
-                    }
-                },
-                error: function(xhr) {
-                    if (xhr.responseJSON?.errors) {
-                        let messages = Object.values(xhr.responseJSON.errors).flat().join(
-                            '\n');
-                        toastr.error(messages, 'Validation Error');
-                    } else {
-                        console.log(xhr.responseText);
-                        toastr.error("Something went wrong.");
-                    }
-                }
-            });
         });
 
 
@@ -2253,14 +2178,6 @@
             }
         });
 
-        // toggleTaskBtn.addEventListener('click', function(e) {
-        //     e.preventDefault();
-        //     if (formTaskDiv.style.display === "none" || formTaskDiv.style.display === "") {
-        //         formTaskDiv.style.display = "block";
-        //     } else {
-        //         formTaskDiv.style.display = "none";
-        //     }
-        // });
         toggleTaskBtn.addEventListener('click', function(e) {
             e.preventDefault();
 
@@ -2466,92 +2383,6 @@
         // =========== Add Task ajax form validation and submition logic ENDS ==============
 
 
-        // =========== Add Person ajax form validation and submition logic STARTS ==============
-        $("#addPeopleAjaxForm").validate({
-            ignore: [],
-            rules: {
-                name: {
-                    required: true
-                },
-                job_title: {
-                    required: true
-                },
-                phone: {
-                    required: true
-                },
-                email: {
-                    required: true
-                },
-                description: {
-                    required: true
-                },
-
-            },
-            messages: {
-                name: {
-                    required: "Please enter the Contact name."
-                },
-                job_title: {
-                    required: "Please enter the job title."
-                },
-                phone: {
-                    required: "Please enter the phone number."
-                },
-                email: {
-                    required: "Please enter the email."
-                },
-                description: {
-                    required: "Please enter the description."
-                },
-
-            },
-            errorElement: 'span',
-            errorClass: 'invalid-feedback d-block',
-            highlight: function(element) {
-                $(element).addClass('is-invalid');
-            },
-            unhighlight: function(element) {
-                $(element).removeClass('is-invalid');
-            },
-            errorPlacement: function(error, element) {
-                if (element.parent('.input-group').length) {
-                    error.insertAfter(element.parent()); // Inserts after the .input-group
-                } else {
-                    error.insertAfter(element); // Default
-                }
-            }
-        });
-
-        $('#addPeopleAjaxForm').submit(function(e) {
-            e.preventDefault();
-
-            if (!$('#addPeopleAjaxForm').valid()) {
-                return; // Stop if validation fails
-            }
-
-            $.ajax({
-                url: "{{ route('admin.people.store') }}",
-                method: "POST",
-                data: $(this).serialize(),
-                success: function(response) {
-
-                    alert('People added successfully.');
-                    $('#addPeopleAjaxForm')[0].reset();
-                    console.log(response);
-                    location.reload();
-
-                },
-                error: function(xhr) {
-                    alert('Error: ' + xhr.responseText);
-                    toastr.error('Something went wrong while adding the person.');
-
-                }
-            });
-        });
-
-        // =========== Add Person ajax form validation and submition logic ENDS ==============
-
-
         // =========== Schedule activity validation and submition logic STARTS ==============
         function scheduleActivity() {
             $('#schedule-activity').modal('show');
@@ -2648,32 +2479,58 @@
             });
         });
 
+
+        // Remove person from the company logic
+        $(document).on('click', '.remove-person-btn', function() {
+            let peopleId = $(this).data('people-id');
+            let companyId = $(this).data('company-id');
+            let $btn = $(this);
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'This person will be removed from the company.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, remove'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/admin/companies/${companyId}/remove-person`,
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            people_id: peopleId
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Removed',
+                                text: response.message,
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+
+                            location.reload();
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message ||
+                                    'Something went wrong.'
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+
+
         // =========== Schedule activity validation and submition logic ENDS ==============
-
-
-
-        function deletePerson(person_id) {
-            var deleteurl = "{{ route('admin.people.delete', ':people_id') }}".replace(':people_id', person_id);
-
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to undo this action!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Redirect to the delete route
-                    window.location.href = deleteurl;
-                }
-            });
-        }
-
         function deleteTask(task_id) {
-            var deleteurl = "/admin/companies/tasks/delete/" + task_id;
-
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to undo this action!",
@@ -2684,10 +2541,35 @@
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = deleteurl;
+                    $.ajax({
+                        url: "/admin/companies/tasks/delete/" + task_id,
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: response.message || "Task deleted successfully.",
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                            // reload after swal closes
+                            location.reload();
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message || 'Something went wrong.'
+                            });
+                        }
+                    });
                 }
             });
         }
+
 
         $(document).ready(function() {
 

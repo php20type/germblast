@@ -14,6 +14,7 @@ use App\Models\LeadPeople;
 use App\Models\LeadProduct;
 use App\Models\LeadSource;
 use App\Models\LeadStage;
+use App\Models\LeadTag;
 use App\Models\LeadTask;
 use App\Models\Market;
 use App\Models\Outcome;
@@ -798,6 +799,75 @@ class LeadController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function updateDetail(Request $request, $leadId)
+    {
+        $request->validate([
+            'field' => 'required|string|in:name',
+            'value' => 'nullable|string',
+        ]);
+
+        $lead = Lead::findOrFail($leadId);
+        $lead->{$request->field} = $request->value;
+        $lead->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => ucfirst($request->field).' updated successfully!',
+        ]);
+    }
+
+    public function addTag(Request $request, $leadId)
+    {
+        $request->validate([
+            'tag_id' => 'required|exists:tags,id',
+        ]);
+
+        // Prevent duplicates
+        $exists = LeadTag::where('lead_id', $leadId)
+            ->where('tag_id', $request->tag_id)
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'This tag is already linked to the lead.',
+            ], 422);
+        }
+
+        // Create new record
+        LeadTag::create([
+            'lead_id' => $leadId,
+            'tag_id' => $request->tag_id,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Tag added to lead successfully!',
+        ]);
+    }
+
+    public function removeTag(Request $request, $leadId, $tagId)
+    {
+        // Find the pivot record
+        $leadTag = LeadTag::where('lead_id', $leadId)
+            ->where('tag_id', $tagId)
+            ->first();
+
+        if (! $leadTag) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Tag not found for this lead.',
+            ], 404);
+        }
+
+        $leadTag->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Tag removed from lead successfully!',
+        ]);
+    }
+
     public function deleteField(Request $request)
     {
         $request->validate([
@@ -814,31 +884,31 @@ class LeadController extends Controller
             switch ($type) {
                 case 'company':
                     $deleted = LeadCompany::where('lead_id', $leadId)
-                        ->where('id', $relatedId)
+                        ->where('company_id', $relatedId)
                         ->delete();
                     break;
 
                 case 'people':
                     $deleted = LeadPeople::where('lead_id', $leadId)
-                        ->where('id', $relatedId)
+                        ->where('people_id', $relatedId)
                         ->delete();
                     break;
 
                 case 'product':
                     $deleted = LeadProduct::where('lead_id', $leadId)
-                        ->where('id', $relatedId)
+                        ->where('product_id', $relatedId)
                         ->delete();
                     break;
 
                 case 'competitor':
                     $deleted = LeadCompetitor::where('lead_id', $leadId)
-                        ->where('id', $relatedId)
+                        ->where('competitor_id', $relatedId)
                         ->delete();
                     break;
 
                 case 'source':
                     $deleted = LeadSource::where('lead_id', $leadId)
-                        ->where('id', $relatedId)
+                        ->where('source_id', $relatedId)
                         ->delete();
                     break;
 
@@ -1042,8 +1112,20 @@ class LeadController extends Controller
 
     public function deleteTask($task_id)
     {
-        LeadTask::where('id', $task_id)->delete();
+        $task = LeadTask::find($task_id);
 
-        return redirect()->back();
+        if (! $task) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Task not found.',
+            ], 404);
+        }
+
+        $task->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Task deleted successfully.',
+        ]);
     }
 }

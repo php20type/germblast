@@ -350,57 +350,6 @@ class PeopleController extends Controller
         ));
     }
 
-    // public function ajax_store(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'user_id' => 'required',
-    //         'name' => 'required|string|max:255',
-    //         'email' => 'required|email',
-    //         'phone' => 'required|string',
-    //         'code' => 'required|string',
-    //         // 'bio' => 'nullable|string',
-    //         // 'tag_id' => 'required',
-    //         // 'territory_id' => 'required',
-    //         // 'company_id' => 'required',
-    //     ]);
-
-    //     $data = [
-    //         'user_id' => $validated['user_id'],
-    //         'name' => $validated['name'],
-    //         'email' => $validated['email'] ?? null,
-    //         'phone' => $validated['phone'] ?? null,
-    //         // 'company_id' => $validated['company_id'],
-    //         // 'tag_id' => $validated['tag_id'],
-    //         // 'territory_id' => $validated['territory_id'],
-    //     ];
-
-    //     // Conditionally add bio and url and address if they exist
-    //     // doing this as are submitting add person inline form through this function as well
-    //     if (!empty($validated['bio'])) {
-    //         $data['bio'] = $validated['bio'];
-    //     }
-
-    //     if (!empty($validated['url'])) {
-    //         $data['url'] = $validated['url'];
-    //     }
-
-    //     if (!empty($validated['address'])) {
-    //         $data['address'] = $validated['address'];
-    //     }
-
-    //     $people = People::create($data);
-
-    //     if ($request->ajax()) {
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'People added successfully.',
-    //             'people' => $people
-    //         ]);
-    //     }
-
-    //     return redirect()->back()->with('success', 'People added successfully.');
-    // }
-
     public function addCompany(Request $request, $peopleId)
     {
         $request->validate([
@@ -428,6 +377,33 @@ class PeopleController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Company added to people successfully!',
+        ]);
+    }
+
+    public function removeCompany(Request $request, $peopleId)
+    {
+        $request->validate([
+            'company_id' => 'required|exists:companies,id',
+        ]);
+
+        // Find the pivot record
+        $companyPeople = PeopleCompany::where('people_id', $peopleId)
+            ->where('company_id', $request->company_id)
+            ->first();
+
+        if (! $companyPeople) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'This company is not linked to the person.',
+            ], 404);
+        }
+
+        // Delete the pivot record
+        $companyPeople->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Company removed from person successfully!',
         ]);
     }
 
@@ -510,7 +486,6 @@ class PeopleController extends Controller
                 'name' => $request->name,
                 'bio' => $request->bio,
                 'territory_id' => $request->territory_id,
-                // 'tag_id' => $request->tag_id,
             ]);
 
             // Step 2: Store Emails
@@ -893,8 +868,20 @@ class PeopleController extends Controller
 
     public function deleteTask($task_id)
     {
-        PeopleTask::where('id', $task_id)->delete();
+        $task = PeopleTask::find($task_id);
 
-        return redirect()->back();
+        if (! $task) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Task not found.',
+            ], 404);
+        }
+
+        $task->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Task deleted successfully.',
+        ]);
     }
 }

@@ -476,6 +476,33 @@ class CompanyController extends Controller
         ]);
     }
 
+    public function removePerson(Request $request, $companyId)
+    {
+        $request->validate([
+            'people_id' => 'required|exists:people,id',
+        ]);
+
+        // Find the pivot record
+        $companyPeople = CompanyPeople::where('company_id', $companyId)
+            ->where('people_id', $request->people_id)
+            ->first();
+
+        if (! $companyPeople) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'This person is not linked to the company.',
+            ], 404);
+        }
+
+        // Delete the pivot record
+        $companyPeople->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Person removed from company successfully!',
+        ]);
+    }
+
     public function updateDetail(Request $request, $companyId)
     {
         $request->validate([
@@ -603,7 +630,6 @@ class CompanyController extends Controller
 
     }
 
-    // app/Http/Controllers/CompanyController.php
     public function updateField(Request $request, Company $company)
     {
         $request->validate([
@@ -913,8 +939,20 @@ class CompanyController extends Controller
 
     public function deleteTask($task_id)
     {
-        CompanyTask::where('id', $task_id)->delete();
+        $task = CompanyTask::find($task_id);
 
-        return redirect()->back();
+        if (! $task) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Task not found.',
+            ], 404);
+        }
+
+        $task->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Task deleted successfully.',
+        ]);
     }
 }

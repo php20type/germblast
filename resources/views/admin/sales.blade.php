@@ -180,14 +180,14 @@
                                 <div class="col-md-4">
                                     <div class="metric-card new-lead">
                                         <h3>NEW LEAD</h3>
-                                        <div class="metric-value green">{{ $newLeadsCount }}</div>
+                                        <div class="metric-value green">{{ $newLeadsThisMonth }}</div>
                                         <div class="metric-change">Down 14% From 7 This Time Last Month</div>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="metric-card open-leads">
                                         <h3>OPEN LEADS</h3>
-                                        <div class="metric-value blue">{{ $openLeadsCount }}</div>
+                                        <div class="metric-value blue">{{ $openLeadsThisMonth }}</div>
                                         <div class="metric-change">Down 6% From $5.48m This Time Last Month
                                         </div>
                                     </div>
@@ -195,7 +195,7 @@
                                 <div class="col-md-4">
                                     <div class="metric-card sales">
                                         <h3>SALES</h3>
-                                        <div class="metric-value red">{{ $salesLeadsCount }}</div>
+                                        <div class="metric-value red">{{ $salesLeadsThisMonth }}</div>
                                         <div class="metric-change">Down 75% From $66.2k This Time Last Month
                                         </div>
                                     </div>

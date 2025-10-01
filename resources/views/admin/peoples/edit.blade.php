@@ -112,28 +112,6 @@
                                 <a href="javascript:void(0);" class="text-warning" id="toggleAddCompany">Add A Company</a>
                             </div>
 
-
-                            {{-- <div class="people-card mb-3">
-                                <div class="d-flex align-items-center">
-                                    <img src="{{ asset('img/home/companyimages1.png') }}" alt="Paul Blake"
-                                        class="person-avatar me-3">
-                                    <div>
-                                        <h6 class="mb-0">{{ $peoples->companyAlt?->name ?? 'N/A' }}</h6>
-                                        <small class="text-warning">{{ $peoples->companyAlt?->description ?? 'N/A' }}</small>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="d-flex gap-3 align-items-center">
-                                        <div class="text-end">
-                                            <div>{{ $peoples->company?->phone ?? 'N/A' }}</div>
-                                            <div class="text-muted">{{ $peoples->company?->address ?? 'N/A' }}</div>
-                                        </div>
-                                        <button class="btn btn-sm btn-outline-secondary">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div> --}}
                             @foreach ($peoples->companiesAlt as $company)
                                 <div class="people-card mb-3">
                                     <div class="d-flex align-items-center">
@@ -151,8 +129,12 @@
                                             <div class="text-muted">{{ $company->companyAddress->address ?? 'N/A' }}</div>
                                         </div>
 
-                                        <button class="btn btn-sm btn-outline-secondary"
+                                        {{-- <button class="btn btn-sm btn-outline-secondary"
                                             onclick="deleteCompany({{ $company->id }})">
+                                            <i class="fas fa-times"></i>
+                                        </button> --}}
+                                        <button class="btn btn-sm btn-outline-secondary remove-company-btn"
+                                            data-company-id="{{ $company->id }}" data-people-id="{{ $peoples->id }}">
                                             <i class="fas fa-times"></i>
                                         </button>
                                     </div>
@@ -772,16 +754,14 @@
 
                                     <!-- Buttons -->
                                     <div class="d-flex justify-content-end align-items-center mt-2" style="gap: 10px;">
-                                        <span id="email-submit" title="Save Email"
-                                            class="rounded-circle d-flex justify-content-center align-items-center"
-                                            style="width:28px;height:28px;background-color:#28a745;cursor:pointer;">
-                                            <i class="fa fa-check text-white"></i>
-                                        </span>
-                                        <span id="email-cancel" title="Cancel"
-                                            class="rounded-circle d-flex justify-content-center align-items-center"
-                                            style="width:28px;height:28px;background-color:#dc3545;cursor:pointer;">
-                                            <i class="fa fa-times text-white"></i>
-                                        </span>
+                                        <button class="btn btn-sm btn-outline-success editable-icon" id="email-submit"
+                                            title="Save Email">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger editable-icon" id="email-cancel"
+                                            title="Cancel">
+                                            <i class="fas fa-times"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -860,16 +840,14 @@
 
                                     <!-- Buttons -->
                                     <div class="d-flex justify-content-end align-items-center mt-2" style="gap: 10px;">
-                                        <span id="address-submit" title="Save Address"
-                                            class="rounded-circle d-flex justify-content-center align-items-center"
-                                            style="width:28px;height:28px;background-color:#28a745;cursor:pointer;">
-                                            <i class="fa fa-check text-white"></i>
-                                        </span>
-                                        <span id="address-cancel" title="Cancel"
-                                            class="rounded-circle d-flex justify-content-center align-items-center"
-                                            style="width:28px;height:28px;background-color:#dc3545;cursor:pointer;">
-                                            <i class="fa fa-times text-white"></i>
-                                        </span>
+                                        <button class="btn btn-sm btn-outline-success editable-icon" id="address-submit"
+                                            title="Save Address">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger editable-icon" id="address-cancel"
+                                            title="Cancel">
+                                            <i class="fas fa-times"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -945,16 +923,14 @@
 
                                     <!-- Buttons -->
                                     <div class="d-flex justify-content-end align-items-center mt-2" style="gap: 10px;">
-                                        <span id="phone-submit" title="Save Phone"
-                                            class="rounded-circle d-flex justify-content-center align-items-center"
-                                            style="width:28px;height:28px;background-color:#28a745;cursor:pointer;">
-                                            <i class="fa fa-check text-white"></i>
-                                        </span>
-                                        <span id="phone-cancel" title="Cancel"
-                                            class="rounded-circle d-flex justify-content-center align-items-center"
-                                            style="width:28px;height:28px;background-color:#dc3545;cursor:pointer;">
-                                            <i class="fa fa-times text-white"></i>
-                                        </span>
+                                        <button class="btn btn-sm btn-outline-success editable-icon" id="phone-submit"
+                                            title="Save Phone">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger editable-icon" id="phone-cancel"
+                                            title="Cancel">
+                                            <i class="fas fa-times"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -1027,16 +1003,14 @@
 
                                     <!-- Buttons -->
                                     <div class="d-flex justify-content-end align-items-center mt-2" style="gap: 10px;">
-                                        <span id="url-submit" title="Save URL"
-                                            class="rounded-circle d-flex justify-content-center align-items-center"
-                                            style="width:28px;height:28px;background-color:#28a745;cursor:pointer;">
-                                            <i class="fa fa-check text-white"></i>
-                                        </span>
-                                        <span id="url-cancel" title="Cancel"
-                                            class="rounded-circle d-flex justify-content-center align-items-center"
-                                            style="width:28px;height:28px;background-color:#dc3545;cursor:pointer;">
-                                            <i class="fa fa-times text-white"></i>
-                                        </span>
+                                        <button class="btn btn-sm btn-outline-success editable-icon" id="url-submit"
+                                            title="Save Url">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger editable-icon" id="url-cancel"
+                                            title="Cancel">
+                                            <i class="fas fa-times"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -1584,6 +1558,7 @@
 
         });
 
+        // Updating name and bio of that person
         $('.editable-submit').click(function() {
             let $button = $(this);
             let $field = $button.siblings('.editable-field');
@@ -1739,6 +1714,7 @@
             });
         });
 
+        // Remove the tag
         function deleteTag(tagId) {
             Swal.fire({
                 title: "Are you sure?",
@@ -1780,6 +1756,7 @@
             });
         }
 
+        // Complete the task
         function markCompleted(taskId) {
             Swal.fire({
                 title: 'Are you sure?',
@@ -1823,6 +1800,7 @@
             });
         }
 
+        // Reopen task
         function reopenTask(taskId) {
             Swal.fire({
                 title: 'Are you sure?',
@@ -1867,9 +1845,8 @@
         }
 
 
+        // Delete task
         function deleteTask(task_id) {
-            var deleteurl = "/admin/people/tasks/delete/" + task_id;
-
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to undo this action!",
@@ -1880,7 +1857,31 @@
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = deleteurl;
+                    $.ajax({
+                        url: "/admin/people/tasks/delete/" + task_id,
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: response.message || "Task deleted successfully.",
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                            // reload after swal closes
+                            location.reload();
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message || 'Something went wrong.'
+                            });
+                        }
+                    });
                 }
             });
         }
@@ -1932,26 +1933,51 @@
             }
         });
 
-        function deleteCompany(company_id) {
-            // var deleteurl = "{{ route('admin.people.delete', ':people_id') }}".replace(':people_id', person_id);
+        // Remove company from that person
+        $(document).on('click', '.remove-company-btn', function() {
+            let companyId = $(this).data('company-id');
+            let peopleId = $(this).data('people-id');
+            let $btn = $(this);
 
             Swal.fire({
                 title: 'Are you sure?',
-                text: "You won't be able to undo this action!",
+                text: 'This company will be removed from the person.',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, remove'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Redirect to the delete route
-                    window.location.href = deleteurl;
+                    $.ajax({
+                        url: `/admin/people/${peopleId}/remove-company`,
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            company_id: companyId
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Removed',
+                                text: response.message,
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                            location.reload(); // keep the flow same as others
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message ||
+                                    'Something went wrong.'
+                            });
+                        }
+                    });
                 }
             });
-        }
-
-
+        });
 
         function deleteField(people_id, type, fieldName) {
 
