@@ -2,14 +2,12 @@
 
 namespace App\Helpers;
 
+use App\Interfaces\CityRepositoryInterface;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\StateRepositoryInterface;
-use App\Interfaces\CityRepositoryInterface;
-
 
 class Helper
 {
-
     // For Countries
     public static function getCountries()
     {
@@ -20,6 +18,7 @@ class Helper
     {
         return app(StateRepositoryInterface::class)->getAll();
     }
+
     public static function getCities()
     {
         return app(CityRepositoryInterface::class)->getAll();
@@ -36,4 +35,23 @@ class Helper
         return app(CityRepositoryInterface::class)->getCitiesByStateId($stateId);
     }
 
+    public static function calculateTotalValue($leads)
+    {
+        return $leads->sum(function ($lead) {
+            return $lead->products->sum(function ($product) {
+                return $product->pivot->qty * $product->pivot->price;
+            });
+        });
+    }
+
+    public static function formatValue($value)
+    {
+        if ($value >= 1000000) {
+            return round($value / 1000000, 1).'m';
+        } elseif ($value >= 1000) {
+            return round($value / 1000, 1).'k';
+        }
+
+        return $value;
+    }
 }

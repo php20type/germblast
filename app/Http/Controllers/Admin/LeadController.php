@@ -74,8 +74,8 @@ class LeadController extends Controller
         //     return $product->pivot->price * ($product->pivot->qty ?? 1);
         // });
         // $avgConfidence = $leads->avg('confidence');
-        $totalValue = $leads->sum('total_value');  // ✅ use accessor
-        $avgValue = $leads->avg('total_value');   // ✅ use accessor
+        $totalValue = $leads->sum('total_value');  //  use accessor
+        $avgValue = $leads->avg('total_value');   //  use accessor
         $avgConfidence = $leads->avg('confidence');
 
         // Formatting (optional: keep or remove the /1000 depending on how you want display)

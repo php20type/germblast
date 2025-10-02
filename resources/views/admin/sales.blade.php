@@ -181,23 +181,24 @@
                                     <div class="metric-card new-lead">
                                         <h3>NEW LEAD</h3>
                                         <div class="metric-value green">{{ $newLeadsThisMonth }}</div>
-                                        <div class="metric-change">Down 14% From 7 This Time Last Month</div>
+                                        {{-- <div class="metric-change">Down 14% From 7 This Time Last Month</div> --}}
+                                        <div class="metric-change">{{ $newLeadsChange }}</div>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="metric-card open-leads">
                                         <h3>OPEN LEADS</h3>
                                         <div class="metric-value blue">{{ $openLeadsThisMonth }}</div>
-                                        <div class="metric-change">Down 6% From $5.48m This Time Last Month
-                                        </div>
+                                        {{-- <div class="metric-change">Down 6% From $5.48m This Time Last Month</div> --}}
+                                        <div class="metric-change">{{ $openLeadsChange }}</div>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="metric-card sales">
                                         <h3>SALES</h3>
                                         <div class="metric-value red">{{ $salesLeadsThisMonth }}</div>
-                                        <div class="metric-change">Down 75% From $66.2k This Time Last Month
-                                        </div>
+                                        {{-- <div class="metric-change">Down 75% From $66.2k This Time Last Month</div> --}}
+                                        <div class="metric-change">{{ $salesLeadsChange }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -229,32 +230,41 @@
                                         <tbody>
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('admin.leads.my_leads', auth()->id()) }}">My Leads</a>
+                                                    <a href="{{ route('admin.leads.index') }}">All Leads</a>
                                                 </td>
-                                            <td>7</td>
-                                            <td>$12k</td>
+                                            <td>{{$allLeadsCount}}</td>
+                                            <td>${{ $allLeadsValueFormatted }}</td>
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('admin.leads.open_leads') }}">My Open leads</a>
+                                                    <a href="{{ route('admin.leads.my_leads', auth()->id()) }}">My Leads</a>
                                                 </td>
-                                                <td>7</td>
-                                                <td>$12k</td>
+                                            <td>{{ $myLeadsCount }}</td>
+                                            <td>${{ $myLeadsValueFormatted }}</td>
                                             </tr>
-                                            <tr>
+                                             <tr>
                                                 <td>
                                                     <a href="{{ route('admin.leads.added_this_week') }}">Added this week</a>
                                                 </td>
-                                                <td>6</td>
-                                                <td>$8.99k</td>
+                                                <td>{{ $addedThisWeekCount }}</td>
+                                                {{-- <td>$8.99k</td> --}}
+                                                <td>${{ $addedThisWeekValueFormatted }}</td>
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <a href="{{ route('admin.leads.closing_this_week') }}">Closing this week</a>
                                                 </td>
-                                                <td>0</td>
-                                                <td>$0</td>
+                                                <td>{{ $closingThisWeekCount }}</td>
+                                                <td>${{ $closingThisWeekValueFormatted }}</td>
                                             </tr>
+                                            <tr>
+                                                <td>
+                                                    <a href="{{ route('admin.leads.hot_leads') }}">Hot leads</a>
+                                                </td>
+                                                <td>{{ $hotLeadsCount }}</td>
+                                                <td>${{ $hotLeadsValueFormatted }}</td>
+                                            </tr>
+
                                         </tbody>
                                     </table>
 
@@ -282,8 +292,8 @@
                                                     <div class="stage-info">
                                                         <div class="stage-name">Int. GB Presentation</div>
                                                         <div class="stage-metrics">
-                                                            <span class="leads-count">104 leads</span>
-                                                            <span class="revenue-amount">$976k</span>
+                                                            <span class="leads-count">{{ $gbPresentationCount }} leads</span>
+                                                            <span class="revenue-amount">${{ $gbPresentationCountValueFormatted }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="progress">
@@ -296,8 +306,8 @@
                                                     <div class="stage-info">
                                                         <div class="stage-name">Site Survey</div>
                                                         <div class="stage-metrics">
-                                                            <span class="leads-count">44 leads</span>
-                                                            <span class="revenue-amount">$286k</span>
+                                                            <span class="leads-count">{{ $siteSurveyCount }} leads</span>
+                                                            <span class="revenue-amount">${{ $siteSurveyCountValueFormatted }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="progress">
@@ -310,8 +320,8 @@
                                                     <div class="stage-info">
                                                         <div class="stage-name">Proposal Approval</div>
                                                         <div class="stage-metrics">
-                                                            <span class="leads-count">106 leads</span>
-                                                            <span class="revenue-amount">$2.34m</span>
+                                                            <span class="leads-count">{{ $proposalApprovalCount }} leads</span>
+                                                            <span class="revenue-amount">${{ $proposalApprovalCountValueFormatted }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="progress">
@@ -324,8 +334,8 @@
                                                     <div class="stage-info">
                                                         <div class="stage-name">Proposal Pres.</div>
                                                         <div class="stage-metrics">
-                                                            <span class="leads-count">64 leads</span>
-                                                            <span class="revenue-amount">$1.56m</span>
+                                                            <span class="leads-count">{{ $proposalPresentationCount }} leads</span>
+                                                            <span class="revenue-amount">${{ $proposalPresentationCountValueFormatted }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="progress">
@@ -338,8 +348,8 @@
                                                     <div class="stage-info">
                                                         <div class="stage-name">Rec. Signed Proposal</div>
                                                         <div class="stage-metrics">
-                                                            <span class="leads-count">3 leads</span>
-                                                            <span class="revenue-amount">$8.03k</span>
+                                                            <span class="leads-count">{{ $signedProposalCount }} leads</span>
+                                                            <span class="revenue-amount">${{ $signedProposalCountValueFormatted }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="progress">
@@ -387,7 +397,6 @@
                                                 aria-controls="timeline" aria-selected="false">TIMELINE</button>
                                         </li>
                                     </ul>
-
 
 
                                     <!-- Tab Content -->

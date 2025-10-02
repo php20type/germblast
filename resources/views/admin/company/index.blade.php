@@ -103,7 +103,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($companies as $company)
+                                        @forelse ($companies as $company)
                                             <tr>
                                                 <td>
                                                     <input type="checkbox" class="form-check-input row-checkbox">
@@ -136,7 +136,12 @@
                                                     </span>
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @empty
+                                            <tr>
+                                                <td colspan="9" class="text-center">No Companies found</td>
+                                            </tr>
+                                        @endforelse
+
 
                                     </tbody>
                                 </table>

@@ -136,11 +136,4 @@ class Lead extends Model
         return $this->hasMany(LeadTask::class, 'lead_id');
     }
 
-    // CUSTOM ACCESSORS
-    public function getTotalValueAttribute()
-    {
-        return $this->products->sum(function ($product) {
-            return $product->pivot->qty * $product->pivot->price;
-        });
-    }
 }

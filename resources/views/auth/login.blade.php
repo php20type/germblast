@@ -61,7 +61,7 @@
 
                     {{-- Register --}}
                     <div class="forget-password">
-                        <p>Don't have an account? <a href="{{ route('register') }}" class="theme-color"> Register</a></p>
+                        <p><span> Don't have an account? <a href="{{ route('register') }}" class="theme-color"> Register</a></span></p>
                     </div>
                 </form>
             </div>

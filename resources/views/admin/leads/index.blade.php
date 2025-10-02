@@ -148,7 +148,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ($groupedLeads as $lead)
+                                            @forelse ($groupedLeads as $lead)
                                                 <tr>
                                                     <td><input type="checkbox" class="form-check-input row-checkbox"></td>
 
@@ -170,7 +170,11 @@
                                                     <td>{{ $lead['close_date'] }}</td>
                                                     <td>{{ $lead['sources'] }}</td>
                                                 </tr>
-                                            @endforeach
+                                            @empty
+                                                <tr>
+                                                    <td colspan="9" class="text-center">No leads found</td>
+                                                </tr>
+                                            @endforelse
 
                                         </tbody>
                                     </table>
