@@ -2491,8 +2491,7 @@
                 text: 'This person will be removed from the company.',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
+                confirmButtonColor: "#d33",remove-company-btn
                 confirmButtonText: 'Yes, remove'
             }).then((result) => {
                 if (result.isConfirmed) {

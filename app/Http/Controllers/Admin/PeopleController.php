@@ -58,10 +58,6 @@ class PeopleController extends Controller
                 $query->where('marketing_status', $request->marketing_status);
             }
 
-            // Optionally filter by assigned user
-            if ($request->filled('user_id')) {
-                $query->where('user_id', $request->user_id);
-            }
         }
 
         // Get filtered people

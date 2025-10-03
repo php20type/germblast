@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Interfaces\CompanyRepositoryInterface;
 use App\Models\Activity;
 use App\Models\ActivityType;
 use App\Models\Company;
@@ -28,57 +29,48 @@ use Illuminate\Support\Facades\DB;
 
 class CompanyController extends Controller
 {
+    protected $companyRepo;
+
+    public function __construct(CompanyRepositoryInterface $companyRepo)
+    {
+        $this->companyRepo = $companyRepo;
+    }
+
     public function getSidebarStats()
     {
         $currentUser = auth()->user();
-        $companies = Company::with('user', 'companyType', 'tag', 'peoples')->get();
-        $myCompanies = $companies->where('user_id', $currentUser->id);
-        $myCompaniesCount = $myCompanies->count();
-        $totalCompanies = $companies->count();
-        $formattedTotalCompanies = number_format($totalCompanies / 1000, 1);
+        $totalCompanies = $this->companyRepo->countAll();
+        $myCompaniesCount = $this->companyRepo->countByUser($currentUser->id);
 
-        return compact('myCompaniesCount', 'totalCompanies', 'formattedTotalCompanies');
+        $formattedTotalCompanies = number_format($totalCompanies / 1000, 1);
+        $formattedMyCompanies = number_format($myCompaniesCount / 1000, 1);
+
+        return compact('formattedTotalCompanies', 'formattedMyCompanies');
     }
 
     public function index(Request $request)
     {
-        $query = Company::with([
-            'user',
-            'companyType',
-            'tag',
-            'peoples',
-            'companyEmail',
-            'companyPhone',
-            'companyAddress',
-            'companyUrl',
-            'companyPeople',
-        ]);
+        $query = $this->companyRepo->getAllWithRelations();
+
+        // Apply filters here in Controller
+        if ($request->filled('search')) {
+            $query->where('name', 'like', "%{$request->search}%");
+        }
+        if ($request->filled('company_type_id')) {
+            $query->where('company_type_id', $request->company_type_id);
+        }
+        if ($request->filled('people_id')) {
+            $query->whereHas('peoples', function ($q) use ($request) {
+                $q->where('people_id', $request->people_id);
+            });
+        }
+
+
+        $companies = $query->get();
+        $companiesCount = $companies->count();
 
         $peoples = People::all();
         $company_types = CompanyType::all();
-
-        if ($request->ajax()) {
-            // Search by company name
-            if ($request->filled('search')) {
-                $search = $request->search;
-                $query->where('name', 'like', "%$search%");
-            }
-
-            // Filter by people id (using pivot table)
-            if ($request->filled('people_id')) {
-                $query->whereHas('peoples', function ($q) use ($request) {
-                    $q->where('people_id', $request->people_id);
-                });
-            }
-
-            // Filter by company type
-            if ($request->filled('company_type_id')) {
-                $query->where('company_type_id', $request->company_type_id);
-            }
-        }
-
-        $companies = $query->get();
-
         $sidebarStats = $this->getSidebarStats();
 
         if ($request->ajax()) {
@@ -86,49 +78,32 @@ class CompanyController extends Controller
         }
 
         return view('admin.company.index', array_merge(
-            compact('companies', 'peoples', 'company_types'),
+            compact('companies', 'peoples', 'company_types', 'companiesCount'),
             $sidebarStats
         ));
     }
 
     public function my_companies(Request $request, $id)
     {
-        // Load companies owned by given user with all relations
-        $query = Company::with([
-            'user',
-            'companyType',
-            'tag',
-            'peoples',        // <-- pivot relation
-            'companyEmail',
-            'companyPhone',
-            'companyAddress',
-            'companyUrl',
-        ])->where('user_id', $id);
+        $query = $this->companyRepo->getByUserWithRelations($id);
 
-        $peoples = People::all();
-        $company_types = CompanyType::all();
-
-        if ($request->ajax()) {
-            // Search by company name
-            if ($request->filled('search')) {
-                $search = $request->search;
-                $query->where('name', 'like', "%{$search}%");
-            }
-
-            // Filter by people id (pivot relation)
-            if ($request->filled('people_id')) {
-                $query->whereHas('peoples', function ($q) use ($request) {
-                    $q->where('people.id', $request->people_id);
-                });
-            }
-
-            // Filter by company type
-            if ($request->filled('company_type_id')) {
-                $query->where('company_type_id', $request->company_type_id);
-            }
+        if ($request->filled('search')) {
+            $query->where('name', 'like', "%{$request->search}%");
+        }
+        if ($request->filled('people_id')) {
+            $query->whereHas('peoples', function ($q) use ($request) {
+                $q->where('people.id', $request->people_id);
+            });
+        }
+        if ($request->filled('company_type_id')) {
+            $query->where('company_type_id', $request->company_type_id);
         }
 
         $companies = $query->get();
+        $totalMyCompanies = $query->count();
+
+        $peoples = People::all();
+        $company_types = CompanyType::all();
         $sidebarStats = $this->getSidebarStats();
 
         if ($request->ajax()) {
@@ -136,7 +111,7 @@ class CompanyController extends Controller
         }
 
         return view('admin.company.my-companies', array_merge(
-            compact('companies', 'peoples', 'company_types'),
+            compact('companies', 'peoples', 'company_types', 'totalMyCompanies'),
             $sidebarStats
         ));
     }
@@ -150,7 +125,6 @@ class CompanyController extends Controller
                 'user_id' => $request->user_id,
                 'name' => $request->name,
                 'description' => $request->description,
-                // 'tag_id' => $request->tag_id,
                 'company_type_id' => $request->company_type_id,
                 'industry_id' => $request->industry_id,
                 'territory_id' => $request->territory_id,

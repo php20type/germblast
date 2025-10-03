@@ -132,6 +132,12 @@ class LeadController extends Controller
             if ($request->has('hot') && $request->hot === 'hot') {
                 $query->whereJsonContains('lead_flags', 'hot');
             }
+
+            if ($request->filled('people_id')) {
+                $query->whereHas('peoples', function ($q) use ($request) {
+                    $q->where('people_id', $request->people_id);
+                });
+            }
         }
 
         $leads = $query->get();

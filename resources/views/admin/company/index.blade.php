@@ -32,7 +32,7 @@
                                             <input type="search" class="form-control" placeholder="" aria-label="Search"
                                                 id="company-search">
                                         </div>
-                                        <span class="company-count">{{ $totalCompanies }} Company Found</span>
+                                        <span class="company-count">{{ $companiesCount }} Company Found</span>
                                     </div>
                                 </div>
                                 <div class="col-md-6 ">

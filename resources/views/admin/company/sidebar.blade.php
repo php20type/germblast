@@ -27,7 +27,7 @@
                 <a class="nav-link company-filter {{ request()->routeIs('admin.company.my_companies') ? 'active' : '' }}"
                     href="{{ route('admin.company.my_companies', auth()->id()) }}">
                     My companies
-                    <span class="badge bg-light text-dark">{{ $myCompaniesCount }}</span>
+                    <span class="badge bg-light text-dark">{{ $formattedMyCompanies }}k</span>
                 </a>
                 <div id="nothing-found" style="display:none;">Nothing found.</div>
             </div>

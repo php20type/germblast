@@ -109,12 +109,237 @@
                             </div>
                             <div class="pipeline-section">
                                 <div class="pipeline-header">
-                                    <div class="pipeline-title">GermBlast</div>
+                                    <div class="pipeline-title">Stage Tasks</div>
                                     <a href="#" class="text-warning">Edit processes</a>
                                 </div>
-                                <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="GermBlast" />
+
+                                <div id="initial-meeting-stage" class="{{ $leads->stage_id == 1 ? '' : 'd-none' }}">
+                                    <div class="task-section mt-2">
+                                        <div class="company-list mb-3 border rounded p-3">
+                                            <div class="row align-items-start">
+                                                <div class="col-md-8">
+                                                    <div class="company-name">
+                                                        <p><strong>Initial Meeting</strong></p>
+                                                        <p class="text-secondary">
+                                                            Completed On Aug 27, 2025 7:00 AM
+                                                            <span class="text-warning">
+                                                                By Jordan Barboza
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4 d-flex justify-content-end">
+                                                    <div class="d-flex gap-2">
+                                                        <!-- Completed -->
+                                                        {{-- <button class="btn btn-sm btn-outline-success"
+                                                            onclick="markCompleted()" title="Mark as Completed">
+                                                            <i class="fas fa-check"></i>
+                                                        </button> --}}
+
+                                                        {{-- Reopen --}}
+                                                        <button class="btn btn-sm btn-outline-warning"
+                                                            onclick="reopenTask()" title="Reopen Task">
+                                                            <i class="fas fa-undo"></i>
+                                                        </button>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="timeline-container" style="font-size: small">
+                                                <div class="timeline-content p-3 mb-3">
+                                                    This is the first step in the process. During this meeting you should
+                                                    talk
+                                                    to the client about their organization and its needs. You should explain
+                                                    what GermBlast is using the company keynote presentation. <br><br>
+                                                    YOU SHOULD CLOSE FOR A SITE SURVEY AT THE VERY LEAST.
+                                                </div>
+                                                <div class="timeline-content p-3">
+                                                    You must have a person attached to the lead to complete this step.
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
                                 </div>
+
+                                <div id="site-survey-stage" class="{{ $leads->stage_id == 2 ? '' : 'd-none' }}">
+                                    <div class="task-section mt-2">
+                                        <div class="company-list mb-3 border rounded p-3">
+                                            <div class="row align-items-start">
+                                                <div class="col-md-8">
+                                                    <div class="company-name">
+                                                        <p><strong>Perform Site Survey</strong></p>
+                                                        <p class="text-secondary">
+                                                            Completed On Aug 27, 2025 7:00 AM
+                                                            <span class="text-warning">
+                                                                By Jordan Barboza
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4 d-flex justify-content-end">
+                                                    <div class="d-flex gap-2">
+                                                        <!-- Completed -->
+                                                        {{-- <button class="btn btn-sm btn-outline-success"
+                                                            onclick="markCompleted()" title="Mark as Completed">
+                                                            <i class="fas fa-check"></i>
+                                                        </button> --}}
+
+                                                        {{-- Reopen --}}
+                                                        <button class="btn btn-sm btn-outline-warning"
+                                                            onclick="reopenTask()" title="Reopen Task">
+                                                            <i class="fas fa-undo"></i>
+                                                        </button>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="timeline-container" style="font-size: small">
+                                                <div class="timeline-content p-3">
+                                                    You must have a logged activity attached to the lead to complete this
+                                                    step.
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div id="present-proposal-stage" class="{{ $leads->stage_id == 4 ? '' : 'd-none' }}">
+                                    <div class="task-section mt-2">
+                                        <div class="company-list mb-3 border rounded p-3">
+                                            <div class="row align-items-start">
+                                                <div class="col-md-8">
+                                                    <div class="company-name">
+                                                        <p><strong>Present Proposal</strong></p>
+                                                        <p class="text-secondary">
+                                                            Completed On Aug 27, 2025 7:00 AM
+                                                            <span class="text-warning">
+                                                                By Jordan Barboza
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4 d-flex justify-content-end">
+                                                    <div class="d-flex gap-2">
+                                                        <!-- Completed -->
+                                                        {{-- <button class="btn btn-sm btn-outline-success"
+                                                            onclick="markCompleted()" title="Mark as Completed">
+                                                            <i class="fas fa-check"></i>
+                                                        </button> --}}
+
+                                                        {{-- Reopen --}}
+                                                        <button class="btn btn-sm btn-outline-warning"
+                                                            onclick="reopenTask()" title="Reopen Task">
+                                                            <i class="fas fa-undo"></i>
+                                                        </button>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="timeline-container" style="font-size: small">
+                                                <div class="timeline-content p-3 mb-3">
+                                                    Present your site survey data collected along with your proposal within
+                                                    7
+                                                    days of your survey. Address any issues with pricing at this time. Ask
+                                                    how
+                                                    long they think the decision process may take.
+                                                </div>
+                                                <div class="timeline-content p-3">
+                                                    You must have a product attached to the lead to complete this step.
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="task-section mt-2">
+                                        <div class="company-list mb-3 border rounded p-3">
+                                            <div class="row align-items-start">
+                                                <div class="col-md-8">
+                                                    <div class="company-name">
+                                                        <p><strong>Follow Up</strong></p>
+                                                        <p class="text-secondary">
+                                                            Completed On Aug 27, 2025 7:00 AM
+                                                            <span class="text-warning">
+                                                                By Jordan Barboza
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4 d-flex justify-content-end">
+                                                    <div class="d-flex gap-2">
+                                                        <!-- Completed -->
+                                                        {{-- <button class="btn btn-sm btn-outline-success"
+                                                            onclick="markCompleted()" title="Mark as Completed">
+                                                            <i class="fas fa-check"></i>
+                                                        </button> --}}
+
+                                                        {{-- Reopen --}}
+                                                        <button class="btn btn-sm btn-outline-warning"
+                                                            onclick="reopenTask()" title="Reopen Task">
+                                                            <i class="fas fa-undo"></i>
+                                                        </button>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="timeline-container" style="font-size: small">
+                                                <div class="timeline-content p-3">
+                                                    Every Sales Representation must have certain skills sets to survive in
+                                                    sales. Selling is essential to GermBlast to create a consistent revenue
+                                                    stream, however, follow up is essential to maintain a client long-term.
+                                                    This will also prevent new market entrants from sneaking in the back
+                                                    door without your knowledge.
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="signed-proposal-stage" class="{{ $leads->stage_id == 5 ? '' : 'd-none' }}">
+                                    <div class="task-section mt-2">
+                                        <div class="company-list mb-3 border rounded p-3">
+                                            <div class="row align-items-start">
+                                                <div class="col-md-8">
+                                                    <div class="company-name">
+                                                        <p><strong>Provided contract Rodney for Processing</strong></p>
+                                                        <p class="text-secondary">
+                                                            Completed On Aug 27, 2025 7:00 AM
+                                                            <span class="text-warning">
+                                                                By Jordan Barboza
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4 d-flex justify-content-end">
+                                                    <div class="d-flex gap-2">
+                                                        <!-- Completed -->
+                                                        {{-- <button class="btn btn-sm btn-outline-success"
+                                                            onclick="markCompleted()" title="Mark as Completed">
+                                                            <i class="fas fa-check"></i>
+                                                        </button> --}}
+
+                                                        {{-- Reopen --}}
+                                                        <button class="btn btn-sm btn-outline-warning"
+                                                            onclick="reopenTask()" title="Reopen Task">
+                                                            <i class="fas fa-undo"></i>
+                                                        </button>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
 
@@ -1893,45 +2118,45 @@
             });
 
             // Delete a task
-             function deleteTask(task_id) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to undo this action!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "/admin/leads/tasks/delete/" + task_id,
-                        method: "POST",
-                        data: {
-                            _token: "{{ csrf_token() }}"
-                        },
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Deleted!',
-                                text: response.message || "Task deleted successfully.",
-                                timer: 1500,
-                                showConfirmButton: false
-                            });
-                            // reload after swal closes
-                            location.reload();
-                        },
-                        error: function(xhr) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: xhr.responseJSON?.message || 'Something went wrong.'
-                            });
-                        }
-                    });
-                }
-            });
-        }
+            function deleteTask(task_id) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to undo this action!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/admin/leads/tasks/delete/" + task_id,
+                            method: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: response.message || "Task deleted successfully.",
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                                // reload after swal closes
+                                location.reload();
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON?.message || 'Something went wrong.'
+                                });
+                            }
+                        });
+                    }
+                });
+            }
 
 
 

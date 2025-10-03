@@ -54,7 +54,7 @@
                                                 </select>
                                             </div>
                                             <div class="me-2">
-                                                <select class="form-select" name="people_id"
+                                                <select class="form-select" name="user_id"
                                                     aria-label="Assigned to select">
                                                     <option value="">Assigned to</option>
                                                     @foreach ($peoples as $people)
