@@ -95,10 +95,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('companies/{company}/tags/{tag}/remove', [CompanyController::class, 'removeTag'])->name('companies.tags.remove');
     Route::post('/companies/{company}/update-field', [CompanyController::class, 'updateField'])->name('company.update.field');
     Route::post('companies/delete-field', [CompanyController::class, 'deleteField'])->name('companies.delete-field');
-    Route::post('/update-company-email', [CompanyController::class, 'updateCompanyEmail'])->name('update.company.email');
-    Route::post('/update-company-address', [CompanyController::class, 'updateCompanyAddress'])->name('update.company.address');
-    Route::post('/update-company-phone', [CompanyController::class, 'updateCompanyPhone'])->name('update.company.phone');
-    Route::post('/update-company-url', [CompanyController::class, 'updateCompanyUrl'])->name('update.company.url');
+    Route::post('/update-company-field', [CompanyController::class, 'updateCompanyField'])->name('update.company.field');
+
 
     // People Section
     Route::get('/people/index', [PeopleController::class, 'index'])->name('peoples.index');
@@ -127,10 +125,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('peoples/{people}', [PeopleController::class, 'show'])->name('peoples.show');
     Route::post('peoples/{people}/update-field', [PeopleController::class, 'updateField'])->name('people.update.field');
     Route::post('peoples/delete-field', [PeopleController::class, 'deleteField'])->name('peoples.delete-field');
-    Route::post('/update-person-email', [PeopleController::class, 'updatePersonEmail'])->name('update.person.email');
-    Route::post('/update-person-address', [PeopleController::class, 'updatePersonAddress'])->name('update.person.address');
-    Route::post('/update-person-phone', [PeopleController::class, 'updatePersonPhone'])->name('update.person.phone');
-    Route::post('/update-person-url', [PeopleController::class, 'updatePersonUrl'])->name('update.person.url');
+    Route::post('/update-people-field', [PeopleController::class, 'updatePeopleField'])->name('update.people.field');
 
     // Task Section
     Route::post('/tasks/store', [TaskController::class, 'store'])->name('tasks.store');
@@ -144,7 +139,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/leads/{lead}/tasks', [LeadController::class, 'addTask'])->name('leads.tasks.store');
     Route::put('leads/tasks/{task}/update', [LeadController::class, 'updateTask'])->name('leads.tasks.update');
     Route::post('leads/tasks/{task}/complete', [LeadController::class, 'markCompleted'])->name('leads.tasks.complete');
-    Route::post('leads/tasks/{task}/reopen', [CompanyController::class, 'reopenTask'])->name('leads.tasks.reopen');
+    Route::post('leads/tasks/{task}/reopen', [LeadController::class, 'reopenTask'])->name('leads.tasks.reopen');
     Route::post('leads/tasks/delete/{task_id}', [LeadController::class, 'deleteTask'])->name('leads.task.delete');
 
     // Lead - Detail Section

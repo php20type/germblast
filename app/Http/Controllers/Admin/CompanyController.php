@@ -65,7 +65,6 @@ class CompanyController extends Controller
             });
         }
 
-
         $companies = $query->get();
         $companiesCount = $companies->count();
 
@@ -624,30 +623,6 @@ class CompanyController extends Controller
         return response()->json(['success' => true, 'field' => $request->field, 'value' => $request->value]);
     }
 
-    // public function deleteEmail(Request $request)
-    // {
-    //     $request->validate([
-    //         'company_id' => 'required|exists:companies,id',
-    //         'type' => 'required|in:email,personal_email,support_email,work_email'
-    //     ]);
-
-    //     $emailRecord = CompanyEmail::where('company_id', $request->company_id)->first();
-
-    //     if (!$emailRecord) {
-    //         return response()->json(['status' => 'error', 'message' => 'Email record not found'], 404);
-    //     }
-
-    //     // Clear the selected email type column
-    //     $emailRecord->{$request->type} = null;
-    //     $emailRecord->save();
-
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'message' => ucfirst(str_replace('_', ' ', $request->type)) . ' deleted successfully',
-    //         'data' => $emailRecord
-    //     ]);
-    // }
-
     public function deleteField(Request $request)
     {
         $request->validate([
@@ -690,120 +665,69 @@ class CompanyController extends Controller
         ]);
     }
 
-    public function updateCompanyEmail(Request $request)
+    public function updateCompanyField(Request $request)
     {
-        // Validate request
+        // Define config for each category
+        $config = [
+            'email' => [
+                'model' => CompanyEmail::class,
+                'valid_types' => ['email', 'personal_email', 'support_email', 'work_email'],
+                'validation' => 'email',
+            ],
+            'address' => [
+                'model' => CompanyAddress::class,
+                'valid_types' => ['address', 'main_address', 'work_address', 'home_address', 'billing_address', 'mailing_address'],
+                'validation' => 'string',
+            ],
+            'phone' => [
+                'model' => CompanyPhone::class,
+                'valid_types' => ['phone', 'home_phones', 'mobile_phones', 'work_phones', 'fax_phones'],
+                'validation' => 'string',
+            ],
+            'url' => [
+                'model' => CompanyUrl::class,
+                'valid_types' => ['url', 'blog_url', 'twitter_url'],
+                'validation' => 'url',
+            ],
+        ];
+
         $request->validate([
             'company_id' => 'required|exists:companies,id',
-            'type' => 'required|in:email,personal_email,support_email,work_email',
-            'value' => 'required|email',
+            'category' => 'required|in:'.implode(',', array_keys($config)),
+            'type' => 'required|string',
+            'value' => 'required',
         ]);
 
-        // Find the company_emails row for this person
-        $emailRecord = CompanyEmail::where('company_id', $request->company_id)->first();
+        $category = $request->category;
 
-        if (! $emailRecord) {
-            // If row doesn't exist, create new
-            $emailRecord = new CompanyEmail;
-            $emailRecord->company_id = $request->company_id;
+        if (! in_array($request->type, $config[$category]['valid_types'])) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid type for category '.$category,
+            ], 422);
         }
 
-        // Update only the selected type column
-        $emailRecord->{$request->type} = $request->value;
-        $emailRecord->save();
-
-        // Return JSON response
-        return response()->json([
-            'status' => 'success',
-            'message' => ucfirst(str_replace('_', ' ', $request->type)).' updated successfully',
-            'data' => $emailRecord,
-        ]);
-    }
-
-    public function updateCompanyAddress(Request $request)
-    {
-        // Validate request
-        $request->validate([
-            'company_id' => 'required|exists:companies,id',
-            'type' => 'required|in:address,main_address,work_address,home_address,billing_address,mailing_address',
-            'value' => 'required|string',
+        // Validate value based on category-specific validation
+        $validator = \Validator::make($request->all(), [
+            'value' => $config[$category]['validation'],
         ]);
 
-        // Find the company_addresses row for this person
-        $addressRecord = CompanyAddress::where('company_id', $request->company_id)->first();
-
-        if (! $addressRecord) {
-            // If row doesn't exist, create new
-            $addressRecord = new CompanyAddress;
-            $addressRecord->company_id = $request->company_id;
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $validator->errors()->first('value'),
+            ], 422);
         }
 
-        // Update only the selected type column
-        $addressRecord->{$request->type} = $request->value;
-        $addressRecord->save();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => ucfirst(str_replace('_', ' ', $request->type)).' updated successfully',
-            'data' => $addressRecord,
-        ]);
-    }
-
-    public function updateCompanyPhone(Request $request)
-    {
-        // Validate request
-        $request->validate([
-            'company_id' => 'required|exists:companies,id',
-            'type' => 'required|in:phone,home_phones,mobile_phones,work_phones,fax_phones',
-            'value' => 'required|string',
-        ]);
-
-        // Find the company_phones row for this person
-        $phoneRecord = CompanyPhone::where('company_id', $request->company_id)->first();
-
-        if (! $phoneRecord) {
-            // If row doesn't exist, create new
-            $phoneRecord = new CompanyPhone;
-            $phoneRecord->company_id = $request->company_id;
-        }
-
-        // Update only the selected type column
-        $phoneRecord->{$request->type} = $request->value;
-        $phoneRecord->save();
+        $modelClass = $config[$category]['model'];
+        $record = $modelClass::firstOrNew(['company_id' => $request->company_id]);
+        $record->{$request->type} = $request->value;
+        $record->save();
 
         return response()->json([
             'status' => 'success',
             'message' => ucfirst(str_replace('_', ' ', $request->type)).' updated successfully',
-            'data' => $phoneRecord,
-        ]);
-    }
-
-    public function updateCompanyUrl(Request $request)
-    {
-        // Validate request
-        $request->validate([
-            'company_id' => 'required|exists:companies,id',
-            'type' => 'required|in:url,blog_url,twitter_url',
-            'value' => 'required|url',
-        ]);
-
-        // Find the company_urls row for this person
-        $urlRecord = CompanyUrl::where('company_id', $request->company_id)->first();
-
-        if (! $urlRecord) {
-            // If row doesn't exist, create new
-            $urlRecord = new CompanyUrl;
-            $urlRecord->company_id = $request->company_id;
-        }
-
-        // Update only the selected type column
-        $urlRecord->{$request->type} = $request->value;
-        $urlRecord->save();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => ucfirst(str_replace('_', ' ', $request->type)).' updated successfully',
-            'data' => $urlRecord,
+            'data' => $record,
         ]);
     }
 

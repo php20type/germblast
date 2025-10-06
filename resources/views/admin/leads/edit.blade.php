@@ -45,7 +45,8 @@
                                                 @foreach ($leads->tags as $tag)
                                                     <span class="badge-customer mx-1 px-2">
                                                         {{ $tag->name }}
-                                                        <button class="btn btn-sm" onclick="deleteTag({{ $tag->id }})">
+                                                        <button type="button" class="btn btn-sm delete-tag-btn"
+                                                            data-id="{{ $tag->id }}">
                                                             <i class="fas fa-times"></i>
                                                         </button>
                                                     </span>
@@ -347,7 +348,7 @@
                         <div class="section-card">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5>Custom fields</h5>
-                                <a href="#" class="text-warning">Create custom fields</a>
+                                <a href="javascript:void(0);" class="text-warning">Create custom fields</a>
                             </div>
                             <div class="d-flex align-items-start">
                                 <div class="task-icon me-3">
@@ -392,15 +393,15 @@
 
                                             <div class="col-md-6 d-flex justify-content-end">
                                                 <div class="d-flex gap-2">
-                                                    <!-- Completed -->
-                                                    <button class="btn btn-sm btn-outline-warning"
-                                                        onclick="reopenTask({{ $task->id }})" title="Reopen Task">
+                                                    <!-- Reopen Task -->
+                                                    <button class="btn btn-sm btn-outline-warning reopen-task-btn"
+                                                        title="Reopen Task" data-id="{{ $task->id }}">
                                                         <i class="fas fa-undo"></i>
                                                     </button>
 
                                                     <!-- Delete -->
-                                                    <button class="btn btn-sm btn-outline-secondary"
-                                                        onclick="deleteTask({{ $task->id }})" title="Delete Task">
+                                                    <button class="btn btn-sm btn-outline-secondary delete-task-btn"
+                                                        title="Delete Task" data-id="{{ $task->id }}">
                                                         <i class="fas fa-times"></i>
                                                     </button>
                                                 </div>
@@ -429,17 +430,12 @@
                                             <div class="col-md-6 d-flex justify-content-end">
                                                 <div class="d-flex gap-2">
                                                     <!-- Completed -->
-                                                    <button class="btn btn-sm btn-outline-success"
-                                                        onclick="markCompleted({{ $task->id }})"
-                                                        title="Mark as Completed">
+                                                     <button class="btn btn-sm btn-outline-success mark-complete-btn"
+                                                        title="Mark as Completed" data-id="{{ $task->id }}">
                                                         <i class="fas fa-check"></i>
                                                     </button>
 
                                                     <!-- Edit -->
-                                                    {{-- <button class="btn btn-sm btn-outline-primary" id="toggleEditTask"
-                                                        onclick="editTask({{ $task->id }})" title="Edit Task">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button> --}}
                                                     <button class="btn btn-sm btn-outline-primary toggleEditTask"
                                                         data-id="{{ $task->id }}" data-title="{{ $task->title }}"
                                                         data-due="{{ $task->due_time }}"
@@ -448,10 +444,9 @@
                                                         <i class="fas fa-edit"></i>
                                                     </button>
 
-
                                                     <!-- Delete -->
-                                                    <button class="btn btn-sm btn-outline-secondary"
-                                                        onclick="deleteTask({{ $task->id }})" title="Delete Task">
+                                                    <button class="btn btn-sm btn-outline-secondary delete-task-btn"
+                                                        title="Delete Task" data-id="{{ $task->id }}">
                                                         <i class="fas fa-times"></i>
                                                     </button>
                                                 </div>
@@ -1404,74 +1399,21 @@
     @endsection
 
     @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            function scheduleActivity() {
+                $('#schedule-activity').modal('show');
+            }
 
-        {{-- <script>
-            document.addEventListener("DOMContentLoaded", function() {
-
-                // common ajax update function
-                function updateLead(data, onSuccess) {
-                    fetch("{{ route('admin.leads.ajax_update') }}", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                            },
-                            body: JSON.stringify(data)
-                        })
-                        .then(response => response.json())
-                        .then(resp => {
-                            if (resp.success) {
-                                if (typeof onSuccess === "function") onSuccess();
-                            } else {
-                                alert("Failed to update lead!");
-                            }
-                        })
-                        .catch(err => console.error(err));
-                }
-
-                // Handle flag checkboxes
-                document.querySelectorAll(".lead-flag").forEach((flagSelect) => {
-                    flagSelect.addEventListener("change", function() {
-                        let leadId = this.dataset.leadId;
-
-                        // Collect all checked flags for this lead
-                        let checkedFlags = [];
-                        document.querySelectorAll('.lead-flag[data-lead-id="' + leadId + '"]:checked')
-                            .forEach(cb => checkedFlags.push(cb.value));
-
-                        updateLead({
-                                lead_flags: checkedFlags,
-                                lead_id: leadId
-                            },
-                            () => console.log("Lead flags updated to:", checkedFlags)
-                        );
-                    });
+            $(document).ready(function() {
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
                 });
 
-                // status dropdown handler
-                let statusSelect = document.getElementById("leadStatusSelect");
-                if (statusSelect) {
-                    statusSelect.addEventListener("change", function() {
-                        let leadId = this.dataset.leadId;
-                        let leadStatus = this.value;
-
-                        updateLead({
-                                lead_status: leadStatus,
-                                lead_id: leadId
-                            },
-                            () => console.log("Lead status updated to:", leadStatus)
-                        );
-                    });
-                }
-
-            });
-        </script> --}}
-
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-
-                // Icons show/hide beside name and description
+                // ==============================
+                // Show/Hide icons beside editable fields
+                // ==============================
                 $('.editable-field').on('focus', function() {
                     $(this).siblings('.editable-icon').removeClass('d-none');
                 });
@@ -1481,10 +1423,485 @@
                     // Delay hiding to allow click event on icons
                     setTimeout(() => {
                         $icons.addClass('d-none');
-                    }, 300); // 200ms delay
+                    }, 300);
                 });
 
-                // common ajax update function
+                // ==============================
+                // Update company details(name and description) on change
+                // ==============================
+                $('.editable-submit').click(function() {
+                    let $button = $(this);
+                    let $field = $button.siblings('.editable-field');
+                    let leadId = $field.data('lead-id');
+                    let fieldName = $button.data('field'); // e.g., 'name'
+                    let newValue = $field.text().trim();
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: `Do you want to update the ${fieldName}?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#dc3545',
+                        confirmButtonText: 'Yes, update'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.post(`/admin/leads/${leadId}/update-detail`, {
+                                    _token: '{{ csrf_token() }}',
+                                    field: fieldName,
+                                    value: newValue
+                                })
+                                .done(response => {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Updated',
+                                        text: response.message,
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    });
+                                })
+                                .fail(xhr => {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: xhr.responseJSON?.message ||
+                                            'Something went wrong.'
+                                    });
+                                    console.error(xhr.responseText);
+                                });
+                        }
+                    });
+                });
+
+                // Cancel button hides sibling buttons
+                $('.editable-cancel').click(function() {
+                    $(this).siblings('.editable-icon').addClass('d-none');
+                });
+
+
+                // ==============================
+                // Adding tags to the company
+                // ==============================
+                $('#tagSelect').change(function() {
+                    let tagId = $(this).val();
+                    let tagName = $("#tagSelect option:selected").text();
+
+                    if (!tagId) {
+                        return; // ignore placeholder
+                    }
+
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "Do you want to add the tag \"" + tagName + "\" to this lead?",
+                        icon: "question",
+                        showCancelButton: true,
+                        confirmButtonColor: "#28a745",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, Add"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: "/admin/leads/{{ $leads->id }}/tags/add", // new route for tags
+                                method: "POST",
+                                data: {
+                                    _token: "{{ csrf_token() }}",
+                                    tag_id: tagId
+                                },
+                                success: function(response) {
+                                    Swal.fire({
+                                        icon: "success",
+                                        title: "Added",
+                                        text: response.message,
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                                },
+                                error: function(xhr) {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Error",
+                                        text: xhr.responseJSON?.message ||
+                                            "Something went wrong."
+                                    });
+                                }
+                            });
+                        } else {
+                            // Reset dropdown back to default if cancelled
+                            $('#tagSelect').val("");
+                        }
+                    });
+                });
+
+                // ==============================
+                // Removing the tag from the company
+                // ==============================
+                $(document).on('click', '.delete-tag-btn', function() {
+                    var tagId = $(this).data('id');
+
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "Do you want to remove this tag from the lead?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#3085d6",
+                        confirmButtonText: "Yes, Remove"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: "/admin/leads/{{ $leads->id }}/tags/" + tagId +
+                                    "/remove",
+                                method: "POST",
+                                data: {
+                                    _token: "{{ csrf_token() }}"
+                                },
+                                success: function(response) {
+                                    Swal.fire({
+                                        icon: "success",
+                                        title: "Removed",
+                                        text: response.message,
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    }).then(() => {
+                                        location
+                                            .reload(); // reload to update tag list
+                                    });
+                                },
+                                error: function(xhr) {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Error",
+                                        text: xhr.responseJSON?.message ||
+                                            "Something went wrong."
+                                    });
+                                    console.error(xhr.responseText);
+                                }
+                            });
+                        }
+                    });
+                });
+
+                // ==============================
+                // Toggle Add task
+                // ==============================
+                const toggleTaskBtn = document.getElementById('toggleAddTask');
+                const formTaskDiv = document.getElementById('addTaskForm');
+
+                toggleTaskBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    if (formTaskDiv.style.display === "none" || formTaskDiv.style.display === "") {
+                        formTaskDiv.style.display = "block";
+
+                        // Reset form
+                        const form = formTaskDiv.querySelector('form');
+                        form.reset();
+
+                        // Reset form action back to store route
+                        form.setAttribute('action', "{{ route('admin.leads.tasks.store', $leads->id) }}");
+
+                        // Reset button text and style
+                        const submitBtn = form.querySelector('button[type="submit"]');
+                        submitBtn.textContent = "Add Task";
+                        submitBtn.classList.remove('btn-primary');
+                        submitBtn.classList.add('btn-warning');
+
+                    } else {
+                        formTaskDiv.style.display = "none";
+                    }
+                });
+
+                // ==============================
+                // Add Task ajax form validation and submittion
+                // ==============================
+                $("#addTaskAjaxForm").validate({
+                    ignore: [],
+                    rules: {
+                        title: {
+                            required: true
+                        },
+                        due_date: {
+                            required: true
+                        },
+                        user_id: {
+                            required: true
+                        },
+                        description: {
+                            required: true
+                        },
+
+                    },
+                    messages: {
+                        name: {
+                            required: "Please enter the task name."
+                        },
+                        due_date: {
+                            required: "Please enter the due date."
+                        },
+                        user_id: {
+                            required: "Please select the user."
+                        },
+                        description: {
+                            required: "Please enter the description."
+                        },
+
+                    },
+                    errorElement: 'span',
+                    errorClass: 'invalid-feedback d-block',
+                    highlight: function(element) {
+                        $(element).addClass('is-invalid');
+                    },
+                    unhighlight: function(element) {
+                        $(element).removeClass('is-invalid');
+                    },
+                    errorPlacement: function(error, element) {
+                        if (element.parent('.input-group').length) {
+                            error.insertAfter(element.parent()); // Inserts after the .input-group
+                        } else {
+                            error.insertAfter(element); // Default
+                        }
+                    }
+                });
+
+                $('#addTaskAjaxForm').submit(function(e) {
+                    e.preventDefault();
+
+                    if (!$('#addTaskAjaxForm').valid()) {
+                        return; // Stop if validation fails
+                    }
+
+                    let form = $(this);
+                    let actionUrl = form.attr('action');
+                    let method = form.attr('method');
+                    let formData = form.serialize();
+
+                    $.ajax({
+                        url: actionUrl,
+                        method: method,
+                        data: formData,
+                        success: function(response) {
+                            console.log('Task Added successfully:', response);
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 2000
+                            }).then(() => {
+                                location.reload(); // reload after popup closes
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseText ||
+                                    'Something went wrong while adding the task.'
+                            });
+                            console.error(xhr.responseText);
+                        }
+                    });
+                });
+
+                // ==============================
+                // Mark Complete Task
+                // ==============================
+                $(document).on('click', '.mark-complete-btn', function() {
+                    var taskId = $(this).data('id'); // get task ID from button
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "Do you want to mark this task as completed?",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Yes, complete it!',
+                        cancelButtonText: 'Cancel'
+                    }).then(function(result) {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: '/admin/leads/tasks/' + taskId + '/complete',
+                                method: 'POST',
+                                data: {
+                                    _token: '{{ csrf_token() }}'
+                                },
+                                success: function(response) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Completed',
+                                        text: response.message,
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    }).then(function() {
+                                        location
+                                            .reload(); // reload after completion
+                                    });
+                                },
+                                error: function(xhr) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: xhr.responseJSON?.message ||
+                                            'Something went wrong while marking the task completed.'
+                                    });
+                                    console.error(xhr.responseText);
+                                }
+                            });
+                        }
+                    });
+                });
+
+                // ==============================
+                // Reopen Task
+                // ==============================
+                $(document).on('click', '.reopen-task-btn', function() {
+                    var taskId = $(this).data('id'); // get task ID from button
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "Do you want to re-open this task?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ffc107',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Yes, re-open it!',
+                        cancelButtonText: 'Cancel'
+                    }).then(function(result) {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: '/admin/leads/tasks/' + taskId + '/reopen',
+                                method: 'POST',
+                                data: {
+                                    _token: '{{ csrf_token() }}'
+                                },
+                                success: function(response) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Re-open',
+                                        text: response.message,
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    }).then(function() {
+                                        location.reload(); // refresh task state
+                                    });
+                                },
+                                error: function(xhr) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: xhr.responseJSON?.message ||
+                                            'Something went wrong while reopening this task.'
+                                    });
+                                    console.error(xhr.responseText);
+                                }
+                            });
+                        }
+                    });
+                });
+
+                // ==============================
+                // Delete Task
+                // ==============================
+                $(document).on('click', '.delete-task-btn', function() {
+                    var taskId = $(this).data('id'); // get task ID from button
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You won't be able to undo this action!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then(function(result) {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: "/admin/leads/tasks/delete/" + taskId,
+                                method: "POST",
+                                data: {
+                                    _token: "{{ csrf_token() }}"
+                                },
+                                success: function(response) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Deleted!',
+                                        text: response.message ||
+                                            "Task deleted successfully.",
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    }).then(function() {
+                                        location.reload(); // reload after deletion
+                                    });
+                                },
+                                error: function(xhr) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: xhr.responseJSON?.message ||
+                                            'Something went wrong.'
+                                    });
+                                    console.error(xhr.responseText);
+                                }
+                            });
+                        }
+                    });
+                });
+
+                // ==============================
+                // Toggle Edit Task Form
+                // ==============================
+                $('.toggleEditTask').click(function() {
+                    var taskId = $(this).data('id');
+
+                    // Get data from button
+                    var title = $(this).data('title');
+                    var due = $(this).data('due');
+                    var userId = $(this).data('user');
+                    var description = $(this).data('description');
+
+                    $('#addTaskForm').toggle();
+                    // Fill the form
+                    $('#addTaskForm #title').val(title);
+                    $('#addTaskForm #due_date').val(due);
+                    $('#addTaskForm select[name="user_id"]').val(userId);
+                    $('#addTaskForm textarea[name="description"]').val(description);
+                    $('#addTaskAjaxForm').attr('method', 'PUT');
+                    // Change form action for update (FIX: point to update route)
+                    $('#addTaskAjaxForm').attr('action', '/admin/leads/tasks/' + taskId + '/update');
+                    // Optional: Change button text to "Update Task"
+                    $('#addTaskAjaxForm button[type="submit"]').text('Update Task');
+
+                });
+
+                // ==============================
+                // Flatpickr for Task Due Date
+                // ==============================
+                flatpickr("#due_date", {
+                    enableTime: true,
+                    dateFormat: "Y-m-d h:i K", // h = 12-hour, K = AM/PM
+                    minDate: "today",
+                    defaultDate: new Date().setHours(18, 30, 0, 0), // today at 6:30 PM
+                    time_24hr: false
+                });
+
+                // ==============================
+                // Activities Form - Select2 Integration
+                // ==============================
+                $('#schedule-activity').on('shown.bs.modal', function() {
+                    $('#participant_select').select2({
+                        dropdownParent: $('#schedule-activity'),
+                        placeholder: 'Choose...',
+                        allowClear: true
+                    });
+                });
+
+
+                // ==============================
+                // Updating lead and flags status
+                // ==============================
                 function updateLead(data, onSuccess) {
                     fetch("{{ route('admin.leads.ajax_update') }}", {
                             method: "POST",
@@ -1505,7 +1922,57 @@
                         .catch(err => console.error(err));
                 }
 
-                // Handle flag checkboxes
+                // ==============================
+                // Handle lead status selection
+                // ==============================
+                let statusSelect = document.getElementById("leadStatusSelect");
+                if (statusSelect) {
+                    // Store initial value
+                    let previousValue = statusSelect.value;
+
+                    statusSelect.addEventListener("change", function() {
+                        let leadId = this.dataset.leadId;
+                        let leadStatus = this.value;
+
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: `Do you want to update the lead status`,
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#dc3545',
+                            confirmButtonText: 'Yes, update'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                updateLead({
+                                        lead_status: leadStatus,
+                                        lead_id: leadId
+                                    },
+                                    () => {
+                                        Swal.fire({
+                                            icon: "success",
+                                            title: "Updated!",
+                                            text: "Lead status updated successfully.",
+                                            timer: 1500,
+                                            showConfirmButton: false
+                                        }).then(() => {
+                                            location.reload();
+                                        });
+                                    }
+                                );
+                                // Update previous value on success
+                                previousValue = leadStatus;
+                            } else {
+                                // Revert select back to previous value on cancel
+                                this.value = previousValue;
+                            }
+                        });
+                    });
+                }
+
+                // ==============================
+                // Handle lead flag checkboxes
+                // ==============================
                 document.querySelectorAll(".lead-flag").forEach((flagSelect) => {
                     flagSelect.addEventListener("change", function() {
                         let leadId = this.dataset.leadId;
@@ -1515,820 +1982,370 @@
                         document.querySelectorAll('.lead-flag[data-lead-id="' + leadId + '"]:checked')
                             .forEach(cb => checkedFlags.push(cb.value));
 
-                        updateLead({
-                                lead_flags: checkedFlags,
-                                lead_id: leadId
-                            },
-                            () => {
-                                Swal.fire({
-                                    icon: "success",
-                                    title: "Updated!",
-                                    text: "Lead flags updated successfully.",
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            }
-                        );
-                    });
-                });
-
-                // status dropdown handler
-                let statusSelect = document.getElementById("leadStatusSelect");
-                if (statusSelect) {
-                    statusSelect.addEventListener("change", function() {
-                        let leadId = this.dataset.leadId;
-                        let leadStatus = this.value;
-
-                        updateLead({
-                                lead_status: leadStatus,
-                                lead_id: leadId
-                            },
-                            () => {
-                                Swal.fire({
-                                    icon: "success",
-                                    title: "Updated!",
-                                    text: "Lead status updated successfully.",
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            }
-                        );
-                    });
-                }
-
-            });
-
-            // Sidebar records delete functionalities
-            $(document).on("click", ".delete-item", function(e) {
-                e.preventDefault();
-
-                let leadId = $(this).data("lead");
-                let relatedId = $(this).data("id");
-                let type = $(this).data("type");
-                let target = $(this).data("target");
-
-                // Use the new container-list structure
-                let container = $(`#${type}-container`);
-                let list = container.find(`#${type}-list`);
-                let count = list.children().length;
-
-                if (count <= 1) {
-                    toastr.warning(`At least one ${type} is required.`);
-                    return false;
-                }
-
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: `This ${type} will be removed from the lead record!`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: "{{ route('admin.leads.delete-field') }}",
-                            type: "POST",
-                            data: {
-                                _token: "{{ csrf_token() }}",
-                                lead_id: leadId,
-                                related_id: relatedId,
-                                type: type
-                            },
-                            success: function(response) {
-                                if (response.success) {
-                                    $("#" + target).remove(); // Remove the specific DOM element
-                                    toastr.success(response.message);
-                                } else {
-                                    toastr.error(response.message || "Delete failed.");
-                                }
-                            },
-                            error: function(xhr) {
-                                toastr.error("Something went wrong.");
-                                console.error(xhr.responseText);
-                            }
-                        });
-                    }
-                });
-            });
-
-
-            // Unified update for all select fields
-            $(document).on("change", ".update-field-select", function() {
-                let relatedId = $(this).val(); // selected item id
-                let type = $(this).data("type"); // type: company | people | source | competitor | product
-                let leadId = "{{ $leads->id }}"; // current lead
-
-                if (!relatedId) return; // do nothing if no selection
-
-                $.ajax({
-                    url: "{{ route('admin.leads.update-field') }}",
-                    type: "POST",
-                    data: {
-                        _token: "{{ csrf_token() }}",
-                        lead_id: leadId,
-                        related_id: relatedId,
-                        type: type
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Updated!',
-                                text: response.message,
-                                timer: 1500,
-                                showConfirmButton: false
-                            }).then(() => location.reload());
-                        } else {
-                            toastr.error(response.message || "Failed to update " + type + ".");
-                        }
-                    },
-                    error: function(xhr) {
-                        toastr.error("Something went wrong.");
-                        console.error(xhr.responseText);
-                    }
-                });
-            });
-
-
-            const toggleTaskBtn = document.getElementById('toggleAddTask');
-            const formTaskDiv = document.getElementById('addTaskForm');
-
-            // toggleTaskBtn.addEventListener('click', function(e) {
-            //     e.preventDefault();
-            //     if (formTaskDiv.style.display === "none" || formTaskDiv.style.display === "") {
-            //         formTaskDiv.style.display = "block";
-            //     } else {
-            //         formTaskDiv.style.display = "none";
-            //     }
-            // });
-            toggleTaskBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-
-                if (formTaskDiv.style.display === "none" || formTaskDiv.style.display === "") {
-                    formTaskDiv.style.display = "block";
-
-                    // Reset form
-                    const form = formTaskDiv.querySelector('form');
-                    form.reset();
-
-                    // Reset form action back to store route
-                    form.setAttribute('action', "{{ route('admin.leads.tasks.store', $leads->id) }}");
-
-                    // Reset button text and style
-                    const submitBtn = form.querySelector('button[type="submit"]');
-                    submitBtn.textContent = "Add Task";
-                    submitBtn.classList.remove('btn-primary');
-                    submitBtn.classList.add('btn-warning');
-
-                } else {
-                    formTaskDiv.style.display = "none";
-                }
-            });
-
-            // Update lead details(name and description) on change
-            $('.editable-submit').click(function() {
-                let $button = $(this);
-                let $field = $button.siblings('.editable-field');
-                let leadId = $field.data('lead-id');
-                let fieldName = $button.data('field'); // e.g., 'name'
-                let newValue = $field.text().trim();
-
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: `Do you want to update the ${fieldName}?`,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#28a745',
-                    cancelButtonColor: '#dc3545',
-                    confirmButtonText: 'Yes, update'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.post(`/admin/leads/${leadId}/update-detail`, {
-                                _token: '{{ csrf_token() }}',
-                                field: fieldName,
-                                value: newValue
-                            })
-                            .done(response => {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Updated',
-                                    text: response.message,
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                });
-                            })
-                            .fail(xhr => {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: xhr.responseJSON?.message || 'Something went wrong.'
-                                });
-                                console.error(xhr.responseText);
-                            });
-                    }
-                });
-            });
-
-            // Cancel button hides sibling buttons
-            $('.editable-cancel').click(function() {
-                $(this).siblings('.editable-icon').addClass('d-none');
-            });
-
-            // Adding tags tot the company
-            $('#tagSelect').change(function() {
-                let tagId = $(this).val();
-                let tagName = $("#tagSelect option:selected").text();
-
-                if (!tagId) {
-                    return; // ignore placeholder
-                }
-
-                Swal.fire({
-                    title: "Are you sure?",
-                    text: "Do you want to add the tag \"" + tagName + "\" to this lead?",
-                    icon: "question",
-                    showCancelButton: true,
-                    confirmButtonColor: "#28a745",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Yes, Add"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: "/admin/leads/{{ $leads->id }}/tags/add", // ✅ new route for tags
-                            method: "POST",
-                            data: {
-                                _token: "{{ csrf_token() }}",
-                                tag_id: tagId
-                            },
-                            success: function(response) {
-                                Swal.fire({
-                                    icon: "success",
-                                    title: "Added",
-                                    text: response.message,
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            },
-                            error: function(xhr) {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "Error",
-                                    text: xhr.responseJSON?.message ||
-                                        "Something went wrong."
-                                });
-                            }
-                        });
-                    } else {
-                        // Reset dropdown back to default if cancelled
-                        $('#tagSelect').val("");
-                    }
-                });
-            });
-
-
-            // Removing the tag from the company
-            function deleteTag(tagId) {
-                Swal.fire({
-                    title: "Are you sure?",
-                    text: "Do you want to remove this tag from the lead?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#d33",
-                    cancelButtonColor: "#3085d6",
-                    confirmButtonText: "Yes, Remove"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: "/admin/leads/{{ $leads->id }}/tags/" + tagId + "/remove",
-                            method: "POST",
-                            data: {
-                                _token: "{{ csrf_token() }}"
-                            },
-                            success: function(response) {
-                                Swal.fire({
-                                    icon: "success",
-                                    title: "Removed",
-                                    text: response.message,
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location.reload(); // reload the page to update tags
-                                });
-                            },
-                            error: function(xhr) {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "Error",
-                                    text: xhr.responseJSON?.message || "Something went wrong."
-                                });
-                                console.error(xhr.responseText);
-                            }
-                        });
-                    }
-                });
-            }
-
-
-            $("#addTaskAjaxForm").validate({
-                ignore: [],
-                rules: {
-                    title: {
-                        required: true
-                    },
-                    due_date: {
-                        required: true
-                    },
-                    user_id: {
-                        required: true
-                    },
-                    description: {
-                        required: true
-                    },
-
-                },
-                messages: {
-                    name: {
-                        required: "Please enter the task name."
-                    },
-                    due_date: {
-                        required: "Please enter the due date."
-                    },
-                    user_id: {
-                        required: "Please select the user."
-                    },
-                    description: {
-                        required: "Please enter the description."
-                    },
-
-                },
-                errorElement: 'span',
-                errorClass: 'invalid-feedback d-block',
-                highlight: function(element) {
-                    $(element).addClass('is-invalid');
-                },
-                unhighlight: function(element) {
-                    $(element).removeClass('is-invalid');
-                },
-                errorPlacement: function(error, element) {
-                    if (element.parent('.input-group').length) {
-                        error.insertAfter(element.parent()); // Inserts after the .input-group
-                    } else {
-                        error.insertAfter(element); // Default
-                    }
-                }
-            });
-
-
-            $('#addTaskAjaxForm').submit(function(e) {
-                e.preventDefault();
-
-                if (!$('#addTaskAjaxForm').valid()) {
-                    return; // Stop if validation fails
-                }
-
-                let form = $(this);
-                let actionUrl = form.attr('action');
-                let method = form.attr('method');
-                let formData = form.serialize();
-
-                $.ajax({
-                    url: actionUrl,
-                    method: method,
-                    data: formData,
-                    success: function(response) {
-                        console.log('Task Added successfully:', response);
+                        // Show confirmation popup before update
                         Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: response.message,
-                            showConfirmButton: false,
-                            timer: 2000
-                        }).then(() => {
-                            location.reload(); // reload after popup closes
-                        });
-                    },
-                    error: function(xhr) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: xhr.responseText || 'Something went wrong while adding the task.'
-                        });
-                        console.error(xhr.responseText);
-                    }
-                });
-            });
-
-
-            function markCompleted(taskId) {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "Do you want to mark this task as completed?",
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#28a745',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Yes, complete it!',
-                    cancelButtonText: 'Cancel'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: '/admin/leads/tasks/' + taskId + '/complete',
-                            method: 'POST',
-                            data: {
-                                _token: '{{ csrf_token() }}'
-                            },
-                            success: function(response) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Completed',
-                                    text: response.message,
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                }).then(() => {
-                                    location.reload(); // ✅ reload after completion
-                                });
-                            },
-                            error: function(xhr) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: xhr.responseJSON?.message ||
-                                        'Something went wrong while marking the task completed.'
-                                });
-                                console.error(xhr.responseText);
+                            title: 'Are you sure?',
+                            text: 'Do you want to update the lead flags?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#dc3545',
+                            confirmButtonText: 'Yes, update',
+                            cancelButtonText: 'Cancel'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                updateLead({
+                                        lead_flags: checkedFlags,
+                                        lead_id: leadId
+                                    },
+                                    () => {
+                                        Swal.fire({
+                                            icon: "success",
+                                            title: "Updated!",
+                                            text: "Lead flags updated successfully.",
+                                            timer: 1500,
+                                            showConfirmButton: false
+                                        }).then(() => {
+                                            location.reload();
+                                        });
+                                    }
+                                );
+                            } else {
+                                // Revert checkbox state
+                                // Uncheck the one that triggered this change
+                                this.checked = !this.checked;
                             }
                         });
-                    }
-                });
-            }
-
-            function reopenTask(taskId) {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "Do you want to re-open this task?",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ffc107',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Yes, re-open it!',
-                    cancelButtonText: 'Cancel'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: '/admin/leads/tasks/' + taskId + '/reopen',
-                            method: 'POST',
-                            data: {
-                                _token: '{{ csrf_token() }}'
-                            },
-                            success: function(response) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Re-open',
-                                    text: response.message,
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                }).then(() => {
-                                    location.reload(); // refresh task state
-                                });
-                            },
-                            error: function(xhr) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: xhr.responseJSON?.message ||
-                                        'Something went wrong while reopening this task.'
-                                });
-                                console.error(xhr.responseText);
-                            }
-                        });
-                    }
-                });
-            }
-
-
-            // $('.step-menu li').click(function() {
-            //     $('.current').removeClass('current')
-            //     $('.complete').removeClass('complete')
-            //     $(this).addClass('current')
-            //     $(this).prevAll().addClass('complete')
-            // })
-
-
-            function scheduleActivity() {
-                $('#schedule-activity').modal('show');
-            }
-
-            $("#store_activity").validate({
-                ignore: [],
-                rules: {
-                    title: {
-                        required: true
-                    },
-                    activity_type_id: {
-                        required: true
-                    },
-                    date: {
-                        required: true
-                    },
-                    start_time: {
-                        required: true
-                    },
-                    end_time: {
-                        required: true
-                    },
-                    location: {
-                        required: true
-                    },
-                    agenda: {
-                        required: true
-                    },
-                },
-                messages: {
-                    title: {
-                        required: "Please enter the title."
-                    },
-                    activity_type_id: {
-                        required: "Please select an activity."
-                    },
-                    date: {
-                        required: "Please enter the date."
-                    },
-                    start_time: {
-                        required: "Please enter the time."
-                    },
-                    end_time: {
-                        required: "Please enter the time."
-                    },
-                    location: {
-                        required: "Please enter the location."
-                    },
-                    agenda: {
-                        required: "Please enter the agenda."
-                    },
-
-                },
-                errorElement: 'span',
-                errorClass: 'invalid-feedback d-block',
-                highlight: function(element) {
-                    $(element).addClass('is-invalid');
-                },
-                unhighlight: function(element) {
-                    $(element).removeClass('is-invalid');
-                },
-                errorPlacement: function(error, element) {
-                    if (element.parent('.input-group').length) {
-                        error.insertAfter(element.parent()); // Inserts after the .input-group
-                    } else {
-                        error.insertAfter(element); // Default
-                    }
-                }
-            });
-
-            // Submit Activity form
-            $('#store_activity').submit(function(e) {
-                e.preventDefault();
-
-                if (!$('#store_activity').valid()) {
-                    return; // Stop if validation fails
-                }
-
-                $.ajax({
-                    url: '{{ route('admin.activity.store') }}',
-                    method: 'POST',
-                    data: $(this).serialize(),
-
-                    success: function(response) {
-                        toastr.success('Activity added successfully!');
-                        $('#store_activity')[0].reset();
-                        $('#AddActivity').modal('hide');
-                    },
-                    error: function(xhr) {
-                        console.log(xhr.responseText);
-                        toastr.error('Something went wrong while adding the activity.');
-                    }
-                });
-            });
-
-            // Delete a task
-            function deleteTask(task_id) {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to undo this action!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: "/admin/leads/tasks/delete/" + task_id,
-                            method: "POST",
-                            data: {
-                                _token: "{{ csrf_token() }}"
-                            },
-                            success: function(response) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Deleted!',
-                                    text: response.message || "Task deleted successfully.",
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                });
-                                // reload after swal closes
-                                location.reload();
-                            },
-                            error: function(xhr) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: xhr.responseJSON?.message || 'Something went wrong.'
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-
-
-
-
-            $(document).ready(function() {
-
-                $('#schedule-activity').on('shown.bs.modal', function() {
-                    $('#participant_select').select2({
-                        dropdownParent: $('#schedule-activity'),
-                        placeholder: 'Choose...',
-                        allowClear: true
                     });
                 });
 
-                $('.toggleEditTask').click(function() {
-                    var taskId = $(this).data('id');
 
-                    // Get data from button
-                    var title = $(this).data('title');
-                    var due = $(this).data('due');
-                    var userId = $(this).data('user');
-                    var description = $(this).data('description');
-
-                    // Show the form (FIX: lowercase "a")
-                    $('#addTaskForm').toggle();
-
-                    // Fill the form
-                    $('#addTaskForm #title').val(title);
-                    $('#addTaskForm #due_date').val(due);
-                    $('#addTaskForm select[name="user_id"]').val(userId);
-                    $('#addTaskForm textarea[name="description"]').val(description);
-
-                    $('#addTaskAjaxForm').attr('method', 'PUT');
-                    // Change form action for update (FIX: point to update route)
-                    $('#addTaskAjaxForm').attr('action', '/admin/leads/tasks/' + taskId + '/update');
-
-                    // Optional: Change button text to "Update Task"
-                    $('#addTaskAjaxForm button[type="submit"]').text('Update Task');
-
-                });
-
-                flatpickr("#due_date", {
-                    enableTime: true,
-                    dateFormat: "Y-m-d h:i K", // h = 12-hour, K = AM/PM
-                    minDate: "today",
-                    defaultDate: new Date().setHours(18, 30, 0, 0), // today at 6:30 PM
-                    time_24hr: false
-                });
-
-
-                $(document).on('click', '.remove-participant', function(e) {
-                    e.preventDefault();
-                    $(this).closest('.participant-entry').remove();
-                });
-
-                // Toggle the Add Person
+                // ==============================
+                // Toggle Fields on sidebar of leads details section
+                // ==============================
                 $('#toggle-add-person').on('click', function() {
                     $('#add-person').toggleClass('d-none');
                 });
 
-                // Toggle the Add company
                 $('#toggle-add-company').on('click', function() {
                     $('#add-company').toggleClass('d-none');
                 });
 
-                // Toggle the Add Product
                 $('#toggle-add-product').on('click', function() {
                     $('#add-product').toggleClass('d-none');
                 });
 
-                // Toggle the Add Competitor
                 $('#toggle-add-competitor').on('click', function() {
                     $('#add-competitor').toggleClass('d-none');
                 });
 
-                // Toggle the Add Source
                 $('#toggle-add-source').on('click', function() {
                     $('#add-source').toggleClass('d-none');
                 });
 
-            });
+                // ==============================
+                // Update Fields on sidebar of leads details section
+                // ==============================
+                $(document).on("change", ".update-field-select", function() {
+                    let relatedId = $(this).val(); // selected item id
+                    let type = $(this).data("type"); // type: company | people | source | competitor | product
+                    let leadId = "{{ $leads->id }}"; // current lead
+                    let selectElement = this; // store reference in case we need to revert
 
-            $("#loginActivity").validate({
-                ignore: [],
-                rules: {
-                    title: {
-                        required: true
-                    },
-                    activity_type: {
-                        required: true
-                    },
-                    duration: {
-                        required: true
-                    },
+                    if (!relatedId) return; // do nothing if no selection
 
-                },
-                messages: {
-                    title: {
-                        required: "Please enter the title."
-                    },
-                    activity_type: {
-                        required: "Please select the activity."
-                    },
-                    duration: {
-                        required: "Please select the duration."
-                    },
+                    // Show confirmation popup
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: `Do you want to update the lead ${type}?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#dc3545',
+                        confirmButtonText: 'Yes, update',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Proceed with update via AJAX
+                            $.ajax({
+                                url: "{{ route('admin.leads.update-field') }}",
+                                type: "POST",
+                                data: {
+                                    _token: "{{ csrf_token() }}",
+                                    lead_id: leadId,
+                                    related_id: relatedId,
+                                    type: type
+                                },
+                                success: function(response) {
+                                    if (response.success) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Updated!',
+                                            text: response.message,
+                                            timer: 1500,
+                                            showConfirmButton: false
+                                        }).then(() => location.reload());
+                                    } else {
+                                        toastr.error(response.message ||
+                                            "Failed to update " + type + ".");
+                                    }
+                                },
+                                error: function(xhr) {
+                                    toastr.error("Something went wrong.");
+                                    console.error(xhr.responseText);
+                                }
+                            });
+                        } else {
+                            // User canceled, revert select to previous value
+                            // Optional: reset or set to default/empty
+                            $(selectElement).val('').trigger('change.select2'); // works with Select2
+                        }
+                    });
+                });
 
-                },
-                errorElement: 'span',
-                errorClass: 'invalid-feedback d-block',
-                highlight: function(element) {
-                    $(element).addClass('is-invalid');
-                },
-                unhighlight: function(element) {
-                    $(element).removeClass('is-invalid');
-                },
-                errorPlacement: function(error, element) {
-                    if (element.parent('.input-group').length) {
-                        error.insertAfter(element.parent()); // Inserts after the .input-group
-                    } else {
-                        error.insertAfter(element); // Default
+                // ==============================
+                // Delete fields on sidebar of leads details section
+                // ==============================
+                $(document).on("click", ".delete-item", function(e) {
+                    e.preventDefault();
+
+                    let leadId = $(this).data("lead");
+                    let relatedId = $(this).data("id");
+                    let type = $(this).data("type");
+                    let target = $(this).data("target");
+
+                    // Use the new container-list structure
+                    let container = $(`#${type}-container`);
+                    let list = container.find(`#${type}-list`);
+                    let count = list.children().length;
+
+                    if (count <= 1) {
+                        toastr.warning(`At least one ${type} is required.`);
+                        return false;
                     }
-                }
-            });
 
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: `This ${type} will be removed from the lead record!`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: "{{ route('admin.leads.delete-field') }}",
+                                type: "POST",
+                                data: {
+                                    _token: "{{ csrf_token() }}",
+                                    lead_id: leadId,
+                                    related_id: relatedId,
+                                    type: type
+                                },
+                                success: function(response) {
+                                    if (response.success) {
+                                        $("#" + target)
+                                            .remove(); // Remove the specific DOM element
+                                        toastr.success(response.message);
+                                    } else {
+                                        toastr.error(response.message || "Delete failed.");
+                                    }
+                                },
+                                error: function(xhr) {
+                                    toastr.error("Something went wrong.");
+                                    console.error(xhr.responseText);
+                                }
+                            });
+                        }
+                    });
+                });
 
-            $('#loginActivity').submit(function(e) {
-                e.preventDefault();
-
-                if (!$('#loginActivity').valid()) {
-                    return; // Stop if validation fails
-                }
-
-                $.ajax({
-                    url: "{{ route('admin.login.activity') }}",
-                    method: "POST",
-                    data: $(this).serialize(),
-                    success: function(response) {
-                        alert('Logged an activity successfully!');
-                        $('#loginActivity')[0].reset();
-                        console.log(response);
-                        location.reload();
+                // ==============================
+                // Schedule activity validation and submition logic
+                // ==============================
+                $("#store_activity").validate({
+                    ignore: [],
+                    rules: {
+                        title: {
+                            required: true
+                        },
+                        activity_type_id: {
+                            required: true
+                        },
+                        date: {
+                            required: true
+                        },
+                        start_time: {
+                            required: true
+                        },
+                        end_time: {
+                            required: true
+                        },
+                        location: {
+                            required: true
+                        },
+                        agenda: {
+                            required: true
+                        },
+                    },
+                    messages: {
+                        title: {
+                            required: "Please enter the title."
+                        },
+                        activity_type_id: {
+                            required: "Please select an activity."
+                        },
+                        date: {
+                            required: "Please enter the date."
+                        },
+                        start_time: {
+                            required: "Please enter the time."
+                        },
+                        end_time: {
+                            required: "Please enter the time."
+                        },
+                        location: {
+                            required: "Please enter the location."
+                        },
+                        agenda: {
+                            required: "Please enter the agenda."
+                        },
 
                     },
-                    error: function(xhr) {
-                        alert('Error: ' + xhr.responseText);
-                        toastr.error('Something went wrong while logging an activity.');
+                    errorElement: 'span',
+                    errorClass: 'invalid-feedback d-block',
+                    highlight: function(element) {
+                        $(element).addClass('is-invalid');
+                    },
+                    unhighlight: function(element) {
+                        $(element).removeClass('is-invalid');
+                    },
+                    errorPlacement: function(error, element) {
+                        if (element.parent('.input-group').length) {
+                            error.insertAfter(element.parent()); // Inserts after the .input-group
+                        } else {
+                            error.insertAfter(element); // Default
+                        }
                     }
                 });
-            });
 
+                // Submit Activity form
+                $('#store_activity').submit(function(e) {
+                    e.preventDefault();
 
-            document.addEventListener('DOMContentLoaded', function() {
+                    if (!$('#store_activity').valid()) {
+                        return; // Stop if validation fails
+                    }
+
+                    $.ajax({
+                        url: '{{ route('admin.activity.store') }}',
+                        method: 'POST',
+                        data: $(this).serialize(),
+
+                        success: function(response) {
+                            toastr.success('Activity added successfully!');
+                            $('#store_activity')[0].reset();
+                            $('#AddActivity').modal('hide');
+                        },
+                        error: function(xhr) {
+                            console.log(xhr.responseText);
+                            toastr.error('Something went wrong while adding the activity.');
+                        }
+                    });
+                });
+
+                $("#loginActivity").validate({
+                    ignore: [],
+                    rules: {
+                        title: {
+                            required: true
+                        },
+                        activity_type: {
+                            required: true
+                        },
+                        duration: {
+                            required: true
+                        },
+
+                    },
+                    messages: {
+                        title: {
+                            required: "Please enter the title."
+                        },
+                        activity_type: {
+                            required: "Please select the activity."
+                        },
+                        duration: {
+                            required: "Please select the duration."
+                        },
+
+                    },
+                    errorElement: 'span',
+                    errorClass: 'invalid-feedback d-block',
+                    highlight: function(element) {
+                        $(element).addClass('is-invalid');
+                    },
+                    unhighlight: function(element) {
+                        $(element).removeClass('is-invalid');
+                    },
+                    errorPlacement: function(error, element) {
+                        if (element.parent('.input-group').length) {
+                            error.insertAfter(element.parent()); // Inserts after the .input-group
+                        } else {
+                            error.insertAfter(element); // Default
+                        }
+                    }
+                });
+
+                $('#loginActivity').submit(function(e) {
+                    e.preventDefault();
+
+                    if (!$('#loginActivity').valid()) {
+                        return; // Stop if validation fails
+                    }
+
+                    $.ajax({
+                        url: "{{ route('admin.login.activity') }}",
+                        method: "POST",
+                        data: $(this).serialize(),
+                        success: function(response) {
+                            alert('Logged an activity successfully!');
+                            $('#loginActivity')[0].reset();
+                            console.log(response);
+                            location.reload();
+
+                        },
+                        error: function(xhr) {
+                            alert('Error: ' + xhr.responseText);
+                            toastr.error('Something went wrong while logging an activity.');
+                        }
+                    });
+                });
+
                 const durationSelect = document.getElementById('duration');
                 const startInput = document.getElementById('start_time');
                 const endInput = document.getElementById('end_time');
 
-                durationSelect.addEventListener('change', function() {
-                    const durationMinutes = parseInt(this.value);
-                    const now = new Date();
+                if (durationSelect && startInput && endInput) {
+                    durationSelect.addEventListener('change', function() {
+                        const durationMinutes = parseInt(this.value);
+                        const now = new Date();
 
-                    const pad = n => String(n).padStart(2, '0');
-                    const formatTime = date => `${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+                        const pad = n => String(n).padStart(2, '0');
+                        const formatTime = date => `${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
 
-                    const end = new Date(now.getTime() + durationMinutes * 60000);
+                        const end = new Date(now.getTime() + durationMinutes * 60000);
 
-                    startInput.value = formatTime(now);
-                    endInput.value = formatTime(end);
-                });
+                        startInput.value = formatTime(now);
+                        endInput.value = formatTime(end);
+                    });
 
-                // Trigger default duration on load (optional)
-                durationSelect.dispatchEvent(new Event('change'));
+                    // Trigger default duration on load (optional)
+                    durationSelect.dispatchEvent(new Event('change'));
+                }
+
+
             });
         </script>
     @endpush

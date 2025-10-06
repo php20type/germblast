@@ -81,13 +81,11 @@
                                     {{ $peoples->created_at->diffForHumans() }}</small>
                             </div>
                             <div class="mt-3">
-                                {{-- <span class="badge-customer">
-                                    {{ $peoples->tag?->name ?? 'N/A' }}
-                                </span> --}}
                                 @foreach ($peoples->tags as $tag)
                                     <span class="badge-customer mx-1 px-2">
                                         {{ $tag->name }}
-                                        <button class="btn btn-sm" onclick="deleteTag({{ $tag->id }})">
+                                        <button type="button" class="btn btn-sm delete-tag-btn"
+                                            data-id="{{ $tag->id }}">
                                             <i class="fas fa-times"></i>
                                         </button>
                                     </span>
@@ -143,11 +141,6 @@
 
 
                             <!-- Slide Toggle Form -->
-                            {{-- <div id="addCompanyForm" class="mt-3" style="display: none;">
-                                <form id="addCompanyAjaxForm" action="{{ route('admin.companies.store') }}" post="POST">
-                                </form>
-                            </div> --}}
-
                             <div id="addCompanyForm" class="mt-3" style="display: none;">
                                 <div class="mb-3">
                                     <select class="form-select company-update" data-field="" id="companiesSelect">
@@ -187,15 +180,15 @@
 
                                             <div class="col-md-6 d-flex justify-content-end">
                                                 <div class="d-flex gap-2">
-                                                    <!-- Completed -->
-                                                    <button class="btn btn-sm btn-outline-warning"
-                                                        onclick="reopenTask({{ $task->id }})" title="Reopen Task">
+                                                    <!-- Reopen -->
+                                                    <button class="btn btn-sm btn-outline-warning reopen-task-btn"
+                                                        title="Reopen Task" data-id="{{ $task->id }}">
                                                         <i class="fas fa-undo"></i>
                                                     </button>
 
                                                     <!-- Delete -->
-                                                    <button class="btn btn-sm btn-outline-secondary"
-                                                        onclick="deleteTask({{ $task->id }})" title="Delete Task">
+                                                    <button class="btn btn-sm btn-outline-secondary delete-task-btn"
+                                                        title="Delete Task" data-id="{{ $task->id }}">
                                                         <i class="fas fa-times"></i>
                                                     </button>
                                                 </div>
@@ -224,17 +217,12 @@
                                             <div class="col-md-6 d-flex justify-content-end">
                                                 <div class="d-flex gap-2">
                                                     <!-- Completed -->
-                                                    <button class="btn btn-sm btn-outline-success"
-                                                        onclick="markCompleted({{ $task->id }})"
-                                                        title="Mark as Completed">
+                                                    <button class="btn btn-sm btn-outline-success mark-complete-btn"
+                                                        title="Mark as Completed" data-id="{{ $task->id }}">
                                                         <i class="fas fa-check"></i>
                                                     </button>
 
                                                     <!-- Edit -->
-                                                    {{-- <button class="btn btn-sm btn-outline-primary" id="toggleEditTask"
-                                                        onclick="editTask({{ $task->id }})" title="Edit Task">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button> --}}
                                                     <button class="btn btn-sm btn-outline-primary toggleEditTask"
                                                         data-id="{{ $task->id }}" data-title="{{ $task->title }}"
                                                         data-due="{{ $task->due_time }}"
@@ -245,8 +233,8 @@
 
 
                                                     <!-- Delete -->
-                                                    <button class="btn btn-sm btn-outline-secondary"
-                                                        onclick="deleteTask({{ $task->id }})" title="Delete Task">
+                                                    <button class="btn btn-sm btn-outline-secondary delete-task-btn"
+                                                        title="Delete Task" data-id="{{ $task->id }}">
                                                         <i class="fas fa-times"></i>
                                                     </button>
                                                 </div>
@@ -1216,38 +1204,6 @@
                                             @endforeach
                                         </select>
 
-                                        {{-- Toggle Button --}}
-                                        <button type="button" id="toggleAddPerson"
-                                            class="btn btn-sm btn-link text-primary">
-                                            + Add New Person
-                                        </button>
-
-                                        {{-- ====== --}}
-                                        <div id="addPersonInlineForm" class="mt-3 p-3 border rounded bg-light d-none">
-                                            <div class="row">
-                                                <div class="col-md-6 mb-2">
-                                                    <label>Name</label>
-                                                    <input type="text" name="inline_name" class="form-control">
-                                                </div>
-                                                <div class="col-md-6 mb-2">
-                                                    <label>Email</label>
-                                                    <input type="email" name="inline_email" class="form-control">
-                                                </div>
-                                                <div class="col-md-6 mb-2">
-                                                    <label>Phone</label>
-                                                    <input type="text" name="inline_phone" class="form-control">
-                                                </div>
-                                                <div class="col-md-6 mb-2">
-                                                    <label>Code</label>
-                                                    <input type="text" name="inline_code" class="form-control">
-                                                </div>
-                                            </div>
-                                            <button type="button" class="btn btn-success mt-2" id="submitAddPerson">Add
-                                                Person</button>
-                                        </div>
-
-
-                                        {{-- ===== --}}
                                     </div>
                                 </div>
 
@@ -1434,31 +1390,586 @@
 @endsection
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
     <script>
-        // Lead Related logic starts
-
+        // ==============================
+        // Modal Show for lead and activity
+        // ==============================
         function addLead() {
             $('#AddLead').modal('show');
         }
 
-        $(document).ready(function() {
+        function scheduleActivity() {
+            $('#schedule-activity').modal('show');
+        }
 
+        $(document).ready(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            });
+
+            // ==============================
+            // Show/Hide icons beside editable fields
+            // ==============================
             $('.editable-field').on('focus', function() {
                 $(this).siblings('.editable-icon').removeClass('d-none');
             });
 
             $('.editable-field').on('blur', function() {
                 let $icons = $(this).siblings('.editable-icon');
-                // Delay hiding to allow click event on icons
                 setTimeout(() => {
                     $icons.addClass('d-none');
-                }, 300); // 200ms delay
+                }, 300);
+            });
+
+            // ==============================
+            // Update people details(name and description) on change
+            // ==============================
+            $('.editable-submit').click(function() {
+                let $button = $(this);
+                let $field = $button.siblings('.editable-field');
+                let peopleId = $field.data('people-id');
+                let fieldName = $button.data('field'); // e.g., 'name' or 'description'
+                let newValue = $field.text().trim();
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `Do you want to update the ${fieldName}?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#dc3545',
+                    confirmButtonText: 'Yes, update'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.post(`/admin/people/${peopleId}/update-detail`, {
+                                _token: '{{ csrf_token() }}',
+                                field: fieldName,
+                                value: newValue
+                            })
+                            .done(response => {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Updated',
+                                    text: response.message,
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                            })
+                            .fail(xhr => {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong.'
+                                });
+                                console.error(xhr.responseText);
+                            });
+                    }
+                });
+            });
+
+            // Cancel button hides sibling buttons
+            $('.editable-cancel').click(function() {
+                $(this).siblings('.editable-icon').addClass('d-none');
+            });
+
+            // ==============================
+            // Adding tags to the company
+            // ==============================
+            $('#tagSelect').change(function() {
+                let tagId = $(this).val();
+                let tagName = $("#tagSelect option:selected").text();
+
+                if (!tagId) {
+                    return; // ignore placeholder
+                }
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Do you want to add the tag \"" + tagName + "\" to this person?",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonColor: "#28a745",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, Add"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/admin/people/{{ $peoples->id }}/tags/add", // ✅ new route for tags
+                            method: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                tag_id: tagId
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Added",
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: xhr.responseJSON?.message ||
+                                        "Something went wrong."
+                                });
+                            }
+                        });
+                    } else {
+                        // Reset dropdown back to default if cancelled
+                        $('#tagSelect').val("");
+                    }
+                });
+            });
+
+            // ==============================
+            // Removing the tag from the company
+            // ==============================
+            $(document).on('click', '.delete-tag-btn', function() {
+                var tagId = $(this).data('id');
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Do you want to remove this tag from the person?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, Remove"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/admin/people/{{ $peoples->id }}/tags/" + tagId +
+                                "/remove",
+                            method: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Removed",
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location
+                                        .reload(); // reload to update tag list
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: xhr.responseJSON?.message ||
+                                        "Something went wrong."
+                                });
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                });
             });
 
 
+            // ==============================
+            // Toggle Add company and task
+            // ==============================
+            const toggleTaskBtn = document.getElementById('toggleAddTask');
+            const formTaskDiv = document.getElementById('addTaskForm');
+
+            const toggleBtn = document.getElementById('toggleAddCompany');
+            const formDiv = document.getElementById('addCompanyForm');
+
+            toggleBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (formDiv.style.display === "none" || formDiv.style.display === "") {
+                    formDiv.style.display = "block";
+                } else {
+                    formDiv.style.display = "none";
+                }
+            });
+
+            toggleTaskBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                if (formTaskDiv.style.display === "none" || formTaskDiv.style.display === "") {
+                    formTaskDiv.style.display = "block";
+
+                    // Reset form
+                    const form = formTaskDiv.querySelector('form');
+                    form.reset();
+
+                    // Reset form action back to store route
+                    form.setAttribute('action', "{{ route('admin.people.tasks.store', $peoples->id) }}");
+
+                    // Reset button text and style
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    submitBtn.textContent = "Add Task";
+                    submitBtn.classList.remove('btn-primary');
+                    submitBtn.classList.add('btn-warning');
+
+                } else {
+                    formTaskDiv.style.display = "none";
+                }
+            });
+
+
+            // ==============================
+            // Adding company to people
+            // ==============================
+            $('#companiesSelect').change(function() {
+                let companyId = $(this).val();
+                let companyName = $("#companiesSelect option:selected").text();
+
+                if (!companyId || companyId === "Add Company") {
+                    return; // ignore placeholder
+                }
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Do you want to add " + companyName + " to this person?",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonColor: "#28a745",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, Add"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/admin/people/{{ $peoples->id }}/company/add", // ✅ route
+                            method: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                company_id: companyId
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Added",
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: xhr.responseJSON?.message ||
+                                        "Something went wrong."
+                                });
+                            }
+                        });
+                    } else {
+                        // Reset dropdown back to default if cancelled
+                        $('#companiesSelect').val("Add Company");
+                    }
+                });
+            });
+
+
+            // ==============================
+            // Remove person from the company
+            // ==============================
+            $(document).on('click', '.remove-company-btn', function() {
+                let companyId = $(this).data('company-id');
+                let peopleId = $(this).data('people-id');
+                let $btn = $(this);
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'This company will be removed from the person.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: 'Yes, remove'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `/admin/people/${peopleId}/remove-company`,
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                company_id: companyId
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Removed',
+                                    text: response.message,
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                                location.reload(); // keep the flow same as others
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong.'
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+
+            // ==============================
+            // Add Task ajax form validation and submittion
+            // ==============================
+            $("#addTaskAjaxForm").validate({
+                ignore: [],
+                rules: {
+                    title: {
+                        required: true
+                    },
+                    due_date: {
+                        required: true
+                    },
+                    user_id: {
+                        required: true
+                    },
+                    description: {
+                        required: true
+                    },
+
+                },
+                messages: {
+                    name: {
+                        required: "Please enter the task name."
+                    },
+                    due_date: {
+                        required: "Please enter the due date."
+                    },
+                    user_id: {
+                        required: "Please select the user."
+                    },
+                    description: {
+                        required: "Please enter the description."
+                    },
+
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent()); // Inserts after the .input-group
+                    } else {
+                        error.insertAfter(element); // Default
+                    }
+                }
+            });
+
+            $('#addTaskAjaxForm').submit(function(e) {
+                e.preventDefault();
+
+                if (!$('#addTaskAjaxForm').valid()) {
+                    return;
+                }
+
+                let form = $(this);
+                let actionUrl = form.attr('action');
+                let method = form.attr('method');
+                let formData = form.serialize();
+
+                $.ajax({
+                    url: actionUrl,
+                    method: method,
+                    data: formData,
+                    success: function(response) {
+                        console.log('Task Added successfully:', response);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => {
+                            location.reload(); // reload after popup closes
+                        });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseText ||
+                                'Something went wrong while adding the task.'
+                        });
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+
+
+            // ==============================
+            // Mark Complete Task
+            // ==============================
+            $(document).on('click', '.mark-complete-btn', function() {
+                var taskId = $(this).data('id'); // get task ID from button
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to mark this task as completed?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, complete it!',
+                    cancelButtonText: 'Cancel'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/admin/people/tasks/' + taskId + '/complete',
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Completed',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(function() {
+                                    location
+                                        .reload(); // reload after completion
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong while marking the task completed.'
+                                });
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                });
+            });
+
+
+            // ==============================
+            // Reopen Task
+            // ==============================
+            $(document).on('click', '.reopen-task-btn', function() {
+                var taskId = $(this).data('id'); // get task ID from button
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to re-open this task?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ffc107',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, re-open it!',
+                    cancelButtonText: 'Cancel'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/admin/people/tasks/' + taskId + '/reopen',
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Re-open',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(function() {
+                                    location.reload(); // refresh task state
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong while reopening this task.'
+                                });
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                });
+            });
+
+            // ==============================
+            // Delete Task
+            // ==============================
+            $(document).on('click', '.delete-task-btn', function() {
+                var taskId = $(this).data('id'); // get task ID from button
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to undo this action!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/admin/people/tasks/delete/" + task_id,
+                            method: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: response.message ||
+                                        "Task deleted successfully.",
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(function() {
+                                    location.reload(); // reload after deletion
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong.'
+                                });
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                });
+            });
+
+            // ==============================
+            // Toggle Edit Task Form
+            // ==============================
             $('.toggleEditTask').click(function() {
                 var taskId = $(this).data('id');
 
@@ -1468,7 +1979,6 @@
                 var userId = $(this).data('user');
                 var description = $(this).data('description');
 
-                // Show the form (FIX: lowercase "a")
                 $('#addTaskForm').toggle();
 
                 // Fill the form
@@ -1486,6 +1996,9 @@
 
             });
 
+            // ==============================
+            // Flatpickr for Task Due Date
+            // ==============================
             flatpickr("#due_date", {
                 enableTime: true,
                 dateFormat: "Y-m-d h:i K", // h = 12-hour, K = AM/PM
@@ -1494,6 +2007,228 @@
                 time_24hr: false
             });
 
+            // ==============================
+            // Lead & Activities Form - Select2 Integration
+            // ==============================
+            $('#AddLead').on('shown.bs.modal', function() {
+                $('#companySelect').select2({
+                    dropdownParent: $('#AddLead'),
+                    placeholder: '-- Select a company --',
+                    allowClear: true
+                });
+                $('#person_select').select2({
+                    dropdownParent: $('#AddLead'),
+                    placeholder: '-- Select a person --',
+                    allowClear: true
+                });
+                $('#source_select').select2({
+                    dropdownParent: $('#AddLead'),
+                    placeholder: 'Choose...',
+                    allowClear: true
+                });
+                $('#competitor_select').select2({
+                    dropdownParent: $('#AddLead'),
+                    placeholder: 'Choose...',
+                    allowClear: true
+
+                });
+
+            });
+
+            $('#schedule-activity').on('shown.bs.modal', function() {
+                $('#participant_select').select2({
+                    dropdownParent: $('#schedule-activity'),
+                    placeholder: 'Choose...',
+                    allowClear: true
+                });
+            });
+
+            // ==============================
+            // Product row add and remove logic in add lead form
+            // ==============================
+            $('#addProductRow').click(function() {
+                var row = $('.product-row:first').clone(); // Clone the first row
+                row.find('input').val(''); // Clear inputs
+                row.find('select').val(''); // Clear dropdown
+                $('#productRowContainer').append(row); // Append to container
+            });
+
+            $(document).on('click', '.remove-product-row', function() {
+                if ($('.product-row').length > 1) {
+                    $(this).closest('.product-row').remove();
+                } else {
+                    alert('At least one product row is required.');
+                }
+            });
+
+            // ==============================
+            // Add lead form validation and submittion
+            // ==============================
+            $("#add-lead-form").validate({
+                ignore: [],
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    assignee_id: {
+                        required: true
+                    },
+                    close_date: {
+                        required: true
+                    },
+                    "product_id[]": {
+                        required: true
+                    },
+                    "quantity[]": {
+                        required: true
+                    },
+                    "price[]": {
+                        required: true
+                    },
+                    confidence: {
+                        required: true
+                    },
+                    "company_id[]": {
+                        required: true
+                    },
+                    "person_id[]": {
+                        required: true
+                    },
+                    "source_id[]": {
+                        required: true
+                    },
+                    "competitors_id[]": {
+                        required: true
+                    },
+                    tag_id: {
+                        required: true
+                    }
+                },
+                messages: {
+                    name: {
+                        required: "Please enter lead name."
+                    },
+                    assignee_id: {
+                        required: "Please select an assignee."
+                    },
+                    close_date: {
+                        required: "Please select a close date."
+                    },
+                    "product_id[]": {
+                        required: "Please select a product."
+                    },
+                    "quantity[]": {
+                        required: "Please enter the quantity."
+                    },
+                    "price[]": {
+                        required: "Please enter the price."
+                    },
+                    confidence: {
+                        required: "Please enter the confidence level."
+                    },
+                    "company_id[]": {
+                        required: "Please select a company."
+                    },
+                    "person_id[]": {
+                        required: "Please select a person."
+                    },
+                    "source_id[]": {
+                        required: "Please select a source."
+                    },
+                    "competitors_id[]": {
+                        required: "Please select a competitor."
+                    },
+                    tag_id: {
+                        required: "Please select the tag."
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent()); // Inserts after the .input-group
+                    } else {
+                        error.insertAfter(element); // Default
+                    }
+                }
+            });
+
+            // Submit Lead form
+            $('#add-lead-form').submit(function(e) {
+                e.preventDefault();
+
+                if (!$('#add-lead-form').valid()) {
+                    return;
+                }
+
+                $.ajax({
+                    url: '{{ route('admin.leads.store') }}',
+                    method: 'POST',
+                    data: $(this).serialize(),
+
+                    success: function(response) {
+                        toastr.success('Lead created successfully!');
+                        $('#add-lead-form')[0].reset();
+                        $('#AddLead').modal('hide');
+                    },
+                    error: function(xhr) {
+                        alert(xhr.responseText);
+                        toastr.error('Something went wrong while creating the lead.');
+                    }
+                });
+            });
+
+            // ==============================
+            // Updating of person fields in sidebar - logic
+            // ==============================
+            // Store previous value when element gains focus
+            $(document).on('focus', '.people-update', function() {
+                $(this).data('prev', $(this).val());
+            });
+
+            // Handle selects (only on change)
+            $(document).on('change', 'select.people-update', function() {
+                let prev = $(this).data('prev');
+                let current = $(this).val();
+                if (prev === current) return;
+
+                updatePeopleField($(this));
+            });
+
+            // AJAX function
+            function updatePeopleField($el) {
+                let peopleId = $('#people-details-container').data('people-id');
+                let field = $el.data('field');
+                let value = $el.val();
+
+                $.ajax({
+                    url: `/admin/peoples/${peopleId}/update-field`,
+                    type: 'POST',
+                    data: {
+                        field: field,
+                        value: value
+                    },
+                    success: function(response) {
+                        console.log('Updated:', response);
+                        toastr.success("Successfully Updated");
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        toastr.error("Update failed");
+                    }
+                });
+            }
+
+
+            // ==============================
+            // Toggle email, address, phone, and url , and cancel buttons
+            // ==============================
             $('.toggle-inline-email').on('click', function() {
                 $('.inline-detail-email').toggle(); // smooth animation
             });
@@ -1509,7 +2244,6 @@
             $('.toggle-inline-url').on('click', function() {
                 $('.inline-detail-url').toggle(); // smooth animation
             });
-
 
             // Email Cancel Buttons
             $('#email-cancel').on('click', function() {
@@ -1556,1298 +2290,286 @@
             });
 
 
-        });
+            // ==============================
+            // Updating and inserting email, address, phone and url to company
+            // ==============================
+            function handleUpdateClick(buttonSelector, containerClass, category, token) {
+                $(buttonSelector).on('click', function() {
+                    let container = $(this).closest(containerClass);
+                    let peopleId = container.data('people-id');
+                    let type = container.find('[id^="new-"][id$="-type"]').val();
+                    let value = container.find('[id^="new-"][id$="-value"]').val();
 
-        // Updating name and bio of that person
-        $('.editable-submit').click(function() {
-            let $button = $(this);
-            let $field = $button.siblings('.editable-field');
-            let peopleId = $field.data('people-id');
-            let fieldName = $button.data('field'); // e.g., 'name' or 'description'
-            let newValue = $field.text().trim();
-
-            Swal.fire({
-                title: 'Are you sure?',
-                text: `Do you want to update the ${fieldName}?`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#dc3545',
-                confirmButtonText: 'Yes, update'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post(`/admin/people/${peopleId}/update-detail`, {
-                            _token: '{{ csrf_token() }}',
-                            field: fieldName,
-                            value: newValue
-                        })
-                        .done(response => {
+                    $.ajax({
+                        url: "{{ route('admin.update.people.field') }}",
+                        type: "POST",
+                        data: {
+                            _token: token,
+                            people_id: peopleId,
+                            category: category,
+                            type: type,
+                            value: value
+                        },
+                        success: function(res) {
+                            console.log(category + ' updated successfully:', res);
                             Swal.fire({
                                 icon: 'success',
-                                title: 'Updated',
-                                text: response.message,
-                                timer: 1500,
-                                showConfirmButton: false
-                            });
-                        })
-                        .fail(xhr => {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: xhr.responseJSON?.message || 'Something went wrong.'
-                            });
-                            console.error(xhr.responseText);
+                                title: 'Success',
+                                text: res.message,
+                                showConfirmButton: false,
+                                timer: 2000
+                            }).then(() => location.reload());
+                        },
+                        error: function(xhr) {
+                            console.error('AJAX Error:', xhr.status, xhr.statusText);
+                            try {
+                                let response = JSON.parse(xhr.responseText);
+                                alert('Error: ' + (response.message || 'Failed to save.'));
+                            } catch {
+                                alert('Failed to save. Check console for details.');
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Calls for each category
+            handleUpdateClick('#email-submit', '.inline-detail-email', 'email', "{{ csrf_token() }}");
+            handleUpdateClick('#address-submit', '.inline-detail-address', 'address', "{{ csrf_token() }}");
+            handleUpdateClick('#phone-submit', '.inline-detail-phone', 'phone', "{{ csrf_token() }}");
+            handleUpdateClick('#url-submit', '.inline-detail-url', 'url', "{{ csrf_token() }}");
+
+            // ==============================
+            // Delete email, address, phone and url of company
+            // ==============================
+            function deleteField(people_id, type, fieldName) {
+
+                let list = $(`#${fieldName}-list`);
+                let count = list.children().length;
+
+                if (count <= 1) {
+                    toastr.warning(`At least one ${fieldName} is required.`);
+                    return false;
+                }
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `This ${fieldName} will be removed from the people record!`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('admin.peoples.delete-field') }}",
+                            type: 'POST',
+                            data: {
+                                people_id: people_id,
+                                type: type,
+                                field_name: fieldName,
+                                _token: $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(response) {
+                                toastr.success(response.message);
+                                location.reload();
+                            },
+                            error: function(xhr) {
+                                toastr.error(`Failed to delete ${fieldName}.`);
+                                console.error(xhr.responseText);
+                            }
                         });
-                }
-            });
-        });
-
-        // Cancel button hides sibling buttons
-        $('.editable-cancel').click(function() {
-            $(this).siblings('.editable-icon').addClass('d-none');
-        });
-
-
-        // Adding company
-        $('#companiesSelect').change(function() {
-            let companyId = $(this).val();
-            let companyName = $("#companiesSelect option:selected").text();
-
-            if (!companyId || companyId === "Add Company") {
-                return; // ignore placeholder
+                    }
+                });
             }
 
-            Swal.fire({
-                title: "Are you sure?",
-                text: "Do you want to add " + companyName + " to this person?",
-                icon: "question",
-                showCancelButton: true,
-                confirmButtonColor: "#28a745",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, Add"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "/admin/people/{{ $peoples->id }}/company/add", // ✅ route
-                        method: "POST",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                            company_id: companyId
-                        },
-                        success: function(response) {
-                            Swal.fire({
-                                icon: "success",
-                                title: "Added",
-                                text: response.message,
-                                timer: 2000,
-                                showConfirmButton: false
-                            }).then(() => {
-                                location.reload();
-                            });
-                        },
-                        error: function(xhr) {
-                            Swal.fire({
-                                icon: "error",
-                                title: "Error",
-                                text: xhr.responseJSON?.message ||
-                                    "Something went wrong."
-                            });
-                        }
-                    });
-                } else {
-                    // Reset dropdown back to default if cancelled
-                    $('#companiesSelect').val("Add Company");
-                }
-            });
-        });
+            // ==============================
+            // Schedule activity validation and submition logic
+            // ==============================
+            $("#store_activity").validate({
+                ignore: [],
+                rules: {
+                    title: {
+                        required: true
+                    },
+                    activity_type_id: {
+                        required: true
+                    },
+                    date: {
+                        required: true
+                    },
+                    start_time: {
+                        required: true
+                    },
+                    end_time: {
+                        required: true
+                    },
+                    location: {
+                        required: true
+                    },
+                    agenda: {
+                        required: true
+                    },
+                },
+                messages: {
+                    title: {
+                        required: "Please enter the title."
+                    },
+                    activity_type_id: {
+                        required: "Please select an activity."
+                    },
+                    date: {
+                        required: "Please enter the date."
+                    },
+                    start_time: {
+                        required: "Please enter the time."
+                    },
+                    end_time: {
+                        required: "Please enter the time."
+                    },
+                    location: {
+                        required: "Please enter the location."
+                    },
+                    agenda: {
+                        required: "Please enter the agenda."
+                    },
 
-        // Adding tags
-        $('#tagSelect').change(function() {
-            let tagId = $(this).val();
-            let tagName = $("#tagSelect option:selected").text();
-
-            if (!tagId) {
-                return; // ignore placeholder
-            }
-
-            Swal.fire({
-                title: "Are you sure?",
-                text: "Do you want to add the tag \"" + tagName + "\" to this person?",
-                icon: "question",
-                showCancelButton: true,
-                confirmButtonColor: "#28a745",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, Add"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "/admin/people/{{ $peoples->id }}/tags/add", // ✅ new route for tags
-                        method: "POST",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                            tag_id: tagId
-                        },
-                        success: function(response) {
-                            Swal.fire({
-                                icon: "success",
-                                title: "Added",
-                                text: response.message,
-                                timer: 2000,
-                                showConfirmButton: false
-                            }).then(() => {
-                                location.reload();
-                            });
-                        },
-                        error: function(xhr) {
-                            Swal.fire({
-                                icon: "error",
-                                title: "Error",
-                                text: xhr.responseJSON?.message ||
-                                    "Something went wrong."
-                            });
-                        }
-                    });
-                } else {
-                    // Reset dropdown back to default if cancelled
-                    $('#tagSelect').val("");
-                }
-            });
-        });
-
-        // Remove the tag
-        function deleteTag(tagId) {
-            Swal.fire({
-                title: "Are you sure?",
-                text: "Do you want to remove this tag from the person?",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "Yes, Remove"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "/admin/people/{{ $peoples->id }}/tags/" + tagId + "/remove",
-                        method: "POST",
-                        data: {
-                            _token: "{{ csrf_token() }}"
-                        },
-                        success: function(response) {
-                            Swal.fire({
-                                icon: "success",
-                                title: "Removed",
-                                text: response.message,
-                                timer: 2000,
-                                showConfirmButton: false
-                            }).then(() => {
-                                location.reload(); // reload the page to update tags
-                            });
-                        },
-                        error: function(xhr) {
-                            Swal.fire({
-                                icon: "error",
-                                title: "Error",
-                                text: xhr.responseJSON?.message || "Something went wrong."
-                            });
-                            console.error(xhr.responseText);
-                        }
-                    });
-                }
-            });
-        }
-
-        // Complete the task
-        function markCompleted(taskId) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "Do you want to mark this task as completed?",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, complete it!',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '/admin/people/tasks/' + taskId + '/complete',
-                        method: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}'
-                        },
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Completed',
-                                text: response.message,
-                                showConfirmButton: false,
-                                timer: 2000
-                            }).then(() => {
-                                location.reload(); // reload after completion
-                            });
-                        },
-                        error: function(xhr) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: xhr.responseJSON?.message ||
-                                    'Something went wrong while marking the task completed.'
-                            });
-                            console.error(xhr.responseText);
-                        }
-                    });
-                }
-            });
-        }
-
-        // Reopen task
-        function reopenTask(taskId) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "Do you want to re-open this task?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ffc107',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, re-open it!',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '/admin/people/tasks/' + taskId + '/reopen',
-                        method: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}'
-                        },
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Re-open',
-                                text: response.message,
-                                showConfirmButton: false,
-                                timer: 2000
-                            }).then(() => {
-                                location.reload(); // refresh task state
-                            });
-                        },
-                        error: function(xhr) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: xhr.responseJSON?.message ||
-                                    'Something went wrong while reopening this task.'
-                            });
-                            console.error(xhr.responseText);
-                        }
-                    });
-                }
-            });
-        }
-
-
-        // Delete task
-        function deleteTask(task_id) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to undo this action!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "/admin/people/tasks/delete/" + task_id,
-                        method: "POST",
-                        data: {
-                            _token: "{{ csrf_token() }}"
-                        },
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Deleted!',
-                                text: response.message || "Task deleted successfully.",
-                                timer: 1500,
-                                showConfirmButton: false
-                            });
-                            // reload after swal closes
-                            location.reload();
-                        },
-                        error: function(xhr) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: xhr.responseJSON?.message || 'Something went wrong.'
-                            });
-                        }
-                    });
-                }
-            });
-        }
-
-        $(document).ready(function() {
-
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent()); // Inserts after the .input-group
+                    } else {
+                        error.insertAfter(element); // Default
+                    }
                 }
             });
 
-            // Store previous value when element gains focus
-            $(document).on('focus', '.people-update', function() {
-                $(this).data('prev', $(this).val());
-            });
+            $('#store_activity').submit(function(e) {
+                e.preventDefault();
 
-            // Handle selects (only on change)
-            $(document).on('change', 'select.people-update', function() {
-                let prev = $(this).data('prev');
-                let current = $(this).val();
-                if (prev === current) return;
-
-                updatePeopleField($(this));
-            });
-
-            // AJAX function
-            function updatePeopleField($el) {
-                let peopleId = $('#people-details-container').data('people-id');
-                let field = $el.data('field');
-                let value = $el.val();
+                if (!$('#store_activity').valid()) {
+                    return; // Stop if validation fails
+                }
 
                 $.ajax({
-                    url: `/admin/peoples/${peopleId}/update-field`,
-                    type: 'POST',
-                    data: {
-                        field: field,
-                        value: value
-                    },
+                    url: '{{ route('admin.activity.store') }}',
+                    method: 'POST',
+                    data: $(this).serialize(),
+
                     success: function(response) {
-                        console.log('Updated:', response);
-                        toastr.success("Successfully Updated");
+                        toastr.success('Activity added successfully!');
+                        $('#store_activity')[0].reset();
+                        $('#AddActivity').modal('hide');
                     },
                     error: function(xhr) {
-                        console.error(xhr.responseText);
-                        toastr.error("Update failed");
-                    }
-                });
-            }
-        });
-
-        // Remove company from that person
-        $(document).on('click', '.remove-company-btn', function() {
-            let companyId = $(this).data('company-id');
-            let peopleId = $(this).data('people-id');
-            let $btn = $(this);
-
-            Swal.fire({
-                title: 'Are you sure?',
-                text: 'This company will be removed from the person.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: 'Yes, remove'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: `/admin/people/${peopleId}/remove-company`,
-                        method: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}',
-                            company_id: companyId
-                        },
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Removed',
-                                text: response.message,
-                                timer: 1500,
-                                showConfirmButton: false
-                            });
-                            location.reload(); // keep the flow same as others
-                        },
-                        error: function(xhr) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: xhr.responseJSON?.message ||
-                                    'Something went wrong.'
-                            });
-                        }
-                    });
-                }
-            });
-        });
-
-        function deleteField(people_id, type, fieldName) {
-
-            let list = $(`#${fieldName}-list`);
-            let count = list.children().length;
-
-            if (count <= 1) {
-                toastr.warning(`At least one ${fieldName} is required.`);
-                return false;
-            }
-
-            Swal.fire({
-                title: 'Are you sure?',
-                text: `This ${fieldName} will be removed from the people record!`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "{{ route('admin.peoples.delete-field') }}",
-                        type: 'POST',
-                        data: {
-                            people_id: people_id,
-                            type: type,
-                            field_name: fieldName,
-                            _token: $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(response) {
-                            toastr.success(response.message);
-                            location.reload(); // or remove row dynamically
-                        },
-                        error: function(xhr) {
-                            toastr.error(`Failed to delete ${fieldName}.`);
-                            console.error(xhr.responseText);
-                        }
-                    });
-                }
-            });
-        }
-
-
-
-        $('#email-submit').on('click', function() {
-            let container = $(this).closest('.inline-detail-email');
-            let peopleId = container.data('people-id');
-            let type = container.find('#new-email-type').val();
-            let value = container.find('#new-email-value').val();
-
-            $.ajax({
-                url: "{{ route('admin.update.person.email') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    people_id: peopleId,
-                    type: type,
-                    value: value
-                },
-                success: function(res) {
-                    console.log('Email updated successfully:', res);
-                    // alert(res.message); // or update UI dynamically
-                    // location.reload();
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: res.message,
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(() => {
-                        location.reload(); // reload after popup closes
-                    });
-                },
-                error: function(xhr, status, error) {
-                    // Detailed logging
-                    console.error('AJAX Error:');
-                    console.error('Status:', status);
-                    console.error('Error:', error);
-                    console.error('Response Text:', xhr.responseText);
-
-                    // Optionally, parse JSON error from Laravel
-                    try {
-                        let response = JSON.parse(xhr.responseText);
-                        alert('Error: ' + (response.message || 'Failed to save email.'));
-                    } catch (e) {
-                        alert('Failed to save email. Check console for details.');
-                    }
-                }
-            });
-        });
-
-        $('#address-submit').on('click', function() {
-            let container = $(this).closest('.inline-detail-address');
-            let peopleId = container.data('people-id');
-            let type = container.find('#new-address-type').val();
-            let value = container.find('#new-address-value').val();
-
-            $.ajax({
-                url: "{{ route('admin.update.person.address') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    people_id: peopleId,
-                    type: type,
-                    value: value
-                },
-                success: function(res) {
-                    console.log('Address updated successfully:', res);
-                    // alert(res.message);
-                    // location.reload(); // simple page reload
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: res.message,
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(() => {
-                        location.reload(); // reload after popup closes
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.error('AJAX Error:', status, error);
-                    console.error('Response Text:', xhr.responseText);
-                    try {
-                        let response = JSON.parse(xhr.responseText);
-                        alert('Error: ' + (response.message || 'Failed to save address.'));
-                    } catch (e) {
-                        alert('Failed to save address. Check console for details.');
-                    }
-                }
-            });
-        });
-
-        $('#phone-submit').on('click', function() {
-            let container = $(this).closest('.inline-detail-phone');
-            let peopleId = container.data('people-id');
-            let type = container.find('#new-phone-type').val();
-            let value = container.find('#new-phone-value').val();
-
-            $.ajax({
-                url: "{{ route('admin.update.person.phone') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    people_id: peopleId,
-                    type: type,
-                    value: value
-                },
-                success: function(res) {
-                    console.log('Phone updated successfully:', res);
-                    // alert(res.message);
-                    // location.reload(); // simple page reload
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: res.message,
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(() => {
-                        location.reload(); // reload after popup closes
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.error('AJAX Error:', status, error);
-                    console.error('Response Text:', xhr.responseText);
-                    try {
-                        let response = JSON.parse(xhr.responseText);
-                        alert('Error: ' + (response.message || 'Failed to save phone.'));
-                    } catch (e) {
-                        alert('Failed to save phone. Check console for details.');
-                    }
-                }
-            });
-        });
-
-        $('#url-submit').on('click', function() {
-            let container = $(this).closest('.inline-detail-url');
-            let peopleId = container.data('people-id');
-            let type = container.find('#new-url-type').val();
-            let value = container.find('#new-url-value').val();
-
-            $.ajax({
-                url: "{{ route('admin.update.person.url') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    people_id: peopleId,
-                    type: type,
-                    value: value
-                },
-                success: function(res) {
-                    console.log('URL updated successfully:', res);
-                    // alert(res.message);
-                    // location.reload(); // simple reload after update
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: res.message,
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(() => {
-                        location.reload(); // reload after popup closes
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.error('AJAX Error:', status, error);
-                    console.error('Response Text:', xhr.responseText);
-                    try {
-                        let response = JSON.parse(xhr.responseText);
-                        alert('Error: ' + (response.message || 'Failed to save URL.'));
-                    } catch (e) {
-                        alert('Failed to save URL. Check console for details.');
-                    }
-                }
-            });
-        });
-
-
-
-        document.addEventListener('DOMContentLoaded', function() {
-            //  Select2 script
-            $('#AddLead').on('shown.bs.modal', function() {
-                $('#companySelect').select2({
-                    dropdownParent: $('#AddLead'),
-                    placeholder: '-- Select a company --',
-                    allowClear: true
-                });
-                $('#person_select').select2({
-                    dropdownParent: $('#AddLead'),
-                    placeholder: '-- Select a person --',
-                    allowClear: true
-                });
-                $('#source_select').select2({
-                    dropdownParent: $('#AddLead'),
-                    placeholder: 'Choose...',
-                    allowClear: true
-                });
-                $('#competitor_select').select2({
-                    dropdownParent: $('#AddLead'),
-                    placeholder: 'Choose...',
-                    allowClear: true
-
-                });
-
-            });
-
-            $('#schedule-activity').on('shown.bs.modal', function() {
-                $('#participant_select').select2({
-                    dropdownParent: $('#schedule-activity'),
-                    placeholder: 'Choose...',
-                    allowClear: true
-                });
-            });
-        });
-
-        $(document).on('click', '.remove-participant', function(e) {
-            e.preventDefault();
-            $(this).closest('.participant-entry').remove();
-        });
-
-        // Toggle the Add Person form
-        $('#toggleAddPerson').on('click', function() {
-            $('#addPersonInlineForm').toggleClass('d-none');
-        });
-
-        // Product row logic
-        $('#addProductRow').click(function() {
-            var row = $('.product-row:first').clone(); // Clone the first row
-            row.find('input').val(''); // Clear inputs
-            row.find('select').val(''); // Clear dropdown
-            $('#productRowContainer').append(row); // Append to container
-        });
-
-        // Remove a specific product row
-        $(document).on('click', '.remove-product-row', function() {
-            if ($('.product-row').length > 1) {
-                $(this).closest('.product-row').remove();
-            } else {
-                alert('At least one product row is required.');
-            }
-        });
-
-
-
-        // Submit Add Person via AJAX
-        $('#submitAddPerson').on('click', function() {
-            let formData = {
-                _token: $('meta[name="csrf-token"]').attr('content'),
-                name: $('input[name="inline_name"]').val(),
-                email: $('input[name="inline_email"]').val(),
-                phone: $('input[name="inline_phone"]').val(),
-                code: $('input[name="inline_code"]').val(),
-            };
-
-            $.ajax({
-                url: "{{ route('admin.people.ajax.store') }}",
-                method: 'POST',
-                data: formData,
-                success: function(response) {
-                    if (response.success) {
-                        toastr.success('Person added successfully!');
-                        $('input[name="inline_name"], input[name="inline_email"], input[name="inline_phone"], input[name="inline_code"]')
-                            .val('');
-                        $('#addPersonInlineForm').addClass('d-none');
-
-                        const newPerson = response.people;
-                        const option = new Option(newPerson.email, newPerson.id);
-                        $('#person_select').append(option);
-
-                    } else {
-                        console.log(response);
-                        toastr.error('Failed to add person. Please try again.');
-                    }
-                },
-                error: function(xhr) {
-                    if (xhr.responseJSON?.errors) {
-                        let messages = Object.values(xhr.responseJSON.errors).flat().join(
-                            '\n');
-                        toastr.error(messages, 'Validation Error');
-                    } else {
                         console.log(xhr.responseText);
-                        toastr.error("Something went wrong.");
+                        toastr.error('Something went wrong while adding the activity.');
+                    }
+                });
+            });
+
+            $("#loginActivity").validate({
+                ignore: [],
+                rules: {
+                    title: {
+                        required: true
+                    },
+                    activity_type: {
+                        required: true
+                    },
+                    duration: {
+                        required: true
+                    },
+
+                },
+                messages: {
+                    title: {
+                        required: "Please enter the title."
+                    },
+                    activity_type: {
+                        required: "Please select the activity."
+                    },
+                    duration: {
+                        required: "Please select the duration."
+                    },
+
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent()); // Inserts after the .input-group
+                    } else {
+                        error.insertAfter(element); // Default
                     }
                 }
             });
-        });
 
 
-        $("#add-lead-form").validate({
-            ignore: [],
-            rules: {
-                name: {
-                    required: true
-                },
-                assignee_id: {
-                    required: true
-                },
-                close_date: {
-                    required: true
-                },
-                "product_id[]": {
-                    required: true
-                },
-                "quantity[]": {
-                    required: true
-                },
-                "price[]": {
-                    required: true
-                },
-                confidence: {
-                    required: true
-                },
-                "company_id[]": {
-                    required: true
-                },
-                "person_id[]": {
-                    required: true
-                },
-                "source_id[]": {
-                    required: true
-                },
-                "competitors_id[]": {
-                    required: true
-                },
-                tag_id: {
-                    required: true
+            $('#loginActivity').submit(function(e) {
+                e.preventDefault();
+
+                if (!$('#loginActivity').valid()) {
+                    return; // Stop if validation fails
                 }
-            },
-            messages: {
-                name: {
-                    required: "Please enter lead name."
-                },
-                assignee_id: {
-                    required: "Please select an assignee."
-                },
-                close_date: {
-                    required: "Please select a close date."
-                },
-                "product_id[]": {
-                    required: "Please select a product."
-                },
-                "quantity[]": {
-                    required: "Please enter the quantity."
-                },
-                "price[]": {
-                    required: "Please enter the price."
-                },
-                confidence: {
-                    required: "Please enter the confidence level."
-                },
-                "company_id[]": {
-                    required: "Please select a company."
-                },
-                "person_id[]": {
-                    required: "Please select a person."
-                },
-                "source_id[]": {
-                    required: "Please select a source."
-                },
-                "competitors_id[]": {
-                    required: "Please select a competitor."
-                },
-                tag_id: {
-                    required: "Please select the tag."
-                }
-            },
-            errorElement: 'span',
-            errorClass: 'invalid-feedback d-block',
-            highlight: function(element) {
-                $(element).addClass('is-invalid');
-            },
-            unhighlight: function(element) {
-                $(element).removeClass('is-invalid');
-            },
-            errorPlacement: function(error, element) {
-                if (element.parent('.input-group').length) {
-                    error.insertAfter(element.parent()); // Inserts after the .input-group
-                } else {
-                    error.insertAfter(element); // Default
-                }
-            }
-        });
 
+                $.ajax({
+                    url: "{{ route('admin.login.activity') }}",
+                    method: "POST",
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        alert('Logged an activity successfully!');
+                        $('#loginActivity')[0].reset();
+                        console.log(response);
+                        location.reload();
 
-        // Submit Lead form
-        $('#add-lead-form').submit(function(e) {
-            e.preventDefault();
-
-            if (!$('#add-lead-form').valid()) {
-                return; // Stop if validation fails
-            }
-
-            $.ajax({
-                url: '{{ route('admin.leads.store') }}',
-                method: 'POST',
-                data: $(this).serialize(),
-
-                success: function(response) {
-                    toastr.success('Lead created successfully!');
-                    $('#add-lead-form')[0].reset();
-                    $('#AddLead').modal('hide');
-
-                    // // 1.5 seconds delay
-                    // setTimeout(function() {
-                    //     window.location.href = "{{ route('admin.leads.index') }}";
-                    // }, 1500);
-                },
-                error: function(xhr) {
-                    alert(xhr.responseText);
-                    toastr.error('Something went wrong while creating the lead.');
-                }
+                    },
+                    error: function(xhr) {
+                        alert('Error: ' + xhr.responseText);
+                        toastr.error('Something went wrong while logging an activity.');
+                    }
+                });
             });
-        });
 
-
-        // Lead Related logic ends
-
-        const toggleTaskBtn = document.getElementById('toggleAddTask');
-        const formTaskDiv = document.getElementById('addTaskForm');
-
-        const toggleBtn = document.getElementById('toggleAddCompany');
-        const formDiv = document.getElementById('addCompanyForm');
-
-        toggleBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (formDiv.style.display === "none" || formDiv.style.display === "") {
-                formDiv.style.display = "block";
-            } else {
-                formDiv.style.display = "none";
-            }
-        });
-
-        // toggleTaskBtn.addEventListener('click', function(e) {
-        //     e.preventDefault();
-        //     if (formTaskDiv.style.display === "none" || formTaskDiv.style.display === "") {
-        //         formTaskDiv.style.display = "block";
-        //     } else {
-        //         formTaskDiv.style.display = "none";
-        //     }
-        // });
-        toggleTaskBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-
-            if (formTaskDiv.style.display === "none" || formTaskDiv.style.display === "") {
-                formTaskDiv.style.display = "block";
-
-                // Reset form
-                const form = formTaskDiv.querySelector('form');
-                form.reset();
-
-                // Reset form action back to store route
-                form.setAttribute('action', "{{ route('admin.people.tasks.store', $peoples->id) }}");
-
-                // Reset button text and style
-                const submitBtn = form.querySelector('button[type="submit"]');
-                submitBtn.textContent = "Add Task";
-                submitBtn.classList.remove('btn-primary');
-                submitBtn.classList.add('btn-warning');
-
-            } else {
-                formTaskDiv.style.display = "none";
-            }
-        });
-
-
-        $("#addTaskAjaxForm").validate({
-            ignore: [],
-            rules: {
-                title: {
-                    required: true
-                },
-                due_date: {
-                    required: true
-                },
-                user_id: {
-                    required: true
-                },
-                description: {
-                    required: true
-                },
-
-            },
-            messages: {
-                name: {
-                    required: "Please enter the task name."
-                },
-                due_date: {
-                    required: "Please enter the due date."
-                },
-                user_id: {
-                    required: "Please select the user."
-                },
-                description: {
-                    required: "Please enter the description."
-                },
-
-            },
-            errorElement: 'span',
-            errorClass: 'invalid-feedback d-block',
-            highlight: function(element) {
-                $(element).addClass('is-invalid');
-            },
-            unhighlight: function(element) {
-                $(element).removeClass('is-invalid');
-            },
-            errorPlacement: function(error, element) {
-                if (element.parent('.input-group').length) {
-                    error.insertAfter(element.parent()); // Inserts after the .input-group
-                } else {
-                    error.insertAfter(element); // Default
-                }
-            }
-        });
-
-
-        $('#addTaskAjaxForm').submit(function(e) {
-            e.preventDefault();
-
-            if (!$('#addTaskAjaxForm').valid()) {
-                return; // Stop if validation fails
-            }
-
-            let form = $(this);
-            let actionUrl = form.attr('action');
-            let method = form.attr('method');
-            let formData = form.serialize();
-
-            $.ajax({
-                url: actionUrl,
-                method: method,
-                data: formData,
-                success: function(response) {
-                    console.log('Task Added successfully:', response);
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: response.message,
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(() => {
-                        location.reload(); // reload after popup closes
-                    });
-                },
-                error: function(xhr) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: xhr.responseText || 'Something went wrong while adding the task.'
-                    });
-                    console.error(xhr.responseText);
-                }
-            });
-        });
-
-        $("#addCompanyAjaxForm").validate({
-            ignore: [],
-            rules: {
-                name: {
-                    required: true
-                },
-                description: {
-                    required: true
-                },
-                email: {
-                    required: true
-                },
-                phone: {
-                    required: true
-                },
-                address: {
-                    required: true
-                },
-                url: {
-                    required: true
-                },
-            },
-            messages: {
-                name: {
-                    required: "Please enter Company name."
-                },
-                description: {
-                    required: "Please enter the description."
-                },
-                email: {
-                    required: "Please enter the email."
-                },
-                phone: {
-                    required: "Please enter the phone number."
-                },
-                address: {
-                    required: "Please enter the address."
-                },
-                url: {
-                    required: "Please enter the url."
-                },
-
-            },
-            errorElement: 'span',
-            errorClass: 'invalid-feedback d-block',
-            highlight: function(element) {
-                $(element).addClass('is-invalid');
-            },
-            unhighlight: function(element) {
-                $(element).removeClass('is-invalid');
-            },
-            errorPlacement: function(error, element) {
-                if (element.parent('.input-group').length) {
-                    error.insertAfter(element.parent()); // Inserts after the .input-group
-                } else {
-                    error.insertAfter(element); // Default
-                }
-            }
-        });
-
-
-        // Submit Lead form
-        $('#addCompanyAjaxForm').submit(function(e) {
-            e.preventDefault();
-
-            if (!$('#addCompanyAjaxForm').valid()) {
-                return; // Stop if validation fails
-            }
-
-            $.ajax({
-                url: '{{ route('admin.companies.store') }}',
-                method: 'POST',
-                data: $(this).serialize(),
-
-                success: function(response) {
-                    alert('Company added successfully!');
-                    $('#addCompanyAjaxForm')[0].reset();
-                    console.log(response);
-                    location.reload();
-
-                },
-                error: function(xhr) {
-                    alert('Error: ' + xhr.responseText);
-                    toastr.error('Something went wrong while adding the company.');
-                }
-            });
-        });
-
-
-
-        function scheduleActivity() {
-            $('#schedule-activity').modal('show');
-        }
-
-        $("#store_activity").validate({
-            ignore: [],
-            rules: {
-                title: {
-                    required: true
-                },
-                activity_type_id: {
-                    required: true
-                },
-                date: {
-                    required: true
-                },
-                start_time: {
-                    required: true
-                },
-                end_time: {
-                    required: true
-                },
-                location: {
-                    required: true
-                },
-                agenda: {
-                    required: true
-                },
-            },
-            messages: {
-                title: {
-                    required: "Please enter the title."
-                },
-                activity_type_id: {
-                    required: "Please select an activity."
-                },
-                date: {
-                    required: "Please enter the date."
-                },
-                start_time: {
-                    required: "Please enter the time."
-                },
-                end_time: {
-                    required: "Please enter the time."
-                },
-                location: {
-                    required: "Please enter the location."
-                },
-                agenda: {
-                    required: "Please enter the agenda."
-                },
-
-            },
-            errorElement: 'span',
-            errorClass: 'invalid-feedback d-block',
-            highlight: function(element) {
-                $(element).addClass('is-invalid');
-            },
-            unhighlight: function(element) {
-                $(element).removeClass('is-invalid');
-            },
-            errorPlacement: function(error, element) {
-                if (element.parent('.input-group').length) {
-                    error.insertAfter(element.parent()); // Inserts after the .input-group
-                } else {
-                    error.insertAfter(element); // Default
-                }
-            }
-        });
-
-        // Submit Activity form
-        $('#store_activity').submit(function(e) {
-            e.preventDefault();
-
-            if (!$('#store_activity').valid()) {
-                return; // Stop if validation fails
-            }
-
-            $.ajax({
-                url: '{{ route('admin.activity.store') }}',
-                method: 'POST',
-                data: $(this).serialize(),
-
-                success: function(response) {
-                    toastr.success('Activity added successfully!');
-                    $('#store_activity')[0].reset();
-                    $('#AddActivity').modal('hide');
-                },
-                error: function(xhr) {
-                    console.log(xhr.responseText);
-                    toastr.error('Something went wrong while adding the activity.');
-                }
-            });
-        });
-
-        $("#loginActivity").validate({
-            ignore: [],
-            rules: {
-                title: {
-                    required: true
-                },
-                activity_type: {
-                    required: true
-                },
-                duration: {
-                    required: true
-                },
-
-            },
-            messages: {
-                title: {
-                    required: "Please enter the title."
-                },
-                activity_type: {
-                    required: "Please select the activity."
-                },
-                duration: {
-                    required: "Please select the duration."
-                },
-
-            },
-            errorElement: 'span',
-            errorClass: 'invalid-feedback d-block',
-            highlight: function(element) {
-                $(element).addClass('is-invalid');
-            },
-            unhighlight: function(element) {
-                $(element).removeClass('is-invalid');
-            },
-            errorPlacement: function(error, element) {
-                if (element.parent('.input-group').length) {
-                    error.insertAfter(element.parent()); // Inserts after the .input-group
-                } else {
-                    error.insertAfter(element); // Default
-                }
-            }
-        });
-
-
-        $('#loginActivity').submit(function(e) {
-            e.preventDefault();
-
-            if (!$('#loginActivity').valid()) {
-                return; // Stop if validation fails
-            }
-
-            $.ajax({
-                url: "{{ route('admin.login.activity') }}",
-                method: "POST",
-                data: $(this).serialize(),
-                success: function(response) {
-                    alert('Logged an activity successfully!');
-                    $('#loginActivity')[0].reset();
-                    console.log(response);
-                    location.reload();
-
-                },
-                error: function(xhr) {
-                    alert('Error: ' + xhr.responseText);
-                    toastr.error('Something went wrong while logging an activity.');
-                }
-            });
-        });
-
-
-        document.addEventListener('DOMContentLoaded', function() {
             const durationSelect = document.getElementById('duration');
             const startInput = document.getElementById('start_time');
             const endInput = document.getElementById('end_time');
 
-            durationSelect.addEventListener('change', function() {
-                const durationMinutes = parseInt(this.value);
-                const now = new Date();
+            if (durationSelect && startInput && endInput) {
+                durationSelect.addEventListener('change', function() {
+                    const durationMinutes = parseInt(this.value);
+                    const now = new Date();
 
-                const pad = n => String(n).padStart(2, '0');
-                const formatTime = date => `${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+                    const pad = n => String(n).padStart(2, '0');
+                    const formatTime = date => `${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
 
-                const end = new Date(now.getTime() + durationMinutes * 60000);
+                    const end = new Date(now.getTime() + durationMinutes * 60000);
 
-                startInput.value = formatTime(now);
-                endInput.value = formatTime(end);
-            });
+                    startInput.value = formatTime(now);
+                    endInput.value = formatTime(end);
+                });
 
-            // Trigger default duration on load (optional)
-            durationSelect.dispatchEvent(new Event('change'));
+                // Trigger default duration on load (optional)
+                durationSelect.dispatchEvent(new Event('change'));
+            }
+
+
         });
     </script>
+
 @endpush
