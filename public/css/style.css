@@ -1960,8 +1960,8 @@ title {
     border: 1px solid #dee2e6;
     border-radius: 4px;
     padding: 12px;
-    font-size: 13px;
-    color: #6c757d;
+    font-size: 16px;
+    /* color: #6c757d; */
     resize: vertical;
     min-height: 80px;
     background-color: #ffffff;
@@ -1977,6 +1977,10 @@ title {
     margin-right: 100px;
 }
 
+.activity-form-group {
+    margin-right: 50px;
+}
+
 .company-details-section .section-card .form-label {
     font-weight: 600;
     font-size: 11px;
@@ -1988,6 +1992,15 @@ title {
 }
 
 .company-details-section .section-card .form-select-custom {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 13px;
+    background-color: white;
+    width: 120px;
+}
+
+.activity-date {
     border: 1px solid #dee2e6;
     border-radius: 4px;
     padding: 8px 12px;

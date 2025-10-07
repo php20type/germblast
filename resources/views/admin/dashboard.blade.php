@@ -288,7 +288,7 @@
                                     <label class="form-label">Tags</label>
                                     <select name="tag_id" class="form-select">
                                         <option value="">Select tag</option>
-                                         @foreach ($persontags as $persontag)
+                                        @foreach ($persontags as $persontag)
                                             <option value="{{ $persontag->id }}">{{ $persontag->name }}</option>
                                         @endforeach
                                     </select>
@@ -504,7 +504,7 @@
                                     <label class="form-label">Tags</label>
                                     <select name="tag_id" class="form-select">
                                         <option value="">Select tag</option>
-                                         @foreach ($leadtags as $leadtag)
+                                        @foreach ($leadtags as $leadtag)
                                             <option value="{{ $leadtag->id }}">{{ $leadtag->name }}</option>
                                         @endforeach
                                     </select>
@@ -540,13 +540,13 @@
                         @csrf
 
                         <div class="row mx-0">
-                            <div class="col-lg-12">
+                            {{-- <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Activity Title</label>
                                     <input type="text" placeholder="Phone Call" name="title"
                                         class="form-control" />
                                 </div>
-                            </div>
+                            </div> --}}
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Activity type</label>
@@ -605,32 +605,15 @@
                             <div class="col-lg-12">
                                 <div class="form-group mb-4">
                                     <label class="form-label">Participant </label>
-                                    <input type="text" placeholder="Type to search for participants…"
-                                        class="form-control" name="search_participant" />
-                                </div>
-                                <div class="participant-list">
-
-                                    @foreach ($peoples as $people)
-                                        <div
-                                            class="d-flex align-items-center justify-content-between mb-3 participant-entry">
-                                            <div class="d-flex align-items-center">
-                                                {{-- <img src="img/home/profile.png" alt="Paul Blake" class="person-avatar me-3"> --}}
-                                                <div>
-                                                    <input type="hidden" name="participant_id[]"
-                                                        value="{{ $people->id }}">
-                                                    <h6 class="mb-0">{{ $people->name }}</h6>
-                                                    <small class="text-warning">{{ $people->email }}</small>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex gap-3 align-items-center">
-                                                <div class="text-end">
-                                                    <a href="#" class="remove-participant"><i
-                                                            class="fa-regular fa-xmark"></i></a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-
+                                    <select id="participant_select" name="participant_id[]" class="form-select mt-2"
+                                        multiple>
+                                        <option value="">Choose...</option>
+                                        @foreach ($peoples as $people)
+                                            <option value="{{ $people->id }}">
+                                                {{ $people->name }} ({{ $people->peopleEmail->email }})
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
 
@@ -744,15 +727,18 @@
                 });
 
             });
+
+            $('#AddActivity').on('shown.bs.modal', function() {
+                $('#participant_select').select2({
+                    dropdownParent: $('#AddActivity'),
+                    placeholder: 'Choose...',
+                    allowClear: true
+                });
+            });
         });
 
 
         $(document).ready(function() {
-
-            $(document).on('click', '.remove-participant', function(e) {
-                e.preventDefault();
-                $(this).closest('.participant-entry').remove();
-            });
 
             // Product row logic
             $('#addProductRow').click(function() {
@@ -1152,9 +1138,6 @@
             $("#store_activity").validate({
                 ignore: [],
                 rules: {
-                    title: {
-                        required: true
-                    },
                     activity_type_id: {
                         required: true
                     },
@@ -1175,9 +1158,6 @@
                     },
                 },
                 messages: {
-                    title: {
-                        required: "Please enter the title."
-                    },
                     activity_type_id: {
                         required: "Please select an activity."
                     },

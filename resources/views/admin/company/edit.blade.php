@@ -365,10 +365,16 @@
                                     <form action="{{ route('admin.login.activity') }}" method="post"
                                         id="loginActivity">
                                         @csrf
-                                        <textarea class="form-textarea w-100" name="title" placeholder="Type Here..."></textarea>
+
+                                        <textarea id="activity-text" name="description" class="form-textarea w-100" placeholder="Type Here..."></textarea>
+
+                                        <!-- hidden fields populated before submit -->
+                                        <input type="hidden" name="company_ids" id="company_ids" value="">
+                                        <input type="hidden" name="people_ids" id="people_ids" value="">
+                                        <input type="hidden" name="title_plain" id="title_plain" value="">
 
                                         <div class="form-row">
-                                            <div class="form-group">
+                                            <div class="activity-form-group">
                                                 <label class="form-label">ACTIVITY</label>
                                                 <select class="form-select-custom" name="activity_type">
                                                     <option value="">-- Select --</option>
@@ -379,11 +385,10 @@
                                                 </select>
                                             </div>
 
-                                            <div class="form-group">
+                                            <div class="activity-form-group">
                                                 <label class="form-label">DURATION</label>
                                                 <input type="hidden" name="start_time" id="start_time">
                                                 <input type="hidden" name="end_time" id="end_time">
-                                                {{-- <input type="hidden" name="participant_id" value={{ $peoples->id }}> --}}
 
                                                 <select class="form-select-custom" name="duration" id="duration">
                                                     <option value="">-- Select --</option>
@@ -392,6 +397,16 @@
                                                     <option value="60">1 Hour</option>
                                                     <option value="120">2 Hours</option>
                                                 </select>
+                                            </div>
+
+                                            <div class="activity-form-group">
+                                                <label class="form-label">DATE</label>
+                                                 <input type="date" name="date" id="date" class="activity-date">
+                                            </div>
+
+                                            <div class="activity-form-group">
+                                                <label class="form-label">LOCATION</label>
+                                                <input type="text" placeholder="Add a Location" class="form-select-custom" name="location" />
                                             </div>
 
                                             <button type="submit" class="btn-login">LOGIN ACTIVITY</button>
@@ -757,11 +772,13 @@
                                                         <input type="text" name="detail_value[]" class="form-control"
                                                             value="{{ $email['value'] }}" placeholder="Enter email"
                                                             disabled>
-                                                        <button class="btn btn-sm btn-outline-secondary"
-                                                            onclick="deleteField('{{ $company->id }}', '{{ $email['selected'] }}', 'email')"
+                                                        <button class="btn btn-sm btn-outline-secondary delete-field-btn"
+                                                            data-company-id="{{ $company->id }}"
+                                                            data-type="{{ $email['selected'] }}" data-field-name="email"
                                                             {{ $email['selected'] === 'email' ? 'disabled' : '' }}>
                                                             <i class="fas fa-times"></i>
                                                         </button>
+
                                                     </div>
 
                                                 </div>
@@ -841,8 +858,10 @@
                                                         <input type="text" name="address_value[]" class="form-control"
                                                             value="{{ $address['value'] }}" placeholder="Enter address"
                                                             disabled>
-                                                        <button class="btn btn-sm btn-outline-secondary"
-                                                            onclick="deleteField('{{ $company->id }}', '{{ $address['selected'] }}', 'address')"
+                                                        <button class="btn btn-sm btn-outline-secondary delete-field-btn"
+                                                            data-company-id="{{ $company->id }}"
+                                                            data-type="{{ $address['selected'] }}"
+                                                            data-field-name="address"
                                                             {{ $address['selected'] === 'address' ? 'disabled' : '' }}>
                                                             <i class="fas fa-times"></i>
                                                         </button>
@@ -927,8 +946,9 @@
                                                         <input type="text" name="phone_value[]" class="form-control"
                                                             value="{{ $phone['value'] }}"
                                                             placeholder="Enter phone number" disabled>
-                                                        <button class="btn btn-sm btn-outline-secondary"
-                                                            onclick="deleteField('{{ $company->id }}', '{{ $phone['selected'] }}', 'phone')"
+                                                        <button class="btn btn-sm btn-outline-secondary delete-field-btn"
+                                                            data-company-id="{{ $company->id }}"
+                                                            data-type="{{ $phone['selected'] }}" data-field-name="phone"
                                                             {{ $phone['selected'] === 'phone' ? 'disabled' : '' }}>
                                                             <i class="fas fa-times"></i>
                                                         </button>
@@ -1011,8 +1031,9 @@
                                                     <div class="col-md-8 d-flex gap-3 align-items-center">
                                                         <input type="text" name="url_value[]" class="form-control"
                                                             value="{{ $url['value'] }}" placeholder="Enter URL" disabled>
-                                                        <button class="btn btn-sm btn-outline-secondary"
-                                                            onclick="deleteField('{{ $company->id }}', '{{ $url['selected'] }}', 'url')"
+                                                        <button class="btn btn-sm btn-outline-secondary delete-field-btn"
+                                                            data-company-id="{{ $company->id }}"
+                                                            data-type="{{ $url['selected'] }}" data-field-name="url"
                                                             {{ $url['selected'] === 'url' ? 'disabled' : '' }}>
                                                             <i class="fas fa-times"></i>
                                                         </button>
@@ -1518,7 +1539,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: "/admin/companies/{{ $company->id }}/tags/add", // ✅ new route for tags
+                            url: "/admin/companies/{{ $company->id }}/tags/add", //  new route for tags
                             method: "POST",
                             data: {
                                 _token: "{{ csrf_token() }}",
@@ -1711,10 +1732,11 @@
 
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: 'This person will be removed from the company.',
+                    text: "Do you want to remove this person from the company?",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: "#d33",
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
                     confirmButtonText: 'Yes, remove'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -2394,7 +2416,10 @@
             // ==============================
             // Delete email, address, phone and url of company
             // ==============================
-            function deleteField(company_id, type, fieldName) {
+            $(document).on('click', '.delete-field-btn', function() {
+                let companyId = $(this).data('company-id');
+                let type = $(this).data('type');
+                let fieldName = $(this).data('field-name');
 
                 let list = $(`#${fieldName}-list`);
                 let count = list.children().length;
@@ -2418,7 +2443,7 @@
                             url: "{{ route('admin.companies.delete-field') }}",
                             type: 'POST',
                             data: {
-                                company_id: company_id,
+                                company_id: companyId,
                                 type: type,
                                 field_name: fieldName,
                                 _token: $('meta[name="csrf-token"]').attr('content')
@@ -2432,100 +2457,6 @@
                                 console.error(xhr.responseText);
                             }
                         });
-                    }
-                });
-            }
-
-            // ==============================
-            // Schedule activity validation and submition logic
-            // ==============================
-            $("#store_activity").validate({
-                ignore: [],
-                rules: {
-                    title: {
-                        required: true
-                    },
-                    activity_type_id: {
-                        required: true
-                    },
-                    date: {
-                        required: true
-                    },
-                    start_time: {
-                        required: true
-                    },
-                    end_time: {
-                        required: true
-                    },
-                    location: {
-                        required: true
-                    },
-                    agenda: {
-                        required: true
-                    },
-                },
-                messages: {
-                    title: {
-                        required: "Please enter the title."
-                    },
-                    activity_type_id: {
-                        required: "Please select an activity."
-                    },
-                    date: {
-                        required: "Please enter the date."
-                    },
-                    start_time: {
-                        required: "Please enter the time."
-                    },
-                    end_time: {
-                        required: "Please enter the time."
-                    },
-                    location: {
-                        required: "Please enter the location."
-                    },
-                    agenda: {
-                        required: "Please enter the agenda."
-                    },
-
-                },
-                errorElement: 'span',
-                errorClass: 'invalid-feedback d-block',
-                highlight: function(element) {
-                    $(element).addClass('is-invalid');
-                },
-                unhighlight: function(element) {
-                    $(element).removeClass('is-invalid');
-                },
-                errorPlacement: function(error, element) {
-                    if (element.parent('.input-group').length) {
-                        error.insertAfter(element.parent()); // Inserts after the .input-group
-                    } else {
-                        error.insertAfter(element); // Default
-                    }
-                }
-            });
-
-            // Submit Activity form
-            $('#store_activity').submit(function(e) {
-                e.preventDefault();
-
-                if (!$('#store_activity').valid()) {
-                    return; // Stop if validation fails
-                }
-
-                $.ajax({
-                    url: '{{ route('admin.activity.store') }}',
-                    method: 'POST',
-                    data: $(this).serialize(),
-
-                    success: function(response) {
-                        toastr.success('Activity added successfully!');
-                        $('#store_activity')[0].reset();
-                        $('#AddActivity').modal('hide');
-                    },
-                    error: function(xhr) {
-                        console.log(xhr.responseText);
-                        toastr.error('Something went wrong while adding the activity.');
                     }
                 });
             });
@@ -2620,6 +2551,70 @@
                 durationSelect.dispatchEvent(new Event('change'));
             }
 
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var mentions = [
+                // companies
+                @foreach ($companies as $company)
+                    {
+                        key: "{{ addslashes($company->name) }}",
+                        value: "company:{{ $company->id }}"
+                    },
+                @endforeach
+
+                // people
+                @foreach ($allpeoples as $person)
+                    , {
+                        key: "{{ addslashes($person->name) }}",
+                        value: "people:{{ $person->id }}"
+                    }
+                @endforeach
+            ];
+
+            var tribute = new Tribute({
+                trigger: '@',
+                values: mentions,
+                lookup: 'key',
+                fillAttr: 'key',
+                menuItemTemplate: function(item) {
+                    var type = item.original.value.split(':')[0];
+                    return `<div><strong>${item.string}</strong> <small>(${type})</small></div>`;
+                },
+                selectTemplate: function(item) {
+                    //  Only insert the display name — no tokens
+                    return item.original ? item.original.key : '';
+                }
+            });
+
+            tribute.attach(document.getElementById('activity-text'));
+
+            // --- HANDLE SUBMIT ---
+            var form = document.getElementById('loginActivity');
+            form.addEventListener('submit', function(e) {
+                var textarea = document.getElementById('activity-text');
+                var rawText = textarea.value;
+
+                var companyIds = [];
+                var peopleIds = [];
+
+                // We'll match names to database IDs using mentions array
+                mentions.forEach(m => {
+                    // Exact name match in text
+                    if (rawText.includes(m.key)) {
+                        let [type, id] = m.value.split(':');
+                        if (type === 'company') companyIds.push(id);
+                        else if (type === 'people') peopleIds.push(id);
+                    }
+                });
+
+                // populate hidden inputs
+                document.getElementById('company_ids').value = companyIds.join(',');
+                document.getElementById('people_ids').value = peopleIds.join(',');
+                document.getElementById('title_plain').value = rawText;
+            });
         });
     </script>
 @endpush

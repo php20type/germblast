@@ -430,7 +430,7 @@
                                             <div class="col-md-6 d-flex justify-content-end">
                                                 <div class="d-flex gap-2">
                                                     <!-- Completed -->
-                                                     <button class="btn btn-sm btn-outline-success mark-complete-btn"
+                                                    <button class="btn btn-sm btn-outline-success mark-complete-btn"
                                                         title="Mark as Completed" data-id="{{ $task->id }}">
                                                         <i class="fas fa-check"></i>
                                                     </button>
@@ -623,10 +623,16 @@
                                     <form action="{{ route('admin.login.activity') }}" method="post"
                                         id="loginActivity">
                                         @csrf
-                                        <textarea class="form-textarea w-100" name="title" placeholder="Type Here..."></textarea>
+
+                                        <textarea id="activity-text" name="description" class="form-textarea w-100" placeholder="Type Here..."></textarea>
+
+                                        <!-- hidden fields populated before submit -->
+                                        <input type="hidden" name="company_ids" id="company_ids" value="">
+                                        <input type="hidden" name="people_ids" id="people_ids" value="">
+                                        <input type="hidden" name="title_plain" id="title_plain" value="">
 
                                         <div class="form-row">
-                                            <div class="form-group">
+                                            <div class="activity-form-group">
                                                 <label class="form-label">ACTIVITY</label>
                                                 <select class="form-select-custom" name="activity_type">
                                                     <option value="">-- Select --</option>
@@ -637,7 +643,7 @@
                                                 </select>
                                             </div>
 
-                                            <div class="form-group">
+                                            <div class="activity-form-group">
                                                 <label class="form-label">DURATION</label>
                                                 <input type="hidden" name="start_time" id="start_time">
                                                 <input type="hidden" name="end_time" id="end_time">
@@ -649,6 +655,16 @@
                                                     <option value="60">1 Hour</option>
                                                     <option value="120">2 Hours</option>
                                                 </select>
+                                            </div>
+
+                                            <div class="activity-form-group">
+                                                <label class="form-label">DATE</label>
+                                                 <input type="date" name="date" id="date" class="activity-date">
+                                            </div>
+
+                                            <div class="activity-form-group">
+                                                <label class="form-label">LOCATION</label>
+                                                <input type="text" placeholder="Add a Location" class="form-select-custom" name="location" />
                                             </div>
 
                                             <button type="submit" class="btn-login">LOGIN ACTIVITY</button>
@@ -946,11 +962,7 @@
                                                 </div>
 
                                                 <div id="delete-company">
-                                                    {{-- <button class="btn btn-sm btn-outline-secondary"
-                                                    onclick="deleteField('{{ $leads->id }}', '{{ $leadCompany->id }}', 'company')">
-                                                    <i class="fas fa-times"></i>
-                                                </button> --}}
-                                                    <button class="btn btn-sm btn-outline-secondary delete-item"
+                                                     <button class="btn btn-sm btn-outline-secondary delete-item"
                                                         data-lead="{{ $leads->id }}" data-id="{{ $leadCompany->id }}"
                                                         data-type="company" data-target="company-{{ $leadCompany->id }}">
                                                         <i class="fas fa-times"></i>
@@ -1007,11 +1019,7 @@
                                                 </div>
 
                                                 <div id="delete-people">
-                                                    {{-- <button class="btn btn-sm btn-outline-secondary" {{-- onclick="deleteField('{{ $company->id }}', '{{ $email['selected'] }}', 'email')"> --}
-                                                        onclick="deleteField('{{ $leads->id }}', '{{ $person->id }}', 'people')">
-                                                        <i class="fas fa-times"></i>
-                                                    </button> --}}
-                                                    <button class="btn btn-sm btn-outline-secondary delete-item"
+                                                     <button class="btn btn-sm btn-outline-secondary delete-item"
                                                         data-lead="{{ $leads->id }}" data-id="{{ $person->id }}"
                                                         data-type="people" data-target="person-{{ $person->id }}">
                                                         <i class="fas fa-times"></i>
@@ -2106,6 +2114,66 @@
                 // ==============================
                 // Delete fields on sidebar of leads details section
                 // ==============================
+                // $(document).on("click", ".delete-item", function(e) {
+                //     e.preventDefault();
+
+                //     let leadId = $(this).data("lead");
+                //     let relatedId = $(this).data("id");
+                //     let type = $(this).data("type");
+                //     let target = $(this).data("target");
+
+                //     // Use the new container-list structure
+                //     let container = $(`#${type}-container`);
+                //     let list = container.find(`#${type}-list`);
+                //     let count = list.children().length;
+
+                //     if (count <= 1) {
+                //         toastr.warning(`At least one ${type} is required.`);
+                //         return false;
+                //     }
+
+                //     Swal.fire({
+                //         title: 'Are you sure?',
+                //         text: `This ${type} will be removed from the lead record!`,
+                //         icon: 'warning',
+                //         showCancelButton: true,
+                //         confirmButtonColor: '#3085d6',
+                //         cancelButtonColor: '#d33',
+                //         confirmButtonText: 'Yes, delete it!'
+                //     }).then((result) => {
+                //         if (result.isConfirmed) {
+                //             $.ajax({
+                //                 url: "{{ route('admin.leads.delete-field') }}",
+                //                 type: "POST",
+                //                 data: {
+                //                     _token: "{{ csrf_token() }}",
+                //                     lead_id: leadId,
+                //                     related_id: relatedId,
+                //                     type: type
+                //                 },
+                //                 success: function(response) {
+                //                     if (response.success) {
+                //                         // toastr.success(response.message);
+                //                         // location.reload();
+                //                         Swal.fire({
+                //                             icon: 'success',
+                //                             title: 'Updated!',
+                //                             text: response.message,
+                //                             timer: 1500,
+                //                             showConfirmButton: false
+                //                         }).then(() => location.reload());
+                //                     } else {
+                //                         toastr.error(response.message || "Delete failed.");
+                //                     }
+                //                 },
+                //                 error: function(xhr) {
+                //                     toastr.error("Something went wrong.");
+                //                     console.error(xhr.responseText);
+                //                 }
+                //             });
+                //         }
+                //     });
+                // });
                 $(document).on("click", ".delete-item", function(e) {
                     e.preventDefault();
 
@@ -2114,7 +2182,6 @@
                     let type = $(this).data("type");
                     let target = $(this).data("target");
 
-                    // Use the new container-list structure
                     let container = $(`#${type}-container`);
                     let list = container.find(`#${type}-list`);
                     let count = list.children().length;
@@ -2145,9 +2212,13 @@
                                 },
                                 success: function(response) {
                                     if (response.success) {
-                                        $("#" + target)
-                                            .remove(); // Remove the specific DOM element
-                                        toastr.success(response.message);
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Updated!',
+                                            text: response.message,
+                                            timer: 1500,
+                                            showConfirmButton: false
+                                        }).then(() => location.reload());
                                     } else {
                                         toastr.error(response.message || "Delete failed.");
                                     }
@@ -2160,6 +2231,7 @@
                         }
                     });
                 });
+
 
                 // ==============================
                 // Schedule activity validation and submition logic
@@ -2348,4 +2420,68 @@
 
             });
         </script>
+
+          <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var mentions = [
+                // companies
+                @foreach ($companies as $company)
+                    {
+                        key: "{{ addslashes($company->name) }}",
+                        value: "company:{{ $company->id }}"
+                    },
+                @endforeach
+
+                // people
+                @foreach ($allpeoples as $person)
+                    , {
+                        key: "{{ addslashes($person->name) }}",
+                        value: "people:{{ $person->id }}"
+                    }
+                @endforeach
+            ];
+
+            var tribute = new Tribute({
+                trigger: '@',
+                values: mentions,
+                lookup: 'key',
+                fillAttr: 'key',
+                menuItemTemplate: function(item) {
+                    var type = item.original.value.split(':')[0];
+                    return `<div><strong>${item.string}</strong> <small>(${type})</small></div>`;
+                },
+                selectTemplate: function(item) {
+                    //  Only insert the display name — no tokens
+                    return item.original ? item.original.key : '';
+                }
+            });
+
+            tribute.attach(document.getElementById('activity-text'));
+
+            // --- HANDLE SUBMIT ---
+            var form = document.getElementById('loginActivity');
+            form.addEventListener('submit', function(e) {
+                var textarea = document.getElementById('activity-text');
+                var rawText = textarea.value;
+
+                var companyIds = [];
+                var peopleIds = [];
+
+                // We'll match names to database IDs using mentions array
+                mentions.forEach(m => {
+                    // Exact name match in text
+                    if (rawText.includes(m.key)) {
+                        let [type, id] = m.value.split(':');
+                        if (type === 'company') companyIds.push(id);
+                        else if (type === 'people') peopleIds.push(id);
+                    }
+                });
+
+                // populate hidden inputs
+                document.getElementById('company_ids').value = companyIds.join(',');
+                document.getElementById('people_ids').value = peopleIds.join(',');
+                document.getElementById('title_plain').value = rawText;
+            });
+        });
+    </script>
     @endpush

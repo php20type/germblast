@@ -874,52 +874,113 @@ class LeadController extends Controller
         ]);
     }
 
+    // public function deleteField(Request $request)
+    // {
+    //     $request->validate([
+    //         'lead_id' => 'required|integer',
+    //         'related_id' => 'required|integer',
+    //         'type' => 'required|string|in:company,people,product,competitor,source',
+    //     ]);
+
+    //     $leadId = $request->lead_id;
+    //     $relatedId = $request->related_id;
+    //     $type = $request->type;
+
+    //     try {
+    //         switch ($type) {
+    //             case 'company':
+    //                 $deleted = LeadCompany::where('lead_id', $leadId)
+    //                     ->where('company_id', $relatedId)
+    //                     ->delete();
+    //                 break;
+
+    //             case 'people':
+    //                 $deleted = LeadPeople::where('lead_id', $leadId)
+    //                     ->where('people_id', $relatedId)
+    //                     ->delete();
+    //                 break;
+
+    //             case 'product':
+    //                 $deleted = LeadProduct::where('lead_id', $leadId)
+    //                     ->where('product_id', $relatedId)
+    //                     ->delete();
+    //                 break;
+
+    //             case 'competitor':
+    //                 $deleted = LeadCompetitor::where('lead_id', $leadId)
+    //                     ->where('competitor_id', $relatedId)
+    //                     ->delete();
+    //                 break;
+
+    //             case 'source':
+    //                 $deleted = LeadSource::where('lead_id', $leadId)
+    //                     ->where('source_id', $relatedId)
+    //                     ->delete();
+    //                 break;
+
+    //             default:
+    //                 return response()->json(['success' => false, 'message' => 'Invalid type provided.'], 422);
+    //         }
+
+    //         if ($deleted) {
+    //             return response()->json([
+    //                 'success' => true,
+    //                 'message' => ucfirst($type).' removed successfully from lead.',
+    //             ]);
+    //         }
+
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => ucfirst($type).' not found or already deleted.',
+    //         ], 404);
+
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Error deleting '.$type,
+    //             'error' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
+
     public function deleteField(Request $request)
     {
         $request->validate([
-            'lead_id' => 'required|integer',
-            'related_id' => 'required|integer',
+            'lead_id' => 'required|exists:leads,id',
+            'related_id' => 'required|integer', // pivot row id
             'type' => 'required|string|in:company,people,product,competitor,source',
         ]);
 
-        $leadId = $request->lead_id;
         $relatedId = $request->related_id;
         $type = $request->type;
 
         try {
             switch ($type) {
                 case 'company':
-                    $deleted = LeadCompany::where('lead_id', $leadId)
-                        ->where('company_id', $relatedId)
-                        ->delete();
+                    $deleted = LeadCompany::where('id', $relatedId)->delete();
                     break;
 
                 case 'people':
-                    $deleted = LeadPeople::where('lead_id', $leadId)
-                        ->where('people_id', $relatedId)
-                        ->delete();
+                    $deleted = LeadPeople::where('id', $relatedId)->delete();
                     break;
 
                 case 'product':
-                    $deleted = LeadProduct::where('lead_id', $leadId)
-                        ->where('product_id', $relatedId)
-                        ->delete();
+                    $deleted = LeadProduct::where('id', $relatedId)->delete();
                     break;
 
                 case 'competitor':
-                    $deleted = LeadCompetitor::where('lead_id', $leadId)
-                        ->where('competitor_id', $relatedId)
-                        ->delete();
+                    $deleted = LeadCompetitor::where('id', $relatedId)->delete();
                     break;
 
                 case 'source':
-                    $deleted = LeadSource::where('lead_id', $leadId)
-                        ->where('source_id', $relatedId)
-                        ->delete();
+                    $deleted = LeadSource::where('id', $relatedId)->delete();
                     break;
 
                 default:
-                    return response()->json(['success' => false, 'message' => 'Invalid type provided.'], 422);
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid type provided.',
+                    ], 422);
             }
 
             if ($deleted) {
@@ -942,7 +1003,6 @@ class LeadController extends Controller
             ], 500);
         }
     }
-
     public function updateField(Request $request)
     {
         $request->validate([

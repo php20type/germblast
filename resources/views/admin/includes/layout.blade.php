@@ -22,6 +22,9 @@
     {{-- Flatpickr --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
+    {{-- Tribute js --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tributejs/5.1.3/tribute.css"/>
+
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     @stack('styles')
 
@@ -56,8 +59,10 @@
     {{-- SweetAlert --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script src="{{ asset('js/custom.js') }}"></script>
+    {{-- Tribute js --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tributejs/5.1.3/tribute.min.js"></script>
 
+    <script src="{{ asset('js/custom.js') }}"></script>
     @stack('scripts')
 </body>
 
