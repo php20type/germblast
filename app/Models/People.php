@@ -93,12 +93,6 @@ class People extends Model
             ->withTimestamps();
     }
 
-    // Has many relations
-    public function activities()
-    {
-        return $this->hasMany(Activity::class, 'participant_id');
-    }
-
     // Lead People pivot table
     public function leadPeople()
     {

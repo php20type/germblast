@@ -195,7 +195,6 @@ class PeopleController extends Controller
             'peopleTask',
             'peopleCompany',
             'companiesAlt',
-            'activities',
             'leadPeople',
             'leads',
             'companyPeople',

@@ -579,30 +579,6 @@ class CompanyController extends Controller
         return redirect()->back()->with('success', 'Activities added successfully.');
     }
 
-    public function login_activity(Request $request)
-    {
-
-        $validated = $request->validate([
-            'title' => 'required|string',
-            'start_time' => 'required|date_format:H:i:s',
-            'end_time' => 'required|date_format:H:i:s|after:start_time',
-            'activity_type' => 'required|exists:activity_types,id',
-            'participant_id' => 'required',
-        ]);
-
-        Activity::create([
-            'title' => $validated['title'],
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'],
-            'activity_type_id' => $validated['activity_type'],
-            'date' => Carbon::today(), // adds current date
-            'participant_id' => $validated['participant_id'],
-        ]);
-
-        return redirect()->back()->with('success', 'Login Activity Added Successfully.');
-
-    }
-
     public function updateField(Request $request, Company $company)
     {
         $request->validate([

@@ -410,7 +410,7 @@
                                 <div class="tab-pane fade show active activity-form" id="write-activity-content"
                                     role="tabpanel" aria-labelledby="activity-tab">
 
-                                    <form action="{{ route('admin.login.activity') }}" method="post"
+                                    {{-- <form action="{{ route('admin.login.activity') }}" method="post"
                                         id="loginActivity">
                                         @csrf
 
@@ -455,6 +455,65 @@
                                             <div class="activity-form-group">
                                                 <label class="form-label">LOCATION</label>
                                                 <input type="text" placeholder="Add a Location" class="form-select-custom" name="location" />
+                                            </div>
+
+                                            <button type="submit" class="btn-login">LOGIN ACTIVITY</button>
+                                        </div>
+                                    </form> --}}
+
+                                    <form action="{{ route('admin.login.activity') }}" method="post"
+                                        data-owner-type="People" data-owner-id="{{ $peoples->id }}"
+                                        data-status="Logged" id="loginActivity">
+                                        @csrf
+
+                                        <textarea id="activity-text" name="description" class="form-textarea w-100"
+                                            placeholder="Log what happened in your activity… @Mention other users to grab their attention, or reference other companies, people, or users."></textarea>
+
+                                        <!-- hidden fields populated before submit -->
+                                        <input type="hidden" name="mentioned_company_ids" id="mentioned_company_ids"
+                                            value="">
+                                        <input type="hidden" name="mentioned_people_ids" id="mentioned_people_ids"
+                                            value="">
+                                        <input type="hidden" name="mentioned_user_ids" id="mentioned_user_ids"
+                                            value="">
+                                        <input type="hidden" name="title_plain" id="title_plain" value="">
+
+                                        <div class="form-row">
+                                            <div class="activity-form-group">
+                                                <label class="form-label">ACTIVITY</label>
+                                                <select class="form-select-custom" name="activity_type">
+                                                    <option value="">-- Select --</option>
+                                                    @foreach ($activity_types as $activity_type)
+                                                        <option value="{{ $activity_type->id }}">
+                                                            {{ $activity_type->type }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <div class="activity-form-group">
+                                                <label class="form-label">DURATION</label>
+                                                <input type="hidden" name="start_time" id="start_time">
+                                                <input type="hidden" name="end_time" id="end_time">
+
+                                                <select class="form-select-custom" name="duration" id="duration">
+                                                    <option value="">-- Select --</option>
+                                                    <option value="15">15 Min</option>
+                                                    <option value="30">30 Min</option>
+                                                    <option value="60">1 Hour</option>
+                                                    <option value="120">2 Hours</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="activity-form-group">
+                                                <label class="form-label">DATE</label>
+                                                <input type="date" name="date" id="date"
+                                                    class="activity-date">
+                                            </div>
+
+                                            <div class="activity-form-group">
+                                                <label class="form-label">LOCATION</label>
+                                                <input type="text" placeholder="Add a Location"
+                                                    class="form-select-custom" name="location" />
                                             </div>
 
                                             <button type="submit" class="btn-login">LOGIN ACTIVITY</button>
@@ -2362,7 +2421,7 @@
             // ==============================
             // Delete email, address, phone and url of company
             // ==============================
-           $(document).on('click', '.delete-field-btn', function() {
+            $(document).on('click', '.delete-field-btn', function() {
                 let peopleId = $(this).data('people-id');
                 let type = $(this).data('type');
                 let fieldName = $(this).data('field-name');
@@ -2504,7 +2563,7 @@
             $("#loginActivity").validate({
                 ignore: [],
                 rules: {
-                    title: {
+                    description: {
                         required: true
                     },
                     activity_type: {
@@ -2513,17 +2572,28 @@
                     duration: {
                         required: true
                     },
-
+                    date: {
+                        required: true
+                    },
+                    location: {
+                        required: true
+                    }
                 },
                 messages: {
-                    title: {
-                        required: "Please enter the title."
+                    description: {
+                        required: "Please enter the activity details."
                     },
                     activity_type: {
                         required: "Please select the activity."
                     },
                     duration: {
                         required: "Please select the duration."
+                    },
+                    date: {
+                        required: "Please select the date."
+                    },
+                    location: {
+                        required: "Please enter the location."
                     },
 
                 },
@@ -2544,24 +2614,45 @@
                 }
             });
 
-
             $('#loginActivity').submit(function(e) {
                 e.preventDefault();
 
-                if (!$('#loginActivity').valid()) {
-                    return; // Stop if validation fails
-                }
+                var form = $(this);
+
+                if (!form.valid()) return;
+
+                // Get owner type and id from data attributes
+                var ownerType = form.data('owner-type');
+                var ownerId = form.data('owner-id');
+                var status = form.data('status');
+
+                // Append them to serialized data
+                var formData = form.serializeArray();
+                formData.push({
+                    name: 'owner_type',
+                    value: ownerType
+                });
+                formData.push({
+                    name: 'owner_id',
+                    value: ownerId
+                });
+                formData.push({
+                    name: 'status',
+                    value: status
+                });
 
                 $.ajax({
                     url: "{{ route('admin.login.activity') }}",
                     method: "POST",
-                    data: $(this).serialize(),
+                    data: $.param(formData),
                     success: function(response) {
-                        alert('Logged an activity successfully!');
-                        $('#loginActivity')[0].reset();
-                        console.log(response);
-                        location.reload();
-
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => location.reload());
                     },
                     error: function(xhr) {
                         alert('Error: ' + xhr.responseText);
@@ -2569,6 +2660,8 @@
                     }
                 });
             });
+
+
 
             const durationSelect = document.getElementById('duration');
             const startInput = document.getElementById('start_time');
@@ -2596,26 +2689,46 @@
         });
     </script>
 
-      <script>
+
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // --- Prepare mentions array ---
             var mentions = [
                 // companies
                 @foreach ($companies as $company)
                     {
                         key: "{{ addslashes($company->name) }}",
                         value: "company:{{ $company->id }}"
-                    },
+                    }
+                    @if (!$loop->last || count($allpeoples) > 0 || count($users) > 0)
+                        ,
+                    @endif
                 @endforeach
 
                 // people
                 @foreach ($allpeoples as $person)
-                    , {
+                    {
                         key: "{{ addslashes($person->name) }}",
                         value: "people:{{ $person->id }}"
                     }
+                    @if (!$loop->last || count($users) > 0)
+                        ,
+                    @endif
+                @endforeach
+
+                // users
+                @foreach ($users as $user)
+                    {
+                        key: "{{ addslashes($user->name) }}",
+                        value: "user:{{ $user->id }}"
+                    }
+                    @if (!$loop->last)
+                        ,
+                    @endif
                 @endforeach
             ];
 
+            // --- Initialize Tribute ---
             var tribute = new Tribute({
                 trigger: '@',
                 values: mentions,
@@ -2626,14 +2739,14 @@
                     return `<div><strong>${item.string}</strong> <small>(${type})</small></div>`;
                 },
                 selectTemplate: function(item) {
-                    //  Only insert the display name — no tokens
+                    // Insert only the display name
                     return item.original ? item.original.key : '';
                 }
             });
 
             tribute.attach(document.getElementById('activity-text'));
 
-            // --- HANDLE SUBMIT ---
+            // --- Handle form submit ---
             var form = document.getElementById('loginActivity');
             form.addEventListener('submit', function(e) {
                 var textarea = document.getElementById('activity-text');
@@ -2641,22 +2754,31 @@
 
                 var companyIds = [];
                 var peopleIds = [];
+                var userIds = [];
 
-                // We'll match names to database IDs using mentions array
+                // Match exact names to database IDs
                 mentions.forEach(m => {
-                    // Exact name match in text
-                    if (rawText.includes(m.key)) {
+                    var regex = new RegExp(`\\b${escapeRegExp(m.key)}\\b`,
+                        'g'); // avoid substring issues
+                    if (regex.test(rawText)) {
                         let [type, id] = m.value.split(':');
                         if (type === 'company') companyIds.push(id);
                         else if (type === 'people') peopleIds.push(id);
+                        else if (type === 'user') userIds.push(id);
                     }
                 });
 
-                // populate hidden inputs
-                document.getElementById('company_ids').value = companyIds.join(',');
-                document.getElementById('people_ids').value = peopleIds.join(',');
+                // Populate hidden inputs
+                document.getElementById('mentioned_company_ids').value = companyIds.join(',');
+                document.getElementById('mentioned_people_ids').value = peopleIds.join(',');
+                document.getElementById('mentioned_user_ids').value = userIds.join(',');
                 document.getElementById('title_plain').value = rawText;
             });
+
+            // --- Helper: escape RegExp special characters ---
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
         });
     </script>
 @endpush

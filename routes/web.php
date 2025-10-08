@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\Admin\PeopleController;
@@ -180,7 +181,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // activities section
     Route::post('/activity/store', [CompanyController::class, 'activity_store'])->name('activity.store');
-    Route::post('/login_activity', [CompanyController::class, 'login_activity'])->name('login.activity');
+    Route::post('/login_activity', [ActivityController::class, 'login_activity'])->name('login.activity');
 
     // Route::post('/people/ajax', [PeopleController::class, 'ajax_store'])->name('people.store');
 
