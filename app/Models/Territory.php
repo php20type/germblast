@@ -8,6 +8,7 @@ class Territory extends Model
 {
 
     protected $fillable = [
+        'id',
         'name',
     ];
 

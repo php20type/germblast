@@ -8,6 +8,7 @@ use App\Models\Currency;
 class Market extends Model
 {
     protected $fillable=[
+        'id',
         'name',
         'currency_id',
     ];

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('markets', function (Blueprint $table) {
              $table->id();
             $table->string('name'); // e.g., "U.S."
-            $table->unsignedBigInteger('currency_id');
+            $table->unsignedBigInteger('currency_id')->nullable();
             $table->foreign('currency_id')->references('id')->on('currencies')->onDelete('cascade');
             $table->timestamps();
         });

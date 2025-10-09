@@ -363,18 +363,69 @@
                                     role="tabpanel" aria-labelledby="activity-tab">
 
                                     <form action="{{ route('admin.login.activity') }}" method="post"
-                                        data-owner-type="Company" data-owner-id="{{ $company->id }}" data-status="Logged"
-                                        id="loginActivity">
+                                        data-owner-type="Company" data-owner-id="{{ $company->id }}"
+                                        data-status="Logged" id="loginActivity">
                                         @csrf
 
-                                        <textarea id="activity-text" name="description" class="form-textarea w-100"
+                                        <textarea id="activity-note" name="note" class="form-textarea w-100"
                                             placeholder="Log what happened in your activity… @Mention other users to grab their attention, or reference other companies, people, or users."></textarea>
 
                                         <!-- hidden fields populated before submit -->
-                                        <input type="hidden" name="mentioned_company_ids" id="mentioned_company_ids" value="">
-                                        <input type="hidden" name="mentioned_people_ids" id="mentioned_people_ids" value="">
-                                        <input type="hidden" name="mentioned_user_ids" id="mentioned_user_ids" value="">
-                                        <input type="hidden" name="title_plain" id="title_plain" value="">
+                                        <input type="hidden" name="mentioned_company_ids" id="mentioned_company_ids"
+                                            value="">
+                                        <input type="hidden" name="mentioned_people_ids" id="mentioned_people_ids"
+                                            value="">
+                                        <input type="hidden" name="mentioned_user_ids" id="mentioned_user_ids"
+                                            value="">
+                                        <input type="hidden" name="note_value" id="note_value" value="">
+
+
+                                        <div class="form-row">
+                                            <div class="activity-form-group">
+                                                <label class="form-label">PARTICIPANTS</label>
+                                                <select id="activity_participant_select" name="participant_id[]"
+                                                    class="form-select-custom" multiple>
+                                                    {{-- Companies --}}
+                                                    <optgroup label="Companies">
+                                                        @foreach ($companies as $c)
+                                                            <option value="{{ $c->id }}"
+                                                                data-entity-type="company"
+                                                                {{ $c->id == $company->id ? 'selected' : '' }}>
+                                                                {{ $c->name }}
+                                                            </option>
+                                                        @endforeach
+
+                                                    </optgroup>
+
+                                                    {{-- Peoples --}}
+                                                    <optgroup label="Peoples">
+                                                        @foreach ($allpeoples as $people)
+                                                            <option value="{{ $people->id }}"
+                                                                data-entity-type="people">
+                                                                {{ $people->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </optgroup>
+
+                                                    {{-- Users --}}
+                                                    <optgroup label="Users">
+                                                        @foreach ($users as $user)
+                                                            <option value="{{ $user->id }}" data-entity-type="user">
+                                                                {{ $user->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </optgroup>
+                                                </select>
+                                            </div>
+
+                                            <div class="activity-form-group">
+                                                <label class="form-label">DESCRIPTION</label>
+                                                <input type="text" style="width: 380px;"
+                                                    placeholder="Add an agenda to share with your attendees..."
+                                                    class="form-select-custom" name="description" />
+                                            </div>
+
+                                        </div>
 
                                         <div class="form-row">
                                             <div class="activity-form-group">
@@ -414,15 +465,20 @@
                                                     class="form-select-custom" name="location" />
                                             </div>
 
+                                        </div>
+
+
+                                        <div class="my-4">
                                             <button type="submit" class="btn-login">LOGIN ACTIVITY</button>
                                         </div>
+
                                     </form>
                                 </div>
 
                                 <!-- Note Tab -->
                                 <div class="tab-pane fade activity-form" id="write-note-content" role="tabpanel"
                                     aria-labelledby="note-tab">
-                                    <textarea class="form-textarea w-100" placeholder="Write your note here..." rows="6"></textarea>
+                                    <textarea class="form-textarea w-100" placeholder="Write a note… @Mention other users to grab their attention, or reference other companies and people." rows="6"></textarea>
                                     <div class="form-row">
                                         <button class="btn-login">SAVE NOTE</button>
                                     </div>
@@ -1401,18 +1457,37 @@
 
                             <div class="col-lg-12">
                                 <div class="form-group mb-4">
-                                    <label class="form-label">Participant </label>
+                                    <label class="form-label">Participants</label>
                                     <select id="participant_select" name="participant_id[]" class="form-select mt-2"
                                         multiple>
-                                        <option value="">Choose...</option>
-                                        @foreach ($allpeoples as $people)
-                                            <option value="{{ $people->id }}">
-                                                {{ $people->name }} ({{ $people->peopleEmail->email }})
-                                            </option>
-                                        @endforeach
+                                        {{-- Companies --}}
+                                        <optgroup label="Companies">
+                                            @foreach ($companies as $company)
+                                                <option value="company:{{ $company->id }}">
+                                                    {{ $company->name }}
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+
+                                        {{-- Peoples --}}
+                                        <optgroup label="Peoples">
+                                            @foreach ($allpeoples as $people)
+                                                <option value="people:{{ $people->id }}">
+                                                    {{ $people->name }} ({{ $people->peopleEmail->email ?? 'N/A' }})
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+
+                                        {{-- Users --}}
+                                        <optgroup label="Users">
+                                            @foreach ($users as $user)
+                                                <option value="user:{{ $user->id }}">
+                                                    {{ $user->name }} ({{ $user->email }})
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
                                     </select>
                                 </div>
-
                             </div>
 
                             <div class="col-lg-12">
@@ -2100,6 +2175,12 @@
                 });
             });
 
+            $('#activity_participant_select').select2({
+                placeholder: '-- Select --',
+                allowClear: true,
+                width: '450px' // make it fit the parent width
+            });
+
             // ==============================
             // Product row add and remove logic in add lead form
             // ==============================
@@ -2469,8 +2550,15 @@
             $("#loginActivity").validate({
                 ignore: [],
                 rules: {
-                    description: {
+                    note: { // textarea
                         required: true
+                    },
+                    description: { // text input
+                        required: true
+                    },
+                    'participant_id[]': {
+                        required: true,
+                        minlength: 1
                     },
                     activity_type: {
                         required: true
@@ -2486,8 +2574,15 @@
                     }
                 },
                 messages: {
+                    note: {
+                        required: "Please enter the activity details in the note."
+                    },
                     description: {
-                        required: "Please enter the activity details."
+                        required: "Please enter the description."
+                    },
+                    'participant_id[]': {
+                        required: "Please select at least one participant.",
+                        minlength: "Please select at least one participant."
                     },
                     activity_type: {
                         required: "Please select the activity."
@@ -2500,8 +2595,7 @@
                     },
                     location: {
                         required: "Please enter the location."
-                    },
-
+                    }
                 },
                 errorElement: 'span',
                 errorClass: 'invalid-feedback d-block',
@@ -2513,12 +2607,60 @@
                 },
                 errorPlacement: function(error, element) {
                     if (element.parent('.input-group').length) {
-                        error.insertAfter(element.parent()); // Inserts after the .input-group
+                        error.insertAfter(element.parent());
                     } else {
-                        error.insertAfter(element); // Default
+                        error.insertAfter(element);
                     }
                 }
             });
+
+
+            // $('#loginActivity').submit(function(e) {
+            //     e.preventDefault();
+
+            //     var form = $(this);
+
+            //     if (!form.valid()) return;
+
+            //     // Get owner type and id from data attributes
+            //     var ownerType = form.data('owner-type');
+            //     var ownerId = form.data('owner-id');
+            //     var status = form.data('status');
+
+            //     // Append them to serialized data
+            //     var formData = form.serializeArray();
+            //     formData.push({
+            //         name: 'owner_type',
+            //         value: ownerType
+            //     });
+            //     formData.push({
+            //         name: 'owner_id',
+            //         value: ownerId
+            //     });
+            //     formData.push({
+            //         name: 'status',
+            //         value: status
+            //     });
+
+            //     $.ajax({
+            //         url: "{{ route('admin.login.activity') }}",
+            //         method: "POST",
+            //         data: $.param(formData),
+            //         success: function(response) {
+            //             Swal.fire({
+            //                 icon: 'success',
+            //                 title: 'Success',
+            //                 text: response.message,
+            //                 showConfirmButton: false,
+            //                 timer: 2000
+            //             }).then(() => location.reload());
+            //         },
+            //         error: function(xhr) {
+            //             alert('Error: ' + xhr.responseText);
+            //             toastr.error('Something went wrong while logging an activity.');
+            //         }
+            //     });
+            // });
 
             $('#loginActivity').submit(function(e) {
                 e.preventDefault();
@@ -2527,13 +2669,24 @@
 
                 if (!form.valid()) return;
 
-                // Get owner type and id from data attributes
+                // Get owner type, id, and status from data attributes
                 var ownerType = form.data('owner-type');
                 var ownerId = form.data('owner-id');
                 var status = form.data('status');
 
-                // Append them to serialized data
+                // Collect selected participants with their entity types
+                var selectedParticipants = $('#activity_participant_select option:selected').map(
+            function() {
+                    return {
+                        id: $(this).val(),
+                        type: $(this).data('entity-type')
+                    };
+                }).get();
+
+                // Serialize other form data
                 var formData = form.serializeArray();
+
+                // Append owner info, status, and participants
                 formData.push({
                     name: 'owner_type',
                     value: ownerType
@@ -2546,7 +2699,12 @@
                     name: 'status',
                     value: status
                 });
+                formData.push({
+                    name: 'participants',
+                    value: JSON.stringify(selectedParticipants)
+                });
 
+                // AJAX request
                 $.ajax({
                     url: "{{ route('admin.login.activity') }}",
                     method: "POST",
@@ -2566,7 +2724,6 @@
                     }
                 });
             });
-
 
             const durationSelect = document.getElementById('duration');
             const startInput = document.getElementById('start_time');
@@ -2647,12 +2804,12 @@
                 }
             });
 
-            tribute.attach(document.getElementById('activity-text'));
+            tribute.attach(document.getElementById('activity-note'));
 
             // --- Handle form submit ---
             var form = document.getElementById('loginActivity');
             form.addEventListener('submit', function(e) {
-                var textarea = document.getElementById('activity-text');
+                var textarea = document.getElementById('activity-note');
                 var rawText = textarea.value;
 
                 var companyIds = [];
@@ -2675,7 +2832,7 @@
                 document.getElementById('mentioned_company_ids').value = companyIds.join(',');
                 document.getElementById('mentioned_people_ids').value = peopleIds.join(',');
                 document.getElementById('mentioned_user_ids').value = userIds.join(',');
-                document.getElementById('title_plain').value = rawText;
+                document.getElementById('note_value').value = rawText;
             });
 
             // --- Helper: escape RegExp special characters ---

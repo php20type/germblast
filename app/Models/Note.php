@@ -10,6 +10,7 @@ class Note extends Model
      use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'note',
         'owner_type',
         'owner_id',

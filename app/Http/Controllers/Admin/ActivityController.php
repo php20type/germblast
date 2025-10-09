@@ -4,16 +4,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Activity;
+use Illuminate\Http\Request;
 
 class ActivityController extends Controller
 {
-     public function login_activity(Request $request)
+    public function login_activity(Request $request)
     {
         $user_id = auth()->id();
         // Validate request
         $validated = $request->validate([
+            'note' => 'required|string',
             'description' => 'required|string',
             'activity_type' => 'required|exists:activity_types,id',
             'date' => 'required|date',
@@ -32,15 +33,37 @@ class ActivityController extends Controller
         $activity = Activity::create([
             'user_id' => $user_id,
             'activity_type_id' => $validated['activity_type'],
+            'note' => $validated['note'],
+            'description' => $validated['description'],
             'owner_type' => $validated['owner_type'],
             'owner_id' => $validated['owner_id'],
             'date' => $validated['date'],
             'start_time' => $validated['start_time'],
             'end_time' => $validated['end_time'],
             'location' => $validated['location'] ?? null,
-            'note' => $validated['description'], // description goes to note
             'status' => $validated['status'] ?? null,
         ]);
+
+        $participants = json_decode($request->participants, true);
+
+        if ($participants && is_array($participants)) {
+            foreach ($participants as $p) {
+                switch ($p['type']) {
+                    case 'company':
+                        $activity->companies()->attach($p['id']);
+                        break;
+                    case 'people':
+                        $activity->peoples()->attach($p['id']);
+                        break;
+                    case 'user':
+                        $activity->users()->attach($p['id']);
+                        break;
+                    case 'lead':
+                        $activity->leads()->attach($p['id']);
+                        break;
+                }
+            }
+        }
 
         // Helper function to convert comma-separated string to array
         $convertToArray = fn ($value) => array_filter(is_array($value) ? $value : explode(',', $value));

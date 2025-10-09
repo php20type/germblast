@@ -27,6 +27,8 @@ class DatabaseSeeder extends Seeder
         $this->call(TagSeeder::class);
         $this->call(TerritorySeeder::class);
         $this->call(OutcomeSeeder::class);
+        $this->call(CompetitorSeeder::class);
+        $this->call(MarketSeeder::class);
 
         User::factory()->create([
             'name' => 'Test User',

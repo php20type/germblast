@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\CompanyType;
+use Illuminate\Database\Seeder;
 
 class CompanyTypeSeeder extends Seeder
 {
@@ -13,13 +12,17 @@ class CompanyTypeSeeder extends Seeder
      */
     public function run(): void
     {
-         $company_types = [
-            'Prospect',
-            'Customer',
+        $company_types = [
+            ['id' => 1, 'type' => 'Prospect'],
+            ['id' => 2, 'type' => 'Customer'],
         ];
 
         foreach ($company_types as $company_type) {
-            CompanyType::create(['type' => $company_type]);
+            CompanyType::updateOrCreate(
+                ['id' => $company_type['id']],
+                ['type' => $company_type['type']]
+            );
         }
+
     }
 }

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notes', function (Blueprint $table) {
+        Schema::create('notes', function (Blueprint $table): void {
             $table->id();
             $table->text('note');
             $table->string('owner_type')->comment('company, people, or lead');

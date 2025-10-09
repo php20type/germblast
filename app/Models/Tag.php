@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Tag extends Model
 {
     protected $fillable = [
+        'id',
         'name',
         'color',
         'created_by', // to users table

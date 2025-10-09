@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Territory;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class TerritorySeeder extends Seeder
@@ -14,17 +13,20 @@ class TerritorySeeder extends Seeder
     public function run(): void
     {
         $territories = [
-            'Lubbock Office',
-            'New Mexico',
-            'Colorado Franchise',
-            'Dallas Fort Worth - North/North East Texas',
-            'Austin Office - Central Texas',
-            'Houston Office',
-            'El Paso Office'
+            ['id' => 1, 'name' => 'Lubbock Office'],
+            ['id' => 2, 'name' => 'New Mexico'],
+            ['id' => 3, 'name' => 'Colorado Franchise'],
+            ['id' => 4, 'name' => 'Dallas Fort Worth - North/North East Texas'],
+            ['id' => 5, 'name' => 'Austin Office - Central Texas'],
+            ['id' => 6, 'name' => 'Houston Office'],
+            ['id' => 7, 'name' => 'El Paso Office'],
         ];
 
         foreach ($territories as $territory) {
-            Territory::create(['name' => $territory]);
+            Territory::updateOrCreate(
+                ['id' => $territory['id']],
+                ['name' => $territory['name']]
+            );
         }
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\LeadStage;
+use Illuminate\Database\Seeder;
+
 class LeadStageSeeder extends Seeder
 {
     /**
@@ -13,15 +13,19 @@ class LeadStageSeeder extends Seeder
     public function run(): void
     {
         $stages = [
-            'Int. GB Presentation',
-            'Site Survey',
-            'Proposal Approval',
-            'Proposal Pres.',
-            'Rec. Signed Proposal'
+            ['id' => 1, 'name' => 'Int. GB Presentation'],
+            ['id' => 2, 'name' => 'Site Survey'],
+            ['id' => 3, 'name' => 'Proposal Approval'],
+            ['id' => 4, 'name' => 'Proposal Pres.'],
+            ['id' => 5, 'name' => 'Rec. Signed Proposal'],
         ];
 
         foreach ($stages as $stage) {
-            LeadStage::create(['name' => $stage]);
+            LeadStage::updateOrCreate(
+                ['id' => $stage['id']],
+                ['name' => $stage['name']]
+            );
         }
+
     }
 }
