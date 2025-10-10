@@ -545,40 +545,6 @@ class CompanyController extends Controller
         ]);
     }
 
-    public function activity_store(Request $request)
-    {
-
-        $data = [
-            'title' => $request->title,
-            'activity_type_id' => $request->activity_type_id,
-            'date' => $request->date,
-            'start_time' => Carbon::parse($request->start_time)->format('H:i:s'),
-            'end_time' => Carbon::parse($request->end_time)->format('H:i:s'),
-            'all_day' => $request->all_day ?? 0,
-            'location' => $request->location,
-            'agenda' => $request->agenda,
-        ];
-
-        $inserted = [];
-
-        foreach ($request->participant_id as $participantId) {
-            $newData = $data;
-            $newData['participant_id'] = $participantId;
-            $activity = Activity::create($newData);
-            $inserted[] = $activity;
-        }
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Activities added successfully.',
-                'activities' => $inserted,
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Activities added successfully.');
-    }
-
     public function updateField(Request $request, Company $company)
     {
         $request->validate([

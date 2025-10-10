@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('activity_type_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('owner_type')->comment('company, people, or lead');
-            $table->unsignedBigInteger('owner_id')->comment('ID of the owner record (company_id, people_id, or lead_id)');
+            $table->string('owner_type')->comment('company, people, or lead')->nullable();
+            $table->unsignedBigInteger('owner_id')->comment('ID of the owner record (company_id, people_id, or lead_id)')->nullable();
             $table->boolean('all_day')->default(value: false);
             $table->date('date');
             $table->time('start_time')->nullable();

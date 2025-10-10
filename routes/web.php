@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\PeopleController;
 use App\Http\Controllers\Admin\SaleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TaskController;
+use App\Http\Controllers\Admin\NoteController;
 use App\Http\Controllers\ProfileController;
 use App\Models\ActivityType;
 use App\Models\Company;
@@ -17,6 +18,7 @@ use App\Models\People;
 use App\Models\Product;
 use App\Models\Source;
 use App\Models\Tag;
+use App\Models\Territory;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -37,6 +39,7 @@ Route::middleware(['auth'])->group(function () {
         $sources = Source::all();
         $products = Product::all();
         $company_types = CompanyType::all();
+        $territories = Territory::all();
         $competitors = Competitor::all();
         $leadtags = Tag::where('tag_id', 1)->get();
         $companytags = Tag::where('tag_id', 2)->get();
@@ -44,7 +47,7 @@ Route::middleware(['auth'])->group(function () {
 
         $activity_types = ActivityType::all();
 
-        return view('admin.dashboard', compact('users', 'company_types', 'industries', 'leadtags', 'companytags', 'persontags', 'activity_types', 'peoples', 'companies', 'sources', 'products', 'competitors'));
+        return view('admin.dashboard', compact('users', 'company_types', 'industries', 'leadtags', 'companytags', 'persontags', 'activity_types', 'peoples', 'companies', 'sources', 'territories','products', 'competitors'));
         // return view('admin.dashboard');
     })->name('admin.dashboard');
 
@@ -180,8 +183,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/settings/territory', [SettingController::class, 'territory_store'])->name('settings.territory.store');
 
     // activities section
-    Route::post('/activity/store', [CompanyController::class, 'activity_store'])->name('activity.store');
+    Route::post('/activity/store', [CompanyController::class, 'activity_store'])->name('activity.store');  // will remove it after succesfull storing of schedule activity on all 3 details page
+    Route::post('/schedule_activity', [ActivityController::class, 'schedule_activity'])->name('schedule.activity');
     Route::post('/login_activity', [ActivityController::class, 'login_activity'])->name('login.activity');
+    Route::post('/add_note', [NoteController::class, 'add_note'])->name('add.note');
 
     // Route::post('/people/ajax', [PeopleController::class, 'ajax_store'])->name('people.store');
 

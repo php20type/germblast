@@ -170,7 +170,7 @@
                                     <h2 class="section-title">SALES METRICS</h2>
                                     <p class="section-subtitle">Metrics - Month - to - date</p>
                                 </div>
-                                <div class="info-icon">
+                                <div class="info-icon d-none">
                                     <a href="#" data-bs-toggle="modal" data-bs-target="#SalesMetricsModal"><i
                                             class="fa-regular fa-gear"></i></a>
                                 </div>
@@ -213,7 +213,7 @@
                                             <h3 class="section-title">LEAD SUMMARY</h3>
                                             <p class="section-subtitle">List Summary</p>
                                         </div>
-                                        <div class="info-icon">
+                                        <div class="info-icon d-none">
                                             <a href="#" data-bs-toggle="modal"
                                                 data-bs-target="#LeadSummaryModal"><i class="fa-regular fa-gear"></i></a>
                                         </div>
@@ -278,7 +278,7 @@
                                             <h3 class="section-title">PIPELINE</h3>
                                             <p class="section-subtitle">Default Pipeline by stage</p>
                                         </div>
-                                        <div class="info-icon">
+                                        <div class="info-icon d-none">
                                             <a href="#EditPipelineModal" data-bs-toggle="modal"
                                                 data-bs-target="#EditPipelineModal"><i class="fa-regular fa-gear"></i></a>
                                         </div>

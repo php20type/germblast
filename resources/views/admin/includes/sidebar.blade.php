@@ -2,7 +2,7 @@
  <aside class="app-sidebar">
     <div id="close"><a href="javascript:void(0)"><i class="fa-regular fa-xmark"></i></a></div>
     <div class="logo-sec">
-        <a href="#" class="d-block"><img src={{ asset("img/logo/logo.svg") }} alt="logo" /></a>
+        <a href="{{ route('admin.dashboard') }}" class="d-block"><img src={{ asset("img/logo/logo.svg") }} alt="logo" /></a>
     </div>
     <nav class="sidebar-nav">
         <ul class="list-inline">

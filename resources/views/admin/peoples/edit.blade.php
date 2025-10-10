@@ -523,12 +523,40 @@
                                 </div>
 
                                 <!-- Note Tab -->
-                                <div class="tab-pane fade activity-form" id="write-note-content" role="tabpanel"
+                                {{-- <div class="tab-pane fade activity-form" id="write-note-content" role="tabpanel"
                                     aria-labelledby="note-tab">
                                     <textarea class="form-textarea w-100" placeholder="Write your note here..." rows="6"></textarea>
                                     <div class="form-row">
                                         <button class="btn-login">SAVE NOTE</button>
                                     </div>
+                                </div> --}}
+
+                                <div class="tab-pane fade activity-form" id="write-note-content" role="tabpanel"
+                                    aria-labelledby="note-tab">
+
+                                    <form action="{{ route('admin.add.note') }}" method="POST" data-owner-type="People"
+                                        data-owner-id="{{ $peoples->id }}" id="logNoteForm">
+                                        @csrf
+
+                                        <textarea id="note-textarea" name="note" class="form-textarea w-100"
+                                            placeholder="Write a note… @Mention other users to grab their attention, or reference other companies and people."
+                                            rows="6"></textarea>
+
+                                        <!-- Hidden fields for mentioned entities -->
+                                        <input type="hidden" name="mentioned_company_ids"
+                                            id="note_mentioned_company_ids" value="">
+                                        <input type="hidden" name="mentioned_people_ids" id="note_mentioned_people_ids"
+                                            value="">
+                                        <input type="hidden" name="mentioned_user_ids" id="note_mentioned_user_ids"
+                                            value="">
+
+                                        <!-- Hidden field to store processed note content -->
+                                        <input type="hidden" name="note_value" id="note_value" value="">
+
+                                        <div class="form-row mt-4">
+                                            <button type="submit" class="btn-login">SAVE NOTE</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
 
@@ -1362,20 +1390,35 @@
                     </div>
                     <div class="modal-body ps-0">
 
-                        <form class="company-form" action="{{ route('admin.activity.store') }}" method="post"
+
+                        <form class="company-form" action="{{ route('admin.schedule.activity') }}" method="post"
+                            data-owner-type="People" data-owner-id="{{ $peoples->id }}" data-status="Scheduled"
                             id="store_activity">
                             @csrf
-                            {{-- Hidden field for storing  company id --}}
-                            <input type="hidden" name="peoples_id" value="{{ $peoples->id }}">
 
                             <div class="row mx-0">
                                 <div class="col-lg-12">
                                     <div class="form-group">
-                                        <label class="form-label">Activity Title</label>
-                                        <input type="text" placeholder="Phone Call" name="title"
-                                            class="form-control" />
+                                        <label class="form-label">Note</label>
+                                        <textarea id="schedule-note-textarea" name="note" class="form-control w-100"
+                                            placeholder="Write a note… @Mention other users to grab their attention, or reference other companies and people."
+                                            rows="6"></textarea>
+
+                                        <!-- Hidden fields for mentioned entities -->
+                                        <input type="hidden" name="mentioned_company_ids"
+                                            id="schedule_mentioned_company_ids" value="">
+                                        <input type="hidden" name="mentioned_people_ids"
+                                            id="schedule_mentioned_people_ids" value="">
+                                        <input type="hidden" name="mentioned_user_ids" id="schedule_mentioned_user_ids"
+                                            value="">
+
+                                        <!-- Hidden field to store processed note content -->
+                                        <input type="hidden" name="schedule_note_value" id="schedule_note_value"
+                                            value="">
                                     </div>
                                 </div>
+
+
                                 <div class="col-lg-12">
                                     <div class="form-group">
                                         <label class="form-label">Activity type</label>
@@ -1389,32 +1432,30 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-lg-4">
+                                <div class="col-lg-12">
                                     <div class="form-group">
                                         <label class="form-label">Date</label>
                                         <input type="date" placeholder="" class="form-control" name="date" />
                                     </div>
                                 </div>
-                                <div class="col-lg-8">
+
+                                <div class="col-lg-6 mt-2">
                                     <div class="form-group">
-                                        <label class="form-label">Time</label>
-                                        <div class="d-flex">
-                                            <select class="form-select mt-2" name="start_time">
-                                                <option value="11:00 AM" selected>11 : 00 AM</option>
-                                                <option value="11:15 AM">11 : 15 AM</option>
-                                                <option value="11:30 AM">11 : 30 AM</option>
-                                                <option value="11:45 AM">11 : 45 AM</option>
-                                            </select>
-                                            <select class="form-select mt-2" name="end_time">
-                                                <option value="01:11 PM" selected>01 : 11 PM (3 min)</option>
-                                                <option value="01:15 PM">01 : 15 PM (15 min)</option>
-                                                <option value="01:30 PM">01 : 30 PM (30 min)</option>
-                                                <option value="01:45 PM">01 : 45 PM (45 min)</option>
-                                            </select>
-                                        </div>
+                                        <label class="form-label">Start Time</label>
+                                        <select class="form-select select2" id="start_time" name="start_time" required>
+                                        </select>
                                     </div>
                                 </div>
-                                <div class="col-lg-12">
+
+                                <div class="col-lg-6 mt-2">
+                                    <div class="form-group">
+                                        <label class="form-label">End Time</label>
+                                        <select class="form-select select2" id="end_time" name="end_time" required>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 mt-2">
                                     <div class="form-check mb-4">
                                         <input class="form-check-input" type="checkbox" value=""
                                             id="flexCheckDefault" name="all_day">
@@ -1423,6 +1464,7 @@
                                         </label>
                                     </div>
                                 </div>
+
                                 <div class="col-lg-12">
                                     <div class="form-group mb-4">
                                         <label class="form-label">Location</label>
@@ -1433,20 +1475,42 @@
 
                                 <div class="col-lg-12">
                                     <div class="form-group mb-4">
-                                        <label class="form-label">Participant </label>
+                                        <label class="form-label">Participants</label>
                                         <select id="participant_select" name="participant_id[]" class="form-select mt-2"
                                             multiple>
-                                            <option value="">Choose...</option>
-                                            @foreach ($allpeoples as $people)
-                                                <option value="{{ $people->id }}">
-                                                    {{ $people->name }} ({{ $people->peopleEmail->email }})
-                                                </option>
-                                            @endforeach
+                                            {{-- Companies --}}
+                                            <optgroup label="Companies">
+                                                @foreach ($companies as $c)
+                                                    <option value="{{ $c->id }}" data-entity-type="company">
+                                                        {{ $c->name }}
+                                                    </option>
+                                                @endforeach
+                                            </optgroup>
+
+                                            {{-- Peoples --}}
+                                            <optgroup label="Peoples">
+                                                @foreach ($allpeoples as $allpeople)
+                                                    <option value="{{ $allpeople->id }}" data-entity-type="people"
+                                                        {{ $allpeople->id == $peoples->id ? 'selected' : '' }}>
+                                                        {{ $allpeople->name }}
+                                                    </option>
+                                                @endforeach
+                                            </optgroup>
+
+                                            {{-- Users --}}
+                                            <optgroup label="Users">
+                                                @foreach ($users as $user)
+                                                    <option value="{{ $user->id }}" data-entity-type="user">
+                                                        {{ $user->name }}
+                                                    </option>
+                                                @endforeach
+                                            </optgroup>
                                         </select>
                                     </div>
                                 </div>
 
                                 <div class="col-lg-12">
+                                    <label class="form-label">Description</label>
                                     <textarea rows="5" placeholder="Add an agenda to share with your attendees" class="form-control"
                                         name="agenda"></textarea>
                                 </div>
@@ -1488,6 +1552,100 @@
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 }
             });
+
+
+            // ==============================
+            // Start time and end time display in schedule activity
+            // ==============================
+            const startTimeSelect = $('#store_activity select[name="start_time"]');
+            const endTimeSelect = $('#store_activity select[name="end_time"]');
+            const allDayCheckbox = $('#store_activity input[name="all_day"]');
+
+            // --- Generate time options every X minutes ---
+            function generateTimeOptions(interval = 15) {
+                const times = [];
+                let time = moment().startOf('day');
+                const end = moment(time).endOf('day').add(1, 'minute'); // include 24:00
+
+                while (time.isBefore(end)) {
+                    // value in HH:mm:ss, display in hh:mm A
+                    times.push({
+                        value: time.format('HH:mm:ss'),
+                        display: time.format('hh:mm A')
+                    });
+                    time.add(interval, 'minutes');
+                }
+                return times;
+            }
+
+            // --- Populate dropdowns ---
+            function populateDropdowns() {
+                const times = generateTimeOptions(15);
+
+                startTimeSelect.empty().append('<option value="">Select Start Time</option>');
+                endTimeSelect.empty().append('<option value="">Select End Time</option>');
+
+                times.forEach(t => {
+                    startTimeSelect.append(`<option value="${t.value}">${t.display}</option>`);
+                    endTimeSelect.append(`<option value="${t.value}">${t.display}</option>`);
+                });
+
+                updateEndTimeOptions();
+            }
+
+            // --- Disable end times <= selected start time ---
+            function updateEndTimeOptions() {
+                const selectedStart = startTimeSelect.val();
+                if (!selectedStart) {
+                    endTimeSelect.find('option').prop('disabled', false).removeClass('text-secondary');
+                    return;
+                }
+
+                const startMoment = moment(selectedStart, 'HH:mm:ss');
+                endTimeSelect.find('option').each(function() {
+                    const optionVal = $(this).val();
+                    if (!optionVal) return;
+
+                    const optionMoment = moment(optionVal, 'HH:mm:ss');
+                    if (optionMoment.isSameOrBefore(startMoment)) {
+                        $(this).prop('disabled', true).addClass('text-secondary');
+                    } else {
+                        $(this).prop('disabled', false).removeClass('text-secondary');
+                    }
+                });
+
+                if (endTimeSelect.find('option:selected').prop('disabled')) {
+                    endTimeSelect.val('');
+                }
+            }
+
+            allDayCheckbox.on('change', function() {
+                if (this.checked) {
+                    startTimeSelect.val('00:00:00').trigger('change').prop('disabled', false);
+                    endTimeSelect.val('23:45:00').trigger('change').prop('disabled', false);
+                } else {
+                    startTimeSelect.prop('disabled', false).val('').trigger('change');
+                    endTimeSelect.prop('disabled', false).val('').trigger('change');
+                }
+            });
+
+            // --- Event listener ---
+            startTimeSelect.on('change', updateEndTimeOptions);
+
+            // --- Initialize Select2 ---
+            startTimeSelect.select2({
+                dropdownParent: $('#store_activity'),
+                width: '100%',
+                dropdownPosition: 'below'
+            });
+            endTimeSelect.select2({
+                dropdownParent: $('#store_activity'),
+                width: '100%',
+                dropdownPosition: 'below'
+            });
+
+            // --- Initial population ---
+            populateDropdowns();
 
             // ==============================
             // Show/Hide icons beside editable fields
@@ -2477,12 +2635,18 @@
 
             // ==============================
             // Schedule activity validation and submition logic
-            // ==============================
             $("#store_activity").validate({
                 ignore: [],
                 rules: {
-                    title: {
+                    note: {
                         required: true
+                    },
+                    agenda: {
+                        required: true
+                    },
+                    'participant_id[]': {
+                        required: true,
+                        minlength: 1
                     },
                     activity_type_id: {
                         required: true
@@ -2498,34 +2662,34 @@
                     },
                     location: {
                         required: true
-                    },
-                    agenda: {
-                        required: true
-                    },
+                    }
                 },
                 messages: {
-                    title: {
-                        required: "Please enter the title."
+                    note: {
+                        required: "Please enter the activity details in the note."
+                    },
+                    agenda: {
+                        required: "Please enter the description/agenda."
+                    },
+                    'participant_id[]': {
+                        required: "Please select at least one participant.",
+                        minlength: "Please select at least one participant."
                     },
                     activity_type_id: {
-                        required: "Please select an activity."
+                        required: "Please select the activity type."
                     },
                     date: {
-                        required: "Please enter the date."
+                        required: "Please select the date."
                     },
                     start_time: {
-                        required: "Please enter the time."
+                        required: "Please select the start time."
                     },
                     end_time: {
-                        required: "Please enter the time."
+                        required: "Please select the end time."
                     },
                     location: {
                         required: "Please enter the location."
-                    },
-                    agenda: {
-                        required: "Please enter the agenda."
-                    },
-
+                    }
                 },
                 errorElement: 'span',
                 errorClass: 'invalid-feedback d-block',
@@ -2537,9 +2701,9 @@
                 },
                 errorPlacement: function(error, element) {
                     if (element.parent('.input-group').length) {
-                        error.insertAfter(element.parent()); // Inserts after the .input-group
+                        error.insertAfter(element.parent());
                     } else {
-                        error.insertAfter(element); // Default
+                        error.insertAfter(element);
                     }
                 }
             });
@@ -2547,28 +2711,71 @@
             $('#store_activity').submit(function(e) {
                 e.preventDefault();
 
-                if (!$('#store_activity').valid()) {
-                    return; // Stop if validation fails
-                }
+                var form = $(this);
+                if (!form.valid()) return;
 
+                // Get owner type, id, and status from data attributes
+                var ownerType = form.data('owner-type');
+                var ownerId = form.data('owner-id');
+                var status = form.data('status');
+
+                // Collect selected participants with their entity types
+                var selectedParticipants = $('#participant_select option:selected').map(function() {
+                    var val = $(this).val();
+                    var type = $(this).data('entity-type') || val.split(':')[
+                        0]; // handle value like "people:3"
+                    var id = val.includes(':') ? val.split(':')[1] : val;
+                    return {
+                        id: id,
+                        type: type
+                    };
+                }).get();
+
+                // Serialize other form data
+                var formData = form.serializeArray();
+
+                // Append owner info, status, and participants
+                formData.push({
+                    name: 'owner_type',
+                    value: ownerType
+                });
+                formData.push({
+                    name: 'owner_id',
+                    value: ownerId
+                });
+                formData.push({
+                    name: 'status',
+                    value: status
+                });
+                formData.push({
+                    name: 'participants',
+                    value: JSON.stringify(selectedParticipants)
+                });
+
+                // AJAX request
                 $.ajax({
-                    url: '{{ route('admin.activity.store') }}',
-                    method: 'POST',
-                    data: $(this).serialize(),
-
+                    url: "{{ route('admin.schedule.activity') }}",
+                    method: "POST",
+                    data: $.param(formData),
                     success: function(response) {
-                        toastr.success('Activity added successfully!');
-                        $('#store_activity')[0].reset();
-                        $('#AddActivity').modal('hide');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => location.reload());
                     },
                     error: function(xhr) {
-                        console.log(xhr.responseText);
-                        toastr.error('Something went wrong while adding the activity.');
+                        alert('Error: ' + xhr.responseText);
+                        toastr.error('Something went wrong while scheduling the activity.');
                     }
                 });
+
             });
 
-             $("#loginActivity").validate({
+
+            $("#loginActivity").validate({
                 ignore: [],
                 rules: {
                     note: { // textarea
@@ -2648,14 +2855,14 @@
                 var ownerId = form.data('owner-id');
                 var status = form.data('status');
 
-                 // Collect selected participants with their entity types
+                // Collect selected participants with their entity types
                 var selectedParticipants = $('#activity_participant_select option:selected').map(
-            function() {
-                    return {
-                        id: $(this).val(),
-                        type: $(this).data('entity-type')
-                    };
-                }).get();
+                    function() {
+                        return {
+                            id: $(this).val(),
+                            type: $(this).data('entity-type')
+                        };
+                    }).get();
 
                 // Append them to serialized data
                 var formData = form.serializeArray();
@@ -2696,6 +2903,79 @@
                 });
             });
 
+            // Log Note Form
+            $("#logNoteForm").validate({
+                ignore: [],
+                rules: {
+                    note: { // textarea
+                        required: true
+                    }
+                },
+                messages: {
+                    note: {
+                        required: "Please enter some note details before saving."
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
+
+            $('#logNoteForm').submit(function(e) {
+                e.preventDefault();
+
+                var form = $(this);
+
+                if (!form.valid()) return;
+
+                // Get owner type and id
+                var ownerType = form.data('owner-type');
+                var ownerId = form.data('owner-id');
+
+                // Serialize form data
+                var formData = form.serializeArray();
+
+                // Append owner details
+                formData.push({
+                    name: 'owner_type',
+                    value: ownerType
+                });
+                formData.push({
+                    name: 'owner_id',
+                    value: ownerId
+                });
+
+                $.ajax({
+                    url: "{{ route('admin.add.note') }}",
+                    method: "POST",
+                    data: $.param(formData),
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message || 'Note added successfully!',
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => location.reload());
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        toastr.error('Something went wrong while saving the note.');
+                    }
+                });
+            });
 
 
             const durationSelect = document.getElementById('duration');
@@ -2725,11 +3005,13 @@
     </script>
 
 
-   <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // --- Prepare mentions array ---
+
+            /**
+             * Prepare mentions array dynamically from Blade variables
+             */
             var mentions = [
-                // companies
                 @foreach ($companies as $company)
                     {
                         key: "{{ addslashes($company->name) }}",
@@ -2740,7 +3022,6 @@
                     @endif
                 @endforeach
 
-                // people
                 @foreach ($allpeoples as $person)
                     {
                         key: "{{ addslashes($person->name) }}",
@@ -2751,7 +3032,6 @@
                     @endif
                 @endforeach
 
-                // users
                 @foreach ($users as $user)
                     {
                         key: "{{ addslashes($user->name) }}",
@@ -2763,57 +3043,76 @@
                 @endforeach
             ];
 
-            // --- Initialize Tribute ---
-            var tribute = new Tribute({
-                trigger: '@',
-                values: mentions,
-                lookup: 'key',
-                fillAttr: 'key',
-                menuItemTemplate: function(item) {
-                    var type = item.original.value.split(':')[0];
-                    return `<div><strong>${item.string}</strong> <small>(${type})</small></div>`;
-                },
-                selectTemplate: function(item) {
-                    // Insert only the display name
-                    return item.original ? item.original.key : '';
-                }
-            });
-
-            tribute.attach(document.getElementById('activity-note'));
-
-            // --- Handle form submit ---
-            var form = document.getElementById('loginActivity');
-            form.addEventListener('submit', function(e) {
-                var textarea = document.getElementById('activity-note');
-                var rawText = textarea.value;
-
-                var companyIds = [];
-                var peopleIds = [];
-                var userIds = [];
-
-                // Match exact names to database IDs
-                mentions.forEach(m => {
-                    var regex = new RegExp(`\\b${escapeRegExp(m.key)}\\b`,
-                        'g'); // avoid substring issues
-                    if (regex.test(rawText)) {
-                        let [type, id] = m.value.split(':');
-                        if (type === 'company') companyIds.push(id);
-                        else if (type === 'people') peopleIds.push(id);
-                        else if (type === 'user') userIds.push(id);
+            /**
+             * Initialize Tribute.js for a textarea
+             * @param {string} textareaId - ID of the textarea
+             */
+            function initTribute(textareaId, companyInputId, peopleInputId, userInputId, rawInputId) {
+                var tribute = new Tribute({
+                    trigger: '@',
+                    values: mentions,
+                    lookup: 'key',
+                    fillAttr: 'key',
+                    menuItemTemplate: function(item) {
+                        var type = item.original.value.split(':')[0];
+                        return `<div><strong>${item.string}</strong> <small>(${type})</small></div>`;
+                    },
+                    selectTemplate: function(item) {
+                        return item.original ? item.original.key : '';
                     }
                 });
 
-                // Populate hidden inputs
-                document.getElementById('mentioned_company_ids').value = companyIds.join(',');
-                document.getElementById('mentioned_people_ids').value = peopleIds.join(',');
-                document.getElementById('mentioned_user_ids').value = userIds.join(',');
-                document.getElementById('note_value').value = rawText;
-            });
+                tribute.attach(document.getElementById(textareaId));
 
-            // --- Helper: escape RegExp special characters ---
+                // Attach form submit handler
+                var form = document.getElementById(textareaId).closest('form');
+                form.addEventListener('submit', function() {
+                    var rawText = document.getElementById(textareaId).value;
+
+                    var companyIds = [];
+                    var peopleIds = [];
+                    var userIds = [];
+
+                    mentions.forEach(m => {
+                        var regex = new RegExp(`\\b${escapeRegExp(m.key)}\\b`, 'g');
+                        if (regex.test(rawText)) {
+                            let [type, id] = m.value.split(':');
+                            if (type === 'company') companyIds.push(id);
+                            else if (type === 'people') peopleIds.push(id);
+                            else if (type === 'user') userIds.push(id);
+                        }
+                    });
+
+                    document.getElementById(companyInputId).value = companyIds.join(',');
+                    document.getElementById(peopleInputId).value = peopleIds.join(',');
+                    document.getElementById(userInputId).value = userIds.join(',');
+                    document.getElementById(rawInputId).value = rawText;
+                });
+            }
+
+            // Helper function to escape regex characters
             function escapeRegExp(string) {
                 return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             }
+
+            // --- Initialize for Activity ---
+            initTribute(
+                'activity-note',
+                'mentioned_company_ids',
+                'mentioned_people_ids',
+                'mentioned_user_ids',
+                'note_value'
+            );
+
+            // --- Initialize for Note ---
+            initTribute(
+                'note-textarea',
+                'note_mentioned_company_ids',
+                'note_mentioned_people_ids',
+                'note_mentioned_user_ids',
+                'note_value'
+            );
+
         });
     </script>
 @endpush
