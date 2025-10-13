@@ -1,34 +1,217 @@
 [
-  { "id": 1, "type": "Name" },
-  { "id": 2, "type": "Email" },
-  { "id": 3, "type": "Phone Call" },
-  { "id": 4, "type": "Initial Meeting/Prospecting" },
-  { "id": 5, "type": "Renewal Contract Delivered" },
-  { "id": 6, "type": "Site Survey" },
-  { "id": 7, "type": "MKT - Digital Media Kit" },
-  { "id": 8, "type": "MKT - Ind. Partner MKT Materials" },
-  { "id": 9, "type": "MKT - Protected Door Stickers" },
-  { "id": 10, "type": "MKT - Web Badge" },
-  { "id": 11, "type": "PH Campaign - Athletics Poster" },
-  { "id": 12, "type": "PH Campaign - COVID-19 Athletic Signage (Owen GRP)" },
-  { "id": 13, "type": "PH Campaign - COVID-19 Flyer" },
-  { "id": 14, "type": "PH Campaign - COVID-19 Poster" },
-  { "id": 15, "type": "PH Campaign - Electronic Initial Flyer w/logo" },
-  { "id": 16, "type": "PH Campaign - Flu Flyer" },
-  { "id": 17, "type": "PH Campaign - Flu Posters" },
-  { "id": 18, "type": "PH Campaign - Flu Vaccine Flyer" },
-  { "id": 19, "type": "PH Campaign - GB Partnership Poster" },
-  { "id": 20, "type": "PH Campaign - Hand Washing Kits" },
-  { "id": 21, "type": "PH Campaign - Initial Flyer" },
-  { "id": 22, "type": "PH Campaign - Newspaper Ad" },
-  { "id": 23, "type": "PH Campaign - Norovirus Flyer" },
-  { "id": 24, "type": "PH Campaign - Press Release" },
-  { "id": 25, "type": "PH Campaign - Social Media Hand Washing" },
-  { "id": 26, "type": "Sales - Initial Presentation utilizing GB Keynote" },
-  { "id": 27, "type": "Sales - New Signed Contract Received" },
-  { "id": 28, "type": "Sales - Proposal Review & Approval" },
-  { "id": 29, "type": "Sales - Prospecting Meeting" },
-  { "id": 30, "type": "Sales - Renewal Contract Received" },
-  { "id": 31, "type": "Sales - Site Survey Reports & Proposal Presentation" },
-  { "id": 32, "type": "Text Message" }
+    {
+        "id": 1,
+        "type": "Email",
+        "icon": "fas fa-envelope"
+    },
+    {
+        "id": 2,
+        "type": "Phone Call",
+        "icon": "fas fa-phone"
+    },
+    {
+        "id": 3,
+        "type": "Sales - Initial Meeting/Prospecting",
+        "icon": "fas fa-users"
+    },
+    {
+        "id": 4,
+        "type": "Sales - Renewal Contract Delivered",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 5,
+        "type": "Account Maintenance Visit",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 6,
+        "type": "CET - Customer Complaint/Concern",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 7,
+        "type": "CET - Donation",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 8,
+        "type": "CET - FD Cert",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 9,
+        "type": "CET - GermStats Meeting",
+        "icon": "fas fa-users"
+    },
+    {
+        "id": 10,
+        "type": "CET - Welcome Box",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 11,
+        "type": "Delivered Card/Thank you note",
+        "icon": "fas fa-pencil"
+    },
+    {
+        "id": 12,
+        "type": "FET - Site Survey",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 13,
+        "type": "FET Closing/Received Contract",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 14,
+        "type": "FET proposal creation/delivery",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 15,
+        "type": "FET Prospecting Meeting",
+        "icon": "fas fa-users"
+    },
+    {
+        "id": 16,
+        "type": "FET Sampling Activity",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 17,
+        "type": "MKT - Digital Media Kit",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 18,
+        "type": "MKT - Ind. Partner MKT Materials",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 19,
+        "type": "MKT - Protected Door Stickers",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 20,
+        "type": "MKT - Web Badge",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 21,
+        "type": "MKT - Yard Signs",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 22,
+        "type": "PH Campaign -  Athletics Poster",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 23,
+        "type": "PH Campaign - COVID-19 Athletic Signage (Owen GRP)",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 24,
+        "type": "PH Campaign - COVID-19 Flyer",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 25,
+        "type": "PH Campaign - COVID-19 Poster",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 26,
+        "type": "PH Campaign - Electronic Initial Flyer w/logo",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 27,
+        "type": "PH Campaign - Flu Flyer",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 28,
+        "type": "PH Campaign - Flu Posters",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 29,
+        "type": "PH Campaign - Flu Vaccine Flyer",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 30,
+        "type": "PH Campaign - GB Partnership Poster",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 31,
+        "type": "PH Campaign - Hand Washing Kits ",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 32,
+        "type": "PH Campaign - Initial Flyer",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 33,
+        "type": "PH Campaign - Newspaper Ad",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 34,
+        "type": "PH Campaign - Norovirus Flyer",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 35,
+        "type": "PH Campaign - Press Release",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 36,
+        "type": "PH Campaign - Social Media Hand Washing",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 37,
+        "type": "Prospecting Meeting",
+        "icon": "fas fa-users"
+    },
+    {
+        "id": 38,
+        "type": "Sales - Board Meeting",
+        "icon": "fas fa-users"
+    },
+    {
+        "id": 39,
+        "type": "Sales - Initial Presentation utilizing GB Keynote",
+        "icon": "fas fa-pencil"
+    },
+    {
+        "id": 40,
+        "type": "Sales - M-RGB",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 41,
+        "type": "Text Message",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 42,
+        "type": "Training - ID Consulting",
+        "icon": "fas fa-calendar"
+    },
+    {
+        "id": 43,
+        "type": "Voicemail",
+        "icon": "fas fa-phone"
+    }
 ]

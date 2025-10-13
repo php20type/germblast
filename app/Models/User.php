@@ -72,6 +72,11 @@ class User extends Authenticatable
         return $this->hasMany(Tag::class, 'created_by');
     }
 
+     public function activity()
+    {
+        return $this->hasMany(Activity::class, 'user_id');
+    }
+
      public function companyTaskAssignee()
     {
         return $this->hasMany(CompanyTask::class, 'assignee_id');

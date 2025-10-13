@@ -27,6 +27,8 @@ class ActivityController extends Controller
             'owner_type' => 'required|string',
             'owner_id' => 'required|integer',
             'status' => 'nullable|string',
+            'leads_ids' => 'nullable|array', // add this
+            'leads_ids.*' => 'integer|exists:leads,id',
         ]);
 
         // Create Activity using validated data
@@ -63,6 +65,11 @@ class ActivityController extends Controller
                         break;
                 }
             }
+        }
+
+        // Attach related leads
+        if ($request->filled('leads_ids')) {
+            $activity->leads()->sync($request->leads_ids);
         }
 
         // Helper function to convert comma-separated string to array
@@ -111,6 +118,8 @@ class ActivityController extends Controller
             'owner_type' => 'required|string',
             'owner_id' => 'required|integer',
             'status' => 'nullable|string',
+            'leads_ids' => 'nullable|array', // add this
+            'leads_ids.*' => 'integer|exists:leads,id',
         ]);
 
         // Create Activity
@@ -145,6 +154,11 @@ class ActivityController extends Controller
                         break;
                 }
             }
+        }
+
+        // Attach related leads
+        if ($request->filled('leads_ids')) {
+            $activity->leads()->sync($request->leads_ids);
         }
 
         // Helper to convert comma-separated string to array

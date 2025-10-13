@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App\Interfaces\CityRepositoryInterface;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\StateRepositoryInterface;
+use App\Models\Activity;
 
 class Helper
 {
@@ -53,5 +54,31 @@ class Helper
         }
 
         return $value;
+    }
+
+    public static function getActivitiesForParticipant(string $entityType, int $entityId)
+    {
+        $query = Activity::query()->with(['companies', 'peoples', 'leads', 'users','activityType']);
+
+        switch ($entityType) {
+            case 'company':
+                $query->whereHas('companies', fn ($q) => $q->where('company_id', $entityId));
+                break;
+            case 'people':
+                $query->whereHas('peoples', fn ($q) => $q->where('people_id', $entityId));
+                break;
+            case 'lead':
+                $query->whereHas('leads', fn ($q) => $q->where('lead_id', $entityId));
+                break;
+            case 'user':
+                $query->whereHas('users', fn ($q) => $q->where('user_id', $entityId));
+                break;
+            default:
+                return collect(); // return empty collection if entity type is invalid
+        }
+
+        return $query->orderBy('date', 'desc')
+            ->orderBy('start_time', 'desc')
+            ->get();
     }
 }

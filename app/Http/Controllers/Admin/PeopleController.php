@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityType;
 use App\Models\Company;
@@ -204,6 +205,23 @@ class PeopleController extends Controller
         $pending_tasks = $peoples->peopleTask->whereNull('completed_user_id');
         $completed_tasks = $peoples->peopleTask->whereNotNull('completed_user_id');
 
+
+        $activities = Helper::getActivitiesForParticipant('people', $peoples->id)
+            ->sortByDesc('created_at');
+        $activities->transform(function ($activity) {
+            $participants = collect();
+            $participants = $participants->merge($activity->peoples->pluck('name'));
+            $participants = $participants->merge($activity->companies->pluck('name'));
+            $participants = $participants->merge($activity->leads->pluck('name'));
+
+            // Add a new attribute to the activity
+            $activity->participant_names = $participants->join(', ');
+
+            return $activity;
+        });
+
+        $related_leads = $peoples->leads;
+
         // Fetch related data
         $activity_types = ActivityType::all();
         $sources = Source::all();
@@ -321,7 +339,9 @@ class PeopleController extends Controller
         return view('admin.peoples.edit', compact(
             'peoples',
             'leads',
+            'activities',
             'persontags',
+            'related_leads',
             'pending_tasks',
             'completed_tasks',
             'activity_types',

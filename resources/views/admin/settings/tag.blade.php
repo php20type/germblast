@@ -125,7 +125,7 @@
                                                                         </div>
                                                                     </td>
                                                                     <td>40- static</td>
-                                                                    <td class="text-danger">{{ $leadtag->user->name }}</td>
+                                                                    <td class="text-danger">{{ $leadtag->user->name ?? 'N/A' }}</td>
                                                                     <td>September 21st, 2022</td>
                                                                     <td>{{ \Carbon\Carbon::parse($leadtag->created_at)->format('F jS, Y') }}</td>
                                                                     <td class="text-end">
@@ -205,7 +205,7 @@
                                                                         </div>
                                                                     </td>
                                                                     <td>40- static</td>
-                                                                    <td class="text-danger">{{ $companytag->user->name }}</td>
+                                                                    <td class="text-danger">{{ $companytag->user->name ?? 'N/A'}}</td>
                                                                     <td>September 21st, 2022</td>
                                                                     <td>{{ \Carbon\Carbon::parse($companytag->created_at)->format('F jS, Y') }}</td>
                                                                     <td class="text-end">
@@ -283,7 +283,7 @@
                                                                         </div>
                                                                     </td>
                                                                     <td>40- static</td>
-                                                                    <td class="text-danger">{{ $persontag->user->name }}</td>
+                                                                    <td class="text-danger">{{ $persontag->user->name ?? 'N/A'}}</td>
                                                                     <td>September 21st, 2022</td>
                                                                     <td>{{ \Carbon\Carbon::parse($persontag->created_at)->format('F jS, Y') }}</td>
                                                                     <td class="text-end">

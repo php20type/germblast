@@ -628,6 +628,9 @@
                                         <textarea id="activity-note" name="note" class="form-textarea w-100"
                                             placeholder="Log what happened in your activity… @Mention other users to grab their attention, or reference other companies, people, or users."></textarea>
 
+                                        <!-- Related Leads of this entity -->
+                                        <input type="hidden" name="leads_ids[]" value="{{ $leads->id }}">
+
                                         <!-- hidden fields populated before submit -->
                                         <input type="hidden" name="mentioned_company_ids" id="mentioned_company_ids"
                                             value="">
@@ -817,7 +820,7 @@
                                 <div class="timeline">
 
                                     <!-- Comment Timeline Item -->
-                                    <div class="timeline-item">
+                                    {{-- <div class="timeline-item">
                                         <div class="timeline-icon comment">
                                             <i class="fa-solid fa-phone-volume"></i>
                                         </div>
@@ -831,7 +834,7 @@
                                                     logged an
                                                     activity with <span
                                                         class="organization">{{ $leads->companies->pluck('company.name')->filter()->join(', ') ?? 'N/A' }},
-                                                        {{-- <a href="#" class="author-link">Paul Blake</a>Heath Herrington --}}
+                                                        {{-- <a href="#" class="author-link">Paul Blake</a>Heath Herrington --}
                                                         <a href="#"
                                                             class="author-link"></a>{{ $leads->peoples->pluck('name')->join(', ') ?: 'N/A' }}
                                                         <a href="#"
@@ -864,10 +867,10 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
 
                                     <!-- Note Timeline Item -->
-                                    <div class="timeline-item">
+                                    {{-- <div class="timeline-item">
                                         <div class="timeline-icon note">
                                             <i class="fa-solid fa-star"></i>
                                         </div>
@@ -883,9 +886,9 @@
                                                         {{ $leads->name ?? 'N/A' }}</span> worth $955</p>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <!-- Note Timeline Item -->
-                                    <div class="timeline-item">
+                                    {{-- <div class="timeline-item">
                                         <div class="timeline-icon note">
                                             <i class="fa-solid fa-angles-right"></i>
                                         </div>
@@ -901,33 +904,94 @@
                                                         {{ $leads->name ?? 'N/A' }}</span> worth $955</p>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <!-- Activity Timeline Item -->
-                                    <div class="timeline-item">
-                                        <div class="timeline-icon activity">
-                                            <i class="fa-solid fa-envelope"></i>
-                                        </div>
-                                        <div class="timeline-content">
-                                            <div class="timeline-header">
-                                                <div class="timestamp">
-                                                    {{ \Carbon\Carbon::parse($leads->created_at)->format('g:i A \o\n M d, Y') }}
+
+                                    {{-- Activities List --}}
+                                    @foreach ($activities as $activity)
+                                        <div class="timeline-item">
+                                            <div class="timeline-icon">
+                                                <i class="{{ $activity->activityType->icon }}"></i>
+                                            </div>
+                                            <div class="timeline-content">
+                                                <div class="timeline-header">
+                                                    <div class="timestamp">
+                                                        {{ \Carbon\Carbon::parse($activity->created_at)->format('g:i A \o\n M j, Y') }}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="timeline-body">
-                                                <a href="#" class="author-link">
-                                                    {{ $leads->assignee?->name ?? 'N/A' }}
-                                                </a>
-                                                logged an activity with <span class="organization">
-                                                    {{ $leads->companies->pluck('company.name')->filter()->join(', ') ?? 'N/A' }}
-                                                </span>,
-                                                {{-- Barbra Moore, <a href="#" class="author-link">Brennan Baxter</a>. --}}
-                                                <a href="#"
-                                                    class="author-link">{{ $leads->peoples->pluck('name')->join(', ') ?: 'N/A' }}
-                                                </a>
-                                                <div class="activity-title">{{ $leads->name ?? 'N/A' }}</div>
+
+                                                <div class="timeline-body">
+                                                    <div class="row align-items-center">
+                                                        <!-- Text section (col-8) -->
+                                                        <div class="col-8">
+                                                            <p class="mb-0">
+                                                                <span class="author-link">
+                                                                    {{ $activity->creator->name ?? 'N/A' }}
+                                                                </span>
+                                                                logged an activity with
+                                                                <span class="organization">
+                                                                    {{ $activity->participant_names }}
+                                                                </span>
+                                                            </p>
+                                                        </div>
+
+                                                        <!-- Buttons section (col-4) -->
+                                                        <div class="col-4 text-end">
+                                                            <button class="btn btn-sm btn-outline-primary me-1"
+                                                                title="Add Comment" data-id="">
+                                                                <i class="fas fa-comment"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-outline-danger"
+                                                                title="Delete Activity" data-id="">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div class="activity-details">
+                                                        <div class="row">
+                                                            <div class="col-10">
+                                                                <div class="activity-label mb-0">
+                                                                    {{ $activity->activityType->type ?? 'N/A' }}</div>
+                                                                <div class="activity-description">
+                                                                    <div class="text-muted mb-2">
+                                                                        {{-- <span class="fw-bold me-1">Note:</span> --}}
+                                                                        <span><i
+                                                                                class="fas fa-pen-to-square text-primary me-1"></i></span>
+                                                                        {{ $activity->note }}
+                                                                    </div>
+                                                                    <div class="text-muted">
+                                                                        {{-- <span class="fw-bold me-1">Description:</span> --}}
+                                                                        <span><i
+                                                                                class="fas fa-file-alt text-warning me-1"></i></span>
+                                                                        {{ $activity->description }}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-2">
+                                                                <div class="activity-badges">
+                                                                    <span class="activity-badge badge-cc">JB</span>
+                                                                    <span class="activity-badge badge-cc">TC</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="comment-box">
+                                                        <span class="comment-avatar">BB</span>
+                                                        <span class="comment-text">I will follow up with lead
+                                                            tomorrow. Chance had reached out to Stephanie about
+                                                            doing a site survey.</span>
+                                                    </div>
+
+                                                </div>
+
+
                                             </div>
                                         </div>
-                                    </div>
+                                    @endforeach
 
                                 </div>
                             </div>
@@ -1370,6 +1434,9 @@
                                         <textarea id="schedule-note-textarea" name="note" class="form-control w-100"
                                             placeholder="Write a note… @Mention other users to grab their attention, or reference other companies and people."
                                             rows="6"></textarea>
+
+                                        <!-- Related Leads of this entity -->
+                                        <input type="hidden" name="leads_ids[]" value="{{ $leads->id }}">
 
                                         <!-- Hidden fields for mentioned entities -->
                                         <input type="hidden" name="mentioned_company_ids"

@@ -9,6 +9,7 @@ class ActivityType extends Model
     protected $fillable=[
         'id',
         'type',
+        'icon'
     ];
 
      public function activities()

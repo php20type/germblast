@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityType;
 use App\Models\Company;
@@ -705,6 +706,20 @@ class LeadController extends Controller
         $pending_tasks = $leads->leadTask->whereNull('completed_user_id');
         $completed_tasks = $leads->leadTask->whereNotNull('completed_user_id');
 
+        $activities = Helper::getActivitiesForParticipant('lead', $leads->id)
+            ->sortByDesc('created_at');
+        $activities->transform(function ($activity) {
+            $participants = collect();
+            $participants = $participants->merge($activity->peoples->pluck('name'));
+            $participants = $participants->merge($activity->companies->pluck('name'));
+            $participants = $participants->merge($activity->leads->pluck('name'));
+
+            // Add a new attribute to the activity
+            $activity->participant_names = $participants->join(', ');
+
+            return $activity;
+        });
+
         $leadStatusIcon = '';
 
         $status = strtolower($leads->lead_status);
@@ -748,6 +763,7 @@ class LeadController extends Controller
 
         return view('admin.leads.edit', compact(
             'leads',
+            'activities',
             'leadStatusIcon',
             'pending_tasks',
             'completed_tasks',
@@ -1003,6 +1019,7 @@ class LeadController extends Controller
             ], 500);
         }
     }
+
     public function updateField(Request $request)
     {
         $request->validate([

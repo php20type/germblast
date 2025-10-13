@@ -43,7 +43,7 @@
                                             @foreach ($markets as $market)
                                                 <tr>
                                                     <td>{{ $market->name }}</td>
-                                                    <td>{{ $market->currency->code }}</td>
+                                                    <td>{{ $market->currency->code ?? 'N/A' }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>

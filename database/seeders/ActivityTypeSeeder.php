@@ -27,6 +27,7 @@ class ActivityTypeSeeder extends Seeder
             ActivityType::create([
                 'id' => $activity_type['id'],
                 'type' => $activity_type['type'],
+                'icon' => $activity_type['icon'],
             ]);
         }
     }

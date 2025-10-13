@@ -370,6 +370,11 @@
                                         <textarea id="activity-note" name="note" class="form-textarea w-100"
                                             placeholder="Log what happened in your activity… @Mention other users to grab their attention, or reference other companies, people, or users."></textarea>
 
+                                        <!-- Related Leads of this entity -->
+                                        @foreach ($related_leads as $related_lead)
+                                            <input type="hidden" name="leads_ids[]" value="{{ $related_lead->id }}">
+                                        @endforeach
+
                                         <!-- hidden fields populated before submit -->
                                         <input type="hidden" name="mentioned_company_ids" id="mentioned_company_ids"
                                             value="">
@@ -552,7 +557,7 @@
                                         </select>
 
                                     </div>
-                                    <div class="col-auto ms-auto">
+                                    <div class="col-auto ms-auto d-none">
                                         <button class="btn btn-warning">
                                             <i class="fa-regular fa-gear"></i>
                                         </button>
@@ -631,9 +636,10 @@
                             </div>
 
                             <!-- Timeline -->
-                            <div class="timeline position-relative">
-                                <!-- Timeline Item 1 -->
-                                <div class="timeline-item">
+                            <div class="timeline-container">
+                                <div class="timeline position-relative">
+                                    <!-- Timeline Item 1 -->
+                                    {{-- <div class="timeline-item">
                                     <div class="timeline-icon calendar">
                                         <i class="fas fa-calendar"></i>
                                     </div>
@@ -646,10 +652,10 @@
                                                 Haynes</strong>.
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
 
-                                <!-- Timeline Item 2 -->
-                                <div class="timeline-item">
+                                    <!-- Timeline Item 2 -->
+                                    {{-- <div class="timeline-item">
                                     <div class="timeline-icon email">
                                         <i class="fas fa-envelope"></i>
                                     </div>
@@ -676,46 +682,98 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
 
-                                <!-- Timeline Item 3 -->
-                                <div class="timeline-item">
-                                    <div class="timeline-icon phone">
-                                        <i class="fas fa-phone"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold">9:30 PM on Feb 8, 2022</div>
-                                        <div class="text-muted mb-2">
-                                            <strong class="text-warning">Cindy Gotham</strong> logged an
-                                            activity with
-                                            <strong class="text-warning">12th Street Church of Christ</strong>,
-                                            <strong>Paul Blake</strong>,
-                                            <strong class="text-warning">Heath Herrington</strong>,
-                                            <strong class="text-warning">12th Street Church of Christ -
-                                                2022</strong>
-                                        </div>
-
-                                        <div class="email-preview">
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <span class="fw-bold">Phone Call</span>
-                                                <div>
-                                                    <span class="badge bg-secondary me-1">7</span>
-                                                    <span class="badge bg-secondary me-1">6</span>
-                                                    <span class="badge bg-secondary">15</span>
+                                    {{-- Activities List --}}
+                                    @foreach ($activities as $activity)
+                                        <div class="timeline-item">
+                                            <div class="timeline-icon">
+                                                <i class="{{ $activity->activityType->icon }}"></i>
+                                            </div>
+                                            <div class="timeline-content">
+                                                <div class="timeline-header">
+                                                    <div class="timestamp">
+                                                        {{ \Carbon\Carbon::parse($activity->created_at)->format('g:i A \o\n M j, Y') }}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="text-muted">
-                                                Heath spoke with Paul Blake who is the Chairman of Deacons at
-                                                12th St Church of Christ. We did a single service response for
-                                                them in November. But we hadn't done quarterly services for them
-                                                in the 9 months leading up to that. So Heath talked with Mr
-                                                Blake about the possibility of doing a renewal with them for
-                                                quarterly services and a partnership...
+
+                                                <div class="timeline-body">
+                                                    <div class="row align-items-center">
+                                                        <!-- Text section (col-8) -->
+                                                        <div class="col-8">
+                                                            <p class="mb-0">
+                                                                <span class="author-link">
+                                                                    {{ $activity->creator->name ?? 'N/A' }}
+                                                                </span>
+                                                                logged an activity with
+                                                                <span class="organization">
+                                                                    {{ $activity->participant_names }}
+                                                                </span>
+                                                            </p>
+                                                        </div>
+
+                                                        <!-- Buttons section (col-4) -->
+                                                        <div class="col-4 text-end">
+                                                            <button class="btn btn-sm btn-outline-primary me-1"
+                                                                title="Add Comment" data-id="">
+                                                                <i class="fas fa-comment"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-outline-danger"
+                                                                title="Delete Activity" data-id="">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div class="activity-details">
+                                                        <div class="row">
+                                                            <div class="col-10">
+                                                                <div class="activity-label mb-0">
+                                                                    {{ $activity->activityType->type ?? 'N/A' }}</div>
+                                                                <div class="activity-description">
+                                                                    <div class="text-muted mb-2">
+                                                                        {{-- <span class="fw-bold me-1">Note:</span> --}}
+                                                                        <span><i
+                                                                                class="fas fa-pen-to-square text-primary me-1"></i></span>
+                                                                        {{ $activity->note }}
+                                                                    </div>
+                                                                    <div class="text-muted">
+                                                                        {{-- <span class="fw-bold me-1">Description:</span> --}}
+                                                                        <span><i
+                                                                                class="fas fa-file-alt text-warning me-1"></i></span>
+                                                                        {{ $activity->description }}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-2">
+                                                                <div class="activity-badges">
+                                                                    <span class="activity-badge badge-cc">JB</span>
+                                                                    <span class="activity-badge badge-cc">TC</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="comment-box">
+                                                        <span class="comment-avatar">BB</span>
+                                                        <span class="comment-text">I will follow up with lead
+                                                            tomorrow. Chance had reached out to Stephanie about
+                                                            doing a site survey.</span>
+                                                    </div>
+
+                                                </div>
+
+
                                             </div>
                                         </div>
-                                    </div>
+                                    @endforeach
+
+
                                 </div>
                             </div>
+
                         </div>
 
 
@@ -1118,7 +1176,8 @@
                                                     <!-- Value Input -->
                                                     <div class="col-md-8 d-flex gap-3 align-items-center">
                                                         <input type="text" name="url_value[]" class="form-control"
-                                                            value="{{ $url['value'] }}" placeholder="Enter URL" disabled>
+                                                            value="{{ $url['value'] }}" placeholder="Enter URL"
+                                                            disabled>
                                                         <button class="btn btn-sm btn-outline-secondary delete-field-btn"
                                                             data-company-id="{{ $company->id }}"
                                                             data-type="{{ $url['selected'] }}" data-field-name="url"
@@ -1425,6 +1484,11 @@
                                     <textarea id="schedule-note-textarea" name="note" class="form-control w-100"
                                         placeholder="Write a note… @Mention other users to grab their attention, or reference other companies and people."
                                         rows="6"></textarea>
+
+                                    <!-- Related Leads of this entity -->
+                                    @foreach ($related_leads as $related_lead)
+                                        <input type="hidden" name="leads_ids[]" value="{{ $related_lead->id }}">
+                                    @endforeach
 
                                     <!-- Hidden fields for mentioned entities -->
                                     <input type="hidden" name="mentioned_company_ids"
@@ -2890,53 +2954,6 @@
                 }
             });
 
-
-            // $('#loginActivity').submit(function(e) {
-            //     e.preventDefault();
-
-            //     var form = $(this);
-
-            //     if (!form.valid()) return;
-
-            //     // Get owner type and id from data attributes
-            //     var ownerType = form.data('owner-type');
-            //     var ownerId = form.data('owner-id');
-            //     var status = form.data('status');
-
-            //     // Append them to serialized data
-            //     var formData = form.serializeArray();
-            //     formData.push({
-            //         name: 'owner_type',
-            //         value: ownerType
-            //     });
-            //     formData.push({
-            //         name: 'owner_id',
-            //         value: ownerId
-            //     });
-            //     formData.push({
-            //         name: 'status',
-            //         value: status
-            //     });
-
-            //     $.ajax({
-            //         url: "{{ route('admin.login.activity') }}",
-            //         method: "POST",
-            //         data: $.param(formData),
-            //         success: function(response) {
-            //             Swal.fire({
-            //                 icon: 'success',
-            //                 title: 'Success',
-            //                 text: response.message,
-            //                 showConfirmButton: false,
-            //                 timer: 2000
-            //             }).then(() => location.reload());
-            //         },
-            //         error: function(xhr) {
-            //             alert('Error: ' + xhr.responseText);
-            //             toastr.error('Something went wrong while logging an activity.');
-            //         }
-            //     });
-            // });
 
             $('#loginActivity').submit(function(e) {
                 e.preventDefault();

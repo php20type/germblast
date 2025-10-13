@@ -24,6 +24,8 @@ class Activity extends Model
         'status',
     ];
 
+    protected $with = ['activityType', 'creator'];
+
     // Relation to activity type
     public function activityType()
     {
@@ -34,6 +36,11 @@ class Activity extends Model
     public function owner()
     {
         return $this->morphTo(null, 'owner_type', 'owner_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     // Relation to companies related to this activity

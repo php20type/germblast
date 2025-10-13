@@ -140,13 +140,15 @@
                             <div class="table-container">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h6 class="fw-bold mb-0">ACTIVITY TYPES ({{ $totalCounts }})</h6>
-                                    <a href="javascript:void(0);" class="btn-add-activity" id="toggleAddActivityType" onclick="addActivityType()">Add Activity Type</a>
+                                    <a href="javascript:void(0);" class="btn-add-activity" id="toggleAddActivityType"
+                                        onclick="addActivityType()">Add Activity Type</a>
                                 </div>
 
                                 <div class="table-responsive">
                                     <table class="table activity-table">
                                         <thead>
                                             <tr>
+                                                <th scope="col">Icon</th>
                                                 <th scope="col">Name</th>
                                                 <th scope="col">Activities in the last 12 months</th>
                                                 <th scope="col">Last activity time</th>
@@ -162,6 +164,8 @@
                                             </tr> --}}
                                             @foreach ($activity_types as $activity_type)
                                                 <tr>
+                                                    <td>
+                                                        <i class="{{ $activity_type->icon }} fa-2x"></i></td>
                                                     <td>{{ $activity_type->type }}</td>
                                                     <td class="activity-count">
                                                         {{ $activityCounts[$activity_type->id] ?? 0 }}</td>
@@ -218,7 +222,8 @@
                 </div>
                 <div class="modal-body ps-0">
 
-                    <form class="company-form" action="{{ route('admin.settings.activity_type.store') }}" method="post" id="store_activity_type">
+                    <form class="company-form" action="{{ route('admin.settings.activity_type.store') }}" method="post"
+                        id="store_activity_type">
                         @csrf
 
 
@@ -234,8 +239,14 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Icon</label>
-                                    <input type="text" placeholder="" name="icon"
-                                        class="form-control" />
+                                    <input type="hidden" name="icon" id="selectedIcon">
+                                    <div class="d-flex flex-wrap gap-2 mt-2" id="iconOptions">
+                                        @foreach ($icons as $icon)
+                                            <div class="activity-icon-circle" data-icon="{{ $icon }}">
+                                                <i class="{{ $icon }} fa-2x"></i>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
 
@@ -254,12 +265,29 @@
 
 @push('scripts')
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const iconOptions = document.querySelectorAll('.activity-icon-circle');
+            const iconInput = document.getElementById('selectedIcon');
+
+            iconOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove 'selected' class from all
+                    iconOptions.forEach(o => o.classList.remove('selected'));
+
+                    // Add 'selected' class to clicked one
+                    this.classList.add('selected');
+
+                    // Set value to hidden input
+                    iconInput.value = this.dataset.icon;
+                });
+            });
+        });
 
         function addActivityType() {
             $('#add_activity_type').modal('show');
         }
 
-         $("#store_activity_type").validate({
+        $("#store_activity_type").validate({
             ignore: [],
             rules: {
                 name: {

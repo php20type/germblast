@@ -2,27 +2,25 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
-use App\Models\ActivityType;
-use App\Models\CompanyType;
 use App\Models\Activity;
+use App\Models\ActivityType;
+use App\Models\Channel;
+use App\Models\CompanyType;
 use App\Models\Competitor;
 use App\Models\Currency;
-use App\Models\Market;
-use App\Models\Channel;
-use App\Models\Source;
-use App\Models\Product;
-use App\Helpers\Helper;
 use App\Models\Industry;
-use App\Models\Territory;
+use App\Models\Market;
+use App\Models\Product;
+use App\Models\Source;
 use App\Models\Tag;
-use App\Models\TerritoryLocation;
-use Illuminate\Support\Facades\DB;
+use App\Models\Territory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SettingController extends Controller
 {
-
     public function index()
     {
 
@@ -32,6 +30,24 @@ class SettingController extends Controller
 
     public function activity_type()
     {
+        $icons = [
+            'fas fa-phone',
+            'fas fa-calendar',
+            'fas fa-users',
+            'fas fa-pencil',
+            'fas fa-envelope',
+            'fas fa-briefcase',
+            'fas fa-comments',
+            'fas fa-globe',
+            'fas fa-chart-line',
+            'fas fa-user',
+            'fas fa-building',
+            'fas fa-map-marker-alt',
+            'fas fa-file-alt',
+            'fas fa-bullhorn',
+            'fas fa-handshake',
+            'fas fa-credit-card',
+        ];
 
         $activity_types = ActivityType::all();
         $totalCounts = ActivityType::count();
@@ -40,7 +56,7 @@ class SettingController extends Controller
             ->groupBy('activity_type_id')
             ->pluck('total', 'activity_type_id');
 
-        return view('admin.settings.activity_type', compact('activity_types', 'activityCounts', 'totalCounts'));
+        return view('admin.settings.activity_type', compact('activity_types', 'activityCounts', 'totalCounts', 'icons'));
 
     }
 
@@ -54,6 +70,7 @@ class SettingController extends Controller
 
         $data = [
             'type' => $validated['name'],
+            'icon' => $validated['icon'],
         ];
 
         $activity_type = ActivityType::create($data);
@@ -62,7 +79,7 @@ class SettingController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Activity type added successfully.',
-                'company' => $activity_type
+                'company' => $activity_type,
             ]);
         }
 
@@ -74,6 +91,7 @@ class SettingController extends Controller
 
         $competitors = Competitor::all();
         $totalCounts = Competitor::count();
+
         return view('admin.settings.competitors', compact('competitors', 'totalCounts'));
 
     }
@@ -95,12 +113,11 @@ class SettingController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Competitor added successfully.',
-                'company' => $competitor
+                'company' => $competitor,
             ]);
         }
 
         return redirect()->back()->with('success', 'Competitor added successfully.');
-
 
     }
 
@@ -109,6 +126,7 @@ class SettingController extends Controller
 
         $industries = Industry::all();
         $totalCounts = Industry::count();
+
         return view('admin.settings.industries', compact('industries', 'totalCounts'));
 
     }
@@ -130,15 +148,13 @@ class SettingController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Industry added successfully.',
-                'company' => $industry
+                'company' => $industry,
             ]);
         }
 
         return redirect()->back()->with('success', 'Industry added successfully.');
 
-
     }
-
 
     public function channel_source()
     {
@@ -207,28 +223,26 @@ class SettingController extends Controller
             'channel_id' => $request->input('channel_id') ?: null,
         ];
 
-
         $source = Source::create($data);
 
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
                 'message' => 'Source added successfully.',
-                'source' => $source
+                'source' => $source,
             ]);
         }
 
         return redirect()->back()->with('success', 'Source added successfully.');
 
-
     }
-
 
     public function company_type()
     {
 
         $company_types = CompanyType::all();
         $totalCounts = CompanyType::count();
+
         return view('admin.settings.company_type', compact('company_types', 'totalCounts'));
     }
 
@@ -249,7 +263,7 @@ class SettingController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Company type added successfully.',
-                'company' => $company_type
+                'company' => $company_type,
             ]);
         }
 
@@ -260,8 +274,9 @@ class SettingController extends Controller
     {
 
         $currencies = Currency::all();
-        $markets = Market::all();
+        $markets = Market::with('currency')->get();
         $totalCounts = Market::count();
+
         return view('admin.settings.market', compact('markets', 'totalCounts', 'currencies'));
 
     }
@@ -285,7 +300,7 @@ class SettingController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Market added successfully.',
-                'market' => $market
+                'market' => $market,
             ]);
         }
 
@@ -308,7 +323,7 @@ class SettingController extends Controller
             '#ffe599',
             '#b6d7a8',
             '#a2c4c9',
-            '#b4a7d6'
+            '#b4a7d6',
         ];
         // $tags = Tag::with('user')->get();
         $leadtags = Tag::with('user')->where('tag_id', 1)->get();
@@ -317,7 +332,8 @@ class SettingController extends Controller
         $companycount = Tag::where('tag_id', 2)->count();
         $persontags = Tag::with('user')->where('tag_id', 3)->get();
         $personcount = Tag::where('tag_id', 3)->count();
-        return view('admin.settings.tag', compact('leadtags','leadcount','companycount','personcount','companytags','persontags','colors'));
+
+        return view('admin.settings.tag', compact('leadtags', 'leadcount', 'companycount', 'personcount', 'companytags', 'persontags', 'colors'));
     }
 
     public function tag_store(Request $request)
@@ -342,17 +358,19 @@ class SettingController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Tag added successfully.',
-                'tag' => $tag
+                'tag' => $tag,
             ]);
         }
 
         return redirect()->back()->with('success', 'Tag added successfully.');
     }
+
     public function product()
     {
         $products = Product::all();
         $product_types = ['Good', 'Service'];
         $productCount = Product::count();
+
         return view('admin.settings.product', compact('products', 'productCount', 'product_types'));
     }
 
@@ -382,7 +400,7 @@ class SettingController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Product added successfully.',
-                'market' => $product
+                'market' => $product,
             ]);
         }
 
@@ -398,18 +416,20 @@ class SettingController extends Controller
 
     public function territory_store(Request $request)
     {
-        return "stored successfully";
+        return 'stored successfully';
     }
 
     public function getStatesByCountry($countryId)
     {
         $states = Helper::getStatesByCountryId($countryId);
+
         return response()->json($states);
     }
 
     public function getCitiesByState($stateId)
     {
         $cities = Helper::getCitiesByStateId($stateId);
+
         return response()->json($cities);
     }
 }
