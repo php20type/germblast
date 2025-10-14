@@ -38,6 +38,11 @@ class Activity extends Model
         return $this->morphTo(null, 'owner_type', 'owner_id');
     }
 
+    public function comments()
+    {
+        return $this->hasMany(ActivityComment::class,'activity_id');
+    }
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'user_id');

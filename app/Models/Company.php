@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Company extends Model
 {
@@ -23,6 +24,7 @@ class Company extends Model
         'employees_count',
     ];
 
+    protected $morphClass = 'Company';
     protected $with = ['companyEmail', 'companyPhone', 'companyAddress', 'companyUrl', 'companyPeople', 'companyTask'];
 
     // public function people()
@@ -33,6 +35,15 @@ class Company extends Model
     // New relation according to the new migration
     // ===============================================================
 
+       public function activity(): MorphMany
+    {
+        return $this->morphMany(Activity::class, 'owner');
+    }
+
+    public function note(): MorphMany
+    {
+        return $this->morphMany(Note::class, 'owner');
+    }
 
     /**
      * Belongs to relationships
@@ -99,6 +110,7 @@ class Company extends Model
     {
         return $this->hasOne(CompanyUrl::class, 'company_id');
     }
+
     public function companyTask()
     {
         return $this->hasMany(CompanyTask::class, 'company_id');
@@ -109,6 +121,7 @@ class Company extends Model
     {
         return $this->hasMany(CompanyPeople::class, 'company_id');
     }
+
     public function peoples()
     {
         return $this->belongsToMany(People::class, 'company_peoples')
@@ -120,25 +133,26 @@ class Company extends Model
     {
         return $this->hasMany(PeopleCompany::class, 'company_id');
     }
+
     public function peoplesAlt()
     {
         return $this->belongsToMany(People::class, 'people_companies')
             ->withTimestamps();
     }
 
-
     // Lead Company pivot table
     public function leadCompanies()
     {
         return $this->hasMany(LeadCompany::class, 'company_id');
     }
+
     public function leads()
     {
         return $this->belongsToMany(Lead::class, 'lead_companies')
             ->withTimestamps();
     }
 
-     // Tags pivot table
+    // Tags pivot table
     public function companyTags()
     {
         return $this->hasMany(CompanyTag::class, 'company_id');
@@ -149,5 +163,6 @@ class Company extends Model
         return $this->belongsToMany(Tag::class, 'company_tags')
             ->withTimestamps();
     }
+
 
 }

@@ -6,6 +6,7 @@ use App\Interfaces\CityRepositoryInterface;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\StateRepositoryInterface;
 use App\Models\Activity;
+use App\Models\Note;
 
 class Helper
 {
@@ -58,7 +59,7 @@ class Helper
 
     public static function getActivitiesForParticipant(string $entityType, int $entityId)
     {
-        $query = Activity::query()->with(['companies', 'peoples', 'leads', 'users','activityType']);
+        $query = Activity::query()->with(['companies', 'peoples', 'leads', 'users', 'activityType']);
 
         switch ($entityType) {
             case 'company':
@@ -80,5 +81,34 @@ class Helper
         return $query->orderBy('date', 'desc')
             ->orderBy('start_time', 'desc')
             ->get();
+        //  return $query->orderBy('created_at', 'desc')->get();
+    }
+
+    public static function getNotesForParticipant(string $entityType, int $entityId)
+    {
+        $query = Note::query()->with(['companies', 'peoples', 'users','owner']);
+
+        switch ($entityType) {
+            case 'company':
+                $query->where('owner_type', 'Company')->where('owner_id', $entityId);
+                break;
+
+            case 'people':
+                $query->where('owner_type', 'People')->where('owner_id', $entityId);
+                break;
+
+            case 'lead':
+                $query->where('owner_type', 'Lead')->where('owner_id', $entityId);
+                break;
+
+            case 'user':
+                $query->where('owner_type', 'User')->where('owner_id', $entityId);
+                break;
+
+            default:
+                return collect(); // empty if invalid entity type
+        }
+
+        return $query->orderBy('created_at', 'desc')->get();
     }
 }

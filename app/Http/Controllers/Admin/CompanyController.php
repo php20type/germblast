@@ -288,8 +288,8 @@ class CompanyController extends Controller
             'peoples', // <-- fetch related people via pivot
         ])->findOrFail($id);
 
-        $activities = Helper::getActivitiesForParticipant('company', $company->id)
-            ->sortByDesc('created_at');
+
+        $activities = Helper::getActivitiesForParticipant('company', $company->id);
         $activities->transform(function ($activity) {
             $participants = collect();
             $participants = $participants->merge($activity->peoples->pluck('name'));
@@ -299,8 +299,36 @@ class CompanyController extends Controller
             // Add a new attribute to the activity
             $activity->participant_names = $participants->join(', ');
 
+            // Add unified structure fields
+            $activity->type = 'activity';
+            // $activity->timestamp = $activity->created_at;
+            $activity->timestamp = $activity->date; // not created_at
+
+
             return $activity;
         });
+
+
+        $notes = Helper::getNotesForParticipant('company', $company->id);
+        $notes->transform(function ($note) {
+            $mentions = collect();
+            $mentions = $mentions->merge($note->peoples->pluck('name'));
+            $mentions = $mentions->merge($note->companies->pluck('name'));
+            $mentions = $mentions->merge($note->users->pluck('name'));
+
+            // Add a new attribute for easy access in views
+            $note->mentioned_names = $mentions->join(', ');
+
+            // Add unified structure fields
+            $note->type = 'note';
+            $note->timestamp = $note->created_at;
+
+            return $note;
+        });
+
+        $timeline = $activities->concat($notes)
+            ->sortByDesc('timestamp')
+            ->values(); // reindex after sorting
 
         $related_leads = $company->leads;
 
@@ -411,6 +439,8 @@ class CompanyController extends Controller
         return view('admin.company.edit', compact(
             'company',
             'activities',
+            'notes',
+            'timeline',
             'related_leads',
             'pending_tasks',
             'completed_tasks',

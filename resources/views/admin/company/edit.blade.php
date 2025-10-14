@@ -638,54 +638,9 @@
                             <!-- Timeline -->
                             <div class="timeline-container">
                                 <div class="timeline position-relative">
-                                    <!-- Timeline Item 1 -->
-                                    {{-- <div class="timeline-item">
-                                    <div class="timeline-icon calendar">
-                                        <i class="fas fa-calendar"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold">4:50 AM on Apr 22, 2023</div>
-                                        <div class="text-muted">
-                                            <strong>Rodney Madsen</strong> reassigned <strong>12th Street Church
-                                                of Christ</strong> to <strong class="text-warning">Denise
-                                                Bradley</strong> from <strong class="text-warning">Christy
-                                                Haynes</strong>.
-                                        </div>
-                                    </div>
-                                </div> --}}
-
-                                    <!-- Timeline Item 2 -->
-                                    {{-- <div class="timeline-item">
-                                    <div class="timeline-icon email">
-                                        <i class="fas fa-envelope"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold">9:38 PM on Feb 8, 2022</div>
-                                        <div class="text-muted mb-2">
-                                            <strong class="text-warning">Heath Herrington</strong> emailed
-                                            <strong>Paul Blake</strong>
-                                        </div>
-
-                                        <div class="email-preview">
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <span class="badge bg-warning text-dark">Outbound Email</span>
-                                                <div>
-                                                    <span class="badge bg-secondary me-1">7</span>
-                                                    <span class="badge bg-secondary">85</span>
-                                                </div>
-                                            </div>
-                                            <div class="fw-bold mb-2">GermBlast Discussion Follow-Up</div>
-                                            <div class="text-muted">
-                                                Mr. Blake, It was a pleasure meeting you over the phone today,
-                                                sir! Thank you so much for your kind words & consideration of
-                                                GermBlast at 12th Street Church of Christ...
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> --}}
 
                                     {{-- Activities List --}}
-                                    @foreach ($activities as $activity)
+                                    {{-- @foreach ($activities as $activity)
                                         <div class="timeline-item">
                                             <div class="timeline-icon">
                                                 <i class="{{ $activity->activityType->icon }}"></i>
@@ -699,7 +654,6 @@
 
                                                 <div class="timeline-body">
                                                     <div class="row align-items-center">
-                                                        <!-- Text section (col-8) -->
                                                         <div class="col-8">
                                                             <p class="mb-0">
                                                                 <span class="author-link">
@@ -712,7 +666,6 @@
                                                             </p>
                                                         </div>
 
-                                                        <!-- Buttons section (col-4) -->
                                                         <div class="col-4 text-end">
                                                             <button class="btn btn-sm btn-outline-primary me-1"
                                                                 title="Add Comment" data-id="">
@@ -733,13 +686,11 @@
                                                                     {{ $activity->activityType->type ?? 'N/A' }}</div>
                                                                 <div class="activity-description">
                                                                     <div class="text-muted mb-2">
-                                                                        {{-- <span class="fw-bold me-1">Note:</span> --}}
                                                                         <span><i
                                                                                 class="fas fa-pen-to-square text-primary me-1"></i></span>
                                                                         {{ $activity->note }}
                                                                     </div>
                                                                     <div class="text-muted">
-                                                                        {{-- <span class="fw-bold me-1">Description:</span> --}}
                                                                         <span><i
                                                                                 class="fas fa-file-alt text-warning me-1"></i></span>
                                                                         {{ $activity->description }}
@@ -768,8 +719,204 @@
 
                                             </div>
                                         </div>
-                                    @endforeach
+                                    @endforeach --}}
 
+                                    @foreach ($timeline as $item)
+                                        @if ($item->type === 'activity')
+                                            <div class="timeline-item">
+                                                <div class="timeline-icon">
+                                                    <i class="{{ $item->activityType->icon }}"></i>
+                                                </div>
+                                                <div class="timeline-content">
+                                                    <div class="timeline-header">
+                                                        <div class="timestamp">
+                                                            {{-- {{ \Carbon\Carbon::parse($item->created_at)->format('g:i A \o\n M j, Y') }} --}}
+                                                            {{ \Carbon\Carbon::parse($item->end_time)->format('g:i A') ?? 'N/A' }}
+                                                            on {{ \Carbon\Carbon::parse($item->date)->format('M j, Y') }}
+
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="timeline-body">
+                                                        <div class="row align-items-center">
+                                                            <div class="col-8">
+                                                                <p class="mb-0">
+                                                                    <span class="author-link">
+                                                                        {{ $item->creator->name ?? 'N/A' }}
+                                                                    </span>
+                                                                    logged an activity with
+                                                                    <span class="organization">
+                                                                        {{ $item->participant_names }}
+                                                                    </span>
+                                                                </p>
+                                                            </div>
+
+                                                            <div class="col-4 text-end">
+                                                                <button
+                                                                    class="btn btn-sm btn-outline-primary me-1 add-comment-btn"
+                                                                    title="Add Comment" data-type="Activity"
+                                                                    data-id="{{ $item->id }}">
+                                                                    <i class="fas fa-comment"></i>
+                                                                </button>
+                                                                <button
+                                                                    class="btn btn-sm btn-outline-danger delete-activity-btn"
+                                                                    title="Delete Activity" data-type="Activity"
+                                                                    data-id="{{ $item->id }}">
+                                                                    <i class="fas fa-times"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+
+                                                        <div class="activity-details">
+                                                            <div class="row">
+                                                                <div class="col-10">
+                                                                    <div class="activity-label mb-0">
+                                                                        {{ $item->activityType->type ?? 'N/A' }}</div>
+                                                                    <div class="activity-description">
+                                                                        <div class="text-muted mb-2">
+                                                                            <span><i
+                                                                                    class="fas fa-pen-to-square text-primary me-1"></i></span>
+                                                                            {{ $item->note }}
+                                                                        </div>
+                                                                        <div class="text-muted">
+                                                                            <span><i
+                                                                                    class="fas fa-file-alt text-warning me-1"></i></span>
+                                                                            {{ $item->description }}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-2">
+                                                                    <div class="activity-badges">
+                                                                        <span class="activity-badge badge-cc">JB</span>
+                                                                        <span class="activity-badge badge-cc">TC</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div class="comment-box">
+                                                            <span class="comment-avatar">BB</span>
+                                                            <span class="comment-text">I will follow up with lead
+                                                                tomorrow. Chance had reached out to Stephanie about
+                                                                doing a site survey.</span>
+                                                        </div>
+
+                                                        <div class="mt-3 d-none add-comment">
+                                                            <textarea id="activity-comment-textarea" name="activity_comment" class="form-textarea"
+                                                                placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
+
+                                                            <button class="mt-3 btn btn-sm btn-outline-success"
+                                                                title="">
+                                                                Add Comment
+                                                            </button>
+                                                            <button
+                                                                class="mt-3 btn btn-sm btn-outline-danger comment-cancel"
+                                                                title="Close">
+                                                                Close
+                                                            </button>
+                                                        </div>
+
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        @elseif ($item->type === 'note')
+                                            <div class="timeline-item">
+                                                <div class="timeline-icon">
+                                                    <i class="fas fa-sticky-note"></i>
+                                                </div>
+                                                <div class="timeline-content">
+                                                    <div class="timeline-header">
+                                                        <div class="timestamp">
+                                                            {{ \Carbon\Carbon::parse($item->created_at)->format('g:i A \o\n M j, Y') }}
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="timeline-body">
+                                                        <div class="row align-items-center">
+                                                            <div class="col-8">
+                                                                <p class="mb-0">
+                                                                    <span class="author-link">
+                                                                        {{ $item->creator->name ?? 'N/A' }}
+                                                                    </span>
+                                                                    wrote a note on
+                                                                    <span class="organization">
+                                                                        {{ $item->owner->name }}
+                                                                    </span>
+                                                                </p>
+                                                            </div>
+
+                                                            <div class="col-4 text-end">
+                                                                <button
+                                                                    class="btn btn-sm btn-outline-primary me-1 add-comment-btn"
+                                                                    title="Add Comment" data-type="Note"
+                                                                    data-id="{{ $item->id }}">
+                                                                    <i class="fas fa-comment"></i>
+                                                                </button>
+                                                                <button
+                                                                    class="btn btn-sm btn-outline-danger delete-note-btn"
+                                                                    title="Delete Note" data-type="Note"
+                                                                    data-id="{{ $item->id }}">
+                                                                    <i class="fas fa-times"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+
+                                                        <div class="activity-details">
+                                                            <div class="row">
+                                                                <div class="col-10">
+                                                                    <div class="activity-description">
+                                                                        <div class="text-muted mb-2">
+                                                                            <span><i
+                                                                                    class="fas fa-pen-to-square text-primary me-1"></i></span>
+                                                                            {{ $item->note }}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-2">
+                                                                    <div class="activity-badges">
+                                                                        <span class="activity-badge badge-cc">JB</span>
+                                                                        <span class="activity-badge badge-cc">TC</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div class="comment-box">
+                                                            <span class="comment-avatar">BB</span>
+                                                            <span class="comment-text">I will follow up with lead
+                                                                tomorrow. Chance had reached out to Stephanie about
+                                                                doing a site survey.</span>
+                                                        </div>
+
+
+                                                        <div class="mt-3 d-none add-comment">
+                                                            <textarea id="note-comment-textarea" name="note_comment" class="form-textarea"
+                                                                placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
+
+                                                            <button class="mt-3 btn btn-sm btn-outline-success"
+                                                                title="">
+                                                                Add Comment
+                                                            </button>
+                                                            <button
+                                                                class="mt-3 btn btn-sm btn-outline-danger comment-cancel"
+                                                                title="Close">
+                                                                Close
+                                                            </button>
+                                                        </div>
+
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        @endif
+                                    @endforeach
 
                                 </div>
                             </div>
@@ -1543,8 +1690,8 @@
 
                             <div class="col-lg-12 mt-2">
                                 <div class="form-check mb-4">
-                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"
-                                        name="all_day">
+                                    <input class="form-check-input" type="checkbox" value=""
+                                        id="flexCheckDefault" name="all_day">
                                     <label class="form-check-label" for="flexCheckDefault">
                                         All day
                                     </label>
@@ -1637,6 +1784,19 @@
                 }
             });
 
+            // ==============================
+            // Activity and note Comment box toggle functionality
+            // ==============================
+            $('.add-comment-btn').click(function() {
+                // Find the nearest comment box relative to this button
+                $(this).closest('.timeline-item').find('.add-comment').toggleClass('d-none');
+            });
+
+            $('.comment-cancel').click(function() {
+                const $commentBox = $(this).closest('.add-comment');
+                $commentBox.addClass('d-none');
+                $commentBox.find('textarea').val(''); // Clear the textarea content
+            });
 
             // ==============================
             // Start time and end time display in schedule activity
@@ -3019,6 +3179,53 @@
             });
 
 
+            // Delete Activity
+            $(document).on('click', '.delete-activity-btn', function() {
+                var activityId = $(this).data('id'); // get task ID from button
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to delete this activity?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/admin/delete_activity/" + activityId,
+                            method: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: response.message ||
+                                        "Activity deleted successfully.",
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(function() {
+                                    location.reload(); // reload after deletion
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong.'
+                                });
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                });
+            });
+
+
             // Log Note Form
             $("#logNoteForm").validate({
                 ignore: [],
@@ -3093,6 +3300,51 @@
                 });
             });
 
+            // Delete Note
+            $(document).on('click', '.delete-note-btn', function() {
+                var noteId = $(this).data('id'); // get task ID from button
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to delete this note?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/admin/note_activity/" + noteId,
+                            method: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: response.message ||
+                                        "Note deleted successfully.",
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(function() {
+                                    location.reload(); // reload after deletion
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong.'
+                                });
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                });
+            });
 
             const durationSelect = document.getElementById('duration');
             const startInput = document.getElementById('start_time');

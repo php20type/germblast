@@ -77,7 +77,22 @@ class User extends Authenticatable
         return $this->hasMany(Activity::class, 'user_id');
     }
 
-     public function companyTaskAssignee()
+    public function activityComments()
+    {
+        return $this->hasMany(ActivityComment::class,'user_id');
+    }
+
+    public function note()
+    {
+        return $this->hasMany(Note::class, 'user_id');
+    }
+
+    public function noteComments()
+    {
+        return $this->hasMany(NoteComment::class,'user_id');
+    }
+
+    public function companyTaskAssignee()
     {
         return $this->hasMany(CompanyTask::class, 'assignee_id');
     }

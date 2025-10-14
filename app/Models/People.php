@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class People extends Model
 {
-     protected $table = 'people';
+    protected $table = 'people';
+
     protected $fillable = [
         'user_id',
         'name',
@@ -18,10 +20,22 @@ class People extends Model
         'city_id',
         'marketing_status',
         'territory_id',
-        'tag_id'
+        'tag_id',
     ];
 
-     protected $with = ['peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany'];
+    protected $morphClass = 'People';
+
+    protected $with = ['peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany'];
+
+    public function activity(): MorphMany
+    {
+        return $this->morphMany(Activity::class, 'owner');
+    }
+
+    public function note(): MorphMany
+    {
+        return $this->morphMany(Note::class, 'owner');
+    }
 
     // Belongs to relations
     public function user()
@@ -117,7 +131,7 @@ class People extends Model
             ->withTimestamps();
     }
 
-     // Tags pivot table
+    // Tags pivot table
     public function peopleTags()
     {
         return $this->hasMany(PeopleTag::class, 'people_id');
@@ -128,6 +142,4 @@ class People extends Model
         return $this->belongsToMany(Tag::class, 'people_tags')
             ->withTimestamps();
     }
-
 }
-

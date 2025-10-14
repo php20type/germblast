@@ -418,7 +418,7 @@
                                         <textarea id="activity-note" name="note" class="form-textarea w-100"
                                             placeholder="Log what happened in your activity… @Mention other users to grab their attention, or reference other companies, people, or users."></textarea>
 
-                                         <!-- Related Leads of this entity -->
+                                        <!-- Related Leads of this entity -->
                                         @foreach ($related_leads as $related_lead)
                                             <input type="hidden" name="leads_ids[]" value="{{ $related_lead->id }}">
                                         @endforeach
@@ -612,29 +612,6 @@
                             <div class="timeline-container">
                                 <div class="timeline">
 
-                                    <!-- Comment Timeline Item -->
-                                    {{-- <div class="timeline-item">
-                                        <div class="timeline-icon comment">
-                                            <i class="fa-regular fa-comment"></i>
-                                        </div>
-                                        <div class="timeline-content">
-                                            <div class="timeline-header">
-                                                <div class="timestamp">12:13 AM on Jan 17</div>
-                                            </div>
-                                            <div class="timeline-body">
-                                                <a href="#" class="author-link">Brennan Baxter</a> commented on
-                                                a note on <span class="organization">Community Health Centers of
-                                                    Lubbock</span>
-                                                <div class="comment-box">
-                                                    <span class="comment-avatar">BB</span>
-                                                    <span class="comment-text">I will follow up with lead
-                                                        tomorrow. Chance had reached out to Stephanie about
-                                                        doing a site survey.</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div> --}}
-
                                     <!-- Note Timeline Item -->
                                     {{-- <div class="timeline-item">
                                         <div class="timeline-icon note">
@@ -673,51 +650,8 @@
                                         </div>
                                     </div> --}}
 
-                                    <!-- Activity Timeline Item -->
-                                    {{-- <div class="timeline-item">
-                                        <div class="timeline-icon activity">
-                                            <i class="fa-regular fa-comment"></i>
-                                        </div>
-                                        <div class="timeline-content">
-                                            <div class="timeline-header">
-                                                <div class="timestamp">5:48 AM on Nov 14, 2024</div>
-                                            </div>
-                                            <div class="timeline-body">
-                                                <a href="#" class="author-link">Cindy Cotham</a> logged an
-                                                activity with <span class="organization">Community Health
-                                                    Centers of Lubbock</span>, Barbra Moore, <a href="#"
-                                                    class="author-link">Brennan Baxter</a>.
-                                                <div class="activity-title">CHCL - Equipment Cleaning 202</div>
-                                                <div class="activity-details">
-                                                    <div class="row">
-                                                        <div class="col-6">
-                                                            <div class="activity-label mb-0">Sales - Renewal
-                                                                Contract
-                                                                Received</div>
-                                                            <div class="activity-description">
-                                                                Brennan received a signed contract from CHCL for
-                                                                2025
-                                                                renewal.
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-6">
-                                                            <div class="activity-badges">
-                                                                <div class="activity-badge badge-cc">CC</div>
-                                                                <div class="activity-badge badge-chcl">CHCL
-                                                                </div>
-                                                                <div class="activity-badge badge-bb">BB</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div> --}}
-
                                     {{-- Activities List --}}
-                                      @foreach ($activities as $activity)
+                                    {{-- @foreach ($activities as $activity)
                                         <div class="timeline-item">
                                             <div class="timeline-icon">
                                                 <i class="{{ $activity->activityType->icon }}"></i>
@@ -765,12 +699,10 @@
                                                                     {{ $activity->activityType->type ?? 'N/A' }}</div>
                                                                 <div class="activity-description">
                                                                     <div class="text-muted mb-2">
-                                                                        {{-- <span class="fw-bold me-1">Note:</span> --}}
                                                                         <span><i class="fas fa-pen-to-square text-primary me-1"></i></span>
                                                                         {{ $activity->note }}
                                                                     </div>
                                                                     <div class="text-muted">
-                                                                        {{-- <span class="fw-bold me-1">Description:</span> --}}
                                                                         <span><i class="fas fa-file-alt text-warning me-1"></i></span>
                                                                         {{ $activity->description }}
                                                                     </div>
@@ -798,7 +730,198 @@
 
                                             </div>
                                         </div>
+                                    @endforeach --}}
+
+                                   @foreach ($timeline as $item)
+                                        @if ($item->type === 'activity')
+                                            <div class="timeline-item">
+                                                <div class="timeline-icon">
+                                                    <i class="{{ $item->activityType->icon }}"></i>
+                                                </div>
+                                                <div class="timeline-content">
+                                                    <div class="timeline-header">
+                                                        <div class="timestamp">
+                                                            {{ \Carbon\Carbon::parse($item->created_at)->format('g:i A \o\n M j, Y') }}
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="timeline-body">
+                                                        <div class="row align-items-center">
+                                                            <div class="col-8">
+                                                                <p class="mb-0">
+                                                                    <span class="author-link">
+                                                                        {{ $item->creator->name ?? 'N/A' }}
+                                                                    </span>
+                                                                    logged an activity with
+                                                                    <span class="organization">
+                                                                        {{ $item->participant_names }}
+                                                                    </span>
+                                                                </p>
+                                                            </div>
+
+                                                            <div class="col-4 text-end">
+                                                                <button
+                                                                    class="btn btn-sm btn-outline-primary me-1 add-comment-btn"
+                                                                    title="Add Comment" data-type="Activity"
+                                                                    data-id="{{ $item->id }}">
+                                                                    <i class="fas fa-comment"></i>
+                                                                </button>
+                                                                <button class="btn btn-sm btn-outline-danger"
+                                                                    title="Delete Activity" data-type="Activity"
+                                                                    data-id="{{ $item->id }}">
+                                                                    <i class="fas fa-times"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+
+                                                        <div class="activity-details">
+                                                            <div class="row">
+                                                                <div class="col-10">
+                                                                    <div class="activity-label mb-0">
+                                                                        {{ $item->activityType->type ?? 'N/A' }}</div>
+                                                                    <div class="activity-description">
+                                                                        <div class="text-muted mb-2">
+                                                                            <span><i
+                                                                                    class="fas fa-pen-to-square text-primary me-1"></i></span>
+                                                                            {{ $item->note }}
+                                                                        </div>
+                                                                        <div class="text-muted">
+                                                                            <span><i
+                                                                                    class="fas fa-file-alt text-warning me-1"></i></span>
+                                                                            {{ $item->description }}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-2">
+                                                                    <div class="activity-badges">
+                                                                        <span class="activity-badge badge-cc">JB</span>
+                                                                        <span class="activity-badge badge-cc">TC</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div class="comment-box">
+                                                            <span class="comment-avatar">BB</span>
+                                                            <span class="comment-text">I will follow up with lead
+                                                                tomorrow. Chance had reached out to Stephanie about
+                                                                doing a site survey.</span>
+                                                        </div>
+
+                                                        <div class="mt-3 d-none add-comment">
+                                                            <textarea id="activity-comment-textarea" name="activity_comment" class="form-textarea"
+                                                                placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
+
+                                                            <button class="mt-3 btn btn-sm btn-outline-success"
+                                                                title="">
+                                                                Add Comment
+                                                            </button>
+                                                            <button
+                                                                class="mt-3 btn btn-sm btn-outline-danger comment-cancel"
+                                                                title="Close">
+                                                                Close
+                                                            </button>
+                                                        </div>
+
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        @elseif ($item->type === 'note')
+                                            <div class="timeline-item">
+                                                <div class="timeline-icon">
+                                                    <i class="fas fa-sticky-note"></i>
+                                                </div>
+                                                <div class="timeline-content">
+                                                    <div class="timeline-header">
+                                                        <div class="timestamp">
+                                                            {{ \Carbon\Carbon::parse($item->created_at)->format('g:i A \o\n M j, Y') }}
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="timeline-body">
+                                                        <div class="row align-items-center">
+                                                            <div class="col-8">
+                                                                <p class="mb-0">
+                                                                    <span class="author-link">
+                                                                        {{ $item->creator->name ?? 'N/A' }}
+                                                                    </span>
+                                                                    wrote a note on
+                                                                    <span class="organization">
+                                                                        {{ $item->owner->name }}
+                                                                    </span>
+                                                                </p>
+                                                            </div>
+
+                                                            <div class="col-4 text-end">
+                                                                <button
+                                                                    class="btn btn-sm btn-outline-primary me-1 add-comment-btn"
+                                                                    title="Add Comment" data-type="Note"
+                                                                    data-id="{{ $item->id }}">
+                                                                    <i class="fas fa-comment"></i>
+                                                                </button>
+                                                                <button class="btn btn-sm btn-outline-danger"
+                                                                    title="Delete Activity" data-id="">
+                                                                    <i class="fas fa-times"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+
+                                                        <div class="activity-details">
+                                                            <div class="row">
+                                                                <div class="col-10">
+                                                                    <div class="activity-description">
+                                                                        <div class="text-muted mb-2">
+                                                                            <span><i
+                                                                                    class="fas fa-pen-to-square text-primary me-1"></i></span>
+                                                                            {{ $item->note }}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-2">
+                                                                    <div class="activity-badges">
+                                                                        <span class="activity-badge badge-cc">JB</span>
+                                                                        <span class="activity-badge badge-cc">TC</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div class="comment-box">
+                                                            <span class="comment-avatar">BB</span>
+                                                            <span class="comment-text">I will follow up with lead
+                                                                tomorrow. Chance had reached out to Stephanie about
+                                                                doing a site survey.</span>
+                                                        </div>
+
+                                                         <div class="mt-3 d-none add-comment">
+                                                            <textarea id="note-comment-textarea" name="note_comment" class="form-textarea"
+                                                                placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
+
+                                                            <button class="mt-3 btn btn-sm btn-outline-success"
+                                                                title="">
+                                                                Add Comment
+                                                            </button>
+                                                            <button
+                                                                class="mt-3 btn btn-sm btn-outline-danger comment-cancel"
+                                                                title="Close">
+                                                                Close
+                                                            </button>
+                                                        </div>
+
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        @endif
                                     @endforeach
+
 
                                 </div>
                             </div>
@@ -1493,7 +1616,7 @@
                                             placeholder="Write a note… @Mention other users to grab their attention, or reference other companies and people."
                                             rows="6"></textarea>
 
-                                         <!-- Related Leads of this entity -->
+                                        <!-- Related Leads of this entity -->
                                         @foreach ($related_leads as $related_lead)
                                             <input type="hidden" name="leads_ids[]" value="{{ $related_lead->id }}">
                                         @endforeach
@@ -1647,6 +1770,19 @@
                 }
             });
 
+              // ==============================
+            // Activity and note Comment box toggle functionality
+            // ==============================
+            $('.add-comment-btn').click(function() {
+                // Find the nearest comment box relative to this button
+                $(this).closest('.timeline-item').find('.add-comment').toggleClass('d-none');
+            });
+
+            $('.comment-cancel').click(function() {
+                const $commentBox = $(this).closest('.add-comment');
+                $commentBox.addClass('d-none');
+                $commentBox.find('textarea').val(''); // Clear the textarea content
+            });
 
             // ==============================
             // Start time and end time display in schedule activity

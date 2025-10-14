@@ -4,19 +4,20 @@ namespace App\Providers;
 
 use App\Helpers\Helper;
 use App\Interfaces\CityRepositoryInterface;
+use App\Interfaces\CompanyRepositoryInterface;
 use App\Interfaces\CountryRepositoryInterface;
+use App\Interfaces\LeadRepositoryInterface;
+use App\Interfaces\PeopleRepositoryInterface;
 use App\Interfaces\StateRepositoryInterface;
 use App\Repositories\CityRepository;
-use App\Repositories\CountryRepository;
-use App\Repositories\StateRepository;
-use App\Interfaces\CompanyRepositoryInterface;
 use App\Repositories\CompanyRepository;
-use App\Interfaces\PeopleRepositoryInterface;
-use App\Repositories\PeopleRepository;
-use App\Interfaces\LeadRepositoryInterface;
+use App\Repositories\CountryRepository;
 use App\Repositories\LeadRepository;
+use App\Repositories\PeopleRepository;
+use App\Repositories\StateRepository;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -42,5 +43,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Schema::defaultStringLength(191);
+
+         Relation::morphMap([
+        'Company' => \App\Models\Company::class,
+        'People'  => \App\Models\People::class,
+        'Lead'    => \App\Models\Lead::class,
+        'User'    => \App\Models\User::class,
+    ]);
     }
 }

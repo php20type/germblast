@@ -573,9 +573,6 @@
                 </div>
                 <div class="modal-body">
 
-                    {{-- <form class="company-form" action="{{ route('admin.activity.store') }}" method="post"
-                        id="store_activity">
-                        @csrf --}}
                     <form class="company-form" action="{{ route('admin.schedule.activity') }}" method="post"
                         data-owner-type="User" data-owner-id="{{ auth()->id() }}" data-status="Scheduled"
                         id="store_activity">

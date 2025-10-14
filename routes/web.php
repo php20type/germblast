@@ -178,15 +178,21 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/settings/tag', [SettingController::class, 'tag'])->name('settings.tag');
     Route::post('/settings/tag', [SettingController::class, 'tag_store'])->name('settings.tag.store');
     Route::get('/settings/product', [SettingController::class, 'product'])->name('settings.product');
-    Route::post('/settings/product', [SettingController::class, 'product_store'])->name('settings.product.store');
+    Route::post('/settings/product', action: [SettingController::class, 'product_store'])->name('settings.product.store');
     Route::get('/settings/territory', [SettingController::class, 'territory'])->name('settings.territory');
     Route::post('/settings/territory', [SettingController::class, 'territory_store'])->name('settings.territory.store');
 
     // activities section
-    Route::post('/activity/store', [CompanyController::class, 'activity_store'])->name('activity.store');  // will remove it after succesfull storing of schedule activity on all 3 details page
     Route::post('/schedule_activity', [ActivityController::class, 'schedule_activity'])->name('schedule.activity');
     Route::post('/login_activity', [ActivityController::class, 'login_activity'])->name('login.activity');
+    Route::post('/delete_activity/{id}', [ActivityController::class, 'delete_activity'])->name('delete.activity');
+    Route::post('activity/add_comment/{id}', [ActivityController::class, 'add_comment'])->name('add.activity.comment');
+    Route::post('activity/delete_comment/{id}', [ActivityController::class, 'delete_comment'])->name('delete.activity.comment');
     Route::post('/add_note', [NoteController::class, 'add_note'])->name('add.note');
+    Route::post('/delete_note/{id}', [NoteController::class, 'delete_note'])->name('delete.note');
+    Route::post('note/add_comment/{id}', [NoteController::class, 'add_comment'])->name('add.note.comment');
+    Route::post('note/delete_comment/{id}', [NoteController::class, 'delete_comment'])->name('delete.note.comment');
+
 
     // Route::post('/people/ajax', [PeopleController::class, 'ajax_store'])->name('people.store');
 

@@ -706,8 +706,9 @@ class LeadController extends Controller
         $pending_tasks = $leads->leadTask->whereNull('completed_user_id');
         $completed_tasks = $leads->leadTask->whereNotNull('completed_user_id');
 
-        $activities = Helper::getActivitiesForParticipant('lead', $leads->id)
-            ->sortByDesc('created_at');
+        // $activities = Helper::getActivitiesForParticipant('lead', $leads->id)
+        //     ->sortByDesc('created_at');
+        $activities = Helper::getActivitiesForParticipant('lead', $leads->id);
         $activities->transform(function ($activity) {
             $participants = collect();
             $participants = $participants->merge($activity->peoples->pluck('name'));
@@ -717,8 +718,34 @@ class LeadController extends Controller
             // Add a new attribute to the activity
             $activity->participant_names = $participants->join(', ');
 
+            // Add unified structure fields
+            $activity->type = 'activity';
+            // $activity->timestamp = $activity->created_at;
+            $activity->timestamp = $activity->date; // not created_at
+
             return $activity;
         });
+
+         $notes = Helper::getNotesForParticipant('lead', $leads->id);
+        $notes->transform(function ($note) {
+            $mentions = collect();
+            $mentions = $mentions->merge($note->peoples->pluck('name'));
+            $mentions = $mentions->merge($note->companies->pluck('name'));
+            $mentions = $mentions->merge($note->users->pluck('name'));
+
+            // Add a new attribute for easy access in views
+            $note->mentioned_names = $mentions->join(', ');
+
+            // Add unified structure fields
+            $note->type = 'note';
+            $note->timestamp = $note->created_at;
+
+            return $note;
+        });
+
+        $timeline = $activities->concat($notes)
+            ->sortByDesc('timestamp')
+            ->values(); // reindex after sorting
 
         $leadStatusIcon = '';
 
@@ -764,6 +791,8 @@ class LeadController extends Controller
         return view('admin.leads.edit', compact(
             'leads',
             'activities',
+            'notes',
+            'timeline',
             'leadStatusIcon',
             'pending_tasks',
             'completed_tasks',

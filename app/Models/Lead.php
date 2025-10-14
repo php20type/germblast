@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Lead extends Model
 {
@@ -25,12 +26,23 @@ class Lead extends Model
         'created_at',
     ];
 
+    protected $morphClass = 'Lead';
     protected $with = ['leadCompanies', 'leadProducts', 'leadPeople', 'leadSources', 'leadCompetitors', 'leadTags', 'leadTask'];
-
     protected $casts = [
         'close_date' => 'datetime',
         'lead_flags' => 'array',
     ];
+
+
+    public function activity(): MorphMany
+    {
+        return $this->morphMany(Activity::class, 'owner');
+    }
+
+    public function note(): MorphMany
+    {
+        return $this->morphMany(Note::class, 'owner');
+    }
 
     // Companies pivot table
     public function leadCompanies()
@@ -135,5 +147,4 @@ class Lead extends Model
     {
         return $this->hasMany(LeadTask::class, 'lead_id');
     }
-
 }

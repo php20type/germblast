@@ -205,9 +205,7 @@ class PeopleController extends Controller
         $pending_tasks = $peoples->peopleTask->whereNull('completed_user_id');
         $completed_tasks = $peoples->peopleTask->whereNotNull('completed_user_id');
 
-
-        $activities = Helper::getActivitiesForParticipant('people', $peoples->id)
-            ->sortByDesc('created_at');
+        $activities = Helper::getActivitiesForParticipant('people', $peoples->id);
         $activities->transform(function ($activity) {
             $participants = collect();
             $participants = $participants->merge($activity->peoples->pluck('name'));
@@ -217,8 +215,35 @@ class PeopleController extends Controller
             // Add a new attribute to the activity
             $activity->participant_names = $participants->join(', ');
 
+             // Add unified structure fields
+            $activity->type = 'activity';
+            // $activity->timestamp = $activity->created_at;
+            $activity->timestamp = $activity->date; // not created_at
+
             return $activity;
         });
+
+         $notes = Helper::getNotesForParticipant('people', $peoples->id);
+        $notes->transform(function ($note) {
+            $mentions = collect();
+            $mentions = $mentions->merge($note->peoples->pluck('name'));
+            $mentions = $mentions->merge($note->companies->pluck('name'));
+            $mentions = $mentions->merge($note->users->pluck('name'));
+
+            // Add a new attribute for easy access in views
+            $note->mentioned_names = $mentions->join(', ');
+
+            // Add unified structure fields
+            $note->type = 'note';
+            $note->timestamp = $note->created_at;
+
+            return $note;
+        });
+
+        $timeline = $activities->concat($notes)
+            ->sortByDesc('timestamp')
+            ->values(); // reindex after sorting
+
 
         $related_leads = $peoples->leads;
 
@@ -340,6 +365,8 @@ class PeopleController extends Controller
             'peoples',
             'leads',
             'activities',
+            'notes',
+            'timeline',
             'persontags',
             'related_leads',
             'pending_tasks',

@@ -28,14 +28,14 @@
                     My people
                     <span class="badge bg-light text-dark">{{ $myPeopleCount }}</span>
                 </a>
-                <a class="nav-link people-filter {{ request()->routeIs('admin.peoples.marketing_contacts') ? 'active' : '' }}"
+                <a class="d-none nav-link people-filter {{ request()->routeIs('admin.peoples.marketing_contacts') ? 'active' : '' }}"
                     href="{{ route('admin.peoples.marketing_contacts') }}">
                     Marketing contacts
                     <span class="badge bg-light text-dark">13.8K</span>
                 </a>
             </div>
-            <hr>
-            <div class="mt-4">
+            {{-- <hr> --}}
+            <div class="mt-4 d-none">
                 <h6 class="text-uppercase text-light mb-2">Audiences </h6>
                 <a class="nav-link people-filter {{ request()->routeIs('admin.peoples.animal_care') ? 'active' : '' }}"
                     href="{{ route('admin.peoples.animal_care') }}">
