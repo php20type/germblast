@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\Activity;
+use App\Models\ActivityComment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ActivityController extends Controller
 {
@@ -181,5 +183,67 @@ class ActivityController extends Controller
             'message' => 'Scheduled activity created successfully!',
             'data' => $activity->load('companies', 'peoples', 'users'),
         ]);
+    }
+
+    public function delete_activity(Request $request, $id)
+    {
+        // Wrap in a transaction to ensure all deletions happen atomically
+        DB::transaction(function () use ($id) {
+            $activity = Activity::findOrFail($id);
+
+            // Delete pivot table entries (related entities)
+            $activity->companies()->detach();
+            $activity->peoples()->detach();
+            $activity->leads()->detach();
+            $activity->users()->detach();
+
+            // Delete mentions
+            $activity->mentionCompanies()->detach();
+            $activity->mentionPeoples()->detach();
+            $activity->mentionUsers()->detach();
+
+            // Delete comments
+            $activity->comments()->delete();
+
+            // Finally delete the activity itself
+            $activity->delete();
+        });
+
+        return response()->json([
+            'message' => 'Activity deleted successfully.',
+        ]);
+    }
+
+    public function add_comment(Request $request, $id)
+    {
+        $request->validate([
+            'comment' => 'required|string|max:2000',
+        ]);
+
+        $activity = Activity::find($id);
+        if (! $activity) {
+            return response()->json(['message' => 'Activity not found.'], 404);
+        }
+
+        ActivityComment::create([
+            'activity_id' => $id,
+            'user_id' => auth()->id(),
+            'comment' => $request->comment,
+        ]);
+
+        return response()->json(['message' => 'Comment added successfully.']);
+    }
+
+    public function delete_comment(Request $request, $id)
+    {
+        $comment = ActivityComment::find($id);
+
+        if (! $comment) {
+            return response()->json(['message' => 'Comment not found.'], 404);
+        }
+
+        $comment->delete();
+
+        return response()->json(['message' => 'Comment deleted successfully.']);
     }
 }

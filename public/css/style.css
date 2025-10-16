@@ -2029,7 +2029,7 @@ title {
     top: 0;
     left: 20px;
     width: 2px;
-    height: 100%;
+    height: 100%; 
     background-color: #FFB81C;
     z-index: 1;
 }
@@ -2053,6 +2053,7 @@ title {
     box-shadow: 3px 1px 10px 0px rgba(0, 0, 0, 0.11);
     -webkit-box-shadow: 3px 1px 10px 0px rgba(0, 0, 0, 0.11);
     -moz-box-shadow: 3px 1px 10px 0px rgba(0, 0, 0, 0.11);
+    cursor: pointer;
 }
 
 .sales-dashboard .dashboard-header {

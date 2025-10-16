@@ -706,9 +706,8 @@ class LeadController extends Controller
         $pending_tasks = $leads->leadTask->whereNull('completed_user_id');
         $completed_tasks = $leads->leadTask->whereNotNull('completed_user_id');
 
-        // $activities = Helper::getActivitiesForParticipant('lead', $leads->id)
-        //     ->sortByDesc('created_at');
         $activities = Helper::getActivitiesForParticipant('lead', $leads->id);
+        $activities->load(['comments.creator']);
         $activities->transform(function ($activity) {
             $participants = collect();
             $participants = $participants->merge($activity->peoples->pluck('name'));
@@ -727,6 +726,7 @@ class LeadController extends Controller
         });
 
          $notes = Helper::getNotesForParticipant('lead', $leads->id);
+         $notes->load(['comments.creator']);
         $notes->transform(function ($note) {
             $mentions = collect();
             $mentions = $mentions->merge($note->peoples->pluck('name'));

@@ -37,12 +37,19 @@ class Helper
         return app(CityRepositoryInterface::class)->getCitiesByStateId($stateId);
     }
 
-    public static function calculateTotalValue($leads)
+    // public static function calculateTotalValue($leads)
+    // {
+    //     return $leads->sum(function ($lead) {
+    //         return $lead->products->sum(function ($product) {
+    //             return $product->pivot->qty * $product->pivot->price;
+    //         });
+    //     });
+    // }
+
+    public static function calculateTotalValue($lead)
     {
-        return $leads->sum(function ($lead) {
-            return $lead->products->sum(function ($product) {
-                return $product->pivot->qty * $product->pivot->price;
-            });
+        return $lead->products->sum(function ($product) {
+            return $product->pivot->qty * $product->pivot->price;
         });
     }
 
@@ -86,7 +93,7 @@ class Helper
 
     public static function getNotesForParticipant(string $entityType, int $entityId)
     {
-        $query = Note::query()->with(['companies', 'peoples', 'users','owner']);
+        $query = Note::query()->with(['companies', 'peoples', 'users', 'owner']);
 
         switch ($entityType) {
             case 'company':

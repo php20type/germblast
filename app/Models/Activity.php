@@ -84,12 +84,6 @@ class Activity extends Model
         return $this->belongsToMany(People::class, 'activity_mention_people', 'activity_id', 'people_id');
     }
 
-    // Relation to leads mentioned in this activity
-    public function mentionLeads()
-    {
-        return $this->belongsToMany(Lead::class, 'activity_mention_leads', 'activity_id', 'lead_id');
-    }
-
     // Relation to users mentioned in this activity
     public function mentionUsers()
     {

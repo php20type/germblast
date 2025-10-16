@@ -206,6 +206,7 @@ class PeopleController extends Controller
         $completed_tasks = $peoples->peopleTask->whereNotNull('completed_user_id');
 
         $activities = Helper::getActivitiesForParticipant('people', $peoples->id);
+        $activities->load(['comments.creator']);
         $activities->transform(function ($activity) {
             $participants = collect();
             $participants = $participants->merge($activity->peoples->pluck('name'));
@@ -224,6 +225,7 @@ class PeopleController extends Controller
         });
 
          $notes = Helper::getNotesForParticipant('people', $peoples->id);
+         $notes->load(['comments.creator']);
         $notes->transform(function ($note) {
             $mentions = collect();
             $mentions = $mentions->merge($note->peoples->pluck('name'));
@@ -245,7 +247,27 @@ class PeopleController extends Controller
             ->values(); // reindex after sorting
 
 
-        $related_leads = $peoples->leads;
+       $related_leads = $peoples->leads;
+
+        foreach ($related_leads as $lead) {
+            $status = strtolower($lead->lead_status ?? 'open');
+            $icon = '';
+
+            if ($status === 'won') {
+                $icon = asset('img/icons/won.svg');
+            } elseif ($status === 'cancelled') {
+                $icon = asset('img/icons/cancelled.svg');
+            } elseif ($status === 'pending') {
+                $icon = asset('img/icons/pending.svg');
+            } elseif ($status === 'lost') {
+                $icon = asset('img/icons/lost.svg');
+            } else {
+                $icon = asset('img/icons/level-5.svg'); // default
+            }
+
+            // Attach computed icon path to the lead model
+            $lead->status_icon = $icon;
+        }
 
         // Fetch related data
         $activity_types = ActivityType::all();

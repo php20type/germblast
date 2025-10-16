@@ -81,6 +81,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/company', [CompanyController::class, 'index'])->name('company.index');
     Route::get('/company/my_companies/{id}', [CompanyController::class, 'my_companies'])->name('company.my_companies');
     Route::post('/companies/store', [CompanyController::class, 'store'])->name('companies.store');
+    Route::post('/companies/delete/{id}', [CompanyController::class, 'delete'])->name('companies.delete');
 
     // Company - Task Section
     Route::post('/companies/{company}/tasks', [CompanyController::class, 'addTask'])->name('companies.tasks.store');
@@ -106,6 +107,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/people/index', [PeopleController::class, 'index'])->name('peoples.index');
     Route::get('/people/my-peoples/{id}', [PeopleController::class, 'my_peoples'])->name('peoples.my_peoples');
     Route::post('/people/store', [PeopleController::class, 'store'])->name('people.store');
+    Route::post('/people/delete/{id}', [PeopleController::class, 'delete'])->name('people.delete');
 
     // People - Task Section
     Route::post('/people/{people}/tasks', [PeopleController::class, 'addTask'])->name('people.tasks.store');
@@ -137,7 +139,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Lead Section
     Route::get('/leads/index', [LeadController::class, 'index'])->name('leads.index');
-    Route::post('/leads', [LeadController::class, 'store'])->name('leads.store');
+    Route::post('/leads/store', [LeadController::class, 'store'])->name('leads.store');
+    Route::get('leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
+    Route::post('/leads/delete/{id}', [LeadController::class, 'delete'])->name('leads.delete');
 
     // Lead - Task Section
     Route::post('/leads/{lead}/tasks', [LeadController::class, 'addTask'])->name('leads.tasks.store');
@@ -157,7 +161,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/leads/open-leads', [LeadController::class, 'open_leads'])->name('leads.open_leads');
     Route::get('/leads/hot-leads', [LeadController::class, 'hot_leads'])->name('leads.hot_leads');
     Route::get('/leads/watching-leads', [LeadController::class, 'watching_leads'])->name('leads.watching_leads');
-    Route::get('leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
     Route::post('leads/delete-field', [LeadController::class, 'deleteField'])->name('leads.delete-field');
     Route::post('leads/update-field', [LeadController::class, 'updateField'])->name('leads.update-field');
 

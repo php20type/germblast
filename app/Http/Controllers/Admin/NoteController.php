@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Note;
+use App\Models\NoteComment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class NoteController extends Controller
 {
@@ -54,5 +56,60 @@ class NoteController extends Controller
             'message' => 'Note added successfully!',
             'data' => $note->load('companies', 'peoples', 'users'),
         ]);
+    }
+
+    public function delete_note(Request $request, $id)
+    {
+        DB::transaction(function () use ($id) {
+            $note = Note::findOrFail($id);
+
+            // Delete pivot table entries (related entities)
+            $note->companies()->detach();
+            $note->peoples()->detach();
+            $note->users()->detach();
+
+            // Delete comments
+            $note->comments()->delete();
+
+            // Finally delete the note itself
+            $note->delete();
+        });
+
+        return response()->json([
+            'message' => 'Note deleted successfully.',
+        ]);
+    }
+
+    public function add_comment(Request $request, $id)
+    {
+        $request->validate([
+            'comment' => 'required|string|max:2000',
+        ]);
+
+        $note = Note::find($id);
+        if (! $note) {
+            return response()->json(['message' => 'Note not found.'], 404);
+        }
+
+        NoteComment::create([
+            'note_id' => $id,
+            'user_id' => auth()->id(),
+            'comment' => $request->comment,
+        ]);
+
+        return response()->json(['message' => 'Comment added successfully.']);
+    }
+
+    public function delete_comment(Request $request, $id)
+    {
+        $comment = NoteComment::find($id);
+
+        if (! $comment) {
+            return response()->json(['message' => 'Comment not found.'], 404);
+        }
+
+        $comment->delete();
+
+        return response()->json(['message' => 'Comment deleted successfully.']);
     }
 }

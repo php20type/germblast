@@ -74,7 +74,7 @@
 
 
                                 </div>
-                                <button class="delete-btn">
+                                <button class="delete-btn delete-company-btn" data-id="{{ $company->id }}">
                                     <i class="fas fa-trash me-2"></i>DELETE
                                 </button>
                             </div>
@@ -767,7 +767,6 @@
                                                             </div>
                                                         </div>
 
-
                                                         <div class="activity-details">
                                                             <div class="row">
                                                                 <div class="col-10">
@@ -796,18 +795,35 @@
 
                                                         </div>
 
-                                                        <div class="comment-box">
-                                                            <span class="comment-avatar">BB</span>
-                                                            <span class="comment-text">I will follow up with lead
-                                                                tomorrow. Chance had reached out to Stephanie about
-                                                                doing a site survey.</span>
-                                                        </div>
+                                                        @if ($item->comments->isNotEmpty())
+                                                            <div class="comment-box d-flex flex-column">
+                                                                @foreach ($item->comments as $comment)
+                                                                    <div
+                                                                        class="d-flex justify-content-between align-items-center mb-2">
+                                                                        <div>
+                                                                            <span class="comment-avatar">
+                                                                                {{ strtoupper(substr($comment->creator->name ?? 'N/A', 0, 2)) }}
+                                                                            </span>
+                                                                            <span
+                                                                                class="comment-text">{{ $comment->comment }}</span>
+                                                                        </div>
+                                                                        <span class="btn btn-sm delete-comment-btn"
+                                                                            data-id="{{ $comment->id }}"
+                                                                            data-type="Activity">
+                                                                            <i class="fas fa-times"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+                                                        @endif
 
-                                                        <div class="mt-3 d-none add-comment">
-                                                            <textarea id="activity-comment-textarea" name="activity_comment" class="form-textarea"
+                                                        <div class="mt-3 d-none add-comment"
+                                                            data-id="{{ $item->id }}" data-type="Activity">
+                                                            <textarea id="activity-comment-textarea" name="comment_text" class="form-textarea"
                                                                 placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
 
-                                                            <button class="mt-3 btn btn-sm btn-outline-success"
+                                                            <button
+                                                                class="mt-3 btn btn-sm btn-outline-success add-comment-submit"
                                                                 title="">
                                                                 Add Comment
                                                             </button>
@@ -817,7 +833,6 @@
                                                                 Close
                                                             </button>
                                                         </div>
-
 
                                                     </div>
 
@@ -887,19 +902,35 @@
 
                                                         </div>
 
-                                                        <div class="comment-box">
-                                                            <span class="comment-avatar">BB</span>
-                                                            <span class="comment-text">I will follow up with lead
-                                                                tomorrow. Chance had reached out to Stephanie about
-                                                                doing a site survey.</span>
-                                                        </div>
+                                                        @if ($item->comments->isNotEmpty())
+                                                            <div class="comment-box d-flex flex-column">
+                                                                @foreach ($item->comments as $comment)
+                                                                    <div
+                                                                        class="d-flex justify-content-between align-items-center mb-2">
+                                                                        <div>
+                                                                           <span class="comment-avatar">
+                                                                                {{ strtoupper(substr($comment->creator->name ?? 'N/A', 0, 2)) }}
+                                                                            </span>
+                                                                            <span
+                                                                                class="comment-text">{{ $comment->comment }}</span>
+                                                                        </div>
+                                                                        <span class="btn btn-sm delete-comment-btn"
+                                                                            data-id="{{ $comment->id }}"
+                                                                            data-type="Activity">
+                                                                            <i class="fas fa-times"></i>
+                                                                        </span>
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+                                                        @endif
 
-
-                                                        <div class="mt-3 d-none add-comment">
-                                                            <textarea id="note-comment-textarea" name="note_comment" class="form-textarea"
+                                                        <div class="mt-3 d-none add-comment"
+                                                            data-id="{{ $item->id }}" data-type="Note">
+                                                            <textarea id="note-comment-textarea" name="comment_text" class="form-textarea"
                                                                 placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
 
-                                                            <button class="mt-3 btn btn-sm btn-outline-success"
+                                                            <button
+                                                                class="mt-3 btn btn-sm btn-outline-success add-comment-submit"
                                                                 title="">
                                                                 Add Comment
                                                             </button>
@@ -911,7 +942,6 @@
                                                         </div>
 
                                                     </div>
-
 
                                                 </div>
                                             </div>
@@ -935,7 +965,7 @@
                                 <h6>LEADS</h6>
                                 <a href="javascript:void(0)" onclick="addLead()" class="text-warning">Create a lead</a>
                             </div>
-                            <div class="lead-carder">
+                            <div class="lead-carder" onclick="relatedLeads()">
                                 <div class="row text-center">
                                     <div class="col-3">
                                         <div class="metric-value">$4.32k</div>
@@ -1762,6 +1792,68 @@
     </div>
 
     {{-- Activities modal end --}}
+
+    {{-- Leads List modal --}}
+    <div class="modal fade" id="related-leads-list" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="exampleModalLabel">Related Leads</h1>
+                    <div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-body ps-0">
+
+                    <div class="sidebar-section">
+
+                        {{-- Leads List --}}
+                        @foreach ($related_leads as $related_lead)
+                            <div class="company-list d-flex justify-content-between align-items-center mb-3"
+                                id="">
+                                <div class="row">
+                                    <div class="col-2">
+                                        <div class="company-icon">
+                                            <img src="{{ $related_lead->status_icon }}" alt="Lead Status">
+                                        </div>
+                                    </div>
+                                    <div class="col-10">
+                                        <div class="company-name">
+                                            <p title="Lead Name">
+                                                <a href="{{ route('admin.leads.show', $related_lead->id) }}">
+                                                    <strong>{{ $related_lead->name }}</strong>
+                                                </a>
+                                            </p>
+                                            <p title="Assignee">{{ $related_lead->assignee->name }}</p>
+                                            @foreach ($related_lead->companies as $leadcompanies)
+                                                <p class="text-primary" title="Related Company">
+                                                    {{ $leadcompanies->name }}</p>
+                                            @endforeach
+                                            @foreach ($related_lead->peoples as $leadpeoples)
+                                                <p class="text-warning" title="Related People">
+                                                    {{ $leadpeoples->name }}</p>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                                <div title="Total Value">
+                                    {{-- $955 --}}
+                                    ${{ \App\Helpers\Helper::calculateTotalValue($related_lead) }}
+                                </div>
+                            </div>
+                        @endforeach
+
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 @endsection
 
 @push('scripts')
@@ -1775,6 +1867,10 @@
 
         function scheduleActivity() {
             $('#schedule-activity').modal('show');
+        }
+
+        function relatedLeads() {
+            $('#related-leads-list').modal('show');
         }
 
         $(document).ready(function() {
@@ -3114,7 +3210,6 @@
                 }
             });
 
-
             $('#loginActivity').submit(function(e) {
                 e.preventDefault();
 
@@ -3179,7 +3274,10 @@
             });
 
 
+            // ==============================
             // Delete Activity
+            // ==============================
+
             $(document).on('click', '.delete-activity-btn', function() {
                 var activityId = $(this).data('id'); // get task ID from button
 
@@ -3224,6 +3322,118 @@
                     }
                 });
             });
+
+            // ==============================
+            // Adding the comment
+            // ==============================
+            $(document).on('click', '.add-comment-submit', function() {
+                let commentBox = $(this).closest('.add-comment');
+                let type = commentBox.data('type'); // Activity or Note
+                let id = commentBox.data('id'); // Item ID
+                let commentText = commentBox.find('textarea[name="comment_text"]').val();
+
+                if (!commentText.trim()) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Empty Comment',
+                        text: 'Please enter a comment before submitting.'
+                    });
+                    return;
+                }
+
+                // Determine URL based on type (like delete)
+                let url = '';
+                if (type === 'Activity') {
+                    url = '/admin/activity/add_comment/' + id;
+                } else {
+                    url = '/admin/note/add_comment/' + id;
+                }
+
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        comment: commentText
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => location.reload());
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON?.message ||
+                                'Something went wrong while adding the comment.'
+                        });
+                    }
+                });
+            });
+
+
+            // ==============================
+            // Removing the comment
+            // ==============================
+            $(document).on('click', '.delete-comment-btn', function() {
+                var commentId = $(this).data('id');
+                var type = $(this).data('type'); // Activity or Note
+                var url = '';
+
+                // Determine URL based on type
+                if (type === "Activity") {
+                    url = "/admin/activity/delete_comment/" + commentId;
+                } else {
+                    url = "/admin/note/delete_comment/" + commentId;
+                }
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Do you want to remove this comment?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, Remove"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: url,
+                            method: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Removed",
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location
+                                        .reload(); // reload to update comment list
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: xhr.responseJSON?.message ||
+                                        "Something went wrong."
+                                });
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                });
+            });
+
 
 
             // Log Note Form

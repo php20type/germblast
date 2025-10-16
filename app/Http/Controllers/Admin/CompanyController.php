@@ -288,8 +288,8 @@ class CompanyController extends Controller
             'peoples', // <-- fetch related people via pivot
         ])->findOrFail($id);
 
-
         $activities = Helper::getActivitiesForParticipant('company', $company->id);
+        $activities->load(['comments.creator']);
         $activities->transform(function ($activity) {
             $participants = collect();
             $participants = $participants->merge($activity->peoples->pluck('name'));
@@ -304,12 +304,11 @@ class CompanyController extends Controller
             // $activity->timestamp = $activity->created_at;
             $activity->timestamp = $activity->date; // not created_at
 
-
             return $activity;
         });
 
-
         $notes = Helper::getNotesForParticipant('company', $company->id);
+        $notes->load(['comments.creator']);
         $notes->transform(function ($note) {
             $mentions = collect();
             $mentions = $mentions->merge($note->peoples->pluck('name'));
@@ -331,6 +330,25 @@ class CompanyController extends Controller
             ->values(); // reindex after sorting
 
         $related_leads = $company->leads;
+
+         foreach ($related_leads as $lead) {
+            $status = strtolower($lead->lead_status ?? 'open');
+            $icon = '';
+
+            if ($status === 'won') {
+                $icon = asset('img/icons/won.svg');
+            } elseif ($status === 'cancelled') {
+                $icon = asset('img/icons/cancelled.svg');
+            } elseif ($status === 'pending') {
+                $icon = asset('img/icons/pending.svg');
+            } elseif ($status === 'lost') {
+                $icon = asset('img/icons/lost.svg');
+            } else {
+                $icon = asset('img/icons/level-5.svg'); // default
+            }
+            // Attach computed icon path to the lead model
+            $lead->status_icon = $icon;
+        }
 
         $companies = Company::all();
         $pending_tasks = $company->companyTask->whereNull('completed_user_id');

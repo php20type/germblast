@@ -63,9 +63,9 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <button class="btn btn-primary me-2"><img
+                                            <button class="d-none btn btn-primary me-2"><img
                                                     src="{{ asset('img/icons/filter.svg') }}" alt="" /></button>
-                                            <button class="btn btn-primary"><img src="{{ asset('img/icons/bar.svg') }}"
+                                            <button class="d-none btn btn-primary"><img src="{{ asset('img/icons/bar.svg') }}"
                                                     alt="" /></button>
                                         </div>
                                     </div>
