@@ -725,8 +725,8 @@ class LeadController extends Controller
             return $activity;
         });
 
-         $notes = Helper::getNotesForParticipant('lead', $leads->id);
-         $notes->load(['comments.creator']);
+        $notes = Helper::getNotesForParticipant('lead', $leads->id);
+        $notes->load(['comments.creator']);
         $notes->transform(function ($note) {
             $mentions = collect();
             $mentions = $mentions->merge($note->peoples->pluck('name'));
@@ -743,7 +743,16 @@ class LeadController extends Controller
             return $note;
         });
 
-        $timeline = $activities->concat($notes)
+        // Separate logged and scheduled activities
+        $logged_activities = $activities->filter(function ($activity) {
+            return $activity->status === 'Logged';
+        });
+
+        $scheduled_activities = $activities->filter(function ($activity) {
+            return $activity->status === 'Scheduled';
+        });
+
+        $timeline = $logged_activities->concat($notes)
             ->sortByDesc('timestamp')
             ->values(); // reindex after sorting
 
@@ -791,6 +800,8 @@ class LeadController extends Controller
         return view('admin.leads.edit', compact(
             'leads',
             'activities',
+            'logged_activities',
+            'scheduled_activities',
             'notes',
             'timeline',
             'leadStatusIcon',
@@ -848,6 +859,46 @@ class LeadController extends Controller
         $lead->save();
 
         return response()->json(['success' => true]);
+    }
+
+    public function checkStageCondition(Request $request, $leadId)
+    {
+        $lead = Lead::findOrFail($leadId);
+        $newStageId = $request->stage_id;
+
+        // Example stage-wise validation
+        switch ($newStageId) {
+            case 2: // Site Survey
+                if (! $lead->activity()->where('status', 'Logged')->exists()) {
+                    return response()->json([
+                        'allowed' => false,
+                        'message' => 'Please log an activity first.',
+                        'current_stage_id' => $lead->stage_id,
+                    ]);
+                }
+                break;
+
+            case 4: // Present Proposal
+                if (! $lead->products()->exists()) {
+                    return response()->json([
+                        'allowed' => false,
+                        'message' => 'Attach a product before moving to this stage.',
+                        'current_stage_id' => $lead->stage_id,
+                    ]);
+                }
+                break;
+        }
+
+        return response()->json(['allowed' => true]);
+    }
+
+    public function changeStage(Request $request, $leadId)
+    {
+        $lead = Lead::findOrFail($leadId);
+        $lead->stage_id = $request->stage_id;
+        $lead->save();
+
+        return response()->json(['message' => 'Lead stage updated successfully.']);
     }
 
     public function updateDetail(Request $request, $leadId)

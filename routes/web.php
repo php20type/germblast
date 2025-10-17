@@ -152,6 +152,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Lead - Detail Section
     Route::post('/leads/ajax-update', [LeadController::class, 'ajax_update'])->name('leads.ajax_update');
+    Route::post('/leads/check-stage-condition/{id}', [LeadController::class, 'checkStageCondition'])->name('leads.check.stage.condition');
+    Route::post('/leads/change-stage/{id}', [LeadController::class, 'changeStage'])->name('leads.change.stage');
     Route::post('leads/{lead}/update-detail', [LeadController::class, 'updateDetail'])->name('lead.updateDetail');
     Route::post('leads/{lead}/tags/add', [LeadController::class, 'addTag'])->name('leads.tags.add');
     Route::post('leads/{lead}/tags/{tag}/remove', [LeadController::class, 'removeTag'])->name('leads.tags.remove');
@@ -188,6 +190,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // activities section
     Route::post('/schedule_activity', [ActivityController::class, 'schedule_activity'])->name('schedule.activity');
     Route::post('/login_activity', [ActivityController::class, 'login_activity'])->name('login.activity');
+    Route::post('/log_activity/{id}', [ActivityController::class, 'log_activity'])->name('log.activity');
     Route::post('/delete_activity/{id}', [ActivityController::class, 'delete_activity'])->name('delete.activity');
     Route::post('activity/add_comment/{id}', [ActivityController::class, 'add_comment'])->name('add.activity.comment');
     Route::post('activity/delete_comment/{id}', [ActivityController::class, 'delete_comment'])->name('delete.activity.comment');

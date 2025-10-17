@@ -246,4 +246,30 @@ class ActivityController extends Controller
 
         return response()->json(['message' => 'Comment deleted successfully.']);
     }
+
+    public function log_activity(Request $request, $id)
+{
+    try {
+        // Find the activity by ID
+        $activity = Activity::findOrFail($id);
+
+        // Update status to Logged
+        $activity->status = 'Logged';
+        $activity->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Activity marked as Logged successfully.',
+            'status' => 'Logged'
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Something went wrong while logging the activity.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
 }

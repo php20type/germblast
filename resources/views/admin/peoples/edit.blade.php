@@ -364,6 +364,74 @@
                                 <a href="javascript:void(0)" onclick="scheduleActivity()" class="text-warning">Schedule
                                     an activity</a>
                             </div>
+
+                            @foreach ($scheduled_activities as $scheduled_activity)
+                                <div class="task-section mt-2">
+                                    <div class="company-list mb-3 border rounded p-3">
+                                        <div class="row align-items-start">
+                                            <div class="col-md-8">
+                                                <div class="company-name mt-1">
+                                                    <p><strong>{{ $scheduled_activity->activityType->type ?? 'N/A' }}</strong>
+                                                    </p>
+                                                    <p class="text-secondary mt-1">
+                                                        {{ \Carbon\Carbon::parse($scheduled_activity->date . ' ' . $scheduled_activity->end_time)->format('M j, g:i A') }}
+                                                    </p>
+                                                    <div class="mt-1">
+                                                        <span class="fw-bold">
+                                                            {{ $scheduled_activity->creator->name ?? 'N/A' }}
+                                                        </span>
+                                                        -
+                                                        <span class="text-muted">
+                                                            {{ $scheduled_activity->participant_names ?? 'N/A' }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4 d-flex justify-content-end">
+                                                <div class="d-flex gap-2">
+                                                    <!-- Completed -->
+                                                    <button class="btn btn-sm btn-outline-success log-activity-btn"
+                                                        title="Mark as Completed"
+                                                        data-id="{{ $scheduled_activity->id }}">
+                                                        Log Activity
+                                                    </button>
+
+                                                    <!-- Delete -->
+                                                    <button class="btn btn-sm btn-outline-secondary delete-activity-btn"
+                                                        title="Delete Task" data-id="{{ $scheduled_activity->id }}">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-2">
+                                            <div class="col-12">
+                                                <div class="email-preview border rounded p-3 text-secondary">
+                                                    <div class="row">
+                                                        <div class="col-10">
+                                                            <div class="activity-description">
+                                                                <div class="text-muted mb-2">
+                                                                    <span><i
+                                                                            class="fas fa-pen-to-square text-primary me-1"></i></span>
+                                                                    {{ $scheduled_activity->note ?? 'N/A' }}
+                                                                </div>
+                                                                <div class="text-muted">
+                                                                    <span><i
+                                                                            class="fas fa-file-alt text-warning me-1"></i></span>
+                                                                    {{ $scheduled_activity->description ?? 'N/A' }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+
                             <div class="d-flex align-items-start">
                                 <div class="activity-icon me-3">
                                     <i class="fas fa-list"></i>
@@ -1415,376 +1483,373 @@
         </div>
     </div>
 
-        <!-- Add Lead Modal Start -->
-        <div class="modal fade" id="AddLead" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-fullscreen">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title" id="exampleModalLabel">Add a lead</h1>
-                        <div>
-                            <a href="#" class="link-decoration">Customize fields</a>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                        </div>
-
+    <!-- Add Lead Modal Start -->
+    <div class="modal fade" id="AddLead" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="exampleModalLabel">Add a lead</h1>
+                    <div>
+                        <a href="#" class="link-decoration">Customize fields</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
 
-                        {{-- <form class="company-form" id="add-lead-form"> --}}
-                        <form action="{{ route('admin.leads.store') }}" class="company-form" id="add-lead-form"
-                            method="POST">
-                            @csrf
+                </div>
+                <div class="modal-body">
 
-                            <div class="row mx-0">
-                                <div class="col-lg-12">
-                                    <div class="form-group">
-                                        <label class="form-label">Lead name</label>
-                                        @error('name')
-                                            <span class="text-danger">* {{ $message }}</span>
-                                        @enderror
-                                        <input type="text" name="name" placeholder="Lead Name"
-                                            class="form-control" />
-                                    </div>
+                    {{-- <form class="company-form" id="add-lead-form"> --}}
+                    <form action="{{ route('admin.leads.store') }}" class="company-form" id="add-lead-form"
+                        method="POST">
+                        @csrf
+
+                        <div class="row mx-0">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Lead name</label>
+                                    @error('name')
+                                        <span class="text-danger">* {{ $message }}</span>
+                                    @enderror
+                                    <input type="text" name="name" placeholder="Lead Name" class="form-control" />
                                 </div>
-                                <div class="col-lg-12">
-                                    <div class="form-group">
-                                        <label class="form-label">Assignee</label>
-                                        @error('assignee_id')
-                                            <span class="text-danger">* {{ $message }}</span>
-                                        @enderror
-                                        <select name="assignee_id" class="form-select">
-                                            <option value="">Choose...</option>
-                                            @foreach ($users as $user)
-                                                <option value="{{ $user->id }}">
-                                                    {{ $user->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Assignee</label>
+                                    @error('assignee_id')
+                                        <span class="text-danger">* {{ $message }}</span>
+                                    @enderror
+                                    <select name="assignee_id" class="form-select">
+                                        <option value="">Choose...</option>
+                                        @foreach ($users as $user)
+                                            <option value="{{ $user->id }}">
+                                                {{ $user->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
-                                <div class="col-lg-12">
-                                    <div class="form-group">
-                                        <label class="form-label">Anticipated closed date</label>
-                                        @error('close_date')
-                                            <span class="text-danger">* {{ $message }}</span>
-                                        @enderror
-                                        <input type="text" name="close_date" placeholder="04-Apr-2004"
-                                            class="form-control" />
-                                    </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Anticipated closed date</label>
+                                    @error('close_date')
+                                        <span class="text-danger">* {{ $message }}</span>
+                                    @enderror
+                                    <input type="text" name="close_date" placeholder="04-Apr-2004"
+                                        class="form-control" />
                                 </div>
+                            </div>
 
-                                <!-- Product Row Container -->
-                                <div id="productRowContainer" class="mt-3">
-                                    <div class="row product-row">
-                                        <div class="col-lg-4">
-                                            <div class="form-group">
-                                                <label class="form-label">Products</label>
-                                                <select class="form-select mt-2" name="product_id[]">
-                                                    <option value="">Choose...</option>
-                                                    @foreach ($products as $product)
-                                                        <option value="{{ $product->id }}">{{ $product->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-4">
-                                            <div class="form-group">
-                                                <label class="form-label">Qty :</label>
-                                                <input type="number" name="quantity[]" placeholder="Add quantity"
-                                                    class="form-control" />
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-4">
-                                            <div class="form-group d-flex justify-content-between align-items-end">
-                                                <div style="width: 100%">
-                                                    <label class="form-label fw-light">U.S(USD)</label>
-                                                    <input type="number" name="price[]" step="0.01"
-                                                        placeholder="Add price" class="form-control" />
-                                                </div>
-                                                <button type="button"
-                                                    class="btn btn-danger btn-sm ms-2 remove-product-row">X</button>
-                                            </div>
+                            <!-- Product Row Container -->
+                            <div id="productRowContainer" class="mt-3">
+                                <div class="row product-row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Products</label>
+                                            <select class="form-select mt-2" name="product_id[]">
+                                                <option value="">Choose...</option>
+                                                @foreach ($products as $product)
+                                                    <option value="{{ $product->id }}">{{ $product->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
-                                </div>
-                                <!-- Add New Product Button -->
-                                <button type="button" id="addProductRow"
-                                    class="btn btn-sm btn-link text-primary text-start">
-                                    + Add New Product
-                                </button>
 
-                                <div class="col-lg-12 mt-2">
-                                    <div class="form-group">
-                                        <label class="form-label">Confidence</label>
-                                        @error('confidence')
-                                            <span class="text-danger">* {{ $message }}</span>
-                                        @enderror
-                                        <input type="number" name="confidence" placeholder="Confidence %"
-                                            class="form-control" />
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Qty :</label>
+                                            <input type="number" name="quantity[]" placeholder="Add quantity"
+                                                class="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-4">
+                                        <div class="form-group d-flex justify-content-between align-items-end">
+                                            <div style="width: 100%">
+                                                <label class="form-label fw-light">U.S(USD)</label>
+                                                <input type="number" name="price[]" step="0.01"
+                                                    placeholder="Add price" class="form-control" />
+                                            </div>
+                                            <button type="button"
+                                                class="btn btn-danger btn-sm ms-2 remove-product-row">X</button>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-12">
-                                    <div class="form-group">
-                                        <label class="form-label">Companies</label>
-                                        @error('company_id')
-                                            <span class="text-danger">* {{ $message }}</span>
-                                        @enderror
-                                        {{-- <select name="company_id[]" id="companySelect" class="form-select">
+                            </div>
+                            <!-- Add New Product Button -->
+                            <button type="button" id="addProductRow"
+                                class="btn btn-sm btn-link text-primary text-start">
+                                + Add New Product
+                            </button>
+
+                            <div class="col-lg-12 mt-2">
+                                <div class="form-group">
+                                    <label class="form-label">Confidence</label>
+                                    @error('confidence')
+                                        <span class="text-danger">* {{ $message }}</span>
+                                    @enderror
+                                    <input type="number" name="confidence" placeholder="Confidence %"
+                                        class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Companies</label>
+                                    @error('company_id')
+                                        <span class="text-danger">* {{ $message }}</span>
+                                    @enderror
+                                    {{-- <select name="company_id[]" id="companySelect" class="form-select">
                                         @foreach ($companies as $company)
                                         <option value="{{ $company->id }}">{{ $company->name }}</option>
                                         @endforeach
                                     </select> --}}
-                                        <select name="company_id[]" id="companySelect" class="form-select" multiple>
-                                            <option value="">Choose Company</option>
-                                            @foreach ($companies as $company)
-                                                <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                            @endforeach
-                                        </select>
+                                    <select name="company_id[]" id="companySelect" class="form-select" multiple>
+                                        <option value="">Choose Company</option>
+                                        @foreach ($companies as $company)
+                                            <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                        @endforeach
+                                    </select>
 
-                                    </div>
                                 </div>
-                                <div class="col-lg-12">
-                                    <div class="form-group">
-                                        <label class="form-label">Select Person</label>
-                                        @error('person_id')
-                                            <span class="text-danger">* {{ $message }}</span>
-                                        @enderror
-                                        <select id="person_select" name="person_id[]" class="form-select" multiple>
-                                            <option value="">-- Select Person --</option>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Select Person</label>
+                                    @error('person_id')
+                                        <span class="text-danger">* {{ $message }}</span>
+                                    @enderror
+                                    <select id="person_select" name="person_id[]" class="form-select" multiple>
+                                        <option value="">-- Select Person --</option>
+                                        @foreach ($allpeoples as $allpeople)
+                                            <option value="{{ $allpeople->id }}"
+                                                {{ $allpeople->id == $peoples->id ? 'selected' : '' }}>
+                                                {{ $allpeople->name }}
+                                                ({{ $allpeople->peopleEmail->email }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-label">Sources</label>
+                                    @error('source_id')
+                                        <span class="text-danger">* {{ $message }}</span>
+                                    @enderror
+                                    <select id="source_select" name="source_id[]" class="form-select mt-2" multiple>
+                                        <option value="">Choose...</option>
+                                        @foreach ($sources as $source)
+                                            <option value="{{ $source->id }}">
+                                                {{ $source->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-label">Competitors</label>
+                                    @error('competitors_id')
+                                        <span class="text-danger">* {{ $message }}</span>
+                                    @enderror
+                                    <select id="competitor_select" name="competitors_id[]" class="form-select mt-2"
+                                        multiple>
+                                        <option value="">Choose...</option>
+                                        @foreach ($competitors as $competitor)
+                                            <option value="{{ $competitor->id }}">
+                                                {{ $competitor->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Tags</label>
+                                    <select name="tag_id" class="form-select">
+                                        <option value="">Select tag</option>
+                                        @foreach ($persontags as $persontag)
+                                            <option value="{{ $persontag->id }}">{{ $persontag->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- div=row mx-0 closed --}}
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Create lead</button>
+                        </div>
+                    </form>
+                    {{-- form closed --}}
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- Lead modal end --}}
+
+    {{-- Activities modal --}}
+    <div class="modal fade" id="schedule-activity" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="exampleModalLabel">Schedule Activity</h1>
+                    <div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-body ps-0">
+
+
+                    <form class="company-form" action="{{ route('admin.schedule.activity') }}" method="post"
+                        data-owner-type="People" data-owner-id="{{ $peoples->id }}" data-status="Scheduled"
+                        id="store_activity">
+                        @csrf
+
+                        <div class="row mx-0">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Note</label>
+                                    <textarea id="schedule-note-textarea" name="note" class="form-control w-100"
+                                        placeholder="Write a note… @Mention other users to grab their attention, or reference other companies and people."
+                                        rows="6"></textarea>
+
+                                    <!-- Related Leads of this entity -->
+                                    @foreach ($related_leads as $related_lead)
+                                        <input type="hidden" name="leads_ids[]" value="{{ $related_lead->id }}">
+                                    @endforeach
+
+                                    <!-- Hidden fields for mentioned entities -->
+                                    <input type="hidden" name="mentioned_company_ids"
+                                        id="schedule_mentioned_company_ids" value="">
+                                    <input type="hidden" name="mentioned_people_ids"
+                                        id="schedule_mentioned_people_ids" value="">
+                                    <input type="hidden" name="mentioned_user_ids" id="schedule_mentioned_user_ids"
+                                        value="">
+
+                                    <!-- Hidden field to store processed note content -->
+                                    <input type="hidden" name="schedule_note_value" id="schedule_note_value"
+                                        value="">
+                                </div>
+                            </div>
+
+
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Activity type</label>
+                                    <select class="form-select mt-2" name="activity_type_id">
+                                        <option selected>Choose...</option>
+                                        @foreach ($activity_types as $activity_type)
+                                            <option value="{{ $activity_type->id }}">
+                                                {{ $activity_type->type }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Date</label>
+                                    <input type="date" placeholder="" class="form-control" name="date" />
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 mt-2">
+                                <div class="form-group">
+                                    <label class="form-label">Start Time</label>
+                                    <select class="form-select select2" id="start_time" name="start_time" required>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 mt-2">
+                                <div class="form-group">
+                                    <label class="form-label">End Time</label>
+                                    <select class="form-select select2" id="end_time" name="end_time" required>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 mt-2">
+                                <div class="form-check mb-4">
+                                    <input class="form-check-input" type="checkbox" value=""
+                                        id="flexCheckDefault" name="all_day">
+                                    <label class="form-check-label" for="flexCheckDefault">
+                                        All day
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12">
+                                <div class="form-group mb-4">
+                                    <label class="form-label">Location</label>
+                                    <input type="text" placeholder="Add a Location" class="form-control"
+                                        name="location" />
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12">
+                                <div class="form-group mb-4">
+                                    <label class="form-label">Participants</label>
+                                    <select id="participant_select" name="participant_id[]" class="form-select mt-2"
+                                        multiple>
+                                        {{-- Companies --}}
+                                        <optgroup label="Companies">
+                                            @foreach ($companies as $c)
+                                                <option value="{{ $c->id }}" data-entity-type="company">
+                                                    {{ $c->name }}
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+
+                                        {{-- Peoples --}}
+                                        <optgroup label="Peoples">
                                             @foreach ($allpeoples as $allpeople)
-                                                <option value="{{ $allpeople->id }}"
+                                                <option value="{{ $allpeople->id }}" data-entity-type="people"
                                                     {{ $allpeople->id == $peoples->id ? 'selected' : '' }}>
                                                     {{ $allpeople->name }}
-                                                    ({{ $allpeople->peopleEmail->email }})
                                                 </option>
                                             @endforeach
-                                        </select>
+                                        </optgroup>
 
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <label class="form-label">Sources</label>
-                                        @error('source_id')
-                                            <span class="text-danger">* {{ $message }}</span>
-                                        @enderror
-                                        <select id="source_select" name="source_id[]" class="form-select mt-2" multiple>
-                                            <option value="">Choose...</option>
-                                            @foreach ($sources as $source)
-                                                <option value="{{ $source->id }}">
-                                                    {{ $source->name }}
+                                        {{-- Users --}}
+                                        <optgroup label="Users">
+                                            @foreach ($users as $user)
+                                                <option value="{{ $user->id }}" data-entity-type="user">
+                                                    {{ $user->name }}
                                                 </option>
                                             @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <label class="form-label">Competitors</label>
-                                        @error('competitors_id')
-                                            <span class="text-danger">* {{ $message }}</span>
-                                        @enderror
-                                        <select id="competitor_select" name="competitors_id[]" class="form-select mt-2"
-                                            multiple>
-                                            <option value="">Choose...</option>
-                                            @foreach ($competitors as $competitor)
-                                                <option value="{{ $competitor->id }}">
-                                                    {{ $competitor->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-12">
-                                    <div class="form-group">
-                                        <label class="form-label">Tags</label>
-                                        <select name="tag_id" class="form-select">
-                                            <option value="">Select tag</option>
-                                            @foreach ($persontags as $persontag)
-                                                <option value="{{ $persontag->id }}">{{ $persontag->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                        </optgroup>
+                                    </select>
                                 </div>
                             </div>
-                            {{-- div=row mx-0 closed --}}
 
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Create lead</button>
+                            <div class="col-lg-12">
+                                <label class="form-label">Description</label>
+                                <textarea rows="5" placeholder="Add an agenda to share with your attendees" class="form-control"
+                                    name="agenda"></textarea>
                             </div>
-                        </form>
-                        {{-- form closed --}}
 
-                    </div>
-                </div>
-            </div>
-        </div>
-        {{-- Lead modal end --}}
-
-        {{-- Activities modal --}}
-        <div class="modal fade" id="schedule-activity" tabindex="-1" aria-labelledby="exampleModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-fullscreen">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title" id="exampleModalLabel">Schedule Activity</h1>
-                        <div>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
                         </div>
-                    </div>
-                    <div class="modal-body ps-0">
 
 
-                        <form class="company-form" action="{{ route('admin.schedule.activity') }}" method="post"
-                            data-owner-type="People" data-owner-id="{{ $peoples->id }}" data-status="Scheduled"
-                            id="store_activity">
-                            @csrf
-
-                            <div class="row mx-0">
-                                <div class="col-lg-12">
-                                    <div class="form-group">
-                                        <label class="form-label">Note</label>
-                                        <textarea id="schedule-note-textarea" name="note" class="form-control w-100"
-                                            placeholder="Write a note… @Mention other users to grab their attention, or reference other companies and people."
-                                            rows="6"></textarea>
-
-                                        <!-- Related Leads of this entity -->
-                                        @foreach ($related_leads as $related_lead)
-                                            <input type="hidden" name="leads_ids[]" value="{{ $related_lead->id }}">
-                                        @endforeach
-
-                                        <!-- Hidden fields for mentioned entities -->
-                                        <input type="hidden" name="mentioned_company_ids"
-                                            id="schedule_mentioned_company_ids" value="">
-                                        <input type="hidden" name="mentioned_people_ids"
-                                            id="schedule_mentioned_people_ids" value="">
-                                        <input type="hidden" name="mentioned_user_ids" id="schedule_mentioned_user_ids"
-                                            value="">
-
-                                        <!-- Hidden field to store processed note content -->
-                                        <input type="hidden" name="schedule_note_value" id="schedule_note_value"
-                                            value="">
-                                    </div>
-                                </div>
-
-
-                                <div class="col-lg-12">
-                                    <div class="form-group">
-                                        <label class="form-label">Activity type</label>
-                                        <select class="form-select mt-2" name="activity_type_id">
-                                            <option selected>Choose...</option>
-                                            @foreach ($activity_types as $activity_type)
-                                                <option value="{{ $activity_type->id }}">
-                                                    {{ $activity_type->type }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-lg-12">
-                                    <div class="form-group">
-                                        <label class="form-label">Date</label>
-                                        <input type="date" placeholder="" class="form-control" name="date" />
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6 mt-2">
-                                    <div class="form-group">
-                                        <label class="form-label">Start Time</label>
-                                        <select class="form-select select2" id="start_time" name="start_time" required>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6 mt-2">
-                                    <div class="form-group">
-                                        <label class="form-label">End Time</label>
-                                        <select class="form-select select2" id="end_time" name="end_time" required>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-12 mt-2">
-                                    <div class="form-check mb-4">
-                                        <input class="form-check-input" type="checkbox" value=""
-                                            id="flexCheckDefault" name="all_day">
-                                        <label class="form-check-label" for="flexCheckDefault">
-                                            All day
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-12">
-                                    <div class="form-group mb-4">
-                                        <label class="form-label">Location</label>
-                                        <input type="text" placeholder="Add a Location" class="form-control"
-                                            name="location" />
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-12">
-                                    <div class="form-group mb-4">
-                                        <label class="form-label">Participants</label>
-                                        <select id="participant_select" name="participant_id[]"
-                                            class="form-select mt-2" multiple>
-                                            {{-- Companies --}}
-                                            <optgroup label="Companies">
-                                                @foreach ($companies as $c)
-                                                    <option value="{{ $c->id }}" data-entity-type="company">
-                                                        {{ $c->name }}
-                                                    </option>
-                                                @endforeach
-                                            </optgroup>
-
-                                            {{-- Peoples --}}
-                                            <optgroup label="Peoples">
-                                                @foreach ($allpeoples as $allpeople)
-                                                    <option value="{{ $allpeople->id }}" data-entity-type="people"
-                                                        {{ $allpeople->id == $peoples->id ? 'selected' : '' }}>
-                                                        {{ $allpeople->name }}
-                                                    </option>
-                                                @endforeach
-                                            </optgroup>
-
-                                            {{-- Users --}}
-                                            <optgroup label="Users">
-                                                @foreach ($users as $user)
-                                                    <option value="{{ $user->id }}" data-entity-type="user">
-                                                        {{ $user->name }}
-                                                    </option>
-                                                @endforeach
-                                            </optgroup>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-12">
-                                    <label class="form-label">Description</label>
-                                    <textarea rows="5" placeholder="Add an agenda to share with your attendees" class="form-control"
-                                        name="agenda"></textarea>
-                                </div>
-
-                            </div>
-
-
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success" id="AddActivity">Create activity</button>
-                    </div>
-                    </form>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success" id="AddActivity">Create activity</button>
+                </div>
+                </form>
             </div>
         </div>
+    </div>
 
-        {{-- Leads List modal --}}
+    {{-- Leads List modal --}}
     <div class="modal fade" id="related-leads-list" tabindex="-1" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-fullscreen">
@@ -1830,7 +1895,7 @@
                                     </div>
                                 </div>
                                 <div title="Total Value">
-                                     ${{ \App\Helpers\Helper::calculateTotalValue($related_lead) }}
+                                    ${{ \App\Helpers\Helper::calculateTotalValue($related_lead) }}
                                 </div>
                             </div>
                         @endforeach
@@ -3232,8 +3297,56 @@
                 });
             });
 
+            // ==============================
+            // Log the scheduled Activity
+            // ==============================
+            $(document).on('click', '.log-activity-btn', function() {
+                var activityId = $(this).data('id'); // Get the activity ID
 
-              // ==============================
+                Swal.fire({
+                    title: 'Mark as Logged?',
+                    text: "Do you want to log this activity?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, log it!'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/admin/log_activity/" + activityId,
+                            method: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Activity Logged!',
+                                    text: response.message ||
+                                        'Activity has been marked as logged.',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(function() {
+                                    location
+                                        .reload(); // Reload to reflect the updated status
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong while logging the activity.'
+                                });
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                });
+            });
+
+            // ==============================
             // Delete Activity
             // ==============================
 
@@ -3468,7 +3581,7 @@
                 });
             });
 
-             // Delete Note
+            // Delete Note
             $(document).on('click', '.delete-note-btn', function() {
                 var noteId = $(this).data('id'); // get task ID from button
 

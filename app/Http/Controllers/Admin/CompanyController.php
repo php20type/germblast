@@ -307,6 +307,15 @@ class CompanyController extends Controller
             return $activity;
         });
 
+        // Separate logged and scheduled activities
+        $logged_activities = $activities->filter(function ($activity) {
+            return $activity->status === 'Logged';
+        });
+
+        $scheduled_activities = $activities->filter(function ($activity) {
+            return $activity->status === 'Scheduled';
+        });
+
         $notes = Helper::getNotesForParticipant('company', $company->id);
         $notes->load(['comments.creator']);
         $notes->transform(function ($note) {
@@ -325,13 +334,13 @@ class CompanyController extends Controller
             return $note;
         });
 
-        $timeline = $activities->concat($notes)
+        $timeline = $logged_activities->concat($notes)
             ->sortByDesc('timestamp')
             ->values(); // reindex after sorting
 
         $related_leads = $company->leads;
 
-         foreach ($related_leads as $lead) {
+        foreach ($related_leads as $lead) {
             $status = strtolower($lead->lead_status ?? 'open');
             $icon = '';
 
@@ -457,6 +466,8 @@ class CompanyController extends Controller
         return view('admin.company.edit', compact(
             'company',
             'activities',
+            'logged_activities',
+            'scheduled_activities',
             'notes',
             'timeline',
             'related_leads',
@@ -611,7 +622,7 @@ class CompanyController extends Controller
             'message' => 'Tag removed from company successfully!',
         ]);
     }
-
+    
     public function updateField(Request $request, Company $company)
     {
         $request->validate([

@@ -316,6 +316,74 @@
                                 <a href="javascript:void(0)" onclick="scheduleActivity()" class="text-warning">Schedule
                                     an activity</a>
                             </div>
+
+                            @foreach ($scheduled_activities as $scheduled_activity)
+                                <div class="task-section mt-2">
+                                    <div class="company-list mb-3 border rounded p-3">
+                                        <div class="row align-items-start">
+                                            <div class="col-md-8">
+                                                <div class="company-name mt-1">
+                                                    <p><strong>{{ $scheduled_activity->activityType->type ?? 'N/A' }}</strong>
+                                                    </p>
+                                                    <p class="text-secondary mt-1">
+                                                        {{ \Carbon\Carbon::parse($scheduled_activity->date . ' ' . $scheduled_activity->end_time)->format('M j, g:i A') }}
+                                                    </p>
+                                                    <div class="mt-1">
+                                                        <span class="fw-bold">
+                                                            {{ $scheduled_activity->creator->name ?? 'N/A' }}
+                                                        </span>
+                                                        -
+                                                        <span class="text-muted">
+                                                            {{ $scheduled_activity->participant_names ?? 'N/A' }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4 d-flex justify-content-end">
+                                                <div class="d-flex gap-2">
+                                                    <!-- Completed -->
+                                                    <button class="btn btn-sm btn-outline-success log-activity-btn"
+                                                        title="Mark as Completed"
+                                                        data-id="{{ $scheduled_activity->id }}">
+                                                        Log Activity
+                                                    </button>
+
+                                                    <!-- Delete -->
+                                                    <button class="btn btn-sm btn-outline-secondary delete-activity-btn"
+                                                        title="Delete Task" data-id="{{ $scheduled_activity->id }}">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-2">
+                                            <div class="col-12">
+                                                <div class="email-preview border rounded p-3 text-secondary">
+                                                    <div class="row">
+                                                        <div class="col-10">
+                                                            <div class="activity-description">
+                                                                <div class="text-muted mb-2">
+                                                                    <span><i
+                                                                            class="fas fa-pen-to-square text-primary me-1"></i></span>
+                                                                    {{ $scheduled_activity->note ?? 'N/A' }}
+                                                                </div>
+                                                                <div class="text-muted">
+                                                                    <span><i
+                                                                            class="fas fa-file-alt text-warning me-1"></i></span>
+                                                                    {{ $scheduled_activity->description ?? 'N/A' }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+
                             <div class="d-flex align-items-start">
                                 <div class="activity-icon me-3">
                                     <i class="fas fa-list"></i>
@@ -908,7 +976,7 @@
                                                                     <div
                                                                         class="d-flex justify-content-between align-items-center mb-2">
                                                                         <div>
-                                                                           <span class="comment-avatar">
+                                                                            <span class="comment-avatar">
                                                                                 {{ strtoupper(substr($comment->creator->name ?? 'N/A', 0, 2)) }}
                                                                             </span>
                                                                             <span
@@ -1670,8 +1738,8 @@
                                     <!-- Hidden fields for mentioned entities -->
                                     <input type="hidden" name="mentioned_company_ids"
                                         id="schedule_mentioned_company_ids" value="">
-                                    <input type="hidden" name="mentioned_people_ids" id="schedule_mentioned_people_ids"
-                                        value="">
+                                    <input type="hidden" name="mentioned_people_ids"
+                                        id="schedule_mentioned_people_ids" value="">
                                     <input type="hidden" name="mentioned_user_ids" id="schedule_mentioned_user_ids"
                                         value="">
 
@@ -3269,6 +3337,55 @@
                     error: function(xhr) {
                         alert('Error: ' + xhr.responseText);
                         toastr.error('Something went wrong while logging an activity.');
+                    }
+                });
+            });
+
+            // ==============================
+            // Log the scheduled Activity
+            // ==============================
+            $(document).on('click', '.log-activity-btn', function() {
+                var activityId = $(this).data('id'); // Get the activity ID
+
+                Swal.fire({
+                    title: 'Mark as Logged?',
+                    text: "Do you want to log this activity?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, log it!'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/admin/log_activity/" + activityId,
+                            method: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Activity Logged!',
+                                    text: response.message ||
+                                        'Activity has been marked as logged.',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(function() {
+                                    location
+                                .reload(); // Reload to reflect the updated status
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong while logging the activity.'
+                                });
+                                console.error(xhr.responseText);
+                            }
+                        });
                     }
                 });
             });

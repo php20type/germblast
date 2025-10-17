@@ -216,7 +216,7 @@ class PeopleController extends Controller
             // Add a new attribute to the activity
             $activity->participant_names = $participants->join(', ');
 
-             // Add unified structure fields
+            // Add unified structure fields
             $activity->type = 'activity';
             // $activity->timestamp = $activity->created_at;
             $activity->timestamp = $activity->date; // not created_at
@@ -224,8 +224,8 @@ class PeopleController extends Controller
             return $activity;
         });
 
-         $notes = Helper::getNotesForParticipant('people', $peoples->id);
-         $notes->load(['comments.creator']);
+        $notes = Helper::getNotesForParticipant('people', $peoples->id);
+        $notes->load(['comments.creator']);
         $notes->transform(function ($note) {
             $mentions = collect();
             $mentions = $mentions->merge($note->peoples->pluck('name'));
@@ -242,12 +242,20 @@ class PeopleController extends Controller
             return $note;
         });
 
-        $timeline = $activities->concat($notes)
+         // Separate logged and scheduled activities
+        $logged_activities = $activities->filter(function ($activity) {
+            return $activity->status === 'Logged';
+        });
+
+        $scheduled_activities = $activities->filter(function ($activity) {
+            return $activity->status === 'Scheduled';
+        });
+
+        $timeline = $logged_activities->concat($notes)
             ->sortByDesc('timestamp')
             ->values(); // reindex after sorting
 
-
-       $related_leads = $peoples->leads;
+        $related_leads = $peoples->leads;
 
         foreach ($related_leads as $lead) {
             $status = strtolower($lead->lead_status ?? 'open');
@@ -387,6 +395,8 @@ class PeopleController extends Controller
             'peoples',
             'leads',
             'activities',
+            'logged_activities',
+            'scheduled_activities',
             'notes',
             'timeline',
             'persontags',
