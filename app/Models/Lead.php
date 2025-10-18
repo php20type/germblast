@@ -39,6 +39,11 @@ class Lead extends Model
         return $this->morphMany(Activity::class, 'owner');
     }
 
+    public function timeline(): MorphMany
+    {
+        return $this->morphMany(Timeline::class, 'owner');
+    }
+
     public function note(): MorphMany
     {
         return $this->morphMany(Note::class, 'owner');

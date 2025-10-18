@@ -25,6 +25,7 @@ class Company extends Model
     ];
 
     protected $morphClass = 'Company';
+
     protected $with = ['companyEmail', 'companyPhone', 'companyAddress', 'companyUrl', 'companyPeople', 'companyTask'];
 
     // public function people()
@@ -35,9 +36,14 @@ class Company extends Model
     // New relation according to the new migration
     // ===============================================================
 
-       public function activity(): MorphMany
+    public function activity(): MorphMany
     {
         return $this->morphMany(Activity::class, 'owner');
+    }
+
+    public function timeline(): MorphMany
+    {
+        return $this->morphMany(Timeline::class, 'owner');
     }
 
     public function note(): MorphMany
@@ -163,6 +169,4 @@ class Company extends Model
         return $this->belongsToMany(Tag::class, 'company_tags')
             ->withTimestamps();
     }
-
-
 }

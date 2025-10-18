@@ -165,6 +165,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/leads/watching-leads', [LeadController::class, 'watching_leads'])->name('leads.watching_leads');
     Route::post('leads/delete-field', [LeadController::class, 'deleteField'])->name('leads.delete-field');
     Route::post('leads/update-field', [LeadController::class, 'updateField'])->name('leads.update-field');
+    Route::post('/leads/add-product', [LeadController::class, 'addProduct'])->name('leads.add-product');
+
 
     // settings section
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');

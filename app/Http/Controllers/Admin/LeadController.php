@@ -970,75 +970,6 @@ class LeadController extends Controller
         ]);
     }
 
-    // public function deleteField(Request $request)
-    // {
-    //     $request->validate([
-    //         'lead_id' => 'required|integer',
-    //         'related_id' => 'required|integer',
-    //         'type' => 'required|string|in:company,people,product,competitor,source',
-    //     ]);
-
-    //     $leadId = $request->lead_id;
-    //     $relatedId = $request->related_id;
-    //     $type = $request->type;
-
-    //     try {
-    //         switch ($type) {
-    //             case 'company':
-    //                 $deleted = LeadCompany::where('lead_id', $leadId)
-    //                     ->where('company_id', $relatedId)
-    //                     ->delete();
-    //                 break;
-
-    //             case 'people':
-    //                 $deleted = LeadPeople::where('lead_id', $leadId)
-    //                     ->where('people_id', $relatedId)
-    //                     ->delete();
-    //                 break;
-
-    //             case 'product':
-    //                 $deleted = LeadProduct::where('lead_id', $leadId)
-    //                     ->where('product_id', $relatedId)
-    //                     ->delete();
-    //                 break;
-
-    //             case 'competitor':
-    //                 $deleted = LeadCompetitor::where('lead_id', $leadId)
-    //                     ->where('competitor_id', $relatedId)
-    //                     ->delete();
-    //                 break;
-
-    //             case 'source':
-    //                 $deleted = LeadSource::where('lead_id', $leadId)
-    //                     ->where('source_id', $relatedId)
-    //                     ->delete();
-    //                 break;
-
-    //             default:
-    //                 return response()->json(['success' => false, 'message' => 'Invalid type provided.'], 422);
-    //         }
-
-    //         if ($deleted) {
-    //             return response()->json([
-    //                 'success' => true,
-    //                 'message' => ucfirst($type).' removed successfully from lead.',
-    //             ]);
-    //         }
-
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => ucfirst($type).' not found or already deleted.',
-    //         ], 404);
-
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Error deleting '.$type,
-    //             'error' => $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
-
     public function deleteField(Request $request)
     {
         $request->validate([
@@ -1052,13 +983,13 @@ class LeadController extends Controller
 
         try {
             switch ($type) {
-                case 'company':
+               case 'company':
                     $deleted = LeadCompany::where('id', $relatedId)->delete();
-                    break;
+                   break;
 
-                case 'people':
-                    $deleted = LeadPeople::where('id', $relatedId)->delete();
-                    break;
+           case 'people':
+                   $deleted = LeadPeople::where('id', $relatedId)->delete();
+                   break;
 
                 case 'product':
                     $deleted = LeadProduct::where('id', $relatedId)->delete();
@@ -1099,6 +1030,82 @@ class LeadController extends Controller
             ], 500);
         }
     }
+
+    // public function deleteField(Request $request)
+    // {
+    //     $request->validate([
+    //         'lead_id' => 'required|exists:leads,id',
+    //         'related_id' => 'required',
+    //         'type' => 'required|string',
+    //     ]);
+
+    //     $lead = Lead::findOrFail($request->lead_id);
+
+    //     switch ($request->type) {
+    //         case 'company':
+    //             $model = Company::class;
+    //             $relation = 'companies';
+    //             $pivotColumn = 'company_id';
+    //             break;
+
+    //         case 'people':
+    //             $model = People::class;
+    //             $relation = 'peoples';
+    //             $pivotColumn = 'people_id';
+    //             break;
+
+    //         case 'competitor':
+    //             $model = Competitor::class;
+    //             $relation = 'competitors';
+    //             $pivotColumn = 'competitor_id';
+    //             break;
+
+    //         case 'source':
+    //             $model = Source::class;
+    //             $relation = 'sources';
+    //             $pivotColumn = 'source_id';
+    //             break;
+
+    //         case 'product':
+    //             $model = Product::class;
+    //             $relation = 'products';
+    //             $pivotColumn = 'product_id';
+    //             break;
+
+    //         default:
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Invalid type.',
+    //             ], 422);
+    //     }
+
+    //     $item = $model::find($request->related_id);
+
+    //     if (! $item) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => ucfirst($request->type).' not found.',
+    //         ], 404);
+    //     }
+
+    //     // Check if the item exists in pivot
+    //     $exists = $lead->$relation()->wherePivot($pivotColumn, $item->id)->exists();
+
+    //     if (! $exists) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => ucfirst($request->type).' is not attached to this lead.',
+    //         ], 404);
+    //     }
+
+    //     // Detach the item from pivot table
+    //     $lead->$relation()->detach($item->id);
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => ucfirst($request->type).' removed successfully from lead.',
+    //     ]);
+    // }
 
     public function updateField(Request $request)
     {
@@ -1166,6 +1173,29 @@ class LeadController extends Controller
         return response()->json([
             'success' => true,
             'message' => ucfirst($request->type).' added successfully.',
+        ]);
+    }
+
+    public function addProduct(Request $request)
+    {
+        $request->validate([
+            'lead_id' => 'required|exists:leads,id',
+            'product_id' => 'required|exists:products,id',
+            'qty' => 'required|numeric|min:1',
+            'price' => 'required|numeric|min:0',
+        ]);
+
+        $lead = Lead::findOrFail($request->lead_id);
+
+        $leadProduct = $lead->leadProducts()->create([
+            'product_id' => $request->product_id,
+            'qty' => $request->qty,
+            'price' => $request->price,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Product added successfully!',
         ]);
     }
 

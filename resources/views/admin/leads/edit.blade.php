@@ -54,7 +54,6 @@
                                             </div>
                                         </div>
 
-
                                     </div>
                                     <div class="amount">$2</div>
                                 </div>
@@ -111,7 +110,7 @@
                             <div class="pipeline-section">
                                 <div class="pipeline-header">
                                     <div class="pipeline-title">Stage Tasks</div>
-                                    <a href="#" class="text-warning">Edit processes</a>
+                                    <a href="#" class="d-none text-warning">Edit processes</a>
                                 </div>
 
                                 <div id="initial-meeting-stage" class="{{ $leads->stage_id == 1 ? '' : 'd-none' }}">
@@ -360,6 +359,7 @@
                                         about your leads, benefiting both you and your company. Prioritize your
                                         top three fields here; the remaining fields will be accessible on the
                                         sidebar.</p>
+                                    <br>
                                     <p class="text-muted mb-0">
                                         Note: User will be redirected to settings > organization > custom fields
                                         to create custom fields.
@@ -2653,6 +2653,65 @@
                         }
                     });
                 });
+
+                // ==============================
+                // Add Product to Lead
+                // ==============================
+                $(document).on("click", "#submitAddPerson", function() {
+                    let leadId = "{{ $leads->id }}";
+                    let productId = $("#product-name").val();
+                    let qty = $("input[name='inline_qty']").val();
+                    let price = $("input[name='inline_price']").val();
+
+                    if (!productId || !qty || !price) {
+                        toastr.error("Please fill all product details before adding.");
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: 'Add Product?',
+                        text: "Do you want to add this product to the lead?",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#dc3545',
+                        confirmButtonText: 'Yes, add it',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: "{{ route('admin.leads.add-product') }}",
+                                method: "POST",
+                                data: {
+                                    _token: "{{ csrf_token() }}",
+                                    lead_id: leadId,
+                                    product_id: productId,
+                                    qty: qty,
+                                    price: price
+                                },
+                                success: function(response) {
+                                    if (response.success) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Added!',
+                                            text: response.message,
+                                            timer: 1500,
+                                            showConfirmButton: false
+                                        }).then(() => location.reload());
+                                    } else {
+                                        toastr.error(response.message ||
+                                            "Failed to add product.");
+                                    }
+                                },
+                                error: function(xhr) {
+                                    toastr.error("Something went wrong.");
+                                    console.error(xhr.responseText);
+                                }
+                            });
+                        }
+                    });
+                });
+
 
                 // ==============================
                 // Delete fields on sidebar of leads details section
