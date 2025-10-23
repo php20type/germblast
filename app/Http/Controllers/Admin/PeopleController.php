@@ -28,22 +28,30 @@ use Illuminate\Support\Facades\DB;
 
 class PeopleController extends Controller
 {
-    private function getSidebarStats()
+    public function getSidebarStats()
     {
         $user = auth()->user();
 
-        $peoples = People::with(['companies', 'tag', 'user'])->get();
+        $peoples = People::with(['companies', 'tags', 'user'])->get();
         $myPeopleCount = $peoples->where('user_id', $user->id)->count();
         $totalPeoples = $peoples->count();
-        $formattedTotalPeoples = number_format($totalPeoples / 1000, 1);
 
-        return compact('myPeopleCount', 'totalPeoples', 'formattedTotalPeoples');
+        // Conditional formatting
+        $formattedTotalPeoples = $totalPeoples >= 1000
+            ? number_format($totalPeoples / 1000, 1).'K'
+            : $totalPeoples;
+
+        $formattedMyPeopleCount = $myPeopleCount >= 1000
+            ? number_format($myPeopleCount / 1000, 1).'K'
+            : $myPeopleCount;
+
+        return compact('myPeopleCount', 'formattedMyPeopleCount', 'totalPeoples', 'formattedTotalPeoples');
     }
 
     public function index(Request $request)
     {
         $user = auth()->user();
-        $query = People::with(['companies', 'tag', 'user', 'peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany']);
+        $query = People::with(['companies', 'tags', 'user', 'peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany']);
 
         // AJAX filters
         if ($request->ajax()) {
@@ -54,27 +62,39 @@ class PeopleController extends Controller
                 $query->where('name', 'like', "%{$search}%");
             }
 
-            // Filter by marketing_status
-            if ($request->filled('marketing_status')) {
-                $query->where('marketing_status', $request->marketing_status);
+            if ($request->filled('user_id')) {
+                $query->whereHas('user', function ($q) use ($request) {
+                    $q->where('user_id', $request->user_id);
+                });
+            }
+            if ($request->filled('company_id')) {
+                $query->whereHas('companiesAlt', function ($q) use ($request) {
+                    $q->where('company_id', $request->company_id);
+                });
             }
 
         }
 
         // Get filtered people
         $peoples = $query->get();
+        $peoplesCount = $peoples->count();
+        $companies = Company::all();
+        $users = User::all();
 
         // Sidebar stats
         $sidebarStats = $this->getSidebarStats();
 
         // Return partial for AJAX
         if ($request->ajax()) {
-            return view('admin.peoples.partials.people-table-row', compact('peoples'))->render();
+            return response()->json([
+                'table' => view('admin.peoples.partials.people-table-row', compact('peoples'))->render(),
+                'count' => $peoplesCount,
+            ]);
         }
 
         // Normal page load
         return view('admin.peoples.index', array_merge(
-            compact('peoples'),
+            compact('peoples', 'peoplesCount', 'companies', 'users'),
             $sidebarStats
         ));
     }
@@ -85,7 +105,7 @@ class PeopleController extends Controller
         $users = User::all();
 
         // Base query: people assigned to the given user
-        $query = People::with(['companies', 'tag', 'user', 'peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany'])
+        $query = People::with(['companies', 'tags', 'user', 'peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany'])
             ->where('user_id', $id);
 
         // AJAX filters
@@ -97,26 +117,38 @@ class PeopleController extends Controller
                 $query->where('name', 'like', "%{$search}%");
             }
 
-            // Filter by marketing_status
-            if ($request->filled('marketing_status')) {
-                $query->where('marketing_status', $request->marketing_status);
+             if ($request->filled('user_id')) {
+                $query->whereHas('user', function ($q) use ($request) {
+                    $q->where('user_id', $request->user_id);
+                });
+            }
+            if ($request->filled('company_id')) {
+                $query->whereHas('companiesAlt', function ($q) use ($request) {
+                    $q->where('company_id', $request->company_id);
+                });
             }
         }
 
         // Get filtered people
         $peoples = $query->get();
+        $myPeoplesCount = $peoples->count();
+        $companies = Company::all();
+        $users = User::all();
 
         // Sidebar stats
         $sidebarStats = $this->getSidebarStats();
 
-        // Return partial for AJAX
+         // Return partial for AJAX
         if ($request->ajax()) {
-            return view('admin.peoples.partials.people-table-row', compact('peoples'))->render();
+            return response()->json([
+                'table' => view('admin.peoples.partials.people-table-row', compact('peoples'))->render(),
+                'count' => $myPeoplesCount,
+            ]);
         }
 
         // Normal page load
         return view('admin.peoples.my-peoples', array_merge(
-            compact('users', 'peoples'),
+            compact('users', 'peoples','myPeoplesCount', 'companies', 'users'),
             $sidebarStats
         ));
     }
@@ -127,7 +159,7 @@ class PeopleController extends Controller
         $users = User::all();
 
         // Fetch people assigned to current user with updated relationships
-        $peoples = People::with(['companies', 'tag', 'user', 'peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany'])
+        $peoples = People::with(['companies', 'tags', 'user', 'peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany'])
             ->where('user_id', $user->id)
             ->get();
 
@@ -146,7 +178,7 @@ class PeopleController extends Controller
         $users = User::all();
 
         // Fetch people assigned to current user with updated relationships
-        $peoples = People::with(['companies', 'tag', 'user'])
+        $peoples = People::with(['companies', 'tags', 'user'])
             ->where('user_id', $user->id)
             ->get();
 
@@ -165,7 +197,7 @@ class PeopleController extends Controller
         $users = User::all();
 
         // Fetch people assigned to current user with updated relationships
-        $peoples = People::with(['companies', 'tag', 'user'])
+        $peoples = People::with(['companies', 'tags', 'user'])
             ->where('user_id', $user->id)
             ->get();
 
@@ -242,7 +274,7 @@ class PeopleController extends Controller
             return $note;
         });
 
-         // Separate logged and scheduled activities
+        // Separate logged and scheduled activities
         $logged_activities = $activities->filter(function ($activity) {
             return $activity->status === 'Logged';
         });

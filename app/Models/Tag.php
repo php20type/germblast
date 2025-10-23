@@ -18,15 +18,6 @@ class Tag extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-    public function company()
-    {
-        return $this->hasMany(Company::class, 'tag_id');
-    }
-
-    public function people()
-    {
-        return $this->hasMany(People::class, 'tag_id');
-    }
 
     // Lead Tags pivot table
     public function leadTags()

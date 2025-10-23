@@ -16,7 +16,8 @@ closeButton.addEventListener("click", function () {
 
 // Handle checkbox selection
 const selectAllCheckbox = document.getElementById('selectAll');
-const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+// const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+const tableBody = document.querySelector('table tbody');
 const actionBar = document.getElementById('actionBar');
 const selectedCount = document.getElementById('selectedCount');
 
@@ -33,32 +34,64 @@ function updateActionBar() {
 // Initialize with first row checked
 updateActionBar();
 
+// selectAllCheckbox.addEventListener('change', function () {
+//     rowCheckboxes.forEach(checkbox => {
+//         checkbox.checked = selectAllCheckbox.checked;
+//     });
+//     updateActionBar();
+// });
 selectAllCheckbox.addEventListener('change', function () {
+    const rowCheckboxes = tableBody.querySelectorAll('.row-checkbox'); // re-query after AJAX
     rowCheckboxes.forEach(checkbox => {
         checkbox.checked = selectAllCheckbox.checked;
     });
     updateActionBar();
 });
 
-rowCheckboxes.forEach(checkbox => {
-    checkbox.addEventListener('change', function () {
+
+// rowCheckboxes.forEach(checkbox => {
+//     checkbox.addEventListener('change', function () {
+//         const allChecked = Array.from(rowCheckboxes).every(cb => cb.checked);
+//         const someChecked = Array.from(rowCheckboxes).some(cb => cb.checked);
+
+//         selectAllCheckbox.checked = allChecked;
+//         selectAllCheckbox.indeterminate = someChecked && !allChecked;
+
+//         updateActionBar();
+//     });
+// });
+
+// // Table row hover effects
+// const tableRows = document.querySelectorAll('tbody tr');
+// tableRows.forEach(row => {
+//     row.addEventListener('mouseenter', function () {
+//         this.style.backgroundColor = '#f8f9fa';
+//     });
+//     row.addEventListener('mouseleave', function () {
+//         this.style.backgroundColor = '';
+//     });
+// });
+// Event delegation for dynamically added row checkboxes
+tableBody.addEventListener('change', function(e) {
+    if (e.target.classList.contains('row-checkbox')) {
+        updateActionBar();
+
+        const rowCheckboxes = tableBody.querySelectorAll('.row-checkbox');
         const allChecked = Array.from(rowCheckboxes).every(cb => cb.checked);
         const someChecked = Array.from(rowCheckboxes).some(cb => cb.checked);
 
         selectAllCheckbox.checked = allChecked;
         selectAllCheckbox.indeterminate = someChecked && !allChecked;
-
-        updateActionBar();
-    });
+    }
 });
 
-// Table row hover effects
-const tableRows = document.querySelectorAll('tbody tr');
-tableRows.forEach(row => {
-    row.addEventListener('mouseenter', function () {
-        this.style.backgroundColor = '#f8f9fa';
-    });
-    row.addEventListener('mouseleave', function () {
-        this.style.backgroundColor = '';
-    });
-});
+// Event delegation for row hover effects
+tableBody.addEventListener('mouseenter', function(e) {
+    const row = e.target.closest('tr');
+    if (row) row.style.backgroundColor = '#f8f9fa';
+}, true);
+
+tableBody.addEventListener('mouseleave', function(e) {
+    const row = e.target.closest('tr');
+    if (row) row.style.backgroundColor = '';
+}, true);

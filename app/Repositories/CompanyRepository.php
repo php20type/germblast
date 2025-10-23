@@ -18,7 +18,7 @@ class CompanyRepository implements CompanyRepositoryInterface
     public function getAllWithRelations()
     {
         return $this->model->with([
-            'user', 'companyType', 'tag', 'peoples',
+            'user', 'companyType', 'tags', 'peoples',
             'companyEmail', 'companyPhone', 'companyAddress', 'companyUrl', 'companyPeople'
         ]);
     }
@@ -27,7 +27,7 @@ class CompanyRepository implements CompanyRepositoryInterface
     public function getByUserWithRelations($userId)
     {
         return $this->model->with([
-            'user', 'companyType', 'tag', 'peoples',
+            'user', 'companyType', 'tags', 'peoples',
             'companyEmail', 'companyPhone', 'companyAddress', 'companyUrl'
         ])->where('user_id', $userId);
     }

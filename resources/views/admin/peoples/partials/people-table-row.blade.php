@@ -22,15 +22,16 @@
             {{ $people->peoplePhone->phone ?? 'N/A' }}
         </td>
         <td>
-             {{ $people->peopleAddress->address ?? 'N/A' }}
+            {{ $people->peopleAddress->address ?? 'N/A' }}
         </td>
         <td>
-            <span class="badge-customer">
-                {{ $people->tag->name ?? 'N/A' }}
-            </span>
-        </td>
-        <td class="company-count">
-             {{ $people->marketing_status ?? 'N/A' }}
+            @if ($people->tags->isNotEmpty())
+                @foreach ($people->tags as $tag)
+                    <span class="badge-customer">{{ $tag->name }}</span>
+                @endforeach
+            @else
+                <span>N/A</span>
+            @endif
         </td>
     </tr>
 @empty

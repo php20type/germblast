@@ -25,9 +25,13 @@
                  {{ $company->companyType->type ?? 'N/A' }}
              </span></td>
          <td>
-             <span class="badge-customer">
-                 {{ $company->tag->name ?? 'N/A' }}
-             </span>
+             @if ($company->tags->isNotEmpty())
+                 @foreach ($company->tags as $tag)
+                     <span class="badge-customer">{{ $tag->name }}</span>
+                 @endforeach
+             @else
+                 <span>N/A</span>
+             @endif
          </td>
      </tr>
  @empty

@@ -1,10 +1,10 @@
 <!-- Sidebar -->
 <div class="col-md-2">
     <div class="sidebar">
-        <div class="counter-number">
-            <a class="nav-link" href="{{ route('admin.peoples.index') }}">
-                All People
-                <span class="badge bg-light text-dark">{{ $formattedTotalPeoples }}k</span>
+        <div class="">
+            <a class="nav-link {{ request()->routeIs('admin.peoples.index') ? 'active' : '' }}" href="{{ route('admin.peoples.index') }}">
+                All peoples
+                <span class="badge bg-light text-dark">{{ $formattedTotalPeoples }}</span>
             </a>
         </div>
         <div class="my-3">
@@ -26,7 +26,7 @@
                 <a class="nav-link people-filter {{ request()->routeIs('admin.peoples.my_peoples') ? 'active' : '' }}"
                     href="{{ route('admin.peoples.my_peoples', auth()->id()) }}">
                     My people
-                    <span class="badge bg-light text-dark">{{ $myPeopleCount }}</span>
+                    <span class="badge bg-light text-dark">{{ $formattedMyPeopleCount }}</span>
                 </a>
                 <a class="d-none nav-link people-filter {{ request()->routeIs('admin.peoples.marketing_contacts') ? 'active' : '' }}"
                     href="{{ route('admin.peoples.marketing_contacts') }}">
@@ -39,12 +39,12 @@
                 <h6 class="text-uppercase text-light mb-2">Audiences </h6>
                 <a class="nav-link people-filter {{ request()->routeIs('admin.peoples.animal_care') ? 'active' : '' }}"
                     href="{{ route('admin.peoples.animal_care') }}">
-                    Pet/Animal Care
+                    Pet/Animal care
                     <span class="badge bg-light text-dark">3</span>
                 </a>
                 <a class="nav-link people-filter {{ request()->routeIs('admin.peoples.sequence_healthcare') ? 'active' : '' }}"
                     href="{{ route('admin.peoples.sequence_healthcare') }}">
-                    1st Drip Sequence..
+                    1st drip sequence..
                     <span class="badge bg-light text-dark">76</span>
                 </a>
                  <div id="nothing-found" style="display:none;">Nothing found.</div>

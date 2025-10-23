@@ -25,26 +25,10 @@
                                         <p class="text-muted mb-0">Contacts (or the individuals) you do business with
                                         </p>
                                     </div>
-                                    <div class="right-part">
+                                    <div class="d-none right-part">
                                         <button class="btn btn-email">Email</button>
                                         <button class="btn btn-export">EXPORT</button>
                                     </div>
-                                </div>
-
-                                <!-- Tabs Navigation -->
-                                <div class="navbar-tabs">
-                                    <ul class="nav nav-tabs" id="viewTabs" role="tablist">
-                                        <li class="nav-item" role="presentation">
-                                            <button class="nav-link active" id="list-tab" data-bs-toggle="tab"
-                                                data-bs-target="#list-content" type="button" role="tab"
-                                                aria-controls="list-content" aria-selected="true">LIST</button>
-                                        </li>
-                                        <li class="nav-item" role="presentation">
-                                            <button class="nav-link" id="map-tab" data-bs-toggle="tab"
-                                                data-bs-target="#map-content" type="button" role="tab"
-                                                aria-controls="map-content" aria-selected="false">MAP</button>
-                                        </li>
-                                    </ul>
                                 </div>
 
                                 <!-- Tabs Content -->
@@ -61,18 +45,29 @@
                                                             <input type="search" class="form-control" placeholder=""
                                                                 aria-label="Search" id="people-search">
                                                         </div>
-                                                        <span class="company-count">{{ $totalPeoples }} people</span>
+                                                        <span class="company-count">{{ $peoplesCount }} People Found</span>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="d-flex align-items-center justify-content-end dropdown">
                                                         <div class="me-2">
-                                                            <select class="form-select" name="marketing_status">
-                                                                <option value="">Marketing Status</option>
-                                                                <option value="Bouncing">Bouncing</option>
-                                                                <option value="Unsubscribed">Unsubscribed</option>
-                                                                <option value="No Email Address">No Email Address</option>
-                                                                <option value="Marketable">Marketable</option>
+                                                            <select class="form-select" aria-label="Default select example"
+                                                                name="company_id">
+                                                                <option value="">Company</option>
+                                                                @foreach ($companies as $company)
+                                                                    <option value="{{ $company->id }}">{{ $company->name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="me-2">
+                                                            <select class="form-select" aria-label="Default select example"
+                                                                name="user_id">
+                                                                <option value="">Assingee</option>
+                                                                @foreach ($users as $user)
+                                                                    <option value="{{ $user->id }}">{{ $user->name }}
+                                                                    </option>
+                                                                @endforeach
                                                             </select>
                                                         </div>
                                                         <button class="d-none btn btn-primary me-2"><img
@@ -96,46 +91,19 @@
                                                                 <input type="checkbox" class="form-check-input"
                                                                     id="selectAll">
                                                             </th>
-                                                            <th>
-                                                                <img src="{{ asset('img/icons/down-vector.svg') }}"
-                                                                    alt="" /> Person
-                                                                name </i>
-                                                            </th>
-                                                            <th>
-                                                                <img src="{{ asset('img/icons/down-vector.svg') }}"
-                                                                    alt="" /> Last
-                                                                contact </i>
-                                                            </th>
-                                                            <th>
-                                                                <img src="{{ asset('img/icons/down-vector.svg') }}"
-                                                                    alt="" /> Email
-                                                                </i>
-                                                            </th>
-                                                            <th>
-                                                                <img src="{{ asset('img/icons/down-vector.svg') }}"
-                                                                    alt="" /> Phone
-                                                                </i>
-                                                            </th>
-                                                            <th>
-                                                                <img src="{{ asset('img/icons/down-vector.svg') }}"
-                                                                    alt="" /> Address </i>
-                                                            </th>
-                                                            <th>
-                                                                <img src="{{ asset('img/icons/down-vector.svg') }}"
-                                                                    alt="" /> Tags
-                                                                </i>
-                                                            </th>
-                                                            <th>
-                                                                <img src="{{ asset('img/icons/down-vector.svg') }}"
-                                                                    alt="" /> Marketing Status
-                                                                </i>
-                                                            </th>
+                                                            <th>People name</th>
+                                                            <th>Last contact</th>
+                                                            <th>Email</th>
+                                                            <th>Phone</th>
+                                                            <th>Address</th>
+                                                            <th>Tags</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        @foreach ($peoples as $people)
+                                                        @forelse ($peoples as $people)
                                                             <tr>
-                                                                <td><input type="checkbox"
+                                                                <td>
+                                                                    <input type="checkbox"
                                                                         class="form-check-input row-checkbox">
                                                                 </td>
                                                                 <td>
@@ -146,7 +114,7 @@
                                                                         </a>
                                                                     </div>
                                                                     <div class="company-name">
-                                                                        {{ $people->companiesAlt->first()->name ?? 'N/A' }}
+                                                                        {{ $people->companiesAlt->first()?->name ?? 'N/A' }}
                                                                     </div>
                                                                 </td>
                                                                 <td>
@@ -162,15 +130,22 @@
                                                                     {{ $people->peopleAddress->address ?? 'N/A' }}
                                                                 </td>
                                                                 <td>
-                                                                    <span class="badge-customer">
-                                                                        {{ $people->tag->name ?? 'N/A' }}
-                                                                    </span>
-                                                                </td>
-                                                                <td class="company-count">
-                                                                    {{ $people->marketing_status ?? 'N/A' }}
+                                                                    @if ($people->tags->isNotEmpty())
+                                                                        @foreach ($people->tags as $tag)
+                                                                            <span
+                                                                                class="badge-customer">{{ $tag->name }}</span>
+                                                                        @endforeach
+                                                                    @else
+                                                                        <span>N/A</span>
+                                                                    @endif
                                                                 </td>
                                                             </tr>
-                                                        @endforeach
+                                                        @empty
+                                                            <tr>
+                                                                <td colspan="7" class="text-center">No People found</td>
+                                                            </tr>
+                                                        @endforelse
+
 
                                                     </tbody>
                                                 </table>
@@ -178,19 +153,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- MAP Tab Content -->
-                                    <div class="tab-pane fade" id="map-content" role="tabpanel"
-                                        aria-labelledby="map-tab">
-                                        <div class="mx-3">
-                                            <div id="google-map" class="mt-3 w-100 border rounded">
-                                                <iframe
-                                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12043.443952636168!2d-78.48005627730406!3d41.006415734414446!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89cc680ea3110bad%3A0x314ee726c077f6b9!2sHyde%2C%20PA%2C%20USA!5e0!3m2!1sen!2sin!4v1750664745416!5m2!1sen!2sin"
-                                                    width="100%" height="450" style="border:0;" allowfullscreen=""
-                                                    loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                                            </div>
-                                        </div>
-
-                                    </div>
                                 </div>
 
                                 <!-- Action Bar -->
@@ -198,10 +160,6 @@
                                     <div class="d-flex align-items-center justify-content-center">
                                         <span class="me-3"><strong id="selectedCount">1</strong> Selected</span>
                                         <button class="btn btn-edit btn-action">CREATE LEAD</button>
-                                        <button class="btn btn-edit btn-action">EDIT</button>
-                                        <button class="btn btn-merge btn-action">MERGE</button>
-                                        <button class="btn btn-merge btn-action">SEND TO MAILCHIMP</button>
-                                        <button class="btn btn-add-audience btn-action">ADD TO AUDIENCE</button>
                                         <button class="btn btn-delete btn-action">DELETE</button>
                                     </div>
                                 </div>
@@ -213,7 +171,6 @@
 
                     <!-- All Companies Section End  -->
 
-
         </main>
 
     @endsection
@@ -222,23 +179,30 @@
             $(document).ready(function() {
                 function fetchPeoples() {
                     let search = $('#people-search').val();
-                    let marketing_status = $('select[name="marketing_status"]').val();
+                    let user_id = $('select[name="user_id"]').val();
+                    let company_id = $('select[name="company_id"]').val();
 
                     $.ajax({
                         url: "{{ route('admin.peoples.index') }}",
                         method: "GET",
                         data: {
                             search: search,
-                            marketing_status: marketing_status,
+                            user_id: user_id,
+                            company_id: company_id,
                         },
-                        success: function(data) {
-                            $('table tbody').html(data);
+                        success: function(response) {
+                            $('table tbody').html(response.table);
+                            $('.company-count').text(response.count + ' People Found');
+                        },
+                        error: function(err) {
+                            console.error('Error fetching people data', err);
                         }
                     });
                 }
 
                 $('#people-search').on('keyup', fetchPeoples);
-                $('#checkDefault, select[name="marketing_status"]').on('change',
+                $('#checkDefault,select[name="user_id"], select[name="company_id"]').on(
+                    'change',
                     fetchPeoples);
             });
         </script>

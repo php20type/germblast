@@ -16,7 +16,6 @@ class Company extends Model
         'industry_id',
         'company_type_id',
         'territory_id',
-        'tag_id',
         'country_id',
         'state_id',
         'city_id',
@@ -26,7 +25,7 @@ class Company extends Model
 
     protected $morphClass = 'Company';
 
-    protected $with = ['companyEmail', 'companyPhone', 'companyAddress', 'companyUrl', 'companyPeople', 'companyTask'];
+    protected $with = ['companyEmail', 'companyPhone', 'companyAddress', 'companyUrl', 'companyPeople', 'companyTask','companyTags','tags'];
 
     // public function people()
     // {
@@ -72,11 +71,6 @@ class Company extends Model
     public function territory()
     {
         return $this->belongsTo(Territory::class, 'territory_id');
-    }
-
-    public function tag()
-    {
-        return $this->belongsTo(Tag::class, 'tag_id');
     }
 
     public function country()

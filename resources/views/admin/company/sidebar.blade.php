@@ -1,10 +1,10 @@
 <!-- Sidebar -->
 <div class="col-md-2">
     <div class="sidebar">
-        <div class="counter-number">
-            <a class="nav-link" href="{{ route('admin.company.index') }}">
+        <div class="">
+            <a class="nav-link {{ request()->routeIs('admin.company.index') ? 'active' : '' }}" href="{{ route('admin.company.index') }}">
                 All companies
-                <span class="badge bg-light text-dark">{{ $formattedTotalCompanies }}k</span>
+                <span class="badge bg-light text-dark">{{ $formattedTotalCompanies }}</span>
             </a>
         </div>
         <div class="my-3">
@@ -27,7 +27,7 @@
                 <a class="nav-link company-filter {{ request()->routeIs('admin.company.my_companies') ? 'active' : '' }}"
                     href="{{ route('admin.company.my_companies', auth()->id()) }}">
                     My companies
-                    <span class="badge bg-light text-dark">{{ $formattedMyCompanies }}k</span>
+                    <span class="badge bg-light text-dark">{{ $formattedMyCompanies }}</span>
                 </a>
                 <div id="nothing-found" style="display:none;">Nothing found.</div>
             </div>

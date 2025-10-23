@@ -1,6 +1,6 @@
 @extends('admin.includes.layout')
 
-@section('title', 'Companies')
+@section('title', 'My Companies')
 
 @section('content')
 
@@ -21,7 +21,10 @@
                                 <h3 class="mb-1">MY COMPANIES <i class="fas fa-thumbtack pinned-icon"></i></h3>
                                 <p class="text-muted mb-0">Accounts and organizations you do business with</p>
                             </div>
-                            <button class="btn btn-export">EXPORT</button>
+                            <div class="d-none right-part">
+                                <button class="btn btn-email">Email</button>
+                                <button class="btn btn-export">EXPORT</button>
+                            </div>
                         </div>
 
                         <!-- Filter Section -->
@@ -50,18 +53,27 @@
                                             </select>
                                         </div>
                                         <div class="me-2">
+                                            <select class="form-select" aria-label="Default select example" name="user_id">
+                                                <option value="">Assignee</option>
+                                                @foreach ($users as $user)
+                                                    <option value="{{ $user->id }}">{{ $user->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="me-2">
                                             <select class="form-select" aria-label="Default select example"
                                                 name="people_id">
-                                                <option value="">Assigned to</option>
+                                                <option value="">People</option>
                                                 @foreach ($peoples as $people)
                                                     <option value="{{ $people->id }}">{{ $people->name }}
                                                     </option>
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <button class="btn btn-primary me-2"><img src="{{ asset('img/icons/filter.svg') }}"
-                                                alt="" /></button>
-                                        <button class="btn btn-primary"><img src="{{ asset('img/icons/bar.svg') }}"
+                                         <button class="d-none btn btn-primary me-2"><img
+                                                src="{{ asset('img/icons/filter.svg') }}" alt="" /></button>
+                                        <button class="d-none btn btn-primary"><img src="{{ asset('img/icons/bar.svg') }}"
                                                 alt="" /></button>
                                     </div>
                                 </div>
@@ -77,33 +89,12 @@
                                             <th class="checkbox-cell">
                                                 <input type="checkbox" class="form-check-input" id="selectAll">
                                             </th>
-                                            <th>
-                                                <img src="{{ asset('img/icons/down-vector.svg') }}" alt="" />
-                                                Company name
-                                                </i>
-                                            </th>
-                                            <th>
-                                                <img src="{{ asset('img/icons/down-vector.svg') }}" alt="" /> People
-                                                </i>
-                                            </th>
-                                            <th>
-                                                <img src="{{ asset('img/icons/down-vector.svg') }}" alt="" /> Last
-                                                contact
-                                                </i>
-                                            </th>
-                                            <th>
-                                                <img src="{{ asset('img/icons/down-vector.svg') }}" alt="" />
-                                                Address </i>
-                                            </th>
-                                            <th>
-                                                <img src="{{ asset('img/icons/down-vector.svg') }}" alt="" />
-                                                Company type
-                                                </i>
-                                            </th>
-                                            <th>
-                                                <img src="{{ asset('img/icons/down-vector.svg') }}" alt="" /> Tags
-                                                </i>
-                                            </th>
+                                            <th>Company name</th>
+                                            <th>People</th>
+                                            <th>Last contact</th>
+                                            <th>Address</th>
+                                            <th>Company type</th>
+                                            <th>Tags</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -135,9 +126,13 @@
                                                         {{ $company->companyType->type ?? 'N/A' }}
                                                     </span></td>
                                                 <td>
-                                                    <span class="badge-customer">
-                                                        {{ $company->tag->name ?? 'N/A' }}
-                                                    </span>
+                                                    @if ($company->tags->isNotEmpty())
+                                                        @foreach ($company->tags as $tag)
+                                                            <span class="badge-customer">{{ $tag->name }}</span>
+                                                        @endforeach
+                                                    @else
+                                                        <span>N/A</span>
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @empty
@@ -152,12 +147,10 @@
                         </div>
 
                         <!-- Action Bar -->
-                        <div class="action-bar" id="actionBar">
+                         <div class="action-bar" id="actionBar">
                             <div class="d-flex align-items-center justify-content-center">
                                 <span class="me-3"><strong id="selectedCount">1</strong> Selected</span>
-                                <button class="btn btn-edit btn-action">EDIT</button>
-                                <button class="btn btn-merge btn-action">MERGE</button>
-                                <button class="btn btn-add-audience btn-action">ADD TO AUDIENCE</button>
+                                <button class="btn btn-edit btn-action">CREATE LEAD</button>
                                 <button class="btn btn-delete btn-action">DELETE</button>
                             </div>
                         </div>
@@ -177,30 +170,36 @@
 @endsection
 @push('scripts')
     <script>
-        $(document).ready(function() {
-            function fetchCompanies() {
-                let search = $('#company-search').val();
-                let company_type_id = $('select[name="company_type_id"]').val();
-                let people_id = $('select[name="people_id"]').val();
-                let userId = '{{ auth()->user()->id }}';
+    const userId = {{ auth()->id() }};
+    $(document).ready(function() {
+        function fetchCompanies() {
+            let search = $('#company-search').val();
+            let company_type_id = $('select[name="company_type_id"]').val();
+            let user_id = $('select[name="user_id"]').val();
+            let people_id = $('select[name="people_id"]').val();
 
-                $.ajax({
-                    url: `/admin/company/my_companies/${userId}`,
-                    method: "GET",
-                    data: {
-                        search: search,
-                        company_type_id: company_type_id,
-                        people_id: people_id,
-                    },
-                    success: function(data) {
-                        $('table tbody').html(data);
-                    }
-                });
-            }
+            $.ajax({
+                url: `/admin/company/my_companies/${userId}`,
+                method: "GET",
+                data: {
+                    search: search,
+                    company_type_id: company_type_id,
+                    user_id: user_id,
+                    people_id: people_id,
+                },
+                success: function(response) {
+                    $('table tbody').html(response.table);
+                    $('.company-count').text(response.count + ' Company Found');
+                },
+                error: function(err) {
+                    console.error('Error fetching company data', err);
+                }
+            });
+        }
 
-            $('#company-search').on('keyup', fetchCompanies);
-            $('#checkDefault, select[name="company_type_id"] ,select[name="people_id"]').on('change',
-                fetchCompanies);
-        });
-    </script>
+        $('#company-search').on('keyup', fetchCompanies);
+        $('select[name="company_type_id"], select[name="user_id"], select[name="people_id"]').on('change', fetchCompanies);
+    });
+</script>
+
 @endpush

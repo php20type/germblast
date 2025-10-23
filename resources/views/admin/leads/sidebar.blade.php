@@ -1,10 +1,10 @@
  <!-- Sidebar -->
  <div class="col-md-2">
      <div class="sidebar">
-         <div class="counter-number">
-             <a class="nav-link" href="{{ route('admin.leads.index') }}">
-                 ALL LEADS
-                 <span class="badge bg-light text-dark">{{ $formattedTotalLeads }}k </span>
+         <div class="">
+             <a class="nav-link {{ request()->routeIs('admin.leads.index') ? 'active' : '' }}" href="{{ route('admin.leads.index') }}">
+                 All leads
+                 <span class="badge bg-light text-dark">{{ $formattedTotalLeads }}</span>
              </a>
          </div>
          <div class="my-3">

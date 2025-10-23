@@ -20,12 +20,11 @@ class People extends Model
         'city_id',
         'marketing_status',
         'territory_id',
-        'tag_id',
     ];
 
     protected $morphClass = 'People';
 
-    protected $with = ['peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany'];
+    protected $with = ['peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany','peopleTags','tags'];
 
     public function activity(): MorphMany
     {
@@ -66,11 +65,6 @@ class People extends Model
     public function territory()
     {
         return $this->belongsTo(Territory::class, 'territory_id');
-    }
-
-    public function tag()
-    {
-        return $this->belongsTo(Tag::class, 'tag_id');
     }
 
     // New database hasOne relations
@@ -147,4 +141,5 @@ class People extends Model
         return $this->belongsToMany(Tag::class, 'people_tags')
             ->withTimestamps();
     }
+
 }

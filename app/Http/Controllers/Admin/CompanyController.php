@@ -42,8 +42,13 @@ class CompanyController extends Controller
         $totalCompanies = $this->companyRepo->countAll();
         $myCompaniesCount = $this->companyRepo->countByUser($currentUser->id);
 
-        $formattedTotalCompanies = number_format($totalCompanies / 1000, 1);
-        $formattedMyCompanies = number_format($myCompaniesCount / 1000, 1);
+        $formattedTotalCompanies = $totalCompanies >= 1000
+            ? number_format($totalCompanies / 1000, 1).'k'
+            : $totalCompanies;
+
+        $formattedMyCompanies = $myCompaniesCount >= 1000
+            ? number_format($myCompaniesCount / 1000, 1).'k'
+            : $myCompaniesCount;
 
         return compact('formattedTotalCompanies', 'formattedMyCompanies');
     }
@@ -59,6 +64,11 @@ class CompanyController extends Controller
         if ($request->filled('company_type_id')) {
             $query->where('company_type_id', $request->company_type_id);
         }
+        if ($request->filled('user_id')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('user_id', $request->user_id);
+            });
+        }
         if ($request->filled('people_id')) {
             $query->whereHas('peoples', function ($q) use ($request) {
                 $q->where('people_id', $request->people_id);
@@ -69,15 +79,19 @@ class CompanyController extends Controller
         $companiesCount = $companies->count();
 
         $peoples = People::all();
+        $users = User::all();
         $company_types = CompanyType::all();
         $sidebarStats = $this->getSidebarStats();
 
         if ($request->ajax()) {
-            return view('admin.company.partials.company-table-rows', compact('companies'))->render();
+            return response()->json([
+                'table' => view('admin.company.partials.company-table-rows', compact('companies'))->render(),
+                'count' => $companiesCount,
+            ]);
         }
 
         return view('admin.company.index', array_merge(
-            compact('companies', 'peoples', 'company_types', 'companiesCount'),
+            compact('companies', 'peoples', 'users', 'company_types', 'companiesCount'),
             $sidebarStats
         ));
     }
@@ -86,31 +100,41 @@ class CompanyController extends Controller
     {
         $query = $this->companyRepo->getByUserWithRelations($id);
 
+        // Apply filters here in Controller
         if ($request->filled('search')) {
             $query->where('name', 'like', "%{$request->search}%");
         }
-        if ($request->filled('people_id')) {
-            $query->whereHas('peoples', function ($q) use ($request) {
-                $q->where('people.id', $request->people_id);
-            });
-        }
         if ($request->filled('company_type_id')) {
             $query->where('company_type_id', $request->company_type_id);
+        }
+        if ($request->filled('user_id')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('user_id', $request->user_id);
+            });
+        }
+        if ($request->filled('people_id')) {
+            $query->whereHas('peoples', function ($q) use ($request) {
+                $q->where('people_id', $request->people_id);
+            });
         }
 
         $companies = $query->get();
         $totalMyCompanies = $query->count();
 
         $peoples = People::all();
+        $users = User::all();
         $company_types = CompanyType::all();
         $sidebarStats = $this->getSidebarStats();
 
         if ($request->ajax()) {
-            return view('admin.company.partials.company-table-rows', compact('companies'))->render();
+            return response()->json([
+                'table' => view('admin.company.partials.company-table-rows', compact('companies'))->render(),
+                'count' => $totalMyCompanies,
+            ]);
         }
 
         return view('admin.company.my-companies', array_merge(
-            compact('companies', 'peoples', 'company_types', 'totalMyCompanies'),
+            compact('companies', 'peoples', 'users', 'company_types', 'totalMyCompanies'),
             $sidebarStats
         ));
     }
@@ -203,7 +227,6 @@ class CompanyController extends Controller
                 'user_id' => auth()->id(),
                 'name' => $request->name,
                 'description' => $request->description,
-                'tag_id' => $request->tag_id,
                 'company_type_id' => $request->company_type_id,
                 'industry_id' => $request->industry_id,
                 'territory_id' => $request->territory_id,
@@ -214,6 +237,14 @@ class CompanyController extends Controller
                 CompanyEmail::create([
                     'company_id' => $company->id,
                     'email' => $request->email,
+                ]);
+            }
+
+            // Store tag
+            if ($request->filled('tag_id')) {
+                CompanyTag::create([
+                    'company_id' => $company->id,
+                    'tag_id' => $request->tag_id,
                 ]);
             }
 
@@ -622,7 +653,7 @@ class CompanyController extends Controller
             'message' => 'Tag removed from company successfully!',
         ]);
     }
-    
+
     public function updateField(Request $request, Company $company)
     {
         $request->validate([

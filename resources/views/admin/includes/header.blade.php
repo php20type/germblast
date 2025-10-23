@@ -26,14 +26,14 @@
                 <ul class="list-inline mb-0">
                     <li class="list-inline-item">
                         <a href="{{ route('admin.dashboard') }}" class="item-nav">
-                            <div class="icon-round">
+                            <div class="icon-round" title="Go to dashboard">
                                 <i class="fa-solid fa-plus"></i>
                             </div>
                         </a>
                     </li>
                     <li class="list-inline-item">
                         <a href="#" class="item-nav">
-                            <div class="icon-round">
+                            <div class="icon-round" title="Notifications">
                                 <i class="fa-solid fa-bell"></i>
                             </div>
                         </a>
@@ -41,7 +41,7 @@
 
                     <li class="list-inline-item">
                         <a href="#" data-bs-toggle="dropdown" class="dropdown item-nav">
-                            <div class="icon-round">
+                            <div class="icon-round" title="View Profile">
                                 <i class="fa-solid fa-user"></i>
                             </div>
                         </a>

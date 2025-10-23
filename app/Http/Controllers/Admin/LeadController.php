@@ -80,9 +80,17 @@ class LeadController extends Controller
         $avgConfidence = $leads->avg('confidence');
 
         // Formatting (optional: keep or remove the /1000 depending on how you want display)
-        $formattedTotalLeads = number_format($totalLeads / 1000, 1);
-        $formattedTotalValue = number_format($totalValue, 2);
-        $formattedAvgValue = number_format($avgValue / 1000, 1);
+        $formattedTotalLeads = $totalLeads >= 1000
+            ? number_format($totalLeads / 1000, 1).'k'
+            : $totalLeads;
+
+        $formattedTotalValue = $totalValue >= 1000
+            ? number_format($totalValue / 1000, 1).'k'
+            : number_format($totalValue, 2);
+
+        $formattedAvgValue = $avgValue >= 1000
+            ? number_format($avgValue / 1000, 1).'k'
+            : number_format($avgValue, 2);
         $formattedAvgConfidence = number_format($avgConfidence, 0);
 
         return compact(
@@ -124,26 +132,25 @@ class LeadController extends Controller
                 $query->where('name', 'like', "%$search%");
             }
 
-            // Filter by status
+            // Filter
             if ($request->filled('status')) {
                 $query->where('lead_status', $request->status);
             }
 
-            // Only hot leads
             if ($request->has('hot') && $request->hot === 'hot') {
                 $query->whereJsonContains('lead_flags', 'hot');
             }
 
-            if ($request->filled('people_id')) {
-                $query->whereHas('peoples', function ($q) use ($request) {
-                    $q->where('people_id', $request->people_id);
+            if ($request->filled('user_id')) {
+                $query->whereHas('assignee', function ($q) use ($request) {
+                    $q->where('assignee_id', $request->user_id);
                 });
             }
         }
 
         $leads = $query->get();
+        $users = User::all();
 
-        // Group leads by name and prepare aggregated data
         $groupedLeads = $leads->groupBy('name')->map(function ($group) {
             $lead = $group->first();
 
@@ -152,9 +159,6 @@ class LeadController extends Controller
                 'name' => $lead->name,
                 'people_name' => $lead->peoples->first()->name ?? 'N/A',
                 'created_at' => $lead->created_at->diffForHumans(null, true),
-                // 'total_price' => $group->flatMap->products->sum(function ($product) {
-                //     return $product->pivot->price * ($product->pivot->qty ?? 1);
-                // }),
                 'total_price' => $group->sum->total_value,
                 'assignee' => $lead->assignee->name ?? 'N/A',
                 'sources' => $group->flatMap->sources->pluck('name')->unique()->join(', ') ?: 'N/A',
@@ -174,7 +178,7 @@ class LeadController extends Controller
 
         // Normal page load
         return view('admin.leads.index', array_merge(
-            compact('groupedLeads', 'peoples', 'activity_types'),
+            compact('groupedLeads', 'peoples', 'users','activity_types'),
             $sidebarStats
         ));
     }
@@ -983,13 +987,13 @@ class LeadController extends Controller
 
         try {
             switch ($type) {
-               case 'company':
+                case 'company':
                     $deleted = LeadCompany::where('id', $relatedId)->delete();
-                   break;
+                    break;
 
-           case 'people':
-                   $deleted = LeadPeople::where('id', $relatedId)->delete();
-                   break;
+                case 'people':
+                    $deleted = LeadPeople::where('id', $relatedId)->delete();
+                    break;
 
                 case 'product':
                     $deleted = LeadProduct::where('id', $relatedId)->delete();
