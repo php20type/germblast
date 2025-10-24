@@ -16,13 +16,15 @@ return new class extends Migration
             // The user who performed the action
             $table->unsignedBigInteger('user_id')->nullable();
             // $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
-            // Polymorphic relation to any entity (Company, People, Lead)
+            // Polymorphic relation to any entity (Company, Peo  ple, Lead)
             $table->string('owner_type');
             $table->unsignedBigInteger('owner_id');
             // Action type (e.g. created, updated, assigned, logged_activity, added_person, etc.)
             $table->string('action_type');
             $table->text('description')->nullable();
             $table->timestamps();
+
+             $table->index('user_id');
         });
     }
 
