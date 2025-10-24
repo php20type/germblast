@@ -1047,13 +1047,18 @@
                             </div>
                             <div class="lead-carder" onclick="relatedLeads()">
                                 <div class="row text-center">
-                                    <div class="col-6">
-                                        <div class="metric-value number-sign">$17.1k</div>
+                                    <div class="col-3">
+                                        <div class="metric-value">${{ $formattedLeadsCount }}</div>
                                     </div>
-                                    <div class="col-6">
-                                        <div class="metric-value number-won">1 won</div>
+                                    <div class="col-3">
+                                        <div class="metric-value won">{{ $wonLeadsCount }} Won</div>
                                     </div>
-
+                                    <div class="col-3">
+                                        <div class="metric-value">{{ $lostLeadsCount }} Lost</div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="metric-value lost">{{ $hotLeadsCount }} Hot</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1073,7 +1078,8 @@
                             </div>
                             <div class="form-group mb-3">
                                 <label for="assigneeSelect" class="form-label"><b>ASSIGNEE</b> </label>
-                                <select class="form-select people-update" data-field="user_id" id="assigneeSelect">
+                                <select class="form-select people-update" data-field="user_id" data-field-name="Assingee"
+                                    id="assigneeSelect">
                                     <option selected>Select assignee</option>
                                     @foreach ($users as $user)
                                         <option value="{{ $user->id }}"
@@ -1085,7 +1091,8 @@
                             </div>
                             <div class="form-group mb-3">
                                 <label for="territorySelect" class="form-label"><b>TERRITORY</b> </label>
-                                <select class="form-select people-update" data-field="territory_id" id="territorySelect">
+                                <select class="form-select people-update" data-field="territory_id"
+                                    data-field-name="Territory" id="territorySelect">
                                     <option selected>Select territory</option>
                                     @foreach ($territories as $territory)
                                         <option value="{{ $territory->id }}"
@@ -1127,7 +1134,8 @@
                                                 <!-- Value Input -->
                                                 <div class="col-md-8 d-flex gap-3 align-items-center">
                                                     <input type="text" name="detail_value[]" class="form-control"
-                                                        value="{{ $email['value'] }}" placeholder="Enter email" disabled>
+                                                        value="{{ $email['value'] }}" placeholder="Enter email"
+                                                        disabled>
                                                     <button class="btn btn-sm btn-outline-secondary delete-field-btn"
                                                         data-people-id="{{ $peoples->id }}"
                                                         data-type="{{ $email['selected'] }}" data-field-name="email"
@@ -2845,24 +2853,53 @@
                 let peopleId = $('#people-details-container').data('people-id');
                 let field = $el.data('field');
                 let value = $el.val();
+                let fieldName = $el.data('field-name') || field; // optional friendly name
 
-                $.ajax({
-                    url: `/admin/peoples/${peopleId}/update-field`,
-                    type: 'POST',
-                    data: {
-                        field: field,
-                        value: value
-                    },
-                    success: function(response) {
-                        console.log('Updated:', response);
-                        toastr.success("Successfully Updated");
-                    },
-                    error: function(xhr) {
-                        console.error(xhr.responseText);
-                        toastr.error("Update failed");
+                // Show confirmation dialog first
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `This ${fieldName} will be updated!`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6', // blue
+                    cancelButtonColor: '#d33', // red
+                    confirmButtonText: 'Yes, update it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Perform AJAX update
+                        $.ajax({
+                            url: `/admin/peoples/${peopleId}/update-field`,
+                            type: 'POST',
+                            data: {
+                                field: field,
+                                value: value
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: response.message || 'Successfully Updated',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            },
+                            error: function(xhr) {
+                                console.error(xhr.responseText);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Update failed',
+                                    showConfirmButton: true
+                                });
+                            }
+                        });
                     }
                 });
             }
+
+
 
 
             // ==============================

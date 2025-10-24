@@ -289,7 +289,7 @@ class LeadController extends Controller
             'competitors',
             'stages',
         ])->where('lead_status', 'open')
-        ->where('assignee_id', $id);
+            ->where('assignee_id', $id);
 
         // Apply Filters
         if ($request->filled('search')) {
@@ -311,7 +311,7 @@ class LeadController extends Controller
         // Get all leads
         $leads = $query->get();
 
-          // Helper for count formatting
+        // Helper for count formatting
         $formatCount = fn ($count) => $count >= 1000
             ? number_format($count / 1000, 1).'k'
             : $count;
@@ -327,12 +327,11 @@ class LeadController extends Controller
         $formattedTotalValue = $formatCount(round($totalValue));
         $formattedAvgValue = $formatCount(round($avgValue));
 
-
         // Group leads by name and aggregate data
         $groupedLeads = $leads->groupBy('name')->map(function ($group) {
             $lead = $group->first();
 
-           return [
+            return [
                 'id' => $lead->id,
                 'name' => $lead->name,
                 'people_name' => $lead->peoples->first()->name ?? 'N/A',
@@ -393,7 +392,7 @@ class LeadController extends Controller
             'stages',
         ])->whereJsonContains('lead_flags', 'hot');
 
-         // Apply Filters
+        // Apply Filters
         if ($request->filled('search')) {
             $query->where('name', 'like', "%{$request->search}%");
         }
@@ -413,7 +412,7 @@ class LeadController extends Controller
         // Get all leads
         $leads = $query->get();
 
-          // Helper for count formatting
+        // Helper for count formatting
         $formatCount = fn ($count) => $count >= 1000
             ? number_format($count / 1000, 1).'k'
             : $count;
@@ -429,13 +428,12 @@ class LeadController extends Controller
         $formattedTotalValue = $formatCount(round($totalValue));
         $formattedAvgValue = $formatCount(round($avgValue));
 
-
         // Group leads by name and aggregate
         $groupedLeads = $leads->groupBy('name')->map(function ($group) {
             $lead = $group->first();
 
             return [
-                 'id' => $lead->id,
+                'id' => $lead->id,
                 'name' => $lead->name,
                 'people_name' => $lead->peoples->first()->name ?? 'N/A',
                 'created_at' => $lead->created_at->diffForHumans(null, true),
@@ -456,7 +454,7 @@ class LeadController extends Controller
         $activity_types = ActivityType::all();
         $sidebarStats = $this->getSidebarStats();
 
-       // Handle AJAX requests
+        // Handle AJAX requests
         if ($request->ajax()) {
             return response()->json([
                 'table' => view('admin.leads.partials.lead-table-rows', compact('groupedLeads'))->render(),
@@ -492,7 +490,7 @@ class LeadController extends Controller
             'competitors',
             'stages',
         ])->where('assignee_id', $id)
-        ->whereJsonContains('lead_flags', 'watching');
+            ->whereJsonContains('lead_flags', 'watching');
 
         // Apply Filters
         if ($request->filled('search')) {
@@ -514,7 +512,7 @@ class LeadController extends Controller
         // Get all leads
         $leads = $query->get();
 
-          // Helper for count formatting
+        // Helper for count formatting
         $formatCount = fn ($count) => $count >= 1000
             ? number_format($count / 1000, 1).'k'
             : $count;
@@ -556,7 +554,7 @@ class LeadController extends Controller
         $activity_types = ActivityType::all();
         $sidebarStats = $this->getSidebarStats();
 
-         // Handle AJAX requests
+        // Handle AJAX requests
         if ($request->ajax()) {
             return response()->json([
                 'table' => view('admin.leads.partials.lead-table-rows', compact('groupedLeads'))->render(),
@@ -617,7 +615,7 @@ class LeadController extends Controller
         // Get all leads
         $leads = $query->get();
 
-          // Helper for count formatting
+        // Helper for count formatting
         $formatCount = fn ($count) => $count >= 1000
             ? number_format($count / 1000, 1).'k'
             : $count;
@@ -633,13 +631,12 @@ class LeadController extends Controller
         $formattedTotalValue = $formatCount(round($totalValue));
         $formattedAvgValue = $formatCount(round($avgValue));
 
-
         // Group leads by name and aggregate
         $groupedLeads = $leads->groupBy('name')->map(function ($group) {
             $lead = $group->first();
 
             return [
-               'id' => $lead->id,
+                'id' => $lead->id,
                 'name' => $lead->name,
                 'people_name' => $lead->peoples->first()->name ?? 'N/A',
                 'created_at' => $lead->created_at->diffForHumans(null, true),
@@ -654,7 +651,7 @@ class LeadController extends Controller
             ];
         });
 
-         // Sidebar and related data
+        // Sidebar and related data
         $peoples = People::all();
         $users = User::all();
         $activity_types = ActivityType::all();
@@ -701,7 +698,7 @@ class LeadController extends Controller
             'stages',
         ])->whereBetween('close_date', [$startOfWeek, $endOfWeek]);
 
-       // Apply Filters
+        // Apply Filters
         if ($request->filled('search')) {
             $query->where('name', 'like', "%{$request->search}%");
         }
@@ -721,7 +718,7 @@ class LeadController extends Controller
         // Get all leads
         $leads = $query->get();
 
-          // Helper for count formatting
+        // Helper for count formatting
         $formatCount = fn ($count) => $count >= 1000
             ? number_format($count / 1000, 1).'k'
             : $count;
@@ -736,7 +733,6 @@ class LeadController extends Controller
         $formattedTotalLeads = $formatCount($totalLeads);
         $formattedTotalValue = $formatCount(round($totalValue));
         $formattedAvgValue = $formatCount(round($avgValue));
-
 
         // Group leads by name and aggregate
         $groupedLeads = $leads->groupBy('name')->map(function ($group) {
@@ -882,6 +878,9 @@ class LeadController extends Controller
             'leadTask',
         ])->findOrFail($id);
 
+        $leadValue = Helper::calculateTotalValue($leads);
+        $formattedLeadValue = Helper::formatValue($leadValue);
+
         $pending_tasks = $leads->leadTask->whereNull('completed_user_id');
         $completed_tasks = $leads->leadTask->whereNotNull('completed_user_id');
 
@@ -978,6 +977,7 @@ class LeadController extends Controller
 
         return view('admin.leads.edit', compact(
             'leads',
+            'formattedLeadValue',
             'activities',
             'logged_activities',
             'scheduled_activities',
@@ -1163,11 +1163,15 @@ class LeadController extends Controller
         try {
             switch ($type) {
                 case 'company':
-                    $deleted = LeadCompany::where('id', $relatedId)->delete();
+                    $deleted = LeadCompany::where('lead_id', $request->lead_id)
+                        ->where('company_id', $relatedId)
+                        ->delete();
                     break;
 
                 case 'people':
-                    $deleted = LeadPeople::where('id', $relatedId)->delete();
+                    $deleted = LeadPeople::where('lead_id', $request->lead_id)
+                        ->where('people_id', $relatedId)
+                        ->delete();
                     break;
 
                 case 'product':

@@ -287,7 +287,13 @@ class PeopleController extends Controller
             ->sortByDesc('timestamp')
             ->values(); // reindex after sorting
 
-        $related_leads = $peoples->leads;
+        $related_leads = $peoples->leads()->with('products')->get();
+        $relatedLeadsCount = Helper::calculateTotalValue($related_leads);
+        $formattedLeadsCount= Helper::formatValue($relatedLeadsCount);
+
+        $hotLeadsCount = $peoples->leads()->whereJsonContains('lead_flags', 'hot')->count();
+        $wonLeadsCount = $peoples->leads()->where('lead_status', 'won')->count();
+        $lostLeadsCount = $peoples->leads()->where('lead_status', 'lost')->count();
 
         foreach ($related_leads as $lead) {
             $status = strtolower($lead->lead_status ?? 'open');
@@ -433,6 +439,10 @@ class PeopleController extends Controller
             'timeline',
             'persontags',
             'related_leads',
+            'formattedLeadsCount',
+            'hotLeadsCount',
+            'wonLeadsCount',
+            'lostLeadsCount',
             'pending_tasks',
             'completed_tasks',
             'activity_types',

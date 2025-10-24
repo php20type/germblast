@@ -1036,16 +1036,16 @@
                             <div class="lead-carder" onclick="relatedLeads()">
                                 <div class="row text-center">
                                     <div class="col-3">
-                                        <div class="metric-value">$4.32k</div>
+                                        <div class="metric-value">${{ $formattedLeadsCount }}</div>
                                     </div>
                                     <div class="col-3">
-                                        <div class="metric-value won">2 won</div>
+                                        <div class="metric-value won">{{ $wonLeadsCount }} Won</div>
                                     </div>
                                     <div class="col-3">
-                                        <div class="metric-value">$4</div>
+                                        <div class="metric-value">{{ $lostLeadsCount }} Lost</div>
                                     </div>
                                     <div class="col-3">
-                                        <div class="metric-value lost">1 lost</div>
+                                        <div class="metric-value lost">{{ $hotLeadsCount }} Hot</div>
                                     </div>
                                 </div>
                             </div>
@@ -1068,7 +1068,8 @@
                             </div>
                             <div class="form-group mb-3">
                                 <label class="form-label"><b>COMPANY Type</b></label>
-                                <select class="form-select company-update" data-field="company_type_id">
+                                <select class="form-select company-update" data-field-name="Company Type"
+                                    data-field="company_type_id">
                                     @foreach ($company_types as $company_type)
                                         <option value="{{ $company_type->id }}"
                                             {{ $company->company_type_id == $company_type->id ? 'selected' : '' }}>
@@ -1078,7 +1079,8 @@
                             </div>
                             <div class="form-group mb-3">
                                 <label class="form-label"><b>INDUSTRY</b></label>
-                                <select class="form-select company-update" data-field="industry_id">
+                                <select class="form-select company-update" data-field-name="Industry"
+                                    data-field="industry_id">
                                     @foreach ($industries as $industry)
                                         <option value="{{ $industry->id }}"
                                             {{ $company->industry_id == $industry->id ? 'selected' : '' }}>
@@ -1089,7 +1091,8 @@
                             </div>
                             <div class="form-group mb-3">
                                 <label class="form-label"><b>ASSIGNEE</b></label>
-                                <select class="form-select company-update" data-field="user_id">
+                                <select class="form-select company-update" data-field-name="Assignee"
+                                    data-field="user_id">
                                     @foreach ($users as $user)
                                         <option value="{{ $user->id }}"
                                             {{ $company->user_id == $user->id ? 'selected' : '' }}>
@@ -1100,7 +1103,8 @@
                             </div>
                             <div class="form-group mb-3">
                                 <label class="form-label"><b>TERRITORY</b></label>
-                                <select class="form-select company-update" data-field="territory_id">
+                                <select class="form-select company-update" data-field-name="Territory"
+                                    data-field="territory_id">
                                     @foreach ($territories as $territory)
                                         <option value="{{ $territory->id }}"
                                             {{ $company->territory_id == $territory->id ? 'selected' : '' }}>
@@ -1115,13 +1119,14 @@
                                     <div class="col-6">
                                         <label class="form-label"><b>ANNUAL RE.</b></label>
                                         <input type="text" class="form-control company-update only-numbers"
-                                            placeholder="00.00" value="{{ $company->annual_revenue }}"
-                                            data-field="annual_revenue">
+                                            data-field-name="Annual Revenue" placeholder="00.00"
+                                            value="{{ $company->annual_revenue }}" data-field="annual_revenue">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label"><b>NU. OF EMPLOYEE</b></label>
                                         <input type="text" class="form-control company-update only-integers"
-                                            data-field="employees_count" placeholder="Enter number of employees"
+                                            data-field-name="Number of Employees" data-field="employees_count"
+                                            placeholder="Enter number of employees"
                                             value="{{ $company->employees_count }}">
                                     </div>
                                 </div>
@@ -1907,7 +1912,6 @@
                                     </div>
                                 </div>
                                 <div title="Total Value">
-                                    {{-- $955 --}}
                                     ${{ \App\Helpers\Helper::calculateTotalValue($related_lead) }}
                                 </div>
                             </div>
@@ -2890,21 +2894,48 @@
                 let companyId = $('#company-details-container').data('company-id');
                 let field = $el.data('field');
                 let value = $el.val();
+                let fieldName = $el.data('field-name') || field; // optional friendly name
 
-                $.ajax({
-                    url: `/admin/companies/${companyId}/update-field`,
-                    type: 'POST',
-                    data: {
-                        field: field,
-                        value: value
-                    },
-                    success: function(response) {
-                        console.log('Updated:', response);
-                        toastr.success("Successfully Updated");
-                    },
-                    error: function(xhr) {
-                        console.error(xhr.responseText);
-                        toastr.error("Update failed");
+                // Show confirmation dialog first
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `This ${fieldName} will be updated!`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, update it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Perform AJAX update
+                        $.ajax({
+                            url: `/admin/companies/${companyId}/update-field`,
+                            type: 'POST',
+                            data: {
+                                field: field,
+                                value: value
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: response.message || 'Successfully Updated',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            },
+                            error: function(xhr) {
+                                console.error(xhr.responseText);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'Update failed',
+                                    showConfirmButton: true
+                                });
+                            }
+                        });
                     }
                 });
             }
@@ -3373,7 +3404,7 @@
                                     showConfirmButton: false
                                 }).then(function() {
                                     location
-                                .reload(); // Reload to reflect the updated status
+                                        .reload(); // Reload to reflect the updated status
                                 });
                             },
                             error: function(xhr) {

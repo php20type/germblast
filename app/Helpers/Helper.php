@@ -6,6 +6,7 @@ use App\Interfaces\CityRepositoryInterface;
 use App\Interfaces\CountryRepositoryInterface;
 use App\Interfaces\StateRepositoryInterface;
 use App\Models\Activity;
+use App\Models\Lead;
 use App\Models\Note;
 
 class Helper
@@ -39,29 +40,35 @@ class Helper
 
     // public static function calculateTotalValue($leads)
     // {
-    //     return $leads->sum(function ($lead) {
-    //         return $lead->products->sum(function ($product) {
-    //             return $product->pivot->qty * $product->pivot->price;
-    //         });
-    //     });
-    // }
-
-    // public static function calculateTotalValue($lead)
-    // {
-    //     return $lead->products->sum(function ($product) {
-    //         return $product->pivot->qty * $product->pivot->price;
-    //     });
+    //     return collect($leads)->sum(fn ($lead)
+    //     => $lead->products->sum(fn ($product)
+    //     => $product->pivot->qty * $product->pivot->price
+    //     )
+    //     );
     // }
 
     public static function calculateTotalValue($leads)
     {
-        return collect($leads)->sum(fn ($lead)
-        => $lead->products->sum(fn ($product)
-        => $product->pivot->qty * $product->pivot->price
+        // If a single Lead model is passed, wrap it into a collection
+        if ($leads instanceof Lead) {
+            $leads = collect([$leads]);
+        }
+
+        return collect($leads)->sum(fn ($lead) => $lead->products->sum(fn ($product) => $product->pivot->qty * $product->pivot->price
         )
         );
     }
 
+    // public static function formatValue($value)
+    // {
+    //     if ($value >= 1000000) {
+    //         return round($value / 1000000, 1).'m';
+    //     } elseif ($value >= 1000) {
+    //         return round($value / 1000, 1).'k';
+    //     }
+
+    //     return $value;
+    // }
     public static function formatValue($value)
     {
         if ($value >= 1000000) {
@@ -70,7 +77,8 @@ class Helper
             return round($value / 1000, 1).'k';
         }
 
-        return $value;
+        // For values less than 1000, just return as-is
+        return (string) $value;
     }
 
     public static function getActivitiesForParticipant(string $entityType, int $entityId)

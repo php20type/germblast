@@ -369,7 +369,14 @@ class CompanyController extends Controller
             ->sortByDesc('timestamp')
             ->values(); // reindex after sorting
 
-        $related_leads = $company->leads;
+        // $related_leads = $company->leads;
+        $related_leads = $company->leads()->with('products')->get();
+        $relatedLeadsCount = Helper::calculateTotalValue($related_leads);
+        $formattedLeadsCount = Helper::formatValue($relatedLeadsCount);
+
+        $hotLeadsCount = $company->leads()->whereJsonContains('lead_flags', 'hot')->count();
+        $wonLeadsCount = $company->leads()->where('lead_status', 'won')->count();
+        $lostLeadsCount = $company->leads()->where('lead_status', 'lost')->count();
 
         foreach ($related_leads as $lead) {
             $status = strtolower($lead->lead_status ?? 'open');
@@ -502,6 +509,10 @@ class CompanyController extends Controller
             'notes',
             'timeline',
             'related_leads',
+            'formattedLeadsCount',
+            'hotLeadsCount',
+            'wonLeadsCount',
+            'lostLeadsCount',
             'pending_tasks',
             'completed_tasks',
             'users',

@@ -55,7 +55,7 @@
                                         </div>
 
                                     </div>
-                                    <div class="amount">$2</div>
+                                    <div class="amount">${{ $formattedLeadValue }}</div>
                                 </div>
 
                                 <div class="mt-4 my-3" id="addLeadTag">
