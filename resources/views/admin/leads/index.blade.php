@@ -18,7 +18,7 @@
                             <!-- Header -->
                             <div class="heading-area-sec">
                                 <div class="left-part-sec">
-                                    <h3 class="mb-1">All leads <i class="fas fa-thumbtack pinned-icon"></i></h3>
+                                    <h3 class="mb-1">ALL LEADS <i class="fas fa-thumbtack pinned-icon"></i></h3>
                                     <p class="text-muted mb-0">Business deals with your companies and people</p>
                                 </div>
                                 <div class="d-none right-part">
@@ -36,7 +36,7 @@
                                                 <input type="search" class="form-control" placeholder=""
                                                     aria-label="Search" id="lead-search">
                                             </div>
-                                            <span class="company-count">{{ $totalLeads }} leads</span>
+                                            <span class="company-count">{{ $formattedTotalLeads }} Lead Found</span>
                                         </div>
                                     </div>
                                     <div class="col-md-6 ">
@@ -83,17 +83,17 @@
                                     </div>
                                     <div class="col-lg-3 col-md-6">
                                         <div class="filter-card">
-                                            <h5>Avg value:<span>${{ $formattedAvgValue }}k</span></h5>
+                                            <h5>Avg value:<span>${{ $formattedAvgValue }}</span></h5>
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
                                         <div class="filter-card">
-                                            <h5>Avg time open:<span>161.5 Days</span></h5>
+                                            <h5>Avg time open:<span>16 Days</span></h5>
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
                                         <div class="filter-card">
-                                            <h5>Win rate:<span>{{ $formattedAvgConfidence }}%</span></h5>
+                                            <h5>Win rate:<span>{{ $avgConfidence }}%</span></h5>
                                         </div>
                                     </div>
                                 </div>
@@ -136,7 +136,7 @@
                                                     <td>{{ $lead['created_at'] }}</td>
                                                     <td>${{ number_format($lead['total_price'], 2) }}</td>
                                                     <td>{{ $lead['assignee'] }}</td>
-                                                    <td>Proposal Approval</td>
+                                                    <td>{{ $lead['stage_name'] }}</td>
                                                     <td>{{ $lead['confidence'] }}%</td>
                                                     <td>{{ $lead['close_date'] }}</td>
                                                     <td>{{ $lead['sources'] }}</td>
@@ -198,7 +198,7 @@
             }
 
             $('#lead-search').on('keyup', fetchLeads);
-            $('#checkDefault, select[name="status"]').on('change', fetchLeads);
+           $('#checkDefault, select[name="status"], select[name="user_id"]').on('change', fetchLeads);
         });
     </script>
 @endpush

@@ -144,7 +144,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Person</label>
-                                    <span class="text-danger">*</span>
+                                    {{-- <span class="text-danger">*</span> --}}
                                     <select name="people_id" class="form-select">
                                         <option value="">Select person</option>
                                         @foreach ($peoples as $people)
@@ -273,7 +273,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Company</label>
-                                    <span class="text-danger">*</span>
+                                    {{-- <span class="text-danger">*</span> --}}
                                     <select name="company_id" class="form-select">
                                         <option value="">Select company</option>
                                         @foreach ($companies as $company)
@@ -583,6 +583,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Note</label>
+                                    <span class="text-danger">*</span>
                                     <textarea id="schedule-note-textarea" name="note" class="form-control w-100"
                                         placeholder="Write a note… @Mention other users to grab their attention, or reference other companies and people."
                                         rows="6"></textarea>
@@ -604,6 +605,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Activity type</label>
+                                    <span class="text-danger">*</span>
                                     <select class="form-select mt-2" name="activity_type_id">
                                         <option selected>Choose...</option>
                                         @foreach ($activity_types as $activity_type)
@@ -618,6 +620,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Date</label>
+                                    <span class="text-danger">*</span>
                                     <input type="date" placeholder="" class="form-control" name="date" />
                                 </div>
                             </div>
@@ -625,6 +628,7 @@
                             <div class="col-lg-6 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">Start Time</label>
+                                    <span class="text-danger">*</span>
                                     <select class="form-select select2" id="start_time" name="start_time" required>
                                     </select>
                                 </div>
@@ -633,6 +637,7 @@
                             <div class="col-lg-6 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">End Time</label>
+                                    <span class="text-danger">*</span>
                                     <select class="form-select select2" id="end_time" name="end_time" required>
                                     </select>
                                 </div>
@@ -651,6 +656,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group mb-4">
                                     <label class="form-label">Location</label>
+                                    <span class="text-danger">*</span>
                                     <input type="text" placeholder="Add a Location" class="form-control"
                                         name="location" />
                                 </div>
@@ -659,6 +665,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group mb-4">
                                     <label class="form-label">Participants</label>
+                                    <span class="text-danger">*</span>
                                     <select id="participant_select" name="participant_id[]" class="form-select mt-2"
                                         multiple>
                                         {{-- Companies --}}
@@ -1073,7 +1080,7 @@
                         required: true
                     },
                     people_id: {
-                        required: true
+                        required: false
                     },
                     url: {
                         required: true,
@@ -1111,9 +1118,9 @@
                     address: {
                         required: "Please enter the address."
                     },
-                    people_id: {
-                        required: "Please select the person."
-                    },
+                    // people_id: {
+                    //     required: "Please select the person."
+                    // },
                     url: {
                         required: "Please enter the url.",
                         url: "The url field must be a valid URL."
@@ -1197,7 +1204,7 @@
                         required: true
                     },
                     company_id: {
-                        required: true
+                        required: false
                     },
                     phone: {
                         required: true
@@ -1229,9 +1236,9 @@
                     bio: {
                         required: "Please enter the bio."
                     },
-                    company_id: {
-                        required: "Please select the company."
-                    },
+                    // company_id: {
+                    //     required: "Please select the company."
+                    // },
                     phone: {
                         required: "Please enter the phone number."
                     },

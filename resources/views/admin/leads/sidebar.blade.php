@@ -4,7 +4,7 @@
          <div class="">
              <a class="nav-link {{ request()->routeIs('admin.leads.index') ? 'active' : '' }}" href="{{ route('admin.leads.index') }}">
                  All leads
-                 <span class="badge bg-light text-dark">{{ $formattedTotalLeads }}</span>
+                 <span class="badge bg-light text-dark">{{ $totalLeads }}</span>
              </a>
          </div>
          <div class="my-3">
@@ -40,14 +40,14 @@
                      <span class="badge bg-light text-dark">{{ $closingThisWeekCount }}</span>
                  </a>
                  <a class="nav-link lead-filter {{ request()->routeIs('admin.leads.watching_leads') ? 'active' : '' }}"
-                     href="{{ route('admin.leads.watching_leads') }}">
+                     href="{{ route('admin.leads.watching_leads', auth()->id()) }}">
                      Leads I’m watching
                      <span class="badge bg-light text-dark">{{ $myWatchingLeadsCount }}</span>
                  </a>
                  <a class="nav-link lead-filter {{ request()->routeIs('admin.leads.open_leads') ? 'active' : '' }}"
-                     href="{{ route('admin.leads.open_leads') }}">
+                     href="{{ route('admin.leads.open_leads', auth()->id()) }}">
                      My open leads
-                     <span class="badge bg-light text-dark">{{ $myLeadStatusCount }}</span>
+                     <span class="badge bg-light text-dark">{{ $myLeadOpenStatusCount }}</span>
                  </a>
                  <a class="nav-link lead-filter {{ request()->routeIs('admin.leads.hot_leads') ? 'active' : '' }}"
                      href="{{ route('admin.leads.hot_leads') }}">

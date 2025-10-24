@@ -117,7 +117,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('people/tasks/delete/{task_id}', [PeopleController::class, 'deleteTask'])->name('people.task.delete');
 
     // People - Detail Section
-    Route::get('/people/delete/{people_id}', [PeopleController::class, 'delete'])->name('people.delete');
     Route::post('/people/ajax', [PeopleController::class, 'ajax_store'])->name('people.ajax.store');
     Route::post('people/{people}/update-detail', [PeopleController::class, 'updateDetail'])->name('people.updateDetail');
     Route::post('people/{people}/company/add', [PeopleController::class, 'addCompany'])->name('people.companies.add');
@@ -139,6 +138,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Lead Section
     Route::get('/leads/index', [LeadController::class, 'index'])->name('leads.index');
+    Route::get('/leads/hot-leads', [LeadController::class, 'hot_leads'])->name('leads.hot_leads');
+    Route::get('/leads/added-this-week', [LeadController::class, 'added_this_week'])->name('leads.added_this_week');
+    Route::get('/leads/closing-this-week', [LeadController::class, 'closing_this_week'])->name('leads.closing_this_week');
+    Route::get('/leads/my-leads/{id}', [LeadController::class, 'my_leads'])->name('leads.my_leads');
+    Route::get('/leads/open-leads/{id}', [LeadController::class, 'open_leads'])->name('leads.open_leads');
+    Route::get('/leads/watching-leads/{id}', [LeadController::class, 'watching_leads'])->name('leads.watching_leads');
     Route::post('/leads/store', [LeadController::class, 'store'])->name('leads.store');
     Route::get('leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
     Route::post('/leads/delete/{id}', [LeadController::class, 'delete'])->name('leads.delete');
@@ -157,12 +162,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('leads/{lead}/update-detail', [LeadController::class, 'updateDetail'])->name('lead.updateDetail');
     Route::post('leads/{lead}/tags/add', [LeadController::class, 'addTag'])->name('leads.tags.add');
     Route::post('leads/{lead}/tags/{tag}/remove', [LeadController::class, 'removeTag'])->name('leads.tags.remove');
-    Route::get('/leads/my-leads/{id}', [LeadController::class, 'my_leads'])->name('leads.my_leads');
-    Route::get('/leads/added-this-week', [LeadController::class, 'added_this_week'])->name('leads.added_this_week');
-    Route::get('/leads/closing-this-week', [LeadController::class, 'closing_this_week'])->name('leads.closing_this_week');
-    Route::get('/leads/open-leads', [LeadController::class, 'open_leads'])->name('leads.open_leads');
-    Route::get('/leads/hot-leads', [LeadController::class, 'hot_leads'])->name('leads.hot_leads');
-    Route::get('/leads/watching-leads', [LeadController::class, 'watching_leads'])->name('leads.watching_leads');
+
     Route::post('leads/delete-field', [LeadController::class, 'deleteField'])->name('leads.delete-field');
     Route::post('leads/update-field', [LeadController::class, 'updateField'])->name('leads.update-field');
     Route::post('/leads/add-product', [LeadController::class, 'addProduct'])->name('leads.add-product');

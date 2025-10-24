@@ -46,11 +46,20 @@ class Helper
     //     });
     // }
 
-    public static function calculateTotalValue($lead)
+    // public static function calculateTotalValue($lead)
+    // {
+    //     return $lead->products->sum(function ($product) {
+    //         return $product->pivot->qty * $product->pivot->price;
+    //     });
+    // }
+
+    public static function calculateTotalValue($leads)
     {
-        return $lead->products->sum(function ($product) {
-            return $product->pivot->qty * $product->pivot->price;
-        });
+        return collect($leads)->sum(fn ($lead)
+        => $lead->products->sum(fn ($product)
+        => $product->pivot->qty * $product->pivot->price
+        )
+        );
     }
 
     public static function formatValue($value)

@@ -14,7 +14,7 @@
          <td>{{ $lead['created_at'] }}</td>
          <td>${{ number_format($lead['total_price'], 2) }}</td>
          <td>{{ $lead['assignee'] }}</td>
-         <td>Proposal Approval</td>
+         <td>{{ $lead['stage_name'] }}</td>
          <td>{{ $lead['confidence'] }}%</td>
          <td>{{ $lead['close_date'] }}</td>
          <td>{{ $lead['sources'] }}</td>

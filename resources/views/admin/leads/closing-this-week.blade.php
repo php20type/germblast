@@ -1,6 +1,6 @@
 @extends('admin.includes.layout')
 
-@section('title', 'Leads')
+@section('title', 'Closing This Week Leads')
 
 @section('content')
 
@@ -18,10 +18,13 @@
                             <!-- Header -->
                             <div class="heading-area-sec">
                                 <div class="left-part-sec">
-                                    <h3 class="mb-1">Closing this week <i class="fas fa-thumbtack pinned-icon"></i></h3>
+                                    <h3 class="mb-1">CLOSING THIS WEEK <i class="fas fa-thumbtack pinned-icon"></i></h3>
                                     <p class="text-muted mb-0">Business deals with your companies and people</p>
                                 </div>
-                                <button class="btn btn-export">EXPORT</button>
+                                <div class="d-none right-part">
+                                    <button class="btn btn-email">Email</button>
+                                    <button class="btn btn-export">EXPORT</button>
+                                </div>
                             </div>
 
                            <!-- Filter Section -->
@@ -33,7 +36,7 @@
                                                 <input type="search" class="form-control" placeholder=""
                                                     aria-label="Search" id="lead-search">
                                             </div>
-                                            <span class="company-count">{{ $leadCount }} leads</span>
+                                            <span class="company-count">{{ $formattedTotalLeads }} Lead Found</span>
                                         </div>
                                     </div>
                                     <div class="col-md-6 ">
@@ -54,47 +57,43 @@
                                                 </select>
                                             </div>
                                             <div class="me-2">
-                                                <select class="form-select" name="people_id"
-                                                    aria-label="Assigned to select">
-                                                    <option value="">Assigned to</option>
-                                                    @foreach ($peoples as $people)
-                                                        <option value="{{ $people->id }}">{{ $people->name }}
+                                                <select class="form-select" name="user_id" aria-label="Assigned to select">
+                                                    <option value="">Assignee</option>
+                                                    @foreach ($users as $user)
+                                                        <option value="{{ $user->id }}">{{ $user->name }}
                                                         </option>
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <button class="btn btn-primary me-2"><img
+                                            <button class="d-none btn btn-primary me-2"><img
                                                     src="{{ asset('img/icons/filter.svg') }}" alt="" /></button>
-                                            <button class="btn btn-primary"><img src="{{ asset('img/icons/bar.svg') }}"
-                                                    alt="" /></button>
+                                            <button class="d-none btn btn-primary"><img
+                                                    src="{{ asset('img/icons/bar.svg') }}" alt="" /></button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="filter-value">
-                                <div class="row">
+                               <div class="row">
                                     <div class="col-lg-3 col-md-6">
                                         <div class="filter-card">
-                                            {{-- <h5>Total value:<span>${{ $formattedTotalValue }}</span></h5> --}}
-                                            <h5>Total value:<span>$45908</span></h5>
+                                            <h5>Total value:<span>${{ $formattedTotalValue }}</span></h5>
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
                                         <div class="filter-card">
-                                            {{-- <h5>Avg value:<span>${{ $formattedAvgValue }}k</span></h5> --}}
-                                            <h5>Avg value:<span>$2.5k</span></h5>
+                                            <h5>Avg value:<span>${{ $formattedAvgValue }}</span></h5>
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
                                         <div class="filter-card">
-                                            <h5>Avg time open:<span>161.5 Days</span></h5>
+                                            <h5>Avg time open:<span>16 Days</span></h5>
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
                                         <div class="filter-card">
-                                            {{-- <h5>Win rate:<span>{{ $formattedAvgConfidence }}%</span></h5> --}}
-                                            <h5>Win rate:<span>100%</span></h5>
+                                            <h5>Win rate:<span>{{ $avgConfidence }}%</span></h5>
                                         </div>
                                     </div>
                                 </div>
@@ -105,51 +104,22 @@
                                 <div class="table-container mt-3">
                                     <table class="table table-hover">
                                         <thead>
-                                            <tr>
+                                             <tr>
                                                 <th class="checkbox-cell">
                                                     <input type="checkbox" class="form-check-input" id="selectAll">
                                                 </th>
-                                                <th>
-                                                    <img src="{{ asset('img/icons/down-vector.svg') }}" alt="" />
-                                                    Lead name
-                                                    </i>
-                                                </th>
-                                                <th>
-                                                    <img src="{{ asset('img/icons/down-vector.svg') }}"
-                                                        alt="" />Age </i>
-                                                </th>
-                                                <th>
-                                                    <img src="{{ asset('img/icons/down-vector.svg') }}"
-                                                        alt="" />Value </i>
-                                                </th>
-                                                <th>
-                                                    <img src="{{ asset('img/icons/down-vector.svg') }}"
-                                                        alt="" />Assignee
-                                                    </i>
-                                                </th>
-                                                <th>
-                                                    <img src="{{ asset('img/icons/down-vector.svg') }}"
-                                                        alt="" />Stage </i>
-                                                </th>
-                                                <th>
-                                                    <img src="{{ asset('img/icons/down-vector.svg') }}"
-                                                        alt="" />Confidence
-                                                    </i>
-                                                </th>
-                                                <th>
-                                                    <img src="{{ asset('img/icons/down-vector.svg') }}"
-                                                        alt="" />Close date
-                                                    </i>
-                                                </th>
-                                                <th>
-                                                    <img src="{{ asset('img/icons/down-vector.svg') }}"
-                                                        alt="" />Sources
-                                                    </i>
-                                                </th>
+                                                <th>Lead name</th>
+                                                <th>Age</th>
+                                                <th>Value</th>
+                                                <th>Assignee</th>
+                                                <th>Stage</th>
+                                                <th>Confidence</th>
+                                                <th>Close date</th>
+                                                <th>Sources</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                             @forelse ($groupedLeads as $lead)
+                                            @forelse ($groupedLeads as $lead)
                                                 <tr>
                                                     <td><input type="checkbox" class="form-check-input row-checkbox"></td>
 
@@ -166,7 +136,7 @@
                                                     <td>{{ $lead['created_at'] }}</td>
                                                     <td>${{ number_format($lead['total_price'], 2) }}</td>
                                                     <td>{{ $lead['assignee'] }}</td>
-                                                    <td>Proposal Approval</td>
+                                                    <td>{{ $lead['stage_name'] }}</td>
                                                     <td>{{ $lead['confidence'] }}%</td>
                                                     <td>{{ $lead['close_date'] }}</td>
                                                     <td>{{ $lead['sources'] }}</td>
@@ -186,9 +156,6 @@
                             <div class="action-bar" id="actionBar">
                                 <div class="d-flex align-items-center justify-content-center">
                                     <span class="me-3"><strong id="selectedCount">1</strong> Selected</span>
-                                    <button class="btn btn-edit btn-action">EDIT</button>
-                                    <button class="btn btn-merge btn-action">MERGE</button>
-                                    <button class="btn btn-add-audience btn-action">ADD TO AUDIENCE</button>
                                     <button class="btn btn-delete btn-action">DELETE</button>
                                 </div>
                             </div>
@@ -208,6 +175,7 @@
             function fetchLeads() {
                 let search = $('#lead-search').val();
                 let status = $('select[name="status"]').val();
+                let user_id = $('select[name="user_id"]').val();
                 let hot = $('#checkDefault').is(':checked') ? 'hot' : '';
 
                 $.ajax({
@@ -216,16 +184,21 @@
                     data: {
                         search: search,
                         status: status,
+                        user_id: user_id,
                         hot: hot,
                     },
-                    success: function(data) {
-                        $('table tbody').html(data);
+                    success: function(response) {
+                        $('table tbody').html(response.table);
+                        $('.company-count').text(response.count + ' Lead Found');
+                    },
+                    error: function() {
+                        console.error('Error fetching lead data');
                     }
                 });
             }
 
             $('#lead-search').on('keyup', fetchLeads);
-            $('#checkDefault, select[name="status"]').on('change', fetchLeads);
+           $('#checkDefault, select[name="status"], select[name="user_id"]').on('change', fetchLeads);
         });
     </script>
 @endpush

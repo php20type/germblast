@@ -107,7 +107,7 @@ class ActivityController extends Controller
         // Validate request
         $validated = $request->validate([
             'note' => 'required|string',
-            'agenda' => 'required|string',
+            'agenda' => 'nullable|string',
             'activity_type_id' => 'required|exists:activity_types,id',
             'date' => 'required|date',
             'start_time' => 'required',
@@ -129,7 +129,7 @@ class ActivityController extends Controller
             'user_id' => $user_id,
             'activity_type_id' => $validated['activity_type_id'],
             'note' => $validated['note'],
-            'description' => $validated['agenda'],
+            'description' => $validated['agenda'] ?? null,
             'owner_type' => $validated['owner_type'],
             'owner_id' => $validated['owner_id'],
             'date' => $validated['date'],
