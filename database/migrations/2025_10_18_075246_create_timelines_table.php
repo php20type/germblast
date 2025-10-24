@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('timelines', function (Blueprint $table) {
             $table->id();
             // The user who performed the action
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             // Polymorphic relation to any entity (Company, People, Lead)
             $table->string('owner_type');
             $table->unsignedBigInteger('owner_id');
             // Action type (e.g. created, updated, assigned, logged_activity, added_person, etc.)
             $table->string('action_type');
-            // Descriptive text for the timeline entry
             $table->text('description')->nullable();
             $table->timestamps();
         });
