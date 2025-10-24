@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             // The user who performed the action
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
+            // $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             // Polymorphic relation to any entity (Company, People, Lead)
             $table->string('owner_type');
             $table->unsignedBigInteger('owner_id');
