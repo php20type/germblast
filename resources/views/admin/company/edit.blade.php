@@ -3704,6 +3704,59 @@
                 });
             });
 
+            // ==============================
+            // Delete Company
+            // ==============================
+            $(document).on('click', '.delete-company-btn', function() {
+                let companyId = $(this).data('id');
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This action will permanently delete this company.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete",
+                    cancelButtonText: "Cancel"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('admin.companies.delete') }}",
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                ids: [companyId] // keep it as array for consistency
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: response.message ||
+                                        'Company deleted successfully.',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                                setTimeout(() => {
+                                    window.location.href =
+                                        "{{ route('admin.company.index') }}";
+                                }, 2000);
+                            },
+
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong while deleting.',
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+
             const durationSelect = document.getElementById('duration');
             const startInput = document.getElementById('start_time');
             const endInput = document.getElementById('end_time');

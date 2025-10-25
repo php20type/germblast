@@ -71,7 +71,7 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                         <button class="d-none btn btn-primary me-2"><img
+                                        <button class="d-none btn btn-primary me-2"><img
                                                 src="{{ asset('img/icons/filter.svg') }}" alt="" /></button>
                                         <button class="d-none btn btn-primary"><img src="{{ asset('img/icons/bar.svg') }}"
                                                 alt="" /></button>
@@ -101,7 +101,7 @@
                                         @forelse ($companies as $company)
                                             <tr>
                                                 <td>
-                                                    <input type="checkbox" class="form-check-input row-checkbox">
+                                                    <input type="checkbox" class="form-check-input row-checkbox" data-id="{{ $company->id }}">
                                                 </td>
                                                 <td>
                                                     <div class="company-name">
@@ -147,10 +147,10 @@
                         </div>
 
                         <!-- Action Bar -->
-                         <div class="action-bar" id="actionBar">
+                       <div class="action-bar" id="actionBar">
                             <div class="d-flex align-items-center justify-content-center">
                                 <span class="me-3"><strong id="selectedCount">1</strong> Selected</span>
-                                <button class="btn btn-edit btn-action">CREATE LEAD</button>
+                                <button class="btn btn-edit btn-action" onclick="addLead()">CREATE LEAD</button>
                                 <button class="btn btn-delete btn-action">DELETE</button>
                             </div>
                         </div>
@@ -166,40 +166,488 @@
 
     </div>
 
+    <!-- Add Lead Modal Start -->
+    <div class="modal fade" id="AddLead" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="exampleModalLabel">Add a lead</h1>
+                    <div>
+                        <a href="#" class="link-decoration">Customize fields</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                </div>
+                <div class="modal-body">
+
+                    {{-- <form class="company-form" id="add-lead-form"> --}}
+                    <form action="{{ route('admin.leads.store') }}" class="company-form" id="add-lead-form" method="POST">
+                        @csrf
+
+
+                        <div class="row mx-0">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Lead name</label>
+                                    @error('name')
+                                        <span class="text-danger">* {{ $message }}</span>
+                                    @enderror
+                                    <input type="text" name="name" placeholder="Lead Name" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Assignee</label>
+                                    @error('assignee_id')
+                                        <span class="text-danger">* {{ $message }}</span>
+                                    @enderror
+                                    <select name="assignee_id" class="form-select">
+                                        <option value="">Choose...</option>
+                                        @foreach ($users as $user)
+                                            <option value="{{ $user->id }}">
+                                                {{ $user->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Anticipated closed date</label>
+                                    @error('close_date')
+                                        <span class="text-danger">* {{ $message }}</span>
+                                    @enderror
+                                    <input type="text" name="close_date" placeholder="04-Apr-2004"
+                                        pattern="\d{2}-[A-Za-z]{3}-\d{4}" class="form-control" />
+                                </div>
+                            </div>
+
+                            <!-- Product Row Container -->
+                            <div id="productRowContainer" class="mt-3">
+                                <div class="row product-row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Products</label>
+                                            <select class="form-select mt-2" name="product_id[]">
+                                                <option value="">Choose...</option>
+                                                @foreach ($products as $product)
+                                                    <option value="{{ $product->id }}">{{ $product->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label class="form-label">Qty :</label>
+                                            <input type="number" name="quantity[]" placeholder="Add quantity"
+                                                class="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-4">
+                                        <div class="form-group d-flex justify-content-between align-items-end">
+                                            <div style="width: 100%">
+                                                <label class="form-label fw-light">U.S(USD)</label>
+                                                <input type="number" name="price[]" step="0.01"
+                                                    placeholder="Add price" class="form-control" />
+                                            </div>
+                                            <button type="button"
+                                                class="btn btn-danger btn-sm ms-2 remove-product-row">X</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Add New Product Button -->
+                            <button type="button" id="addProductRow"
+                                class="btn btn-sm btn-link text-primary text-start">
+                                + Add New Product
+                            </button>
+
+                            <div class="col-lg-12 mt-2">
+                                <div class="form-group">
+                                    <label class="form-label">Confidence</label>
+                                    @error('confidence')
+                                        <span class="text-danger">* {{ $message }}</span>
+                                    @enderror
+                                    <input type="number" name="confidence" placeholder="Confidence %"
+                                        class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Companies</label>
+                                    @error('company_id')
+                                        <span class="text-danger">* {{ $message }}</span>
+                                    @enderror
+                                    <select name="company_id[]" id="companySelect" class="form-select" multiple>
+                                        <option value="">Choose Company</option>
+                                        @foreach ($allCompanies as $company)
+                                            <option value="{{ $company->id }}">
+                                                {{ $company->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Select Person</label>
+                                    @error('person_id')
+                                        <span class="text-danger">* {{ $message }}</span>
+                                    @enderror
+                                    <select id="person_select" name="person_id[]" class="form-select" multiple>
+                                        <option value="">-- Select Person --</option>
+                                        @foreach ($peoples as $people)
+                                            <option value="{{ $people->id }}">
+                                                {{ $people->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-label">Sources</label>
+                                    @error('source_id')
+                                        <span class="text-danger">* {{ $message }}</span>
+                                    @enderror
+                                    <select id="source_select" name="source_id[]" class="form-select mt-2" multiple>
+                                        <option value="">Choose...</option>
+                                        @foreach ($sources as $source)
+                                            <option value="{{ $source->id }}">
+                                                {{ $source->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-label">Competitors</label>
+                                    @error('competitors_id')
+                                        <span class="text-danger">* {{ $message }}</span>
+                                    @enderror
+                                    <select id="competitor_select" name="competitors_id[]" class="form-select mt-2"
+                                        multiple>
+                                        <option value="">Choose...</option>
+                                        @foreach ($competitors as $competitor)
+                                            <option value="{{ $competitor->id }}">
+                                                {{ $competitor->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Tags</label>
+                                    <select name="tag_id" class="form-select">
+                                        <option value="">Select tag</option>
+                                        @foreach ($companytags as $companytag)
+                                            <option value="{{ $companytag->id }}">{{ $companytag->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- div=row mx-0 closed --}}
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Create lead</button>
+                        </div>
+                    </form>
+                    {{-- form closed --}}
+
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 @endsection
 @push('scripts')
     <script>
-    const userId = {{ auth()->id() }};
-    $(document).ready(function() {
-        function fetchCompanies() {
-            let search = $('#company-search').val();
-            let company_type_id = $('select[name="company_type_id"]').val();
-            let user_id = $('select[name="user_id"]').val();
-            let people_id = $('select[name="people_id"]').val();
+        // ==============================
+        // Modal Show for leads
+        // ==============================
+        // function addLead() {
+        //     $('#AddLead').modal('show');
+        // }
 
-            $.ajax({
-                url: `/admin/company/my_companies/${userId}`,
-                method: "GET",
-                data: {
-                    search: search,
-                    company_type_id: company_type_id,
-                    user_id: user_id,
-                    people_id: people_id,
-                },
-                success: function(response) {
-                    $('table tbody').html(response.table);
-                    $('.company-count').text(response.count + ' Company Found');
-                },
-                error: function(err) {
-                    console.error('Error fetching company data', err);
-                }
+        function addLead() {
+            // Collect all checked company IDs
+            let selectedCompanies = [];
+            $('.row-checkbox:checked').each(function() {
+                selectedCompanies.push($(this).data('id'));
             });
+
+            // Preselect these companies in the modal dropdown
+            $('#companySelect').val(selectedCompanies).trigger('change');
+
+            // Show the modal
+            $('#AddLead').modal('show');
         }
 
-        $('#company-search').on('keyup', fetchCompanies);
-        $('select[name="company_type_id"], select[name="user_id"], select[name="people_id"]').on('change', fetchCompanies);
-    });
-</script>
 
+        const userId = {{ auth()->id() }};
+        $(document).ready(function() {
+            function fetchCompanies() {
+                let search = $('#company-search').val();
+                let company_type_id = $('select[name="company_type_id"]').val();
+                let user_id = $('select[name="user_id"]').val();
+                let people_id = $('select[name="people_id"]').val();
+
+                $.ajax({
+                    url: `/admin/company/my_companies/${userId}`,
+                    method: "GET",
+                    data: {
+                        search: search,
+                        company_type_id: company_type_id,
+                        user_id: user_id,
+                        people_id: people_id,
+                    },
+                    success: function(response) {
+                        $('table tbody').html(response.table);
+                        $('.company-count').text(response.count + ' Company Found');
+                    },
+                    error: function(err) {
+                        console.error('Error fetching company data', err);
+                    }
+                });
+            }
+
+            $('#company-search').on('keyup', fetchCompanies);
+            $('select[name="company_type_id"], select[name="user_id"], select[name="people_id"]').on('change',
+                fetchCompanies);
+
+
+            // ==============================
+            // Lead & Activities Form - Select2 Integration
+            // ==============================
+            $('#AddLead').on('shown.bs.modal', function() {
+                $('#companySelect').select2({
+                    dropdownParent: $('#AddLead'),
+                    placeholder: '-- Select a company --',
+                    allowClear: true,
+                });
+
+                $('#person_select').select2({
+                    dropdownParent: $('#AddLead'),
+                    placeholder: '-- Select a person --',
+                    allowClear: true
+                });
+
+                $('#source_select').select2({
+                    dropdownParent: $('#AddLead'),
+                    placeholder: 'Choose...',
+                    allowClear: true
+                });
+
+                $('#competitor_select').select2({
+                    dropdownParent: $('#AddLead'),
+                    placeholder: 'Choose...',
+                    allowClear: true
+                });
+            });
+
+            // ==============================
+            // Product row add and remove logic in add lead form
+            // ==============================
+            $('#addProductRow').click(function() {
+                var row = $('.product-row:first').clone(); // Clone the first row
+                row.find('input').val(''); // Clear inputs
+                row.find('select').val(''); // Clear dropdown
+                $('#productRowContainer').append(row); // Append to container
+            });
+
+            $(document).on('click', '.remove-product-row', function() {
+                if ($('.product-row').length > 1) {
+                    $(this).closest('.product-row').remove();
+                } else {
+                    toastr.warning('At least one product row is required.');
+                }
+            });
+
+            // ==============================
+            // Add lead form validation and submittion
+            // ==============================
+            $("#add-lead-form").validate({
+                ignore: [],
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    assignee_id: {
+                        required: true
+                    },
+                    close_date: {
+                        required: true
+                    },
+                    "product_id[]": {
+                        required: true
+                    },
+                    "quantity[]": {
+                        required: true
+                    },
+                    "price[]": {
+                        required: true
+                    },
+                    confidence: {
+                        required: true
+                    },
+                    "company_id[]": {
+                        required: true
+                    },
+                    "person_id[]": {
+                        required: true
+                    },
+                    "source_id[]": {
+                        required: true
+                    },
+                    "competitors_id[]": {
+                        required: true
+                    },
+                    tag_id: {
+                        required: true
+                    }
+                },
+                messages: {
+                    name: {
+                        required: "Please enter lead name."
+                    },
+                    assignee_id: {
+                        required: "Please select an assignee."
+                    },
+                    close_date: {
+                        required: "Please select a close date."
+                    },
+                    "product_id[]": {
+                        required: "Please select a product."
+                    },
+                    "quantity[]": {
+                        required: "Please enter the quantity."
+                    },
+                    "price[]": {
+                        required: "Please enter the price."
+                    },
+                    confidence: {
+                        required: "Please enter the confidence level."
+                    },
+                    "company_id[]": {
+                        required: "Please select a company."
+                    },
+                    "person_id[]": {
+                        required: "Please select a person."
+                    },
+                    "source_id[]": {
+                        required: "Please select a source."
+                    },
+                    "competitors_id[]": {
+                        required: "Please select a competitor."
+                    },
+                    tag_id: {
+                        required: "Please select the tag."
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent()); // Inserts after the .input-group
+                    } else {
+                        error.insertAfter(element); // Default
+                    }
+                }
+            });
+
+            $('#add-lead-form').submit(function(e) {
+                e.preventDefault();
+
+                if (!$('#add-lead-form').valid()) {
+                    return; // Stop if validation fails
+                }
+
+                $.ajax({
+                    url: '{{ route('admin.leads.store') }}',
+                    method: 'POST',
+                    data: $(this).serialize(),
+
+                    success: function(response) {
+                        toastr.success('Lead created successfully!');
+                        $('#add-lead-form')[0].reset();
+                        $('#AddLead').modal('hide');
+
+                    },
+                    error: function(xhr) {
+                        alert(xhr.responseText);
+                        toastr.error('Something went wrong while creating the lead.');
+                    }
+                });
+            });
+
+
+            $(document).on('click', '.btn-delete', function() {
+                let selectedCompanies = $('.row-checkbox:checked').map(function() {
+                    return $(this).data('id');
+                }).get();
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This action will permanently delete the selected company.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete",
+                    cancelButtonText: "Cancel"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('admin.companies.delete') }}",
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                ids: selectedCompanies
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: response.message ||
+                                        'Company deleted successfully.',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                                setTimeout(() => location.reload(), 2000);
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong while deleting.',
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+
+        });
+    </script>
 @endpush

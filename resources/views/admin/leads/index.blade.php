@@ -78,12 +78,12 @@
                                 <div class="row">
                                     <div class="col-lg-3 col-md-6">
                                         <div class="filter-card">
-                                            <h5>Total value:<span>${{ $formattedTotalValue }}</span></h5>
+                                            <h5 id="total-value">Total value:<span>${{ $formattedTotalValue }}</span></h5>
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
                                         <div class="filter-card">
-                                            <h5>Avg value:<span>${{ $formattedAvgValue }}</span></h5>
+                                            <h5 id="avg-value">Avg value:<span>${{ $formattedAvgValue }}</span></h5>
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
@@ -93,7 +93,7 @@
                                     </div>
                                     <div class="col-lg-3 col-md-6">
                                         <div class="filter-card">
-                                            <h5>Win rate:<span>{{ $avgConfidence }}%</span></h5>
+                                            <h5 id="confidence-value">Win rate:<span>{{ $avgConfidence }}%</span></h5>
                                         </div>
                                     </div>
                                 </div>
@@ -121,7 +121,8 @@
                                         <tbody>
                                             @forelse ($groupedLeads as $lead)
                                                 <tr>
-                                                    <td><input type="checkbox" class="form-check-input row-checkbox"></td>
+                                                    <td><input type="checkbox" class="form-check-input row-checkbox"
+                                                            data-id="{{ $lead['id'] }}"></td>
 
                                                     <td>
                                                         <div class="company-name">
@@ -190,6 +191,9 @@
                     success: function(response) {
                         $('table tbody').html(response.table);
                         $('.company-count').text(response.count + ' Lead Found');
+                        $('#total-value span').text('$' + response.total_value);
+                        $('#avg-value span').text('$' + response.avg_value);
+                        $('#confidence-value span').text(response.avg_confidence + '%');
                     },
                     error: function() {
                         console.error('Error fetching lead data');
@@ -198,7 +202,55 @@
             }
 
             $('#lead-search').on('keyup', fetchLeads);
-           $('#checkDefault, select[name="status"], select[name="user_id"]').on('change', fetchLeads);
+            $('#checkDefault, select[name="status"], select[name="user_id"]').on('change', fetchLeads);
+
+            $(document).on('click', '.btn-delete', function() {
+                let selectedLeads = $('.row-checkbox:checked').map(function() {
+                    return $(this).data('id');
+                }).get();
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This action will permanently delete the selected lead.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete",
+                    cancelButtonText: "Cancel"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('admin.leads.delete') }}",
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                ids: selectedLeads
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: response.message ||
+                                        'Lead deleted successfully.',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                                setTimeout(() => location.reload(), 2000);
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong while deleting.',
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
         });
     </script>
 @endpush

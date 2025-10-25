@@ -3,11 +3,11 @@
 use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\LeadController;
+use App\Http\Controllers\Admin\NoteController;
 use App\Http\Controllers\Admin\PeopleController;
 use App\Http\Controllers\Admin\SaleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TaskController;
-use App\Http\Controllers\Admin\NoteController;
 use App\Http\Controllers\ProfileController;
 use App\Models\ActivityType;
 use App\Models\Company;
@@ -47,7 +47,7 @@ Route::middleware(['auth'])->group(function () {
 
         $activity_types = ActivityType::all();
 
-        return view('admin.dashboard', compact('users', 'company_types', 'industries', 'leadtags', 'companytags', 'persontags', 'activity_types', 'peoples', 'companies', 'sources', 'territories','products', 'competitors'));
+        return view('admin.dashboard', compact('users', 'company_types', 'industries', 'leadtags', 'companytags', 'persontags', 'activity_types', 'peoples', 'companies', 'sources', 'territories', 'products', 'competitors'));
         // return view('admin.dashboard');
     })->name('admin.dashboard');
 
@@ -81,7 +81,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/company', [CompanyController::class, 'index'])->name('company.index');
     Route::get('/company/my_companies/{id}', [CompanyController::class, 'my_companies'])->name('company.my_companies');
     Route::post('/companies/store', [CompanyController::class, 'store'])->name('companies.store');
-    Route::post('/companies/delete/{id}', [CompanyController::class, 'delete'])->name('companies.delete');
+    Route::post('/companies/delete', [CompanyController::class, 'delete'])->name('companies.delete');
 
     // Company - Task Section
     Route::post('/companies/{company}/tasks', [CompanyController::class, 'addTask'])->name('companies.tasks.store');
@@ -102,12 +102,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('companies/delete-field', [CompanyController::class, 'deleteField'])->name('companies.delete-field');
     Route::post('/update-company-field', [CompanyController::class, 'updateCompanyField'])->name('update.company.field');
 
-
     // People Section
     Route::get('/people/index', [PeopleController::class, 'index'])->name('peoples.index');
     Route::get('/people/my-peoples/{id}', [PeopleController::class, 'my_peoples'])->name('peoples.my_peoples');
     Route::post('/people/store', [PeopleController::class, 'store'])->name('people.store');
-    Route::post('/people/delete/{id}', [PeopleController::class, 'delete'])->name('people.delete');
+    Route::post('/people/delete', [PeopleController::class, 'delete'])->name('people.delete');
 
     // People - Task Section
     Route::post('/people/{people}/tasks', [PeopleController::class, 'addTask'])->name('people.tasks.store');
@@ -146,7 +145,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/leads/watching-leads/{id}', [LeadController::class, 'watching_leads'])->name('leads.watching_leads');
     Route::post('/leads/store', [LeadController::class, 'store'])->name('leads.store');
     Route::get('leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
-    Route::post('/leads/delete/{id}', [LeadController::class, 'delete'])->name('leads.delete');
+    Route::post('/leads/delete', [LeadController::class, 'delete'])->name('leads.delete');
 
     // Lead - Task Section
     Route::post('/leads/{lead}/tasks', [LeadController::class, 'addTask'])->name('leads.tasks.store');
@@ -166,7 +165,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('leads/delete-field', [LeadController::class, 'deleteField'])->name('leads.delete-field');
     Route::post('leads/update-field', [LeadController::class, 'updateField'])->name('leads.update-field');
     Route::post('/leads/add-product', [LeadController::class, 'addProduct'])->name('leads.add-product');
-
 
     // settings section
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
@@ -200,7 +198,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/delete_note/{id}', [NoteController::class, 'delete_note'])->name('delete.note');
     Route::post('note/add_comment/{id}', [NoteController::class, 'add_comment'])->name('add.note.comment');
     Route::post('note/delete_comment/{id}', [NoteController::class, 'delete_comment'])->name('delete.note.comment');
-
 
     // Route::post('/people/ajax', [PeopleController::class, 'ajax_store'])->name('people.store');
 

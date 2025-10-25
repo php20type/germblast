@@ -80,6 +80,11 @@ class CompanyController extends Controller
 
         $peoples = People::all();
         $users = User::all();
+        $products = Product::all();
+        $allCompanies = Company::all();
+        $sources = Source::all();
+        $competitors = Competitor::all();
+        $companytags = Tag::where('tag_id', 2)->get();
         $company_types = CompanyType::all();
         $sidebarStats = $this->getSidebarStats();
 
@@ -91,7 +96,7 @@ class CompanyController extends Controller
         }
 
         return view('admin.company.index', array_merge(
-            compact('companies', 'peoples', 'users', 'company_types', 'companiesCount'),
+            compact('companies', 'peoples', 'users', 'products', 'allCompanies', 'sources', 'competitors', 'companytags', 'company_types', 'companiesCount'),
             $sidebarStats
         ));
     }
@@ -123,6 +128,11 @@ class CompanyController extends Controller
 
         $peoples = People::all();
         $users = User::all();
+        $products = Product::all();
+        $allCompanies = Company::all();
+        $sources = Source::all();
+        $competitors = Competitor::all();
+        $companytags = Tag::where('tag_id', 2)->get();
         $company_types = CompanyType::all();
         $sidebarStats = $this->getSidebarStats();
 
@@ -134,7 +144,7 @@ class CompanyController extends Controller
         }
 
         return view('admin.company.my-companies', array_merge(
-            compact('companies', 'peoples', 'users', 'company_types', 'totalMyCompanies'),
+            compact('companies', 'peoples', 'users', 'company_types', 'totalMyCompanies', 'products', 'allCompanies', 'sources', 'competitors', 'companytags'),
             $sidebarStats
         ));
     }
@@ -914,5 +924,33 @@ class CompanyController extends Controller
             'status' => 'success',
             'message' => 'Task deleted successfully.',
         ]);
+    }
+
+    public function delete(Request $request)
+    {
+        $ids = (array) $request->ids; // handles both single and multiple
+
+        if (empty($ids)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No company selected for deletion.',
+            ], 400);
+        }
+
+        try {
+            Company::whereIn('id', $ids)->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => count($ids) > 1
+                    ? 'Selected companies deleted successfully.'
+                    : 'Company deleted successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete company(s): '.$e->getMessage(),
+            ], 500);
+        }
     }
 }

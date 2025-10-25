@@ -71,7 +71,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button class="delete-btn">
+                                <button class="delete-btn delete-people-btn" data-id="{{ $peoples->id }}">
                                     <i class="fas fa-trash me-2"></i>DELETE
                                 </button>
                             </div>
@@ -2900,8 +2900,6 @@
             }
 
 
-
-
             // ==============================
             // Toggle email, address, phone, and url , and cancel buttons
             // ==============================
@@ -3658,6 +3656,58 @@
                                         'Something went wrong.'
                                 });
                                 console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                });
+            });
+
+            // ==============================
+            // Delete People
+            // ==============================
+            $(document).on('click', '.delete-people-btn', function() {
+                let peopleId = $(this).data('id');
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This action will permanently delete this people.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete",
+                    cancelButtonText: "Cancel"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('admin.people.delete') }}",
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                ids: [peopleId] // keep it as array for consistency
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: response.message ||
+                                        'People deleted successfully.',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                                setTimeout(() => {
+                                    window.location.href =
+                                        "{{ route('admin.peoples.index') }}";
+                                }, 2000);
+                            },
+
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong while deleting.',
+                                });
                             }
                         });
                     }

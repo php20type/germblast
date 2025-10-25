@@ -116,7 +116,7 @@ class LeadController extends Controller
         // Calculations (use accessors where possible)
         $totalValue = Helper::calculateTotalValue($leads);
         $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = $leads->avg('confidence');
+        $avgConfidence = number_format($leads->avg('confidence'),2);
         $totalLeads = $leads->count();
 
         // Format counts
@@ -157,6 +157,7 @@ class LeadController extends Controller
                 'count' => $formattedTotalLeads,
                 'total_value' => $formattedTotalValue,
                 'avg_value' => $formattedAvgValue,
+                'avg_confidence' => $avgConfidence,
             ]);
         }
 
@@ -217,7 +218,7 @@ class LeadController extends Controller
         // Calculations
         $totalValue = Helper::calculateTotalValue($leads);
         $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = $leads->avg('confidence');
+        $avgConfidence = number_format($leads->avg('confidence'),2);
         $totalLeads = $leads->count();
 
         // Format counts
@@ -258,6 +259,7 @@ class LeadController extends Controller
                 'count' => $formattedTotalLeads,
                 'total_value' => $formattedTotalValue,
                 'avg_value' => $formattedAvgValue,
+                'avg_confidence' => $avgConfidence,
             ]);
         }
 
@@ -319,7 +321,7 @@ class LeadController extends Controller
         // Calculations
         $totalValue = Helper::calculateTotalValue($leads);
         $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = $leads->avg('confidence');
+        $avgConfidence = number_format($leads->avg('confidence'),2);
         $totalLeads = $leads->count();
 
         // Format counts
@@ -360,6 +362,7 @@ class LeadController extends Controller
                 'count' => $formattedTotalLeads,
                 'total_value' => $formattedTotalValue,
                 'avg_value' => $formattedAvgValue,
+                'avg_confidence' => $avgConfidence,
             ]);
         }
 
@@ -420,7 +423,7 @@ class LeadController extends Controller
         // Calculations
         $totalValue = Helper::calculateTotalValue($leads);
         $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = $leads->avg('confidence');
+        $avgConfidence = number_format($leads->avg('confidence'),2);
         $totalLeads = $leads->count();
 
         // Format counts
@@ -461,6 +464,7 @@ class LeadController extends Controller
                 'count' => $formattedTotalLeads,
                 'total_value' => $formattedTotalValue,
                 'avg_value' => $formattedAvgValue,
+                'avg_confidence' => $avgConfidence,
             ]);
         }
 
@@ -520,7 +524,7 @@ class LeadController extends Controller
         // Calculations
         $totalValue = Helper::calculateTotalValue($leads);
         $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = $leads->avg('confidence');
+        $avgConfidence = number_format($leads->avg('confidence'),2);
         $totalLeads = $leads->count();
 
         // Format counts
@@ -561,6 +565,7 @@ class LeadController extends Controller
                 'count' => $formattedTotalLeads,
                 'total_value' => $formattedTotalValue,
                 'avg_value' => $formattedAvgValue,
+                'avg_confidence' => $avgConfidence,
             ]);
         }
 
@@ -623,7 +628,7 @@ class LeadController extends Controller
         // Calculations
         $totalValue = Helper::calculateTotalValue($leads);
         $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = $leads->avg('confidence');
+        $avgConfidence = number_format($leads->avg('confidence'),2);
         $totalLeads = $leads->count();
 
         // Format counts
@@ -664,6 +669,7 @@ class LeadController extends Controller
                 'count' => $formattedTotalLeads,
                 'total_value' => $formattedTotalValue,
                 'avg_value' => $formattedAvgValue,
+                'avg_confidence' => $avgConfidence,
             ]);
         }
 
@@ -726,7 +732,7 @@ class LeadController extends Controller
         // Calculations
         $totalValue = Helper::calculateTotalValue($leads);
         $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = $leads->avg('confidence');
+        $avgConfidence = number_format($leads->avg('confidence'),2);
         $totalLeads = $leads->count();
 
         // Format counts
@@ -767,6 +773,7 @@ class LeadController extends Controller
                 'count' => $formattedTotalLeads,
                 'total_value' => $formattedTotalValue,
                 'avg_value' => $formattedAvgValue,
+                'avg_confidence' => $avgConfidence,
             ]);
         }
 
@@ -1503,5 +1510,33 @@ class LeadController extends Controller
             'status' => 'success',
             'message' => 'Task deleted successfully.',
         ]);
+    }
+
+     public function delete(Request $request)
+    {
+        $ids = (array) $request->ids; // handles both single and multiple
+
+        if (empty($ids)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No lead selected for deletion.',
+            ], 400);
+        }
+
+        try {
+            Lead::whereIn('id', $ids)->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => count($ids) > 1
+                    ? 'Selected leads deleted successfully.'
+                    : 'Lead deleted successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete lead(s): '.$e->getMessage(),
+            ], 500);
+        }
     }
 }

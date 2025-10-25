@@ -51,7 +51,8 @@ class PeopleController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $query = People::with(['companies', 'tags', 'user', 'peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany']);
+        $query = People::with(['companies', 'tags', 'user', 'peopleEmail', 'peoplePhone',
+            'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany']);
 
         // AJAX filters
         if ($request->ajax()) {
@@ -78,8 +79,14 @@ class PeopleController extends Controller
         // Get filtered people
         $peoples = $query->get();
         $peoplesCount = $peoples->count();
+
         $companies = Company::all();
         $users = User::all();
+        $products = Product::all();
+        $allPeoples = People::all();
+        $sources = Source::all();
+        $competitors = Competitor::all();
+        $peopletags = Tag::where('tag_id', 3)->get();
 
         // Sidebar stats
         $sidebarStats = $this->getSidebarStats();
@@ -94,7 +101,7 @@ class PeopleController extends Controller
 
         // Normal page load
         return view('admin.peoples.index', array_merge(
-            compact('peoples', 'peoplesCount', 'companies', 'users'),
+            compact('peoples', 'peoplesCount', 'companies', 'users', 'products', 'allPeoples', 'sources', 'competitors', 'peopletags'),
             $sidebarStats
         ));
     }
@@ -117,7 +124,7 @@ class PeopleController extends Controller
                 $query->where('name', 'like', "%{$search}%");
             }
 
-             if ($request->filled('user_id')) {
+            if ($request->filled('user_id')) {
                 $query->whereHas('user', function ($q) use ($request) {
                     $q->where('user_id', $request->user_id);
                 });
@@ -132,13 +139,19 @@ class PeopleController extends Controller
         // Get filtered people
         $peoples = $query->get();
         $myPeoplesCount = $peoples->count();
+
         $companies = Company::all();
         $users = User::all();
+        $products = Product::all();
+        $allPeoples = People::all();
+        $sources = Source::all();
+        $competitors = Competitor::all();
+        $peopletags = Tag::where('tag_id', 3)->get();
 
         // Sidebar stats
         $sidebarStats = $this->getSidebarStats();
 
-         // Return partial for AJAX
+        // Return partial for AJAX
         if ($request->ajax()) {
             return response()->json([
                 'table' => view('admin.peoples.partials.people-table-row', compact('peoples'))->render(),
@@ -148,7 +161,7 @@ class PeopleController extends Controller
 
         // Normal page load
         return view('admin.peoples.my-peoples', array_merge(
-            compact('users', 'peoples','myPeoplesCount', 'companies', 'users'),
+            compact('users', 'peoples', 'myPeoplesCount', 'companies', 'users', 'products', 'allPeoples', 'sources', 'competitors', 'peopletags'),
             $sidebarStats
         ));
     }
@@ -289,7 +302,7 @@ class PeopleController extends Controller
 
         $related_leads = $peoples->leads()->with('products')->get();
         $relatedLeadsCount = Helper::calculateTotalValue($related_leads);
-        $formattedLeadsCount= Helper::formatValue($relatedLeadsCount);
+        $formattedLeadsCount = Helper::formatValue($relatedLeadsCount);
 
         $hotLeadsCount = $peoples->leads()->whereJsonContains('lead_flags', 'hot')->count();
         $wonLeadsCount = $peoples->leads()->where('lead_status', 'won')->count();
@@ -758,13 +771,6 @@ class PeopleController extends Controller
         ]);
     }
 
-    public function delete(Request $request)
-    {
-        People::where('id', $request->people_id)->delete();
-
-        return redirect()->back();
-    }
-
     public function deleteField(Request $request)
     {
         $request->validate([
@@ -807,7 +813,7 @@ class PeopleController extends Controller
         ]);
     }
 
-    public function updateField(Request $request, Company $company)
+    public function updateField(Request $request, People $people)
     {
         $request->validate([
             'field' => 'required|string',
@@ -820,7 +826,7 @@ class PeopleController extends Controller
             return response()->json(['error' => 'Invalid field'], 422);
         }
 
-        $company->update([
+        $people->update([
             $request->field => $request->value,
         ]);
 
@@ -948,5 +954,33 @@ class PeopleController extends Controller
             'status' => 'success',
             'message' => 'Task deleted successfully.',
         ]);
+    }
+
+    public function delete(Request $request)
+    {
+        $ids = (array) $request->ids; // handles both single and multiple
+
+        if (empty($ids)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No people selected for deletion.',
+            ], 400);
+        }
+
+        try {
+            People::whereIn('id', $ids)->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => count($ids) > 1
+                    ? 'Selected peoples deleted successfully.'
+                    : 'People deleted successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete people: '.$e->getMessage(),
+            ], 500);
+        }
     }
 }
