@@ -1026,6 +1026,33 @@
 
                                                 </div>
                                             </div>
+                                        @elseif ($item->type === 'timeline')
+                                            <div class="timeline-item">
+                                                <div class="timeline-icon">
+                                                    <i class="fas fa-angle-double-right"></i>
+                                                </div>
+                                                <div class="timeline-content">
+                                                    <div class="timeline-header">
+                                                        <div class="timestamp">
+                                                            {{ \Carbon\Carbon::parse($item->created_at)->format('g:i A \o\n M j, Y') }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="timeline-body">
+                                                        <div class="row align-items-center">
+                                                            <div class="col-12">
+                                                                <p class="mb-0">
+                                                                    <span class="author-link">
+                                                                        {{ $item->creator->name ?? 'N/A' }}
+                                                                    </span>
+                                                                    {{ $item->description ?? 'N/A' }}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
                                         @endif
                                     @endforeach
 

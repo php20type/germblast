@@ -365,7 +365,7 @@
                         </div>
 
                         <!-- Add Card Section -->
-                        <div class="section-card">
+                        <div class="section-card d-none">
                             <div class="row">
                                 <div class="col-12">
                                     <h3 class="section-title">ADD A CARD</h3>
@@ -397,7 +397,6 @@
                                                 aria-controls="timeline" aria-selected="false">TIMELINE</button>
                                         </li>
                                     </ul>
-
 
                                     <!-- Tab Content -->
                                     <div class="tab-content pt-2" id="activityTabsContent">

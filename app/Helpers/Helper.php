@@ -8,6 +8,7 @@ use App\Interfaces\StateRepositoryInterface;
 use App\Models\Activity;
 use App\Models\Lead;
 use App\Models\Note;
+use App\Models\Timeline;
 
 class Helper
 {
@@ -135,4 +136,35 @@ class Helper
 
         return $query->orderBy('created_at', 'desc')->get();
     }
+
+     public static function getTimelineForEntity(string $entityType, int $entityId)
+    {
+        $query = Timeline::query()->with('creator');
+
+        switch (strtolower($entityType)) {
+            case 'company':
+                $query->where('owner_type', 'company')->where('owner_id', $entityId);
+                break;
+
+            case 'people':
+                $query->where('owner_type', 'people')->where('owner_id', $entityId);
+                break;
+
+            case 'lead':
+                $query->where('owner_type', 'lead')->where('owner_id', $entityId);
+                break;
+
+            case 'user':
+                $query->where('owner_type', 'user')->where('owner_id', $entityId);
+                break;
+
+            default:
+                return collect(); // empty collection if invalid type
+        }
+
+        return $query->orderBy('created_at', 'desc')->get();
+    }
+
+
+
 }

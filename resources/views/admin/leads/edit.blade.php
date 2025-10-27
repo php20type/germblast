@@ -1198,6 +1198,33 @@
 
                                                 </div>
                                             </div>
+                                        @elseif ($item->type === 'timeline')
+                                            <div class="timeline-item">
+                                                <div class="timeline-icon">
+                                                    <i class="fas fa-angle-double-right"></i>
+                                                </div>
+                                                <div class="timeline-content">
+                                                    <div class="timeline-header">
+                                                        <div class="timestamp">
+                                                            {{ \Carbon\Carbon::parse($item->created_at)->format('g:i A \o\n M j, Y') }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="timeline-body">
+                                                        <div class="row align-items-center">
+                                                            <div class="col-12">
+                                                                <p class="mb-0">
+                                                                    <span class="author-link">
+                                                                        {{ $item->creator->name ?? 'N/A' }}
+                                                                    </span>
+                                                                    {{ $item->description ?? 'N/A' }}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
                                         @endif
                                     @endforeach
 
@@ -1264,7 +1291,8 @@
                                     <label for="assigneeSelect" class="form-label">
                                         <b>ASSIGNEE</b>
                                     </label>
-                                    <select class="form-select" id="assigneeSelect">
+                                    <select class="form-select update-field-select" id="assigneeSelect"
+                                        data-type="assignee">
                                         <option selected>Select assignee</option>
                                         @foreach ($users as $user)
                                             <option value="{{ $user->id }}">
@@ -1427,7 +1455,7 @@
                                                 <input type="text" name="inline_price" class="form-control" required>
                                             </div>
                                         </div>
-                                        <button type="button" class="btn btn-success mt-2" id="submitAddPerson">Add
+                                        <button type="button" class="btn btn-success mt-2" id="submitAddProduct">Add
                                             Product</button>
                                     </div>
 
@@ -2657,7 +2685,7 @@
                 // ==============================
                 // Add Product to Lead
                 // ==============================
-                $(document).on("click", "#submitAddPerson", function() {
+                $(document).on("click", "#submitAddProduct", function() {
                     let leadId = "{{ $leads->id }}";
                     let productId = $("#product-name").val();
                     let qty = $("input[name='inline_qty']").val();

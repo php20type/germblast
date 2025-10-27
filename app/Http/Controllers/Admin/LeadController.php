@@ -23,6 +23,7 @@ use App\Models\People;
 use App\Models\Product;
 use App\Models\Source;
 use App\Models\Tag;
+use App\Models\Timeline;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -116,7 +117,7 @@ class LeadController extends Controller
         // Calculations (use accessors where possible)
         $totalValue = Helper::calculateTotalValue($leads);
         $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = number_format($leads->avg('confidence'),2);
+        $avgConfidence = number_format($leads->avg('confidence'), 2);
         $totalLeads = $leads->count();
 
         // Format counts
@@ -218,7 +219,7 @@ class LeadController extends Controller
         // Calculations
         $totalValue = Helper::calculateTotalValue($leads);
         $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = number_format($leads->avg('confidence'),2);
+        $avgConfidence = number_format($leads->avg('confidence'), 2);
         $totalLeads = $leads->count();
 
         // Format counts
@@ -321,7 +322,7 @@ class LeadController extends Controller
         // Calculations
         $totalValue = Helper::calculateTotalValue($leads);
         $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = number_format($leads->avg('confidence'),2);
+        $avgConfidence = number_format($leads->avg('confidence'), 2);
         $totalLeads = $leads->count();
 
         // Format counts
@@ -423,7 +424,7 @@ class LeadController extends Controller
         // Calculations
         $totalValue = Helper::calculateTotalValue($leads);
         $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = number_format($leads->avg('confidence'),2);
+        $avgConfidence = number_format($leads->avg('confidence'), 2);
         $totalLeads = $leads->count();
 
         // Format counts
@@ -524,7 +525,7 @@ class LeadController extends Controller
         // Calculations
         $totalValue = Helper::calculateTotalValue($leads);
         $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = number_format($leads->avg('confidence'),2);
+        $avgConfidence = number_format($leads->avg('confidence'), 2);
         $totalLeads = $leads->count();
 
         // Format counts
@@ -628,7 +629,7 @@ class LeadController extends Controller
         // Calculations
         $totalValue = Helper::calculateTotalValue($leads);
         $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = number_format($leads->avg('confidence'),2);
+        $avgConfidence = number_format($leads->avg('confidence'), 2);
         $totalLeads = $leads->count();
 
         // Format counts
@@ -732,7 +733,7 @@ class LeadController extends Controller
         // Calculations
         $totalValue = Helper::calculateTotalValue($leads);
         $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = number_format($leads->avg('confidence'),2);
+        $avgConfidence = number_format($leads->avg('confidence'), 2);
         $totalLeads = $leads->count();
 
         // Format counts
@@ -937,9 +938,24 @@ class LeadController extends Controller
             return $activity->status === 'Scheduled';
         });
 
-        $timeline = $logged_activities->concat($notes)
+        // --- Fetch Timeline Entries ---
+        $timelineEntries = Helper::getTimelineForEntity('lead', $leads->id);
+        $timelineEntries->transform(function ($item) {
+            $item->type = 'timeline';
+            $item->timestamp = $item->created_at;
+
+            return $item;
+        });
+
+        $timeline = $logged_activities
+            ->concat($notes)
+            ->concat($timelineEntries)
             ->sortByDesc('timestamp')
             ->values(); // reindex after sorting
+
+        // $timeline = $logged_activities->concat($notes)
+        //     ->sortByDesc('timestamp')
+        //     ->values(); // reindex after sorting
 
         $leadStatusIcon = '';
 
@@ -989,6 +1005,7 @@ class LeadController extends Controller
             'logged_activities',
             'scheduled_activities',
             'notes',
+            'timelineEntries',
             'timeline',
             'leadStatusIcon',
             'pending_tasks',
@@ -1008,41 +1025,42 @@ class LeadController extends Controller
         ));
     }
 
+
     public function ajax_update(Request $request)
     {
         $request->validate([
             'lead_id' => 'required|exists:leads,id',
             'lead_status' => 'nullable|string',
             'lead_flags' => 'nullable|array',
-            'assignee_id' => 'nullable|exists:users,id',
-            'stage_id' => 'nullable|exists:lead_stages,id',
-            'close_date' => 'nullable|date',
-            'confidence' => 'nullable|numeric',
         ]);
 
         $lead = Lead::findOrFail($request->lead_id);
+        $leadName = $lead->name ?? 'Unnamed Lead';
+        $description = null;
+        $actionType = null;
 
-        // Update core fields if provided
         if ($request->filled('lead_status')) {
             $lead->lead_status = $request->lead_status;
+
+            $description = "changed the status of {$leadName} to {$request->lead_status}";
+            $actionType = 'updated_status';
         }
         if ($request->has('lead_flags')) {
             $lead->lead_flags = $request->lead_flags;
         }
-        if ($request->filled('assignee_id')) {
-            $lead->assignee_id = $request->assignee_id;
-        }
-        if ($request->filled('stage_id')) {
-            $lead->stage_id = $request->stage_id;
-        }
-        if ($request->filled('close_date')) {
-            $lead->close_date = $request->close_date;
-        }
-        if ($request->filled('confidence')) {
-            $lead->confidence = $request->confidence;
-        }
 
         $lead->save();
+
+        // Save timeline entry if any change occurred
+        if ($description && $actionType) {
+            Timeline::create([
+                'user_id' => auth()->id(),
+                'owner_type' => 'lead',
+                'owner_id' => $lead->id,
+                'action_type' => $actionType,
+                'description' => $description,
+            ]);
+        }
 
         return response()->json(['success' => true]);
     }
@@ -1081,8 +1099,22 @@ class LeadController extends Controller
     public function changeStage(Request $request, $leadId)
     {
         $lead = Lead::findOrFail($leadId);
+        $oldStage = $lead->stages->name ?? 'Unknown Stage';
+        $newStage = LeadStage::find($request->stage_id)->name ?? 'Unknown Stage';
+
         $lead->stage_id = $request->stage_id;
         $lead->save();
+
+        // Timeline logging
+        $leadName = $lead->name ?? 'Unnamed Lead';
+
+        Timeline::create([
+            'user_id' => auth()->id(),
+            'owner_type' => 'lead',
+            'owner_id' => $lead->id,
+            'action_type' => 'updated_stage',
+            'description' => "changed the stage of {$leadName} from {$oldStage} to {$newStage}",
+        ]);
 
         return response()->json(['message' => 'Lead stage updated successfully.']);
     }
@@ -1156,6 +1188,71 @@ class LeadController extends Controller
         ]);
     }
 
+    // public function deleteField(Request $request)
+    // {
+    //     $request->validate([
+    //         'lead_id' => 'required|exists:leads,id',
+    //         'related_id' => 'required|integer', // pivot row id
+    //         'type' => 'required|string|in:company,people,product,competitor,source',
+    //     ]);
+
+    //     $relatedId = $request->related_id;
+    //     $type = $request->type;
+
+    //     try {
+    //         switch ($type) {
+    //             case 'company':
+    //                 $deleted = LeadCompany::where('lead_id', $request->lead_id)
+    //                     ->where('company_id', $relatedId)
+    //                     ->delete();
+    //                 break;
+
+    //             case 'people':
+    //                 $deleted = LeadPeople::where('lead_id', $request->lead_id)
+    //                     ->where('people_id', $relatedId)
+    //                     ->delete();
+    //                 break;
+
+    //             case 'product':
+    //                 $deleted = LeadProduct::where('id', $relatedId)->delete();
+    //                 break;
+
+    //             case 'competitor':
+    //                 $deleted = LeadCompetitor::where('id', $relatedId)->delete();
+    //                 break;
+
+    //             case 'source':
+    //                 $deleted = LeadSource::where('id', $relatedId)->delete();
+    //                 break;
+
+    //             default:
+    //                 return response()->json([
+    //                     'success' => false,
+    //                     'message' => 'Invalid type provided.',
+    //                 ], 422);
+    //         }
+
+    //         if ($deleted) {
+    //             return response()->json([
+    //                 'success' => true,
+    //                 'message' => ucfirst($type).' removed successfully from lead.',
+    //             ]);
+    //         }
+
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => ucfirst($type).' not found or already deleted.',
+    //         ], 404);
+
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Error deleting '.$type,
+    //             'error' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
+
     public function deleteField(Request $request)
     {
         $request->validate([
@@ -1166,41 +1263,69 @@ class LeadController extends Controller
 
         $relatedId = $request->related_id;
         $type = $request->type;
+        $lead = Lead::findOrFail($request->lead_id);
+        $leadName = $lead->name ?? 'Unnamed Lead';
 
         try {
+            $deleted = false;
+            $itemName = 'Unknown';
+            $actionType = null;
+
             switch ($type) {
                 case 'company':
-                    $deleted = LeadCompany::where('lead_id', $request->lead_id)
+                    $company = Company::find($relatedId);
+                    $itemName = $company->name ?? 'Unknown Company';
+                    $deleted = LeadCompany::where('lead_id', $lead->id)
                         ->where('company_id', $relatedId)
                         ->delete();
+                    $actionType = 'removed_company';
                     break;
 
                 case 'people':
-                    $deleted = LeadPeople::where('lead_id', $request->lead_id)
+                    $person = People::find($relatedId);
+                    $itemName = $person->name ?? 'Unknown Person';
+                    $deleted = LeadPeople::where('lead_id', $lead->id)
                         ->where('people_id', $relatedId)
                         ->delete();
+                    $actionType = 'removed_person';
                     break;
 
                 case 'product':
-                    $deleted = LeadProduct::where('id', $relatedId)->delete();
+                    $pivot = LeadProduct::find($relatedId);
+                    $product = $pivot ? Product::find($pivot->product_id) : null;
+                    $itemName = $product->name ?? 'Unknown Product';
+                    $deleted = $pivot ? $pivot->delete() : false;
+                    $actionType = 'removed_product';
                     break;
 
                 case 'competitor':
-                    $deleted = LeadCompetitor::where('id', $relatedId)->delete();
+                    $pivot = LeadCompetitor::find($relatedId);
+                    $competitor = $pivot ? Competitor::find($pivot->competitor_id) : null;
+                    $itemName = $competitor->name ?? 'Unknown Competitor';
+                    $deleted = $pivot ? $pivot->delete() : false;
+                    $actionType = 'null';
                     break;
 
                 case 'source':
-                    $deleted = LeadSource::where('id', $relatedId)->delete();
+                    $pivot = LeadSource::find($relatedId);
+                    $source = $pivot ? Source::find($pivot->source_id) : null;
+                    $itemName = $source->name ?? 'Unknown Source';
+                    $deleted = $pivot ? $pivot->delete() : false;
+                    $actionType = 'null';
                     break;
-
-                default:
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Invalid type provided.',
-                    ], 422);
             }
 
             if ($deleted) {
+                if (! empty($actionType)) {
+                    Timeline::create([
+                        'user_id' => auth()->id(),
+                        'owner_type' => 'lead',
+                        'owner_id' => $lead->id,
+                        'action_type' => $actionType,
+                        'description' => "removed {$itemName} from {$leadName}",
+                    ]);
+                }
+
                 return response()->json([
                     'success' => true,
                     'message' => ucfirst($type).' removed successfully from lead.',
@@ -1221,82 +1346,6 @@ class LeadController extends Controller
         }
     }
 
-    // public function deleteField(Request $request)
-    // {
-    //     $request->validate([
-    //         'lead_id' => 'required|exists:leads,id',
-    //         'related_id' => 'required',
-    //         'type' => 'required|string',
-    //     ]);
-
-    //     $lead = Lead::findOrFail($request->lead_id);
-
-    //     switch ($request->type) {
-    //         case 'company':
-    //             $model = Company::class;
-    //             $relation = 'companies';
-    //             $pivotColumn = 'company_id';
-    //             break;
-
-    //         case 'people':
-    //             $model = People::class;
-    //             $relation = 'peoples';
-    //             $pivotColumn = 'people_id';
-    //             break;
-
-    //         case 'competitor':
-    //             $model = Competitor::class;
-    //             $relation = 'competitors';
-    //             $pivotColumn = 'competitor_id';
-    //             break;
-
-    //         case 'source':
-    //             $model = Source::class;
-    //             $relation = 'sources';
-    //             $pivotColumn = 'source_id';
-    //             break;
-
-    //         case 'product':
-    //             $model = Product::class;
-    //             $relation = 'products';
-    //             $pivotColumn = 'product_id';
-    //             break;
-
-    //         default:
-    //             return response()->json([
-    //                 'success' => false,
-    //                 'message' => 'Invalid type.',
-    //             ], 422);
-    //     }
-
-    //     $item = $model::find($request->related_id);
-
-    //     if (! $item) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => ucfirst($request->type).' not found.',
-    //         ], 404);
-    //     }
-
-    //     // Check if the item exists in pivot
-    //     $exists = $lead->$relation()->wherePivot($pivotColumn, $item->id)->exists();
-
-    //     if (! $exists) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => ucfirst($request->type).' is not attached to this lead.',
-    //         ], 404);
-    //     }
-
-    //     // Detach the item from pivot table
-    //     $lead->$relation()->detach($item->id);
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => ucfirst($request->type).' removed successfully from lead.',
-    //     ]);
-    // }
-
     public function updateField(Request $request)
     {
         $request->validate([
@@ -1308,34 +1357,61 @@ class LeadController extends Controller
         $lead = Lead::findOrFail($request->lead_id);
 
         switch ($request->type) {
+
+            case 'assignee':
+                $oldAssignee = $lead->assignee->name;
+                $lead->assignee_id = $request->related_id;
+                $lead->save();
+
+                $newAssignee = User::find($request->related_id)->name ?? 'Unknown User';
+                $leadName = $lead->name ?? 'Unnamed Lead';
+
+                Timeline::create([
+                    'user_id' => auth()->id(),
+                    'owner_type' => 'lead',
+                    'owner_id' => $lead->id,
+                    'action_type' => 'updated_assignee',
+                    'description' => "reassigned {$leadName} from {$oldAssignee} to {$newAssignee}",
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Assignee updated successfully.',
+                ]);
+
             case 'company':
                 $model = Company::class;
                 $relation = 'companies';
                 $pivotColumn = 'company_id';
+                $actionType = 'added_company';
                 break;
 
             case 'people':
                 $model = People::class;
                 $relation = 'peoples';
                 $pivotColumn = 'people_id';
+                $actionType = 'added_person';
                 break;
 
             case 'competitor':
                 $model = Competitor::class;
                 $relation = 'competitors';
                 $pivotColumn = 'competitor_id';
+                $actionType = null;
                 break;
 
             case 'source':
                 $model = Source::class;
                 $relation = 'sources';
                 $pivotColumn = 'source_id';
+                $actionType = null;
                 break;
 
             case 'product':
                 $model = Product::class;
                 $relation = 'products';
                 $pivotColumn = 'product_id';
+                $actionType = 'added_product';
                 break;
 
             default:
@@ -1360,6 +1436,20 @@ class LeadController extends Controller
         // Attach the item without removing existing
         $lead->$relation()->attach($item->id);
 
+        // Log timeline entry only if $actionType is defined
+        if (! empty($actionType)) {
+            $leadName = $lead->name ?? 'Unnamed Lead';
+            $itemName = $item->name ?? ucfirst($request->type);
+
+            Timeline::create([
+                'user_id' => auth()->id(),
+                'owner_type' => 'lead',
+                'owner_id' => $lead->id,
+                'action_type' => $actionType,
+                'description' => "added {$itemName} to {$leadName}",
+            ]);
+        }
+
         return response()->json([
             'success' => true,
             'message' => ucfirst($request->type).' added successfully.',
@@ -1376,11 +1466,24 @@ class LeadController extends Controller
         ]);
 
         $lead = Lead::findOrFail($request->lead_id);
+        $product = Product::findOrFail($request->product_id);
 
         $leadProduct = $lead->leadProducts()->create([
             'product_id' => $request->product_id,
             'qty' => $request->qty,
             'price' => $request->price,
+        ]);
+
+        // Timeline logging
+        $leadName = $lead->name ?? 'Unnamed Lead';
+        $productName = $product->name ?? 'Unknown Product';
+
+        Timeline::create([
+            'user_id' => auth()->id(),
+            'owner_type' => 'lead',
+            'owner_id' => $lead->id,
+            'action_type' => 'added_product',
+            'description' => "added {$productName} (Qty: {$request->qty}, Price: {$request->price}) to {$leadName}",
         ]);
 
         return response()->json([
@@ -1512,7 +1615,7 @@ class LeadController extends Controller
         ]);
     }
 
-     public function delete(Request $request)
+    public function delete(Request $request)
     {
         $ids = (array) $request->ids; // handles both single and multiple
 

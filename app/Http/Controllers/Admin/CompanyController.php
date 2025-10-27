@@ -22,6 +22,7 @@ use App\Models\Product;
 use App\Models\Source;
 use App\Models\Tag;
 use App\Models\Territory;
+use App\Models\Timeline;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -375,7 +376,18 @@ class CompanyController extends Controller
             return $note;
         });
 
-        $timeline = $logged_activities->concat($notes)
+        // --- Fetch Timeline Entries ---
+        $timelineEntries = Helper::getTimelineForEntity('company', $company->id);
+        $timelineEntries->transform(function ($item) {
+            $item->type = 'timeline';
+            $item->timestamp = $item->created_at;
+
+            return $item;
+        });
+
+        $timeline = $logged_activities
+            ->concat($notes)
+            ->concat($timelineEntries)
             ->sortByDesc('timestamp')
             ->values(); // reindex after sorting
 
@@ -518,6 +530,7 @@ class CompanyController extends Controller
             'scheduled_activities',
             'notes',
             'timeline',
+            'timelineEntries',
             'related_leads',
             'formattedLeadsCount',
             'hotLeadsCount',
@@ -551,6 +564,7 @@ class CompanyController extends Controller
 
     public function addPeople(Request $request, $companyId)
     {
+
         $request->validate([
             'people_id' => 'required|exists:people,id',
         ]);
@@ -571,6 +585,17 @@ class CompanyController extends Controller
         CompanyPeople::create([
             'company_id' => $companyId,
             'people_id' => $request->people_id,
+        ]);
+
+        $personName = People::find($request->people_id)->name;
+        $companyName = Company::find($companyId)->name;
+
+        Timeline::create([
+            'user_id' => auth()->id(),
+            'owner_type' => 'company',
+            'owner_id' => $companyId,
+            'action_type' => 'added_person',
+            'description' => "added {$personName} to {$companyName}",
         ]);
 
         return response()->json([
@@ -599,6 +624,19 @@ class CompanyController extends Controller
 
         // Delete the pivot record
         $companyPeople->delete();
+
+        // Prepare names for readable timeline entry
+        $personName = People::find($request->people_id)->name;
+        $companyName = Company::find($companyId)->name;
+
+        // Log to timeline with proper action type and message
+        Timeline::create([
+            'user_id' => auth()->id(),
+            'owner_type' => 'company',
+            'owner_id' => $companyId,
+            'action_type' => 'removed_person',
+            'description' => "removed {$personName} from {$companyName}",
+        ]);
 
         return response()->json([
             'status' => 'success',
@@ -691,6 +729,31 @@ class CompanyController extends Controller
         $company->update([
             $request->field => $request->value,
         ]);
+
+        $companyName = $company->name ?? 'Unknown Company';
+        $description = null;
+        $actionType = null;
+
+        // Add timeline entries for key updates
+        if ($request->field === 'company_type_id') {
+            $newType = CompanyType::find($request->value)->type;
+            $description = "changed the company type of {$companyName} to {$newType}";
+            $actionType = 'updated_company_type';
+        } elseif ($request->field === 'user_id') {
+            $newAssignee = User::find($request->value)->name;
+            $description = "reassigned {$companyName} to {$newAssignee}";
+            $actionType = 'updated_assignee';
+        }
+
+        if ($description) {
+            Timeline::create([
+                'user_id' => auth()->id(),
+                'owner_type' => 'company',
+                'owner_id' => $company->id,
+                'action_type' => $actionType,
+                'description' => $description,
+            ]);
+        }
 
         return response()->json(['success' => true, 'field' => $request->field, 'value' => $request->value]);
     }
