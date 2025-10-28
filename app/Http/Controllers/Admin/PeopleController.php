@@ -305,9 +305,49 @@ class PeopleController extends Controller
             return $item;
         });
 
+
+        $milestones = collect();
+
+        if ($peoples->created_at) {
+            $createdAt = $peoples->created_at->copy();
+            $now = now();
+
+            // Calculate total months since creation
+            $totalMonths = $createdAt->diffInMonths($now);
+
+            // Generate milestones dynamically — only 1 month, 6 months, and yearly
+            for ($i = 1; $i <= $totalMonths; $i++) {
+                $milestoneDate = $createdAt->copy()->addMonths($i);
+
+                // Only display for 1 month, 6 months, 1 year, 2 years, 3 years, etc.
+                if ($i === 1) {
+                    $label = '1 month as a client';
+                } elseif ($i === 6) {
+                    $label = '6 months as a client';
+                } elseif ($i % 12 === 0) {
+                    $years = $i / 12;
+                    $label = $years === 1
+                        ? '1 year as a client'
+                        : "{$years} years as a client";
+                } else {
+                    continue; // skip other months like 18, 9, etc.
+                }
+
+                // Push milestone to collection
+                $milestones->push((object) [
+                    'type' => 'milestone',
+                    'title' => $label,
+                    'timestamp' => $milestoneDate,
+                ]);
+            }
+
+        }
+
+
         $timeline = $logged_activities
             ->concat($notes)
             ->concat($timelineEntries)
+            ->concat($milestones)
             ->sortByDesc('timestamp')
             ->values(); // reindex after sorting
 
@@ -319,7 +359,7 @@ class PeopleController extends Controller
         $relatedLeadsCount = Helper::calculateTotalValue($related_leads);
         $formattedLeadsCount = Helper::formatValue($relatedLeadsCount);
 
-        $hotLeadsCount = $peoples->leads()->whereJsonContains('lead_flags', 'hot')->count();
+        $hotLeadsCount = $peoples->leads()->where('is_hot', 1)->count();
         $wonLeadsCount = $peoples->leads()->where('lead_status', 'won')->count();
         $lostLeadsCount = $peoples->leads()->where('lead_status', 'lost')->count();
 

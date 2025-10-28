@@ -733,18 +733,22 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Name</label>
-                                    <input type="text" name="name" placeholder="" class="form-control" />
+                                    <span class="text-danger">*</span>
+                                    <input type="text" name="name" placeholder="Enter task name"
+                                        class="form-control" />
                                 </div>
                             </div>
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Due Date</label>
-                                    <input type="date" name="due_date" placeholder="" class="form-control" />
+                                    <span class="text-danger">*</span>
+                                    <input type="text" name="due_date" placeholder="" class="form-control" id="due_date"/>
                                 </div>
                             </div>
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Assignee</label>
+                                    <span class="text-danger">*</span>
                                     <select name="assignee_id" class="form-select">
                                         <option value="">Select a assingee</option>
                                         @foreach ($users as $user)
@@ -755,15 +759,47 @@
                             </div>
                             <div class="col-lg-12">
                                 <div class="form-group">
-                                    <label class="form-label">Related to</label>
-                                    <input type="text" name="related_to" placeholder="Type to search..."
-                                        class="form-control" />
+                                    <label class="form-label">Related to <span class="text-danger">*</span></label>
+
+                                    <!-- Hidden field to store type dynamically -->
+                                    <input type="hidden" id="related_type" name="related_type">
+
+                                    <select id="related_to_select" name="related_to" class="form-select mt-2">
+                                        {{-- Companies --}}
+                                        <optgroup label="Companies">
+                                            @foreach ($companies as $company)
+                                                <option value="{{ $company->id }}" data-entity-type="company">
+                                                    {{ $company->name }}
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+
+                                        {{-- Peoples --}}
+                                        <optgroup label="Peoples">
+                                            @foreach ($peoples as $people)
+                                                <option value="{{ $people->id }}" data-entity-type="people">
+                                                    {{ $people->name }}
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+
+                                        {{-- Leads --}}
+                                        <optgroup label="Leads">
+                                            @foreach ($leads as $lead)
+                                                <option value="{{ $lead->id }}" data-entity-type="lead">
+                                                    {{ $lead->name }}
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+                                    </select>
                                 </div>
                             </div>
+
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Notes</label>
-                                    <textarea name="notes" id="notes" class="form-control"></textarea>
+                                    <span class="text-danger">*</span>
+                                    <textarea name="notes" id="notes" class="form-control" placeholder="Enter task details"></textarea>
                                 </div>
                             </div>
 
@@ -784,6 +820,15 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+             flatpickr("#due_date", {
+                enableTime: true,
+                dateFormat: "Y-m-d h:i K", // h = 12-hour, K = AM/PM
+                minDate: "today",
+                defaultDate: new Date(new Date().setDate(new Date().getDate() + 1)).setHours(18, 30, 0, 0),
+                time_24hr: false
+            });
+
             //  Select2 script
             $('#AddLead').on('shown.bs.modal', function() {
                 $('#companySelect').select2({
@@ -813,6 +858,14 @@
             $('#AddActivity').on('shown.bs.modal', function() {
                 $('#participant_select').select2({
                     dropdownParent: $('#AddActivity'),
+                    placeholder: 'Choose...',
+                    allowClear: true
+                });
+            });
+
+            $('#AddTask').on('shown.bs.modal', function() {
+                $('#related_to_select').select2({
+                    dropdownParent: $('#AddTask'),
                     placeholder: 'Choose...',
                     allowClear: true
                 });
@@ -1470,7 +1523,6 @@
                     notes: {
                         required: true
                     },
-
                 },
                 messages: {
                     name: {
@@ -1483,12 +1535,11 @@
                         required: "Please select the assignee."
                     },
                     related_to: {
-                        required: "Please enter data in related_to."
+                        required: "Please select an entity."
                     },
                     notes: {
                         required: "Please enter the notes."
                     },
-
                 },
                 errorElement: 'span',
                 errorClass: 'invalid-feedback d-block',
@@ -1507,7 +1558,7 @@
                 }
             });
 
-            // Submit Activity form
+            // Submit Task form
             $('#add-task').submit(function(e) {
                 e.preventDefault();
 
@@ -1519,24 +1570,18 @@
                     url: '{{ route('admin.task.ajax.store') }}',
                     method: 'POST',
                     data: $(this).serialize(),
-
                     success: function(response) {
                         toastr.success('Task added successfully!');
                         $('#add-task')[0].reset();
                         $('#AddTask').modal('hide');
-
-                        // // 1.5 seconds delay
-                        // setTimeout(function() {
-                        //     window.location.href =
-                        //         "{{ route('admin.company.index') }}";
-                        // }, 1500);
                     },
                     error: function(xhr) {
                         console.log(xhr.responseText);
-                        toastr.error('Something went wrong while adding the activity.');
+                        toastr.error('Something went wrong while adding the task.');
                     }
                 });
             });
+
 
 
 
@@ -1646,4 +1691,32 @@
 
         });
     </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const relatedToSelect = document.getElementById('related_to_select');
+        const relatedTypeInput = document.getElementById('related_type');
+
+        // Function to update the hidden type field
+        const updateRelatedType = () => {
+            const selectedOption = relatedToSelect.options[relatedToSelect.selectedIndex];
+            // Check if an option is actually selected
+            if (selectedOption) {
+                // Get the entity type from the data attribute
+                const entityType = selectedOption.getAttribute('data-entity-type');
+                relatedTypeInput.value = entityType || ''; // Set value, default to empty string if not found
+            } else {
+                relatedTypeInput.value = '';
+            }
+        };
+
+        // Attach event listener to update on change
+        relatedToSelect.addEventListener('change', updateRelatedType);
+
+        // Also run once on page load to initialize the hidden field
+        // in case an option is pre-selected (though not required by your current form)
+        updateRelatedType();
+    });
+</script>
+
 @endpush

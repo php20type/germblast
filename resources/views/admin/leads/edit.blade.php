@@ -884,94 +884,41 @@
                                     </div>
                                 </div>
                             </div>
+                             {{-- <div class="filter-section">
+                                <div class="row g-2">
+                                    <div class="col-auto">
+                                        <select class="form-select dropdown-orange">
+                                            <option selected>All Entries</option>
+                                            <option value="7">Last 7 Days</option>
+                                            <option value="30">Last 30 Days</option>
+                                            <option value="90">Last 90 Days</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-auto">
+                                        <select class="form-select dropdown-orange">
+                                            @foreach ($activity_types as $activity_type)
+                                                <option value="{{ $activity_type->id }}">
+                                                    {{ $activity_type->type }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-auto">
+                                        <select class="form-select dropdown-orange">
+                                            @foreach ($users as $user)
+                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-auto ms-auto d-none">
+                                        <button class="btn btn-warning">
+                                            <i class="fa-regular fa-gear"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div> --}}
 
                             <div class="timeline-container">
                                 <div class="timeline">
-
-                                    {{-- Activities List --}}
-                                    {{-- @foreach ($activities as $activity)
-                                        <div class="timeline-item">
-                                            <div class="timeline-icon">
-                                                <i class="{{ $activity->activityType->icon }}"></i>
-                                            </div>
-                                            <div class="timeline-content">
-                                                <div class="timeline-header">
-                                                    <div class="timestamp">
-                                                        {{ \Carbon\Carbon::parse($activity->created_at)->format('g:i A \o\n M j, Y') }}
-                                                    </div>
-                                                </div>
-
-                                                <div class="timeline-body">
-                                                    <div class="row align-items-center">
-                                                        <!-- Text section (col-8) -->
-                                                        <div class="col-8">
-                                                            <p class="mb-0">
-                                                                <span class="author-link">
-                                                                    {{ $activity->creator->name ?? 'N/A' }}
-                                                                </span>
-                                                                logged an activity with
-                                                                <span class="organization">
-                                                                    {{ $activity->participant_names }}
-                                                                </span>
-                                                            </p>
-                                                        </div>
-
-                                                        <!-- Buttons section (col-4) -->
-                                                        <div class="col-4 text-end">
-                                                            <button class="btn btn-sm btn-outline-primary me-1"
-                                                                title="Add Comment" data-id="">
-                                                                <i class="fas fa-comment"></i>
-                                                            </button>
-                                                            <button class="btn btn-sm btn-outline-danger"
-                                                                title="Delete Activity" data-id="">
-                                                                <i class="fas fa-times"></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-
-
-                                                    <div class="activity-details">
-                                                        <div class="row">
-                                                            <div class="col-10">
-                                                                <div class="activity-label mb-0">
-                                                                    {{ $activity->activityType->type ?? 'N/A' }}</div>
-                                                                <div class="activity-description">
-                                                                    <div class="text-muted mb-2">
-                                                                        <span><i
-                                                                                class="fas fa-pen-to-square text-primary me-1"></i></span>
-                                                                        {{ $activity->note }}
-                                                                    </div>
-                                                                    <div class="text-muted">
-                                                                        <span><i
-                                                                                class="fas fa-file-alt text-warning me-1"></i></span>
-                                                                        {{ $activity->description }}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-2">
-                                                                <div class="activity-badges">
-                                                                    <span class="activity-badge badge-cc">JB</span>
-                                                                    <span class="activity-badge badge-cc">TC</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-
-                                                    <div class="comment-box">
-                                                        <span class="comment-avatar">BB</span>
-                                                        <span class="comment-text">I will follow up with lead
-                                                            tomorrow. Chance had reached out to Stephanie about
-                                                            doing a site survey.</span>
-                                                    </div>
-
-                                                </div>
-
-
-                                            </div>
-                                        </div>
-                                    @endforeach --}}
-
                                     @foreach ($timeline as $item)
                                         @if ($item->type === 'activity')
                                             <div class="timeline-item">
@@ -1268,18 +1215,18 @@
                                         <div class="col-6">
                                             <div class="form-check">
                                                 <input class="form-check-input lead-flag" name="lead_flag"
-                                                    type="checkbox" value="watching" id="checkbox1"
+                                                    type="checkbox" value="is_watching" id="checkbox1"
                                                     data-lead-id="{{ $leads->id }}"
-                                                    @if (is_array($leads->lead_flags) && in_array('watching', $leads->lead_flags)) checked @endif>
+                                                    @if ($leads->is_watching) checked @endif>
                                                 <label class="form-check-label" for="checkbox1"><b>Watching</b></label>
                                             </div>
                                         </div>
                                         <div class="col-6">
                                             <div class="form-check">
                                                 <input class="form-check-input lead-flag" name="lead_flag"
-                                                    type="checkbox" value="hot" id="checkbox2"
+                                                    type="checkbox" value="is_hot" id="checkbox2"
                                                     data-lead-id="{{ $leads->id }}"
-                                                    @if (is_array($leads->lead_flags) && in_array('hot', $leads->lead_flags)) checked @endif>
+                                                    @if ($leads->is_hot) checked @endif>
                                                 <label class="form-check-label" for="checkbox2"><b>Hot</b></label>
                                             </div>
                                         </div>
@@ -2481,6 +2428,25 @@
                 // ==============================
                 // Updating lead and flags status
                 // ==============================
+                // function updateLead(data, onSuccess) {
+                //     fetch("{{ route('admin.leads.ajax_update') }}", {
+                //             method: "POST",
+                //             headers: {
+                //                 "Content-Type": "application/json",
+                //                 "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                //             },
+                //             body: JSON.stringify(data)
+                //         })
+                //         .then(response => response.json())
+                //         .then(resp => {
+                //             if (resp.success) {
+                //                 if (typeof onSuccess === "function") onSuccess();
+                //             } else {
+                //                 Swal.fire("Error", "Failed to update lead!", "error");
+                //             }
+                //         })
+                //         .catch(err => console.error(err));
+                // }
                 function updateLead(data, onSuccess) {
                     fetch("{{ route('admin.leads.ajax_update') }}", {
                             method: "POST",
@@ -2500,6 +2466,7 @@
                         })
                         .catch(err => console.error(err));
                 }
+
 
                 // ==============================
                 // Handle lead status selection
@@ -2552,19 +2519,61 @@
                 // ==============================
                 // Handle lead flag checkboxes
                 // ==============================
-                document.querySelectorAll(".lead-flag").forEach((flagSelect) => {
-                    flagSelect.addEventListener("change", function() {
+                // document.querySelectorAll(".lead-flag").forEach((flagSelect) => {
+                //     flagSelect.addEventListener("change", function() {
+                //         let leadId = this.dataset.leadId;
+
+                //         // Collect all checked flags for this lead
+                //         let checkedFlags = [];
+                //         document.querySelectorAll('.lead-flag[data-lead-id="' + leadId + '"]:checked')
+                //             .forEach(cb => checkedFlags.push(cb.value));
+
+                //         // Show confirmation popup before update
+                //         Swal.fire({
+                //             title: 'Are you sure?',
+                //             text: 'Do you want to update the lead flags?',
+                //             icon: 'question',
+                //             showCancelButton: true,
+                //             confirmButtonColor: '#28a745',
+                //             cancelButtonColor: '#dc3545',
+                //             confirmButtonText: 'Yes, update',
+                //             cancelButtonText: 'Cancel'
+                //         }).then((result) => {
+                //             if (result.isConfirmed) {
+                //                 updateLead({
+                //                         lead_flags: checkedFlags,
+                //                         lead_id: leadId
+                //                     },
+                //                     () => {
+                //                         Swal.fire({
+                //                             icon: "success",
+                //                             title: "Updated!",
+                //                             text: "Lead flags updated successfully.",
+                //                             timer: 1500,
+                //                             showConfirmButton: false
+                //                         }).then(() => {
+                //                             location.reload();
+                //                         });
+                //                     }
+                //                 );
+                //             } else {
+                //                 // Revert checkbox state
+                //                 // Uncheck the one that triggered this change
+                //                 this.checked = !this.checked;
+                //             }
+                //         });
+                //     });
+                // });
+
+                document.querySelectorAll(".lead-flag").forEach((checkbox) => {
+                    checkbox.addEventListener("change", function() {
                         let leadId = this.dataset.leadId;
+                        let flagType = this.value; // e.g., "is_hot" or "is_watching"
+                        let isChecked = this.checked ? 1 : 0;
 
-                        // Collect all checked flags for this lead
-                        let checkedFlags = [];
-                        document.querySelectorAll('.lead-flag[data-lead-id="' + leadId + '"]:checked')
-                            .forEach(cb => checkedFlags.push(cb.value));
-
-                        // Show confirmation popup before update
                         Swal.fire({
                             title: 'Are you sure?',
-                            text: 'Do you want to update the lead flags?',
+                            text: `Do you want to ${isChecked ? 'enable' : 'disable'} this flag?`,
                             icon: 'question',
                             showCancelButton: true,
                             confirmButtonColor: '#28a745',
@@ -2574,14 +2583,15 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 updateLead({
-                                        lead_flags: checkedFlags,
-                                        lead_id: leadId
+                                        lead_id: leadId,
+                                        flag_type: flagType,
+                                        flag_value: isChecked
                                     },
                                     () => {
                                         Swal.fire({
                                             icon: "success",
                                             title: "Updated!",
-                                            text: "Lead flags updated successfully.",
+                                            text: "Lead flag updated successfully.",
                                             timer: 1500,
                                             showConfirmButton: false
                                         }).then(() => {
@@ -2590,13 +2600,13 @@
                                     }
                                 );
                             } else {
-                                // Revert checkbox state
-                                // Uncheck the one that triggered this change
+                                // Revert checkbox state if cancelled
                                 this.checked = !this.checked;
                             }
                         });
                     });
                 });
+
 
 
                 // ==============================
@@ -3490,6 +3500,9 @@
                     // Trigger default duration on load (optional)
                     durationSelect.dispatchEvent(new Event('change'));
                 }
+
+
+
 
 
             });

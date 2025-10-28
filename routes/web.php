@@ -16,6 +16,7 @@ use App\Models\Competitor;
 use App\Models\Industry;
 use App\Models\People;
 use App\Models\Product;
+use App\Models\Lead;
 use App\Models\Source;
 use App\Models\Tag;
 use App\Models\Territory;
@@ -36,6 +37,7 @@ Route::middleware(['auth'])->group(function () {
         $industries = Industry::all();
         $peoples = People::all();
         $companies = Company::all();
+        $leads = Lead::all();
         $sources = Source::all();
         $products = Product::all();
         $company_types = CompanyType::all();
@@ -47,7 +49,7 @@ Route::middleware(['auth'])->group(function () {
 
         $activity_types = ActivityType::all();
 
-        return view('admin.dashboard', compact('users', 'company_types', 'industries', 'leadtags', 'companytags', 'persontags', 'activity_types', 'peoples', 'companies', 'sources', 'territories', 'products', 'competitors'));
+        return view('admin.dashboard', compact('users', 'company_types', 'leads','industries', 'leadtags', 'companytags', 'persontags', 'activity_types', 'peoples', 'companies', 'sources', 'territories', 'products', 'competitors'));
         // return view('admin.dashboard');
     })->name('admin.dashboard');
 
@@ -132,7 +134,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/update-people-field', [PeopleController::class, 'updatePeopleField'])->name('update.people.field');
 
     // Task Section
-    Route::post('/tasks/store', [TaskController::class, 'store'])->name('tasks.store');
     Route::post('/tasks/ajax', [TaskController::class, 'ajax_store'])->name('task.ajax.store');
 
     // Lead Section

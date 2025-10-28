@@ -3,65 +3,69 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\CompanyTask;
+use App\Models\LeadTask;
+use App\Models\PeopleTask;
 use App\Models\Task;
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    public function store(Request $request)
-    {
-        // $request->validate([
-        //     'company_id' => 'nullable|exists:companies,id',
-        //     'user_id' => 'required|exists:users,id',
-        //     'title' => 'nullable|string|max:255',
-        //     'description' => 'nullable|string',
-        //     'due_date' => 'nullable|date',
-        // ]);
-
-        $task = Task::create([
-            'company_id' => $request->company_id,
-            'user_id' => $request->user_id,
-            'title' => $request->title,
-            'description' => $request->description,
-            'due_date' => $request->due_date,
-        ]);
-
-        return response()->json(['status' => 'success', 'task' => $task]);
-    }
-
-
     public function ajax_store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'due_date' => 'nullable',
+            'due_date' => 'nullable|date',
             'assignee_id' => 'nullable|exists:users,id',
+            'related_to' => 'required|integer',
+            'related_type' => 'required|string|in:company,people,lead',
+            'notes' => 'nullable|string',
         ]);
 
+        $assignee = User::find($validated['assignee_id']);
+        $assigneeName = $assignee->name;
+        $dueTime = Carbon::parse($validated['due_date'])->format('Y-m-d H:i:s');
+
+        // Prepare base task data (common fields)
         $data = [
             'title' => $validated['name'],
-            'due_date' => $validated['due_date'] ?? null,
-            'user_id' => $validated['assignee_id'] ?? null,
+            'description' => $validated['notes'] ?? null,
+            'created_time' => now(),
+            'due_time' => $dueTime,
+            'assignee_id' => $validated['assignee_id'] ?? null,
+            'assignee_name' => $assigneeName,
+            'created_at' => now(),
         ];
 
+        // Create task in respective model
+        switch ($validated['related_type']) {
+            case 'company':
+                $data['company_id'] = $validated['related_to'];
+                CompanyTask::create($data);
+                break;
 
-        if (!empty($request->company_id)) {
-            $data['company_id'] = $request->company_id;
+            case 'people':
+                $data['people_id'] = $validated['related_to'];
+                PeopleTask::create($data);
+                break;
+
+            case 'lead':
+                $data['lead_id'] = $validated['related_to'];
+                LeadTask::create($data);
+                break;
+
+            default:
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid related type.',
+                ], 422);
         }
 
-
-        $task = Task::create($data);
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Task added successfully.',
-                'task' => $task
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Task added successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Task added successfully.',
+        ]);
     }
-
 }

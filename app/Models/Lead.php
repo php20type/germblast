@@ -12,7 +12,9 @@ class Lead extends Model
         'name',
         'description',
         'lead_status',
-        'lead_flags',
+        // 'lead_flags',
+        'is_watching',
+        'is_hot',
         'stage_id',
         'confidence',
         'unknown_field',
@@ -30,7 +32,6 @@ class Lead extends Model
     protected $with = ['leadCompanies', 'leadProducts', 'leadPeople', 'leadSources', 'leadCompetitors', 'leadTags', 'leadTask'];
     protected $casts = [
         'close_date' => 'datetime',
-        'lead_flags' => 'array',
     ];
 
 

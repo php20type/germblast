@@ -587,7 +587,7 @@
 
 
                             <!-- Filter Section -->
-                            <div class="filter-section">
+                            {{-- <div class="filter-section">
                                 <div class="row g-2">
                                     <div class="col-auto">
                                         <select class="form-select dropdown-orange">
@@ -624,6 +624,42 @@
                                             <option value="3">Pending</option>
                                         </select>
 
+                                    </div>
+                                    <div class="col-auto ms-auto d-none">
+                                        <button class="btn btn-warning">
+                                            <i class="fa-regular fa-gear"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div> --}}
+                            <div class="filter-section">
+                                <div class="row g-2">
+                                    <div class="col-auto">
+                                        <select class="form-select dropdown-orange" id="filter-range"
+                                            name="filter_range">
+                                            <option selected>All Entries</option>
+                                            <option value="7">Last 7 Days</option>
+                                            <option value="30">Last 30 Days</option>
+                                            <option value="90">Last 90 Days</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-auto">
+                                        <select class="form-select dropdown-orange" id="filter-activity"
+                                            name="activity_type_id">
+                                            <option selected>All Activity Type</option>
+                                            @foreach ($activity_types as $activity_type)
+                                                <option value="{{ $activity_type->id }}">{{ $activity_type->type }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-auto">
+                                        <select class="form-select dropdown-orange" id="filter-user" name="user_id">
+                                            <option selected>All Users</option>
+                                            @foreach ($users as $user)
+                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                     <div class="col-auto ms-auto d-none">
                                         <button class="btn btn-warning">
@@ -706,89 +742,6 @@
                             <!-- Timeline -->
                             <div class="timeline-container">
                                 <div class="timeline position-relative">
-
-                                    {{-- Activities List --}}
-                                    {{-- @foreach ($activities as $activity)
-                                        <div class="timeline-item">
-                                            <div class="timeline-icon">
-                                                <i class="{{ $activity->activityType->icon }}"></i>
-                                            </div>
-                                            <div class="timeline-content">
-                                                <div class="timeline-header">
-                                                    <div class="timestamp">
-                                                        {{ \Carbon\Carbon::parse($activity->created_at)->format('g:i A \o\n M j, Y') }}
-                                                    </div>
-                                                </div>
-
-                                                <div class="timeline-body">
-                                                    <div class="row align-items-center">
-                                                        <div class="col-8">
-                                                            <p class="mb-0">
-                                                                <span class="author-link">
-                                                                    {{ $activity->creator->name ?? 'N/A' }}
-                                                                </span>
-                                                                logged an activity with
-                                                                <span class="organization">
-                                                                    {{ $activity->participant_names }}
-                                                                </span>
-                                                            </p>
-                                                        </div>
-
-                                                        <div class="col-4 text-end">
-                                                            <button class="btn btn-sm btn-outline-primary me-1"
-                                                                title="Add Comment" data-id="">
-                                                                <i class="fas fa-comment"></i>
-                                                            </button>
-                                                            <button class="btn btn-sm btn-outline-danger"
-                                                                title="Delete Activity" data-id="">
-                                                                <i class="fas fa-times"></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-
-
-                                                    <div class="activity-details">
-                                                        <div class="row">
-                                                            <div class="col-10">
-                                                                <div class="activity-label mb-0">
-                                                                    {{ $activity->activityType->type ?? 'N/A' }}</div>
-                                                                <div class="activity-description">
-                                                                    <div class="text-muted mb-2">
-                                                                        <span><i
-                                                                                class="fas fa-pen-to-square text-primary me-1"></i></span>
-                                                                        {{ $activity->note }}
-                                                                    </div>
-                                                                    <div class="text-muted">
-                                                                        <span><i
-                                                                                class="fas fa-file-alt text-warning me-1"></i></span>
-                                                                        {{ $activity->description }}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-2">
-                                                                <div class="activity-badges">
-                                                                    <span class="activity-badge badge-cc">JB</span>
-                                                                    <span class="activity-badge badge-cc">TC</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-
-                                                    <div class="comment-box">
-                                                        <span class="comment-avatar">BB</span>
-                                                        <span class="comment-text">I will follow up with lead
-                                                            tomorrow. Chance had reached out to Stephanie about
-                                                            doing a site survey.</span>
-                                                    </div>
-
-                                                </div>
-
-
-                                            </div>
-                                        </div>
-                                    @endforeach --}}
-
                                     @foreach ($timeline as $item)
                                         @if ($item->type === 'activity')
                                             <div class="timeline-item">
@@ -1039,6 +992,14 @@
                                                     </div>
 
                                                 </div>
+                                            </div>
+                                        @elseif ($item->type === 'milestone')
+                                            <div class="timeline-item milestone">
+                                                <div class="timeline-icon">
+                                                    <i class="fa-brands fa-web-awesome"></i>
+                                                </div>
+                                                <strong>🎉 {{ $item->title }}</strong>
+                                                <span class="text-muted">{{ $item->timestamp->format('M d, Y') }}</span>
                                             </div>
                                         @endif
                                     @endforeach
@@ -3608,8 +3569,6 @@
                     }
                 });
             });
-
-
 
             // Log Note Form
             $("#logNoteForm").validate({

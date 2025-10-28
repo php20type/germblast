@@ -88,7 +88,7 @@ class SaleController extends Controller
         $closingThisWeekValue = Helper::calculateTotalValue($closingThisWeek);
         $closingThisWeekValueFormatted = Helper::formatValue($closingThisWeekValue);
 
-        $hotLeads = Lead::whereJsonContains('lead_flags', 'hot')->get();
+        $hotLeads = Lead::where('is_hot', 1)->get();
         $hotLeadsCount = $hotLeads->count();
         $hotLeadsValue = Helper::calculateTotalValue($hotLeads);
         $hotLeadsValueFormatted = Helper::formatValue($hotLeadsValue);

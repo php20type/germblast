@@ -679,127 +679,6 @@
 
                             <div class="timeline-container">
                                 <div class="timeline">
-
-                                    <!-- Note Timeline Item -->
-                                    {{-- <div class="timeline-item">
-                                        <div class="timeline-icon note">
-                                            <i class="fa-regular fa-note-sticky"></i>
-                                        </div>
-                                        <div class="timeline-content">
-                                            <button class="close-button"
-                                                onclick="this.closest('.timeline-item').style.display='none'">×</button>
-                                            <div class="timeline-header">
-                                                <div class="timestamp">11:30 PM on Jan 14</div>
-                                            </div>
-                                            <div class="timeline-body">
-                                                <a href="#" class="author-link">Rodney Madsen</a> wrote a note
-                                                on <span class="organization">Community Health Centers of
-                                                    Lubbock</span>
-                                                <div class="question-text">
-                                                    Brennan Baxter: What is the status of this lead?
-                                                </div>
-                                                <div class="nested-response">
-                                                    <div class="response-header">
-                                                        <div class="response-author">
-                                                            <div class="response-avatar">BB</div>
-                                                            <div class="response-name">
-                                                                <h4>Brennan Baxter</h4>
-                                                                <p>I will follow up with lead tomorrow. Chance
-                                                                    had reached
-                                                                    out to Stephanie about doing a site survey.
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                        <div class="response-time">4 Months Ago</div>
-                                                    </div>
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div> --}}
-
-                                    {{-- Activities List --}}
-                                    {{-- @foreach ($activities as $activity)
-                                        <div class="timeline-item">
-                                            <div class="timeline-icon">
-                                                <i class="{{ $activity->activityType->icon }}"></i>
-                                            </div>
-                                            <div class="timeline-content">
-                                                <div class="timeline-header">
-                                                    <div class="timestamp">
-                                                        {{ \Carbon\Carbon::parse($activity->created_at)->format('g:i A \o\n M j, Y') }}
-                                                    </div>
-                                                </div>
-
-                                                <div class="timeline-body">
-                                                    <div class="row align-items-center">
-                                                        <!-- Text section (col-8) -->
-                                                        <div class="col-8">
-                                                            <p class="mb-0">
-                                                                <span class="author-link">
-                                                                    {{ $activity->creator->name ?? 'N/A' }}
-                                                                </span>
-                                                                logged an activity with
-                                                                <span class="organization">
-                                                                    {{ $activity->participant_names }}
-                                                                </span>
-                                                            </p>
-                                                        </div>
-
-                                                        <!-- Buttons section (col-4) -->
-                                                        <div class="col-4 text-end">
-                                                            <button class="btn btn-sm btn-outline-primary me-1"
-                                                                title="Add Comment" data-id="">
-                                                                <i class="fas fa-comment"></i>
-                                                            </button>
-                                                            <button class="btn btn-sm btn-outline-danger"
-                                                                title="Delete Activity" data-id="">
-                                                                <i class="fas fa-times"></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-
-
-                                                    <div class="activity-details">
-                                                        <div class="row">
-                                                            <div class="col-10">
-                                                                <div class="activity-label mb-0">
-                                                                    {{ $activity->activityType->type ?? 'N/A' }}</div>
-                                                                <div class="activity-description">
-                                                                    <div class="text-muted mb-2">
-                                                                        <span><i class="fas fa-pen-to-square text-primary me-1"></i></span>
-                                                                        {{ $activity->note }}
-                                                                    </div>
-                                                                    <div class="text-muted">
-                                                                        <span><i class="fas fa-file-alt text-warning me-1"></i></span>
-                                                                        {{ $activity->description }}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-2">
-                                                                <div class="activity-badges">
-                                                                    <span class="activity-badge badge-cc">JB</span>
-                                                                    <span class="activity-badge badge-cc">TC</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-
-                                                    <div class="comment-box">
-                                                        <span class="comment-avatar">BB</span>
-                                                        <span class="comment-text">I will follow up with lead
-                                                            tomorrow. Chance had reached out to Stephanie about
-                                                            doing a site survey.</span>
-                                                    </div>
-
-                                                </div>
-
-
-                                            </div>
-                                        </div>
-                                    @endforeach --}}
-
                                     @foreach ($timeline as $item)
                                         @if ($item->type === 'activity')
                                             <div class="timeline-item">
@@ -1050,8 +929,15 @@
                                                         </div>
 
                                                     </div>
-
                                                 </div>
+                                            </div>
+                                        @elseif ($item->type === 'milestone')
+                                            <div class="timeline-item milestone">
+                                                <div class="timeline-icon">
+                                                    <i class="fa-brands fa-web-awesome"></i>
+                                                </div>
+                                                <strong>🎉 {{ $item->title }}</strong>
+                                                <span class="text-muted">{{ $item->timestamp->format('M d, Y') }}</span>
                                             </div>
                                         @endif
                                     @endforeach
@@ -1736,7 +1622,8 @@
                 <div class="modal-header">
                     <h1 class="modal-title" id="exampleModalLabel">Schedule Activity</h1>
                     <div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
                 </div>
                 <div class="modal-body ps-0">

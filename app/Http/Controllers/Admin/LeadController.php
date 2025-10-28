@@ -62,8 +62,8 @@ class LeadController extends Controller
         $addedThisWeekCount = Lead::whereBetween('created_at', [$startOfWeek, $endOfWeek])->count();
         $closingThisWeekCount = Lead::whereBetween('close_date', [$startOfWeek, $endOfWeek])->count();
         $myLeadOpenStatusCount = Lead::where('lead_status', 'open')->where('assignee_id', $user->id)->count();
-        $myWatchingLeadsCount = Lead::whereJsonContains('lead_flags', 'watching')->where('assignee_id', $user->id)->count();
-        $hotLeadsCount = Lead::whereJsonContains('lead_flags', 'hot')->count();
+        $myWatchingLeadsCount = Lead::where('is_watching', 1)->where('assignee_id', $user->id)->count();
+        $hotLeadsCount = Lead::where('is_hot', 1)->count();
 
         return [
             'totalLeads' => $formatCount($totalLeads),
@@ -99,7 +99,7 @@ class LeadController extends Controller
         }
 
         if ($request->has('hot') && $request->hot === 'hot') {
-            $query->whereJsonContains('lead_flags', 'hot');
+            $query->where('is_hot', 1);
         }
 
         if ($request->filled('user_id')) {
@@ -201,7 +201,7 @@ class LeadController extends Controller
         }
 
         if ($request->has('hot') && $request->hot === 'hot') {
-            $query->whereJsonContains('lead_flags', 'hot');
+            $query->where('is_hot', 1);
         }
 
         if ($request->filled('user_id')) {
@@ -304,7 +304,7 @@ class LeadController extends Controller
         }
 
         if ($request->has('hot') && $request->hot === 'hot') {
-            $query->whereJsonContains('lead_flags', 'hot');
+            $query->where('is_hot', 1);
         }
 
         if ($request->filled('user_id')) {
@@ -394,7 +394,7 @@ class LeadController extends Controller
             'sources',
             'competitors',
             'stages',
-        ])->whereJsonContains('lead_flags', 'hot');
+        ])->where('is_hot', 1);
 
         // Apply Filters
         if ($request->filled('search')) {
@@ -406,7 +406,7 @@ class LeadController extends Controller
         }
 
         if ($request->has('hot') && $request->hot === 'hot') {
-            $query->whereJsonContains('lead_flags', 'hot');
+            $query->where('is_hot', 1);
         }
 
         if ($request->filled('user_id')) {
@@ -495,7 +495,7 @@ class LeadController extends Controller
             'competitors',
             'stages',
         ])->where('assignee_id', $id)
-            ->whereJsonContains('lead_flags', 'watching');
+            ->where('is_watching', 1);
 
         // Apply Filters
         if ($request->filled('search')) {
@@ -507,7 +507,7 @@ class LeadController extends Controller
         }
 
         if ($request->has('hot') && $request->hot === 'hot') {
-            $query->whereJsonContains('lead_flags', 'hot');
+            $query->where('is_hot', 1);
         }
 
         if ($request->filled('user_id')) {
@@ -611,7 +611,7 @@ class LeadController extends Controller
         }
 
         if ($request->has('hot') && $request->hot === 'hot') {
-            $query->whereJsonContains('lead_flags', 'hot');
+            $query->where('is_hot', 1);
         }
 
         if ($request->filled('user_id')) {
@@ -715,7 +715,7 @@ class LeadController extends Controller
         }
 
         if ($request->has('hot') && $request->hot === 'hot') {
-            $query->whereJsonContains('lead_flags', 'hot');
+            $query->where('is_hot', 1);
         }
 
         if ($request->filled('user_id')) {
@@ -1025,13 +1025,14 @@ class LeadController extends Controller
         ));
     }
 
-
     public function ajax_update(Request $request)
     {
         $request->validate([
             'lead_id' => 'required|exists:leads,id',
             'lead_status' => 'nullable|string',
-            'lead_flags' => 'nullable|array',
+            // 'lead_flags' => 'nullable|array',
+            'flag_type' => 'nullable|string|in:is_hot,is_watching',
+            'flag_value' => 'nullable|boolean',
         ]);
 
         $lead = Lead::findOrFail($request->lead_id);
@@ -1045,8 +1046,25 @@ class LeadController extends Controller
             $description = "changed the status of {$leadName} to {$request->lead_status}";
             $actionType = 'updated_status';
         }
-        if ($request->has('lead_flags')) {
-            $lead->lead_flags = $request->lead_flags;
+        // if ($request->has('lead_flags')) {
+        //     $lead->lead_flags = $request->lead_flags;
+        // }
+        if ($request->filled('flag_type')) {
+            $flagField = $request->flag_type; // 'is_hot' or 'is_watching'
+            $flagValue = (int) $request->flag_value;
+
+            $lead->$flagField = $flagValue;
+
+            $flagLabel = $flagField === 'is_hot' ? 'Hot' : 'Watching';
+
+            // Dynamic message
+            if ($flagValue === 1) {
+                $description = "marked {$leadName} as {$flagLabel}";
+            } else {
+                $description = "removed {$leadName} from {$flagLabel}";
+            }
+
+            $actionType = 'updated_flags';
         }
 
         $lead->save();
