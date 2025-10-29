@@ -78,6 +78,19 @@
                 </a>
             </li>
             <hr>
+
+            <li class="{{ request()->routeIs('admin.icimatrix.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.icimatrix.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon10.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        ICIMatrix
+                    </div>
+                </a>
+            </li>
+
+            <hr>
              <li class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.settings.index') }}">
                     <div class="icon-round">

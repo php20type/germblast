@@ -17,6 +17,7 @@ use App\Models\LeadSource;
 use App\Models\LeadStage;
 use App\Models\LeadTag;
 use App\Models\LeadTask;
+use App\Models\LeadFile;
 use App\Models\Market;
 use App\Models\Outcome;
 use App\Models\People;
@@ -26,7 +27,10 @@ use App\Models\Tag;
 use App\Models\Timeline;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class LeadController extends Controller
 {
@@ -862,7 +866,7 @@ class LeadController extends Controller
         return redirect()->back()->with('success', 'Leads created successfully');
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         // Fetch lead with all pivot relations
         $leads = Lead::with([
@@ -877,6 +881,7 @@ class LeadController extends Controller
             'stages',
             'market',
             'outcome',
+            'leadFile',
             'leadCompanies',
             'leadProducts',
             'leadPeople',
@@ -885,6 +890,8 @@ class LeadController extends Controller
             'leadTags',
             'leadTask',
         ])->findOrFail($id);
+
+        $leadFiles = $leads->leadFile;
 
         $leadValue = Helper::calculateTotalValue($leads);
         $formattedLeadValue = Helper::formatValue($leadValue);
@@ -929,6 +936,36 @@ class LeadController extends Controller
             return $note;
         });
 
+        // // Separate logged and scheduled activities
+        // $logged_activities = $activities->filter(function ($activity) {
+        //     return $activity->status === 'Logged';
+        // });
+
+        // $scheduled_activities = $activities->filter(function ($activity) {
+        //     return $activity->status === 'Scheduled';
+        // });
+
+        // // --- Fetch Timeline Entries ---
+        // $timelineEntries = Helper::getTimelineForEntity('lead', $leads->id);
+        // $timelineEntries->transform(function ($item) {
+        //     $item->type = 'timeline';
+        //     $item->timestamp = $item->created_at;
+
+        //     return $item;
+        // });
+
+        // $timeline = $logged_activities
+        //     ->concat($notes)
+        //     ->concat($timelineEntries)
+        //     ->sortByDesc('timestamp')
+        //     ->values(); // reindex after sorting
+
+        $filters = [
+            'filter_range' => $request->input('filter_range', 'all'),
+            'activity_type_id' => $request->input('activity_type_id', 'all'),
+            'user_id' => $request->input('user_id', 'all'),
+        ];
+
         // Separate logged and scheduled activities
         $logged_activities = $activities->filter(function ($activity) {
             return $activity->status === 'Logged';
@@ -939,7 +976,7 @@ class LeadController extends Controller
         });
 
         // --- Fetch Timeline Entries ---
-        $timelineEntries = Helper::getTimelineForEntity('lead', $leads->id);
+        $timelineEntries = Helper::getTimelineForEntity('company', $leads->id);
         $timelineEntries->transform(function ($item) {
             $item->type = 'timeline';
             $item->timestamp = $item->created_at;
@@ -947,15 +984,28 @@ class LeadController extends Controller
             return $item;
         });
 
-        $timeline = $logged_activities
+        // Apply filtering via helper
+        $filtered = Helper::applyTimelineFilters($logged_activities, $notes, $timelineEntries, $filters);
+
+        $logged_activities = $filtered['logged_activities'];
+        $notes = $filtered['notes'];
+        $timelineEntries = $filtered['timelineEntries'];
+
+
+         $timeline = $logged_activities
             ->concat($notes)
             ->concat($timelineEntries)
             ->sortByDesc('timestamp')
             ->values(); // reindex after sorting
 
-        // $timeline = $logged_activities->concat($notes)
-        //     ->sortByDesc('timestamp')
-        //     ->values(); // reindex after sorting
+        // 👉 ADD THIS SECTION — Handle AJAX requests
+        if ($request->ajax()) {
+            $timeline_html = view('admin.leads.partials.lead-timeline', compact('timeline'))->render();
+
+            return response()->json([
+                'timeline_html' => $timeline_html,
+            ]);
+        }
 
         $leadStatusIcon = '';
 
@@ -1011,6 +1061,7 @@ class LeadController extends Controller
             'pending_tasks',
             'completed_tasks',
             'users',
+            'leadFiles',
             'allpeoples',
             'industries',
             'activity_types',
@@ -1631,6 +1682,77 @@ class LeadController extends Controller
             'status' => 'success',
             'message' => 'Task deleted successfully.',
         ]);
+    }
+
+    public function fileUpload(Request $request, Lead $lead)
+    {
+        $request->validate([
+            'file' => 'required|file|max:10240',
+        ]);
+
+        try {
+            $file = $request->file('file');
+            $originalName = $file->getClientOriginalName();
+            $cleanName = Str::slug(pathinfo($originalName, PATHINFO_FILENAME));
+            $extension = $file->getClientOriginalExtension();
+            $filename = Str::random(10).'_'.$cleanName.'.'.$extension;
+
+            $path = $file->storeAs('lead_files', $filename, 'public');
+
+            $leadFile = LeadFile::create([
+                'lead_id' => $lead->id,
+                'user_id' => auth()->id(),
+                'file_name' => $originalName,
+                'file_path' => $path,
+                'file_type' => $extension,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'File uploaded successfully!',
+                'file' => $leadFile,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error("Lead file upload failed for lead ID {$lead->id}: ".$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'File upload failed. Please try again later.',
+            ], 500);
+        }
+    }
+
+    public function fileDelete(Request $request)
+    {
+        $request->validate([
+            'file_id' => 'required|integer',
+            'lead_id' => 'required|integer',
+        ]);
+
+        try {
+            $file = LeadFile::where('id', $request->file_id)
+                ->where('lead_id', $request->lead_id)
+                ->firstOrFail();
+
+            // Delete file from storage
+            Storage::disk('public')->delete($file->file_path);
+
+            // Delete record from DB
+            $file->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'File deleted successfully!',
+            ]);
+
+        } catch (\Throwable $e) {
+            Log::error("File delete failed for lead {$request->lead_id}: ".$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'File deletion failed. Please try again later.',
+            ], 500);
+        }
     }
 
     public function delete(Request $request)

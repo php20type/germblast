@@ -21,7 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role'
+        'role',
     ];
 
     /**
@@ -49,37 +49,37 @@ class User extends Authenticatable
 
     public function task()
     {
-        return $this->hasMany(Task::class,'user_id');
+        return $this->hasMany(Task::class, 'user_id');
     }
 
     public function leads()
     {
-        return $this->hasMany(Lead::class,'assingee_id');
+        return $this->hasMany(Lead::class, 'assingee_id');
     }
 
     public function company()
     {
-        return $this->hasMany(Company::class,'user_id');
+        return $this->hasMany(Company::class, 'user_id');
     }
 
     public function people()
     {
-        return $this->hasMany(People::class,'user_id');
+        return $this->hasMany(People::class, 'user_id');
     }
 
-     public function tag()
+    public function tag()
     {
         return $this->hasMany(Tag::class, 'created_by');
     }
 
-     public function activity()
+    public function activity()
     {
         return $this->hasMany(Activity::class, 'user_id');
     }
 
     public function activityComments()
     {
-        return $this->hasMany(ActivityComment::class,'user_id');
+        return $this->hasMany(ActivityComment::class, 'user_id');
     }
 
     public function note()
@@ -89,7 +89,7 @@ class User extends Authenticatable
 
     public function noteComments()
     {
-        return $this->hasMany(NoteComment::class,'user_id');
+        return $this->hasMany(NoteComment::class, 'user_id');
     }
 
     public function companyTaskAssignee()
@@ -100,6 +100,21 @@ class User extends Authenticatable
     public function companyTaskCompleted()
     {
         return $this->hasMany(CompanyTask::class, 'completed_user_id');
+    }
+
+    public function companyFile()
+    {
+        return $this->hasMany(CompanyFile::class, 'user_id');
+    }
+
+    public function peopleFile()
+    {
+        return $this->hasMany(PeopleFile::class, 'user_id');
+    }
+
+    public function leadFile()
+    {
+        return $this->hasMany(LeadFile::class, 'user_id');
     }
 
     public function peopleTaskAssignee()
@@ -121,5 +136,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(LeadTask::class, 'completed_user_id');
     }
-
 }

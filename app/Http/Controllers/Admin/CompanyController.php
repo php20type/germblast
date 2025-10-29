@@ -9,6 +9,7 @@ use App\Models\ActivityType;
 use App\Models\Company;
 use App\Models\CompanyAddress;
 use App\Models\CompanyEmail;
+use App\Models\CompanyFile;
 use App\Models\CompanyPeople;
 use App\Models\CompanyPhone;
 use App\Models\CompanyTag;
@@ -27,6 +28,9 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CompanyController extends Controller
 {
@@ -309,7 +313,7 @@ class CompanyController extends Controller
         return redirect()->back()->with('success', 'Company added successfully.');
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $activity_types = ActivityType::all();
         $products = Product::all();
@@ -323,12 +327,15 @@ class CompanyController extends Controller
             'companyEmail',
             'companyPeople',
             'companyPhone',
+            'companyFile',
             'companyAddress',
             'companyTask',
             'companyUrl',
             'leads',
             'peoples', // <-- fetch related people via pivot
         ])->findOrFail($id);
+
+        $companyFiles = $company->companyFile;
 
         $activities = Helper::getActivitiesForParticipant('company', $company->id);
         $activities->load(['comments.creator']);
@@ -349,15 +356,6 @@ class CompanyController extends Controller
             return $activity;
         });
 
-        // Separate logged and scheduled activities
-        $logged_activities = $activities->filter(function ($activity) {
-            return $activity->status === 'Logged';
-        });
-
-        $scheduled_activities = $activities->filter(function ($activity) {
-            return $activity->status === 'Scheduled';
-        });
-
         $notes = Helper::getNotesForParticipant('company', $company->id);
         $notes->load(['comments.creator']);
         $notes->transform(function ($note) {
@@ -376,6 +374,21 @@ class CompanyController extends Controller
             return $note;
         });
 
+        $filters = [
+            'filter_range' => $request->input('filter_range', 'all'),
+            'activity_type_id' => $request->input('activity_type_id', 'all'),
+            'user_id' => $request->input('user_id', 'all'),
+        ];
+
+        // Separate logged and scheduled activities
+        $logged_activities = $activities->filter(function ($activity) {
+            return $activity->status === 'Logged';
+        });
+
+        $scheduled_activities = $activities->filter(function ($activity) {
+            return $activity->status === 'Scheduled';
+        });
+
         // --- Fetch Timeline Entries ---
         $timelineEntries = Helper::getTimelineForEntity('company', $company->id);
         $timelineEntries->transform(function ($item) {
@@ -384,6 +397,13 @@ class CompanyController extends Controller
 
             return $item;
         });
+
+        // Apply filtering via helper
+        $filtered = Helper::applyTimelineFilters($logged_activities, $notes, $timelineEntries, $filters);
+
+        $logged_activities = $filtered['logged_activities'];
+        $notes = $filtered['notes'];
+        $timelineEntries = $filtered['timelineEntries'];
 
         $milestones = collect();
 
@@ -428,6 +448,15 @@ class CompanyController extends Controller
             ->concat($milestones)
             ->sortByDesc('timestamp')
             ->values(); // reindex after sorting
+
+        // 👉 ADD THIS SECTION — Handle AJAX requests
+        if ($request->ajax()) {
+            $timeline_html = view('admin.company.partials.company-timeline', compact('timeline'))->render();
+
+            return response()->json([
+                'timeline_html' => $timeline_html,
+            ]);
+        }
 
         // $related_leads = $company->leads;
         $related_leads = $company->leads()->with('products')->get();
@@ -563,6 +592,7 @@ class CompanyController extends Controller
 
         return view('admin.company.edit', compact(
             'company',
+            'companyFiles',
             'activities',
             'logged_activities',
             'scheduled_activities',
@@ -1025,6 +1055,77 @@ class CompanyController extends Controller
             'status' => 'success',
             'message' => 'Task deleted successfully.',
         ]);
+    }
+
+    public function fileUpload(Request $request, Company $company)
+    {
+        $request->validate([
+            'file' => 'required|file|max:10240',
+        ]);
+
+        try {
+            $file = $request->file('file');
+            $originalName = $file->getClientOriginalName();
+            $cleanName = Str::slug(pathinfo($originalName, PATHINFO_FILENAME));
+            $extension = $file->getClientOriginalExtension();
+            $filename = Str::random(10).'_'.$cleanName.'.'.$extension;
+
+            $path = $file->storeAs('company_files', $filename, 'public');
+
+            $companyFile = CompanyFile::create([
+                'company_id' => $company->id,
+                'user_id' => auth()->id(),
+                'file_name' => $originalName,
+                'file_path' => $path,
+                'file_type' => $extension,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'File uploaded successfully!',
+                'file' => $companyFile,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error("Company file upload failed for company ID {$company->id}: ".$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'File upload failed. Please try again later.',
+            ], 500);
+        }
+    }
+
+    public function fileDelete(Request $request)
+    {
+        $request->validate([
+            'file_id' => 'required|integer',
+            'company_id' => 'required|integer',
+        ]);
+
+        try {
+            $file = CompanyFile::where('id', $request->file_id)
+                ->where('company_id', $request->company_id)
+                ->firstOrFail();
+
+            // Delete file from storage
+            Storage::disk('public')->delete($file->file_path);
+
+            // Delete record from DB
+            $file->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'File deleted successfully!',
+            ]);
+
+        } catch (\Throwable $e) {
+            Log::error("File delete failed for company {$request->company_id}: ".$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'File deletion failed. Please try again later.',
+            ], 500);
+        }
     }
 
     public function delete(Request $request)

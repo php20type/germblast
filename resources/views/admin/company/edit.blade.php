@@ -636,8 +636,8 @@
                                 <div class="row g-2">
                                     <div class="col-auto">
                                         <select class="form-select dropdown-orange" id="filter-range"
-                                            name="filter_range">
-                                            <option selected>All Entries</option>
+                                            data-company-id="{{ $company->id }}" name="filter_range">
+                                            <option value="all">All Entries</option>
                                             <option value="7">Last 7 Days</option>
                                             <option value="30">Last 30 Days</option>
                                             <option value="90">Last 90 Days</option>
@@ -645,8 +645,8 @@
                                     </div>
                                     <div class="col-auto">
                                         <select class="form-select dropdown-orange" id="filter-activity"
-                                            name="activity_type_id">
-                                            <option selected>All Activity Type</option>
+                                            data-company-id="{{ $company->id }}" name="activity_type_id">
+                                            <option value="all">All Activity Type</option>
                                             @foreach ($activity_types as $activity_type)
                                                 <option value="{{ $activity_type->id }}">{{ $activity_type->type }}
                                                 </option>
@@ -654,10 +654,12 @@
                                         </select>
                                     </div>
                                     <div class="col-auto">
-                                        <select class="form-select dropdown-orange" id="filter-user" name="user_id">
-                                            <option selected>All Users</option>
+                                        <select class="form-select dropdown-orange" id="filter-user" name="user_id"
+                                            data-company-id="{{ $company->id }}">
+                                            <option value="all">All Users</option>
                                             @foreach ($users as $user)
-                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                                <option value="{{ $user->id }}">{{ $user->name }}
+                                                </option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -741,7 +743,7 @@
 
                             <!-- Timeline -->
                             <div class="timeline-container">
-                                <div class="timeline position-relative">
+                                <div class="timeline position-relative" id="timeline">
                                     @foreach ($timeline as $item)
                                         @if ($item->type === 'activity')
                                             <div class="timeline-item">
@@ -1473,12 +1475,67 @@
 
                         <hr>
 
-                        <div class="sidebar-section">
+                        {{-- <div class="sidebar-section">
                             <h6 class="form-label">ATTACHED FILES</h6>
                             <button class="btn btn-outline-secondary w-100">
                                 <i class="fas fa-upload me-2"></i>Upload File
                             </button>
+                        </div> --}}
+                        <div class="sidebar-section">
+                            <h6 class="form-label">ATTACHED FILES</h6>
+
+                            {{-- Existing Uploaded Files --}}
+                            <div id="uploadedFilesList" class="m-3">
+                                @foreach ($companyFiles as $file)
+                                    <div class="preview row align-items-center mb-3">
+                                        <div class="img-upload col-4 text-center">
+                                            @if (in_array(strtolower(pathinfo($file->file_path, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif', 'webp']))
+                                                <img id="img-preview-file-{{ $file->id }}"
+                                                    src="{{ asset('storage/' . $file->file_path) }}"
+                                                    alt="{{ $file->file_name }}" class="img-fluid rounded"
+                                                    style="width: 70px; height: 70px; object-fit: cover;">
+                                            @else
+                                                <i class="fa-regular fa-file fs-1 text-secondary"></i>
+                                            @endif
+                                        </div>
+
+                                        <div class="text-upload col-6">
+                                            <a href="{{ asset('storage/' . $file->file_path) }}" download>
+                                                <p class="mb-1 fw-semibold">{{ $file->file_name }}</p>
+                                                <p class="text-muted mb-0 small">
+                                                    {{ number_format(Storage::disk('public')->size($file->file_path) / 1024, 2) }}
+                                                    KB
+                                                </p>
+                                            </a>
+                                        </div>
+
+                                        <div class="col-2 text-end">
+                                            {{-- <button class="btn btn-sm btn-outline-danger" title="Cancel">
+                                                <i class="fas fa-times"></i>
+                                            </button> --}}
+                                            <button type="button" class="btn btn-sm btn-outline-danger delete-file-btn"
+                                                data-id="{{ $file->id }}" data-company-id="{{ $company->id }}"
+                                                title="Delete file">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+
+                            <form id="companyFileUploadForm" enctype="multipart/form-data"
+                                data-company-id="{{ $company->id }}">
+                                @csrf
+                                <input type="file" id="companyFileInput" name="file" class="d-none" />
+                                <button type="button" class="btn btn-outline-secondary w-100" id="uploadCompanyFileBtn">
+                                    <i class="fas fa-upload me-2"></i>Upload File
+                                </button>
+                            </form>
+
+                            <div id="uploadedFilesList" class="mt-3"></div>
                         </div>
+
 
                         <div class="sidebar-section">
                             <h6 class="form-label">COMPANY HIERARCHY</h6>
@@ -1705,7 +1762,8 @@
                 <div class="modal-header">
                     <h1 class="modal-title" id="exampleModalLabel">Schedule Activity</h1>
                     <div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
                 </div>
                 <div class="modal-body ps-0">
@@ -3883,6 +3941,139 @@
                 'schedule_mentioned_user_ids',
                 'schedule_note_value'
             );
+
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            function fetchFilteredTimeline() {
+                // ✅ Fetch company_id dynamically from dropdown
+                let companyId = $('#filter-range').data('company-id');
+                let filter_range = $('select[name="filter_range"]').val();
+                let activity_type_id = $('#filter-activity').val();
+                let user_id = $('#filter-user').val();
+
+
+                console.log("Fetching timeline with filters:", {
+                    company_id: companyId,
+                    filter_range: filter_range,
+                    activity_type_id: activity_type_id,
+                    user_id: user_id
+                });
+
+                $.ajax({
+                    url: "/admin/companies/" + companyId + "/timeline",
+                    method: "GET",
+                    data: {
+                        filter_range: filter_range,
+                        activity_type_id: activity_type_id,
+                        user_id: user_id
+                    },
+                    success: function(response) {
+                        $('#timeline').html(response.timeline_html);
+                    },
+                    error: function() {
+                        console.error('Error fetching filtered timeline data');
+                    }
+                });
+            }
+
+            // Trigger AJAX when filters change
+            $('select[name="filter_range"], select[name="activity_type_id"], select[name="user_id"]').on('change',
+                fetchFilteredTimeline);
+
+
+            const uploadBtn = document.getElementById("uploadCompanyFileBtn");
+            const fileInput = document.getElementById("companyFileInput");
+            const uploadedList = document.getElementById("uploadedFilesList");
+            const companyId = document.getElementById("companyFileUploadForm").dataset.companyId;
+
+            uploadBtn.addEventListener("click", () => fileInput.click());
+
+            fileInput.addEventListener("change", function() {
+                const file = this.files[0];
+                if (!file) return;
+
+                let formData = new FormData();
+                formData.append("file", file);
+                formData.append("_token", "{{ csrf_token() }}");
+
+                uploadBtn.disabled = true;
+                uploadBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-2"></i> Uploading...`;
+
+                fetch(`/admin/companies/${companyId}/files/upload`, {
+                        method: "POST",
+                        body: formData,
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert("Upload failed: " + data.message);
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Upload error:", err);
+                        alert("Something went wrong while uploading the file.");
+                    })
+                    .finally(() => {
+                        uploadBtn.disabled = false;
+                        uploadBtn.innerHTML = `<i class="fas fa-upload me-2"></i>Upload File`;
+                        fileInput.value = "";
+                    });
+            });
+
+
+            $(document).on('click', '.delete-file-btn', function() {
+                let fileId = $(this).data('id');
+                let companyId = $(this).data('company-id'); // available from your Blade
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This file will be permanently deleted.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete it",
+                    cancelButtonText: "Cancel"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `/admin/companies/files/delete`,
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                company_id: companyId, // ✅ pass company_id
+                                file_id: fileId
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Deleted!",
+                                    text: response.message ||
+                                        "File deleted successfully.",
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                                setTimeout(() => location.reload(), 2000);
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error!",
+                                    text: xhr.responseJSON?.message ||
+                                        "Something went wrong while deleting."
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+
 
         });
     </script>

@@ -638,47 +638,39 @@
                             <div class="filter-section">
                                 <div class="row g-2">
                                     <div class="col-auto">
-                                        <select class="form-select dropdown-orange">
-                                            <option selected>All Entries</option>
-                                            <option value="1">Last 7 Days</option>
-                                            <option value="2">Last 30 Days</option>
-                                            <option value="3">Last 90 Days</option>
+                                         <select class="form-select dropdown-orange" id="filter-range"
+                                            data-people-id="{{ $peoples->id }}" name="filter_range">
+                                            <option value="all">All Entries</option>
+                                            <option value="7">Last 7 Days</option>
+                                            <option value="30">Last 30 Days</option>
+                                            <option value="90">Last 90 Days</option>
                                         </select>
                                     </div>
                                     <div class="col-auto">
-                                        <select class="form-select dropdown-orange">
-                                            <option selected>All Activity Type</option>
-                                            <option value="1">Phone Call</option>
-                                            <option value="2">Email</option>
-                                            <option value="3">Meeting</option>
+                                         <select class="form-select dropdown-orange" id="filter-activity"
+                                            data-people-id="{{ $peoples->id }}" name="activity_type_id">
+                                            <option value="all">All Activity Type</option>
+                                            @foreach ($activity_types as $activity_type)
+                                                <option value="{{ $activity_type->id }}">{{ $activity_type->type }}
+                                                </option>
+                                            @endforeach
                                         </select>
                                     </div>
                                     <div class="col-auto">
-                                        <select class="form-select dropdown-orange">
-                                            <option selected>All Users & Team</option>
-                                            <option value="1">User 1</option>
-                                            <option value="2">User 2</option>
-                                            <option value="3">Team A</option>
+                                       <select class="form-select dropdown-orange" id="filter-user" name="user_id"
+                                            data-people-id="{{ $peoples->id }}">
+                                            <option value="all">All Users</option>
+                                            @foreach ($users as $user)
+                                                <option value="{{ $user->id }}">{{ $user->name }}
+                                                </option>
+                                            @endforeach
                                         </select>
-                                    </div>
-                                    <div class="col-auto">
-                                        <select class="form-select dropdown-orange">
-                                            <option selected>All Time</option>
-                                            <option value="1">Open</option>
-                                            <option value="2">Closed</option>
-                                            <option value="3">Pending</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-auto ms-auto">
-                                        <button class="btn btn-warning">
-                                            <i class="fa-regular fa-gear"></i>
-                                        </button>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="timeline-container">
-                                <div class="timeline">
+                                <div class="timeline position-relative" id="timeline">
                                     @foreach ($timeline as $item)
                                         @if ($item->type === 'activity')
                                             <div class="timeline-item">
@@ -1358,7 +1350,7 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <h6>AUDIENCES</h6>
                                 <div>
-                                    <p><a href="#" class="text-warning">Add to audience</a></p>
+                                    <p><a href="#" class="text-warning d-none">Add to audience</a></p>
                                 </div>
                             </div>
                             <p class="small">isn’t in any audiences</p>
@@ -1392,12 +1384,66 @@
                                     placeholder="https://example.com">
                             </div>
                         </form> --}}
-                        <div class="sidebar-section">
+                        {{-- <div class="sidebar-section">
                             <h6 class="form-label">ATTACHED FILES</h6>
                             <button class="btn btn-outline-secondary w-100">
                                 <i class="fas fa-upload me-2"></i>Upload File
                             </button>
+                        </div> --}}
+
+
+                        <div class="sidebar-section">
+                            <h6 class="form-label">ATTACHED FILES</h6>
+
+                            {{-- Existing Uploaded Files --}}
+                            <div id="uploadedFilesList" class="m-3">
+                                @foreach ($peopleFiles as $file)
+                                    <div class="preview row align-items-center mb-3">
+                                        <div class="img-upload col-4 text-center">
+                                            @if (in_array(strtolower(pathinfo($file->file_path, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif', 'webp']))
+                                                <img id="img-preview-file-{{ $file->id }}"
+                                                    src="{{ asset('storage/' . $file->file_path) }}"
+                                                    alt="{{ $file->file_name }}" class="img-fluid rounded"
+                                                    style="width: 70px; height: 70px; object-fit: cover;">
+                                            @else
+                                                <i class="fa-regular fa-file fs-1 text-secondary"></i>
+                                            @endif
+                                        </div>
+
+                                        <div class="text-upload col-6">
+                                            <a href="{{ asset('storage/' . $file->file_path) }}" download>
+                                                <p class="mb-1 fw-semibold">{{ $file->file_name }}</p>
+                                                <p class="text-muted mb-0 small">
+                                                    {{ number_format(Storage::disk('public')->size($file->file_path) / 1024, 2) }}
+                                                    KB
+                                                </p>
+                                            </a>
+                                        </div>
+
+                                        <div class="col-2 text-end">
+                                            <button type="button" class="btn btn-sm btn-outline-danger delete-file-btn"
+                                                data-id="{{ $file->id }}" data-people-id="{{ $peoples->id }}"
+                                                title="Delete file">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+
+                            <form id="peopleFileUploadForm" enctype="multipart/form-data"
+                                data-people-id="{{ $peoples->id }}">
+                                @csrf
+                                <input type="file" id="peopleFileInput" name="file" class="d-none" />
+                                <button type="button" class="btn btn-outline-secondary w-100" id="uploadPeopleFileBtn">
+                                    <i class="fas fa-upload me-2"></i>Upload File
+                                </button>
+                            </form>
+
+                            <div id="uploadedFilesList" class="mt-3"></div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -3762,6 +3808,138 @@
                 'note_mentioned_user_ids',
                 'note_value'
             );
+
+        });
+    </script>
+       <script>
+        $(document).ready(function() {
+            function fetchFilteredTimeline() {
+                // ✅ Fetch people_id dynamically from dropdown
+                let peopleId = $('#filter-range').data('people-id');
+                let filter_range = $('select[name="filter_range"]').val();
+                let activity_type_id = $('#filter-activity').val();
+                let user_id = $('#filter-user').val();
+
+
+                console.log("Fetching timeline with filters:", {
+                    people_id: peopleId,
+                    filter_range: filter_range,
+                    activity_type_id: activity_type_id,
+                    user_id: user_id
+                });
+
+                $.ajax({
+                    url: "/admin/peoples/" + peopleId + "/timeline",
+                    method: "GET",
+                    data: {
+                        filter_range: filter_range,
+                        activity_type_id: activity_type_id,
+                        user_id: user_id
+                    },
+                    success: function(response) {
+                        $('#timeline').html(response.timeline_html);
+                    },
+                    error: function() {
+                        console.error('Error fetching filtered timeline data');
+                    }
+                });
+            }
+
+            // ✅ Trigger AJAX when filters change
+            $('select[name="filter_range"], select[name="activity_type_id"], select[name="user_id"]').on('change',
+                fetchFilteredTimeline);
+
+
+             const uploadBtn = document.getElementById("uploadPeopleFileBtn");
+            const fileInput = document.getElementById("peopleFileInput");
+            const uploadedList = document.getElementById("uploadedFilesList");
+            const peopleId = document.getElementById("peopleFileUploadForm").dataset.peopleId;
+
+            uploadBtn.addEventListener("click", () => fileInput.click());
+
+            fileInput.addEventListener("change", function() {
+                const file = this.files[0];
+                if (!file) return;
+
+                let formData = new FormData();
+                formData.append("file", file);
+                formData.append("_token", "{{ csrf_token() }}");
+
+                uploadBtn.disabled = true;
+                uploadBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-2"></i> Uploading...`;
+
+                fetch(`/admin/peoples/${peopleId}/files/upload`, {
+                        method: "POST",
+                        body: formData,
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert("Upload failed: " + data.message);
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Upload error:", err);
+                        alert("Something went wrong while uploading the file.");
+                    })
+                    .finally(() => {
+                        uploadBtn.disabled = false;
+                        uploadBtn.innerHTML = `<i class="fas fa-upload me-2"></i>Upload File`;
+                        fileInput.value = "";
+                    });
+            });
+
+
+             $(document).on('click', '.delete-file-btn', function() {
+                let fileId = $(this).data('id');
+                let peopleId = $(this).data('people-id'); // available from your Blade
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This file will be permanently deleted.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete it",
+                    cancelButtonText: "Cancel"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `/admin/peoples/files/delete`,
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                people_id: peopleId,
+                                file_id: fileId
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Deleted!",
+                                    text: response.message ||
+                                        "File deleted successfully.",
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                                setTimeout(() => location.reload(), 2000);
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error!",
+                                    text: xhr.responseJSON?.message ||
+                                        "Something went wrong while deleting."
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+
 
         });
     </script>

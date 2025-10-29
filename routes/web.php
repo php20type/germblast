@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\SaleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\IcimatrixController;
 use App\Models\ActivityType;
 use App\Models\Company;
 use App\Models\CompanyType;
@@ -94,6 +95,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Company - Detail Section
     Route::get('companies/{company}', [CompanyController::class, 'show'])->name('companies.show');
+    Route::get('companies/{id}/timeline', [CompanyController::class, 'show'])->name('companies.timeline');
     Route::post('/company/ajax', [CompanyController::class, 'ajax_store'])->name('company.ajax.store');
     Route::post('companies/{company}/update-detail', [CompanyController::class, 'updateDetail'])->name('companies.updateDetail');
     Route::post('companies/{company}/people/add', [CompanyController::class, 'addPeople'])->name('companies.people.add');
@@ -103,12 +105,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/companies/{company}/update-field', [CompanyController::class, 'updateField'])->name('company.update.field');
     Route::post('companies/delete-field', [CompanyController::class, 'deleteField'])->name('companies.delete-field');
     Route::post('/update-company-field', [CompanyController::class, 'updateCompanyField'])->name('update.company.field');
+    Route::post('/companies/{company}/files/upload', [CompanyController::class, 'fileUpload'])->name('companies.files.upload');
+    Route::post('/companies/files/delete', [CompanyController::class, 'fileDelete'])->name('companies.files.delete');
 
     // People Section
     Route::get('/people/index', [PeopleController::class, 'index'])->name('peoples.index');
     Route::get('/people/my-peoples/{id}', [PeopleController::class, 'my_peoples'])->name('peoples.my_peoples');
     Route::post('/people/store', [PeopleController::class, 'store'])->name('people.store');
     Route::post('/people/delete', [PeopleController::class, 'delete'])->name('people.delete');
+    Route::get('peoples/{people}', [PeopleController::class, 'show'])->name('peoples.show');
+    Route::get('peoples/{id}/timeline', [PeopleController::class, 'show'])->name('peoples.timeline');
 
     // People - Task Section
     Route::post('/people/{people}/tasks', [PeopleController::class, 'addTask'])->name('people.tasks.store');
@@ -128,10 +134,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/people/animal-care', [PeopleController::class, 'animal_care'])->name('peoples.animal_care');
     Route::get('/people/marketing-contacts', [PeopleController::class, 'marketing_contacts'])->name('peoples.marketing_contacts');
     Route::get('/people/sequence-healthcare', [PeopleController::class, 'sequence_healthcare'])->name('peoples.sequence_healthcare');
-    Route::get('peoples/{people}', [PeopleController::class, 'show'])->name('peoples.show');
     Route::post('peoples/{people}/update-field', [PeopleController::class, 'updateField'])->name('people.update.field');
     Route::post('peoples/delete-field', [PeopleController::class, 'deleteField'])->name('peoples.delete-field');
     Route::post('/update-people-field', [PeopleController::class, 'updatePeopleField'])->name('update.people.field');
+    Route::post('/peoples/{people}/files/upload', [PeopleController::class, 'fileUpload'])->name('people.files.upload');
+    Route::post('/peoples/files/delete', [PeopleController::class, 'fileDelete'])->name('people.files.delete');
 
     // Task Section
     Route::post('/tasks/ajax', [TaskController::class, 'ajax_store'])->name('task.ajax.store');
@@ -146,6 +153,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/leads/watching-leads/{id}', [LeadController::class, 'watching_leads'])->name('leads.watching_leads');
     Route::post('/leads/store', [LeadController::class, 'store'])->name('leads.store');
     Route::get('leads/{lead}', [LeadController::class, 'show'])->name('leads.show');
+    Route::get('leads/{id}/timeline', [LeadController::class, 'show'])->name('leads.timeline');
     Route::post('/leads/delete', [LeadController::class, 'delete'])->name('leads.delete');
 
     // Lead - Task Section
@@ -162,6 +170,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('leads/{lead}/update-detail', [LeadController::class, 'updateDetail'])->name('lead.updateDetail');
     Route::post('leads/{lead}/tags/add', [LeadController::class, 'addTag'])->name('leads.tags.add');
     Route::post('leads/{lead}/tags/{tag}/remove', [LeadController::class, 'removeTag'])->name('leads.tags.remove');
+    Route::post('/leads/{lead}/files/upload', [LeadController::class, 'fileUpload'])->name('leads.files.upload');
+    Route::post('/leads/files/delete', [LeadController::class, 'fileDelete'])->name('leads.files.delete');
 
     Route::post('leads/delete-field', [LeadController::class, 'deleteField'])->name('leads.delete-field');
     Route::post('leads/update-field', [LeadController::class, 'updateField'])->name('leads.update-field');
@@ -200,8 +210,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('note/add_comment/{id}', [NoteController::class, 'add_comment'])->name('add.note.comment');
     Route::post('note/delete_comment/{id}', [NoteController::class, 'delete_comment'])->name('delete.note.comment');
 
-    // Route::post('/people/ajax', [PeopleController::class, 'ajax_store'])->name('people.store');
-
+    // ICIMatrix sections
+    Route::get('/icimatrix', [IcimatrixController::class, 'index'])->name('icimatrix.index');
 });
 
 Route::get('/states/{countryId}', [SettingController::class, 'getStatesByCountry'])->name('get.states');

@@ -25,7 +25,7 @@ class Company extends Model
 
     protected $morphClass = 'Company';
 
-    protected $with = ['companyEmail', 'companyPhone', 'companyAddress', 'companyUrl', 'companyPeople', 'companyTask','companyTags','tags'];
+    protected $with = ['companyEmail', 'companyPhone', 'companyAddress', 'companyUrl', 'companyPeople', 'companyTask','companyTags','tags', 'companyFile'];
 
     // public function people()
     // {
@@ -115,6 +115,12 @@ class Company extends Model
     {
         return $this->hasMany(CompanyTask::class, 'company_id');
     }
+
+     public function companyFile()
+    {
+        return $this->hasMany(CompanyFile::class, 'company_id');
+    }
+
 
     // Company People pivot table
     public function companyPeople()

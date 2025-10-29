@@ -24,7 +24,7 @@ class People extends Model
 
     protected $morphClass = 'People';
 
-    protected $with = ['peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany','peopleTags','tags'];
+    protected $with = ['peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany','peopleTags','tags', 'peopleFile'];
 
     public function activity(): MorphMany
     {
@@ -141,5 +141,12 @@ class People extends Model
         return $this->belongsToMany(Tag::class, 'people_tags')
             ->withTimestamps();
     }
+
+
+     public function peopleFile()
+    {
+        return $this->hasMany(PeopleFile::class, 'people_id');
+    }
+
 
 }

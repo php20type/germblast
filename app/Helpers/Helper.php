@@ -84,24 +84,56 @@ class Helper
 
     public static function getActivitiesForParticipant(string $entityType, int $entityId)
     {
-        $query = Activity::query()->with(['companies', 'peoples', 'leads', 'users', 'activityType']);
+        $query = Activity::query()->with(['companies', 'peoples', 'leads', 'users', 'activityType', 'mentionCompanies', 'mentionPeoples', 'mentionUsers']);
 
+        // switch ($entityType) {
+        //     case 'company':
+        //         $query->whereHas('companies', fn ($q) => $q->where('company_id', $entityId));
+        //         break;
+        //     case 'people':
+        //         $query->whereHas('peoples', fn ($q) => $q->where('people_id', $entityId));
+        //         break;
+        //     case 'lead':
+        //         $query->whereHas('leads', fn ($q) => $q->where('lead_id', $entityId));
+        //         break;
+        //     case 'user':
+        //         $query->whereHas('users', fn ($q) => $q->where('user_id', $entityId));
+        //         break;
+        //     default:
+        //         return collect(); // return empty collection if entity type is invalid
+        // }
         switch ($entityType) {
-            case 'company':
-                $query->whereHas('companies', fn ($q) => $q->where('company_id', $entityId));
-                break;
-            case 'people':
-                $query->whereHas('peoples', fn ($q) => $q->where('people_id', $entityId));
-                break;
-            case 'lead':
-                $query->whereHas('leads', fn ($q) => $q->where('lead_id', $entityId));
-                break;
-            case 'user':
-                $query->whereHas('users', fn ($q) => $q->where('user_id', $entityId));
-                break;
-            default:
-                return collect(); // return empty collection if entity type is invalid
-        }
+        case 'company':
+            $query->where(function ($q) use ($entityId) {
+                $q->whereHas('companies', fn($sub) => $sub->where('company_id', $entityId))
+                  ->orWhereHas('mentionCompanies', fn($sub) => $sub->where('company_id', $entityId));
+            });
+            break;
+
+        case 'people':
+            $query->where(function ($q) use ($entityId) {
+                $q->whereHas('peoples', fn($sub) => $sub->where('people_id', $entityId))
+                  ->orWhereHas('mentionPeoples', fn($sub) => $sub->where('people_id', $entityId));
+            });
+            break;
+
+        case 'lead':
+            $query->where(function ($q) use ($entityId) {
+                $q->whereHas('leads', fn($sub) => $sub->where('lead_id', $entityId));
+                // leads don’t have a mention relation (if you have one, add it like others)
+            });
+            break;
+
+        case 'user':
+            $query->where(function ($q) use ($entityId) {
+                $q->whereHas('users', fn($sub) => $sub->where('user_id', $entityId))
+                  ->orWhereHas('mentionUsers', fn($sub) => $sub->where('user_id', $entityId));
+            });
+            break;
+
+        default:
+            return collect(); // invalid entity type
+    }
 
         return $query->orderBy('date', 'desc')
             ->orderBy('start_time', 'desc')
@@ -137,7 +169,7 @@ class Helper
         return $query->orderBy('created_at', 'desc')->get();
     }
 
-     public static function getTimelineForEntity(string $entityType, int $entityId)
+    public static function getTimelineForEntity(string $entityType, int $entityId)
     {
         $query = Timeline::query()->with('creator');
 
@@ -165,6 +197,63 @@ class Helper
         return $query->orderBy('created_at', 'desc')->get();
     }
 
+    public static function applyTimelineFilters($logged_activities, $notes, $timelineEntries, $filters = [])
+    {
+        $now = now();
 
+        // Extract filters
+        $filterRange = $filters['filter_range'] ?? 'all';
+        $activityTypeId = $filters['activity_type_id'] ?? 'all';
+        $userId = $filters['user_id'] ?? 'all';
 
+        // 1️⃣ Range Filter (7, 30, 90 days)
+        if ($filterRange !== 'all') {
+            $days = intval($filterRange);
+            if (in_array($days, [7, 30, 90])) {
+                $logged_activities = $logged_activities->filter(function ($a) use ($now, $days) {
+                    return $a->timestamp >= $now->copy()->subDays($days);
+                });
+                $notes = $notes->filter(function ($n) use ($now, $days) {
+                    return $n->timestamp >= $now->copy()->subDays($days);
+                });
+                $timelineEntries = $timelineEntries->filter(function ($t) use ($now, $days) {
+                    return $t->timestamp >= $now->copy()->subDays($days);
+                });
+            }
+        }
+
+        // // 2️⃣ Activity Type Filter
+        if ($activityTypeId !== 'all') {
+            // Show only matching activities
+            $logged_activities = $logged_activities->filter(function ($a) use ($activityTypeId) {
+                return isset($a->activity_type_id) && $a->activity_type_id == $activityTypeId;
+            });
+
+            // Hide notes and timeline entries completely
+            $notes = collect([]);
+            $timelineEntries = collect([]);
+        }
+
+        // 3️⃣ User Filter
+        if ($userId !== 'all') {
+            $logged_activities = $logged_activities->filter(function ($a) use ($userId) {
+                return isset($a->user_id) && $a->user_id == $userId;
+            });
+
+            $notes = $notes->filter(function ($n) use ($userId) {
+                return isset($n->user_id) && $n->user_id == $userId;
+            });
+
+            $timelineEntries = $timelineEntries->filter(function ($t) use ($userId) {
+                return isset($t->user_id) && $t->user_id == $userId;
+            });
+        }
+
+        // 4️⃣ Return filtered collections
+        return [
+            'logged_activities' => $logged_activities->values(),
+            'notes' => $notes->values(),
+            'timelineEntries' => $timelineEntries->values(),
+        ];
+    }
 }

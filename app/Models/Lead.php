@@ -29,7 +29,7 @@ class Lead extends Model
     ];
 
     protected $morphClass = 'Lead';
-    protected $with = ['leadCompanies', 'leadProducts', 'leadPeople', 'leadSources', 'leadCompetitors', 'leadTags', 'leadTask'];
+    protected $with = ['leadCompanies', 'leadProducts', 'leadPeople', 'leadSources', 'leadCompetitors', 'leadTags', 'leadTask', 'leadFile'];
     protected $casts = [
         'close_date' => 'datetime',
     ];
@@ -153,4 +153,10 @@ class Lead extends Model
     {
         return $this->hasMany(LeadTask::class, 'lead_id');
     }
+
+     public function leadFile()
+    {
+        return $this->hasMany(LeadFile::class, 'lead_id');
+    }
+
 }
