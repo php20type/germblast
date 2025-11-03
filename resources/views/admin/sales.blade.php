@@ -148,6 +148,125 @@
                                     Quotas
                                 </a>
                             </li>
+                            <li>
+                                <a class="nav-link d-inline-block w-100" href="#">
+
+
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M1 8C1 8.91925 1.18106 9.82951 1.53284 10.6788C1.88463 11.5281 2.40024 12.2997 3.05025 12.9497C3.70026 13.5998 4.47194 14.1154 5.32122 14.4672C6.1705 14.8189 7.08075 15 8 15C8.91925 15 9.82951 14.8189 10.6788 14.4672C11.5281 14.1154 12.2997 13.5998 12.9497 12.9497C13.5998 12.2997 14.1154 11.5281 14.4672 10.6788C14.8189 9.82951 15 8.91925 15 8C15 6.14348 14.2625 4.36301 12.9497 3.05025C11.637 1.7375 9.85652 1 8 1C6.14348 1 4.36301 1.7375 3.05025 3.05025C1.7375 4.36301 1 6.14348 1 8Z"
+                                            stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path
+                                            d="M4 8C4 8.52529 4.10346 9.04543 4.30448 9.53073C4.5055 10.016 4.80014 10.457 5.17157 10.8284C5.54301 11.1999 5.98396 11.4945 6.46927 11.6955C6.95457 11.8965 7.47471 12 8 12C8.52529 12 9.04543 11.8965 9.53073 11.6955C10.016 11.4945 10.457 11.1999 10.8284 10.8284C11.1999 10.457 11.4945 10.016 11.6955 9.53073C11.8965 9.04543 12 8.52529 12 8C12 6.93913 11.5786 5.92172 10.8284 5.17157C10.0783 4.42143 9.06087 4 8 4C6.93913 4 5.92172 4.42143 5.17157 5.17157C4.42143 5.92172 4 6.93913 4 8Z"
+                                            stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+
+                                    Contract Exception Report
+                                </a>
+                            </li>
+                            <li>
+                                <a class="nav-link d-inline-block w-100" href="#">
+
+
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M1 8C1 8.91925 1.18106 9.82951 1.53284 10.6788C1.88463 11.5281 2.40024 12.2997 3.05025 12.9497C3.70026 13.5998 4.47194 14.1154 5.32122 14.4672C6.1705 14.8189 7.08075 15 8 15C8.91925 15 9.82951 14.8189 10.6788 14.4672C11.5281 14.1154 12.2997 13.5998 12.9497 12.9497C13.5998 12.2997 14.1154 11.5281 14.4672 10.6788C14.8189 9.82951 15 8.91925 15 8C15 6.14348 14.2625 4.36301 12.9497 3.05025C11.637 1.7375 9.85652 1 8 1C6.14348 1 4.36301 1.7375 3.05025 3.05025C1.7375 4.36301 1 6.14348 1 8Z"
+                                            stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path
+                                            d="M4 8C4 8.52529 4.10346 9.04543 4.30448 9.53073C4.5055 10.016 4.80014 10.457 5.17157 10.8284C5.54301 11.1999 5.98396 11.4945 6.46927 11.6955C6.95457 11.8965 7.47471 12 8 12C8.52529 12 9.04543 11.8965 9.53073 11.6955C10.016 11.4945 10.457 11.1999 10.8284 10.8284C11.1999 10.457 11.4945 10.016 11.6955 9.53073C11.8965 9.04543 12 8.52529 12 8C12 6.93913 11.5786 5.92172 10.8284 5.17157C10.0783 4.42143 9.06087 4 8 4C6.93913 4 5.92172 4.42143 5.17157 5.17157C4.42143 5.92172 4 6.93913 4 8Z"
+                                            stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+
+                                    Equipement Loan
+                                </a>
+                            </li>
+                            <li>
+                                <a class="nav-link d-inline-block w-100" href="#">
+
+
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M1 8C1 8.91925 1.18106 9.82951 1.53284 10.6788C1.88463 11.5281 2.40024 12.2997 3.05025 12.9497C3.70026 13.5998 4.47194 14.1154 5.32122 14.4672C6.1705 14.8189 7.08075 15 8 15C8.91925 15 9.82951 14.8189 10.6788 14.4672C11.5281 14.1154 12.2997 13.5998 12.9497 12.9497C13.5998 12.2997 14.1154 11.5281 14.4672 10.6788C14.8189 9.82951 15 8.91925 15 8C15 6.14348 14.2625 4.36301 12.9497 3.05025C11.637 1.7375 9.85652 1 8 1C6.14348 1 4.36301 1.7375 3.05025 3.05025C1.7375 4.36301 1 6.14348 1 8Z"
+                                            stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path
+                                            d="M4 8C4 8.52529 4.10346 9.04543 4.30448 9.53073C4.5055 10.016 4.80014 10.457 5.17157 10.8284C5.54301 11.1999 5.98396 11.4945 6.46927 11.6955C6.95457 11.8965 7.47471 12 8 12C8.52529 12 9.04543 11.8965 9.53073 11.6955C10.016 11.4945 10.457 11.1999 10.8284 10.8284C11.1999 10.457 11.4945 10.016 11.6955 9.53073C11.8965 9.04543 12 8.52529 12 8C12 6.93913 11.5786 5.92172 10.8284 5.17157C10.0783 4.42143 9.06087 4 8 4C6.93913 4 5.92172 4.42143 5.17157 5.17157C4.42143 5.92172 4 6.93913 4 8Z"
+                                            stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+
+                                    Leads
+                                </a>
+                            </li>
+                            <li>
+                                <a class="nav-link d-inline-block w-100" href="#">
+
+
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M1 8C1 8.91925 1.18106 9.82951 1.53284 10.6788C1.88463 11.5281 2.40024 12.2997 3.05025 12.9497C3.70026 13.5998 4.47194 14.1154 5.32122 14.4672C6.1705 14.8189 7.08075 15 8 15C8.91925 15 9.82951 14.8189 10.6788 14.4672C11.5281 14.1154 12.2997 13.5998 12.9497 12.9497C13.5998 12.2997 14.1154 11.5281 14.4672 10.6788C14.8189 9.82951 15 8.91925 15 8C15 6.14348 14.2625 4.36301 12.9497 3.05025C11.637 1.7375 9.85652 1 8 1C6.14348 1 4.36301 1.7375 3.05025 3.05025C1.7375 4.36301 1 6.14348 1 8Z"
+                                            stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path
+                                            d="M4 8C4 8.52529 4.10346 9.04543 4.30448 9.53073C4.5055 10.016 4.80014 10.457 5.17157 10.8284C5.54301 11.1999 5.98396 11.4945 6.46927 11.6955C6.95457 11.8965 7.47471 12 8 12C8.52529 12 9.04543 11.8965 9.53073 11.6955C10.016 11.4945 10.457 11.1999 10.8284 10.8284C11.1999 10.457 11.4945 10.016 11.6955 9.53073C11.8965 9.04543 12 8.52529 12 8C12 6.93913 11.5786 5.92172 10.8284 5.17157C10.0783 4.42143 9.06087 4 8 4C6.93913 4 5.92172 4.42143 5.17157 5.17157C4.42143 5.92172 4 6.93913 4 8Z"
+                                            stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+
+                                    Product List
+                                </a>
+                            </li>
+                             <li>
+                                <a class="nav-link d-inline-block w-100" href="#">
+
+
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M1 8C1 8.91925 1.18106 9.82951 1.53284 10.6788C1.88463 11.5281 2.40024 12.2997 3.05025 12.9497C3.70026 13.5998 4.47194 14.1154 5.32122 14.4672C6.1705 14.8189 7.08075 15 8 15C8.91925 15 9.82951 14.8189 10.6788 14.4672C11.5281 14.1154 12.2997 13.5998 12.9497 12.9497C13.5998 12.2997 14.1154 11.5281 14.4672 10.6788C14.8189 9.82951 15 8.91925 15 8C15 6.14348 14.2625 4.36301 12.9497 3.05025C11.637 1.7375 9.85652 1 8 1C6.14348 1 4.36301 1.7375 3.05025 3.05025C1.7375 4.36301 1 6.14348 1 8Z"
+                                            stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path
+                                            d="M4 8C4 8.52529 4.10346 9.04543 4.30448 9.53073C4.5055 10.016 4.80014 10.457 5.17157 10.8284C5.54301 11.1999 5.98396 11.4945 6.46927 11.6955C6.95457 11.8965 7.47471 12 8 12C8.52529 12 9.04543 11.8965 9.53073 11.6955C10.016 11.4945 10.457 11.1999 10.8284 10.8284C11.1999 10.457 11.4945 10.016 11.6955 9.53073C11.8965 9.04543 12 8.52529 12 8C12 6.93913 11.5786 5.92172 10.8284 5.17157C10.0783 4.42143 9.06087 4 8 4C6.93913 4 5.92172 4.42143 5.17157 5.17157C4.42143 5.92172 4 6.93913 4 8Z"
+                                            stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+
+                                    Purchasing Coop
+                                </a>
+                            </li>
+                            <li>
+                                <a class="nav-link d-inline-block w-100" href="#">
+
+
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M1 8C1 8.91925 1.18106 9.82951 1.53284 10.6788C1.88463 11.5281 2.40024 12.2997 3.05025 12.9497C3.70026 13.5998 4.47194 14.1154 5.32122 14.4672C6.1705 14.8189 7.08075 15 8 15C8.91925 15 9.82951 14.8189 10.6788 14.4672C11.5281 14.1154 12.2997 13.5998 12.9497 12.9497C13.5998 12.2997 14.1154 11.5281 14.4672 10.6788C14.8189 9.82951 15 8.91925 15 8C15 6.14348 14.2625 4.36301 12.9497 3.05025C11.637 1.7375 9.85652 1 8 1C6.14348 1 4.36301 1.7375 3.05025 3.05025C1.7375 4.36301 1 6.14348 1 8Z"
+                                            stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path
+                                            d="M4 8C4 8.52529 4.10346 9.04543 4.30448 9.53073C4.5055 10.016 4.80014 10.457 5.17157 10.8284C5.54301 11.1999 5.98396 11.4945 6.46927 11.6955C6.95457 11.8965 7.47471 12 8 12C8.52529 12 9.04543 11.8965 9.53073 11.6955C10.016 11.4945 10.457 11.1999 10.8284 10.8284C11.1999 10.457 11.4945 10.016 11.6955 9.53073C11.8965 9.04543 12 8.52529 12 8C12 6.93913 11.5786 5.92172 10.8284 5.17157C10.0783 4.42143 9.06087 4 8 4C6.93913 4 5.92172 4.42143 5.17157 5.17157C4.42143 5.92172 4 6.93913 4 8Z"
+                                            stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+
+                                    Reference Lists
+                                </a>
+                            </li>
+                            <li>
+                                <a class="nav-link d-inline-block w-100" href="#">
+
+
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M1 8C1 8.91925 1.18106 9.82951 1.53284 10.6788C1.88463 11.5281 2.40024 12.2997 3.05025 12.9497C3.70026 13.5998 4.47194 14.1154 5.32122 14.4672C6.1705 14.8189 7.08075 15 8 15C8.91925 15 9.82951 14.8189 10.6788 14.4672C11.5281 14.1154 12.2997 13.5998 12.9497 12.9497C13.5998 12.2997 14.1154 11.5281 14.4672 10.6788C14.8189 9.82951 15 8.91925 15 8C15 6.14348 14.2625 4.36301 12.9497 3.05025C11.637 1.7375 9.85652 1 8 1C6.14348 1 4.36301 1.7375 3.05025 3.05025C1.7375 4.36301 1 6.14348 1 8Z"
+                                            stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path
+                                            d="M4 8C4 8.52529 4.10346 9.04543 4.30448 9.53073C4.5055 10.016 4.80014 10.457 5.17157 10.8284C5.54301 11.1999 5.98396 11.4945 6.46927 11.6955C6.95457 11.8965 7.47471 12 8 12C8.52529 12 9.04543 11.8965 9.53073 11.6955C10.016 11.4945 10.457 11.1999 10.8284 10.8284C11.1999 10.457 11.4945 10.016 11.6955 9.53073C11.8965 9.04543 12 8.52529 12 8C12 6.93913 11.5786 5.92172 10.8284 5.17157C10.0783 4.42143 9.06087 4 8 4C6.93913 4 5.92172 4.42143 5.17157 5.17157C4.42143 5.92172 4 6.93913 4 8Z"
+                                            stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+
+                                    Video Library
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -232,19 +351,21 @@
                                                 <td>
                                                     <a href="{{ route('admin.leads.index') }}">All Leads</a>
                                                 </td>
-                                            <td>{{$allLeadsCount}}</td>
-                                            <td>${{ $allLeadsValueFormatted }}</td>
+                                                <td>{{ $allLeadsCount }}</td>
+                                                <td>${{ $allLeadsValueFormatted }}</td>
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('admin.leads.my_leads', auth()->id()) }}">My Leads</a>
+                                                    <a href="{{ route('admin.leads.my_leads', auth()->id()) }}">My
+                                                        Leads</a>
                                                 </td>
-                                            <td>{{ $myLeadsCount }}</td>
-                                            <td>${{ $myLeadsValueFormatted }}</td>
+                                                <td>{{ $myLeadsCount }}</td>
+                                                <td>${{ $myLeadsValueFormatted }}</td>
                                             </tr>
-                                             <tr>
+                                            <tr>
                                                 <td>
-                                                    <a href="{{ route('admin.leads.added_this_week') }}">Added this week</a>
+                                                    <a href="{{ route('admin.leads.added_this_week') }}">Added this
+                                                        week</a>
                                                 </td>
                                                 <td>{{ $addedThisWeekCount }}</td>
                                                 {{-- <td>$8.99k</td> --}}
@@ -252,7 +373,8 @@
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('admin.leads.closing_this_week') }}">Closing this week</a>
+                                                    <a href="{{ route('admin.leads.closing_this_week') }}">Closing this
+                                                        week</a>
                                                 </td>
                                                 <td>{{ $closingThisWeekCount }}</td>
                                                 <td>${{ $closingThisWeekValueFormatted }}</td>
@@ -292,8 +414,10 @@
                                                     <div class="stage-info">
                                                         <div class="stage-name">Int. GB Presentation</div>
                                                         <div class="stage-metrics">
-                                                            <span class="leads-count">{{ $gbPresentationCount }} leads</span>
-                                                            <span class="revenue-amount">${{ $gbPresentationCountValueFormatted }}</span>
+                                                            <span class="leads-count">{{ $gbPresentationCount }}
+                                                                leads</span>
+                                                            <span
+                                                                class="revenue-amount">${{ $gbPresentationCountValueFormatted }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="progress">
@@ -307,7 +431,8 @@
                                                         <div class="stage-name">Site Survey</div>
                                                         <div class="stage-metrics">
                                                             <span class="leads-count">{{ $siteSurveyCount }} leads</span>
-                                                            <span class="revenue-amount">${{ $siteSurveyCountValueFormatted }}</span>
+                                                            <span
+                                                                class="revenue-amount">${{ $siteSurveyCountValueFormatted }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="progress">
@@ -320,8 +445,10 @@
                                                     <div class="stage-info">
                                                         <div class="stage-name">Proposal Approval</div>
                                                         <div class="stage-metrics">
-                                                            <span class="leads-count">{{ $proposalApprovalCount }} leads</span>
-                                                            <span class="revenue-amount">${{ $proposalApprovalCountValueFormatted }}</span>
+                                                            <span class="leads-count">{{ $proposalApprovalCount }}
+                                                                leads</span>
+                                                            <span
+                                                                class="revenue-amount">${{ $proposalApprovalCountValueFormatted }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="progress">
@@ -334,8 +461,10 @@
                                                     <div class="stage-info">
                                                         <div class="stage-name">Proposal Pres.</div>
                                                         <div class="stage-metrics">
-                                                            <span class="leads-count">{{ $proposalPresentationCount }} leads</span>
-                                                            <span class="revenue-amount">${{ $proposalPresentationCountValueFormatted }}</span>
+                                                            <span class="leads-count">{{ $proposalPresentationCount }}
+                                                                leads</span>
+                                                            <span
+                                                                class="revenue-amount">${{ $proposalPresentationCountValueFormatted }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="progress">
@@ -348,8 +477,10 @@
                                                     <div class="stage-info">
                                                         <div class="stage-name">Rec. Signed Proposal</div>
                                                         <div class="stage-metrics">
-                                                            <span class="leads-count">{{ $signedProposalCount }} leads</span>
-                                                            <span class="revenue-amount">${{ $signedProposalCountValueFormatted }}</span>
+                                                            <span class="leads-count">{{ $signedProposalCount }}
+                                                                leads</span>
+                                                            <span
+                                                                class="revenue-amount">${{ $signedProposalCountValueFormatted }}</span>
                                                         </div>
                                                     </div>
                                                     <div class="progress">

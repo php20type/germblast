@@ -79,6 +79,28 @@ class CompanyController extends Controller
                 $q->where('people_id', $request->people_id);
             });
         }
+        if (! empty($request->company_tags_filter_id)) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->whereIn('tags.id', $request->company_tags_filter_id);
+            });
+        }
+        if (! empty($request->industry_filter_id)) {
+            $query->whereIn('industry_id', $request->industry_filter_id);
+        }
+
+        if (! empty($request->territory_filter_id)) {
+            $query->whereIn('territory_id', $request->territory_filter_id);
+        }
+        if (! empty($request->activity_type_filter_id)) {
+            $query->whereHas('activity', function ($q) use ($request) {
+                $q->whereIn('activity_type_id', $request->activity_type_filter_id);
+            });
+        }
+        if (! empty($request->leads_status)) {
+            $query->whereHas('leads', function ($q) use ($request) {
+                $q->whereIn('lead_status', $request->leads_status);
+            });
+        }
 
         $companies = $query->get();
         $companiesCount = $companies->count();
@@ -88,6 +110,9 @@ class CompanyController extends Controller
         $products = Product::all();
         $allCompanies = Company::all();
         $sources = Source::all();
+        $activity_types = ActivityType::all();
+        $industries = Industry::all();
+        $territories = Territory::all();
         $competitors = Competitor::all();
         $companytags = Tag::where('tag_id', 2)->get();
         $company_types = CompanyType::all();
@@ -101,7 +126,7 @@ class CompanyController extends Controller
         }
 
         return view('admin.company.index', array_merge(
-            compact('companies', 'peoples', 'users', 'products', 'allCompanies', 'sources', 'competitors', 'companytags', 'company_types', 'companiesCount'),
+            compact('companies', 'peoples', 'users', 'products', 'allCompanies', 'sources', 'activity_types', 'industries', 'territories', 'competitors', 'companytags', 'company_types', 'companiesCount'),
             $sidebarStats
         ));
     }
@@ -127,6 +152,29 @@ class CompanyController extends Controller
                 $q->where('people_id', $request->people_id);
             });
         }
+        if (! empty($request->company_tags_filter_id)) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->whereIn('tags.id', $request->company_tags_filter_id);
+            });
+        }
+        if (! empty($request->industry_filter_id)) {
+            $query->whereIn('industry_id', $request->industry_filter_id);
+        }
+
+        if (! empty($request->territory_filter_id)) {
+            $query->whereIn('territory_id', $request->territory_filter_id);
+        }
+        if (! empty($request->activity_type_filter_id)) {
+            $query->whereHas('activity', function ($q) use ($request) {
+                $q->whereIn('activity_type_id', $request->activity_type_filter_id);
+            });
+        }
+        if (! empty($request->leads_status)) {
+            $query->whereHas('leads', function ($q) use ($request) {
+                $q->whereIn('lead_status', $request->leads_status);
+            });
+        }
+
 
         $companies = $query->get();
         $totalMyCompanies = $query->count();
@@ -136,6 +184,9 @@ class CompanyController extends Controller
         $products = Product::all();
         $allCompanies = Company::all();
         $sources = Source::all();
+        $activity_types = ActivityType::all();
+        $industries = Industry::all();
+        $territories = Territory::all();
         $competitors = Competitor::all();
         $companytags = Tag::where('tag_id', 2)->get();
         $company_types = CompanyType::all();
@@ -149,7 +200,7 @@ class CompanyController extends Controller
         }
 
         return view('admin.company.my-companies', array_merge(
-            compact('companies', 'peoples', 'users', 'company_types', 'totalMyCompanies', 'products', 'allCompanies', 'sources', 'competitors', 'companytags'),
+            compact('companies', 'peoples', 'users', 'company_types', 'totalMyCompanies', 'products', 'allCompanies',  'activity_types', 'industries', 'territories', 'sources', 'competitors', 'companytags'),
             $sidebarStats
         ));
     }

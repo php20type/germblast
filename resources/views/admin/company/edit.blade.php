@@ -680,7 +680,8 @@
                                     <span class="text-muted">The 12th Street Church of Christ in Shallowater has
                                         been interacting with Nutshell users, primarily Mark Corkery and Christy
                                         Haynes, regarding their interest in GermBlast's disinfection
-                                        services.</span>
+                                        services.
+                                    </span>
                                 </div>
 
                                 <div class="mb-3">

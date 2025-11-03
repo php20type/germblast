@@ -70,9 +70,9 @@
                                                             @endforeach
                                                         </select>
                                                     </div>
-                                                    <button class="d-none btn btn-primary me-2"><img
-                                                            src="{{ asset('img/icons/filter.svg') }}"
-                                                            alt=""></button>
+                                                    <button class="btn btn-primary me-2" onclick="addFilter()">
+                                                        <img src="{{ asset('img/icons/filter.svg') }}" alt="" />
+                                                    </button>
                                                     <button class="d-none btn btn-primary"><img
                                                             src="{{ asset('img/icons/bar.svg') }}" alt=""></button>
                                                 </div>
@@ -378,274 +378,398 @@
         </div>
     </div>
 
+    <div class="modal fade" id="AddFilter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="exampleModalLabel">Extended Filters</h1>
+                    <div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
 
-@endsection
-@push('scripts')
-    <script>
-        // ==============================
-        // Modal Show for leads
-        // ==============================
-        function addLead() {
-            // Collect all checked company IDs
-            let selectedPersons = [];
-            $('.row-checkbox:checked').each(function() {
-                selectedPersons.push($(this).data('id'));
-            });
+                </div>
+                <div class="modal-body">
 
-            // Preselect these companies in the modal dropdown
-            $('#person_select').val(selectedPersons).trigger('change');
 
-            // Show the modal
-            $('#AddLead').modal('show');
-        }
+                    <div class="row mx-0" id="filter-section">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">People Tags</label>
+                                <div class="checkbox-group">
+                                    @foreach ($peopletags as $peopletag)
+                                        <div class="form-check">
+                                            <input type="checkbox" name="people_tags_filter_id[]"
+                                                value="{{ $peopletag->id }}" class="form-check-input"
+                                                id="peopletag_{{ $peopletag->id }}">
+                                            <label class="form-check-label" for="peopletag_{{ $peopletag->id }}">
+                                                {{ $peopletag->name }}
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
 
-        const userId = {{ auth()->id() }};
-        $(document).ready(function() {
-            function fetchPeoples() {
-                let search = $('#people-search').val();
-                let user_id = $('select[name="user_id"]').val();
-                let company_id = $('select[name="company_id"]').val();
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Territory</label>
+                                <div class="checkbox-group">
+                                    @foreach ($territories as $territory)
+                                        <div class="form-check">
+                                            <input type="checkbox" name="territory_filter_id[]"
+                                                value="{{ $territory->id }}" class="form-check-input"
+                                                id="territory_{{ $territory->id }}">
+                                            <label class="form-check-label" for="territory_{{ $territory->id }}">
+                                                {{ $territory->name }}
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
 
-                $.ajax({
-                    url: `/admin/people/my-peoples/${userId}`,
-                    method: "GET",
-                    data: {
-                        search: search,
-                        user_id: user_id,
-                        company_id: company_id,
-                    },
-                    success: function(response) {
-                        $('table tbody').html(response.table);
-                        $('.company-count').text(response.count + ' People Found');
-                    },
-                    error: function(err) {
-                        console.error('Error fetching people data', err);
-                    }
-                });
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Leads Status</label>
+                                <div class="checkbox-group">
+                                    @php
+                                        $lead_statuses = ['won', 'pending', 'open', 'lost', 'cancelled'];
+                                    @endphp
+                                    @foreach ($lead_statuses as $status)
+                                        <div class="form-check">
+                                            <input type="checkbox" name="leads_status[]" value="{{ $status }}"
+                                                class="form-check-input" id="leadstatus_{{ $status }}">
+                                            <label class="form-check-label" for="leadstatus_{{ $status }}">
+                                                {{ ucfirst($status) }}
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Activity Types</label>
+                                <div class="checkbox-group">
+                                    @foreach ($activity_types as $activity_type)
+                                        <div class="form-check">
+                                            <input type="checkbox" name="activity_type_filter_id[]"
+                                                value="{{ $activity_type->id }}" class="form-check-input"
+                                                id="activitytype_{{ $activity_type->id }}">
+                                            <label class="form-check-label" for="activitytype_{{ $activity_type->id }}">
+                                                {{ $activity_type->type }}
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    @endsection
+    @push('scripts')
+        <script>
+            function addFilter() {
+                $('#AddFilter').modal('show');
             }
 
-            $('#people-search').on('keyup', fetchPeoples);
-            $('#checkDefault, select[name="user_id"], select[name="company_id"]').on('change',
-                fetchPeoples);
-
-
             // ==============================
-            // Lead & Activities Form - Select2 Integration
+            // Modal Show for leads
             // ==============================
-            $('#AddLead').on('shown.bs.modal', function() {
-                $('#companySelect').select2({
-                    dropdownParent: $('#AddLead'),
-                    placeholder: '-- Select a company --',
-                    allowClear: true,
+            function addLead() {
+                // Collect all checked company IDs
+                let selectedPersons = [];
+                $('.row-checkbox:checked').each(function() {
+                    selectedPersons.push($(this).data('id'));
                 });
 
-                $('#person_select').select2({
-                    dropdownParent: $('#AddLead'),
-                    placeholder: '-- Select a person --',
-                    allowClear: true
-                });
+                // Preselect these companies in the modal dropdown
+                $('#person_select').val(selectedPersons).trigger('change');
 
-                $('#source_select').select2({
-                    dropdownParent: $('#AddLead'),
-                    placeholder: 'Choose...',
-                    allowClear: true
-                });
+                // Show the modal
+                $('#AddLead').modal('show');
+            }
 
-                $('#competitor_select').select2({
-                    dropdownParent: $('#AddLead'),
-                    placeholder: 'Choose...',
-                    allowClear: true
-                });
-            });
+            const userId = {{ auth()->id() }};
+            $(document).ready(function() {
+                function fetchPeoples() {
+                    let search = $('#people-search').val();
+                    let user_id = $('select[name="user_id"]').val();
+                    let company_id = $('select[name="company_id"]').val();
 
-            // ==============================
-            // Product row add and remove logic in add lead form
-            // ==============================
-            $('#addProductRow').click(function() {
-                var row = $('.product-row:first').clone(); // Clone the first row
-                row.find('input').val(''); // Clear inputs
-                row.find('select').val(''); // Clear dropdown
-                $('#productRowContainer').append(row); // Append to container
-            });
+                    // collect checkbox values
+                    let people_tags_filter_id = [];
+                    $('input[name="people_tags_filter_id[]"]:checked').each(function() {
+                        people_tags_filter_id.push($(this).val());
+                    });
 
-            $(document).on('click', '.remove-product-row', function() {
-                if ($('.product-row').length > 1) {
-                    $(this).closest('.product-row').remove();
-                } else {
-                    toastr.warning('At least one product row is required.');
+                    let territory_filter_id = [];
+                    $('input[name="territory_filter_id[]"]:checked').each(function() {
+                        territory_filter_id.push($(this).val());
+                    });
+
+                    let leads_status = [];
+                    $('input[name="leads_status[]"]:checked').each(function() {
+                        leads_status.push($(this).val());
+                    });
+
+                    let activity_type_filter_id = [];
+                    $('input[name="activity_type_filter_id[]"]:checked').each(function() {
+                        activity_type_filter_id.push($(this).val());
+                    });
+
+                    $.ajax({
+                        url: `/admin/people/my-peoples/${userId}`,
+                        method: "GET",
+                        data: {
+                            search: search,
+                            user_id: user_id,
+                            company_id: company_id,
+                            people_tags_filter_id: people_tags_filter_id,
+                            territory_filter_id: territory_filter_id,
+                            leads_status: leads_status,
+                            activity_type_filter_id: activity_type_filter_id,
+                        },
+                        success: function(response) {
+                            $('table tbody').html(response.table);
+                            $('.company-count').text(response.count + ' People Found');
+                        },
+                        error: function(err) {
+                            console.error('Error fetching people data', err);
+                        }
+                    });
                 }
-            });
 
-            // ==============================
-            // Add lead form validation and submittion
-            // ==============================
-            $("#add-lead-form").validate({
-                ignore: [],
-                rules: {
-                    name: {
-                        required: true
-                    },
-                    assignee_id: {
-                        required: true
-                    },
-                    close_date: {
-                        required: true
-                    },
-                    "product_id[]": {
-                        required: true
-                    },
-                    "quantity[]": {
-                        required: true
-                    },
-                    "price[]": {
-                        required: true
-                    },
-                    confidence: {
-                        required: true
-                    },
-                    "company_id[]": {
-                        required: true
-                    },
-                    "person_id[]": {
-                        required: true
-                    },
-                    "source_id[]": {
-                        required: true
-                    },
-                    "competitors_id[]": {
-                        required: true
-                    },
-                    tag_id: {
-                        required: true
-                    }
-                },
-                messages: {
-                    name: {
-                        required: "Please enter lead name."
-                    },
-                    assignee_id: {
-                        required: "Please select an assignee."
-                    },
-                    close_date: {
-                        required: "Please select a close date."
-                    },
-                    "product_id[]": {
-                        required: "Please select a product."
-                    },
-                    "quantity[]": {
-                        required: "Please enter the quantity."
-                    },
-                    "price[]": {
-                        required: "Please enter the price."
-                    },
-                    confidence: {
-                        required: "Please enter the confidence level."
-                    },
-                    "company_id[]": {
-                        required: "Please select a company."
-                    },
-                    "person_id[]": {
-                        required: "Please select a person."
-                    },
-                    "source_id[]": {
-                        required: "Please select a source."
-                    },
-                    "competitors_id[]": {
-                        required: "Please select a competitor."
-                    },
-                    tag_id: {
-                        required: "Please select the tag."
-                    }
-                },
-                errorElement: 'span',
-                errorClass: 'invalid-feedback d-block',
-                highlight: function(element) {
-                    $(element).addClass('is-invalid');
-                },
-                unhighlight: function(element) {
-                    $(element).removeClass('is-invalid');
-                },
-                errorPlacement: function(error, element) {
-                    if (element.parent('.input-group').length) {
-                        error.insertAfter(element.parent()); // Inserts after the .input-group
+                $('#people-search').on('keyup', fetchPeoples);
+                $('#checkDefault, select[name="user_id"], select[name="company_id"]').on('change',
+                    fetchPeoples);
+                // catch all checkbox changes
+                $('#filter-section input[type="checkbox"]').on('change', fetchPeoples);
+
+
+                // ==============================
+                // Lead & Activities Form - Select2 Integration
+                // ==============================
+                $('#AddLead').on('shown.bs.modal', function() {
+                    $('#companySelect').select2({
+                        dropdownParent: $('#AddLead'),
+                        placeholder: '-- Select a company --',
+                        allowClear: true,
+                    });
+
+                    $('#person_select').select2({
+                        dropdownParent: $('#AddLead'),
+                        placeholder: '-- Select a person --',
+                        allowClear: true
+                    });
+
+                    $('#source_select').select2({
+                        dropdownParent: $('#AddLead'),
+                        placeholder: 'Choose...',
+                        allowClear: true
+                    });
+
+                    $('#competitor_select').select2({
+                        dropdownParent: $('#AddLead'),
+                        placeholder: 'Choose...',
+                        allowClear: true
+                    });
+                });
+
+                // ==============================
+                // Product row add and remove logic in add lead form
+                // ==============================
+                $('#addProductRow').click(function() {
+                    var row = $('.product-row:first').clone(); // Clone the first row
+                    row.find('input').val(''); // Clear inputs
+                    row.find('select').val(''); // Clear dropdown
+                    $('#productRowContainer').append(row); // Append to container
+                });
+
+                $(document).on('click', '.remove-product-row', function() {
+                    if ($('.product-row').length > 1) {
+                        $(this).closest('.product-row').remove();
                     } else {
-                        error.insertAfter(element); // Default
+                        toastr.warning('At least one product row is required.');
                     }
-                }
-            });
+                });
 
-            $('#add-lead-form').submit(function(e) {
-                e.preventDefault();
-
-                if (!$('#add-lead-form').valid()) {
-                    return; // Stop if validation fails
-                }
-
-                $.ajax({
-                    url: '{{ route('admin.leads.store') }}',
-                    method: 'POST',
-                    data: $(this).serialize(),
-
-                    success: function(response) {
-                        toastr.success('Lead created successfully!');
-                        $('#add-lead-form')[0].reset();
-                        $('#AddLead').modal('hide');
-
+                // ==============================
+                // Add lead form validation and submittion
+                // ==============================
+                $("#add-lead-form").validate({
+                    ignore: [],
+                    rules: {
+                        name: {
+                            required: true
+                        },
+                        assignee_id: {
+                            required: true
+                        },
+                        close_date: {
+                            required: true
+                        },
+                        "product_id[]": {
+                            required: true
+                        },
+                        "quantity[]": {
+                            required: true
+                        },
+                        "price[]": {
+                            required: true
+                        },
+                        confidence: {
+                            required: true
+                        },
+                        "company_id[]": {
+                            required: true
+                        },
+                        "person_id[]": {
+                            required: true
+                        },
+                        "source_id[]": {
+                            required: true
+                        },
+                        "competitors_id[]": {
+                            required: true
+                        },
+                        tag_id: {
+                            required: true
+                        }
                     },
-                    error: function(xhr) {
-                        alert(xhr.responseText);
-                        toastr.error('Something went wrong while creating the lead.');
+                    messages: {
+                        name: {
+                            required: "Please enter lead name."
+                        },
+                        assignee_id: {
+                            required: "Please select an assignee."
+                        },
+                        close_date: {
+                            required: "Please select a close date."
+                        },
+                        "product_id[]": {
+                            required: "Please select a product."
+                        },
+                        "quantity[]": {
+                            required: "Please enter the quantity."
+                        },
+                        "price[]": {
+                            required: "Please enter the price."
+                        },
+                        confidence: {
+                            required: "Please enter the confidence level."
+                        },
+                        "company_id[]": {
+                            required: "Please select a company."
+                        },
+                        "person_id[]": {
+                            required: "Please select a person."
+                        },
+                        "source_id[]": {
+                            required: "Please select a source."
+                        },
+                        "competitors_id[]": {
+                            required: "Please select a competitor."
+                        },
+                        tag_id: {
+                            required: "Please select the tag."
+                        }
+                    },
+                    errorElement: 'span',
+                    errorClass: 'invalid-feedback d-block',
+                    highlight: function(element) {
+                        $(element).addClass('is-invalid');
+                    },
+                    unhighlight: function(element) {
+                        $(element).removeClass('is-invalid');
+                    },
+                    errorPlacement: function(error, element) {
+                        if (element.parent('.input-group').length) {
+                            error.insertAfter(element.parent()); // Inserts after the .input-group
+                        } else {
+                            error.insertAfter(element); // Default
+                        }
                     }
                 });
-            });
 
-            $(document).on('click', '.btn-delete', function() {
-                let selectedPeoples = $('.row-checkbox:checked').map(function() {
-                    return $(this).data('id');
-                }).get();
+                $('#add-lead-form').submit(function(e) {
+                    e.preventDefault();
 
-                Swal.fire({
-                    title: "Are you sure?",
-                    text: "This action will permanently delete the selected people.",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#d33",
-                    cancelButtonColor: "#3085d6",
-                    confirmButtonText: "Yes, delete",
-                    cancelButtonText: "Cancel"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: "{{ route('admin.people.delete') }}",
-                            type: "POST",
-                            data: {
-                                _token: "{{ csrf_token() }}",
-                                ids: selectedPeoples
-                            },
-                            success: function(response) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Deleted!',
-                                    text: response.message ||
-                                        'People deleted successfully.',
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                });
-                                setTimeout(() => location.reload(), 2000);
-                            },
-                            error: function(xhr) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error!',
-                                    text: xhr.responseJSON?.message ||
-                                        'Something went wrong while deleting.',
-                                });
-                            }
-                        });
+                    if (!$('#add-lead-form').valid()) {
+                        return; // Stop if validation fails
                     }
-                });
-            });
 
-        });
-    </script>
-@endpush
+                    $.ajax({
+                        url: '{{ route('admin.leads.store') }}',
+                        method: 'POST',
+                        data: $(this).serialize(),
+
+                        success: function(response) {
+                            toastr.success('Lead created successfully!');
+                            $('#add-lead-form')[0].reset();
+                            $('#AddLead').modal('hide');
+
+                        },
+                        error: function(xhr) {
+                            alert(xhr.responseText);
+                            toastr.error('Something went wrong while creating the lead.');
+                        }
+                    });
+                });
+
+                $(document).on('click', '.btn-delete', function() {
+                    let selectedPeoples = $('.row-checkbox:checked').map(function() {
+                        return $(this).data('id');
+                    }).get();
+
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "This action will permanently delete the selected people.",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#3085d6",
+                        confirmButtonText: "Yes, delete",
+                        cancelButtonText: "Cancel"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: "{{ route('admin.people.delete') }}",
+                                type: "POST",
+                                data: {
+                                    _token: "{{ csrf_token() }}",
+                                    ids: selectedPeoples
+                                },
+                                success: function(response) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Deleted!',
+                                        text: response.message ||
+                                            'People deleted successfully.',
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
+                                    setTimeout(() => location.reload(), 2000);
+                                },
+                                error: function(xhr) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error!',
+                                        text: xhr.responseJSON?.message ||
+                                            'Something went wrong while deleting.',
+                                    });
+                                }
+                            });
+                        }
+                    });
+                });
+
+            });
+        </script>
+    @endpush

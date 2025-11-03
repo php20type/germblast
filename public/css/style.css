@@ -988,6 +988,7 @@ title {
     border: none;
     padding: 0.6rem 0.8rem;
     font-size: 16px;
+    cursor: pointer;
 }
 
 .form-check-input[type=checkbox]:indeterminate {
@@ -2029,7 +2030,7 @@ title {
     top: 0;
     left: 20px;
     width: 2px;
-    height: 100%; 
+    height: 100%;
     background-color: #FFB81C;
     z-index: 1;
 }
@@ -2070,6 +2071,7 @@ title {
     border: 1px solid #e9ecef;
     height: 140px;
     position: relative;
+    cursor: pointer;
 }
 
 .sales-dashboard .metric-card.new-lead {
@@ -2429,6 +2431,7 @@ title {
     font-weight: 500;
     color: #495057;
     flex: 1;
+    cursor: pointer;
 }
 
 .company-form .stage-metrics {

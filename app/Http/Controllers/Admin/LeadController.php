@@ -11,13 +11,13 @@ use App\Models\Industry;
 use App\Models\Lead;
 use App\Models\LeadCompany;
 use App\Models\LeadCompetitor;
+use App\Models\LeadFile;
 use App\Models\LeadPeople;
 use App\Models\LeadProduct;
 use App\Models\LeadSource;
 use App\Models\LeadStage;
 use App\Models\LeadTag;
 use App\Models\LeadTask;
-use App\Models\LeadFile;
 use App\Models\Market;
 use App\Models\Outcome;
 use App\Models\People;
@@ -27,10 +27,10 @@ use App\Models\Tag;
 use App\Models\Timeline;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class LeadController extends Controller
 {
@@ -109,6 +109,22 @@ class LeadController extends Controller
         if ($request->filled('user_id')) {
             $query->where('assignee_id', $request->user_id);
         }
+        if (! empty($request->lead_tags_filter_id)) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->whereIn('tags.id', $request->lead_tags_filter_id);
+            });
+        }
+        if (! empty($request->lead_stage_filter_id)) {
+            $query->whereIn('stage_id', $request->lead_stage_filter_id);
+        }
+        if (! empty($request->leads_status)) {
+            $query->whereIn('lead_status', $request->leads_status);
+        }
+        if (! empty($request->activity_type_filter_id)) {
+            $query->whereHas('activity', function ($q) use ($request) {
+                $q->whereIn('activity_type_id', $request->activity_type_filter_id);
+            });
+        }
 
         // Get all leads
         $leads = $query->get();
@@ -153,6 +169,8 @@ class LeadController extends Controller
         $peoples = People::all();
         $users = User::all();
         $activity_types = ActivityType::all();
+        $lead_stages = LeadStage::all();
+        $leadtags = Tag::where('tag_id', 1)->get();
         $sidebarStats = $this->getSidebarStats();
 
         // Handle AJAX requests
@@ -172,6 +190,8 @@ class LeadController extends Controller
                 'groupedLeads',
                 'peoples',
                 'users',
+                'lead_stages',
+                'leadtags',
                 'activity_types',
                 'formattedTotalLeads',
                 'formattedTotalValue',
@@ -211,6 +231,23 @@ class LeadController extends Controller
         if ($request->filled('user_id')) {
             $query->where('assignee_id', $request->user_id);
         }
+         if (! empty($request->lead_tags_filter_id)) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->whereIn('tags.id', $request->lead_tags_filter_id);
+            });
+        }
+        if (! empty($request->lead_stage_filter_id)) {
+            $query->whereIn('stage_id', $request->lead_stage_filter_id);
+        }
+        if (! empty($request->leads_status)) {
+            $query->whereIn('lead_status', $request->leads_status);
+        }
+        if (! empty($request->activity_type_filter_id)) {
+            $query->whereHas('activity', function ($q) use ($request) {
+                $q->whereIn('activity_type_id', $request->activity_type_filter_id);
+            });
+        }
+
 
         // Get all leads
         $leads = $query->get();
@@ -255,6 +292,8 @@ class LeadController extends Controller
         $peoples = People::all();
         $users = User::all();
         $activity_types = ActivityType::all();
+         $lead_stages = LeadStage::all();
+        $leadtags = Tag::where('tag_id', 1)->get();
         $sidebarStats = $this->getSidebarStats();
 
         // Handle AJAX requests
@@ -275,6 +314,8 @@ class LeadController extends Controller
                 'peoples',
                 'users',
                 'activity_types',
+                  'lead_stages',
+                'leadtags',
                 'formattedTotalLeads',
                 'formattedTotalValue',
                 'formattedAvgValue',
@@ -313,6 +354,22 @@ class LeadController extends Controller
 
         if ($request->filled('user_id')) {
             $query->where('assignee_id', $request->user_id);
+        }
+         if (! empty($request->lead_tags_filter_id)) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->whereIn('tags.id', $request->lead_tags_filter_id);
+            });
+        }
+        if (! empty($request->lead_stage_filter_id)) {
+            $query->whereIn('stage_id', $request->lead_stage_filter_id);
+        }
+        if (! empty($request->leads_status)) {
+            $query->whereIn('lead_status', $request->leads_status);
+        }
+        if (! empty($request->activity_type_filter_id)) {
+            $query->whereHas('activity', function ($q) use ($request) {
+                $q->whereIn('activity_type_id', $request->activity_type_filter_id);
+            });
         }
 
         // Get all leads
@@ -358,6 +415,8 @@ class LeadController extends Controller
         $peoples = People::all();
         $users = User::all();
         $activity_types = ActivityType::all();
+          $lead_stages = LeadStage::all();
+        $leadtags = Tag::where('tag_id', 1)->get();
         $sidebarStats = $this->getSidebarStats();
 
         // Handle AJAX requests
@@ -377,6 +436,8 @@ class LeadController extends Controller
                 'groupedLeads',
                 'peoples',
                 'users',
+                  'lead_stages',
+                'leadtags',
                 'activity_types',
                 'formattedTotalLeads',
                 'formattedTotalValue',
@@ -415,6 +476,22 @@ class LeadController extends Controller
 
         if ($request->filled('user_id')) {
             $query->where('assignee_id', $request->user_id);
+        }
+         if (! empty($request->lead_tags_filter_id)) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->whereIn('tags.id', $request->lead_tags_filter_id);
+            });
+        }
+        if (! empty($request->lead_stage_filter_id)) {
+            $query->whereIn('stage_id', $request->lead_stage_filter_id);
+        }
+        if (! empty($request->leads_status)) {
+            $query->whereIn('lead_status', $request->leads_status);
+        }
+        if (! empty($request->activity_type_filter_id)) {
+            $query->whereHas('activity', function ($q) use ($request) {
+                $q->whereIn('activity_type_id', $request->activity_type_filter_id);
+            });
         }
 
         // Get all leads
@@ -460,6 +537,8 @@ class LeadController extends Controller
         $peoples = People::all();
         $users = User::all();
         $activity_types = ActivityType::all();
+        $lead_stages = LeadStage::all();
+        $leadtags = Tag::where('tag_id', 1)->get();
         $sidebarStats = $this->getSidebarStats();
 
         // Handle AJAX requests
@@ -478,6 +557,8 @@ class LeadController extends Controller
             compact('groupedLeads',
                 'peoples',
                 'users',
+                'lead_stages',
+                'leadtags',
                 'activity_types',
                 'formattedTotalLeads',
                 'formattedTotalValue',
@@ -516,6 +597,22 @@ class LeadController extends Controller
 
         if ($request->filled('user_id')) {
             $query->where('assignee_id', $request->user_id);
+        }
+         if (! empty($request->lead_tags_filter_id)) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->whereIn('tags.id', $request->lead_tags_filter_id);
+            });
+        }
+        if (! empty($request->lead_stage_filter_id)) {
+            $query->whereIn('stage_id', $request->lead_stage_filter_id);
+        }
+        if (! empty($request->leads_status)) {
+            $query->whereIn('lead_status', $request->leads_status);
+        }
+        if (! empty($request->activity_type_filter_id)) {
+            $query->whereHas('activity', function ($q) use ($request) {
+                $q->whereIn('activity_type_id', $request->activity_type_filter_id);
+            });
         }
 
         // Get all leads
@@ -561,6 +658,8 @@ class LeadController extends Controller
         $peoples = People::all();
         $users = User::all();
         $activity_types = ActivityType::all();
+        $lead_stages = LeadStage::all();
+        $leadtags = Tag::where('tag_id', 1)->get();
         $sidebarStats = $this->getSidebarStats();
 
         // Handle AJAX requests
@@ -580,6 +679,8 @@ class LeadController extends Controller
                 'peoples',
                 'users',
                 'activity_types',
+                 'lead_stages',
+                'leadtags',
                 'formattedTotalLeads',
                 'formattedTotalValue',
                 'formattedAvgValue',
@@ -621,6 +722,22 @@ class LeadController extends Controller
         if ($request->filled('user_id')) {
             $query->where('assignee_id', $request->user_id);
         }
+         if (! empty($request->lead_tags_filter_id)) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->whereIn('tags.id', $request->lead_tags_filter_id);
+            });
+        }
+        if (! empty($request->lead_stage_filter_id)) {
+            $query->whereIn('stage_id', $request->lead_stage_filter_id);
+        }
+        if (! empty($request->leads_status)) {
+            $query->whereIn('lead_status', $request->leads_status);
+        }
+        if (! empty($request->activity_type_filter_id)) {
+            $query->whereHas('activity', function ($q) use ($request) {
+                $q->whereIn('activity_type_id', $request->activity_type_filter_id);
+            });
+        }
 
         // Get all leads
         $leads = $query->get();
@@ -665,6 +782,8 @@ class LeadController extends Controller
         $peoples = People::all();
         $users = User::all();
         $activity_types = ActivityType::all();
+         $lead_stages = LeadStage::all();
+        $leadtags = Tag::where('tag_id', 1)->get();
         $sidebarStats = $this->getSidebarStats();
 
         // Handle AJAX requests
@@ -683,6 +802,8 @@ class LeadController extends Controller
             compact('groupedLeads',
                 'peoples',
                 'users',
+                'lead_stages',
+                'leadtags',
                 'activity_types',
                 'formattedTotalLeads',
                 'formattedTotalValue',
@@ -725,6 +846,22 @@ class LeadController extends Controller
         if ($request->filled('user_id')) {
             $query->where('assignee_id', $request->user_id);
         }
+         if (! empty($request->lead_tags_filter_id)) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->whereIn('tags.id', $request->lead_tags_filter_id);
+            });
+        }
+        if (! empty($request->lead_stage_filter_id)) {
+            $query->whereIn('stage_id', $request->lead_stage_filter_id);
+        }
+        if (! empty($request->leads_status)) {
+            $query->whereIn('lead_status', $request->leads_status);
+        }
+        if (! empty($request->activity_type_filter_id)) {
+            $query->whereHas('activity', function ($q) use ($request) {
+                $q->whereIn('activity_type_id', $request->activity_type_filter_id);
+            });
+        }
 
         // Get all leads
         $leads = $query->get();
@@ -769,6 +906,8 @@ class LeadController extends Controller
         $peoples = People::all();
         $users = User::all();
         $activity_types = ActivityType::all();
+          $lead_stages = LeadStage::all();
+        $leadtags = Tag::where('tag_id', 1)->get();
         $sidebarStats = $this->getSidebarStats();
 
         // Handle AJAX requests
@@ -788,6 +927,8 @@ class LeadController extends Controller
                 'peoples',
                 'users',
                 'activity_types',
+                  'lead_stages',
+                'leadtags',
                 'formattedTotalLeads',
                 'formattedTotalValue',
                 'formattedAvgValue',
@@ -991,8 +1132,7 @@ class LeadController extends Controller
         $notes = $filtered['notes'];
         $timelineEntries = $filtered['timelineEntries'];
 
-
-         $timeline = $logged_activities
+        $timeline = $logged_activities
             ->concat($notes)
             ->concat($timelineEntries)
             ->sortByDesc('timestamp')

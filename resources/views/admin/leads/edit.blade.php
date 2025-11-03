@@ -846,7 +846,7 @@
                             <div class="filter-section">
                                 <div class="row g-2">
                                     <div class="col-auto">
-                                        <select class="form-select dropdown-orange" id="filter-range"
+                                        <select class="form-select dropdown-orange select2" id="filter-range"
                                             data-lead-id="{{ $leads->id }}" name="filter_range">
                                             <option value="all">All Entries</option>
                                             <option value="7">Last 7 Days</option>
@@ -855,7 +855,7 @@
                                         </select>
                                     </div>
                                     <div class="col-auto">
-                                        <select class="form-select dropdown-orange" id="filter-activity"
+                                        <select class="form-select dropdown-orange select2" id="filter-activity"
                                             data-lead-id="{{ $leads->id }}" name="activity_type_id">
                                             <option value="all">All Activity Type</option>
                                             @foreach ($activity_types as $activity_type)
@@ -865,8 +865,8 @@
                                         </select>
                                     </div>
                                     <div class="col-auto">
-                                        <select class="form-select dropdown-orange" id="filter-user" name="user_id"
-                                            data-lead-id="{{ $leads->id }}">
+                                        <select class="form-select dropdown-orange select2" id="filter-user"
+                                            name="user_id" data-lead-id="{{ $leads->id }}">
                                             <option value="all">All Users</option>
                                             @foreach ($users as $user)
                                                 <option value="{{ $user->id }}">{{ $user->name }}
@@ -1075,11 +1075,9 @@
                                                                             <span class="comment-avatar">
                                                                                 {{ strtoupper(substr($comment->creator->name ?? 'N/A', 0, 2)) }}
                                                                             </span>
-                                                                            <span
-                                                                                class="comment-text">{{ $comment->comment }}</span>
+                                                                            <span class="comment-text">{{ $comment->comment }}</span>
                                                                         </div>
-                                                                        <span class="btn btn-sm delete-comment-btn"
-                                                                            data-id="{{ $comment->id }}"
+                                                                        <span class="btn btn-sm delete-comment-btn" data-id="{{ $comment->id }}"
                                                                             data-type="Activity">
                                                                             <i class="fas fa-times"></i>
                                                                         </span>
@@ -1088,12 +1086,10 @@
                                                             </div>
                                                         @endif
 
-
                                                         <div class="mt-3 d-none add-comment"
                                                             data-id="{{ $item->id }}" data-type="Note">
                                                             <textarea id="note-comment-textarea" name="comment_text" class="form-textarea"
                                                                 placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
-
                                                             <button
                                                                 class="mt-3 btn btn-sm btn-outline-success add-comment-submit"
                                                                 title="">
@@ -1576,9 +1572,10 @@
                                                 </div>
 
                                                 <div class="col-2 text-end">
-                                                     <button type="button" class="btn btn-sm btn-outline-danger delete-file-btn"
-                                                        data-id="{{ $file->id }}" data-lead-id="{{ $leads->id }}"
-                                                        title="Delete file">
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-outline-danger delete-file-btn"
+                                                        data-id="{{ $file->id }}"
+                                                        data-lead-id="{{ $leads->id }}" title="Delete file">
                                                         <i class="fa-solid fa-xmark"></i>
                                                     </button>
                                                 </div>
@@ -1599,8 +1596,6 @@
 
                                     <div id="uploadedFilesList" class="mt-3"></div>
                                 </div>
-
-
 
                             </div>
                         </div>
@@ -1778,6 +1773,27 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     }
                 });
+
+                // $('#filter-range').select2({
+                //     placeholder: 'Select Range',
+                //     containerCssClass: 'form-select dropdown-orange',
+                //     dropdownCssClass: 'dropdown-orange',
+                //     allowClear: true
+                // });
+
+                // $('#filter-activity').select2({
+                //     placeholder: 'Select Activity Type',
+                //     containerCssClass: 'form-select dropdown-orange',
+                //     dropdownCssClass: 'dropdown-orange',
+                //     allowClear: true
+                // });
+
+                // $('#filter-user').select2({
+                //     placeholder: 'Select User',
+                //     containerCssClass: 'form-select dropdown-orange',
+                //     dropdownCssClass: 'dropdown-orange',
+                //     allowClear: true
+                // });
 
                 // ==============================
                 // Activity and note Comment box toggle functionality
@@ -3811,51 +3827,51 @@
 
 
                 $(document).on('click', '.delete-file-btn', function() {
-                let fileId = $(this).data('id');
-                let leadId = $(this).data('lead-id'); // available from your Blade
+                    let fileId = $(this).data('id');
+                    let leadId = $(this).data('lead-id'); // available from your Blade
 
-                Swal.fire({
-                    title: "Are you sure?",
-                    text: "This file will be permanently deleted.",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#d33",
-                    cancelButtonColor: "#3085d6",
-                    confirmButtonText: "Yes, delete it",
-                    cancelButtonText: "Cancel"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: `/admin/leads/files/delete`,
-                            type: "POST",
-                            data: {
-                                _token: "{{ csrf_token() }}",
-                                lead_id: leadId,
-                                file_id: fileId
-                            },
-                            success: function(response) {
-                                Swal.fire({
-                                    icon: "success",
-                                    title: "Deleted!",
-                                    text: response.message ||
-                                        "File deleted successfully.",
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                });
-                                setTimeout(() => location.reload(), 2000);
-                            },
-                            error: function(xhr) {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "Error!",
-                                    text: xhr.responseJSON?.message ||
-                                        "Something went wrong while deleting."
-                                });
-                            }
-                        });
-                    }
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "This file will be permanently deleted.",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#3085d6",
+                        confirmButtonText: "Yes, delete it",
+                        cancelButtonText: "Cancel"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: `/admin/leads/files/delete`,
+                                type: "POST",
+                                data: {
+                                    _token: "{{ csrf_token() }}",
+                                    lead_id: leadId,
+                                    file_id: fileId
+                                },
+                                success: function(response) {
+                                    Swal.fire({
+                                        icon: "success",
+                                        title: "Deleted!",
+                                        text: response.message ||
+                                            "File deleted successfully.",
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
+                                    setTimeout(() => location.reload(), 2000);
+                                },
+                                error: function(xhr) {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Error!",
+                                        text: xhr.responseJSON?.message ||
+                                            "Something went wrong while deleting."
+                                    });
+                                }
+                            });
+                        }
+                    });
                 });
-            });
 
 
             });

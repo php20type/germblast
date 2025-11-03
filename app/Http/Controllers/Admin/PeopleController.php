@@ -11,9 +11,9 @@ use App\Models\Industry;
 use App\Models\Lead;
 use App\Models\People;
 use App\Models\PeopleAddress;
-use App\Models\PeopleFile;
 use App\Models\PeopleCompany;
 use App\Models\PeopleEmail;
+use App\Models\PeopleFile;
 use App\Models\PeoplePhone;
 use App\Models\PeopleTag;
 use App\Models\PeopleTask;
@@ -28,8 +28,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class PeopleController extends Controller
 {
@@ -78,6 +78,24 @@ class PeopleController extends Controller
                     $q->where('company_id', $request->company_id);
                 });
             }
+            if (! empty($request->people_tags_filter_id)) {
+                $query->whereHas('tags', function ($q) use ($request) {
+                    $q->whereIn('tags.id', $request->people_tags_filter_id);
+                });
+            }
+            if (! empty($request->territory_filter_id)) {
+                $query->whereIn('territory_id', $request->territory_filter_id);
+            }
+            if (! empty($request->activity_type_filter_id)) {
+                $query->whereHas('activity', function ($q) use ($request) {
+                    $q->whereIn('activity_type_id', $request->activity_type_filter_id);
+                });
+            }
+            if (! empty($request->leads_status)) {
+                $query->whereHas('leads', function ($q) use ($request) {
+                    $q->whereIn('lead_status', $request->leads_status);
+                });
+            }
 
         }
 
@@ -90,6 +108,8 @@ class PeopleController extends Controller
         $products = Product::all();
         $allPeoples = People::all();
         $sources = Source::all();
+        $activity_types = ActivityType::all();
+        $territories = Territory::all();
         $competitors = Competitor::all();
         $peopletags = Tag::where('tag_id', 3)->get();
 
@@ -106,7 +126,7 @@ class PeopleController extends Controller
 
         // Normal page load
         return view('admin.peoples.index', array_merge(
-            compact('peoples', 'peoplesCount', 'companies', 'users', 'products', 'allPeoples', 'sources', 'competitors', 'peopletags'),
+            compact('peoples', 'peoplesCount', 'companies', 'users', 'products', 'allPeoples', 'sources', 'activity_types', 'territories', 'competitors', 'peopletags'),
             $sidebarStats
         ));
     }
@@ -139,6 +159,25 @@ class PeopleController extends Controller
                     $q->where('company_id', $request->company_id);
                 });
             }
+             if (! empty($request->people_tags_filter_id)) {
+                $query->whereHas('tags', function ($q) use ($request) {
+                    $q->whereIn('tags.id', $request->people_tags_filter_id);
+                });
+            }
+            if (! empty($request->territory_filter_id)) {
+                $query->whereIn('territory_id', $request->territory_filter_id);
+            }
+            if (! empty($request->activity_type_filter_id)) {
+                $query->whereHas('activity', function ($q) use ($request) {
+                    $q->whereIn('activity_type_id', $request->activity_type_filter_id);
+                });
+            }
+            if (! empty($request->leads_status)) {
+                $query->whereHas('leads', function ($q) use ($request) {
+                    $q->whereIn('lead_status', $request->leads_status);
+                });
+            }
+
         }
 
         // Get filtered people
@@ -150,6 +189,8 @@ class PeopleController extends Controller
         $products = Product::all();
         $allPeoples = People::all();
         $sources = Source::all();
+        $activity_types = ActivityType::all();
+        $territories = Territory::all();
         $competitors = Competitor::all();
         $peopletags = Tag::where('tag_id', 3)->get();
 
@@ -166,7 +207,7 @@ class PeopleController extends Controller
 
         // Normal page load
         return view('admin.peoples.my-peoples', array_merge(
-            compact('users', 'peoples', 'myPeoplesCount', 'companies', 'users', 'products', 'allPeoples', 'sources', 'competitors', 'peopletags'),
+            compact('users', 'peoples', 'myPeoplesCount', 'companies', 'users', 'products', 'allPeoples', 'sources','activity_types', 'territories',  'competitors', 'peopletags'),
             $sidebarStats
         ));
     }
@@ -1144,7 +1185,7 @@ class PeopleController extends Controller
         }
     }
 
-     public function fileDelete(Request $request)
+    public function fileDelete(Request $request)
     {
         $request->validate([
             'file_id' => 'required|integer',

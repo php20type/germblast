@@ -65,8 +65,9 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <button class="d-none btn btn-primary me-2"><img
-                                                    src="{{ asset('img/icons/filter.svg') }}" alt="" /></button>
+                                           <button class="btn btn-primary me-2" onclick="addFilter()">
+                                                <img src="{{ asset('img/icons/filter.svg') }}" alt="" />
+                                            </button>
                                             <button class="d-none btn btn-primary"><img
                                                     src="{{ asset('img/icons/bar.svg') }}" alt="" /></button>
                                         </div>
@@ -168,15 +169,139 @@
         </div>
     </main>
 
+      <!-- Extended Filters Modal Start -->
+    <div class="modal fade" id="AddFilter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="exampleModalLabel">Extended Filters</h1>
+                    <div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                </div>
+                <div class="modal-body">
+
+
+                    <div class="row mx-0" id="filter-section">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Lead Tags</label>
+                                <div class="checkbox-group">
+                                    @foreach ($leadtags as $leadtag)
+                                        <div class="form-check">
+                                            <input type="checkbox" name="lead_tags_filter_id[]"
+                                                value="{{ $leadtag->id }}" class="form-check-input"
+                                                id="leadtag_{{ $leadtag->id }}">
+                                            <label class="form-check-label" for="leadtag_{{ $leadtag->id }}">
+                                                {{ $leadtag->name }}
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Lead Stage</label>
+                                <div class="checkbox-group">
+                                    @foreach ($lead_stages as $lead_stage)
+                                        <div class="form-check">
+                                            <input type="checkbox" name="lead_stage_filter_id[]"
+                                                value="{{ $lead_stage->id }}" class="form-check-input"
+                                                id="lead_stage_{{ $lead_stage->id }}">
+                                            <label class="form-check-label" for="lead_stage_{{ $lead_stage->id }}">
+                                                {{ $lead_stage->name }}
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Leads Status</label>
+                                <div class="checkbox-group">
+                                    @php
+                                        $lead_statuses = ['won', 'pending', 'open', 'lost', 'cancelled'];
+                                    @endphp
+                                    @foreach ($lead_statuses as $status)
+                                        <div class="form-check">
+                                            <input type="checkbox" name="leads_status[]" value="{{ $status }}"
+                                                class="form-check-input" id="leadstatus_{{ $status }}">
+                                            <label class="form-check-label" for="leadstatus_{{ $status }}">
+                                                {{ ucfirst($status) }}
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Activity Types</label>
+                                <div class="checkbox-group">
+                                    @foreach ($activity_types as $activity_type)
+                                        <div class="form-check">
+                                            <input type="checkbox" name="activity_type_filter_id[]"
+                                                value="{{ $activity_type->id }}" class="form-check-input"
+                                                id="activitytype_{{ $activity_type->id }}">
+                                            <label class="form-check-label" for="activitytype_{{ $activity_type->id }}">
+                                                {{ $activity_type->type }}
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 @endsection
 @push('scripts')
     <script>
+
+         function addFilter() {
+                $('#AddFilter').modal('show');
+            }
+
+
         $(document).ready(function() {
             function fetchLeads() {
                 let search = $('#lead-search').val();
                 let status = $('select[name="status"]').val();
                 let user_id = $('select[name="user_id"]').val();
                 let hot = $('#checkDefault').is(':checked') ? 'hot' : '';
+
+                // collect checkbox values
+                    let lead_tags_filter_id = [];
+                    $('input[name="lead_tags_filter_id[]"]:checked').each(function() {
+                        lead_tags_filter_id.push($(this).val());
+                    });
+
+                    let lead_stage_filter_id = [];
+                    $('input[name="lead_stage_filter_id[]"]:checked').each(function() {
+                        lead_stage_filter_id.push($(this).val());
+                    });
+
+                    let leads_status = [];
+                    $('input[name="leads_status[]"]:checked').each(function() {
+                        leads_status.push($(this).val());
+                    });
+
+                     let activity_type_filter_id = [];
+                        $('input[name="activity_type_filter_id[]"]:checked').each(function() {
+                            activity_type_filter_id.push($(this).val());
+                        });
 
                 $.ajax({
                     url: "{{ route('admin.leads.closing_this_week') }}",
@@ -186,6 +311,10 @@
                         status: status,
                         user_id: user_id,
                         hot: hot,
+                        lead_tags_filter_id: lead_tags_filter_id,
+                            lead_stage_filter_id: lead_stage_filter_id,
+                            leads_status: leads_status,
+                             activity_type_filter_id: activity_type_filter_id,
                     },
                     success: function(response) {
                         $('table tbody').html(response.table);
@@ -202,6 +331,9 @@
 
             $('#lead-search').on('keyup', fetchLeads);
            $('#checkDefault, select[name="status"], select[name="user_id"]').on('change', fetchLeads);
+             // catch all checkbox changes
+                $('#filter-section input[type="checkbox"]').on('change', fetchLeads);
+
 
 
            $(document).on('click', '.btn-delete', function() {

@@ -70,9 +70,9 @@
                                                                 @endforeach
                                                             </select>
                                                         </div>
-                                                        <button class="d-none btn btn-primary me-2"><img
-                                                                src="{{ asset('img/icons/filter.svg') }}"
-                                                                alt=""></button>
+                                                        <button class="btn btn-primary me-2" onclick="addFilter()">
+                                                            <img src="{{ asset('img/icons/filter.svg') }}" alt="" />
+                                                        </button>
                                                         <button class="d-none btn btn-primary"><img
                                                                 src="{{ asset('img/icons/bar.svg') }}"
                                                                 alt=""></button>
@@ -103,7 +103,9 @@
                                                         @forelse ($peoples as $people)
                                                             <tr>
                                                                 <td>
-                                                                    <input type="checkbox" class="form-check-input row-checkbox" data-id="{{ $people->id }}">
+                                                                    <input type="checkbox"
+                                                                        class="form-check-input row-checkbox"
+                                                                        data-id="{{ $people->id }}">
                                                                 </td>
                                                                 <td>
                                                                     <div class="person-name">
@@ -173,225 +175,322 @@
         </main>
 
 
-          <!-- Add Lead Modal Start -->
-            <div class="modal fade" id="AddLead" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-fullscreen">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h1 class="modal-title" id="exampleModalLabel">Add a lead</h1>
-                            <div>
-                                <a href="#" class="link-decoration">Customize fields</a>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
+        <!-- Add Lead Modal Start -->
+        <div class="modal fade" id="AddLead" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title" id="exampleModalLabel">Add a lead</h1>
+                        <div>
+                            <a href="#" class="link-decoration">Customize fields</a>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                    </div>
+                    <div class="modal-body">
+
+                        {{-- <form class="company-form" id="add-lead-form"> --}}
+                        <form action="{{ route('admin.leads.store') }}" class="company-form" id="add-lead-form"
+                            method="POST">
+                            @csrf
+
+
+                            <div class="row mx-0">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-label">Lead name</label>
+                                        @error('name')
+                                            <span class="text-danger">* {{ $message }}</span>
+                                        @enderror
+                                        <input type="text" name="name" placeholder="Lead Name"
+                                            class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-label">Assignee</label>
+                                        @error('assignee_id')
+                                            <span class="text-danger">* {{ $message }}</span>
+                                        @enderror
+                                        <select name="assignee_id" class="form-select">
+                                            <option value="">Choose...</option>
+                                            @foreach ($users as $user)
+                                                <option value="{{ $user->id }}">
+                                                    {{ $user->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-label">Anticipated closed date</label>
+                                        @error('close_date')
+                                            <span class="text-danger">* {{ $message }}</span>
+                                        @enderror
+                                        <input type="text" name="close_date" placeholder="04-Apr-2004"
+                                            pattern="\d{2}-[A-Za-z]{3}-\d{4}" class="form-control" />
+                                    </div>
+                                </div>
+
+                                <!-- Product Row Container -->
+                                <div id="productRowContainer" class="mt-3">
+                                    <div class="row product-row">
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label class="form-label">Products</label>
+                                                <select class="form-select mt-2" name="product_id[]">
+                                                    <option value="">Choose...</option>
+                                                    @foreach ($products as $product)
+                                                        <option value="{{ $product->id }}">{{ $product->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label class="form-label">Qty :</label>
+                                                <input type="number" name="quantity[]" placeholder="Add quantity"
+                                                    class="form-control" />
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-4">
+                                            <div class="form-group d-flex justify-content-between align-items-end">
+                                                <div style="width: 100%">
+                                                    <label class="form-label fw-light">U.S(USD)</label>
+                                                    <input type="number" name="price[]" step="0.01"
+                                                        placeholder="Add price" class="form-control" />
+                                                </div>
+                                                <button type="button"
+                                                    class="btn btn-danger btn-sm ms-2 remove-product-row">X</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Add New Product Button -->
+                                <button type="button" id="addProductRow"
+                                    class="btn btn-sm btn-link text-primary text-start">
+                                    + Add New Product
+                                </button>
+
+                                <div class="col-lg-12 mt-2">
+                                    <div class="form-group">
+                                        <label class="form-label">Confidence</label>
+                                        @error('confidence')
+                                            <span class="text-danger">* {{ $message }}</span>
+                                        @enderror
+                                        <input type="number" name="confidence" placeholder="Confidence %"
+                                            class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-label">Companies</label>
+                                        @error('company_id')
+                                            <span class="text-danger">* {{ $message }}</span>
+                                        @enderror
+                                        <select name="company_id[]" id="companySelect" class="form-select" multiple>
+                                            <option value="">Choose Company</option>
+                                            @foreach ($companies as $company)
+                                                <option value="{{ $company->id }}">
+                                                    {{ $company->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-label">Select Person</label>
+                                        @error('person_id')
+                                            <span class="text-danger">* {{ $message }}</span>
+                                        @enderror
+                                        <select id="person_select" name="person_id[]" class="form-select" multiple>
+                                            <option value="">-- Select Person --</option>
+                                            @foreach ($allPeoples as $people)
+                                                <option value="{{ $people->id }}">
+                                                    {{ $people->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Sources</label>
+                                        @error('source_id')
+                                            <span class="text-danger">* {{ $message }}</span>
+                                        @enderror
+                                        <select id="source_select" name="source_id[]" class="form-select mt-2" multiple>
+                                            <option value="">Choose...</option>
+                                            @foreach ($sources as $source)
+                                                <option value="{{ $source->id }}">
+                                                    {{ $source->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Competitors</label>
+                                        @error('competitors_id')
+                                            <span class="text-danger">* {{ $message }}</span>
+                                        @enderror
+                                        <select id="competitor_select" name="competitors_id[]" class="form-select mt-2"
+                                            multiple>
+                                            <option value="">Choose...</option>
+                                            @foreach ($competitors as $competitor)
+                                                <option value="{{ $competitor->id }}">
+                                                    {{ $competitor->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label class="form-label">Tags</label>
+                                        <select name="tag_id" class="form-select">
+                                            <option value="">Select tag</option>
+                                            @foreach ($peopletags as $peopletag)
+                                                <option value="{{ $peopletag->id }}">{{ $peopletag->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            {{-- div=row mx-0 closed --}}
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Create lead</button>
+                            </div>
+                        </form>
+                        {{-- form closed --}}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Extended Filters Modal Start -->
+        <div class="modal fade" id="AddFilter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title" id="exampleModalLabel">Extended Filters</h1>
+                        <div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+
+                    </div>
+                    <div class="modal-body">
+
+
+                        <div class="row mx-0" id="filter-section">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">People Tags</label>
+                                    <div class="checkbox-group">
+                                        @foreach ($peopletags as $peopletag)
+                                            <div class="form-check">
+                                                <input type="checkbox" name="people_tags_filter_id[]"
+                                                    value="{{ $peopletag->id }}" class="form-check-input"
+                                                    id="peopletag_{{ $peopletag->id }}">
+                                                <label class="form-check-label" for="peopletag_{{ $peopletag->id }}">
+                                                    {{ $peopletag->name }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
                             </div>
 
-                        </div>
-                        <div class="modal-body">
-
-                            {{-- <form class="company-form" id="add-lead-form"> --}}
-                            <form action="{{ route('admin.leads.store') }}" class="company-form" id="add-lead-form"
-                                method="POST">
-                                @csrf
-
-
-                                <div class="row mx-0">
-                                    <div class="col-lg-12">
-                                        <div class="form-group">
-                                            <label class="form-label">Lead name</label>
-                                            @error('name')
-                                                <span class="text-danger">* {{ $message }}</span>
-                                            @enderror
-                                            <input type="text" name="name" placeholder="Lead Name"
-                                                class="form-control" />
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-12">
-                                        <div class="form-group">
-                                            <label class="form-label">Assignee</label>
-                                            @error('assignee_id')
-                                                <span class="text-danger">* {{ $message }}</span>
-                                            @enderror
-                                            <select name="assignee_id" class="form-select">
-                                                <option value="">Choose...</option>
-                                                @foreach ($users as $user)
-                                                    <option value="{{ $user->id }}">
-                                                        {{ $user->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-12">
-                                        <div class="form-group">
-                                            <label class="form-label">Anticipated closed date</label>
-                                            @error('close_date')
-                                                <span class="text-danger">* {{ $message }}</span>
-                                            @enderror
-                                            <input type="text" name="close_date" placeholder="04-Apr-2004"
-                                                pattern="\d{2}-[A-Za-z]{3}-\d{4}" class="form-control" />
-                                        </div>
-                                    </div>
-
-                                    <!-- Product Row Container -->
-                                    <div id="productRowContainer" class="mt-3">
-                                        <div class="row product-row">
-                                            <div class="col-lg-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Products</label>
-                                                    <select class="form-select mt-2" name="product_id[]">
-                                                        <option value="">Choose...</option>
-                                                        @foreach ($products as $product)
-                                                            <option value="{{ $product->id }}">{{ $product->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Territory</label>
+                                    <div class="checkbox-group">
+                                        @foreach ($territories as $territory)
+                                            <div class="form-check">
+                                                <input type="checkbox" name="territory_filter_id[]"
+                                                    value="{{ $territory->id }}" class="form-check-input"
+                                                    id="territory_{{ $territory->id }}">
+                                                <label class="form-check-label" for="territory_{{ $territory->id }}">
+                                                    {{ $territory->name }}
+                                                </label>
                                             </div>
-
-                                            <div class="col-lg-4">
-                                                <div class="form-group">
-                                                    <label class="form-label">Qty :</label>
-                                                    <input type="number" name="quantity[]" placeholder="Add quantity"
-                                                        class="form-control" />
-                                                </div>
-                                            </div>
-
-                                            <div class="col-lg-4">
-                                                <div class="form-group d-flex justify-content-between align-items-end">
-                                                    <div style="width: 100%">
-                                                        <label class="form-label fw-light">U.S(USD)</label>
-                                                        <input type="number" name="price[]" step="0.01"
-                                                            placeholder="Add price" class="form-control" />
-                                                    </div>
-                                                    <button type="button"
-                                                        class="btn btn-danger btn-sm ms-2 remove-product-row">X</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Add New Product Button -->
-                                    <button type="button" id="addProductRow"
-                                        class="btn btn-sm btn-link text-primary text-start">
-                                        + Add New Product
-                                    </button>
-
-                                    <div class="col-lg-12 mt-2">
-                                        <div class="form-group">
-                                            <label class="form-label">Confidence</label>
-                                            @error('confidence')
-                                                <span class="text-danger">* {{ $message }}</span>
-                                            @enderror
-                                            <input type="number" name="confidence" placeholder="Confidence %"
-                                                class="form-control" />
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-12">
-                                        <div class="form-group">
-                                            <label class="form-label">Companies</label>
-                                            @error('company_id')
-                                                <span class="text-danger">* {{ $message }}</span>
-                                            @enderror
-                                            <select name="company_id[]" id="companySelect" class="form-select" multiple>
-                                                <option value="">Choose Company</option>
-                                                @foreach ($companies as $company)
-                                                    <option value="{{ $company->id }}">
-                                                        {{ $company->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-12">
-                                        <div class="form-group">
-                                            <label class="form-label">Select Person</label>
-                                            @error('person_id')
-                                                <span class="text-danger">* {{ $message }}</span>
-                                            @enderror
-                                            <select id="person_select" name="person_id[]" class="form-select" multiple>
-                                                <option value="">-- Select Person --</option>
-                                                @foreach ($allPeoples as $people)
-                                                    <option value="{{ $people->id }}">
-                                                        {{ $people->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-
-                                        </div>
-                                    </div>
-
-                                    <div class="col-lg-6">
-                                        <div class="form-group">
-                                            <label class="form-label">Sources</label>
-                                            @error('source_id')
-                                                <span class="text-danger">* {{ $message }}</span>
-                                            @enderror
-                                            <select id="source_select" name="source_id[]" class="form-select mt-2"
-                                                multiple>
-                                                <option value="">Choose...</option>
-                                                @foreach ($sources as $source)
-                                                    <option value="{{ $source->id }}">
-                                                        {{ $source->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <div class="form-group">
-                                            <label class="form-label">Competitors</label>
-                                            @error('competitors_id')
-                                                <span class="text-danger">* {{ $message }}</span>
-                                            @enderror
-                                            <select id="competitor_select" name="competitors_id[]"
-                                                class="form-select mt-2" multiple>
-                                                <option value="">Choose...</option>
-                                                @foreach ($competitors as $competitor)
-                                                    <option value="{{ $competitor->id }}">
-                                                        {{ $competitor->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-lg-12">
-                                        <div class="form-group">
-                                            <label class="form-label">Tags</label>
-                                            <select name="tag_id" class="form-select">
-                                                <option value="">Select tag</option>
-                                                @foreach ($peopletags as $peopletag)
-                                                    <option value="{{ $peopletag->id }}">{{ $peopletag->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                                        @endforeach
                                     </div>
                                 </div>
-                                {{-- div=row mx-0 closed --}}
+                            </div>
 
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary">Create lead</button>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Leads Status</label>
+                                    <div class="checkbox-group">
+                                        @php
+                                            $lead_statuses = ['won', 'pending', 'open', 'lost', 'cancelled'];
+                                        @endphp
+                                        @foreach ($lead_statuses as $status)
+                                            <div class="form-check">
+                                                <input type="checkbox" name="leads_status[]" value="{{ $status }}"
+                                                    class="form-check-input" id="leadstatus_{{ $status }}">
+                                                <label class="form-check-label" for="leadstatus_{{ $status }}">
+                                                    {{ ucfirst($status) }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
-                            </form>
-                            {{-- form closed --}}
+                            </div>
+
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Activity Types</label>
+                                    <div class="checkbox-group">
+                                        @foreach ($activity_types as $activity_type)
+                                            <div class="form-check">
+                                                <input type="checkbox" name="activity_type_filter_id[]"
+                                                    value="{{ $activity_type->id }}" class="form-check-input"
+                                                    id="activitytype_{{ $activity_type->id }}">
+                                                <label class="form-check-label"
+                                                    for="activitytype_{{ $activity_type->id }}">
+                                                    {{ $activity_type->type }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+
 
                         </div>
                     </div>
                 </div>
             </div>
 
+        @endsection
+        @push('scripts')
+            <script>
 
-    @endsection
-    @push('scripts')
-        <script>
+                function addFilter() {
+                    $('#AddFilter').modal('show');
+                }
 
-             // ==============================
+                // ==============================
                 // Modal Show for leads
                 // ==============================
-             function addLead() {
+                function addLead() {
                     // Collect all checked company IDs
                     let selectedPersons = [];
                     $('.row-checkbox:checked').each(function() {
@@ -405,37 +504,64 @@
                     $('#AddLead').modal('show');
                 }
 
-            $(document).ready(function() {
-                function fetchPeoples() {
-                    let search = $('#people-search').val();
-                    let user_id = $('select[name="user_id"]').val();
-                    let company_id = $('select[name="company_id"]').val();
+                $(document).ready(function() {
+                    function fetchPeoples() {
+                        let search = $('#people-search').val();
+                        let user_id = $('select[name="user_id"]').val();
+                        let company_id = $('select[name="company_id"]').val();
 
-                    $.ajax({
-                        url: "{{ route('admin.peoples.index') }}",
-                        method: "GET",
-                        data: {
-                            search: search,
-                            user_id: user_id,
-                            company_id: company_id,
-                        },
-                        success: function(response) {
-                            $('table tbody').html(response.table);
-                            $('.company-count').text(response.count + ' People Found');
-                        },
-                        error: function(err) {
-                            console.error('Error fetching people data', err);
-                        }
-                    });
-                }
+                          // collect checkbox values
+                        let people_tags_filter_id = [];
+                        $('input[name="people_tags_filter_id[]"]:checked').each(function() {
+                            people_tags_filter_id.push($(this).val());
+                        });
 
-                $('#people-search').on('keyup', fetchPeoples);
-                $('#checkDefault,select[name="user_id"], select[name="company_id"]').on(
-                    'change',
-                    fetchPeoples);
+                        let territory_filter_id = [];
+                        $('input[name="territory_filter_id[]"]:checked').each(function() {
+                            territory_filter_id.push($(this).val());
+                        });
+
+                        let leads_status = [];
+                        $('input[name="leads_status[]"]:checked').each(function() {
+                            leads_status.push($(this).val());
+                        });
+
+                        let activity_type_filter_id = [];
+                        $('input[name="activity_type_filter_id[]"]:checked').each(function() {
+                            activity_type_filter_id.push($(this).val());
+                        });
+
+                        $.ajax({
+                            url: "{{ route('admin.peoples.index') }}",
+                            method: "GET",
+                            data: {
+                                search: search,
+                                user_id: user_id,
+                                company_id: company_id,
+                                 people_tags_filter_id: people_tags_filter_id,
+                                territory_filter_id: territory_filter_id,
+                                leads_status: leads_status,
+                                activity_type_filter_id: activity_type_filter_id,
+                            },
+                            success: function(response) {
+                                $('table tbody').html(response.table);
+                                $('.company-count').text(response.count + ' People Found');
+                            },
+                            error: function(err) {
+                                console.error('Error fetching people data', err);
+                            }
+                        });
+                    }
+
+                    $('#people-search').on('keyup', fetchPeoples);
+                    $('#checkDefault,select[name="user_id"], select[name="company_id"]').on(
+                        'change',
+                        fetchPeoples);
+                    // catch all checkbox changes
+                    $('#filter-section input[type="checkbox"]').on('change', fetchPeoples);
 
 
-                // ==============================
+                    // ==============================
                     // Lead & Activities Form - Select2 Integration
                     // ==============================
                     $('#AddLead').on('shown.bs.modal', function() {
@@ -605,7 +731,7 @@
                         });
                     });
 
-                $(document).on('click', '.btn-delete', function() {
+                    $(document).on('click', '.btn-delete', function() {
                         let selectedPeoples = $('.row-checkbox:checked').map(function() {
                             return $(this).data('id');
                         }).get();
@@ -652,6 +778,6 @@
                         });
                     });
 
-            });
-        </script>
-    @endpush
+                });
+            </script>
+        @endpush
