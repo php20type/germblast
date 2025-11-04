@@ -77,9 +77,9 @@
                     </div>
                 </a>
             </li>
-            <hr>
+            <hr class="d-none">
 
-            <li class="{{ request()->routeIs('admin.icimatrix.*') ? 'active' : '' }}">
+            <li class="d-none {{ request()->routeIs('admin.icimatrix.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.icimatrix.index') }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon10.svg") }} alt="icon" />

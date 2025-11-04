@@ -62,7 +62,6 @@
                                             </button>
                                         </div>
 
-
                                         <div class="star-rating">
                                             <i class="fas fa-star"></i>
                                             <i class="fas fa-star"></i>
@@ -71,7 +70,6 @@
                                             <i class="fas fa-star star-empty"></i>
                                         </div>
                                     </div>
-
 
                                 </div>
                                 <button class="delete-btn delete-company-btn" data-id="{{ $company->id }}">

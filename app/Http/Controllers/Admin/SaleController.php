@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
+use App\Models\ActivityType;
 use App\Models\Lead;
 use App\Models\People;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class SaleController extends Controller
 {
@@ -32,7 +35,7 @@ class SaleController extends Controller
         }
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $leads = Lead::with('assignee', 'companies', 'products', 'peoples', 'sources', 'competitors')->get();
         $peoples = People::with('peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany')->get();
@@ -119,6 +122,117 @@ class SaleController extends Controller
         $signedProposalCountValue = Helper::calculateTotalValue($signedProposal);
         $signedProposalCountValueFormatted = Helper::formatValue($signedProposalCountValue);
 
+        $users = User::all();
+        $activitytypes = ActivityType::all();
+
+        // ==============
+        // TIMELINE
+        // ==============
+        $user = auth()->user();
+        $userId = $user->id;
+
+        // --- Fetch Activities directly ---
+        $activities = $user->activity()->with('comments.creator', 'peoples', 'companies', 'leads')->get();
+
+        $activities->transform(function ($activity) {
+            $participants = collect();
+            $participants = $participants->merge($activity->peoples->pluck('name'));
+            $participants = $participants->merge($activity->companies->pluck('name'));
+            $participants = $participants->merge($activity->leads->pluck('name'));
+
+            $activity->participant_names = $participants->join(', ');
+            $activity->type = 'activity';
+            $activity->timestamp = $activity->date;
+
+            return $activity;
+        });
+
+        // --- Fetch Notes directly ---
+        $notes = $user->note()->with('comments.creator', 'peoples', 'companies', 'users')->get();
+
+        $notes->transform(function ($note) {
+            $mentions = collect();
+            $mentions = $mentions->merge($note->peoples->pluck('name'));
+            $mentions = $mentions->merge($note->companies->pluck('name'));
+            $mentions = $mentions->merge($note->users->pluck('name'));
+
+            $note->mentioned_names = $mentions->join(', ');
+            $note->type = 'note';
+            $note->timestamp = $note->created_at;
+
+            return $note;
+        });
+
+        // --- Fetch Timeline directly ---
+        $timelineEntries = $user->timeline()->get();
+
+        $timelineEntries->transform(function ($item) {
+            $item->type = 'timeline';
+            $item->timestamp = $item->created_at;
+
+            return $item;
+        });
+
+        // --- Apply Filters (if any) ---
+        $filters = [
+            'filter_range' => $request->input('filter_range', 'all'),
+            'activity_type_id' => $request->input('activity_type_id', 'all'),
+            'user_id' => $userId,
+        ];
+
+        // Separate logged & scheduled
+        $logged_activities = $activities->filter(fn ($a) => $a->status === 'Logged');
+        $scheduled_activities = $activities->filter(fn ($a) => $a->status === 'Scheduled');
+
+        // --- Milestones (based on user created_at) ---
+        $milestones = collect();
+        if ($user->created_at) {
+            $createdAt = $user->created_at->copy();
+            $now = now();
+            $totalMonths = $createdAt->diffInMonths($now);
+
+            for ($i = 1; $i <= $totalMonths; $i++) {
+                $milestoneDate = $createdAt->copy()->addMonths($i);
+
+                if ($i === 1) {
+                    $label = '1 month since joining';
+                } elseif ($i === 6) {
+                    $label = '6 months since joining';
+                } elseif ($i % 12 === 0) {
+                    $years = $i / 12;
+                    $label = $years === 1 ? '1 year since joining' : "{$years} years since joining";
+                } else {
+                    continue;
+                }
+
+                $milestones->push((object) [
+                    'type' => 'milestone',
+                    'title' => $label,
+                    'timestamp' => $milestoneDate,
+                ]);
+            }
+        }
+
+        // --- Merge everything into one timeline ---
+        $timeline = $logged_activities
+            ->concat($notes)
+            ->concat($timelineEntries)
+            ->concat($milestones)
+            ->sortByDesc('timestamp')
+            ->values();
+
+        // Fetch all tasks assigned to the logged-in user
+        $companyTasks = $user->companyTaskAssignee()->whereNull('completed_user_id')->get();
+        $peopleTasks = $user->peopleTaskAssignee()->whereNull('completed_user_id')->get();
+        $leadTasks = $user->leadTaskAssignee()->whereNull('completed_user_id')->get();
+
+        // Combine all pending tasks
+        $pending_tasks = $companyTasks
+            ->concat($peopleTasks)
+            ->concat($leadTasks)
+            ->sortByDesc('created_at')
+            ->values();
+
         return view('admin.sales', compact('leads', 'peoples',
             'newLeadsThisMonth', 'newLeadsLastMonth', 'newLeadsDiff', 'newLeadsPercent',
             'openLeadsThisMonth', 'openLeadsLastMonth', 'openLeadsDiff', 'openLeadsPercent',
@@ -128,7 +242,14 @@ class SaleController extends Controller
             'allLeadsValue', 'myLeadsValue', 'addedThisWeekValue', 'closingThisWeekValue', 'hotLeadsValue',
             'allLeadsValueFormatted', 'myLeadsValueFormatted', 'addedThisWeekValueFormatted', 'closingThisWeekValueFormatted', 'hotLeadsValueFormatted',
             'gbPresentationCount', 'siteSurveyCount', 'proposalApprovalCount', 'proposalPresentationCount', 'signedProposalCount',
-            'gbPresentationCountValueFormatted', 'siteSurveyCountValueFormatted', 'proposalApprovalCountValueFormatted', 'proposalPresentationCountValueFormatted', 'signedProposalCountValueFormatted',
+            'gbPresentationCountValueFormatted', 'siteSurveyCountValueFormatted', 'proposalApprovalCountValueFormatted', 'proposalPresentationCountValueFormatted', 'signedProposalCountValueFormatted', 'users', 'activitytypes',
+            'activities',
+            'logged_activities',
+            'scheduled_activities',
+            'notes',
+            'timeline',
+            'timelineEntries',
+            'pending_tasks'
         ));
 
     }

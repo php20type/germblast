@@ -185,6 +185,22 @@
 
 
                     <div class="row mx-0" id="filter-section">
+
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Open Date</label>
+                                <div class="checkbox-group">
+                                    <!-- Month-to-Date Checkbox -->
+                                    <div class="form-check">
+                                        <input type="checkbox" name="month_to_date" id="month_to_date"
+                                            class="form-check-input">
+                                        <label class="form-check-label" for="month_to_date">Month-to-Date</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label class="form-label">Lead Tags</label>
@@ -265,123 +281,170 @@
             </div>
         </div>
     </div>
-    
 
-    @endsection
 
-    @push('scripts')
-        <script>
-            function addFilter() {
-                $('#AddFilter').modal('show');
+@endsection
+
+@push('scripts')
+    <script>
+        function addFilter() {
+            $('#AddFilter').modal('show');
+        }
+
+        $(document).ready(function() {
+
+            // ==============================
+            // Redirecting user from sales page to leads page with applied filters
+            // ==============================
+            const selectedStage = sessionStorage.getItem('selectedLeadStage');
+
+            if (selectedStage) {
+                $('#lead_stage_' + selectedStage).prop('checked', true);
+                fetchLeads();
+                sessionStorage.removeItem('selectedLeadStage'); // clear after use
             }
 
-            $(document).ready(function() {
-                function fetchLeads() {
-                    let search = $('#lead-search').val();
-                    let status = $('select[name="status"]').val();
-                    let user_id = $('select[name="user_id"]').val();
-                    let hot = $('#checkDefault').is(':checked') ? 'hot' : '';
+            const savedFilters = sessionStorage.getItem('lead_filters');
+            if (savedFilters) {
+                const filters = JSON.parse(savedFilters);
 
-                    // collect checkbox values
-                    let lead_tags_filter_id = [];
-                    $('input[name="lead_tags_filter_id[]"]:checked').each(function() {
-                        lead_tags_filter_id.push($(this).val());
-                    });
-
-                    let lead_stage_filter_id = [];
-                    $('input[name="lead_stage_filter_id[]"]:checked').each(function() {
-                        lead_stage_filter_id.push($(this).val());
-                    });
-
-                    let leads_status = [];
-                    $('input[name="leads_status[]"]:checked').each(function() {
-                        leads_status.push($(this).val());
-                    });
-
-                     let activity_type_filter_id = [];
-                        $('input[name="activity_type_filter_id[]"]:checked').each(function() {
-                            activity_type_filter_id.push($(this).val());
-                        });
-
-                    $.ajax({
-                        url: "{{ route('admin.leads.index') }}",
-                        method: "GET",
-                        data: {
-                            search: search,
-                            status: status,
-                            user_id: user_id,
-                            hot: hot,
-                            lead_tags_filter_id: lead_tags_filter_id,
-                            lead_stage_filter_id: lead_stage_filter_id,
-                            leads_status: leads_status,
-                             activity_type_filter_id: activity_type_filter_id,
-                        },
-                        success: function(response) {
-                            $('table tbody').html(response.table);
-                            $('.company-count').text(response.count + ' Lead Found');
-                            $('#total-value span').text('$' + response.total_value);
-                            $('#avg-value span').text('$' + response.avg_value);
-                            $('#confidence-value span').text(response.avg_confidence + '%');
-                        },
-                        error: function() {
-                            console.error('Error fetching lead data');
-                        }
-                    });
+                // Apply "Month-to-Date" filter
+                if (filters.month_to_date) {
+                    $('#month_to_date').prop('checked', true);
                 }
 
-                $('#lead-search').on('keyup', fetchLeads);
-                $('#checkDefault, select[name="status"], select[name="user_id"]').on('change', fetchLeads);
-                // catch all checkbox changes
-                $('#filter-section input[type="checkbox"]').on('change', fetchLeads);
+                // Apply "Open Leads" filter
+                if (filters.leads_status && filters.leads_status.includes('open')) {
+                    $('#leadstatus_open').prop('checked', true);
+                }
+
+                // Apply "Sales (Won)" filter
+                if (filters.leads_status && filters.leads_status.includes('won')) {
+                    $('#leadstatus_won').prop('checked', true);
+                }
+
+                // Fetch leads with filters applied
+                fetchLeads();
+
+                // Clear after applying once
+                sessionStorage.removeItem('lead_filters');
+            }
+
+            // ==============================
+            // End
+            // ==============================
 
 
-                $(document).on('click', '.btn-delete', function() {
-                    let selectedLeads = $('.row-checkbox:checked').map(function() {
-                        return $(this).data('id');
-                    }).get();
+            function fetchLeads() {
+                let search = $('#lead-search').val();
+                let status = $('select[name="status"]').val();
+                let user_id = $('select[name="user_id"]').val();
+                let hot = $('#checkDefault').is(':checked') ? 'hot' : '';
 
-                    Swal.fire({
-                        title: "Are you sure?",
-                        text: "This action will permanently delete the selected lead.",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#d33",
-                        cancelButtonColor: "#3085d6",
-                        confirmButtonText: "Yes, delete",
-                        cancelButtonText: "Cancel"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: "{{ route('admin.leads.delete') }}",
-                                type: "POST",
-                                data: {
-                                    _token: "{{ csrf_token() }}",
-                                    ids: selectedLeads
-                                },
-                                success: function(response) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Deleted!',
-                                        text: response.message ||
-                                            'Lead deleted successfully.',
-                                        showConfirmButton: false,
-                                        timer: 2000
-                                    });
-                                    setTimeout(() => location.reload(), 2000);
-                                },
-                                error: function(xhr) {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error!',
-                                        text: xhr.responseJSON?.message ||
-                                            'Something went wrong while deleting.',
-                                    });
-                                }
-                            });
-                        }
-                    });
+                // collect checkbox values
+                let lead_tags_filter_id = [];
+                $('input[name="lead_tags_filter_id[]"]:checked').each(function() {
+                    lead_tags_filter_id.push($(this).val());
                 });
 
+                let lead_stage_filter_id = [];
+                $('input[name="lead_stage_filter_id[]"]:checked').each(function() {
+                    lead_stage_filter_id.push($(this).val());
+                });
+
+                let leads_status = [];
+                $('input[name="leads_status[]"]:checked').each(function() {
+                    leads_status.push($(this).val());
+                });
+
+                let activity_type_filter_id = [];
+                $('input[name="activity_type_filter_id[]"]:checked').each(function() {
+                    activity_type_filter_id.push($(this).val());
+                });
+
+                // New open date filters
+                let month_to_date = $('#month_to_date').is(':checked') ? 1 : 0;
+
+                $.ajax({
+                    url: "{{ route('admin.leads.index') }}",
+                    method: "GET",
+                    data: {
+                        search: search,
+                        status: status,
+                        user_id: user_id,
+                        hot: hot,
+                        lead_tags_filter_id: lead_tags_filter_id,
+                        lead_stage_filter_id: lead_stage_filter_id,
+                        leads_status: leads_status,
+                        activity_type_filter_id: activity_type_filter_id,
+                        month_to_date: month_to_date,
+                    },
+                    success: function(response) {
+                        $('table tbody').html(response.table);
+                        $('.company-count').text(response.count + ' Lead Found');
+                        $('#total-value span').text('$' + response.total_value);
+                        $('#avg-value span').text('$' + response.avg_value);
+                        $('#confidence-value span').text(response.avg_confidence + '%');
+                    },
+                    error: function() {
+                        console.error('Error fetching lead data');
+                    }
+                });
+            }
+
+            $('#lead-search').on('keyup', fetchLeads);
+            $('#checkDefault, select[name="status"], select[name="user_id"]').on('change', fetchLeads);
+            // catch all checkbox changes
+            $('#filter-section input[type="checkbox"]').on('change', fetchLeads);
+
+
+            $(document).on('click', '.btn-delete', function() {
+                let selectedLeads = $('.row-checkbox:checked').map(function() {
+                    return $(this).data('id');
+                }).get();
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This action will permanently delete the selected lead.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete",
+                    cancelButtonText: "Cancel"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('admin.leads.delete') }}",
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                ids: selectedLeads
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: response.message ||
+                                        'Lead deleted successfully.',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                                setTimeout(() => location.reload(), 2000);
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong while deleting.',
+                                });
+                            }
+                        });
+                    }
+                });
             });
-        </script>
-    @endpush
+
+        });
+    </script>
+@endpush

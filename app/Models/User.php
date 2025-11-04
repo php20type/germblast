@@ -87,6 +87,11 @@ class User extends Authenticatable
         return $this->hasMany(Note::class, 'user_id');
     }
 
+    public function timeline()
+    {
+        return $this->hasMany(Timeline::class, 'user_id');
+    }
+
     public function noteComments()
     {
         return $this->hasMany(NoteComment::class, 'user_id');

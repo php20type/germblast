@@ -500,7 +500,7 @@ class CompanyController extends Controller
             ->sortByDesc('timestamp')
             ->values(); // reindex after sorting
 
-        // 👉 ADD THIS SECTION — Handle AJAX requests
+        // ADD THIS SECTION — Handle AJAX requests
         if ($request->ajax()) {
             $timeline_html = view('admin.company.partials.company-timeline', compact('timeline'))->render();
 

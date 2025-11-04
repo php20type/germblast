@@ -206,7 +206,7 @@ class Helper
         $activityTypeId = $filters['activity_type_id'] ?? 'all';
         $userId = $filters['user_id'] ?? 'all';
 
-        // 1️⃣ Range Filter (7, 30, 90 days)
+        // Range Filter (7, 30, 90 days)
         if ($filterRange !== 'all') {
             $days = intval($filterRange);
             if (in_array($days, [7, 30, 90])) {
@@ -222,7 +222,7 @@ class Helper
             }
         }
 
-        // // 2️⃣ Activity Type Filter
+        // Activity Type Filter
         if ($activityTypeId !== 'all') {
             // Show only matching activities
             $logged_activities = $logged_activities->filter(function ($a) use ($activityTypeId) {
@@ -234,7 +234,7 @@ class Helper
             $timelineEntries = collect([]);
         }
 
-        // 3️⃣ User Filter
+        // User Filter
         if ($userId !== 'all') {
             $logged_activities = $logged_activities->filter(function ($a) use ($userId) {
                 return isset($a->user_id) && $a->user_id == $userId;
@@ -249,7 +249,7 @@ class Helper
             });
         }
 
-        // 4️⃣ Return filtered collections
+        // Return filtered collections
         return [
             'logged_activities' => $logged_activities->values(),
             'notes' => $notes->values(),

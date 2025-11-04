@@ -125,6 +125,11 @@ class LeadController extends Controller
                 $q->whereIn('activity_type_id', $request->activity_type_filter_id);
             });
         }
+        if ($request->month_to_date) {
+            $startOfMonth = now()->startOfMonth();
+            $today = now();
+            $query->whereBetween('created_at', [$startOfMonth, $today]);
+        }
 
         // Get all leads
         $leads = $query->get();
@@ -231,7 +236,7 @@ class LeadController extends Controller
         if ($request->filled('user_id')) {
             $query->where('assignee_id', $request->user_id);
         }
-         if (! empty($request->lead_tags_filter_id)) {
+        if (! empty($request->lead_tags_filter_id)) {
             $query->whereHas('tags', function ($q) use ($request) {
                 $q->whereIn('tags.id', $request->lead_tags_filter_id);
             });
@@ -247,7 +252,6 @@ class LeadController extends Controller
                 $q->whereIn('activity_type_id', $request->activity_type_filter_id);
             });
         }
-
 
         // Get all leads
         $leads = $query->get();
@@ -292,7 +296,7 @@ class LeadController extends Controller
         $peoples = People::all();
         $users = User::all();
         $activity_types = ActivityType::all();
-         $lead_stages = LeadStage::all();
+        $lead_stages = LeadStage::all();
         $leadtags = Tag::where('tag_id', 1)->get();
         $sidebarStats = $this->getSidebarStats();
 
@@ -314,7 +318,7 @@ class LeadController extends Controller
                 'peoples',
                 'users',
                 'activity_types',
-                  'lead_stages',
+                'lead_stages',
                 'leadtags',
                 'formattedTotalLeads',
                 'formattedTotalValue',
@@ -355,7 +359,7 @@ class LeadController extends Controller
         if ($request->filled('user_id')) {
             $query->where('assignee_id', $request->user_id);
         }
-         if (! empty($request->lead_tags_filter_id)) {
+        if (! empty($request->lead_tags_filter_id)) {
             $query->whereHas('tags', function ($q) use ($request) {
                 $q->whereIn('tags.id', $request->lead_tags_filter_id);
             });
@@ -415,7 +419,7 @@ class LeadController extends Controller
         $peoples = People::all();
         $users = User::all();
         $activity_types = ActivityType::all();
-          $lead_stages = LeadStage::all();
+        $lead_stages = LeadStage::all();
         $leadtags = Tag::where('tag_id', 1)->get();
         $sidebarStats = $this->getSidebarStats();
 
@@ -436,7 +440,7 @@ class LeadController extends Controller
                 'groupedLeads',
                 'peoples',
                 'users',
-                  'lead_stages',
+                'lead_stages',
                 'leadtags',
                 'activity_types',
                 'formattedTotalLeads',
@@ -477,7 +481,7 @@ class LeadController extends Controller
         if ($request->filled('user_id')) {
             $query->where('assignee_id', $request->user_id);
         }
-         if (! empty($request->lead_tags_filter_id)) {
+        if (! empty($request->lead_tags_filter_id)) {
             $query->whereHas('tags', function ($q) use ($request) {
                 $q->whereIn('tags.id', $request->lead_tags_filter_id);
             });
@@ -598,7 +602,7 @@ class LeadController extends Controller
         if ($request->filled('user_id')) {
             $query->where('assignee_id', $request->user_id);
         }
-         if (! empty($request->lead_tags_filter_id)) {
+        if (! empty($request->lead_tags_filter_id)) {
             $query->whereHas('tags', function ($q) use ($request) {
                 $q->whereIn('tags.id', $request->lead_tags_filter_id);
             });
@@ -679,7 +683,7 @@ class LeadController extends Controller
                 'peoples',
                 'users',
                 'activity_types',
-                 'lead_stages',
+                'lead_stages',
                 'leadtags',
                 'formattedTotalLeads',
                 'formattedTotalValue',
@@ -722,7 +726,7 @@ class LeadController extends Controller
         if ($request->filled('user_id')) {
             $query->where('assignee_id', $request->user_id);
         }
-         if (! empty($request->lead_tags_filter_id)) {
+        if (! empty($request->lead_tags_filter_id)) {
             $query->whereHas('tags', function ($q) use ($request) {
                 $q->whereIn('tags.id', $request->lead_tags_filter_id);
             });
@@ -782,7 +786,7 @@ class LeadController extends Controller
         $peoples = People::all();
         $users = User::all();
         $activity_types = ActivityType::all();
-         $lead_stages = LeadStage::all();
+        $lead_stages = LeadStage::all();
         $leadtags = Tag::where('tag_id', 1)->get();
         $sidebarStats = $this->getSidebarStats();
 
@@ -846,7 +850,7 @@ class LeadController extends Controller
         if ($request->filled('user_id')) {
             $query->where('assignee_id', $request->user_id);
         }
-         if (! empty($request->lead_tags_filter_id)) {
+        if (! empty($request->lead_tags_filter_id)) {
             $query->whereHas('tags', function ($q) use ($request) {
                 $q->whereIn('tags.id', $request->lead_tags_filter_id);
             });
@@ -906,7 +910,7 @@ class LeadController extends Controller
         $peoples = People::all();
         $users = User::all();
         $activity_types = ActivityType::all();
-          $lead_stages = LeadStage::all();
+        $lead_stages = LeadStage::all();
         $leadtags = Tag::where('tag_id', 1)->get();
         $sidebarStats = $this->getSidebarStats();
 
@@ -927,7 +931,7 @@ class LeadController extends Controller
                 'peoples',
                 'users',
                 'activity_types',
-                  'lead_stages',
+                'lead_stages',
                 'leadtags',
                 'formattedTotalLeads',
                 'formattedTotalValue',

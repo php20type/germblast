@@ -14,7 +14,8 @@
                     <div class="sidebar">
                         <ul class="list-inline">
                             <li>
-                                <a class="nav-link d-inline-block w-100" href="#">
+                                <a class="nav-link d-inline-block w-100 {{ request()->routeIs('admin.sales.index') ? 'active' : '' }}"
+                                    href="{{ route('admin.sales.index') }}">
 
                                     <svg width="18" height="17" viewBox="0 0 18 17" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
@@ -196,27 +197,10 @@
                                             stroke="white" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
 
-                                    Leads
-                                </a>
-                            </li>
-                            <li>
-                                <a class="nav-link d-inline-block w-100" href="#">
-
-
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-                                        xmlns="http://www.w3.org/2000/svg">
-                                        <path
-                                            d="M1 8C1 8.91925 1.18106 9.82951 1.53284 10.6788C1.88463 11.5281 2.40024 12.2997 3.05025 12.9497C3.70026 13.5998 4.47194 14.1154 5.32122 14.4672C6.1705 14.8189 7.08075 15 8 15C8.91925 15 9.82951 14.8189 10.6788 14.4672C11.5281 14.1154 12.2997 13.5998 12.9497 12.9497C13.5998 12.2997 14.1154 11.5281 14.4672 10.6788C14.8189 9.82951 15 8.91925 15 8C15 6.14348 14.2625 4.36301 12.9497 3.05025C11.637 1.7375 9.85652 1 8 1C6.14348 1 4.36301 1.7375 3.05025 3.05025C1.7375 4.36301 1 6.14348 1 8Z"
-                                            stroke="white" stroke-linecap="round" stroke-linejoin="round" />
-                                        <path
-                                            d="M4 8C4 8.52529 4.10346 9.04543 4.30448 9.53073C4.5055 10.016 4.80014 10.457 5.17157 10.8284C5.54301 11.1999 5.98396 11.4945 6.46927 11.6955C6.95457 11.8965 7.47471 12 8 12C8.52529 12 9.04543 11.8965 9.53073 11.6955C10.016 11.4945 10.457 11.1999 10.8284 10.8284C11.1999 10.457 11.4945 10.016 11.6955 9.53073C11.8965 9.04543 12 8.52529 12 8C12 6.93913 11.5786 5.92172 10.8284 5.17157C10.0783 4.42143 9.06087 4 8 4C6.93913 4 5.92172 4.42143 5.17157 5.17157C4.42143 5.92172 4 6.93913 4 8Z"
-                                            stroke="white" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-
                                     Product List
                                 </a>
                             </li>
-                             <li>
+                            <li>
                                 <a class="nav-link d-inline-block w-100" href="#">
 
 
@@ -297,7 +281,7 @@
 
                             <div class="row">
                                 <div class="col-md-4">
-                                    <div class="metric-card new-lead">
+                                    <div class="metric-card new-lead" id="newLeadCard">
                                         <h3>NEW LEAD</h3>
                                         <div class="metric-value green">{{ $newLeadsThisMonth }}</div>
                                         {{-- <div class="metric-change">Down 14% From 7 This Time Last Month</div> --}}
@@ -305,7 +289,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <div class="metric-card open-leads">
+                                    <div class="metric-card open-leads" id="openLeadCard">
                                         <h3>OPEN LEADS</h3>
                                         <div class="metric-value blue">{{ $openLeadsThisMonth }}</div>
                                         {{-- <div class="metric-change">Down 6% From $5.48m This Time Last Month</div> --}}
@@ -313,7 +297,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <div class="metric-card sales">
+                                    <div class="metric-card sales" id="saleLeadCard">
                                         <h3>SALES</h3>
                                         <div class="metric-value red">{{ $salesLeadsThisMonth }}</div>
                                         {{-- <div class="metric-change">Down 75% From $66.2k This Time Last Month</div> --}}
@@ -410,7 +394,7 @@
                                         <div class="company-form">
                                             <div class="pipeline-stages">
                                                 <!-- Stage 1: Int. GB Presentation -->
-                                                <div class="pipeline-stage stage-1">
+                                                <div class="pipeline-stage stage-1" data-lead-stage="1">
                                                     <div class="stage-info">
                                                         <div class="stage-name">Int. GB Presentation</div>
                                                         <div class="stage-metrics">
@@ -426,7 +410,7 @@
                                                 </div>
 
                                                 <!-- Stage 2: Site Survey -->
-                                                <div class="pipeline-stage stage-2">
+                                                <div class="pipeline-stage stage-2" data-lead-stage="2">
                                                     <div class="stage-info">
                                                         <div class="stage-name">Site Survey</div>
                                                         <div class="stage-metrics">
@@ -441,7 +425,7 @@
                                                 </div>
 
                                                 <!-- Stage 3: Proposal Approval -->
-                                                <div class="pipeline-stage stage-3">
+                                                <div class="pipeline-stage stage-3" data-lead-stage="3">
                                                     <div class="stage-info">
                                                         <div class="stage-name">Proposal Approval</div>
                                                         <div class="stage-metrics">
@@ -457,7 +441,7 @@
                                                 </div>
 
                                                 <!-- Stage 4: Proposal Pres. -->
-                                                <div class="pipeline-stage stage-4">
+                                                <div class="pipeline-stage stage-4" data-lead-stage="4">
                                                     <div class="stage-info">
                                                         <div class="stage-name">Proposal Pres.</div>
                                                         <div class="stage-metrics">
@@ -473,7 +457,7 @@
                                                 </div>
 
                                                 <!-- Stage 5: Rec. Signed Proposal -->
-                                                <div class="pipeline-stage stage-5">
+                                                <div class="pipeline-stage stage-5" data-lead-stage="5">
                                                     <div class="stage-info">
                                                         <div class="stage-name">Rec. Signed Proposal</div>
                                                         <div class="stage-metrics">
@@ -537,26 +521,27 @@
                                             <div class="filter-tags mt-3 d-flex flex-wrap gap-3">
                                                 <div class="filter-group">
                                                     <select class="form-select filter-tag">
-                                                        <option selected>Type</option>
-                                                        <option value="1">1</option>
-                                                        <option value="2">2</option>
-                                                        <option value="3">3</option>
+                                                        <option value="all">All Activity Types</option>
+                                                        @foreach ($activitytypes as $activitytype)
+                                                            <option value="{{ $activitytype->id }}">
+                                                                {{ $activitytype->type }}</option>
+                                                        @endforeach
                                                     </select>
                                                 </div>
                                                 <div class="filter-group">
                                                     <select class="form-select filter-tag">
-                                                        <option selected>Jordan Barbosa</option>
-                                                        <option value="1">1</option>
-                                                        <option value="2">2</option>
-                                                        <option value="3">3</option>
+                                                        <option value="all">All Users</option>
+                                                        @foreach ($users as $user)
+                                                            <option value="{{ $user->id }}">{{ $user->name }}
+                                                            </option>
+                                                        @endforeach
                                                     </select>
                                                 </div>
                                                 <div class="filter-group">
                                                     <select class="form-select filter-tag">
-                                                        <option selected>Any Status</option>
-                                                        <option value="1">1</option>
-                                                        <option value="2">2</option>
-                                                        <option value="3">3</option>
+                                                        <option selected>Status</option>
+                                                        <option value="logged">Logged</option>
+                                                        <option value="scheduled">Scheduled</option>
                                                     </select>
                                                 </div>
                                                 <div class="form-check">
@@ -570,74 +555,495 @@
                                                         leads</label>
                                                 </div>
                                             </div>
+
                                             <div class="section-header">
-                                                <h4>UNLOGGED ACTIVITIES (14)</h4>
+                                                <div>LOGGED ACTIVITIES (12)</div>
                                             </div>
 
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="activity-item">
-                                                        <div class="activity-time">10:00 PM</div>
-                                                        <div class="activity-date">Oct 27th, 2021</div>
-                                                        <div class="activity-title">Partner Appreciation
-                                                            Luncheon hosted by UTA/Maverick Sports Properties
+                                            <div class="timeline-container">
+                                                <div class="timeline position-relative">
+                                                    @foreach ($logged_activities as $item)
+                                                        <div class="timeline-item">
+                                                            {{-- <div class="timeline-icon">
+                                                                    <i class="{{ $item->activityType->icon }}"></i>
+                                                                </div> --}}
+                                                            <div class="timeline-content">
+                                                                <div class="timeline-header">
+                                                                    <div class="timestamp">
+                                                                        {{-- {{ \Carbon\Carbon::parse($item->created_at)->format('g:i A \o\n M j, Y') }} --}}
+                                                                        {{ \Carbon\Carbon::parse($item->end_time)->format('g:i A') ?? 'N/A' }}
+                                                                        on
+                                                                        {{ \Carbon\Carbon::parse($item->date)->format('M j, Y') }}
+
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="timeline-body">
+                                                                    <div class="row align-items-center">
+                                                                        <div class="col-8">
+                                                                            <p class="mb-0">
+                                                                                <span class="author-link">
+                                                                                    {{ $item->creator->name ?? 'N/A' }}
+                                                                                </span>
+                                                                                logged an activity with
+                                                                                <span class="organization">
+                                                                                    {{ $item->participant_names }}
+                                                                                </span>
+                                                                            </p>
+                                                                        </div>
+
+                                                                        <div class="col-4 text-end">
+                                                                            <button
+                                                                                class="btn btn-sm btn-outline-primary me-1 add-comment-btn"
+                                                                                title="Add Comment" data-type="Activity"
+                                                                                data-id="{{ $item->id }}">
+                                                                                <i class="fas fa-comment"></i>
+                                                                            </button>
+                                                                            <button
+                                                                                class="btn btn-sm btn-outline-danger delete-activity-btn"
+                                                                                title="Delete Activity"
+                                                                                data-type="Activity"
+                                                                                data-id="{{ $item->id }}">
+                                                                                <i class="fas fa-times"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="activity-details">
+                                                                        <div class="row">
+                                                                            <div class="col-10">
+                                                                                <div class="activity-label mb-0">
+                                                                                    {{ $item->activityType->type ?? 'N/A' }}
+                                                                                </div>
+                                                                                <div class="activity-description">
+                                                                                    <div class="text-muted mb-2">
+                                                                                        <span><i
+                                                                                                class="fas fa-pen-to-square text-primary me-1"></i></span>
+                                                                                        {{ $item->note }}
+                                                                                    </div>
+                                                                                    <div class="text-muted">
+                                                                                        <span><i
+                                                                                                class="fas fa-file-alt text-warning me-1"></i></span>
+                                                                                        {{ $item->description }}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-2">
+                                                                                <div class="activity-badges">
+                                                                                    <span
+                                                                                        class="activity-badge badge-cc">JB</span>
+                                                                                    <span
+                                                                                        class="activity-badge badge-cc">TC</span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                    @if ($item->comments->isNotEmpty())
+                                                                        <div class="comment-box d-flex flex-column">
+                                                                            @foreach ($item->comments as $comment)
+                                                                                <div
+                                                                                    class="d-flex justify-content-between align-items-center mb-2">
+                                                                                    <div>
+                                                                                        <span class="comment-avatar">
+                                                                                            {{ strtoupper(substr($comment->creator->name ?? 'N/A', 0, 2)) }}
+                                                                                        </span>
+                                                                                        <span
+                                                                                            class="comment-text">{{ $comment->comment }}</span>
+                                                                                    </div>
+                                                                                    <span
+                                                                                        class="btn btn-sm delete-comment-btn"
+                                                                                        data-id="{{ $comment->id }}"
+                                                                                        data-type="Activity">
+                                                                                        <i class="fas fa-times"></i>
+                                                                                    </span>
+                                                                                </div>
+                                                                            @endforeach
+                                                                        </div>
+                                                                    @endif
+
+                                                                    <div class="mt-3 d-none add-comment"
+                                                                        data-id="{{ $item->id }}"
+                                                                        data-type="Activity">
+                                                                        <textarea id="activity-comment-textarea" name="comment_text" class="form-textarea"
+                                                                            placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
+
+                                                                        <button
+                                                                            class="mt-3 btn btn-sm btn-outline-success add-comment-submit"
+                                                                            title="">
+                                                                            Add Comment
+                                                                        </button>
+                                                                        <button
+                                                                            class="mt-3 btn btn-sm btn-outline-danger comment-cancel"
+                                                                            title="Close">
+                                                                            Close
+                                                                        </button>
+                                                                    </div>
+
+                                                                </div>
+
+                                                            </div>
                                                         </div>
-                                                        <div class="activity-details">UTA CPC 2-21/22 ⭐</div>
-                                                        <div class="activity-contacts">alidell@germblast.com
-                                                        </div>
-                                                        <a href="#" class="more-link">+4 More</a>
-                                                    </div>
-                                                </div>
+                                                    @endforeach
 
-                                                <div class="col-md-6">
-                                                    <div class="activity-item">
-                                                        <div class="activity-time">7:00 AM</div>
-                                                        <div class="activity-date">Mar 19th, 2022</div>
-                                                        <div class="activity-title">Lady Mavs NCAA Watch Party
-                                                            (tip off 9pm)</div>
-                                                        <div class="activity-details">UTA CPC 2-21/22 ⭐</div>
-                                                        <div class="activity-contacts">'aaguilarwo@gmail.com'
-                                                            'andy.james@brodnax21c.com'</div>
-                                                        <a href="#" class="more-link">+108 More</a>
-                                                    </div>
                                                 </div>
                                             </div>
 
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="activity-item">
-                                                        <div class="activity-time">8:00 PM</div>
-                                                        <div class="activity-date">Nov 7th, 2022</div>
-                                                        <div class="activity-title">GB Jumpstart</div>
-                                                        <div class="activity-details">aiyana rivera Robert
-                                                            Morrison<br>Phil Cotham</div>
-                                                        <a href="#" class="more-link">+13 More</a>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <div class="activity-item">
-                                                        <div class="activity-time">6:00 PM</div>
-                                                        <div class="activity-date">Nov 14th, 2022</div>
-                                                        <div class="activity-title">GB Jumpstart</div>
-                                                        <div class="activity-details">aiyana rivera Robert
-                                                            Morrison Don Delozier<br>Phil Cotham</div>
-                                                        <a href="#" class="more-link">+13 More</a>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
 
                                         <!-- TO DO TAB -->
                                         <div class="tab-pane fade" id="todo" role="tabpanel"
                                             aria-labelledby="todo-tab">
-                                            <p class="mt-3">TO DO content goes here...</p>
+
+                                            @foreach ($pending_tasks as $task)
+                                                <div class="task-section mt-2">
+                                                    <div class="company-list mb-3 border rounded p-3">
+                                                        <div class="row align-items-start">
+                                                            <div class="col-md-6">
+                                                                <div class="company-name">
+                                                                    <p><strong>{{ $task->title ?? 'N/A' }}</strong></p>
+                                                                    <p class="text-secondary">
+                                                                        Due
+                                                                        {{ \Carbon\Carbon::parse($task->due_time)->format('M d, \a\t g:i a') }}
+                                                                    </p>
+                                                                    <p class="text-warning">
+                                                                        {{ $task->assignee_name ?? 'N/A' }}</p>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-6 d-flex justify-content-end">
+                                                                <div class="d-flex gap-2">
+                                                                    <!-- Completed -->
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-success mark-complete-btn"
+                                                                        title="Mark as Completed"
+                                                                        data-id="{{ $task->id }}">
+                                                                        <i class="fas fa-check"></i>
+                                                                    </button>
+
+                                                                    <!-- Edit -->
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-primary toggleEditTask"
+                                                                        data-id="{{ $task->id }}"
+                                                                        data-title="{{ $task->title }}"
+                                                                        data-due="{{ $task->due_time }}"
+                                                                        data-user="{{ $task->assignee_id }}"
+                                                                        data-description="{{ $task->description }}"
+                                                                        title="Edit Task">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </button>
+
+                                                                    <!-- Delete -->
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-secondary delete-task-btn"
+                                                                        title="Delete Task"
+                                                                        data-id="{{ $task->id }}">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row mt-2">
+                                                            <div class="col-12">
+                                                                <div
+                                                                    class="email-preview border rounded p-3 text-secondary">
+                                                                    {{ $task->description ?? 'N/A' }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+
                                         </div>
 
                                         <!-- TIMELINE TAB -->
                                         <div class="tab-pane fade" id="timeline" role="tabpanel"
                                             aria-labelledby="timeline-tab">
-                                            <p class="mt-3">TIMELINE content goes here...</p>
+
+                                            <!-- Timeline -->
+                                            <div class="timeline-container">
+                                                <div class="timeline position-relative">
+                                                    @foreach ($timeline as $item)
+                                                        @if ($item->type === 'activity')
+                                                            <div class="timeline-item">
+                                                                {{-- <div class="timeline-icon">
+                                                                    <i class="{{ $item->activityType->icon }}"></i>
+                                                                </div> --}}
+                                                                <div class="timeline-content">
+                                                                    <div class="timeline-header">
+                                                                        <div class="timestamp">
+                                                                            {{-- {{ \Carbon\Carbon::parse($item->created_at)->format('g:i A \o\n M j, Y') }} --}}
+                                                                            {{ \Carbon\Carbon::parse($item->end_time)->format('g:i A') ?? 'N/A' }}
+                                                                            on
+                                                                            {{ \Carbon\Carbon::parse($item->date)->format('M j, Y') }}
+
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="timeline-body">
+                                                                        <div class="row align-items-center">
+                                                                            <div class="col-8">
+                                                                                <p class="mb-0">
+                                                                                    <span class="author-link">
+                                                                                        {{ $item->creator->name ?? 'N/A' }}
+                                                                                    </span>
+                                                                                    logged an activity with
+                                                                                    <span class="organization">
+                                                                                        {{ $item->participant_names }}
+                                                                                    </span>
+                                                                                </p>
+                                                                            </div>
+
+                                                                            <div class="col-4 text-end">
+                                                                                <button
+                                                                                    class="btn btn-sm btn-outline-primary me-1 add-comment-btn"
+                                                                                    title="Add Comment"
+                                                                                    data-type="Activity"
+                                                                                    data-id="{{ $item->id }}">
+                                                                                    <i class="fas fa-comment"></i>
+                                                                                </button>
+                                                                                <button
+                                                                                    class="btn btn-sm btn-outline-danger delete-activity-btn"
+                                                                                    title="Delete Activity"
+                                                                                    data-type="Activity"
+                                                                                    data-id="{{ $item->id }}">
+                                                                                    <i class="fas fa-times"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="activity-details">
+                                                                            <div class="row">
+                                                                                <div class="col-10">
+                                                                                    <div class="activity-label mb-0">
+                                                                                        {{ $item->activityType->type ?? 'N/A' }}
+                                                                                    </div>
+                                                                                    <div class="activity-description">
+                                                                                        <div class="text-muted mb-2">
+                                                                                            <span><i
+                                                                                                    class="fas fa-pen-to-square text-primary me-1"></i></span>
+                                                                                            {{ $item->note }}
+                                                                                        </div>
+                                                                                        <div class="text-muted">
+                                                                                            <span><i
+                                                                                                    class="fas fa-file-alt text-warning me-1"></i></span>
+                                                                                            {{ $item->description }}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-2">
+                                                                                    <div class="activity-badges">
+                                                                                        <span
+                                                                                            class="activity-badge badge-cc">JB</span>
+                                                                                        <span
+                                                                                            class="activity-badge badge-cc">TC</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                        @if ($item->comments->isNotEmpty())
+                                                                            <div class="comment-box d-flex flex-column">
+                                                                                @foreach ($item->comments as $comment)
+                                                                                    <div
+                                                                                        class="d-flex justify-content-between align-items-center mb-2">
+                                                                                        <div>
+                                                                                            <span class="comment-avatar">
+                                                                                                {{ strtoupper(substr($comment->creator->name ?? 'N/A', 0, 2)) }}
+                                                                                            </span>
+                                                                                            <span
+                                                                                                class="comment-text">{{ $comment->comment }}</span>
+                                                                                        </div>
+                                                                                        <span
+                                                                                            class="btn btn-sm delete-comment-btn"
+                                                                                            data-id="{{ $comment->id }}"
+                                                                                            data-type="Activity">
+                                                                                            <i class="fas fa-times"></i>
+                                                                                        </span>
+                                                                                    </div>
+                                                                                @endforeach
+                                                                            </div>
+                                                                        @endif
+
+                                                                        <div class="mt-3 d-none add-comment"
+                                                                            data-id="{{ $item->id }}"
+                                                                            data-type="Activity">
+                                                                            <textarea id="activity-comment-textarea" name="comment_text" class="form-textarea"
+                                                                                placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
+
+                                                                            <button
+                                                                                class="mt-3 btn btn-sm btn-outline-success add-comment-submit"
+                                                                                title="">
+                                                                                Add Comment
+                                                                            </button>
+                                                                            <button
+                                                                                class="mt-3 btn btn-sm btn-outline-danger comment-cancel"
+                                                                                title="Close">
+                                                                                Close
+                                                                            </button>
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        @elseif ($item->type === 'note')
+                                                            <div class="timeline-item">
+                                                                {{-- <div class="timeline-icon">
+                                                                    <i class="fas fa-sticky-note"></i>
+                                                                </div> --}}
+                                                                <div class="timeline-content">
+                                                                    <div class="timeline-header">
+                                                                        <div class="timestamp">
+                                                                            {{ \Carbon\Carbon::parse($item->created_at)->format('g:i A \o\n M j, Y') }}
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="timeline-body">
+                                                                        <div class="row align-items-center">
+                                                                            <div class="col-8">
+                                                                                <p class="mb-0">
+                                                                                    <span class="author-link">
+                                                                                        {{ $item->creator->name ?? 'N/A' }}
+                                                                                    </span>
+                                                                                    wrote a note on
+                                                                                    <span class="organization">
+                                                                                        {{ $item->owner->name }}
+                                                                                    </span>
+                                                                                </p>
+                                                                            </div>
+
+                                                                            <div class="col-4 text-end">
+                                                                                <button
+                                                                                    class="btn btn-sm btn-outline-primary me-1 add-comment-btn"
+                                                                                    title="Add Comment" data-type="Note"
+                                                                                    data-id="{{ $item->id }}">
+                                                                                    <i class="fas fa-comment"></i>
+                                                                                </button>
+                                                                                <button
+                                                                                    class="btn btn-sm btn-outline-danger delete-note-btn"
+                                                                                    title="Delete Note" data-type="Note"
+                                                                                    data-id="{{ $item->id }}">
+                                                                                    <i class="fas fa-times"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+
+
+                                                                        <div class="activity-details">
+                                                                            <div class="row">
+                                                                                <div class="col-10">
+                                                                                    <div class="activity-description">
+                                                                                        <div class="text-muted mb-2">
+                                                                                            <span><i
+                                                                                                    class="fas fa-pen-to-square text-primary me-1"></i></span>
+                                                                                            {{ $item->note }}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-2">
+                                                                                    <div class="activity-badges">
+                                                                                        <span
+                                                                                            class="activity-badge badge-cc">JB</span>
+                                                                                        <span
+                                                                                            class="activity-badge badge-cc">TC</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                        @if ($item->comments->isNotEmpty())
+                                                                            <div class="comment-box d-flex flex-column">
+                                                                                @foreach ($item->comments as $comment)
+                                                                                    <div
+                                                                                        class="d-flex justify-content-between align-items-center mb-2">
+                                                                                        <div>
+                                                                                            <span class="comment-avatar">
+                                                                                                {{ strtoupper(substr($comment->creator->name ?? 'N/A', 0, 2)) }}
+                                                                                            </span>
+                                                                                            <span
+                                                                                                class="comment-text">{{ $comment->comment }}</span>
+                                                                                        </div>
+                                                                                        <span
+                                                                                            class="btn btn-sm delete-comment-btn"
+                                                                                            data-id="{{ $comment->id }}"
+                                                                                            data-type="Activity">
+                                                                                            <i class="fas fa-times"></i>
+                                                                                        </span>
+                                                                                    </div>
+                                                                                @endforeach
+                                                                            </div>
+                                                                        @endif
+
+                                                                        <div class="mt-3 d-none add-comment"
+                                                                            data-id="{{ $item->id }}"
+                                                                            data-type="Note">
+                                                                            <textarea id="note-comment-textarea" name="comment_text" class="form-textarea"
+                                                                                placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
+
+                                                                            <button
+                                                                                class="mt-3 btn btn-sm btn-outline-success add-comment-submit"
+                                                                                title="">
+                                                                                Add Comment
+                                                                            </button>
+                                                                            <button
+                                                                                class="mt-3 btn btn-sm btn-outline-danger comment-cancel"
+                                                                                title="Close">
+                                                                                Close
+                                                                            </button>
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        @elseif ($item->type === 'timeline')
+                                                            <div class="timeline-item">
+                                                                {{-- <div class="timeline-icon">
+                                                                    <i class="fas fa-angle-double-right"></i>
+                                                                </div> --}}
+                                                                <div class="timeline-content">
+                                                                    <div class="timeline-header">
+                                                                        <div class="timestamp">
+                                                                            {{ \Carbon\Carbon::parse($item->created_at)->format('g:i A \o\n M j, Y') }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="timeline-body">
+                                                                        <div class="row align-items-center">
+                                                                            <div class="col-12">
+                                                                                <p class="mb-0">
+                                                                                    <span class="author-link">
+                                                                                        {{ $item->creator->name ?? 'N/A' }}
+                                                                                    </span>
+                                                                                    {{ $item->description ?? 'N/A' }}
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        @elseif ($item->type === 'milestone')
+                                                            <div class="timeline-item milestone">
+                                                                {{-- <div class="timeline-icon">
+                                                                    <i class="fa-brands fa-web-awesome"></i>
+                                                                </div> --}}
+                                                                <strong>🎉 {{ $item->title }}</strong>
+                                                                <span
+                                                                    class="text-muted">{{ $item->timestamp->format('M d, Y') }}</span>
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -1103,6 +1509,190 @@
     </script>
 
     <script>
+        $(document).ready(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            });
+
+            // ==============================
+            // Delete Activity
+            // ==============================
+
+            $(document).on('click', '.delete-activity-btn', function() {
+                var activityId = $(this).data('id'); // get task ID from button
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to delete this activity?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/admin/delete_activity/" + activityId,
+                            method: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: response.message ||
+                                        "Activity deleted successfully.",
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(function() {
+                                    location.reload(); // reload after deletion
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong.'
+                                });
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                });
+            });
+
+            // ==============================
+            // Adding the comment
+            // ==============================
+            $(document).on('click', '.add-comment-submit', function() {
+                let commentBox = $(this).closest('.add-comment');
+                let type = commentBox.data('type'); // Activity or Note
+                let id = commentBox.data('id'); // Item ID
+                let commentText = commentBox.find('textarea[name="comment_text"]').val();
+
+                if (!commentText.trim()) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Empty Comment',
+                        text: 'Please enter a comment before submitting.'
+                    });
+                    return;
+                }
+
+                // Determine URL based on type (like delete)
+                let url = '';
+                if (type === 'Activity') {
+                    url = '/admin/activity/add_comment/' + id;
+                } else {
+                    url = '/admin/note/add_comment/' + id;
+                }
+
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        comment: commentText
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => location.reload());
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON?.message ||
+                                'Something went wrong while adding the comment.'
+                        });
+                    }
+                });
+            });
+
+
+            // ==============================
+            // Removing the comment
+            // ==============================
+            $(document).on('click', '.delete-comment-btn', function() {
+                var commentId = $(this).data('id');
+                var type = $(this).data('type'); // Activity or Note
+                var url = '';
+
+                // Determine URL based on type
+                if (type === "Activity") {
+                    url = "/admin/activity/delete_comment/" + commentId;
+                } else {
+                    url = "/admin/note/delete_comment/" + commentId;
+                }
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Do you want to remove this comment?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, Remove"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: url,
+                            method: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Removed",
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location
+                                        .reload(); // reload to update comment list
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: xhr.responseJSON?.message ||
+                                        "Something went wrong."
+                                });
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    }
+                });
+            });
+
+
+            // ==============================
+            // Activity and note Comment box toggle functionality
+            // ==============================
+            $('.add-comment-btn').click(function() {
+                // Find the nearest comment box relative to this button
+                $(this).closest('.timeline-item').find('.add-comment').toggleClass('d-none');
+            });
+
+            $('.comment-cancel').click(function() {
+                const $commentBox = $(this).closest('.add-comment');
+                $commentBox.addClass('d-none');
+                $commentBox.find('textarea').val(''); // Clear the textarea content
+            });
+
+        });
+
         // Close button functionality
         document.querySelector('.btn-close').addEventListener('click', function() {
             console.log('Modal would close');
@@ -1180,5 +1770,40 @@
                 offset: Number.NEGATIVE_INFINITY
             }).element;
         }
+
+        // Redirecting user to index page of leads with attached filters
+        $('.pipeline-stage').on('click', function() {
+            const stageId = $(this).data('lead-stage');
+            sessionStorage.setItem('selectedLeadStage', stageId);
+            window.location.href = "{{ route('admin.leads.index') }}";
+        });
+
+        // When user clicks on "NEW LEAD" metric card
+        $('#newLeadCard').on('click', function() {
+            sessionStorage.setItem('lead_filters', JSON.stringify({
+                month_to_date: true,
+            }));
+            window.location.href = "{{ route('admin.leads.index') }}";
+        });
+
+        // Handle "OPEN LEADS" card click
+        $('#openLeadCard').on('click', function() {
+            // Save both filters (Month-to-Date + Open status)
+            sessionStorage.setItem('lead_filters', JSON.stringify({
+                month_to_date: true,
+                leads_status: ['open']
+            }));
+            window.location.href = "{{ route('admin.leads.index') }}";
+        });
+
+        // Handle "SALE LEADS" card click
+        $('#saleLeadCard').on('click', function() {
+            // Save both filters (Month-to-Date + Open status)
+            sessionStorage.setItem('lead_filters', JSON.stringify({
+                month_to_date: true,
+                leads_status: ['won']
+            }));
+            window.location.href = "{{ route('admin.leads.index') }}";
+        });
     </script>
 @endpush
