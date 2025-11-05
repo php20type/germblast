@@ -3947,7 +3947,7 @@
     <script>
         $(document).ready(function() {
             function fetchFilteredTimeline() {
-                // ✅ Fetch company_id dynamically from dropdown
+                // Fetch company_id dynamically from dropdown
                 let companyId = $('#filter-range').data('company-id');
                 let filter_range = $('select[name="filter_range"]').val();
                 let activity_type_id = $('#filter-activity').val();

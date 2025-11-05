@@ -183,6 +183,21 @@
 
 
                     <div class="row mx-0" id="filter-section">
+
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Open Date</label>
+                                <div class="checkbox-group">
+                                    <!-- Month-to-Date Checkbox -->
+                                    <div class="form-check">
+                                        <input type="checkbox" name="month_to_date" id="month_to_date"
+                                            class="form-check-input">
+                                        <label class="form-check-label" for="month_to_date">Month-to-Date</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label class="form-label">Lead Tags</label>
@@ -267,6 +282,7 @@
 
     @push('scripts')
         <script>
+            
             function addFilter() {
                 $('#AddFilter').modal('show');
             }
@@ -302,6 +318,9 @@
                         activity_type_filter_id.push($(this).val());
                     });
 
+                    // New open date filters
+                    let month_to_date = $('#month_to_date').is(':checked') ? 1 : 0;
+
                     $.ajax({
                         url: `/admin/leads/my-leads/${userId}`,
                         method: "GET",
@@ -314,6 +333,7 @@
                             lead_stage_filter_id: lead_stage_filter_id,
                             leads_status: leads_status,
                             activity_type_filter_id: activity_type_filter_id,
+                            month_to_date: month_to_date,
                         },
                         success: function(response) {
                             $('table tbody').html(response.table);

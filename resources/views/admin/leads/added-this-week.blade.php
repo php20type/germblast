@@ -36,7 +36,7 @@
                                                 <input type="search" class="form-control" placeholder=""
                                                     aria-label="Search" id="lead-search">
                                             </div>
-                                           <span class="company-count">{{ $formattedTotalLeads }} Lead Found</span>
+                                            <span class="company-count">{{ $formattedTotalLeads }} Lead Found</span>
                                         </div>
                                     </div>
                                     <div class="col-md-6 ">
@@ -76,7 +76,7 @@
                             </div>
 
                             <div class="filter-value">
-                               <div class="row">
+                                <div class="row">
                                     <div class="col-lg-3 col-md-6">
                                         <div class="filter-card">
                                             <h5 id="total-value">Total value:<span>${{ $formattedTotalValue }}</span></h5>
@@ -105,7 +105,7 @@
                                 <div class="table-container mt-3">
                                     <table class="table table-hover">
                                         <thead>
-                                           <tr>
+                                            <tr>
                                                 <th class="checkbox-cell">
                                                     <input type="checkbox" class="form-check-input" id="selectAll">
                                                 </th>
@@ -122,7 +122,8 @@
                                         <tbody>
                                             @forelse ($groupedLeads as $lead)
                                                 <tr>
-                                                    <td><input type="checkbox" class="form-check-input row-checkbox" data-id="{{ $lead['id'] }}"></td>
+                                                    <td><input type="checkbox" class="form-check-input row-checkbox"
+                                                            data-id="{{ $lead['id'] }}"></td>
 
                                                     <td>
                                                         <div class="company-name">
@@ -154,7 +155,7 @@
                             </div>
 
                             <!-- Action Bar -->
-                           <div class="action-bar" id="actionBar">
+                            <div class="action-bar" id="actionBar">
                                 <div class="d-flex align-items-center justify-content-center">
                                     <span class="me-3"><strong id="selectedCount">1</strong> Selected</span>
                                     <button class="btn btn-delete btn-action">DELETE</button>
@@ -169,7 +170,7 @@
         </div>
     </main>
 
-      <!-- Extended Filters Modal Start -->
+    <!-- Extended Filters Modal Start -->
     <div class="modal fade" id="AddFilter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-fullscreen">
             <div class="modal-content">
@@ -184,6 +185,21 @@
 
 
                     <div class="row mx-0" id="filter-section">
+
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Open Date</label>
+                                <div class="checkbox-group">
+                                    <!-- Month-to-Date Checkbox -->
+                                    <div class="form-check">
+                                        <input type="checkbox" name="month_to_date" id="month_to_date"
+                                            class="form-check-input">
+                                        <label class="form-check-label" for="month_to_date">Month-to-Date</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label class="form-label">Lead Tags</label>
@@ -268,10 +284,9 @@
 @endsection
 @push('scripts')
     <script>
-
         function addFilter() {
-                $('#AddFilter').modal('show');
-            }
+            $('#AddFilter').modal('show');
+        }
 
         $(document).ready(function() {
             function fetchLeads() {
@@ -280,26 +295,30 @@
                 let user_id = $('select[name="user_id"]').val();
                 let hot = $('#checkDefault').is(':checked') ? 'hot' : '';
 
-                 // collect checkbox values
-                    let lead_tags_filter_id = [];
-                    $('input[name="lead_tags_filter_id[]"]:checked').each(function() {
-                        lead_tags_filter_id.push($(this).val());
-                    });
+                // collect checkbox values
+                let lead_tags_filter_id = [];
+                $('input[name="lead_tags_filter_id[]"]:checked').each(function() {
+                    lead_tags_filter_id.push($(this).val());
+                });
 
-                    let lead_stage_filter_id = [];
-                    $('input[name="lead_stage_filter_id[]"]:checked').each(function() {
-                        lead_stage_filter_id.push($(this).val());
-                    });
+                let lead_stage_filter_id = [];
+                $('input[name="lead_stage_filter_id[]"]:checked').each(function() {
+                    lead_stage_filter_id.push($(this).val());
+                });
 
-                    let leads_status = [];
-                    $('input[name="leads_status[]"]:checked').each(function() {
-                        leads_status.push($(this).val());
-                    });
+                let leads_status = [];
+                $('input[name="leads_status[]"]:checked').each(function() {
+                    leads_status.push($(this).val());
+                });
 
-                     let activity_type_filter_id = [];
-                        $('input[name="activity_type_filter_id[]"]:checked').each(function() {
-                            activity_type_filter_id.push($(this).val());
-                        });
+                let activity_type_filter_id = [];
+                $('input[name="activity_type_filter_id[]"]:checked').each(function() {
+                    activity_type_filter_id.push($(this).val());
+                });
+
+
+                // New open date filters
+                let month_to_date = $('#month_to_date').is(':checked') ? 1 : 0;
 
 
                 $.ajax({
@@ -310,10 +329,11 @@
                         status: status,
                         user_id: user_id,
                         hot: hot,
-                         lead_tags_filter_id: lead_tags_filter_id,
-                            lead_stage_filter_id: lead_stage_filter_id,
-                            leads_status: leads_status,
-                             activity_type_filter_id: activity_type_filter_id,
+                        lead_tags_filter_id: lead_tags_filter_id,
+                        lead_stage_filter_id: lead_stage_filter_id,
+                        leads_status: leads_status,
+                        activity_type_filter_id: activity_type_filter_id,
+                        month_to_date: month_to_date,
                     },
                     success: function(response) {
                         $('table tbody').html(response.table);
@@ -329,11 +349,11 @@
             }
 
             $('#lead-search').on('keyup', fetchLeads);
-           $('#checkDefault, select[name="status"], select[name="user_id"]').on('change', fetchLeads);
-             // catch all checkbox changes
-                $('#filter-section input[type="checkbox"]').on('change', fetchLeads);
+            $('#checkDefault, select[name="status"], select[name="user_id"]').on('change', fetchLeads);
+            // catch all checkbox changes
+            $('#filter-section input[type="checkbox"]').on('change', fetchLeads);
 
-             $(document).on('click', '.btn-delete', function() {
+            $(document).on('click', '.btn-delete', function() {
                 let selectedLeads = $('.row-checkbox:checked').map(function() {
                     return $(this).data('id');
                 }).get();

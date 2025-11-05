@@ -21,7 +21,7 @@
                                     <h3 class="mb-1">HOT LEADS <i class="fas fa-thumbtack pinned-icon"></i></h3>
                                     <p class="text-muted mb-0">Business deals with your companies and people</p>
                                 </div>
-                                 <div class="d-none right-part">
+                                <div class="d-none right-part">
                                     <button class="btn btn-email">Email</button>
                                     <button class="btn btn-export">EXPORT</button>
                                 </div>
@@ -65,7 +65,7 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                             <button class="btn btn-primary me-2" onclick="addFilter()">
+                                            <button class="btn btn-primary me-2" onclick="addFilter()">
                                                 <img src="{{ asset('img/icons/filter.svg') }}" alt="" />
                                             </button>
                                             <button class="d-none btn btn-primary"><img
@@ -121,9 +121,10 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                             @forelse ($groupedLeads as $lead)
+                                            @forelse ($groupedLeads as $lead)
                                                 <tr>
-                                                    <td><input type="checkbox" class="form-check-input row-checkbox" data-id="{{ $lead['id'] }}"></td>
+                                                    <td><input type="checkbox" class="form-check-input row-checkbox"
+                                                            data-id="{{ $lead['id'] }}"></td>
 
                                                     <td>
                                                         <div class="company-name">
@@ -169,7 +170,7 @@
         </div>
     </main>
 
-     <!-- Extended Filters Modal Start -->
+    <!-- Extended Filters Modal Start -->
     <div class="modal fade" id="AddFilter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-fullscreen">
             <div class="modal-content">
@@ -184,6 +185,22 @@
 
 
                     <div class="row mx-0" id="filter-section">
+
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Open Date</label>
+                                <div class="checkbox-group">
+                                    <!-- Month-to-Date Checkbox -->
+                                    <div class="form-check">
+                                        <input type="checkbox" name="month_to_date" id="month_to_date"
+                                            class="form-check-input">
+                                        <label class="form-check-label" for="month_to_date">Month-to-Date</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label class="form-label">Lead Tags</label>
@@ -269,6 +286,11 @@
 @endsection
 @push('scripts')
     <script>
+
+        function addFilter() {
+            $('#AddFilter').modal('show');
+        }
+
         $(document).ready(function() {
             function fetchLeads() {
                 let search = $('#lead-search').val();
@@ -276,26 +298,29 @@
                 let user_id = $('select[name="user_id"]').val();
                 let hot = $('#checkDefault').is(':checked') ? 'hot' : '';
 
-                 // collect checkbox values
-                    let lead_tags_filter_id = [];
-                    $('input[name="lead_tags_filter_id[]"]:checked').each(function() {
-                        lead_tags_filter_id.push($(this).val());
-                    });
+                // collect checkbox values
+                let lead_tags_filter_id = [];
+                $('input[name="lead_tags_filter_id[]"]:checked').each(function() {
+                    lead_tags_filter_id.push($(this).val());
+                });
 
-                    let lead_stage_filter_id = [];
-                    $('input[name="lead_stage_filter_id[]"]:checked').each(function() {
-                        lead_stage_filter_id.push($(this).val());
-                    });
+                let lead_stage_filter_id = [];
+                $('input[name="lead_stage_filter_id[]"]:checked').each(function() {
+                    lead_stage_filter_id.push($(this).val());
+                });
 
-                    let leads_status = [];
-                    $('input[name="leads_status[]"]:checked').each(function() {
-                        leads_status.push($(this).val());
-                    });
+                let leads_status = [];
+                $('input[name="leads_status[]"]:checked').each(function() {
+                    leads_status.push($(this).val());
+                });
 
-                     let activity_type_filter_id = [];
-                        $('input[name="activity_type_filter_id[]"]:checked').each(function() {
-                            activity_type_filter_id.push($(this).val());
-                        });
+                let activity_type_filter_id = [];
+                $('input[name="activity_type_filter_id[]"]:checked').each(function() {
+                    activity_type_filter_id.push($(this).val());
+                });
+
+                // New open date filters
+                let month_to_date = $('#month_to_date').is(':checked') ? 1 : 0;
 
                 $.ajax({
                     url: "{{ route('admin.leads.hot_leads') }}",
@@ -305,10 +330,11 @@
                         status: status,
                         user_id: user_id,
                         hot: hot,
-                         lead_tags_filter_id: lead_tags_filter_id,
-                            lead_stage_filter_id: lead_stage_filter_id,
-                            leads_status: leads_status,
-                             activity_type_filter_id: activity_type_filter_id,
+                        lead_tags_filter_id: lead_tags_filter_id,
+                        lead_stage_filter_id: lead_stage_filter_id,
+                        leads_status: leads_status,
+                        activity_type_filter_id: activity_type_filter_id,
+                        month_to_date: month_to_date,
                     },
                     success: function(response) {
                         $('table tbody').html(response.table);
@@ -324,12 +350,12 @@
             }
 
             $('#lead-search').on('keyup', fetchLeads);
-           $('#checkDefault, select[name="status"], select[name="user_id"]').on('change', fetchLeads);
-             // catch all checkbox changes
-                $('#filter-section input[type="checkbox"]').on('change', fetchLeads);
-                
+            $('#checkDefault, select[name="status"], select[name="user_id"]').on('change', fetchLeads);
+            // catch all checkbox changes
+            $('#filter-section input[type="checkbox"]').on('change', fetchLeads);
 
-             $(document).on('click', '.btn-delete', function() {
+
+            $(document).on('click', '.btn-delete', function() {
                 let selectedLeads = $('.row-checkbox:checked').map(function() {
                     return $(this).data('id');
                 }).get();

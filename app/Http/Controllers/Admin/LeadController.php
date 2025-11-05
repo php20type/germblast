@@ -252,6 +252,11 @@ class LeadController extends Controller
                 $q->whereIn('activity_type_id', $request->activity_type_filter_id);
             });
         }
+        if ($request->month_to_date) {
+            $startOfMonth = now()->startOfMonth();
+            $today = now();
+            $query->whereBetween('created_at', [$startOfMonth, $today]);
+        }
 
         // Get all leads
         $leads = $query->get();
@@ -375,6 +380,12 @@ class LeadController extends Controller
                 $q->whereIn('activity_type_id', $request->activity_type_filter_id);
             });
         }
+        if ($request->month_to_date) {
+            $startOfMonth = now()->startOfMonth();
+            $today = now();
+            $query->whereBetween('created_at', [$startOfMonth, $today]);
+        }
+
 
         // Get all leads
         $leads = $query->get();
@@ -497,6 +508,12 @@ class LeadController extends Controller
                 $q->whereIn('activity_type_id', $request->activity_type_filter_id);
             });
         }
+        if ($request->month_to_date) {
+            $startOfMonth = now()->startOfMonth();
+            $today = now();
+            $query->whereBetween('created_at', [$startOfMonth, $today]);
+        }
+
 
         // Get all leads
         $leads = $query->get();
@@ -618,6 +635,12 @@ class LeadController extends Controller
                 $q->whereIn('activity_type_id', $request->activity_type_filter_id);
             });
         }
+        if ($request->month_to_date) {
+            $startOfMonth = now()->startOfMonth();
+            $today = now();
+            $query->whereBetween('created_at', [$startOfMonth, $today]);
+        }
+
 
         // Get all leads
         $leads = $query->get();
@@ -742,6 +765,12 @@ class LeadController extends Controller
                 $q->whereIn('activity_type_id', $request->activity_type_filter_id);
             });
         }
+        if ($request->month_to_date) {
+            $startOfMonth = now()->startOfMonth();
+            $today = now();
+            $query->whereBetween('created_at', [$startOfMonth, $today]);
+        }
+
 
         // Get all leads
         $leads = $query->get();
@@ -866,6 +895,12 @@ class LeadController extends Controller
                 $q->whereIn('activity_type_id', $request->activity_type_filter_id);
             });
         }
+        if ($request->month_to_date) {
+            $startOfMonth = now()->startOfMonth();
+            $today = now();
+            $query->whereBetween('created_at', [$startOfMonth, $today]);
+        }
+
 
         // Get all leads
         $leads = $query->get();

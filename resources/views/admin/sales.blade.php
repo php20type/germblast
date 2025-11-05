@@ -518,51 +518,46 @@
                                         <!-- ACTIVITIES TAB -->
                                         <div class="tab-pane fade show active" id="activities" role="tabpanel"
                                             aria-labelledby="activities-tab">
-                                            <div class="filter-tags mt-3 d-flex flex-wrap gap-3">
-                                                <div class="filter-group">
-                                                    <select class="form-select filter-tag">
-                                                        <option value="all">All Activity Types</option>
-                                                        @foreach ($activitytypes as $activitytype)
-                                                            <option value="{{ $activitytype->id }}">
-                                                                {{ $activitytype->type }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="filter-group">
-                                                    <select class="form-select filter-tag">
-                                                        <option value="all">All Users</option>
-                                                        @foreach ($users as $user)
-                                                            <option value="{{ $user->id }}">{{ $user->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <div class="filter-group">
-                                                    <select class="form-select filter-tag">
-                                                        <option selected>Status</option>
-                                                        <option value="logged">Logged</option>
-                                                        <option value="scheduled">Scheduled</option>
-                                                    </select>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="important">
-                                                    <label class="form-check-label" for="important">Only
-                                                        Important</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="hot-leads">
-                                                    <label class="form-check-label" for="hot-leads">Only hot
-                                                        leads</label>
-                                                </div>
-                                            </div>
+                                            <div class="filter-section mb-3">
+                                                <div class="row g-2 align-items-center">
+                                                    <!-- Filter Range -->
+                                                    <div class="col-auto">
+                                                        <select class="form-select dropdown-orange" id="filter-range"
+                                                            name="filter_range">
+                                                            <option value="all">All Entries</option>
+                                                            <option value="7">Last 7 Days</option>
+                                                            <option value="30">Last 30 Days</option>
+                                                            <option value="90">Last 90 Days</option>
+                                                        </select>
+                                                    </div>
 
-                                            <div class="section-header">
-                                                <div>LOGGED ACTIVITIES (12)</div>
+                                                    <!-- Activity Type -->
+                                                    <div class="col-auto">
+                                                        <select class="form-select dropdown-orange" id="filter-activity"
+                                                            name="activity_type_id">
+                                                            <option value="all">All Activity Types</option>
+                                                            @foreach ($activitytypes as $activitytype)
+                                                                <option value="{{ $activitytype->id }}">
+                                                                    {{ $activitytype->type }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+
+                                                    <!-- Status -->
+                                                    <div class="col-auto">
+                                                        <select class="form-select dropdown-orange" id="filter-status"
+                                                            name="status">
+                                                            <option value="all">All Status</option>
+                                                            <option value="logged">Logged</option>
+                                                            <option value="scheduled">Scheduled</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             <div class="timeline-container">
-                                                <div class="timeline position-relative">
-                                                    @foreach ($logged_activities as $item)
+                                                <div class="timeline position-relative" id="allActivitiesContainer">
+                                                    @foreach ($allactivities as $item)
                                                         <div class="timeline-item">
                                                             {{-- <div class="timeline-icon">
                                                                     <i class="{{ $item->activityType->icon }}"></i>
@@ -696,66 +691,95 @@
                                         <div class="tab-pane fade" id="todo" role="tabpanel"
                                             aria-labelledby="todo-tab">
 
-                                            @foreach ($pending_tasks as $task)
-                                                <div class="task-section mt-2">
-                                                    <div class="company-list mb-3 border rounded p-3">
-                                                        <div class="row align-items-start">
-                                                            <div class="col-md-6">
-                                                                <div class="company-name">
-                                                                    <p><strong>{{ $task->title ?? 'N/A' }}</strong></p>
-                                                                    <p class="text-secondary">
-                                                                        Due
-                                                                        {{ \Carbon\Carbon::parse($task->due_time)->format('M d, \a\t g:i a') }}
-                                                                    </p>
-                                                                    <p class="text-warning">
-                                                                        {{ $task->assignee_name ?? 'N/A' }}</p>
+                                            <div class="filter-section mb-3">
+                                                <div class="row g-2 align-items-center">
+                                                    <!-- Filter Range -->
+                                                    <div class="col-auto">
+                                                        <select class="form-select dropdown-orange" id="filter-task-range"
+                                                            name="filter_range">
+                                                            <option value="all">All Entries</option>
+                                                            <option value="7">Last 7 Days</option>
+                                                            <option value="30">Last 30 Days</option>
+                                                            <option value="90">Last 90 Days</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <!-- Status -->
+                                                    <div class="col-auto">
+                                                        <select class="form-select dropdown-orange"
+                                                            id="filter-task-status" name="status">
+                                                            <option value="all">All Status</option>
+                                                            <option value="completed">Completed</option>
+                                                            <option value="uncompleted">Uncompleted</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div id="pendingTasksContainer">
+
+                                                @foreach ($alltasks as $task)
+                                                    <div class="task-section mt-2">
+                                                        <div class="company-list mb-3 border rounded p-3">
+                                                            <div class="row align-items-start">
+                                                                <div class="col-md-6">
+                                                                    <div class="company-name">
+                                                                        <p><strong>{{ $task->title ?? 'N/A' }}</strong></p>
+                                                                        <p class="text-secondary">
+                                                                            Due
+                                                                            {{ \Carbon\Carbon::parse($task->due_time)->format('M d, \a\t g:i a') }}
+                                                                        </p>
+                                                                        <p class="text-warning">
+                                                                            {{ $task->assignee_name ?? 'N/A' }}</p>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-md-6 d-flex justify-content-end">
+                                                                    <div class="d-flex gap-2">
+                                                                        <!-- Completed -->
+                                                                        <button
+                                                                            class="btn btn-sm btn-outline-success mark-complete-btn"
+                                                                            title="Mark as Completed"
+                                                                            data-id="{{ $task->id }}">
+                                                                            <i class="fas fa-check"></i>
+                                                                        </button>
+
+                                                                        <!-- Edit -->
+                                                                        <button
+                                                                            class="btn btn-sm btn-outline-primary toggleEditTask"
+                                                                            data-id="{{ $task->id }}"
+                                                                            data-title="{{ $task->title }}"
+                                                                            data-due="{{ $task->due_time }}"
+                                                                            data-user="{{ $task->assignee_id }}"
+                                                                            data-description="{{ $task->description }}"
+                                                                            title="Edit Task">
+                                                                            <i class="fas fa-edit"></i>
+                                                                        </button>
+
+                                                                        <!-- Delete -->
+                                                                        <button
+                                                                            class="btn btn-sm btn-outline-secondary delete-task-btn"
+                                                                            title="Delete Task"
+                                                                            data-id="{{ $task->id }}">
+                                                                            <i class="fas fa-times"></i>
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
 
-                                                            <div class="col-md-6 d-flex justify-content-end">
-                                                                <div class="d-flex gap-2">
-                                                                    <!-- Completed -->
-                                                                    <button
-                                                                        class="btn btn-sm btn-outline-success mark-complete-btn"
-                                                                        title="Mark as Completed"
-                                                                        data-id="{{ $task->id }}">
-                                                                        <i class="fas fa-check"></i>
-                                                                    </button>
-
-                                                                    <!-- Edit -->
-                                                                    <button
-                                                                        class="btn btn-sm btn-outline-primary toggleEditTask"
-                                                                        data-id="{{ $task->id }}"
-                                                                        data-title="{{ $task->title }}"
-                                                                        data-due="{{ $task->due_time }}"
-                                                                        data-user="{{ $task->assignee_id }}"
-                                                                        data-description="{{ $task->description }}"
-                                                                        title="Edit Task">
-                                                                        <i class="fas fa-edit"></i>
-                                                                    </button>
-
-                                                                    <!-- Delete -->
-                                                                    <button
-                                                                        class="btn btn-sm btn-outline-secondary delete-task-btn"
-                                                                        title="Delete Task"
-                                                                        data-id="{{ $task->id }}">
-                                                                        <i class="fas fa-times"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row mt-2">
-                                                            <div class="col-12">
-                                                                <div
-                                                                    class="email-preview border rounded p-3 text-secondary">
-                                                                    {{ $task->description ?? 'N/A' }}
+                                                            <div class="row mt-2">
+                                                                <div class="col-12">
+                                                                    <div
+                                                                        class="email-preview border rounded p-3 text-secondary">
+                                                                        {{ $task->description ?? 'N/A' }}
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                @endforeach
+
                                                 </div>
-                                            @endforeach
 
                                         </div>
 
@@ -763,9 +787,57 @@
                                         <div class="tab-pane fade" id="timeline" role="tabpanel"
                                             aria-labelledby="timeline-tab">
 
+                                            <div class="filter-section mb-3">
+                                                <div class="row g-2 align-items-center">
+                                                    <!-- Filter Range -->
+                                                    <div class="col-auto">
+                                                        <select class="form-select dropdown-orange"
+                                                            id="filter-timeline-range" name="filter_range">
+                                                            <option value="all">All Entries</option>
+                                                            <option value="7">Last 7 Days</option>
+                                                            <option value="30">Last 30 Days</option>
+                                                            <option value="90">Last 90 Days</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <!-- Activity Type -->
+                                                    <div class="col-auto">
+                                                        <select class="form-select dropdown-orange"
+                                                            id="filter-timeline-activity" name="activity_type_id">
+                                                            <option value="all">All Activity Types</option>
+                                                            @foreach ($activitytypes as $activitytype)
+                                                                <option value="{{ $activitytype->id }}">
+                                                                    {{ $activitytype->type }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+
+                                                    <!-- Status -->
+                                                    <div class="col-auto">
+                                                        <select class="form-select dropdown-orange"
+                                                            id="filter-timeline-status" name="status">
+                                                            <option value="all">All Status</option>
+                                                            <option value="logged">Logged</option>
+                                                            <option value="scheduled">Scheduled</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <!-- Type -->
+                                                    <div class="col-auto">
+                                                        <select class="form-select dropdown-orange"
+                                                            id="filter-timeline-type" name="type">
+                                                            <option value="all">All Types</option>
+                                                            <option value="activities">Activities</option>
+                                                            <option value="notes">Notes</option>
+                                                            <option value="updates">Updates</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                             <!-- Timeline -->
                                             <div class="timeline-container">
-                                                <div class="timeline position-relative">
+                                                <div class="timeline position-relative" id="timelineContainer">
                                                     @foreach ($timeline as $item)
                                                         @if ($item->type === 'activity')
                                                             <div class="timeline-item">
@@ -1450,64 +1522,12 @@
         </div>
         <!-- Add AddCustomizefields Modal End -->
 
-
     </div>
 
 @endsection
 
 
 @push('scripts')
-    <script>
-        // Handle checkbox selection
-        const selectAllCheckbox = document.getElementById('selectAll');
-        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-        const actionBar = document.getElementById('actionBar');
-        const selectedCount = document.getElementById('selectedCount');
-
-        function updateActionBar() {
-            const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
-            if (checkedBoxes.length > 0) {
-                actionBar.classList.add('show');
-                selectedCount.textContent = checkedBoxes.length;
-            } else {
-                actionBar.classList.remove('show');
-            }
-        }
-
-        // Initialize with first row checked
-        updateActionBar();
-
-        selectAllCheckbox.addEventListener('change', function() {
-            rowCheckboxes.forEach(checkbox => {
-                checkbox.checked = selectAllCheckbox.checked;
-            });
-            updateActionBar();
-        });
-
-        rowCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const allChecked = Array.from(rowCheckboxes).every(cb => cb.checked);
-                const someChecked = Array.from(rowCheckboxes).some(cb => cb.checked);
-
-                selectAllCheckbox.checked = allChecked;
-                selectAllCheckbox.indeterminate = someChecked && !allChecked;
-
-                updateActionBar();
-            });
-        });
-
-        // Table row hover effects
-        const tableRows = document.querySelectorAll('tbody tr');
-        tableRows.forEach(row => {
-            row.addEventListener('mouseenter', function() {
-                this.style.backgroundColor = '#f8f9fa';
-            });
-            row.addEventListener('mouseleave', function() {
-                this.style.backgroundColor = '';
-            });
-        });
-    </script>
-
     <script>
         $(document).ready(function() {
             $.ajaxSetup({
@@ -1516,181 +1536,255 @@
                 }
             });
 
-            // ==============================
-            // Delete Activity
-            // ==============================
-
-            $(document).on('click', '.delete-activity-btn', function() {
-                var activityId = $(this).data('id'); // get task ID from button
-
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "Do you want to delete this activity?",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then(function(result) {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: "/admin/delete_activity/" + activityId,
-                            method: "POST",
-                            data: {
-                                _token: "{{ csrf_token() }}"
-                            },
-                            success: function(response) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Deleted!',
-                                    text: response.message ||
-                                        "Activity deleted successfully.",
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                }).then(function() {
-                                    location.reload(); // reload after deletion
-                                });
-                            },
-                            error: function(xhr) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: xhr.responseJSON?.message ||
-                                        'Something went wrong.'
-                                });
-                                console.error(xhr.responseText);
-                            }
-                        });
-                    }
-                });
-            });
-
-            // ==============================
-            // Adding the comment
-            // ==============================
-            $(document).on('click', '.add-comment-submit', function() {
-                let commentBox = $(this).closest('.add-comment');
-                let type = commentBox.data('type'); // Activity or Note
-                let id = commentBox.data('id'); // Item ID
-                let commentText = commentBox.find('textarea[name="comment_text"]').val();
-
-                if (!commentText.trim()) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Empty Comment',
-                        text: 'Please enter a comment before submitting.'
-                    });
-                    return;
-                }
-
-                // Determine URL based on type (like delete)
-                let url = '';
-                if (type === 'Activity') {
-                    url = '/admin/activity/add_comment/' + id;
-                } else {
-                    url = '/admin/note/add_comment/' + id;
-                }
+            function fetchFilteredAllActivities() {
+                let filters = {
+                    filter_range: $('#filter-range').val(),
+                    activity_type_id: $('#filter-activity').val(),
+                    status: $('#filter-status').val(),
+                    section: 'logged_activities'
+                };
 
                 $.ajax({
-                    url: url,
-                    method: 'POST',
-                    data: {
-                        _token: "{{ csrf_token() }}",
-                        comment: commentText
-                    },
+                    url: "{{ route('admin.sales.index') }}",
+                    method: "GET",
+                    data: filters,
                     success: function(response) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: response.message,
-                            showConfirmButton: false,
-                            timer: 2000
-                        }).then(() => location.reload());
+                        $('#allActivitiesContainer').html(response.activity_html);
                     },
-                    error: function(xhr) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: xhr.responseJSON?.message ||
-                                'Something went wrong while adding the comment.'
-                        });
+                    error: function() {
+                        alert('Error fetching filtered activities.');
                     }
                 });
-            });
+            }
+
+            $('#filter-range, #filter-activity, #filter-status')
+                .on('change', fetchFilteredAllActivities);
+
+            function fetchFilteredTimeline() {
+                console.log("Timeline filtered function called");
+                let filters = {
+                    filter_range: $('#filter-timeline-range').val(),
+                    activity_type_id: $('#filter-timeline-activity').val(),
+                    status: $('#filter-timeline-status').val(),
+                    type: $('#filter-timeline-type').val(),
+                    section: 'timeline'
+                };
+
+                $.ajax({
+                    url: "{{ route('admin.sales.index') }}",
+                    method: "GET",
+                    data: filters,
+                    success: function(response) {
+                        $('#timelineContainer').html(response.timeline_html);
+                    },
+                    error: function() {
+                        alert('Error fetching filtered timeline.');
+                    }
+                });
+            }
+
+            $('#filter-timeline-range, #filter-timeline-activity, #filter-timeline-status, #filter-timeline-type')
+                .on('change', fetchFilteredTimeline);
+
+            function fetchFilteredTask() {
+                console.log("Task filtered function called");
+
+                let filters = {
+                    filter_range: $('#filter-task-range').val(),
+                    status: $('#filter-task-status').val(),
+                    section: 'task'
+                };
+
+                $.ajax({
+                    url: "{{ route('admin.sales.index') }}", // confirm this route hits your main controller
+                    method: "GET",
+                    data: filters,
+                    success: function(response) {
+                        $('#pendingTasksContainer').html(response.task_html);
+                    },
+                    error: function() {
+                        alert('Error fetching filtered task.');
+                    }
+                });
+            }
+
+            $('#filter-task-range, #filter-task-status').on('change', fetchFilteredTask);
+
+        });
 
 
-            // ==============================
-            // Removing the comment
-            // ==============================
-            $(document).on('click', '.delete-comment-btn', function() {
-                var commentId = $(this).data('id');
-                var type = $(this).data('type'); // Activity or Note
-                var url = '';
+        // ==============================
+        // Delete Activity
+        // ==============================
+        $(document).on('click', '.delete-activity-btn', function() {
+            var activityId = $(this).data('id'); // get task ID from button
 
-                // Determine URL based on type
-                if (type === "Activity") {
-                    url = "/admin/activity/delete_comment/" + commentId;
-                } else {
-                    url = "/admin/note/delete_comment/" + commentId;
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to delete this activity?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/admin/delete_activity/" + activityId,
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: response.message ||
+                                    "Activity deleted successfully.",
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(function() {
+                                location.reload(); // reload after deletion
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message ||
+                                    'Something went wrong.'
+                            });
+                            console.error(xhr.responseText);
+                        }
+                    });
                 }
+            });
+        });
 
+        // ==============================
+        // Adding the comment
+        // ==============================
+        $(document).on('click', '.add-comment-submit', function() {
+            let commentBox = $(this).closest('.add-comment');
+            let type = commentBox.data('type'); // Activity or Note
+            let id = commentBox.data('id'); // Item ID
+            let commentText = commentBox.find('textarea[name="comment_text"]').val();
+
+            if (!commentText.trim()) {
                 Swal.fire({
-                    title: "Are you sure?",
-                    text: "Do you want to remove this comment?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#d33",
-                    cancelButtonColor: "#3085d6",
-                    confirmButtonText: "Yes, Remove"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: url,
-                            method: "POST",
-                            data: {
-                                _token: "{{ csrf_token() }}"
-                            },
-                            success: function(response) {
-                                Swal.fire({
-                                    icon: "success",
-                                    title: "Removed",
-                                    text: response.message,
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location
-                                        .reload(); // reload to update comment list
-                                });
-                            },
-                            error: function(xhr) {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "Error",
-                                    text: xhr.responseJSON?.message ||
-                                        "Something went wrong."
-                                });
-                                console.error(xhr.responseText);
-                            }
-                        });
-                    }
+                    icon: 'warning',
+                    title: 'Empty Comment',
+                    text: 'Please enter a comment before submitting.'
                 });
+                return;
+            }
+
+            // Determine URL based on type (like delete)
+            let url = '';
+            if (type === 'Activity') {
+                url = '/admin/activity/add_comment/' + id;
+            } else {
+                url = '/admin/note/add_comment/' + id;
+            }
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    comment: commentText
+                },
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(() => location.reload());
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: xhr.responseJSON?.message ||
+                            'Something went wrong while adding the comment.'
+                    });
+                }
             });
+        });
 
 
-            // ==============================
-            // Activity and note Comment box toggle functionality
-            // ==============================
-            $('.add-comment-btn').click(function() {
-                // Find the nearest comment box relative to this button
-                $(this).closest('.timeline-item').find('.add-comment').toggleClass('d-none');
+        // ==============================
+        // Removing the comment
+        // ==============================
+        $(document).on('click', '.delete-comment-btn', function() {
+            var commentId = $(this).data('id');
+            var type = $(this).data('type'); // Activity or Note
+            var url = '';
+
+            // Determine URL based on type
+            if (type === "Activity") {
+                url = "/admin/activity/delete_comment/" + commentId;
+            } else {
+                url = "/admin/note/delete_comment/" + commentId;
+            }
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to remove this comment?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, Remove"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url,
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Removed",
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location
+                                    .reload(); // reload to update comment list
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: xhr.responseJSON?.message ||
+                                    "Something went wrong."
+                            });
+                            console.error(xhr.responseText);
+                        }
+                    });
+                }
             });
+        });
 
-            $('.comment-cancel').click(function() {
-                const $commentBox = $(this).closest('.add-comment');
-                $commentBox.addClass('d-none');
-                $commentBox.find('textarea').val(''); // Clear the textarea content
-            });
 
+        // ==============================
+        // Activity and note Comment box toggle functionality
+        // ==============================
+        $('.add-comment-btn').click(function() {
+            // Find the nearest comment box relative to this button
+            $(this).closest('.timeline-item').find('.add-comment').toggleClass('d-none');
+        });
+
+        $('.comment-cancel').click(function() {
+            const $commentBox = $(this).closest('.add-comment');
+            $commentBox.addClass('d-none');
+            $commentBox.find('textarea').val(''); // Clear the textarea content
         });
 
         // Close button functionality

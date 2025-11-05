@@ -35,11 +35,8 @@ class SaleController extends Controller
         }
     }
 
-    public function index(Request $request)
+    private function calculateLeadData()
     {
-        $leads = Lead::with('assignee', 'companies', 'products', 'peoples', 'sources', 'competitors')->get();
-        $peoples = People::with('peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany')->get();
-
         $today = Carbon::now();
         $startOfThisMonth = $today->copy()->startOfMonth();
         $endOfToday = $today->copy()->endOfDay();
@@ -122,6 +119,27 @@ class SaleController extends Controller
         $signedProposalCountValue = Helper::calculateTotalValue($signedProposal);
         $signedProposalCountValueFormatted = Helper::formatValue($signedProposalCountValue);
 
+        return compact(
+            'newLeadsThisMonth', 'newLeadsLastMonth', 'newLeadsDiff', 'newLeadsPercent',
+            'openLeadsThisMonth', 'openLeadsLastMonth', 'openLeadsDiff', 'openLeadsPercent',
+            'salesLeadsThisMonth', 'salesLeadsLastMonth', 'salesLeadsDiff', 'salesLeadsPercent',
+            'newLeadsChange', 'openLeadsChange', 'salesLeadsChange',
+            'allLeadsCount', 'myLeadsCount', 'addedThisWeekCount', 'closingThisWeekCount', 'hotLeadsCount',
+            'allLeadsValue', 'myLeadsValue', 'addedThisWeekValue', 'closingThisWeekValue', 'hotLeadsValue',
+            'allLeadsValueFormatted', 'myLeadsValueFormatted', 'addedThisWeekValueFormatted', 'closingThisWeekValueFormatted', 'hotLeadsValueFormatted',
+            'gbPresentationCount', 'siteSurveyCount', 'proposalApprovalCount', 'proposalPresentationCount', 'signedProposalCount',
+            'gbPresentationCountValueFormatted', 'siteSurveyCountValueFormatted', 'proposalApprovalCountValueFormatted', 'proposalPresentationCountValueFormatted', 'signedProposalCountValueFormatted'
+        );
+    }
+
+    public function index(Request $request)
+    {
+        $leads = Lead::with('assignee', 'companies', 'products', 'peoples', 'sources', 'competitors')->get();
+        $peoples = People::with('peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany')->get();
+
+        // Call separated calculation function
+        $data = $this->calculateLeadData();
+
         $users = User::all();
         $activitytypes = ActivityType::all();
 
@@ -173,16 +191,26 @@ class SaleController extends Controller
             return $item;
         });
 
-        // --- Apply Filters (if any) ---
-        $filters = [
+        $activityFilters = [
             'filter_range' => $request->input('filter_range', 'all'),
             'activity_type_id' => $request->input('activity_type_id', 'all'),
             'user_id' => $userId,
+            'status' => $request->input('status', 'all'),
         ];
 
-        // Separate logged & scheduled
+        $timelineFilters = [
+            'filter_range' => $request->input('filter_range', 'all'),
+            'activity_type_id' => $request->input('activity_type_id', 'all'),
+            'user_id' => $userId,
+            'status' => $request->input('status', 'all'),
+            'type' => $request->input('type', 'all'),
+        ];
+
         $logged_activities = $activities->filter(fn ($a) => $a->status === 'Logged');
-        $scheduled_activities = $activities->filter(fn ($a) => $a->status === 'Scheduled');
+        $allactivities = $activities->filter(fn ($a) => in_array($a->status, ['Logged', 'Scheduled']));
+
+        $activityFiltered = Helper::applySaleActivityFilters($allactivities, $activityFilters);
+        $allactivities = $activityFiltered['allactivities'];
 
         // --- Milestones (based on user created_at) ---
         $milestones = collect();
@@ -213,7 +241,20 @@ class SaleController extends Controller
             }
         }
 
-        // --- Merge everything into one timeline ---
+        $timelineFiltered = Helper::applySaleTimelineFilters(
+            $logged_activities,
+            $notes,
+            $timelineEntries,
+            $milestones,
+            $timelineFilters
+        );
+
+        $logged_activities = $timelineFiltered['logged_activities'];
+        $notes = $timelineFiltered['notes'];
+        $timelineEntries = $timelineFiltered['timelineEntries'];
+        $milestones = $timelineFiltered['milestones'];
+
+        // FINAL TIMELINE MERGE
         $timeline = $logged_activities
             ->concat($notes)
             ->concat($timelineEntries)
@@ -222,35 +263,52 @@ class SaleController extends Controller
             ->values();
 
         // Fetch all tasks assigned to the logged-in user
-        $companyTasks = $user->companyTaskAssignee()->whereNull('completed_user_id')->get();
-        $peopleTasks = $user->peopleTaskAssignee()->whereNull('completed_user_id')->get();
-        $leadTasks = $user->leadTaskAssignee()->whereNull('completed_user_id')->get();
+        $companyTasks = $user->companyTaskAssignee()->get();
+        $peopleTasks = $user->peopleTaskAssignee()->get();
+        $leadTasks = $user->leadTaskAssignee()->get();
 
         // Combine all pending tasks
-        $pending_tasks = $companyTasks
+        $alltasks = $companyTasks
             ->concat($peopleTasks)
             ->concat($leadTasks)
             ->sortByDesc('created_at')
             ->values();
 
-        return view('admin.sales', compact('leads', 'peoples',
-            'newLeadsThisMonth', 'newLeadsLastMonth', 'newLeadsDiff', 'newLeadsPercent',
-            'openLeadsThisMonth', 'openLeadsLastMonth', 'openLeadsDiff', 'openLeadsPercent',
-            'salesLeadsThisMonth', 'salesLeadsLastMonth', 'salesLeadsDiff', 'salesLeadsPercent',
-            'newLeadsChange', 'openLeadsChange', 'salesLeadsChange',
-            'allLeadsCount', 'myLeadsCount', 'addedThisWeekCount', 'closingThisWeekCount', 'hotLeadsCount',
-            'allLeadsValue', 'myLeadsValue', 'addedThisWeekValue', 'closingThisWeekValue', 'hotLeadsValue',
-            'allLeadsValueFormatted', 'myLeadsValueFormatted', 'addedThisWeekValueFormatted', 'closingThisWeekValueFormatted', 'hotLeadsValueFormatted',
-            'gbPresentationCount', 'siteSurveyCount', 'proposalApprovalCount', 'proposalPresentationCount', 'signedProposalCount',
-            'gbPresentationCountValueFormatted', 'siteSurveyCountValueFormatted', 'proposalApprovalCountValueFormatted', 'proposalPresentationCountValueFormatted', 'signedProposalCountValueFormatted', 'users', 'activitytypes',
-            'activities',
-            'logged_activities',
-            'scheduled_activities',
-            'notes',
-            'timeline',
-            'timelineEntries',
-            'pending_tasks'
-        ));
+        // --- Apply Task Filters ---
+        $taskFilters = [
+            'filter_range' => $request->input('filter_range', 'all'),
+            'status' => $request->input('status', 'all'),
+        ];
 
+        $taskFiltered = Helper::applySaleTaskFilters($alltasks, $taskFilters);
+        $alltasks = $taskFiltered['alltasks'];
+
+         // Handle AJAX requests
+        if ($request->ajax()) {
+            if ($request->input('section') === 'timeline') {
+                $timeline_html = view('admin.sales-timeline-partial', compact('timeline'))->render();
+
+                return response()->json(['timeline_html' => $timeline_html]);
+            }
+
+            if ($request->input('section') === 'logged_activities') {
+                $activity_html = view('admin.sales-activity-partial', compact('allactivities'))->render();
+
+                return response()->json(['activity_html' => $activity_html]);
+            }
+
+            if ($request->input('section') === 'task') {
+                $task_html = view('admin.sales-task-partial', compact('alltasks'))->render();
+
+                return response()->json(['task_html' => $task_html]);
+            }
+
+        }
+
+        return view('admin.sales', array_merge(compact(
+            'leads', 'peoples', 'users', 'activitytypes',
+            'activities', 'logged_activities', 'allactivities',
+            'notes', 'timeline', 'timelineEntries', 'alltasks'
+        ), $data));
     }
 }
