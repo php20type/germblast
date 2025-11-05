@@ -17,13 +17,13 @@ use App\Models\LeadProduct;
 use App\Models\LeadSource;
 use App\Models\LeadStage;
 use App\Models\LeadTag;
-use App\Models\LeadTask;
 use App\Models\Market;
 use App\Models\Outcome;
 use App\Models\People;
 use App\Models\Product;
 use App\Models\Source;
 use App\Models\Tag;
+use App\Models\Task;
 use App\Models\Timeline;
 use App\Models\User;
 use Carbon\Carbon;
@@ -386,7 +386,6 @@ class LeadController extends Controller
             $query->whereBetween('created_at', [$startOfMonth, $today]);
         }
 
-
         // Get all leads
         $leads = $query->get();
 
@@ -514,7 +513,6 @@ class LeadController extends Controller
             $query->whereBetween('created_at', [$startOfMonth, $today]);
         }
 
-
         // Get all leads
         $leads = $query->get();
 
@@ -640,7 +638,6 @@ class LeadController extends Controller
             $today = now();
             $query->whereBetween('created_at', [$startOfMonth, $today]);
         }
-
 
         // Get all leads
         $leads = $query->get();
@@ -771,7 +768,6 @@ class LeadController extends Controller
             $query->whereBetween('created_at', [$startOfMonth, $today]);
         }
 
-
         // Get all leads
         $leads = $query->get();
 
@@ -900,7 +896,6 @@ class LeadController extends Controller
             $today = now();
             $query->whereBetween('created_at', [$startOfMonth, $today]);
         }
-
 
         // Get all leads
         $leads = $query->get();
@@ -1068,7 +1063,6 @@ class LeadController extends Controller
             'leadSources',
             'leadCompetitors',
             'leadTags',
-            'leadTask',
         ])->findOrFail($id);
 
         $leadFiles = $leads->leadFile;
@@ -1076,8 +1070,8 @@ class LeadController extends Controller
         $leadValue = Helper::calculateTotalValue($leads);
         $formattedLeadValue = Helper::formatValue($leadValue);
 
-        $pending_tasks = $leads->leadTask->whereNull('completed_user_id');
-        $completed_tasks = $leads->leadTask->whereNotNull('completed_user_id');
+        $pending_tasks = $leads->task->whereNull('completed_user_id');
+        $completed_tasks = $leads->task->whereNotNull('completed_user_id');
 
         $activities = Helper::getActivitiesForParticipant('lead', $leads->id);
         $activities->load(['comments.creator']);
@@ -1740,9 +1734,44 @@ class LeadController extends Controller
         ]);
     }
 
+    // public function addTask(Request $request, $leadId)
+    // {
+
+    //     $request->validate([
+    //         'title' => 'required|string|max:255',
+    //         'due_date' => 'required|string', // will parse manually
+    //         'user_id' => 'required|exists:users,id',
+    //         'description' => 'nullable|string',
+    //     ]);
+
+    //     $assignee = User::findOrFail($request->user_id);
+
+    //     // Convert the due_date from "2025-09-24 6:30 PM" → "2025-09-24 18:30:00"
+    //     $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
+
+    //     // Create the task
+    //     $task = LeadTask::create([
+    //         'lead_id' => $leadId,
+    //         'title' => $request->title,
+    //         'description' => $request->description,
+    //         'created_time' => now(),
+    //         'due_time' => $dueTime,
+    //         'assignee_id' => $assignee->id,
+    //         'assignee_name' => $assignee->name,
+    //         'subject_type' => 'lead',
+    //         'subject_legacy_id' => $leadId,
+    //     ]);
+
+    //     // Return JSON response for AJAX
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'Task added successfully',
+    //         'task' => $task,
+    //     ]);
+    // }
+
     public function addTask(Request $request, $leadId)
     {
-
         $request->validate([
             'title' => 'required|string|max:255',
             'due_date' => 'required|string', // will parse manually
@@ -1755,9 +1784,10 @@ class LeadController extends Controller
         // Convert the due_date from "2025-09-24 6:30 PM" → "2025-09-24 18:30:00"
         $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
 
-        // Create the task
-        $task = LeadTask::create([
-            'lead_id' => $leadId,
+        // Create the task in unified tasks table
+        $task = Task::create([
+            'owner_type' => 'Lead',
+            'owner_id' => $leadId,
             'title' => $request->title,
             'description' => $request->description,
             'created_time' => now(),
@@ -1776,6 +1806,38 @@ class LeadController extends Controller
         ]);
     }
 
+    // public function updateTask(Request $request, $taskId)
+    // {
+    //     $request->validate([
+    //         'title' => 'required|string|max:255',
+    //         'due_date' => 'required|string', // will parse manually
+    //         'user_id' => 'required|exists:users,id',
+    //         'description' => 'nullable|string',
+    //     ]);
+
+    //     $assignee = User::findOrFail($request->user_id);
+
+    //     // Convert the due_date from "2025-09-24 6:30 PM" → "2025-09-24 18:30:00"
+    //     $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
+
+    //     // Find and update the task
+    //     $task = LeadTask::findOrFail($taskId);
+    //     $task->update([
+    //         'title' => $request->title,
+    //         'description' => $request->description,
+    //         'due_time' => $dueTime,
+    //         'assignee_id' => $assignee->id,
+    //         'assignee_name' => $assignee->name,
+    //     ]);
+
+    //     // Return JSON response for AJAX
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'Task updated successfully',
+    //         'task' => $task,
+    //     ]);
+    // }
+
     public function updateTask(Request $request, $taskId)
     {
         $request->validate([
@@ -1790,8 +1852,11 @@ class LeadController extends Controller
         // Convert the due_date from "2025-09-24 6:30 PM" → "2025-09-24 18:30:00"
         $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
 
-        // Find and update the task
-        $task = LeadTask::findOrFail($taskId);
+        // Find and update the task in unified tasks table
+        $task = Task::where('owner_type', 'lead')
+            ->where('id', $taskId)
+            ->firstOrFail();
+
         $task->update([
             'title' => $request->title,
             'description' => $request->description,
@@ -1808,12 +1873,35 @@ class LeadController extends Controller
         ]);
     }
 
+    // public function markCompleted($taskId)
+    // {
+    //     $task = LeadTask::findOrFail($taskId);
+
+    //     $user = auth()->user(); // logged-in user
+
+    //     $task->update([
+    //         'completed_time' => now(),
+    //         'completed_user_id' => $user->id,
+    //         'completed_user_name' => $user->name,
+    //     ]);
+
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'Task marked as completed successfully!',
+    //         'task' => $task,
+    //     ]);
+    // }
+
     public function markCompleted($taskId)
     {
-        $task = LeadTask::findOrFail($taskId);
-
         $user = auth()->user(); // logged-in user
 
+        // Find the task in unified tasks table
+        $task = Task::where('owner_type', 'lead')
+            ->where('id', $taskId)
+            ->firstOrFail();
+
+        // Update completion details
         $task->update([
             'completed_time' => now(),
             'completed_user_id' => $user->id,
@@ -1827,10 +1915,29 @@ class LeadController extends Controller
         ]);
     }
 
+    // public function reopenTask($taskId)
+    // {
+    //     $task = LeadTask::findOrFail($taskId);
+
+    //     $task->update([
+    //         'completed_time' => null,
+    //         'completed_user_id' => null,
+    //         'completed_user_name' => null,
+    //     ]);
+
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'Task reopened successfully',
+    //         'task' => $task,
+    //     ]);
+    // }
+
     public function reopenTask($taskId)
     {
-        $task = LeadTask::findOrFail($taskId);
+        // Find the task in the unified tasks table
+        $task = Task::findOrFail($taskId);
 
+        // Reset completion details
         $task->update([
             'completed_time' => null,
             'completed_user_id' => null,
@@ -1844,9 +1951,29 @@ class LeadController extends Controller
         ]);
     }
 
-    public function deleteTask($task_id)
+    // public function deleteTask($task_id)
+    // {
+    //     $task = LeadTask::find($task_id);
+
+    //     if (! $task) {
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => 'Task not found.',
+    //         ], 404);
+    //     }
+
+    //     $task->delete();
+
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'Task deleted successfully.',
+    //     ]);
+    // }
+
+    public function deleteTask($taskId)
     {
-        $task = LeadTask::find($task_id);
+        // Find the task in the unified tasks table
+        $task = Task::find($taskId);
 
         if (! $task) {
             return response()->json([
@@ -1855,6 +1982,7 @@ class LeadController extends Controller
             ], 404);
         }
 
+        // Delete the task
         $task->delete();
 
         return response()->json([

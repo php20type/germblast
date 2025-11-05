@@ -2523,6 +2523,7 @@
             // Delete Task
             // ==============================
             $(document).on('click', '.delete-task-btn', function() {
+                console.log('delete function called');
                 var taskId = $(this).data('id'); // get task ID from button
 
                 Swal.fire({
@@ -2536,7 +2537,7 @@
                 }).then(function(result) {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: "/admin/people/tasks/delete/" + task_id,
+                            url: "/admin/people/tasks/delete/" + taskId,
                             method: "POST",
                             data: {
                                 _token: "{{ csrf_token() }}"

@@ -25,7 +25,7 @@ class Company extends Model
 
     protected $morphClass = 'Company';
 
-    protected $with = ['companyEmail', 'companyPhone', 'companyAddress', 'companyUrl', 'companyPeople', 'companyTask','companyTags','tags', 'companyFile'];
+    protected $with = ['companyEmail', 'companyPhone', 'companyAddress', 'companyUrl', 'companyPeople', 'companyTags','tags', 'companyFile','task'];
 
     // public function people()
     // {
@@ -38,6 +38,11 @@ class Company extends Model
     public function activity(): MorphMany
     {
         return $this->morphMany(Activity::class, 'owner');
+    }
+
+    public function task(): MorphMany
+    {
+        return $this->morphMany(Task::class, 'owner');
     }
 
     public function timeline(): MorphMany
@@ -111,10 +116,10 @@ class Company extends Model
         return $this->hasOne(CompanyUrl::class, 'company_id');
     }
 
-    public function companyTask()
-    {
-        return $this->hasMany(CompanyTask::class, 'company_id');
-    }
+    // public function companyTask()
+    // {
+    //     return $this->hasMany(CompanyTask::class, 'company_id');
+    // }
 
      public function companyFile()
     {

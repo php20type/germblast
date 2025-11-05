@@ -1,4 +1,43 @@
-@foreach ($alltasks as $task)
+@foreach ($completedTasks as $task)
+    <div class="task-section mt-2">
+        <div class="company-list mb-3 border rounded p-3">
+
+            <div class="row align-items-start">
+                <div class="col-md-6">
+                    <div class="company-name">
+                        <p><strong>{{ $task->title ?? 'N/A' }}</strong></p>
+                        <p class="text-secondary">
+                            Completed On
+                            {{ \Carbon\Carbon::parse($task->completed_time)->format('M d, \a\t g:i a') }}
+                        </p>
+                        <p class="text-warning">By
+                            {{ $task->completed_user_name ?? 'N/A' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 d-flex justify-content-end">
+                    <div class="d-flex gap-2">
+                        <!-- Reopen Task -->
+                        <button class="btn btn-sm btn-outline-warning reopen-task-btn" title="Reopen Task"
+                            data-id="{{ $task->id }}">
+                            <i class="fas fa-undo"></i>
+                        </button>
+
+                        <!-- Delete -->
+                        <button class="btn btn-sm btn-outline-secondary delete-task-btn" title="Delete Task"
+                            data-id="{{ $task->id }}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+@endforeach
+
+@foreach ($pendingTasks as $task)
     <div class="task-section mt-2">
         <div class="company-list mb-3 border rounded p-3">
             <div class="row align-items-start">
@@ -34,7 +73,7 @@
                         <button class="btn btn-sm btn-outline-secondary delete-task-btn" title="Delete Task"
                             data-id="{{ $task->id }}">
                             <i class="fas fa-times"></i>
-                        </button>
+                        </button>   
                     </div>
                 </div>
             </div>

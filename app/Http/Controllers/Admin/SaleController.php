@@ -135,7 +135,7 @@ class SaleController extends Controller
     public function index(Request $request)
     {
         $leads = Lead::with('assignee', 'companies', 'products', 'peoples', 'sources', 'competitors')->get();
-        $peoples = People::with('peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany')->get();
+        $peoples = People::with('peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleCompany')->get();
 
         // Call separated calculation function
         $data = $this->calculateLeadData();
@@ -263,27 +263,43 @@ class SaleController extends Controller
             ->values();
 
         // Fetch all tasks assigned to the logged-in user
-        $companyTasks = $user->companyTaskAssignee()->get();
-        $peopleTasks = $user->peopleTaskAssignee()->get();
-        $leadTasks = $user->leadTaskAssignee()->get();
+        // $companyTasks = $user->companyTaskAssignee()->get();
+        // $peopleTasks = $user->peopleTaskAssignee()->get();
+        // $leadTasks = $user->leadTaskAssignee()->get();
+        // // Combine all pending tasks
+        // $alltasks = $companyTasks
+        //     ->concat($peopleTasks)
+        //     ->concat($leadTasks)
+        //     ->sortByDesc('created_at')
+        //     ->values();
 
-        // Combine all pending tasks
-        $alltasks = $companyTasks
-            ->concat($peopleTasks)
-            ->concat($leadTasks)
-            ->sortByDesc('created_at')
-            ->values();
+        // $alltasks = $user->taskAssignee()->get();
 
-        // --- Apply Task Filters ---
+        // // --- Apply Task Filters ---
+        // $taskFilters = [
+        //     'filter_range' => $request->input('filter_range', 'all'),
+        //     'status' => $request->input('status', 'all'),
+        // ];
+
+        // $taskFiltered = Helper::applySaleTaskFilters($alltasks, $taskFilters);
+        // $alltasks = $taskFiltered['alltasks'];
+
+        $alltasks = $user->taskAssignee()->get();
+
+        // --- Apply Task Filters first ---
         $taskFilters = [
             'filter_range' => $request->input('filter_range', 'all'),
             'status' => $request->input('status', 'all'),
         ];
 
         $taskFiltered = Helper::applySaleTaskFilters($alltasks, $taskFilters);
-        $alltasks = $taskFiltered['alltasks'];
+        $filteredTasks = $taskFiltered['alltasks'];
 
-         // Handle AJAX requests
+        // --- Split after filtering ---
+        $pendingTasks = $filteredTasks->filter(fn ($task) => is_null($task->completed_time));
+        $completedTasks = $filteredTasks->filter(fn ($task) => ! is_null($task->completed_time));
+
+        // Handle AJAX requests
         if ($request->ajax()) {
             if ($request->input('section') === 'timeline') {
                 $timeline_html = view('admin.sales-timeline-partial', compact('timeline'))->render();
@@ -297,8 +313,13 @@ class SaleController extends Controller
                 return response()->json(['activity_html' => $activity_html]);
             }
 
-            if ($request->input('section') === 'task') {
-                $task_html = view('admin.sales-task-partial', compact('alltasks'))->render();
+            // if ($request->input('section') === 'task') {
+            //     $task_html = view('admin.sales-task-partial', compact('alltasks'))->render();
+
+            //     return response()->json(['task_html' => $task_html]);
+            // }
+            if ($request->ajax() && $request->input('section') === 'task') {
+                $task_html = view('admin.sales-task-partial', compact('pendingTasks', 'completedTasks'))->render();
 
                 return response()->json(['task_html' => $task_html]);
             }
@@ -308,7 +329,7 @@ class SaleController extends Controller
         return view('admin.sales', array_merge(compact(
             'leads', 'peoples', 'users', 'activitytypes',
             'activities', 'logged_activities', 'allactivities',
-            'notes', 'timeline', 'timelineEntries', 'alltasks'
+            'notes', 'timeline', 'timelineEntries', 'alltasks', 'pendingTasks', 'completedTasks'
         ), $data));
     }
 }

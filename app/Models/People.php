@@ -24,11 +24,16 @@ class People extends Model
 
     protected $morphClass = 'People';
 
-    protected $with = ['peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany','peopleTags','tags', 'peopleFile'];
+    protected $with = ['peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleCompany','peopleTags','tags', 'peopleFile','task'];
 
     public function activity(): MorphMany
     {
         return $this->morphMany(Activity::class, 'owner');
+    }
+
+    public function task(): MorphMany
+    {
+        return $this->morphMany(Task::class, 'owner');
     }
 
     public function timeline(): MorphMany

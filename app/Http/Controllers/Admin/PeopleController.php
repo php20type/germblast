@@ -16,11 +16,11 @@ use App\Models\PeopleEmail;
 use App\Models\PeopleFile;
 use App\Models\PeoplePhone;
 use App\Models\PeopleTag;
-use App\Models\PeopleTask;
 use App\Models\PeopleUrl;
 use App\Models\Product;
 use App\Models\Source;
 use App\Models\Tag;
+use App\Models\Task;
 use App\Models\Territory;
 use App\Models\Timeline;
 use App\Models\User;
@@ -57,7 +57,7 @@ class PeopleController extends Controller
     {
         $user = auth()->user();
         $query = People::with(['companies', 'tags', 'user', 'peopleEmail', 'peoplePhone',
-            'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany']);
+            'peopleAddress', 'peopleUrl', 'peopleCompany']);
 
         // AJAX filters
         if ($request->ajax()) {
@@ -137,7 +137,7 @@ class PeopleController extends Controller
         $users = User::all();
 
         // Base query: people assigned to the given user
-        $query = People::with(['companies', 'tags', 'user', 'peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany'])
+        $query = People::with(['companies', 'tags', 'user', 'peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleCompany'])
             ->where('user_id', $id);
 
         // AJAX filters
@@ -159,7 +159,7 @@ class PeopleController extends Controller
                     $q->where('company_id', $request->company_id);
                 });
             }
-             if (! empty($request->people_tags_filter_id)) {
+            if (! empty($request->people_tags_filter_id)) {
                 $query->whereHas('tags', function ($q) use ($request) {
                     $q->whereIn('tags.id', $request->people_tags_filter_id);
                 });
@@ -207,7 +207,7 @@ class PeopleController extends Controller
 
         // Normal page load
         return view('admin.peoples.my-peoples', array_merge(
-            compact('users', 'peoples', 'myPeoplesCount', 'companies', 'users', 'products', 'allPeoples', 'sources','activity_types', 'territories',  'competitors', 'peopletags'),
+            compact('users', 'peoples', 'myPeoplesCount', 'companies', 'users', 'products', 'allPeoples', 'sources', 'activity_types', 'territories', 'competitors', 'peopletags'),
             $sidebarStats
         ));
     }
@@ -218,7 +218,7 @@ class PeopleController extends Controller
         $users = User::all();
 
         // Fetch people assigned to current user with updated relationships
-        $peoples = People::with(['companies', 'tags', 'user', 'peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleTask', 'peopleCompany'])
+        $peoples = People::with(['companies', 'tags', 'user', 'peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl',  'peopleCompany'])
             ->where('user_id', $user->id)
             ->get();
 
@@ -285,7 +285,6 @@ class PeopleController extends Controller
             'peopleAddress',
             'peoplePhone',
             'peopleUrl',
-            'peopleTask',
             'peopleCompany',
             'companiesAlt',
             'leadPeople',
@@ -296,8 +295,8 @@ class PeopleController extends Controller
 
         $peopleFiles = $peoples->peopleFile;
 
-        $pending_tasks = $peoples->peopleTask->whereNull('completed_user_id');
-        $completed_tasks = $peoples->peopleTask->whereNotNull('completed_user_id');
+        $pending_tasks = $peoples->task->whereNull('completed_user_id');
+        $completed_tasks = $peoples->task->whereNotNull('completed_user_id');
 
         $activities = Helper::getActivitiesForParticipant('people', $peoples->id);
         $activities->load(['comments.creator']);
@@ -1024,9 +1023,44 @@ class PeopleController extends Controller
         return response()->json(['success' => true, 'field' => $request->field, 'value' => $request->value]);
     }
 
+    // public function addTask(Request $request, $peopleId)
+    // {
+
+    //     $request->validate([
+    //         'title' => 'required|string|max:255',
+    //         'due_date' => 'required|string', // will parse manually
+    //         'user_id' => 'required|exists:users,id',
+    //         'description' => 'nullable|string',
+    //     ]);
+
+    //     $assignee = User::findOrFail($request->user_id);
+
+    //     // Convert the due_date from "2025-09-24 6:30 PM" → "2025-09-24 18:30:00"
+    //     $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
+
+    //     // Create the task
+    //     $task = PeopleTask::create([
+    //         'people_id' => $peopleId,
+    //         'title' => $request->title,
+    //         'description' => $request->description,
+    //         'created_time' => now(),
+    //         'due_time' => $dueTime,
+    //         'assignee_id' => $assignee->id,
+    //         'assignee_name' => $assignee->name,
+    //         'subject_type' => 'people',
+    //         'subject_legacy_id' => $peopleId,
+    //     ]);
+
+    //     // Return JSON response for AJAX
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'Task added successfully',
+    //         'task' => $task,
+    //     ]);
+    // }
+
     public function addTask(Request $request, $peopleId)
     {
-
         $request->validate([
             'title' => 'required|string|max:255',
             'due_date' => 'required|string', // will parse manually
@@ -1039,17 +1073,16 @@ class PeopleController extends Controller
         // Convert the due_date from "2025-09-24 6:30 PM" → "2025-09-24 18:30:00"
         $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
 
-        // Create the task
-        $task = PeopleTask::create([
-            'people_id' => $peopleId,
+        // Create the task in the unified tasks table
+        $task = Task::create([
+            'owner_type' => 'People',        // polymorphic type
+            'owner_id' => $peopleId,         // polymorphic ID
             'title' => $request->title,
             'description' => $request->description,
             'created_time' => now(),
             'due_time' => $dueTime,
             'assignee_id' => $assignee->id,
             'assignee_name' => $assignee->name,
-            'subject_type' => 'people',
-            'subject_legacy_id' => $peopleId,
         ]);
 
         // Return JSON response for AJAX
@@ -1059,6 +1092,38 @@ class PeopleController extends Controller
             'task' => $task,
         ]);
     }
+
+    // public function updateTask(Request $request, $taskId)
+    // {
+    //     $request->validate([
+    //         'title' => 'required|string|max:255',
+    //         'due_date' => 'required|string', // will parse manually
+    //         'user_id' => 'required|exists:users,id',
+    //         'description' => 'nullable|string',
+    //     ]);
+
+    //     $assignee = User::findOrFail($request->user_id);
+
+    //     // Convert the due_date from "2025-09-24 6:30 PM" → "2025-09-24 18:30:00"
+    //     $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
+
+    //     // Find and update the task
+    //     $task = PeopleTask::findOrFail($taskId);
+    //     $task->update([
+    //         'title' => $request->title,
+    //         'description' => $request->description,
+    //         'due_time' => $dueTime,
+    //         'assignee_id' => $assignee->id,
+    //         'assignee_name' => $assignee->name,
+    //     ]);
+
+    //     // Return JSON response for AJAX
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'Task updated successfully',
+    //         'task' => $task,
+    //     ]);
+    // }
 
     public function updateTask(Request $request, $taskId)
     {
@@ -1074,8 +1139,8 @@ class PeopleController extends Controller
         // Convert the due_date from "2025-09-24 6:30 PM" → "2025-09-24 18:30:00"
         $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
 
-        // Find and update the task
-        $task = PeopleTask::findOrFail($taskId);
+        // Find and update the task in the unified tasks table
+        $task = Task::findOrFail($taskId);
         $task->update([
             'title' => $request->title,
             'description' => $request->description,
@@ -1092,12 +1157,33 @@ class PeopleController extends Controller
         ]);
     }
 
+    // public function markCompleted($taskId)
+    // {
+    //     $task = PeopleTask::findOrFail($taskId);
+
+    //     $user = auth()->user(); // logged-in user
+
+    //     $task->update([
+    //         'completed_time' => now(),
+    //         'completed_user_id' => $user->id,
+    //         'completed_user_name' => $user->name,
+    //     ]);
+
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'Task marked as completed successfully!',
+    //         'task' => $task,
+    //     ]);
+    // }
+
     public function markCompleted($taskId)
     {
-        $task = PeopleTask::findOrFail($taskId);
+        // Find the task in the unified tasks table
+        $task = Task::findOrFail($taskId);
 
         $user = auth()->user(); // logged-in user
 
+        // Update completed info
         $task->update([
             'completed_time' => now(),
             'completed_user_id' => $user->id,
@@ -1111,10 +1197,29 @@ class PeopleController extends Controller
         ]);
     }
 
+    // public function reopenTask($taskId)
+    // {
+    //     $task = PeopleTask::findOrFail($taskId);
+
+    //     $task->update([
+    //         'completed_time' => null,
+    //         'completed_user_id' => null,
+    //         'completed_user_name' => null,
+    //     ]);
+
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'Task reopened successfully',
+    //         'task' => $task,
+    //     ]);
+    // }
+
     public function reopenTask($taskId)
     {
-        $task = PeopleTask::findOrFail($taskId);
+        // Find the task in the unified tasks table
+        $task = Task::findOrFail($taskId);
 
+        // Reset completion fields
         $task->update([
             'completed_time' => null,
             'completed_user_id' => null,
@@ -1128,9 +1233,29 @@ class PeopleController extends Controller
         ]);
     }
 
+    // public function deleteTask($task_id)
+    // {
+    //     $task = PeopleTask::find($task_id);
+
+    //     if (! $task) {
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => 'Task not found.',
+    //         ], 404);
+    //     }
+
+    //     $task->delete();
+
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'Task deleted successfully.',
+    //     ]);
+    // }
+
     public function deleteTask($task_id)
     {
-        $task = PeopleTask::find($task_id);
+        // Find the task in the unified tasks table
+        $task = Task::find($task_id);
 
         if (! $task) {
             return response()->json([

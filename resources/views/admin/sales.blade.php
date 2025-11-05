@@ -718,7 +718,111 @@
 
                                             <div id="pendingTasksContainer">
 
-                                                @foreach ($alltasks as $task)
+                                                {{-- @foreach ($alltasks as $task)
+                                                    <div class="task-section mt-2">
+                                                        <div class="company-list mb-3 border rounded p-3">
+                                                            <div class="row align-items-start">
+                                                                <div class="col-md-6">
+                                                                    <div class="company-name">
+                                                                        <p><strong>{{ $task->title ?? 'N/A' }}</strong></p>
+                                                                        <p class="text-secondary">
+                                                                            Due
+                                                                            {{ \Carbon\Carbon::parse($task->due_time)->format('M d, \a\t g:i a') }}
+                                                                        </p>
+                                                                        <p class="text-warning">
+                                                                            {{ $task->assignee_name ?? 'N/A' }}</p>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-md-6 d-flex justify-content-end">
+                                                                    <div class="d-flex gap-2">
+                                                                        <!-- Completed -->
+                                                                        <button
+                                                                            class="btn btn-sm btn-outline-success mark-complete-btn"
+                                                                            title="Mark as Completed"
+                                                                            data-id="{{ $task->id }}">
+                                                                            <i class="fas fa-check"></i>
+                                                                        </button>
+
+                                                                        <!-- Edit -->
+                                                                        <button
+                                                                            class="btn btn-sm btn-outline-primary toggleEditTask"
+                                                                            data-id="{{ $task->id }}"
+                                                                            data-title="{{ $task->title }}"
+                                                                            data-due="{{ $task->due_time }}"
+                                                                            data-user="{{ $task->assignee_id }}"
+                                                                            data-description="{{ $task->description }}"
+                                                                            title="Edit Task">
+                                                                            <i class="fas fa-edit"></i>
+                                                                        </button>
+
+                                                                        <!-- Delete -->
+                                                                        <button
+                                                                            class="btn btn-sm btn-outline-secondary delete-task-btn"
+                                                                            title="Delete Task"
+                                                                            data-id="{{ $task->id }}">
+                                                                            <i class="fas fa-times"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row mt-2">
+                                                                <div class="col-12">
+                                                                    <div
+                                                                        class="email-preview border rounded p-3 text-secondary">
+                                                                        {{ $task->description ?? 'N/A' }}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endforeach --}}
+
+                                                @foreach ($completedTasks as $task)
+                                                    <div class="task-section mt-2">
+                                                        <div class="company-list mb-3 border rounded p-3">
+
+                                                            <div class="row align-items-start">
+                                                                <div class="col-md-6">
+                                                                    <div class="company-name">
+                                                                        <p><strong>{{ $task->title ?? 'N/A' }}</strong></p>
+                                                                        <p class="text-secondary">
+                                                                            Completed On
+                                                                            {{ \Carbon\Carbon::parse($task->completed_time)->format('M d, \a\t g:i a') }}
+                                                                        </p>
+                                                                        <p class="text-warning">By
+                                                                            {{ $task->completed_user_name ?? 'N/A' }}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-md-6 d-flex justify-content-end">
+                                                                    <div class="d-flex gap-2">
+                                                                        <!-- Reopen Task -->
+                                                                        <button
+                                                                            class="btn btn-sm btn-outline-warning reopen-task-btn"
+                                                                            title="Reopen Task"
+                                                                            data-id="{{ $task->id }}">
+                                                                            <i class="fas fa-undo"></i>
+                                                                        </button>
+
+                                                                        <!-- Delete -->
+                                                                        <button
+                                                                            class="btn btn-sm btn-outline-secondary delete-task-btn"
+                                                                            title="Delete Task"
+                                                                            data-id="{{ $task->id }}">
+                                                                            <i class="fas fa-times"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+
+                                                @foreach ($pendingTasks as $task)
                                                     <div class="task-section mt-2">
                                                         <div class="company-list mb-3 border rounded p-3">
                                                             <div class="row align-items-start">
@@ -779,7 +883,8 @@
                                                     </div>
                                                 @endforeach
 
-                                                </div>
+
+                                            </div>
 
                                         </div>
 
@@ -1772,6 +1877,152 @@
             });
         });
 
+
+        // ==============================
+        // Mark Complete Task
+        // ==============================
+        $(document).on('click', '.mark-complete-btn', function() {
+            var taskId = $(this).data('id'); // get task ID from button
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to mark this task as completed?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, complete it!',
+                cancelButtonText: 'Cancel'
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/admin/companies/tasks/' + taskId + '/complete',
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Completed',
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 2000
+                            }).then(function() {
+                                location
+                                    .reload(); // reload after completion
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message ||
+                                    'Something went wrong while marking the task completed.'
+                            });
+                            console.error(xhr.responseText);
+                        }
+                    });
+                }
+            });
+        });
+
+        // ==============================
+        // Reopen Task
+        // ==============================
+        $(document).on('click', '.reopen-task-btn', function() {
+            var taskId = $(this).data('id'); // get task ID from button
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to re-open this task?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, re-open it!',
+                cancelButtonText: 'Cancel'
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/admin/companies/tasks/' + taskId + '/reopen',
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Re-open',
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 2000
+                            }).then(function() {
+                                location.reload(); // refresh task state
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message ||
+                                    'Something went wrong while reopening this task.'
+                            });
+                            console.error(xhr.responseText);
+                        }
+                    });
+                }
+            });
+        });
+
+
+        // ==============================
+        // Delete Task
+        // ==============================
+        $(document).on('click', '.delete-task-btn', function() {
+            var taskId = $(this).data('id'); // get task ID from button
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to undo this action!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/admin/companies/tasks/delete/" + taskId,
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: response.message ||
+                                    "Task deleted successfully.",
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(function() {
+                                location.reload(); // reload after deletion
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message ||
+                                    'Something went wrong.'
+                            });
+                            console.error(xhr.responseText);
+                        }
+                    });
+                }
+            });
+        });
 
         // ==============================
         // Activity and note Comment box toggle functionality

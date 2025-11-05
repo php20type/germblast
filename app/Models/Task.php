@@ -3,24 +3,49 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Task extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'company_id',
-        'user_id',
+        'owner_type',
+        'owner_id',
         'title',
         'description',
-        'due_date',
+        'created_time',
+        'due_time',
+        'completed_time',
+        'subject_type',
+        'subject_legacy_id',
+        'assignee_id',
+        'assignee_name',
+        'completed_user_id',
+        'completed_user_name',
     ];
 
-    public function user()
+    /**
+     * Get the parent model (Company, People, or Lead) that owns this task.
+     */
+     public function owner()
     {
-        return $this->belongsTo(User::class,'user_id');
+        return $this->morphTo(null, 'owner_type', 'owner_id');
     }
 
-    public function company()
+    /**
+     * The user assigned to this task.
+     */
+    public function assignee()
     {
-        return $this->belongsTo(Company::class,'company_id');
+        return $this->belongsTo(User::class, 'assignee_id');
+    }
+
+    /**
+     * The user who completed this task.
+     */
+    public function completedBy()
+    {
+        return $this->belongsTo(User::class, 'completed_user_id');
     }
 }

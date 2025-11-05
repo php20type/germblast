@@ -1622,7 +1622,7 @@
                         value: "user:{{ $user->id }}"
                     }
                     @if (!$loop->last)
-                        ,
+                        ,w
                     @endif
                 @endforeach
             ];

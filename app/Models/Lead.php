@@ -12,7 +12,6 @@ class Lead extends Model
         'name',
         'description',
         'lead_status',
-        // 'lead_flags',
         'is_watching',
         'is_hot',
         'stage_id',
@@ -29,7 +28,7 @@ class Lead extends Model
     ];
 
     protected $morphClass = 'Lead';
-    protected $with = ['leadCompanies', 'leadProducts', 'leadPeople', 'leadSources', 'leadCompetitors', 'leadTags', 'leadTask', 'leadFile'];
+    protected $with = ['leadCompanies', 'leadProducts', 'leadPeople', 'leadSources', 'leadCompetitors', 'leadTags', 'leadFile','task'];
     protected $casts = [
         'close_date' => 'datetime',
     ];
@@ -38,6 +37,11 @@ class Lead extends Model
     public function activity(): MorphMany
     {
         return $this->morphMany(Activity::class, 'owner');
+    }
+
+    public function task(): MorphMany
+    {
+        return $this->morphMany(Task::class, 'owner');
     }
 
     public function timeline(): MorphMany

@@ -97,16 +97,6 @@ class User extends Authenticatable
         return $this->hasMany(NoteComment::class, 'user_id');
     }
 
-    public function companyTaskAssignee()
-    {
-        return $this->hasMany(CompanyTask::class, 'assignee_id');
-    }
-
-    public function companyTaskCompleted()
-    {
-        return $this->hasMany(CompanyTask::class, 'completed_user_id');
-    }
-
     public function companyFile()
     {
         return $this->hasMany(CompanyFile::class, 'user_id');
@@ -122,23 +112,43 @@ class User extends Authenticatable
         return $this->hasMany(LeadFile::class, 'user_id');
     }
 
-    public function peopleTaskAssignee()
+    // public function companyTaskAssignee()
+    // {
+    //     return $this->hasMany(CompanyTask::class, 'assignee_id');
+    // }
+
+    // public function companyTaskCompleted()
+    // {
+    //     return $this->hasMany(CompanyTask::class, 'completed_user_id');
+    // }
+
+    // public function peopleTaskAssignee()
+    // {
+    //     return $this->hasMany(PeopleTask::class, 'assignee_id');
+    // }
+
+    // public function peopleTaskCompleted()
+    // {
+    //     return $this->hasMany(PeopleTask::class, 'completed_user_id');
+    // }
+
+    // public function leadTaskAssignee()
+    // {
+    //     return $this->hasMany(LeadTask::class, 'assignee_id');
+    // }
+
+    // public function leadTaskCompleted()
+    // {
+    //     return $this->hasMany(LeadTask::class, 'completed_user_id');
+    // }
+
+    public function taskAssignee()
     {
-        return $this->hasMany(PeopleTask::class, 'assignee_id');
+        return $this->hasMany(Task::class, 'assignee_id');
     }
 
-    public function peopleTaskCompleted()
+    public function taskCompleted()
     {
-        return $this->hasMany(PeopleTask::class, 'completed_user_id');
-    }
-
-    public function leadTaskAssignee()
-    {
-        return $this->hasMany(LeadTask::class, 'assignee_id');
-    }
-
-    public function leadTaskCompleted()
-    {
-        return $this->hasMany(LeadTask::class, 'completed_user_id');
+        return $this->hasMany(Task::class, 'completed_user_id');
     }
 }
