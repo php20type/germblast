@@ -153,11 +153,6 @@ class Lead extends Model
         return $this->belongsTo(LeadStage::class, 'stage_id');
     }
 
-    public function leadTask()
-    {
-        return $this->hasMany(LeadTask::class, 'lead_id');
-    }
-
      public function leadFile()
     {
         return $this->hasMany(LeadFile::class, 'lead_id');

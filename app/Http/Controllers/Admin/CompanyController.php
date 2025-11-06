@@ -24,6 +24,8 @@ use App\Models\Tag;
 use App\Models\Task;
 use App\Models\Territory;
 use App\Models\Timeline;
+use App\Mail\TestEmail;
+use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -265,7 +267,12 @@ class CompanyController extends Controller
                     'tag_id' => $request->tag_id,
                 ]);
             }
+
+            // This is just for testing the mails integration
+            // Mail::to($request->email)->send(new TestEmail($company));
         });
+
+
 
         return redirect()->back()->with('success', 'Company created successfully!');
     }
@@ -983,42 +990,6 @@ class CompanyController extends Controller
         ]);
     }
 
-    // public function addTask(Request $request, $companyId)
-    // {
-
-    //     $request->validate([
-    //         'title' => 'required|string|max:255',
-    //         'due_date' => 'required|string', // will parse manually
-    //         'user_id' => 'required|exists:users,id',
-    //         'description' => 'nullable|string',
-    //     ]);
-
-    //     $assignee = User::findOrFail($request->user_id);
-
-    //     // Convert the due_date from "2025-09-24 6:30 PM" → "2025-09-24 18:30:00"
-    //     $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
-
-    //     // Create the task
-    //     $task = CompanyTask::create([
-    //         'company_id' => $companyId,
-    //         'title' => $request->title,
-    //         'description' => $request->description,
-    //         'created_time' => now(),
-    //         'due_time' => $dueTime,
-    //         'assignee_id' => $assignee->id,
-    //         'assignee_name' => $assignee->name,
-    //         'subject_type' => 'company',
-    //         'subject_legacy_id' => $companyId,
-    //     ]);
-
-    //     // Return JSON response for AJAX
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'message' => 'Task added successfully',
-    //         'task' => $task,
-    //     ]);
-    // }
-
     public function addTask(Request $request, $companyId)
     {
         $request->validate([
@@ -1055,38 +1026,6 @@ class CompanyController extends Controller
         ]);
     }
 
-    // public function updateTask(Request $request, $taskId)
-    // {
-    //     $request->validate([
-    //         'title' => 'required|string|max:255',
-    //         'due_date' => 'required|string', // will parse manually
-    //         'user_id' => 'required|exists:users,id',
-    //         'description' => 'nullable|string',
-    //     ]);
-
-    //     $task = CompanyTask::findOrFail($taskId);
-    //     $assignee = User::findOrFail($request->user_id);
-
-    //     // Convert the due_date from "2025-09-24 6:30 PM" → "2025-09-24 18:30:00"
-    //     $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
-
-    //     // Update the task
-    //     $task->update([
-    //         'title' => $request->title,
-    //         'description' => $request->description,
-    //         'due_time' => $dueTime,
-    //         'assignee_id' => $assignee->id,
-    //         'assignee_name' => $assignee->name,
-    //     ]);
-
-    //     // Return JSON response for AJAX
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'message' => 'Task updated successfully',
-    //         'task' => $task,
-    //     ]);
-    // }
-
     public function updateTask(Request $request, $taskId)
     {
         $request->validate([
@@ -1119,25 +1058,6 @@ class CompanyController extends Controller
         ]);
     }
 
-    // public function markCompleted($taskId)
-    // {
-    //     $task = CompanyTask::findOrFail($taskId);
-
-    //     $user = auth()->user(); // logged-in user
-
-    //     $task->update([
-    //         'completed_time' => now(),
-    //         'completed_user_id' => $user->id,
-    //         'completed_user_name' => $user->name,
-    //     ]);
-
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'message' => 'Task marked as completed successfully!',
-    //         'task' => $task,
-    //     ]);
-    // }
-
     public function markCompleted($taskId)
     {
         // Fetch from unified tasks table
@@ -1160,23 +1080,6 @@ class CompanyController extends Controller
         ]);
     }
 
-    // public function reopenTask($taskId)
-    // {
-    //     $task = CompanyTask::findOrFail($taskId);
-
-    //     $task->update([
-    //         'completed_time' => null,
-    //         'completed_user_id' => null,
-    //         'completed_user_name' => null,
-    //     ]);
-
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'message' => 'Task reopened successfully',
-    //         'task' => $task,
-    //     ]);
-    // }
-
     public function reopenTask($taskId)
     {
         // Fetch the task from the unified tasks table
@@ -1195,25 +1098,6 @@ class CompanyController extends Controller
             'task' => $task,
         ]);
     }
-
-    // public function deleteTask($task_id)
-    // {
-    //     $task = CompanyTask::find($task_id);
-
-    //     if (! $task) {
-    //         return response()->json([
-    //             'status' => 'error',
-    //             'message' => 'Task not found.',
-    //         ], 404);
-    //     }
-
-    //     $task->delete();
-
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'message' => 'Task deleted successfully.',
-    //     ]);
-    // }
 
     public function deleteTask($task_id)
     {

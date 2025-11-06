@@ -112,36 +112,6 @@ class User extends Authenticatable
         return $this->hasMany(LeadFile::class, 'user_id');
     }
 
-    // public function companyTaskAssignee()
-    // {
-    //     return $this->hasMany(CompanyTask::class, 'assignee_id');
-    // }
-
-    // public function companyTaskCompleted()
-    // {
-    //     return $this->hasMany(CompanyTask::class, 'completed_user_id');
-    // }
-
-    // public function peopleTaskAssignee()
-    // {
-    //     return $this->hasMany(PeopleTask::class, 'assignee_id');
-    // }
-
-    // public function peopleTaskCompleted()
-    // {
-    //     return $this->hasMany(PeopleTask::class, 'completed_user_id');
-    // }
-
-    // public function leadTaskAssignee()
-    // {
-    //     return $this->hasMany(LeadTask::class, 'assignee_id');
-    // }
-
-    // public function leadTaskCompleted()
-    // {
-    //     return $this->hasMany(LeadTask::class, 'completed_user_id');
-    // }
-
     public function taskAssignee()
     {
         return $this->hasMany(Task::class, 'assignee_id');

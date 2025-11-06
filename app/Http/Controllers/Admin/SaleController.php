@@ -262,28 +262,6 @@ class SaleController extends Controller
             ->sortByDesc('timestamp')
             ->values();
 
-        // Fetch all tasks assigned to the logged-in user
-        // $companyTasks = $user->companyTaskAssignee()->get();
-        // $peopleTasks = $user->peopleTaskAssignee()->get();
-        // $leadTasks = $user->leadTaskAssignee()->get();
-        // // Combine all pending tasks
-        // $alltasks = $companyTasks
-        //     ->concat($peopleTasks)
-        //     ->concat($leadTasks)
-        //     ->sortByDesc('created_at')
-        //     ->values();
-
-        // $alltasks = $user->taskAssignee()->get();
-
-        // // --- Apply Task Filters ---
-        // $taskFilters = [
-        //     'filter_range' => $request->input('filter_range', 'all'),
-        //     'status' => $request->input('status', 'all'),
-        // ];
-
-        // $taskFiltered = Helper::applySaleTaskFilters($alltasks, $taskFilters);
-        // $alltasks = $taskFiltered['alltasks'];
-
         $alltasks = $user->taskAssignee()->get();
 
         // --- Apply Task Filters first ---
@@ -313,11 +291,6 @@ class SaleController extends Controller
                 return response()->json(['activity_html' => $activity_html]);
             }
 
-            // if ($request->input('section') === 'task') {
-            //     $task_html = view('admin.sales-task-partial', compact('alltasks'))->render();
-
-            //     return response()->json(['task_html' => $task_html]);
-            // }
             if ($request->ajax() && $request->input('section') === 'task') {
                 $task_html = view('admin.sales-task-partial', compact('pendingTasks', 'completedTasks'))->render();
 

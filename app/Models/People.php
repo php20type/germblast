@@ -93,11 +93,6 @@ class People extends Model
         return $this->hasOne(PeopleUrl::class, 'people_id');
     }
 
-    // New database hasMany relations
-    public function peopleTask()
-    {
-        return $this->hasMany(PeopleTask::class, 'people_id');
-    }
 
     public function peopleCompany()
     {

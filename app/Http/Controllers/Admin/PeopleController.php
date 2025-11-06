@@ -1023,42 +1023,6 @@ class PeopleController extends Controller
         return response()->json(['success' => true, 'field' => $request->field, 'value' => $request->value]);
     }
 
-    // public function addTask(Request $request, $peopleId)
-    // {
-
-    //     $request->validate([
-    //         'title' => 'required|string|max:255',
-    //         'due_date' => 'required|string', // will parse manually
-    //         'user_id' => 'required|exists:users,id',
-    //         'description' => 'nullable|string',
-    //     ]);
-
-    //     $assignee = User::findOrFail($request->user_id);
-
-    //     // Convert the due_date from "2025-09-24 6:30 PM" → "2025-09-24 18:30:00"
-    //     $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
-
-    //     // Create the task
-    //     $task = PeopleTask::create([
-    //         'people_id' => $peopleId,
-    //         'title' => $request->title,
-    //         'description' => $request->description,
-    //         'created_time' => now(),
-    //         'due_time' => $dueTime,
-    //         'assignee_id' => $assignee->id,
-    //         'assignee_name' => $assignee->name,
-    //         'subject_type' => 'people',
-    //         'subject_legacy_id' => $peopleId,
-    //     ]);
-
-    //     // Return JSON response for AJAX
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'message' => 'Task added successfully',
-    //         'task' => $task,
-    //     ]);
-    // }
-
     public function addTask(Request $request, $peopleId)
     {
         $request->validate([
@@ -1093,38 +1057,6 @@ class PeopleController extends Controller
         ]);
     }
 
-    // public function updateTask(Request $request, $taskId)
-    // {
-    //     $request->validate([
-    //         'title' => 'required|string|max:255',
-    //         'due_date' => 'required|string', // will parse manually
-    //         'user_id' => 'required|exists:users,id',
-    //         'description' => 'nullable|string',
-    //     ]);
-
-    //     $assignee = User::findOrFail($request->user_id);
-
-    //     // Convert the due_date from "2025-09-24 6:30 PM" → "2025-09-24 18:30:00"
-    //     $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
-
-    //     // Find and update the task
-    //     $task = PeopleTask::findOrFail($taskId);
-    //     $task->update([
-    //         'title' => $request->title,
-    //         'description' => $request->description,
-    //         'due_time' => $dueTime,
-    //         'assignee_id' => $assignee->id,
-    //         'assignee_name' => $assignee->name,
-    //     ]);
-
-    //     // Return JSON response for AJAX
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'message' => 'Task updated successfully',
-    //         'task' => $task,
-    //     ]);
-    // }
-
     public function updateTask(Request $request, $taskId)
     {
         $request->validate([
@@ -1157,25 +1089,6 @@ class PeopleController extends Controller
         ]);
     }
 
-    // public function markCompleted($taskId)
-    // {
-    //     $task = PeopleTask::findOrFail($taskId);
-
-    //     $user = auth()->user(); // logged-in user
-
-    //     $task->update([
-    //         'completed_time' => now(),
-    //         'completed_user_id' => $user->id,
-    //         'completed_user_name' => $user->name,
-    //     ]);
-
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'message' => 'Task marked as completed successfully!',
-    //         'task' => $task,
-    //     ]);
-    // }
-
     public function markCompleted($taskId)
     {
         // Find the task in the unified tasks table
@@ -1197,23 +1110,6 @@ class PeopleController extends Controller
         ]);
     }
 
-    // public function reopenTask($taskId)
-    // {
-    //     $task = PeopleTask::findOrFail($taskId);
-
-    //     $task->update([
-    //         'completed_time' => null,
-    //         'completed_user_id' => null,
-    //         'completed_user_name' => null,
-    //     ]);
-
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'message' => 'Task reopened successfully',
-    //         'task' => $task,
-    //     ]);
-    // }
-
     public function reopenTask($taskId)
     {
         // Find the task in the unified tasks table
@@ -1232,25 +1128,6 @@ class PeopleController extends Controller
             'task' => $task,
         ]);
     }
-
-    // public function deleteTask($task_id)
-    // {
-    //     $task = PeopleTask::find($task_id);
-
-    //     if (! $task) {
-    //         return response()->json([
-    //             'status' => 'error',
-    //             'message' => 'Task not found.',
-    //         ], 404);
-    //     }
-
-    //     $task->delete();
-
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'message' => 'Task deleted successfully.',
-    //     ]);
-    // }
 
     public function deleteTask($task_id)
     {

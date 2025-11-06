@@ -116,11 +116,6 @@ class Company extends Model
         return $this->hasOne(CompanyUrl::class, 'company_id');
     }
 
-    // public function companyTask()
-    // {
-    //     return $this->hasMany(CompanyTask::class, 'company_id');
-    // }
-
      public function companyFile()
     {
         return $this->hasMany(CompanyFile::class, 'company_id');
