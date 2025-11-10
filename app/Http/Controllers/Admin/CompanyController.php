@@ -268,8 +268,6 @@ class CompanyController extends Controller
                 ]);
             }
 
-            // This is just for testing the mails integration
-            // Mail::to($request->email)->send(new TestEmail($company));
         });
 
 

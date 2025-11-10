@@ -26,6 +26,7 @@ use App\Models\Tag;
 use App\Models\Task;
 use App\Models\Timeline;
 use App\Models\User;
+use App\Services\ApprovalService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -971,6 +972,76 @@ class LeadController extends Controller
         ));
     }
 
+    // public function store(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'name' => 'required|string|max:255',
+    //         'assignee_id' => 'nullable|exists:users,id',
+    //         'close_date' => 'nullable|date',
+    //         'confidence' => 'nullable|numeric',
+    //         'product_id' => 'nullable|array',
+    //         'product_id.*' => 'exists:products,id',
+    //         'quantity' => 'nullable|array',
+    //         'price' => 'nullable|array',
+    //         'company_id' => 'nullable|array',
+    //         'company_id.*' => 'exists:companies,id',
+    //         'person_id' => 'nullable|array',
+    //         'person_id.*' => 'nullable|exists:people,id',
+    //         'source_id' => 'nullable|array',
+    //         'source_id.*' => 'exists:sources,id',
+    //         'competitors_id' => 'nullable|array',
+    //         'competitors_id.*' => 'nullable|exists:competitors,id',
+    //         'tag_id' => 'required',
+    //     ]);
+
+    //     // Create one lead only
+    //     $lead = Lead::create([
+    //         'name' => $request->name,
+    //         'assignee_id' => $request->assignee_id,
+    //         'close_date' => $request->close_date,
+    //         'confidence' => $request->confidence,
+    //         'creator_id' => auth()->id(),
+    //     ]);
+
+    //     // Companies
+    //     if ($request->filled('company_id')) {
+    //         $lead->companies()->attach($request->company_id);
+    //     }
+
+    //     // People
+    //     if ($request->filled('person_id')) {
+    //         $lead->peoples()->attach($request->person_id);
+    //     }
+
+    //     // Products with qty & price
+    //     if ($request->filled('product_id')) {
+    //         foreach ($request->product_id as $index => $productId) {
+    //             $lead->products()->attach($productId, [
+    //                 'qty' => $request->quantity[$index] ?? 1,
+    //                 'price' => $request->price[$index] ?? 0,
+    //             ]);
+    //         }
+    //     }
+
+    //     // Sources
+    //     if ($request->filled('source_id')) {
+    //         $lead->sources()->attach($request->source_id);
+    //     }
+
+    //     // Competitors
+    //     if ($request->filled('competitors_id')) {
+    //         $lead->competitors()->attach($request->competitors_id);
+    //     }
+
+    //     // Tags
+    //     if ($request->filled('tag_id')) {
+    //         $lead->tags()->attach($request->tag_id);
+    //     }
+
+    //     // return redirect()->route('admin.leads.index')->with('success', 'Leads created successfully');
+    //     return redirect()->back()->with('success', 'Leads created successfully');
+    // }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -993,52 +1064,18 @@ class LeadController extends Controller
             'tag_id' => 'required',
         ]);
 
-        // Create one lead only
-        $lead = Lead::create([
-            'name' => $request->name,
-            'assignee_id' => $request->assignee_id,
-            'close_date' => $request->close_date,
-            'confidence' => $request->confidence,
-            'creator_id' => auth()->id(),
-        ]);
+        // Instead of directly storing lead — send for approval
+        ApprovalService::request(
+            auth()->user()->email,
+            'create_lead',
+            [
+                'data' => $validated,
+                'creator_id' => auth()->id(),
+            ],
+            url()->previous() // redirect back to same page
+        );
 
-        // Companies
-        if ($request->filled('company_id')) {
-            $lead->companies()->attach($request->company_id);
-        }
-
-        // People
-        if ($request->filled('person_id')) {
-            $lead->peoples()->attach($request->person_id);
-        }
-
-        // Products with qty & price
-        if ($request->filled('product_id')) {
-            foreach ($request->product_id as $index => $productId) {
-                $lead->products()->attach($productId, [
-                    'qty' => $request->quantity[$index] ?? 1,
-                    'price' => $request->price[$index] ?? 0,
-                ]);
-            }
-        }
-
-        // Sources
-        if ($request->filled('source_id')) {
-            $lead->sources()->attach($request->source_id);
-        }
-
-        // Competitors
-        if ($request->filled('competitors_id')) {
-            $lead->competitors()->attach($request->competitors_id);
-        }
-
-        // Tags
-        if ($request->filled('tag_id')) {
-            $lead->tags()->attach($request->tag_id);
-        }
-
-        // return redirect()->route('admin.leads.index')->with('success', 'Leads created successfully');
-        return redirect()->back()->with('success', 'Leads created successfully');
+        return redirect()->back()->with('info', 'Approval email sent! The lead will be created after approval.');
     }
 
     public function show(Request $request, $id)
@@ -1150,7 +1187,7 @@ class LeadController extends Controller
         });
 
         // --- Fetch Timeline Entries ---
-        $timelineEntries = Helper::getTimelineForEntity('company', $leads->id);
+        $timelineEntries = Helper::getTimelineForEntity('lead', $leads->id);
         $timelineEntries->transform(function ($item) {
             $item->type = 'timeline';
             $item->timestamp = $item->created_at;
@@ -1338,27 +1375,50 @@ class LeadController extends Controller
         return response()->json(['allowed' => true]);
     }
 
+    // public function changeStage(Request $request, $leadId)
+    // {
+    //     $lead = Lead::findOrFail($leadId);
+    //     $oldStage = $lead->stages->name ?? 'Unknown Stage';
+    //     $newStage = LeadStage::find($request->stage_id)->name ?? 'Unknown Stage';
+
+    //     $lead->stage_id = $request->stage_id;
+    //     $lead->save();
+
+    //     // Timeline logging
+    //     $leadName = $lead->name ?? 'Unnamed Lead';
+
+    //     Timeline::create([
+    //         'user_id' => auth()->id(),
+    //         'owner_type' => 'lead',
+    //         'owner_id' => $lead->id,
+    //         'action_type' => 'updated_stage',
+    //         'description' => "changed the stage of {$leadName} from {$oldStage} to {$newStage}",
+    //     ]);
+
+    //     return response()->json(['message' => 'Lead stage updated successfully.']);
+    // }
+
     public function changeStage(Request $request, $leadId)
     {
         $lead = Lead::findOrFail($leadId);
+
         $oldStage = $lead->stages->name ?? 'Unknown Stage';
         $newStage = LeadStage::find($request->stage_id)->name ?? 'Unknown Stage';
 
-        $lead->stage_id = $request->stage_id;
-        $lead->save();
+        ApprovalService::request(
+            auth()->user()->email,
+            'update_lead_stage',
+            [
+                'lead_id' => $lead->id,
+                'new_stage_id' => $request->stage_id,
+                'old_stage' => $oldStage,
+                'new_stage' => $newStage,
+                'user_id' => auth()->id(),
+            ],
+            url()->previous()
+        );
 
-        // Timeline logging
-        $leadName = $lead->name ?? 'Unnamed Lead';
-
-        Timeline::create([
-            'user_id' => auth()->id(),
-            'owner_type' => 'lead',
-            'owner_id' => $lead->id,
-            'action_type' => 'updated_stage',
-            'description' => "changed the stage of {$leadName} from {$oldStage} to {$newStage}",
-        ]);
-
-        return response()->json(['message' => 'Lead stage updated successfully.']);
+        return response()->json(['message' => 'Approval email sent! The stage will update after approval.']);
     }
 
     public function updateDetail(Request $request, $leadId)

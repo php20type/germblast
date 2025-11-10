@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\Admin\NoteController;
+use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\Admin\PeopleController;
 use App\Http\Controllers\Admin\SaleController;
 use App\Http\Controllers\Admin\SettingController;
@@ -216,3 +217,4 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 Route::get('/states/{countryId}', [SettingController::class, 'getStatesByCountry'])->name('get.states');
 Route::get('/cities/{stateId}', [SettingController::class, 'getCitiesByState'])->name('get.cities');
+Route::get('/approval/{token}', [ApprovalController::class, 'process'])->name('approval.process');
