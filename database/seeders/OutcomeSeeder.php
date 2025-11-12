@@ -25,6 +25,7 @@ class OutcomeSeeder extends Seeder
         foreach ($outcomes as $outcome) {
             Outcome::create([
                 'id' => $outcome['outcome_id'], // outcome_id → id
+                'type' => $outcome['type'],
                 'name' => $outcome['outcome'],    // outcome → name
             ]);
         }

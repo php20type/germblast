@@ -8,6 +8,7 @@ class Outcome extends Model
 {
     protected $fillable=[
         'id',
+        'type',
         'name'
     ];
 

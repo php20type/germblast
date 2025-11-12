@@ -69,7 +69,7 @@ class ApprovalService
             case 'create_lead':
                 $validated = $data['data'];
                 $creatorId = $data['creator_id'] ?? null;
-
+ 
                 $lead = Lead::create([
                     'name' => $validated['name'],
                     'assignee_id' => $validated['assignee_id'] ?? null,

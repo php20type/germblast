@@ -1075,9 +1075,11 @@
                                                                             <span class="comment-avatar">
                                                                                 {{ strtoupper(substr($comment->creator->name ?? 'N/A', 0, 2)) }}
                                                                             </span>
-                                                                            <span class="comment-text">{{ $comment->comment }}</span>
+                                                                            <span
+                                                                                class="comment-text">{{ $comment->comment }}</span>
                                                                         </div>
-                                                                        <span class="btn btn-sm delete-comment-btn" data-id="{{ $comment->id }}"
+                                                                        <span class="btn btn-sm delete-comment-btn"
+                                                                            data-id="{{ $comment->id }}"
                                                                             data-type="Activity">
                                                                             <i class="fas fa-times"></i>
                                                                         </span>
@@ -1154,6 +1156,9 @@
 
                                 {{-- Lead Status --}}
                                 <div class="form-group mb-3">
+                                    <label for="leadStatusSelect" class="form-label">
+                                        <b>LEAD STATUS</b>
+                                    </label>
                                     <select class="form-select" id="leadStatusSelect"
                                         data-lead-id="{{ $leads->id }}">
                                         <option value="open" {{ $leads->lead_status == 'open' ? 'selected' : '' }}>Open
@@ -1167,6 +1172,38 @@
                                             Cancelled</option>
                                         <option value="pending" {{ $leads->lead_status == 'pending' ? 'selected' : '' }}>
                                             Pending</option>
+                                    </select>
+                                </div>
+
+                                {{-- Lost outcome wrapper --}}
+                                <div class="form-group mb-3 d-none" id="lostOutcomeWrapper">
+                                    <label for="lostOutcomeSelect" class="form-label">
+                                        <b>OUTCOME</b>
+                                    </label>
+                                    <select class="form-select" id="lostOutcomeSelect">
+                                        <option value="">Select reason</option>
+                                        @foreach ($lost_outcomes as $outcome)
+                                            <option value="{{ $outcome->id }}"
+                                                {{ $leads->outcome_id == $outcome->id && $leads->lead_status == 'lost' ? 'selected' : '' }}>
+                                                {{ $outcome->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                {{-- Cancelled outcome wrapper --}}
+                                <div class="form-group mb-3 d-none" id="cancelledOutcomeWrapper">
+                                    <label for="cancelledOutcomeSelect" class="form-label">
+                                        <b>OUTCOME</b>
+                                    </label>
+                                    <select class="form-select" id="cancelledOutcomeSelect">
+                                        <option value="">Select reason</option>
+                                        @foreach ($cancelled_outcomes as $outcome)
+                                            <option value="{{ $outcome->id }}"
+                                                {{ $leads->outcome_id == $outcome->id && $leads->lead_status == 'cancelled' ? 'selected' : '' }}>
+                                                {{ $outcome->name }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
 
@@ -1203,7 +1240,8 @@
                                         data-type="assignee">
                                         <option selected>Select assignee</option>
                                         @foreach ($users as $user)
-                                            <option value="{{ $user->id }}">
+                                            <option value="{{ $user->id }}"
+                                                {{ $leads->assignee_id == $user->id ? 'selected' : '' }}>
                                                 {{ $user->name }}
                                             </option>
                                         @endforeach
@@ -1773,27 +1811,6 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     }
                 });
-
-                // $('#filter-range').select2({
-                //     placeholder: 'Select Range',
-                //     containerCssClass: 'form-select dropdown-orange',
-                //     dropdownCssClass: 'dropdown-orange',
-                //     allowClear: true
-                // });
-
-                // $('#filter-activity').select2({
-                //     placeholder: 'Select Activity Type',
-                //     containerCssClass: 'form-select dropdown-orange',
-                //     dropdownCssClass: 'dropdown-orange',
-                //     allowClear: true
-                // });
-
-                // $('#filter-user').select2({
-                //     placeholder: 'Select User',
-                //     containerCssClass: 'form-select dropdown-orange',
-                //     dropdownCssClass: 'dropdown-orange',
-                //     allowClear: true
-                // });
 
                 // ==============================
                 // Activity and note Comment box toggle functionality
@@ -2506,50 +2523,209 @@
                 // ==============================
                 // Handle lead status selection
                 // ==============================
-                let statusSelect = document.getElementById("leadStatusSelect");
-                if (statusSelect) {
-                    // Store initial value
-                    let previousValue = statusSelect.value;
+                // let statusSelect = document.getElementById("leadStatusSelect");
+                // if (statusSelect) {
+                //     // Store initial value
+                //     let previousValue = statusSelect.value;
 
-                    statusSelect.addEventListener("change", function() {
-                        let leadId = this.dataset.leadId;
-                        let leadStatus = this.value;
+                //     statusSelect.addEventListener("change", function() {
+                //         let leadId = this.dataset.leadId;
+                //         let leadStatus = this.value;
 
-                        Swal.fire({
-                            title: 'Are you sure?',
-                            text: `Do you want to update the lead status`,
-                            icon: 'question',
-                            showCancelButton: true,
-                            confirmButtonColor: '#28a745',
-                            cancelButtonColor: '#dc3545',
-                            confirmButtonText: 'Yes, update'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                updateLead({
-                                        lead_status: leadStatus,
-                                        lead_id: leadId
-                                    },
-                                    () => {
-                                        Swal.fire({
-                                            icon: "success",
-                                            title: "Updated!",
-                                            text: "Lead status updated successfully.",
-                                            timer: 1500,
-                                            showConfirmButton: false
-                                        }).then(() => {
-                                            location.reload();
-                                        });
-                                    }
-                                );
-                                // Update previous value on success
-                                previousValue = leadStatus;
-                            } else {
-                                // Revert select back to previous value on cancel
-                                this.value = previousValue;
-                            }
-                        });
-                    });
+                //         Swal.fire({
+                //             title: 'Are you sure?',
+                //             text: `Do you want to update the lead status`,
+                //             icon: 'question',
+                //             showCancelButton: true,
+                //             confirmButtonColor: '#28a745',
+                //             cancelButtonColor: '#dc3545',
+                //             confirmButtonText: 'Yes, update'
+                //         }).then((result) => {
+                //             if (result.isConfirmed) {
+                //                 updateLead({
+                //                         lead_status: leadStatus,
+                //                         lead_id: leadId
+                //                     },
+                //                     () => {
+                //                         Swal.fire({
+                //                             icon: "success",
+                //                             title: "Updated!",
+                //                             text: "Lead status updated successfully.",
+                //                             timer: 1500,
+                //                             showConfirmButton: false
+                //                         }).then(() => {
+                //                             location.reload();
+                //                         });
+                //                     }
+                //                 );
+                //                 // Update previous value on success
+                //                 previousValue = leadStatus;
+                //             } else {
+                //                 // Revert select back to previous value on cancel
+                //                 this.value = previousValue;
+                //             }
+                //         });
+                //     });
+                // }
+                const statusSelect = document.getElementById('leadStatusSelect');
+                const lostWrapper = document.getElementById('lostOutcomeWrapper');
+                const cancelledWrapper = document.getElementById('cancelledOutcomeWrapper');
+                const lostSelect = document.getElementById('lostOutcomeSelect');
+                const cancelledSelect = document.getElementById('cancelledOutcomeSelect');
+
+                // store previous to revert if cancelled
+                let previousStatus = statusSelect.value;
+
+                // helper to hide both wrappers
+                function hideBoth() {
+                    lostWrapper.classList.add('d-none');
+                    cancelledWrapper.classList.add('d-none');
                 }
+
+                // initial state: show correct wrapper if lead already lost/cancelled
+                (function init() {
+                    if (statusSelect.value === 'lost') {
+                        lostWrapper.classList.remove('d-none');
+                    } else if (statusSelect.value === 'cancelled') {
+                        cancelledWrapper.classList.remove('d-none');
+                    } else {
+                        hideBoth();
+                    }
+                })();
+
+                // When status changes
+                statusSelect.addEventListener('change', function() {
+                    const selectedStatus = this.value;
+
+                    // If it's Lost or Cancelled -> show the respective select and wait for outcome selection
+                    if (selectedStatus === 'lost' || selectedStatus === 'cancelled') {
+                        // show correct wrapper
+                        if (selectedStatus === 'lost') {
+                            lostWrapper.classList.remove('d-none');
+                            cancelledWrapper.classList.add('d-none');
+                            // focus the select so user chooses reason
+                            lostSelect.focus();
+                        } else {
+                            cancelledWrapper.classList.remove('d-none');
+                            lostWrapper.classList.add('d-none');
+                            cancelledSelect.focus();
+                        }
+
+                        toastr.warning('Please select an outcome reason before submitting.',
+                            'Action Required');
+
+                        // Do NOT auto-send update here; wait for user to choose a reason.
+                        // Keep previousStatus so we can revert if they cancel at confirmation step.
+                        return;
+                    }
+
+                    // For other statuses: confirm immediately and send update (no outcome_id)
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: `Change status to "${selectedStatus}"?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#dc3545',
+                        confirmButtonText: 'Yes, update'
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            // call updateLead (your existing AJAX helper)
+                            updateLead({
+                                lead_status: selectedStatus,
+                                lead_id: statusSelect.dataset.leadId,
+                                outcome_id: null
+                            }, () => {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Updated!",
+                                    text: "Lead status updated successfully.",
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => location.reload());
+                            });
+                            previousStatus = selectedStatus;
+                        } else {
+                            statusSelect.value = previousStatus;
+                        }
+                    });
+                });
+
+                // When user selects a Lost outcome
+                lostSelect.addEventListener('change', function() {
+                    const outcomeId = this.value;
+                    const leadId = statusSelect.dataset.leadId;
+                    if (!outcomeId) {
+                        // if user chooses blank, do nothing (let them pick real reason)
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: 'Confirm update',
+                        text: 'Update status to "Lost" with selected reason?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#dc3545',
+                        confirmButtonText: 'Yes, update'
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            updateLead({
+                                lead_status: 'lost',
+                                lead_id: leadId,
+                                outcome_id: outcomeId
+                            }, () => {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Updated!',
+                                    timer: 1200,
+                                    showConfirmButton: false
+                                }).then(() => location.reload());
+                            });
+                            previousStatus = 'lost';
+                        } else {
+                            // revert status and hide wrapper
+                            statusSelect.value = previousStatus;
+                            hideBoth();
+                        }
+                    });
+                });
+
+                // When user selects a Cancelled outcome
+                cancelledSelect.addEventListener('change', function() {
+                    const outcomeId = this.value;
+                    const leadId = statusSelect.dataset.leadId;
+                    if (!outcomeId) return;
+
+                    Swal.fire({
+                        title: 'Confirm update',
+                        text: 'Update status to "Cancelled" with selected reason?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#dc3545',
+                        confirmButtonText: 'Yes, update'
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            updateLead({
+                                lead_status: 'cancelled',
+                                lead_id: leadId,
+                                outcome_id: outcomeId
+                            }, () => {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Updated!',
+                                    timer: 1200,
+                                    showConfirmButton: false
+                                }).then(() => location.reload());
+                            });
+                            previousStatus = 'cancelled';
+                        } else {
+                            statusSelect.value = previousStatus;
+                            hideBoth();
+                        }
+                    });
+                });
 
                 // ==============================
                 // Handle lead flag checkboxes
