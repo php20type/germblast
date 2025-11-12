@@ -14,7 +14,7 @@
                     @include('admin.settings.sidebar')
 
                     <!-- Main Content -->
-                    <div class="col-md-10 p-0">
+                    <div class="col-lg-9 col-md-9 p-0">
                         <div class="defaults-card">
                             <div class="heading-area-sec">
                                 <div class="left-part-sec">

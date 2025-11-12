@@ -109,7 +109,7 @@
                             </div>
                             <div class="pipeline-section">
                                 <div class="pipeline-header">
-                                    <div class="pipeline-title">Stage Tasks</div>
+                                    <div class="pipeline-title d-none">Stage Tasks</div>
                                     <a href="#" class="d-none text-warning">Edit processes</a>
                                 </div>
 
@@ -164,6 +164,53 @@
                                 </div>
 
                                 <div id="site-survey-stage" class="{{ $leads->stage_id == 2 ? '' : 'd-none' }}">
+                                    {{-- Sales Forecasting --}}
+                                    <div class="task-section mt-2">
+                                        <div class="company-list mb-3 border rounded p-3">
+                                            <div class="row align-items-start">
+                                                <div class="col-md-8">
+                                                    <div class="company-name">
+                                                        <p><strong>Sales Forecasting</strong></p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4 d-flex justify-content-end">
+                                                    <div class="d-flex gap-2">
+                                                        <a class="text-warning" href="javascript:void(0);"
+                                                            onclick="addForecasting()">
+                                                            Add Forecasting</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Survey & Proposal --}}
+                                    <div class="task-section mt-2 d-none">
+                                        <div class="company-list mb-3 border rounded p-3">
+                                            <div class="row align-items-start">
+                                                <div class="col-md-8">
+                                                    <div class="company-name">
+                                                        <p><strong>Survey & Proposal</strong></p>
+                                                        <p class="text-secondary">
+                                                            Completed On Aug 27, 2025 7:00 AM
+                                                            <span class="text-warning">
+                                                                By Jordan Barboza
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4 d-flex justify-content-end">
+                                                    <div class="d-flex gap-2">
+                                                        <a class="text-warning" href="javascript:void(0);"
+                                                            id="toggleAddProposal">Add Proposal</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="task-section mt-2">
                                         <div class="company-list mb-3 border rounded p-3">
                                             <div class="row align-items-start">
@@ -181,18 +228,7 @@
 
                                                 <div class="col-md-4 d-flex justify-content-end">
                                                     <div class="d-flex gap-2">
-                                                        <!-- Completed -->
-                                                        {{-- <button class="btn btn-sm btn-outline-success"
-                                                            onclick="markCompleted()" title="Mark as Completed">
-                                                            <i class="fas fa-check"></i>
-                                                        </button> --}}
-
-                                                        {{-- Reopen --}}
-                                                        {{-- <button class="btn btn-sm btn-outline-warning"
-                                                            onclick="reopenTask()" title="Reopen Task">
-                                                            <i class="fas fa-undo"></i>
-                                                        </button> --}}
-
+                                                        {{-- Buttons --}}
                                                     </div>
                                                 </div>
                                             </div>
@@ -205,6 +241,7 @@
 
                                         </div>
                                     </div>
+
                                 </div>
 
 
@@ -1746,8 +1783,8 @@
                                 <div class="col-lg-12">
                                     <div class="form-group mb-4">
                                         <label class="form-label">Participants</label>
-                                        <select id="participant_select" name="participant_id[]" class="form-select mt-2"
-                                            multiple>
+                                        <select id="participant_select" name="participant_id[]"
+                                            class="form-select mt-2" multiple>
                                             {{-- Companies --}}
                                             <optgroup label="Companies">
                                                 @foreach ($companies as $company)
@@ -1796,995 +1833,1248 @@
             </div>
         </div>
 
+        {{-- Sales Forecasting modal --}}
+        <div class="modal fade" id="add-forecasting" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title" id="exampleModalLabel">Sales Forecasting</h1>
+                        <div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                    </div>
+                    <div class="modal-body ps-0">
 
-    @endsection
 
-    @push('scripts')
-        <script>
-            function scheduleActivity() {
-                $('#schedule-activity').modal('show');
-            }
+                        <form id="add_forecasting" class="company-form"
+                            action="{{ route('admin.leads.forecasting.store') }}" method="POST"
+                            data-owner-id="{{ $leads->id }}">
+                            @csrf
 
-            $(document).ready(function() {
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            <input type="hidden" name="lead_id" id="lead_id" value="{{ $leads->id }}">
+
+                            <div class="row mx-0">
+                                <div class="col-lg-12 mb-3">
+                                    <label class="form-label">Confidence Level <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="confidence"
+                                        value="{{ $leads->confidence ?? '' }}" placeholder="Enter confidence level">
+                                </div>
+
+                                <div class="col-lg-12 mb-3">
+                                    <label class="form-label">Number of Services <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="expected_services"
+                                    value="{{ $leads->expected_services ?? '' }}"
+                                        placeholder="Enter expected number of services">
+                                </div>
+
+                                <div class="col-lg-12 mb-3">
+                                    <label class="form-label">Number of Months <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="expected_months"
+                                    value="{{ $leads->expected_months ?? '' }}"
+                                        placeholder="Enter expected number of months (e.g. 12)">
+                                </div>
+
+                                <div class="col-lg-12 mb-3">
+                                    <label class="form-label">Price <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="expected_price" value="{{ $leads->expected_price ?? '' }}"
+                                        placeholder="Enter expected price per service">
+                                </div>
+
+                                <div class="col-lg-12 mb-3">
+                                    <label class="form-label">First Service Date <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="service_date"
+                                        name="expected_first_date"
+                                        value="{{ $leads->expected_first_date ?? '' }}"
+                                        placeholder="Select expected first service date">
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-success" id="addForecasting">
+                                    Save Forecasting</button>
+                            </div>
+                        </form>
+
+
+                    </div>
+                </div>
+            </div>
+
+
+        @endsection
+
+        @push('scripts')
+            <script>
+                function scheduleActivity() {
+                    $('#schedule-activity').modal('show');
+                }
+
+                function addForecasting() {
+                    $('#add-forecasting').modal('show');
+                }
+
+                $(document).ready(function() {
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    });
+
+                    // ==============================
+                    // Flatpickr for Forecasting Serice Date
+                    // ==============================
+                    flatpickr("#service_date", {
+                        dateFormat: "Y-m-d",
+                        minDate: "today",
+                        time_24hr: false
+                    });
+
+                    // ==============================
+                    // Activity and note Comment box toggle functionality
+                    // ==============================
+                    $('.add-comment-btn').click(function() {
+                        // Find the nearest comment box relative to this button
+                        $(this).closest('.timeline-item').find('.add-comment').toggleClass('d-none');
+                    });
+
+                    $('.comment-cancel').click(function() {
+                        const $commentBox = $(this).closest('.add-comment');
+                        $commentBox.addClass('d-none');
+                        $commentBox.find('textarea').val(''); // Clear the textarea content
+                    });
+
+                    // ==============================
+                    // Start time and end time display in schedule activity
+                    // ==============================
+                    const startTimeSelect = $('#store_activity select[name="start_time"]');
+                    const endTimeSelect = $('#store_activity select[name="end_time"]');
+                    const allDayCheckbox = $('#store_activity input[name="all_day"]');
+
+                    // --- Generate time options every X minutes ---
+                    function generateTimeOptions(interval = 15) {
+                        const times = [];
+                        let time = moment().startOf('day');
+                        const end = moment(time).endOf('day').add(1, 'minute'); // include 24:00
+
+                        while (time.isBefore(end)) {
+                            // value in HH:mm:ss, display in hh:mm A
+                            times.push({
+                                value: time.format('HH:mm:ss'),
+                                display: time.format('hh:mm A')
+                            });
+                            time.add(interval, 'minutes');
+                        }
+                        return times;
                     }
-                });
 
-                // ==============================
-                // Activity and note Comment box toggle functionality
-                // ==============================
-                $('.add-comment-btn').click(function() {
-                    // Find the nearest comment box relative to this button
-                    $(this).closest('.timeline-item').find('.add-comment').toggleClass('d-none');
-                });
+                    // --- Populate dropdowns ---
+                    function populateDropdowns() {
+                        const times = generateTimeOptions(15);
 
-                $('.comment-cancel').click(function() {
-                    const $commentBox = $(this).closest('.add-comment');
-                    $commentBox.addClass('d-none');
-                    $commentBox.find('textarea').val(''); // Clear the textarea content
-                });
+                        startTimeSelect.empty().append('<option value="">Select Start Time</option>');
+                        endTimeSelect.empty().append('<option value="">Select End Time</option>');
 
-                // ==============================
-                // Start time and end time display in schedule activity
-                // ==============================
-                const startTimeSelect = $('#store_activity select[name="start_time"]');
-                const endTimeSelect = $('#store_activity select[name="end_time"]');
-                const allDayCheckbox = $('#store_activity input[name="all_day"]');
-
-                // --- Generate time options every X minutes ---
-                function generateTimeOptions(interval = 15) {
-                    const times = [];
-                    let time = moment().startOf('day');
-                    const end = moment(time).endOf('day').add(1, 'minute'); // include 24:00
-
-                    while (time.isBefore(end)) {
-                        // value in HH:mm:ss, display in hh:mm A
-                        times.push({
-                            value: time.format('HH:mm:ss'),
-                            display: time.format('hh:mm A')
+                        times.forEach(t => {
+                            startTimeSelect.append(`<option value="${t.value}">${t.display}</option>`);
+                            endTimeSelect.append(`<option value="${t.value}">${t.display}</option>`);
                         });
-                        time.add(interval, 'minutes');
-                    }
-                    return times;
-                }
 
-                // --- Populate dropdowns ---
-                function populateDropdowns() {
-                    const times = generateTimeOptions(15);
-
-                    startTimeSelect.empty().append('<option value="">Select Start Time</option>');
-                    endTimeSelect.empty().append('<option value="">Select End Time</option>');
-
-                    times.forEach(t => {
-                        startTimeSelect.append(`<option value="${t.value}">${t.display}</option>`);
-                        endTimeSelect.append(`<option value="${t.value}">${t.display}</option>`);
-                    });
-
-                    updateEndTimeOptions();
-                }
-
-                // --- Disable end times <= selected start time ---
-                function updateEndTimeOptions() {
-                    const selectedStart = startTimeSelect.val();
-                    if (!selectedStart) {
-                        endTimeSelect.find('option').prop('disabled', false).removeClass('text-secondary');
-                        return;
+                        updateEndTimeOptions();
                     }
 
-                    const startMoment = moment(selectedStart, 'HH:mm:ss');
-                    endTimeSelect.find('option').each(function() {
-                        const optionVal = $(this).val();
-                        if (!optionVal) return;
-
-                        const optionMoment = moment(optionVal, 'HH:mm:ss');
-                        if (optionMoment.isSameOrBefore(startMoment)) {
-                            $(this).prop('disabled', true).addClass('text-secondary');
-                        } else {
-                            $(this).prop('disabled', false).removeClass('text-secondary');
+                    // --- Disable end times <= selected start time ---
+                    function updateEndTimeOptions() {
+                        const selectedStart = startTimeSelect.val();
+                        if (!selectedStart) {
+                            endTimeSelect.find('option').prop('disabled', false).removeClass('text-secondary');
+                            return;
                         }
-                    });
 
-                    if (endTimeSelect.find('option:selected').prop('disabled')) {
-                        endTimeSelect.val('');
-                    }
-                }
+                        const startMoment = moment(selectedStart, 'HH:mm:ss');
+                        endTimeSelect.find('option').each(function() {
+                            const optionVal = $(this).val();
+                            if (!optionVal) return;
 
-                allDayCheckbox.on('change', function() {
-                    if (this.checked) {
-                        startTimeSelect.val('00:00:00').trigger('change').prop('disabled', false);
-                        endTimeSelect.val('23:45:00').trigger('change').prop('disabled', false);
-                    } else {
-                        startTimeSelect.prop('disabled', false).val('').trigger('change');
-                        endTimeSelect.prop('disabled', false).val('').trigger('change');
-                    }
-                });
-
-                // --- Event listener ---
-                startTimeSelect.on('change', updateEndTimeOptions);
-
-                // --- Initialize Select2 ---
-                startTimeSelect.select2({
-                    dropdownParent: $('#store_activity'),
-                    width: '100%',
-                    dropdownPosition: 'below'
-                });
-                endTimeSelect.select2({
-                    dropdownParent: $('#store_activity'),
-                    width: '100%',
-                    dropdownPosition: 'below'
-                });
-
-                // --- Initial population ---
-                populateDropdowns();
-
-
-                // ==============================
-                // Show/Hide icons beside editable fields
-                // ==============================
-                $('.editable-field').on('focus', function() {
-                    $(this).siblings('.editable-icon').removeClass('d-none');
-                });
-
-                $('.editable-field').on('blur', function() {
-                    let $icons = $(this).siblings('.editable-icon');
-                    // Delay hiding to allow click event on icons
-                    setTimeout(() => {
-                        $icons.addClass('d-none');
-                    }, 300);
-                });
-
-                // ==============================
-                // Update company details(name and description) on change
-                // ==============================
-                $('.editable-submit').click(function() {
-                    let $button = $(this);
-                    let $field = $button.siblings('.editable-field');
-                    let leadId = $field.data('lead-id');
-                    let fieldName = $button.data('field'); // e.g., 'name'
-                    let newValue = $field.text().trim();
-
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: `Do you want to update the ${fieldName}?`,
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#28a745',
-                        cancelButtonColor: '#dc3545',
-                        confirmButtonText: 'Yes, update'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.post(`/admin/leads/${leadId}/update-detail`, {
-                                    _token: '{{ csrf_token() }}',
-                                    field: fieldName,
-                                    value: newValue
-                                })
-                                .done(response => {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Updated',
-                                        text: response.message,
-                                        timer: 1500,
-                                        showConfirmButton: false
-                                    });
-                                })
-                                .fail(xhr => {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: xhr.responseJSON?.message ||
-                                            'Something went wrong.'
-                                    });
-                                    console.error(xhr.responseText);
-                                });
-                        }
-                    });
-                });
-
-                // Cancel button hides sibling buttons
-                $('.editable-cancel').click(function() {
-                    $(this).siblings('.editable-icon').addClass('d-none');
-                });
-
-
-                $(document).on('click', '.stage-item', function() {
-                    var newStageId = $(this).data('stage-id');
-                    var leadId = $(this).data('lead-id');
-                    var currentStageId = {{ $leads->stage_id }};
-
-                    // Only allow changing to a different stage
-                    if (newStageId == currentStageId) return;
-
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "Do you want to move this lead to the selected stage?",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, change it'
-                    }).then(function(result) {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: '/admin/leads/check-stage-condition/' + leadId,
-                                method: 'POST',
-                                data: {
-                                    _token: "{{ csrf_token() }}",
-                                    stage_id: newStageId
-                                },
-                                success: function(response) {
-                                    if (response.allowed) {
-                                        // Stage change allowed
-                                        $.ajax({
-                                            url: '/admin/leads/change-stage/' +
-                                                leadId,
-                                            method: 'POST',
-                                            data: {
-                                                _token: "{{ csrf_token() }}",
-                                                stage_id: newStageId
-                                            },
-                                            success: function(res) {
-                                                Swal.fire({
-                                                    icon: 'success',
-                                                    title: 'Stage Updated',
-                                                    text: res.message ||
-                                                        'Lead stage updated successfully.',
-                                                    timer: 1500,
-                                                    showConfirmButton: false
-                                                }).then(() => location
-                                                    .reload());
-                                            }
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'warning',
-                                            title: 'Cannot Change Stage',
-                                            text: response.message
-                                        });
-                                    }
-                                }
-                            });
-                        }
-                    });
-                });
-
-
-
-                // ==============================
-                // Adding tags to the company
-                // ==============================
-                $('#tagSelect').change(function() {
-                    let tagId = $(this).val();
-                    let tagName = $("#tagSelect option:selected").text();
-
-                    if (!tagId) {
-                        return; // ignore placeholder
-                    }
-
-                    Swal.fire({
-                        title: "Are you sure?",
-                        text: "Do you want to add the tag \"" + tagName + "\" to this lead?",
-                        icon: "question",
-                        showCancelButton: true,
-                        confirmButtonColor: "#28a745",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: "Yes, Add"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: "/admin/leads/{{ $leads->id }}/tags/add", // new route for tags
-                                method: "POST",
-                                data: {
-                                    _token: "{{ csrf_token() }}",
-                                    tag_id: tagId
-                                },
-                                success: function(response) {
-                                    Swal.fire({
-                                        icon: "success",
-                                        title: "Added",
-                                        text: response.message,
-                                        timer: 2000,
-                                        showConfirmButton: false
-                                    }).then(() => {
-                                        location.reload();
-                                    });
-                                },
-                                error: function(xhr) {
-                                    Swal.fire({
-                                        icon: "error",
-                                        title: "Error",
-                                        text: xhr.responseJSON?.message ||
-                                            "Something went wrong."
-                                    });
-                                }
-                            });
-                        } else {
-                            // Reset dropdown back to default if cancelled
-                            $('#tagSelect').val("");
-                        }
-                    });
-                });
-
-                // ==============================
-                // Removing the tag from the company
-                // ==============================
-                $(document).on('click', '.delete-tag-btn', function() {
-                    var tagId = $(this).data('id');
-
-                    Swal.fire({
-                        title: "Are you sure?",
-                        text: "Do you want to remove this tag from the lead?",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#d33",
-                        cancelButtonColor: "#3085d6",
-                        confirmButtonText: "Yes, Remove"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: "/admin/leads/{{ $leads->id }}/tags/" + tagId +
-                                    "/remove",
-                                method: "POST",
-                                data: {
-                                    _token: "{{ csrf_token() }}"
-                                },
-                                success: function(response) {
-                                    Swal.fire({
-                                        icon: "success",
-                                        title: "Removed",
-                                        text: response.message,
-                                        timer: 2000,
-                                        showConfirmButton: false
-                                    }).then(() => {
-                                        location
-                                            .reload(); // reload to update tag list
-                                    });
-                                },
-                                error: function(xhr) {
-                                    Swal.fire({
-                                        icon: "error",
-                                        title: "Error",
-                                        text: xhr.responseJSON?.message ||
-                                            "Something went wrong."
-                                    });
-                                    console.error(xhr.responseText);
-                                }
-                            });
-                        }
-                    });
-                });
-
-                // ==============================
-                // Toggle Add task
-                // ==============================
-                const toggleTaskBtn = document.getElementById('toggleAddTask');
-                const formTaskDiv = document.getElementById('addTaskForm');
-
-                toggleTaskBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-
-                    if (formTaskDiv.style.display === "none" || formTaskDiv.style.display === "") {
-                        formTaskDiv.style.display = "block";
-
-                        // Reset form
-                        const form = formTaskDiv.querySelector('form');
-                        form.reset();
-
-                        // Reset form action back to store route
-                        form.setAttribute('action', "{{ route('admin.leads.tasks.store', $leads->id) }}");
-
-                        // Reset button text and style
-                        const submitBtn = form.querySelector('button[type="submit"]');
-                        submitBtn.textContent = "Add Task";
-                        submitBtn.classList.remove('btn-primary');
-                        submitBtn.classList.add('btn-warning');
-
-                    } else {
-                        formTaskDiv.style.display = "none";
-                    }
-                });
-
-                // ==============================
-                // Add Task ajax form validation and submittion
-                // ==============================
-                $("#addTaskAjaxForm").validate({
-                    ignore: [],
-                    rules: {
-                        title: {
-                            required: true
-                        },
-                        due_date: {
-                            required: true
-                        },
-                        user_id: {
-                            required: true
-                        },
-                        description: {
-                            required: true
-                        },
-
-                    },
-                    messages: {
-                        name: {
-                            required: "Please enter the task name."
-                        },
-                        due_date: {
-                            required: "Please enter the due date."
-                        },
-                        user_id: {
-                            required: "Please select the user."
-                        },
-                        description: {
-                            required: "Please enter the description."
-                        },
-
-                    },
-                    errorElement: 'span',
-                    errorClass: 'invalid-feedback d-block',
-                    highlight: function(element) {
-                        $(element).addClass('is-invalid');
-                    },
-                    unhighlight: function(element) {
-                        $(element).removeClass('is-invalid');
-                    },
-                    errorPlacement: function(error, element) {
-                        if (element.parent('.input-group').length) {
-                            error.insertAfter(element.parent()); // Inserts after the .input-group
-                        } else {
-                            error.insertAfter(element); // Default
-                        }
-                    }
-                });
-
-                $('#addTaskAjaxForm').submit(function(e) {
-                    e.preventDefault();
-
-                    if (!$('#addTaskAjaxForm').valid()) {
-                        return; // Stop if validation fails
-                    }
-
-                    let form = $(this);
-                    let actionUrl = form.attr('action');
-                    let method = form.attr('method');
-                    let formData = form.serialize();
-
-                    $.ajax({
-                        url: actionUrl,
-                        method: method,
-                        data: formData,
-                        success: function(response) {
-                            console.log('Task Added successfully:', response);
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success',
-                                text: response.message,
-                                showConfirmButton: false,
-                                timer: 2000
-                            }).then(() => {
-                                location.reload(); // reload after popup closes
-                            });
-                        },
-                        error: function(xhr) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: xhr.responseText ||
-                                    'Something went wrong while adding the task.'
-                            });
-                            console.error(xhr.responseText);
-                        }
-                    });
-                });
-
-                // ==============================
-                // Mark Complete Task
-                // ==============================
-                $(document).on('click', '.mark-complete-btn', function() {
-                    var taskId = $(this).data('id'); // get task ID from button
-
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "Do you want to mark this task as completed?",
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#28a745',
-                        cancelButtonColor: '#6c757d',
-                        confirmButtonText: 'Yes, complete it!',
-                        cancelButtonText: 'Cancel'
-                    }).then(function(result) {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: '/admin/leads/tasks/' + taskId + '/complete',
-                                method: 'POST',
-                                data: {
-                                    _token: '{{ csrf_token() }}'
-                                },
-                                success: function(response) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Completed',
-                                        text: response.message,
-                                        showConfirmButton: false,
-                                        timer: 2000
-                                    }).then(function() {
-                                        location
-                                            .reload(); // reload after completion
-                                    });
-                                },
-                                error: function(xhr) {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: xhr.responseJSON?.message ||
-                                            'Something went wrong while marking the task completed.'
-                                    });
-                                    console.error(xhr.responseText);
-                                }
-                            });
-                        }
-                    });
-                });
-
-                // ==============================
-                // Reopen Task
-                // ==============================
-                $(document).on('click', '.reopen-task-btn', function() {
-                    var taskId = $(this).data('id'); // get task ID from button
-
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "Do you want to re-open this task?",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#ffc107',
-                        cancelButtonColor: '#6c757d',
-                        confirmButtonText: 'Yes, re-open it!',
-                        cancelButtonText: 'Cancel'
-                    }).then(function(result) {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: '/admin/leads/tasks/' + taskId + '/reopen',
-                                method: 'POST',
-                                data: {
-                                    _token: '{{ csrf_token() }}'
-                                },
-                                success: function(response) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Re-open',
-                                        text: response.message,
-                                        showConfirmButton: false,
-                                        timer: 2000
-                                    }).then(function() {
-                                        location.reload(); // refresh task state
-                                    });
-                                },
-                                error: function(xhr) {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: xhr.responseJSON?.message ||
-                                            'Something went wrong while reopening this task.'
-                                    });
-                                    console.error(xhr.responseText);
-                                }
-                            });
-                        }
-                    });
-                });
-
-                // ==============================
-                // Delete Task
-                // ==============================
-                $(document).on('click', '.delete-task-btn', function() {
-                    var taskId = $(this).data('id'); // get task ID from button
-
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "You won't be able to undo this action!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, delete it!'
-                    }).then(function(result) {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: "/admin/leads/tasks/delete/" + taskId,
-                                method: "POST",
-                                data: {
-                                    _token: "{{ csrf_token() }}"
-                                },
-                                success: function(response) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Deleted!',
-                                        text: response.message ||
-                                            "Task deleted successfully.",
-                                        timer: 1500,
-                                        showConfirmButton: false
-                                    }).then(function() {
-                                        location.reload(); // reload after deletion
-                                    });
-                                },
-                                error: function(xhr) {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: xhr.responseJSON?.message ||
-                                            'Something went wrong.'
-                                    });
-                                    console.error(xhr.responseText);
-                                }
-                            });
-                        }
-                    });
-                });
-
-                // ==============================
-                // Toggle Edit Task Form
-                // ==============================
-                $('.toggleEditTask').click(function() {
-                    var taskId = $(this).data('id');
-
-                    // Get data from button
-                    var title = $(this).data('title');
-                    var due = $(this).data('due');
-                    var userId = $(this).data('user');
-                    var description = $(this).data('description');
-
-                    $('#addTaskForm').toggle();
-                    // Fill the form
-                    $('#addTaskForm #title').val(title);
-                    $('#addTaskForm #due_date').val(due);
-                    $('#addTaskForm select[name="user_id"]').val(userId);
-                    $('#addTaskForm textarea[name="description"]').val(description);
-                    $('#addTaskAjaxForm').attr('method', 'PUT');
-                    // Change form action for update (FIX: point to update route)
-                    $('#addTaskAjaxForm').attr('action', '/admin/leads/tasks/' + taskId + '/update');
-                    // Optional: Change button text to "Update Task"
-                    $('#addTaskAjaxForm button[type="submit"]').text('Update Task');
-
-                });
-
-                // ==============================
-                // Flatpickr for Task Due Date
-                // ==============================
-                flatpickr("#due_date", {
-                    enableTime: true,
-                    dateFormat: "Y-m-d h:i K", // h = 12-hour, K = AM/PM
-                    minDate: "today",
-                    defaultDate: new Date().setHours(18, 30, 0, 0), // today at 6:30 PM
-                    time_24hr: false
-                });
-
-                // ==============================
-                // Activities Form - Select2 Integration
-                // ==============================
-                $('#schedule-activity').on('shown.bs.modal', function() {
-                    $('#participant_select').select2({
-                        dropdownParent: $('#schedule-activity'),
-                        placeholder: 'Choose...',
-                        allowClear: true
-                    });
-                });
-
-                $('#activity_participant_select').select2({
-                    placeholder: '-- Select --',
-                    allowClear: true,
-                    width: '450px' // make it fit the parent width
-                });
-
-
-                // ==============================
-                // Updating lead and flags status
-                // ==============================
-                // function updateLead(data, onSuccess) {
-                //     fetch("{{ route('admin.leads.ajax_update') }}", {
-                //             method: "POST",
-                //             headers: {
-                //                 "Content-Type": "application/json",
-                //                 "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                //             },
-                //             body: JSON.stringify(data)
-                //         })
-                //         .then(response => response.json())
-                //         .then(resp => {
-                //             if (resp.success) {
-                //                 if (typeof onSuccess === "function") onSuccess();
-                //             } else {
-                //                 Swal.fire("Error", "Failed to update lead!", "error");
-                //             }
-                //         })
-                //         .catch(err => console.error(err));
-                // }
-                function updateLead(data, onSuccess) {
-                    fetch("{{ route('admin.leads.ajax_update') }}", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                            },
-                            body: JSON.stringify(data)
-                        })
-                        .then(response => response.json())
-                        .then(resp => {
-                            if (resp.success) {
-                                if (typeof onSuccess === "function") onSuccess();
+                            const optionMoment = moment(optionVal, 'HH:mm:ss');
+                            if (optionMoment.isSameOrBefore(startMoment)) {
+                                $(this).prop('disabled', true).addClass('text-secondary');
                             } else {
-                                Swal.fire("Error", "Failed to update lead!", "error");
+                                $(this).prop('disabled', false).removeClass('text-secondary');
                             }
-                        })
-                        .catch(err => console.error(err));
-                }
+                        });
 
-
-                // ==============================
-                // Handle lead status selection
-                // ==============================
-                // let statusSelect = document.getElementById("leadStatusSelect");
-                // if (statusSelect) {
-                //     // Store initial value
-                //     let previousValue = statusSelect.value;
-
-                //     statusSelect.addEventListener("change", function() {
-                //         let leadId = this.dataset.leadId;
-                //         let leadStatus = this.value;
-
-                //         Swal.fire({
-                //             title: 'Are you sure?',
-                //             text: `Do you want to update the lead status`,
-                //             icon: 'question',
-                //             showCancelButton: true,
-                //             confirmButtonColor: '#28a745',
-                //             cancelButtonColor: '#dc3545',
-                //             confirmButtonText: 'Yes, update'
-                //         }).then((result) => {
-                //             if (result.isConfirmed) {
-                //                 updateLead({
-                //                         lead_status: leadStatus,
-                //                         lead_id: leadId
-                //                     },
-                //                     () => {
-                //                         Swal.fire({
-                //                             icon: "success",
-                //                             title: "Updated!",
-                //                             text: "Lead status updated successfully.",
-                //                             timer: 1500,
-                //                             showConfirmButton: false
-                //                         }).then(() => {
-                //                             location.reload();
-                //                         });
-                //                     }
-                //                 );
-                //                 // Update previous value on success
-                //                 previousValue = leadStatus;
-                //             } else {
-                //                 // Revert select back to previous value on cancel
-                //                 this.value = previousValue;
-                //             }
-                //         });
-                //     });
-                // }
-                const statusSelect = document.getElementById('leadStatusSelect');
-                const lostWrapper = document.getElementById('lostOutcomeWrapper');
-                const cancelledWrapper = document.getElementById('cancelledOutcomeWrapper');
-                const lostSelect = document.getElementById('lostOutcomeSelect');
-                const cancelledSelect = document.getElementById('cancelledOutcomeSelect');
-
-                // store previous to revert if cancelled
-                let previousStatus = statusSelect.value;
-
-                // helper to hide both wrappers
-                function hideBoth() {
-                    lostWrapper.classList.add('d-none');
-                    cancelledWrapper.classList.add('d-none');
-                }
-
-                // initial state: show correct wrapper if lead already lost/cancelled
-                (function init() {
-                    if (statusSelect.value === 'lost') {
-                        lostWrapper.classList.remove('d-none');
-                    } else if (statusSelect.value === 'cancelled') {
-                        cancelledWrapper.classList.remove('d-none');
-                    } else {
-                        hideBoth();
-                    }
-                })();
-
-                // When status changes
-                statusSelect.addEventListener('change', function() {
-                    const selectedStatus = this.value;
-
-                    // If it's Lost or Cancelled -> show the respective select and wait for outcome selection
-                    if (selectedStatus === 'lost' || selectedStatus === 'cancelled') {
-                        // show correct wrapper
-                        if (selectedStatus === 'lost') {
-                            lostWrapper.classList.remove('d-none');
-                            cancelledWrapper.classList.add('d-none');
-                            // focus the select so user chooses reason
-                            lostSelect.focus();
-                        } else {
-                            cancelledWrapper.classList.remove('d-none');
-                            lostWrapper.classList.add('d-none');
-                            cancelledSelect.focus();
+                        if (endTimeSelect.find('option:selected').prop('disabled')) {
+                            endTimeSelect.val('');
                         }
-
-                        toastr.warning('Please select an outcome reason before submitting.',
-                            'Action Required');
-
-                        // Do NOT auto-send update here; wait for user to choose a reason.
-                        // Keep previousStatus so we can revert if they cancel at confirmation step.
-                        return;
                     }
 
-                    // For other statuses: confirm immediately and send update (no outcome_id)
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: `Change status to "${selectedStatus}"?`,
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#28a745',
-                        cancelButtonColor: '#dc3545',
-                        confirmButtonText: 'Yes, update'
-                    }).then(result => {
-                        if (result.isConfirmed) {
-                            // call updateLead (your existing AJAX helper)
-                            updateLead({
-                                lead_status: selectedStatus,
-                                lead_id: statusSelect.dataset.leadId,
-                                outcome_id: null
-                            }, () => {
-                                Swal.fire({
-                                    icon: "success",
-                                    title: "Updated!",
-                                    text: "Lead status updated successfully.",
-                                    timer: 1500,
-                                    showConfirmButton: false
-                                }).then(() => location.reload());
-                            });
-                            previousStatus = selectedStatus;
+                    allDayCheckbox.on('change', function() {
+                        if (this.checked) {
+                            startTimeSelect.val('00:00:00').trigger('change').prop('disabled', false);
+                            endTimeSelect.val('23:45:00').trigger('change').prop('disabled', false);
                         } else {
-                            statusSelect.value = previousStatus;
+                            startTimeSelect.prop('disabled', false).val('').trigger('change');
+                            endTimeSelect.prop('disabled', false).val('').trigger('change');
                         }
                     });
-                });
 
-                // When user selects a Lost outcome
-                lostSelect.addEventListener('change', function() {
-                    const outcomeId = this.value;
-                    const leadId = statusSelect.dataset.leadId;
-                    if (!outcomeId) {
-                        // if user chooses blank, do nothing (let them pick real reason)
-                        return;
-                    }
+                    // --- Event listener ---
+                    startTimeSelect.on('change', updateEndTimeOptions);
 
-                    Swal.fire({
-                        title: 'Confirm update',
-                        text: 'Update status to "Lost" with selected reason?',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#28a745',
-                        cancelButtonColor: '#dc3545',
-                        confirmButtonText: 'Yes, update'
-                    }).then(result => {
-                        if (result.isConfirmed) {
-                            updateLead({
-                                lead_status: 'lost',
-                                lead_id: leadId,
-                                outcome_id: outcomeId
-                            }, () => {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Updated!',
-                                    timer: 1200,
-                                    showConfirmButton: false
-                                }).then(() => location.reload());
-                            });
-                            previousStatus = 'lost';
-                        } else {
-                            // revert status and hide wrapper
-                            statusSelect.value = previousStatus;
-                            hideBoth();
-                        }
+                    // --- Initialize Select2 ---
+                    startTimeSelect.select2({
+                        dropdownParent: $('#store_activity'),
+                        width: '100%',
+                        dropdownPosition: 'below'
                     });
-                });
-
-                // When user selects a Cancelled outcome
-                cancelledSelect.addEventListener('change', function() {
-                    const outcomeId = this.value;
-                    const leadId = statusSelect.dataset.leadId;
-                    if (!outcomeId) return;
-
-                    Swal.fire({
-                        title: 'Confirm update',
-                        text: 'Update status to "Cancelled" with selected reason?',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#28a745',
-                        cancelButtonColor: '#dc3545',
-                        confirmButtonText: 'Yes, update'
-                    }).then(result => {
-                        if (result.isConfirmed) {
-                            updateLead({
-                                lead_status: 'cancelled',
-                                lead_id: leadId,
-                                outcome_id: outcomeId
-                            }, () => {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Updated!',
-                                    timer: 1200,
-                                    showConfirmButton: false
-                                }).then(() => location.reload());
-                            });
-                            previousStatus = 'cancelled';
-                        } else {
-                            statusSelect.value = previousStatus;
-                            hideBoth();
-                        }
+                    endTimeSelect.select2({
+                        dropdownParent: $('#store_activity'),
+                        width: '100%',
+                        dropdownPosition: 'below'
                     });
-                });
 
-                // ==============================
-                // Handle lead flag checkboxes
-                // ==============================
-                // document.querySelectorAll(".lead-flag").forEach((flagSelect) => {
-                //     flagSelect.addEventListener("change", function() {
-                //         let leadId = this.dataset.leadId;
+                    // --- Initial population ---
+                    populateDropdowns();
 
-                //         // Collect all checked flags for this lead
-                //         let checkedFlags = [];
-                //         document.querySelectorAll('.lead-flag[data-lead-id="' + leadId + '"]:checked')
-                //             .forEach(cb => checkedFlags.push(cb.value));
 
-                //         // Show confirmation popup before update
-                //         Swal.fire({
-                //             title: 'Are you sure?',
-                //             text: 'Do you want to update the lead flags?',
-                //             icon: 'question',
-                //             showCancelButton: true,
-                //             confirmButtonColor: '#28a745',
-                //             cancelButtonColor: '#dc3545',
-                //             confirmButtonText: 'Yes, update',
-                //             cancelButtonText: 'Cancel'
-                //         }).then((result) => {
-                //             if (result.isConfirmed) {
-                //                 updateLead({
-                //                         lead_flags: checkedFlags,
-                //                         lead_id: leadId
-                //                     },
-                //                     () => {
-                //                         Swal.fire({
-                //                             icon: "success",
-                //                             title: "Updated!",
-                //                             text: "Lead flags updated successfully.",
-                //                             timer: 1500,
-                //                             showConfirmButton: false
-                //                         }).then(() => {
-                //                             location.reload();
-                //                         });
-                //                     }
-                //                 );
-                //             } else {
-                //                 // Revert checkbox state
-                //                 // Uncheck the one that triggered this change
-                //                 this.checked = !this.checked;
-                //             }
-                //         });
-                //     });
-                // });
+                    // ==============================
+                    // Show/Hide icons beside editable fields
+                    // ==============================
+                    $('.editable-field').on('focus', function() {
+                        $(this).siblings('.editable-icon').removeClass('d-none');
+                    });
 
-                document.querySelectorAll(".lead-flag").forEach((checkbox) => {
-                    checkbox.addEventListener("change", function() {
-                        let leadId = this.dataset.leadId;
-                        let flagType = this.value; // e.g., "is_hot" or "is_watching"
-                        let isChecked = this.checked ? 1 : 0;
+                    $('.editable-field').on('blur', function() {
+                        let $icons = $(this).siblings('.editable-icon');
+                        // Delay hiding to allow click event on icons
+                        setTimeout(() => {
+                            $icons.addClass('d-none');
+                        }, 300);
+                    });
+
+                    // ==============================
+                    // Update company details(name and description) on change
+                    // ==============================
+                    $('.editable-submit').click(function() {
+                        let $button = $(this);
+                        let $field = $button.siblings('.editable-field');
+                        let leadId = $field.data('lead-id');
+                        let fieldName = $button.data('field'); // e.g., 'name'
+                        let newValue = $field.text().trim();
 
                         Swal.fire({
                             title: 'Are you sure?',
-                            text: `Do you want to ${isChecked ? 'enable' : 'disable'} this flag?`,
+                            text: `Do you want to update the ${fieldName}?`,
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#dc3545',
+                            confirmButtonText: 'Yes, update'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.post(`/admin/leads/${leadId}/update-detail`, {
+                                        _token: '{{ csrf_token() }}',
+                                        field: fieldName,
+                                        value: newValue
+                                    })
+                                    .done(response => {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Updated',
+                                            text: response.message,
+                                            timer: 1500,
+                                            showConfirmButton: false
+                                        });
+                                    })
+                                    .fail(xhr => {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: xhr.responseJSON?.message ||
+                                                'Something went wrong.'
+                                        });
+                                        console.error(xhr.responseText);
+                                    });
+                            }
+                        });
+                    });
+
+                    // Cancel button hides sibling buttons
+                    $('.editable-cancel').click(function() {
+                        $(this).siblings('.editable-icon').addClass('d-none');
+                    });
+
+
+                    $(document).on('click', '.stage-item', function() {
+                        var newStageId = $(this).data('stage-id');
+                        var leadId = $(this).data('lead-id');
+                        var currentStageId = {{ $leads->stage_id }};
+
+                        // Only allow changing to a different stage
+                        if (newStageId == currentStageId) return;
+
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "Do you want to move this lead to the selected stage?",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, change it'
+                        }).then(function(result) {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: '/admin/leads/check-stage-condition/' + leadId,
+                                    method: 'POST',
+                                    data: {
+                                        _token: "{{ csrf_token() }}",
+                                        stage_id: newStageId
+                                    },
+                                    success: function(response) {
+                                        if (response.allowed) {
+                                            // Stage change allowed
+                                            $.ajax({
+                                                url: '/admin/leads/change-stage/' +
+                                                    leadId,
+                                                method: 'POST',
+                                                data: {
+                                                    _token: "{{ csrf_token() }}",
+                                                    stage_id: newStageId
+                                                },
+                                                success: function(res) {
+                                                    Swal.fire({
+                                                        icon: 'success',
+                                                        title: 'Stage Updated',
+                                                        text: res.message ||
+                                                            'Lead stage updated successfully.',
+                                                        timer: 1500,
+                                                        showConfirmButton: false
+                                                    }).then(() => location
+                                                        .reload());
+                                                }
+                                            });
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'warning',
+                                                title: 'Cannot Change Stage',
+                                                text: response.message
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    });
+
+
+
+                    // ==============================
+                    // Adding tags to the company
+                    // ==============================
+                    $('#tagSelect').change(function() {
+                        let tagId = $(this).val();
+                        let tagName = $("#tagSelect option:selected").text();
+
+                        if (!tagId) {
+                            return; // ignore placeholder
+                        }
+
+                        Swal.fire({
+                            title: "Are you sure?",
+                            text: "Do you want to add the tag \"" + tagName + "\" to this lead?",
+                            icon: "question",
+                            showCancelButton: true,
+                            confirmButtonColor: "#28a745",
+                            cancelButtonColor: "#d33",
+                            confirmButtonText: "Yes, Add"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "/admin/leads/{{ $leads->id }}/tags/add", // new route for tags
+                                    method: "POST",
+                                    data: {
+                                        _token: "{{ csrf_token() }}",
+                                        tag_id: tagId
+                                    },
+                                    success: function(response) {
+                                        Swal.fire({
+                                            icon: "success",
+                                            title: "Added",
+                                            text: response.message,
+                                            timer: 2000,
+                                            showConfirmButton: false
+                                        }).then(() => {
+                                            location.reload();
+                                        });
+                                    },
+                                    error: function(xhr) {
+                                        Swal.fire({
+                                            icon: "error",
+                                            title: "Error",
+                                            text: xhr.responseJSON?.message ||
+                                                "Something went wrong."
+                                        });
+                                    }
+                                });
+                            } else {
+                                // Reset dropdown back to default if cancelled
+                                $('#tagSelect').val("");
+                            }
+                        });
+                    });
+
+                    // ==============================
+                    // Removing the tag from the company
+                    // ==============================
+                    $(document).on('click', '.delete-tag-btn', function() {
+                        var tagId = $(this).data('id');
+
+                        Swal.fire({
+                            title: "Are you sure?",
+                            text: "Do you want to remove this tag from the lead?",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#d33",
+                            cancelButtonColor: "#3085d6",
+                            confirmButtonText: "Yes, Remove"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "/admin/leads/{{ $leads->id }}/tags/" + tagId +
+                                        "/remove",
+                                    method: "POST",
+                                    data: {
+                                        _token: "{{ csrf_token() }}"
+                                    },
+                                    success: function(response) {
+                                        Swal.fire({
+                                            icon: "success",
+                                            title: "Removed",
+                                            text: response.message,
+                                            timer: 2000,
+                                            showConfirmButton: false
+                                        }).then(() => {
+                                            location
+                                                .reload(); // reload to update tag list
+                                        });
+                                    },
+                                    error: function(xhr) {
+                                        Swal.fire({
+                                            icon: "error",
+                                            title: "Error",
+                                            text: xhr.responseJSON?.message ||
+                                                "Something went wrong."
+                                        });
+                                        console.error(xhr.responseText);
+                                    }
+                                });
+                            }
+                        });
+                    });
+
+                    // ==============================
+                    // Toggle Add task
+                    // ==============================
+                    const toggleTaskBtn = document.getElementById('toggleAddTask');
+                    const formTaskDiv = document.getElementById('addTaskForm');
+
+                    toggleTaskBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+
+                        if (formTaskDiv.style.display === "none" || formTaskDiv.style.display === "") {
+                            formTaskDiv.style.display = "block";
+
+                            // Reset form
+                            const form = formTaskDiv.querySelector('form');
+                            form.reset();
+
+                            // Reset form action back to store route
+                            form.setAttribute('action', "{{ route('admin.leads.tasks.store', $leads->id) }}");
+
+                            // Reset button text and style
+                            const submitBtn = form.querySelector('button[type="submit"]');
+                            submitBtn.textContent = "Add Task";
+                            submitBtn.classList.remove('btn-primary');
+                            submitBtn.classList.add('btn-warning');
+
+                        } else {
+                            formTaskDiv.style.display = "none";
+                        }
+                    });
+
+
+                    // ==============================
+                    // Add Task ajax form validation and submittion
+                    // ==============================
+                    $('#add_forecasting').validate({
+                        ignore: [],
+                        rules: {
+                            confidence: {
+                                required: true
+                            },
+                            expected_services: {
+                                required: true,
+                                digits: true
+                            },
+                            expected_months: {
+                                required: true,
+                                digits: true
+                            },
+                            expected_price: {
+                                required: true,
+                                digits: true
+                            },
+                            expected_first_date: {
+                                required: true
+                            }
+                        },
+                        messages: {
+                            confidence: {
+                                required: "Please enter the confidence level."
+                            },
+                            expected_services: {
+                                required: "Please enter the expected number of services.",
+                                digits: "Only numeric values are allowed."
+                            },
+                            expected_months: {
+                                required: "Please enter the expected number of months.",
+                                digits: "Only numeric values are allowed."
+                            },
+                            expected_price: {
+                                required: "Please enter the expected price per service.",
+                                digits: "Only numeric values are allowed."
+                            },
+                            expected_first_date: {
+                                required: "Please enter the expected first service date."
+                            }
+                        },
+                        errorElement: 'span',
+                        errorClass: 'invalid-feedback d-block',
+                        highlight: element => $(element).addClass('is-invalid'),
+                        unhighlight: element => $(element).removeClass('is-invalid'),
+                        errorPlacement: (error, element) => {
+                            element.parent('.input-group').length ? error.insertAfter(element.parent()) : error
+                                .insertAfter(element);
+                        }
+                    });
+
+                    $('#add_forecasting').on('submit', function(e) {
+                        e.preventDefault();
+
+                        if (!$('#add_forecasting').valid()) return;
+
+                        const form = $(this);
+                        const actionUrl = form.attr('action');
+                        const formData = form.serialize();
+
+                        $.ajax({
+                            url: actionUrl,
+                            method: 'POST',
+                            data: formData,
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(() => location.reload());
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong while adding the sales forecasting.'
+                                });
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    });
+
+
+
+                    // ==============================
+                    // Add Task ajax form validation and submittion
+                    // ==============================
+                    $("#addTaskAjaxForm").validate({
+                        ignore: [],
+                        rules: {
+                            title: {
+                                required: true
+                            },
+                            due_date: {
+                                required: true
+                            },
+                            user_id: {
+                                required: true
+                            },
+                            description: {
+                                required: true
+                            },
+
+                        },
+                        messages: {
+                            name: {
+                                required: "Please enter the task name."
+                            },
+                            due_date: {
+                                required: "Please enter the due date."
+                            },
+                            user_id: {
+                                required: "Please select the user."
+                            },
+                            description: {
+                                required: "Please enter the description."
+                            },
+
+                        },
+                        errorElement: 'span',
+                        errorClass: 'invalid-feedback d-block',
+                        highlight: function(element) {
+                            $(element).addClass('is-invalid');
+                        },
+                        unhighlight: function(element) {
+                            $(element).removeClass('is-invalid');
+                        },
+                        errorPlacement: function(error, element) {
+                            if (element.parent('.input-group').length) {
+                                error.insertAfter(element.parent()); // Inserts after the .input-group
+                            } else {
+                                error.insertAfter(element); // Default
+                            }
+                        }
+                    });
+
+                    $('#addTaskAjaxForm').submit(function(e) {
+                        e.preventDefault();
+
+                        if (!$('#addTaskAjaxForm').valid()) {
+                            return; // Stop if validation fails
+                        }
+
+                        let form = $(this);
+                        let actionUrl = form.attr('action');
+                        let method = form.attr('method');
+                        let formData = form.serialize();
+
+                        $.ajax({
+                            url: actionUrl,
+                            method: method,
+                            data: formData,
+                            success: function(response) {
+                                console.log('Task Added successfully:', response);
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(() => {
+                                    location.reload(); // reload after popup closes
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseText ||
+                                        'Something went wrong while adding the task.'
+                                });
+                                console.error(xhr.responseText);
+                            }
+                        });
+                    });
+
+                    // ==============================
+                    // Mark Complete Task
+                    // ==============================
+                    $(document).on('click', '.mark-complete-btn', function() {
+                        var taskId = $(this).data('id'); // get task ID from button
+
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "Do you want to mark this task as completed?",
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#6c757d',
+                            confirmButtonText: 'Yes, complete it!',
+                            cancelButtonText: 'Cancel'
+                        }).then(function(result) {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: '/admin/leads/tasks/' + taskId + '/complete',
+                                    method: 'POST',
+                                    data: {
+                                        _token: '{{ csrf_token() }}'
+                                    },
+                                    success: function(response) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Completed',
+                                            text: response.message,
+                                            showConfirmButton: false,
+                                            timer: 2000
+                                        }).then(function() {
+                                            location
+                                                .reload(); // reload after completion
+                                        });
+                                    },
+                                    error: function(xhr) {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: xhr.responseJSON?.message ||
+                                                'Something went wrong while marking the task completed.'
+                                        });
+                                        console.error(xhr.responseText);
+                                    }
+                                });
+                            }
+                        });
+                    });
+
+                    // ==============================
+                    // Reopen Task
+                    // ==============================
+                    $(document).on('click', '.reopen-task-btn', function() {
+                        var taskId = $(this).data('id'); // get task ID from button
+
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "Do you want to re-open this task?",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ffc107',
+                            cancelButtonColor: '#6c757d',
+                            confirmButtonText: 'Yes, re-open it!',
+                            cancelButtonText: 'Cancel'
+                        }).then(function(result) {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: '/admin/leads/tasks/' + taskId + '/reopen',
+                                    method: 'POST',
+                                    data: {
+                                        _token: '{{ csrf_token() }}'
+                                    },
+                                    success: function(response) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Re-open',
+                                            text: response.message,
+                                            showConfirmButton: false,
+                                            timer: 2000
+                                        }).then(function() {
+                                            location.reload(); // refresh task state
+                                        });
+                                    },
+                                    error: function(xhr) {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: xhr.responseJSON?.message ||
+                                                'Something went wrong while reopening this task.'
+                                        });
+                                        console.error(xhr.responseText);
+                                    }
+                                });
+                            }
+                        });
+                    });
+
+                    // ==============================
+                    // Delete Task
+                    // ==============================
+                    $(document).on('click', '.delete-task-btn', function() {
+                        var taskId = $(this).data('id'); // get task ID from button
+
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to undo this action!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then(function(result) {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "/admin/leads/tasks/delete/" + taskId,
+                                    method: "POST",
+                                    data: {
+                                        _token: "{{ csrf_token() }}"
+                                    },
+                                    success: function(response) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Deleted!',
+                                            text: response.message ||
+                                                "Task deleted successfully.",
+                                            timer: 1500,
+                                            showConfirmButton: false
+                                        }).then(function() {
+                                            location.reload(); // reload after deletion
+                                        });
+                                    },
+                                    error: function(xhr) {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: xhr.responseJSON?.message ||
+                                                'Something went wrong.'
+                                        });
+                                        console.error(xhr.responseText);
+                                    }
+                                });
+                            }
+                        });
+                    });
+
+                    // ==============================
+                    // Toggle Edit Task Form
+                    // ==============================
+                    $('.toggleEditTask').click(function() {
+                        var taskId = $(this).data('id');
+
+                        // Get data from button
+                        var title = $(this).data('title');
+                        var due = $(this).data('due');
+                        var userId = $(this).data('user');
+                        var description = $(this).data('description');
+
+                        $('#addTaskForm').toggle();
+                        // Fill the form
+                        $('#addTaskForm #title').val(title);
+                        $('#addTaskForm #due_date').val(due);
+                        $('#addTaskForm select[name="user_id"]').val(userId);
+                        $('#addTaskForm textarea[name="description"]').val(description);
+                        $('#addTaskAjaxForm').attr('method', 'PUT');
+                        // Change form action for update (FIX: point to update route)
+                        $('#addTaskAjaxForm').attr('action', '/admin/leads/tasks/' + taskId + '/update');
+                        // Optional: Change button text to "Update Task"
+                        $('#addTaskAjaxForm button[type="submit"]').text('Update Task');
+
+                    });
+
+                    // ==============================
+                    // Flatpickr for Task Due Date
+                    // ==============================
+                    flatpickr("#due_date", {
+                        enableTime: true,
+                        dateFormat: "Y-m-d h:i K", // h = 12-hour, K = AM/PM
+                        minDate: "today",
+                        defaultDate: new Date().setHours(18, 30, 0, 0), // today at 6:30 PM
+                        time_24hr: false
+                    });
+
+                    // ==============================
+                    // Activities Form - Select2 Integration
+                    // ==============================
+                    $('#schedule-activity').on('shown.bs.modal', function() {
+                        $('#participant_select').select2({
+                            dropdownParent: $('#schedule-activity'),
+                            placeholder: 'Choose...',
+                            allowClear: true
+                        });
+                    });
+
+                    $('#activity_participant_select').select2({
+                        placeholder: '-- Select --',
+                        allowClear: true,
+                        width: '450px' // make it fit the parent width
+                    });
+
+
+                    // ==============================
+                    // Updating lead and flags status
+                    // ==============================
+                    // function updateLead(data, onSuccess) {
+                    //     fetch("{{ route('admin.leads.ajax_update') }}", {
+                    //             method: "POST",
+                    //             headers: {
+                    //                 "Content-Type": "application/json",
+                    //                 "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    //             },
+                    //             body: JSON.stringify(data)
+                    //         })
+                    //         .then(response => response.json())
+                    //         .then(resp => {
+                    //             if (resp.success) {
+                    //                 if (typeof onSuccess === "function") onSuccess();
+                    //             } else {
+                    //                 Swal.fire("Error", "Failed to update lead!", "error");
+                    //             }
+                    //         })
+                    //         .catch(err => console.error(err));
+                    // }
+                    function updateLead(data, onSuccess) {
+                        fetch("{{ route('admin.leads.ajax_update') }}", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                                },
+                                body: JSON.stringify(data)
+                            })
+                            .then(response => response.json())
+                            .then(resp => {
+                                if (resp.success) {
+                                    if (typeof onSuccess === "function") onSuccess();
+                                } else {
+                                    Swal.fire("Error", "Failed to update lead!", "error");
+                                }
+                            })
+                            .catch(err => console.error(err));
+                    }
+
+
+                    // ==============================
+                    // Handle lead status selection
+                    // ==============================
+                    // let statusSelect = document.getElementById("leadStatusSelect");
+                    // if (statusSelect) {
+                    //     // Store initial value
+                    //     let previousValue = statusSelect.value;
+
+                    //     statusSelect.addEventListener("change", function() {
+                    //         let leadId = this.dataset.leadId;
+                    //         let leadStatus = this.value;
+
+                    //         Swal.fire({
+                    //             title: 'Are you sure?',
+                    //             text: `Do you want to update the lead status`,
+                    //             icon: 'question',
+                    //             showCancelButton: true,
+                    //             confirmButtonColor: '#28a745',
+                    //             cancelButtonColor: '#dc3545',
+                    //             confirmButtonText: 'Yes, update'
+                    //         }).then((result) => {
+                    //             if (result.isConfirmed) {
+                    //                 updateLead({
+                    //                         lead_status: leadStatus,
+                    //                         lead_id: leadId
+                    //                     },
+                    //                     () => {
+                    //                         Swal.fire({
+                    //                             icon: "success",
+                    //                             title: "Updated!",
+                    //                             text: "Lead status updated successfully.",
+                    //                             timer: 1500,
+                    //                             showConfirmButton: false
+                    //                         }).then(() => {
+                    //                             location.reload();
+                    //                         });
+                    //                     }
+                    //                 );
+                    //                 // Update previous value on success
+                    //                 previousValue = leadStatus;
+                    //             } else {
+                    //                 // Revert select back to previous value on cancel
+                    //                 this.value = previousValue;
+                    //             }
+                    //         });
+                    //     });
+                    // }
+                    const statusSelect = document.getElementById('leadStatusSelect');
+                    const lostWrapper = document.getElementById('lostOutcomeWrapper');
+                    const cancelledWrapper = document.getElementById('cancelledOutcomeWrapper');
+                    const lostSelect = document.getElementById('lostOutcomeSelect');
+                    const cancelledSelect = document.getElementById('cancelledOutcomeSelect');
+
+                    // store previous to revert if cancelled
+                    let previousStatus = statusSelect.value;
+
+                    // helper to hide both wrappers
+                    function hideBoth() {
+                        lostWrapper.classList.add('d-none');
+                        cancelledWrapper.classList.add('d-none');
+                    }
+
+                    // initial state: show correct wrapper if lead already lost/cancelled
+                    (function init() {
+                        if (statusSelect.value === 'lost') {
+                            lostWrapper.classList.remove('d-none');
+                        } else if (statusSelect.value === 'cancelled') {
+                            cancelledWrapper.classList.remove('d-none');
+                        } else {
+                            hideBoth();
+                        }
+                    })();
+
+                    // When status changes
+                    statusSelect.addEventListener('change', function() {
+                        const selectedStatus = this.value;
+
+                        // If it's Lost or Cancelled -> show the respective select and wait for outcome selection
+                        if (selectedStatus === 'lost' || selectedStatus === 'cancelled') {
+                            // show correct wrapper
+                            if (selectedStatus === 'lost') {
+                                lostWrapper.classList.remove('d-none');
+                                cancelledWrapper.classList.add('d-none');
+                                // focus the select so user chooses reason
+                                lostSelect.focus();
+                            } else {
+                                cancelledWrapper.classList.remove('d-none');
+                                lostWrapper.classList.add('d-none');
+                                cancelledSelect.focus();
+                            }
+
+                            toastr.warning('Please select an outcome reason before submitting.',
+                                'Action Required');
+
+                            // Do NOT auto-send update here; wait for user to choose a reason.
+                            // Keep previousStatus so we can revert if they cancel at confirmation step.
+                            return;
+                        }
+
+                        // For other statuses: confirm immediately and send update (no outcome_id)
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: `Change status to "${selectedStatus}"?`,
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#dc3545',
+                            confirmButtonText: 'Yes, update'
+                        }).then(result => {
+                            if (result.isConfirmed) {
+                                // call updateLead (your existing AJAX helper)
+                                updateLead({
+                                    lead_status: selectedStatus,
+                                    lead_id: statusSelect.dataset.leadId,
+                                    outcome_id: null
+                                }, () => {
+                                    Swal.fire({
+                                        icon: "success",
+                                        title: "Updated!",
+                                        text: "Lead status updated successfully.",
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    }).then(() => location.reload());
+                                });
+                                previousStatus = selectedStatus;
+                            } else {
+                                statusSelect.value = previousStatus;
+                            }
+                        });
+                    });
+
+                    // When user selects a Lost outcome
+                    lostSelect.addEventListener('change', function() {
+                        const outcomeId = this.value;
+                        const leadId = statusSelect.dataset.leadId;
+                        if (!outcomeId) {
+                            // if user chooses blank, do nothing (let them pick real reason)
+                            return;
+                        }
+
+                        Swal.fire({
+                            title: 'Confirm update',
+                            text: 'Update status to "Lost" with selected reason?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#dc3545',
+                            confirmButtonText: 'Yes, update'
+                        }).then(result => {
+                            if (result.isConfirmed) {
+                                updateLead({
+                                    lead_status: 'lost',
+                                    lead_id: leadId,
+                                    outcome_id: outcomeId
+                                }, () => {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Updated!',
+                                        timer: 1200,
+                                        showConfirmButton: false
+                                    }).then(() => location.reload());
+                                });
+                                previousStatus = 'lost';
+                            } else {
+                                // revert status and hide wrapper
+                                statusSelect.value = previousStatus;
+                                hideBoth();
+                            }
+                        });
+                    });
+
+                    // When user selects a Cancelled outcome
+                    cancelledSelect.addEventListener('change', function() {
+                        const outcomeId = this.value;
+                        const leadId = statusSelect.dataset.leadId;
+                        if (!outcomeId) return;
+
+                        Swal.fire({
+                            title: 'Confirm update',
+                            text: 'Update status to "Cancelled" with selected reason?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#dc3545',
+                            confirmButtonText: 'Yes, update'
+                        }).then(result => {
+                            if (result.isConfirmed) {
+                                updateLead({
+                                    lead_status: 'cancelled',
+                                    lead_id: leadId,
+                                    outcome_id: outcomeId
+                                }, () => {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Updated!',
+                                        timer: 1200,
+                                        showConfirmButton: false
+                                    }).then(() => location.reload());
+                                });
+                                previousStatus = 'cancelled';
+                            } else {
+                                statusSelect.value = previousStatus;
+                                hideBoth();
+                            }
+                        });
+                    });
+
+                    // ==============================
+                    // Handle lead flag checkboxes
+                    // ==============================
+                    // document.querySelectorAll(".lead-flag").forEach((flagSelect) => {
+                    //     flagSelect.addEventListener("change", function() {
+                    //         let leadId = this.dataset.leadId;
+
+                    //         // Collect all checked flags for this lead
+                    //         let checkedFlags = [];
+                    //         document.querySelectorAll('.lead-flag[data-lead-id="' + leadId + '"]:checked')
+                    //             .forEach(cb => checkedFlags.push(cb.value));
+
+                    //         // Show confirmation popup before update
+                    //         Swal.fire({
+                    //             title: 'Are you sure?',
+                    //             text: 'Do you want to update the lead flags?',
+                    //             icon: 'question',
+                    //             showCancelButton: true,
+                    //             confirmButtonColor: '#28a745',
+                    //             cancelButtonColor: '#dc3545',
+                    //             confirmButtonText: 'Yes, update',
+                    //             cancelButtonText: 'Cancel'
+                    //         }).then((result) => {
+                    //             if (result.isConfirmed) {
+                    //                 updateLead({
+                    //                         lead_flags: checkedFlags,
+                    //                         lead_id: leadId
+                    //                     },
+                    //                     () => {
+                    //                         Swal.fire({
+                    //                             icon: "success",
+                    //                             title: "Updated!",
+                    //                             text: "Lead flags updated successfully.",
+                    //                             timer: 1500,
+                    //                             showConfirmButton: false
+                    //                         }).then(() => {
+                    //                             location.reload();
+                    //                         });
+                    //                     }
+                    //                 );
+                    //             } else {
+                    //                 // Revert checkbox state
+                    //                 // Uncheck the one that triggered this change
+                    //                 this.checked = !this.checked;
+                    //             }
+                    //         });
+                    //     });
+                    // });
+
+                    document.querySelectorAll(".lead-flag").forEach((checkbox) => {
+                        checkbox.addEventListener("change", function() {
+                            let leadId = this.dataset.leadId;
+                            let flagType = this.value; // e.g., "is_hot" or "is_watching"
+                            let isChecked = this.checked ? 1 : 0;
+
+                            Swal.fire({
+                                title: 'Are you sure?',
+                                text: `Do you want to ${isChecked ? 'enable' : 'disable'} this flag?`,
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonColor: '#28a745',
+                                cancelButtonColor: '#dc3545',
+                                confirmButtonText: 'Yes, update',
+                                cancelButtonText: 'Cancel'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    updateLead({
+                                            lead_id: leadId,
+                                            flag_type: flagType,
+                                            flag_value: isChecked
+                                        },
+                                        () => {
+                                            Swal.fire({
+                                                icon: "success",
+                                                title: "Updated!",
+                                                text: "Lead flag updated successfully.",
+                                                timer: 1500,
+                                                showConfirmButton: false
+                                            }).then(() => {
+                                                location.reload();
+                                            });
+                                        }
+                                    );
+                                } else {
+                                    // Revert checkbox state if cancelled
+                                    this.checked = !this.checked;
+                                }
+                            });
+                        });
+                    });
+
+
+
+                    // ==============================
+                    // Toggle Fields on sidebar of leads details section
+                    // ==============================
+                    $('#toggle-add-person').on('click', function() {
+                        $('#add-person').toggleClass('d-none');
+                    });
+
+                    $('#toggle-add-company').on('click', function() {
+                        $('#add-company').toggleClass('d-none');
+                    });
+
+                    $('#toggle-add-product').on('click', function() {
+                        $('#add-product').toggleClass('d-none');
+                    });
+
+                    $('#toggle-add-competitor').on('click', function() {
+                        $('#add-competitor').toggleClass('d-none');
+                    });
+
+                    $('#toggle-add-source').on('click', function() {
+                        $('#add-source').toggleClass('d-none');
+                    });
+
+                    // ==============================
+                    // Update Fields on sidebar of leads details section
+                    // ==============================
+                    $(document).on("change", ".update-field-select", function() {
+                        let relatedId = $(this).val(); // selected item id
+                        let type = $(this).data("type"); // type: company | people | source | competitor | product
+                        let leadId = "{{ $leads->id }}"; // current lead
+                        let selectElement = this; // store reference in case we need to revert
+
+                        if (!relatedId) return; // do nothing if no selection
+
+                        // Show confirmation popup
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: `Do you want to update the lead ${type}?`,
                             icon: 'question',
                             showCancelButton: true,
                             confirmButtonColor: '#28a745',
@@ -2793,933 +3083,860 @@
                             cancelButtonText: 'Cancel'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                updateLead({
+                                // Proceed with update via AJAX
+                                $.ajax({
+                                    url: "{{ route('admin.leads.update-field') }}",
+                                    type: "POST",
+                                    data: {
+                                        _token: "{{ csrf_token() }}",
                                         lead_id: leadId,
-                                        flag_type: flagType,
-                                        flag_value: isChecked
+                                        related_id: relatedId,
+                                        type: type
                                     },
-                                    () => {
-                                        Swal.fire({
-                                            icon: "success",
-                                            title: "Updated!",
-                                            text: "Lead flag updated successfully.",
-                                            timer: 1500,
-                                            showConfirmButton: false
-                                        }).then(() => {
-                                            location.reload();
-                                        });
+                                    success: function(response) {
+                                        if (response.success) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'Updated!',
+                                                text: response.message,
+                                                timer: 1500,
+                                                showConfirmButton: false
+                                            }).then(() => location.reload());
+                                        } else {
+                                            toastr.error(response.message ||
+                                                "Failed to update " + type + ".");
+                                        }
+                                    },
+                                    error: function(xhr) {
+                                        toastr.error("Something went wrong.");
+                                        console.error(xhr.responseText);
                                     }
-                                );
+                                });
                             } else {
-                                // Revert checkbox state if cancelled
-                                this.checked = !this.checked;
+                                // User canceled, revert select to previous value
+                                // Optional: reset or set to default/empty
+                                $(selectElement).val('').trigger('change.select2'); // works with Select2
                             }
                         });
                     });
-                });
 
+                    // ==============================
+                    // Add Product to Lead
+                    // ==============================
+                    $(document).on("click", "#submitAddProduct", function() {
+                        let leadId = "{{ $leads->id }}";
+                        let productId = $("#product-name").val();
+                        let qty = $("input[name='inline_qty']").val();
+                        let price = $("input[name='inline_price']").val();
 
+                        if (!productId || !qty || !price) {
+                            toastr.error("Please fill all product details before adding.");
+                            return;
+                        }
 
-                // ==============================
-                // Toggle Fields on sidebar of leads details section
-                // ==============================
-                $('#toggle-add-person').on('click', function() {
-                    $('#add-person').toggleClass('d-none');
-                });
-
-                $('#toggle-add-company').on('click', function() {
-                    $('#add-company').toggleClass('d-none');
-                });
-
-                $('#toggle-add-product').on('click', function() {
-                    $('#add-product').toggleClass('d-none');
-                });
-
-                $('#toggle-add-competitor').on('click', function() {
-                    $('#add-competitor').toggleClass('d-none');
-                });
-
-                $('#toggle-add-source').on('click', function() {
-                    $('#add-source').toggleClass('d-none');
-                });
-
-                // ==============================
-                // Update Fields on sidebar of leads details section
-                // ==============================
-                $(document).on("change", ".update-field-select", function() {
-                    let relatedId = $(this).val(); // selected item id
-                    let type = $(this).data("type"); // type: company | people | source | competitor | product
-                    let leadId = "{{ $leads->id }}"; // current lead
-                    let selectElement = this; // store reference in case we need to revert
-
-                    if (!relatedId) return; // do nothing if no selection
-
-                    // Show confirmation popup
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: `Do you want to update the lead ${type}?`,
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#28a745',
-                        cancelButtonColor: '#dc3545',
-                        confirmButtonText: 'Yes, update',
-                        cancelButtonText: 'Cancel'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Proceed with update via AJAX
-                            $.ajax({
-                                url: "{{ route('admin.leads.update-field') }}",
-                                type: "POST",
-                                data: {
-                                    _token: "{{ csrf_token() }}",
-                                    lead_id: leadId,
-                                    related_id: relatedId,
-                                    type: type
-                                },
-                                success: function(response) {
-                                    if (response.success) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'Updated!',
-                                            text: response.message,
-                                            timer: 1500,
-                                            showConfirmButton: false
-                                        }).then(() => location.reload());
-                                    } else {
-                                        toastr.error(response.message ||
-                                            "Failed to update " + type + ".");
+                        Swal.fire({
+                            title: 'Add Product?',
+                            text: "Do you want to add this product to the lead?",
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#dc3545',
+                            confirmButtonText: 'Yes, add it',
+                            cancelButtonText: 'Cancel'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "{{ route('admin.leads.add-product') }}",
+                                    method: "POST",
+                                    data: {
+                                        _token: "{{ csrf_token() }}",
+                                        lead_id: leadId,
+                                        product_id: productId,
+                                        qty: qty,
+                                        price: price
+                                    },
+                                    success: function(response) {
+                                        if (response.success) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'Added!',
+                                                text: response.message,
+                                                timer: 1500,
+                                                showConfirmButton: false
+                                            }).then(() => location.reload());
+                                        } else {
+                                            toastr.error(response.message ||
+                                                "Failed to add product.");
+                                        }
+                                    },
+                                    error: function(xhr) {
+                                        toastr.error("Something went wrong.");
+                                        console.error(xhr.responseText);
                                     }
-                                },
-                                error: function(xhr) {
-                                    toastr.error("Something went wrong.");
-                                    console.error(xhr.responseText);
-                                }
-                            });
-                        } else {
-                            // User canceled, revert select to previous value
-                            // Optional: reset or set to default/empty
-                            $(selectElement).val('').trigger('change.select2'); // works with Select2
-                        }
+                                });
+                            }
+                        });
                     });
-                });
 
-                // ==============================
-                // Add Product to Lead
-                // ==============================
-                $(document).on("click", "#submitAddProduct", function() {
-                    let leadId = "{{ $leads->id }}";
-                    let productId = $("#product-name").val();
-                    let qty = $("input[name='inline_qty']").val();
-                    let price = $("input[name='inline_price']").val();
 
-                    if (!productId || !qty || !price) {
-                        toastr.error("Please fill all product details before adding.");
-                        return;
-                    }
+                    // ==============================
+                    // Delete fields on sidebar of leads details section
+                    // ==============================
+                    // $(document).on("click", ".delete-item", function(e) {
+                    //     e.preventDefault();
 
-                    Swal.fire({
-                        title: 'Add Product?',
-                        text: "Do you want to add this product to the lead?",
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#28a745',
-                        cancelButtonColor: '#dc3545',
-                        confirmButtonText: 'Yes, add it',
-                        cancelButtonText: 'Cancel'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: "{{ route('admin.leads.add-product') }}",
-                                method: "POST",
-                                data: {
-                                    _token: "{{ csrf_token() }}",
-                                    lead_id: leadId,
-                                    product_id: productId,
-                                    qty: qty,
-                                    price: price
-                                },
-                                success: function(response) {
-                                    if (response.success) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'Added!',
-                                            text: response.message,
-                                            timer: 1500,
-                                            showConfirmButton: false
-                                        }).then(() => location.reload());
-                                    } else {
-                                        toastr.error(response.message ||
-                                            "Failed to add product.");
+                    //     let leadId = $(this).data("lead");
+                    //     let relatedId = $(this).data("id");
+                    //     let type = $(this).data("type");
+                    //     let target = $(this).data("target");
+
+                    //     // Use the new container-list structure
+                    //     let container = $(`#${type}-container`);
+                    //     let list = container.find(`#${type}-list`);
+                    //     let count = list.children().length;
+
+                    //     if (count <= 1) {
+                    //         toastr.warning(`At least one ${type} is required.`);
+                    //         return false;
+                    //     }
+
+                    //     Swal.fire({
+                    //         title: 'Are you sure?',
+                    //         text: `This ${type} will be removed from the lead record!`,
+                    //         icon: 'warning',
+                    //         showCancelButton: true,
+                    //         confirmButtonColor: '#3085d6',
+                    //         cancelButtonColor: '#d33',
+                    //         confirmButtonText: 'Yes, delete it!'
+                    //     }).then((result) => {
+                    //         if (result.isConfirmed) {
+                    //             $.ajax({
+                    //                 url: "{{ route('admin.leads.delete-field') }}",
+                    //                 type: "POST",
+                    //                 data: {
+                    //                     _token: "{{ csrf_token() }}",
+                    //                     lead_id: leadId,
+                    //                     related_id: relatedId,
+                    //                     type: type
+                    //                 },
+                    //                 success: function(response) {
+                    //                     if (response.success) {
+                    //                         // toastr.success(response.message);
+                    //                         // location.reload();
+                    //                         Swal.fire({
+                    //                             icon: 'success',
+                    //                             title: 'Updated!',
+                    //                             text: response.message,
+                    //                             timer: 1500,
+                    //                             showConfirmButton: false
+                    //                         }).then(() => location.reload());
+                    //                     } else {
+                    //                         toastr.error(response.message || "Delete failed.");
+                    //                     }
+                    //                 },
+                    //                 error: function(xhr) {
+                    //                     toastr.error("Something went wrong.");
+                    //                     console.error(xhr.responseText);
+                    //                 }
+                    //             });
+                    //         }
+                    //     });
+                    // });
+                    $(document).on("click", ".delete-item", function(e) {
+                        e.preventDefault();
+
+                        let leadId = $(this).data("lead");
+                        let relatedId = $(this).data("id");
+                        let type = $(this).data("type");
+                        let target = $(this).data("target");
+
+                        let container = $(`#${type}-container`);
+                        let list = container.find(`#${type}-list`);
+                        let count = list.children().length;
+
+                        if (count <= 1) {
+                            toastr.warning(`At least one ${type} is required.`);
+                            return false;
+                        }
+
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: `This ${type} will be removed from the lead record!`,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "{{ route('admin.leads.delete-field') }}",
+                                    type: "POST",
+                                    data: {
+                                        _token: "{{ csrf_token() }}",
+                                        lead_id: leadId,
+                                        related_id: relatedId,
+                                        type: type
+                                    },
+                                    success: function(response) {
+                                        if (response.success) {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'Updated!',
+                                                text: response.message,
+                                                timer: 1500,
+                                                showConfirmButton: false
+                                            }).then(() => location.reload());
+                                        } else {
+                                            toastr.error(response.message || "Delete failed.");
+                                        }
+                                    },
+                                    error: function(xhr) {
+                                        toastr.error("Something went wrong.");
+                                        console.error(xhr.responseText);
                                     }
-                                },
-                                error: function(xhr) {
-                                    toastr.error("Something went wrong.");
-                                    console.error(xhr.responseText);
-                                }
-                            });
-                        }
-                    });
-                });
-
-
-                // ==============================
-                // Delete fields on sidebar of leads details section
-                // ==============================
-                // $(document).on("click", ".delete-item", function(e) {
-                //     e.preventDefault();
-
-                //     let leadId = $(this).data("lead");
-                //     let relatedId = $(this).data("id");
-                //     let type = $(this).data("type");
-                //     let target = $(this).data("target");
-
-                //     // Use the new container-list structure
-                //     let container = $(`#${type}-container`);
-                //     let list = container.find(`#${type}-list`);
-                //     let count = list.children().length;
-
-                //     if (count <= 1) {
-                //         toastr.warning(`At least one ${type} is required.`);
-                //         return false;
-                //     }
-
-                //     Swal.fire({
-                //         title: 'Are you sure?',
-                //         text: `This ${type} will be removed from the lead record!`,
-                //         icon: 'warning',
-                //         showCancelButton: true,
-                //         confirmButtonColor: '#3085d6',
-                //         cancelButtonColor: '#d33',
-                //         confirmButtonText: 'Yes, delete it!'
-                //     }).then((result) => {
-                //         if (result.isConfirmed) {
-                //             $.ajax({
-                //                 url: "{{ route('admin.leads.delete-field') }}",
-                //                 type: "POST",
-                //                 data: {
-                //                     _token: "{{ csrf_token() }}",
-                //                     lead_id: leadId,
-                //                     related_id: relatedId,
-                //                     type: type
-                //                 },
-                //                 success: function(response) {
-                //                     if (response.success) {
-                //                         // toastr.success(response.message);
-                //                         // location.reload();
-                //                         Swal.fire({
-                //                             icon: 'success',
-                //                             title: 'Updated!',
-                //                             text: response.message,
-                //                             timer: 1500,
-                //                             showConfirmButton: false
-                //                         }).then(() => location.reload());
-                //                     } else {
-                //                         toastr.error(response.message || "Delete failed.");
-                //                     }
-                //                 },
-                //                 error: function(xhr) {
-                //                     toastr.error("Something went wrong.");
-                //                     console.error(xhr.responseText);
-                //                 }
-                //             });
-                //         }
-                //     });
-                // });
-                $(document).on("click", ".delete-item", function(e) {
-                    e.preventDefault();
-
-                    let leadId = $(this).data("lead");
-                    let relatedId = $(this).data("id");
-                    let type = $(this).data("type");
-                    let target = $(this).data("target");
-
-                    let container = $(`#${type}-container`);
-                    let list = container.find(`#${type}-list`);
-                    let count = list.children().length;
-
-                    if (count <= 1) {
-                        toastr.warning(`At least one ${type} is required.`);
-                        return false;
-                    }
-
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: `This ${type} will be removed from the lead record!`,
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, delete it!'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: "{{ route('admin.leads.delete-field') }}",
-                                type: "POST",
-                                data: {
-                                    _token: "{{ csrf_token() }}",
-                                    lead_id: leadId,
-                                    related_id: relatedId,
-                                    type: type
-                                },
-                                success: function(response) {
-                                    if (response.success) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'Updated!',
-                                            text: response.message,
-                                            timer: 1500,
-                                            showConfirmButton: false
-                                        }).then(() => location.reload());
-                                    } else {
-                                        toastr.error(response.message || "Delete failed.");
-                                    }
-                                },
-                                error: function(xhr) {
-                                    toastr.error("Something went wrong.");
-                                    console.error(xhr.responseText);
-                                }
-                            });
-                        }
-                    });
-                });
-
-
-                // ==============================
-                // Schedule activity validation and submition logic
-                // ==============================
-
-                $("#store_activity").validate({
-                    ignore: [],
-                    rules: {
-                        note: {
-                            required: true
-                        },
-                        agenda: {
-                            required: true
-                        },
-                        'participant_id[]': {
-                            required: true,
-                            minlength: 1
-                        },
-                        activity_type_id: {
-                            required: true
-                        },
-                        date: {
-                            required: true
-                        },
-                        start_time: {
-                            required: true
-                        },
-                        end_time: {
-                            required: true
-                        },
-                        location: {
-                            required: true
-                        }
-                    },
-                    messages: {
-                        note: {
-                            required: "Please enter the activity details in the note."
-                        },
-                        agenda: {
-                            required: "Please enter the description/agenda."
-                        },
-                        'participant_id[]': {
-                            required: "Please select at least one participant.",
-                            minlength: "Please select at least one participant."
-                        },
-                        activity_type_id: {
-                            required: "Please select the activity type."
-                        },
-                        date: {
-                            required: "Please select the date."
-                        },
-                        start_time: {
-                            required: "Please select the start time."
-                        },
-                        end_time: {
-                            required: "Please select the end time."
-                        },
-                        location: {
-                            required: "Please enter the location."
-                        }
-                    },
-                    errorElement: 'span',
-                    errorClass: 'invalid-feedback d-block',
-                    highlight: function(element) {
-                        $(element).addClass('is-invalid');
-                    },
-                    unhighlight: function(element) {
-                        $(element).removeClass('is-invalid');
-                    },
-                    errorPlacement: function(error, element) {
-                        if (element.parent('.input-group').length) {
-                            error.insertAfter(element.parent());
-                        } else {
-                            error.insertAfter(element);
-                        }
-                    }
-                });
-
-                $('#store_activity').submit(function(e) {
-                    e.preventDefault();
-
-                    var form = $(this);
-                    if (!form.valid()) return;
-
-                    // Get owner type, id, and status from data attributes
-                    var ownerType = form.data('owner-type');
-                    var ownerId = form.data('owner-id');
-                    var status = form.data('status');
-
-                    // Collect selected participants with their entity types
-                    var selectedParticipants = $('#participant_select option:selected').map(function() {
-                        var val = $(this).val();
-                        var type = $(this).data('entity-type') || val.split(':')[
-                            0]; // handle value like "people:3"
-                        var id = val.includes(':') ? val.split(':')[1] : val;
-                        return {
-                            id: id,
-                            type: type
-                        };
-                    }).get();
-
-                    // Serialize other form data
-                    var formData = form.serializeArray();
-
-                    // Append owner info, status, and participants
-                    formData.push({
-                        name: 'owner_type',
-                        value: ownerType
-                    });
-                    formData.push({
-                        name: 'owner_id',
-                        value: ownerId
-                    });
-                    formData.push({
-                        name: 'status',
-                        value: status
-                    });
-                    formData.push({
-                        name: 'participants',
-                        value: JSON.stringify(selectedParticipants)
+                                });
+                            }
+                        });
                     });
 
-                    // AJAX request
-                    $.ajax({
-                        url: "{{ route('admin.schedule.activity') }}",
-                        method: "POST",
-                        data: $.param(formData),
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success',
-                                text: response.message,
-                                showConfirmButton: false,
-                                timer: 2000
-                            }).then(() => location.reload());
+
+                    // ==============================
+                    // Schedule activity validation and submition logic
+                    // ==============================
+
+                    $("#store_activity").validate({
+                        ignore: [],
+                        rules: {
+                            note: {
+                                required: true
+                            },
+                            agenda: {
+                                required: true
+                            },
+                            'participant_id[]': {
+                                required: true,
+                                minlength: 1
+                            },
+                            activity_type_id: {
+                                required: true
+                            },
+                            date: {
+                                required: true
+                            },
+                            start_time: {
+                                required: true
+                            },
+                            end_time: {
+                                required: true
+                            },
+                            location: {
+                                required: true
+                            }
                         },
-                        error: function(xhr) {
-                            alert('Error: ' + xhr.responseText);
-                            toastr.error('Something went wrong while scheduling the activity.');
+                        messages: {
+                            note: {
+                                required: "Please enter the activity details in the note."
+                            },
+                            agenda: {
+                                required: "Please enter the description/agenda."
+                            },
+                            'participant_id[]': {
+                                required: "Please select at least one participant.",
+                                minlength: "Please select at least one participant."
+                            },
+                            activity_type_id: {
+                                required: "Please select the activity type."
+                            },
+                            date: {
+                                required: "Please select the date."
+                            },
+                            start_time: {
+                                required: "Please select the start time."
+                            },
+                            end_time: {
+                                required: "Please select the end time."
+                            },
+                            location: {
+                                required: "Please enter the location."
+                            }
+                        },
+                        errorElement: 'span',
+                        errorClass: 'invalid-feedback d-block',
+                        highlight: function(element) {
+                            $(element).addClass('is-invalid');
+                        },
+                        unhighlight: function(element) {
+                            $(element).removeClass('is-invalid');
+                        },
+                        errorPlacement: function(error, element) {
+                            if (element.parent('.input-group').length) {
+                                error.insertAfter(element.parent());
+                            } else {
+                                error.insertAfter(element);
+                            }
                         }
                     });
 
-                });
+                    $('#store_activity').submit(function(e) {
+                        e.preventDefault();
 
+                        var form = $(this);
+                        if (!form.valid()) return;
 
+                        // Get owner type, id, and status from data attributes
+                        var ownerType = form.data('owner-type');
+                        var ownerId = form.data('owner-id');
+                        var status = form.data('status');
 
-                $("#loginActivity").validate({
-                    ignore: [],
-                    rules: {
-                        note: { // textarea
-                            required: true
-                        },
-                        description: { // text input
-                            required: true
-                        },
-                        'participant_id[]': {
-                            required: true,
-                            minlength: 1
-                        },
-                        activity_type: {
-                            required: true
-                        },
-                        duration: {
-                            required: true
-                        },
-                        date: {
-                            required: true
-                        },
-                        location: {
-                            required: true
-                        }
-                    },
-                    messages: {
-                        note: {
-                            required: "Please enter the activity details in the note."
-                        },
-                        description: {
-                            required: "Please enter the description."
-                        },
-                        'participant_id[]': {
-                            required: "Please select at least one participant.",
-                            minlength: "Please select at least one participant."
-                        },
-                        activity_type: {
-                            required: "Please select the activity."
-                        },
-                        duration: {
-                            required: "Please select the duration."
-                        },
-                        date: {
-                            required: "Please select the date."
-                        },
-                        location: {
-                            required: "Please enter the location."
-                        }
-                    },
-                    errorElement: 'span',
-                    errorClass: 'invalid-feedback d-block',
-                    highlight: function(element) {
-                        $(element).addClass('is-invalid');
-                    },
-                    unhighlight: function(element) {
-                        $(element).removeClass('is-invalid');
-                    },
-                    errorPlacement: function(error, element) {
-                        if (element.parent('.input-group').length) {
-                            error.insertAfter(element.parent());
-                        } else {
-                            error.insertAfter(element);
-                        }
-                    }
-                });
-
-
-                $('#loginActivity').submit(function(e) {
-                    e.preventDefault();
-
-                    var form = $(this);
-
-                    if (!form.valid()) return;
-
-                    // Get owner type and id from data attributes
-                    var ownerType = form.data('owner-type');
-                    var ownerId = form.data('owner-id');
-                    var status = form.data('status');
-
-
-                    // Collect selected participants with their entity types
-                    var selectedParticipants = $('#activity_participant_select option:selected').map(
-                        function() {
+                        // Collect selected participants with their entity types
+                        var selectedParticipants = $('#participant_select option:selected').map(function() {
+                            var val = $(this).val();
+                            var type = $(this).data('entity-type') || val.split(':')[
+                                0]; // handle value like "people:3"
+                            var id = val.includes(':') ? val.split(':')[1] : val;
                             return {
-                                id: $(this).val(),
-                                type: $(this).data('entity-type')
+                                id: id,
+                                type: type
                             };
                         }).get();
 
-                    // Append them to serialized data
-                    var formData = form.serializeArray();
-                    formData.push({
-                        name: 'owner_type',
-                        value: ownerType
-                    });
-                    formData.push({
-                        name: 'owner_id',
-                        value: ownerId
-                    });
-                    formData.push({
-                        name: 'status',
-                        value: status
-                    });
-                    formData.push({
-                        name: 'participants',
-                        value: JSON.stringify(selectedParticipants)
-                    });
+                        // Serialize other form data
+                        var formData = form.serializeArray();
 
-                    $.ajax({
-                        url: "{{ route('admin.login.activity') }}",
-                        method: "POST",
-                        data: $.param(formData),
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success',
-                                text: response.message,
-                                showConfirmButton: false,
-                                timer: 2000
-                            }).then(() => location.reload());
-                        },
-                        error: function(xhr) {
-                            alert('Error: ' + xhr.responseText);
-                            toastr.error('Something went wrong while logging an activity.');
-                        }
-                    });
-                });
-
-                // ==============================
-                // Log the scheduled Activity
-                // ==============================
-                $(document).on('click', '.log-activity-btn', function() {
-                    var activityId = $(this).data('id'); // Get the activity ID
-
-                    Swal.fire({
-                        title: 'Mark as Logged?',
-                        text: "Do you want to log this activity?",
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#28a745',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, log it!'
-                    }).then(function(result) {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: "/admin/log_activity/" + activityId,
-                                method: "POST",
-                                data: {
-                                    _token: "{{ csrf_token() }}"
-                                },
-                                success: function(response) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Activity Logged!',
-                                        text: response.message ||
-                                            'Activity has been marked as logged.',
-                                        timer: 1500,
-                                        showConfirmButton: false
-                                    }).then(function() {
-                                        location
-                                            .reload(); // Reload to reflect the updated status
-                                    });
-                                },
-                                error: function(xhr) {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: xhr.responseJSON?.message ||
-                                            'Something went wrong while logging the activity.'
-                                    });
-                                    console.error(xhr.responseText);
-                                }
-                            });
-                        }
-                    });
-                });
-
-
-
-                // ==============================
-                // Delete Activity
-                // ==============================
-
-                $(document).on('click', '.delete-activity-btn', function() {
-                    var activityId = $(this).data('id'); // get task ID from button
-
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "Do you want to delete this activity?",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, delete it!'
-                    }).then(function(result) {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: "/admin/delete_activity/" + activityId,
-                                method: "POST",
-                                data: {
-                                    _token: "{{ csrf_token() }}"
-                                },
-                                success: function(response) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Deleted!',
-                                        text: response.message ||
-                                            "Activity deleted successfully.",
-                                        timer: 1500,
-                                        showConfirmButton: false
-                                    }).then(function() {
-                                        location.reload(); // reload after deletion
-                                    });
-                                },
-                                error: function(xhr) {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: xhr.responseJSON?.message ||
-                                            'Something went wrong.'
-                                    });
-                                    console.error(xhr.responseText);
-                                }
-                            });
-                        }
-                    });
-                });
-
-                // ==============================
-                // Adding the comment
-                // ==============================
-                $(document).on('click', '.add-comment-submit', function() {
-                    let commentBox = $(this).closest('.add-comment');
-                    let type = commentBox.data('type'); // Activity or Note
-                    let id = commentBox.data('id'); // Item ID
-                    let commentText = commentBox.find('textarea[name="comment_text"]').val();
-
-                    if (!commentText.trim()) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Empty Comment',
-                            text: 'Please enter a comment before submitting.'
+                        // Append owner info, status, and participants
+                        formData.push({
+                            name: 'owner_type',
+                            value: ownerType
                         });
-                        return;
-                    }
+                        formData.push({
+                            name: 'owner_id',
+                            value: ownerId
+                        });
+                        formData.push({
+                            name: 'status',
+                            value: status
+                        });
+                        formData.push({
+                            name: 'participants',
+                            value: JSON.stringify(selectedParticipants)
+                        });
 
-                    // Determine URL based on type (like delete)
-                    let url = '';
-                    if (type === 'Activity') {
-                        url = '/admin/activity/add_comment/' + id;
-                    } else {
-                        url = '/admin/note/add_comment/' + id;
-                    }
+                        // AJAX request
+                        $.ajax({
+                            url: "{{ route('admin.schedule.activity') }}",
+                            method: "POST",
+                            data: $.param(formData),
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(() => location.reload());
+                            },
+                            error: function(xhr) {
+                                alert('Error: ' + xhr.responseText);
+                                toastr.error('Something went wrong while scheduling the activity.');
+                            }
+                        });
 
-                    $.ajax({
-                        url: url,
-                        method: 'POST',
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                            comment: commentText
+                    });
+
+
+
+                    $("#loginActivity").validate({
+                        ignore: [],
+                        rules: {
+                            note: { // textarea
+                                required: true
+                            },
+                            description: { // text input
+                                required: true
+                            },
+                            'participant_id[]': {
+                                required: true,
+                                minlength: 1
+                            },
+                            activity_type: {
+                                required: true
+                            },
+                            duration: {
+                                required: true
+                            },
+                            date: {
+                                required: true
+                            },
+                            location: {
+                                required: true
+                            }
                         },
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success',
-                                text: response.message,
-                                showConfirmButton: false,
-                                timer: 2000
-                            }).then(() => location.reload());
+                        messages: {
+                            note: {
+                                required: "Please enter the activity details in the note."
+                            },
+                            description: {
+                                required: "Please enter the description."
+                            },
+                            'participant_id[]': {
+                                required: "Please select at least one participant.",
+                                minlength: "Please select at least one participant."
+                            },
+                            activity_type: {
+                                required: "Please select the activity."
+                            },
+                            duration: {
+                                required: "Please select the duration."
+                            },
+                            date: {
+                                required: "Please select the date."
+                            },
+                            location: {
+                                required: "Please enter the location."
+                            }
                         },
-                        error: function(xhr) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: xhr.responseJSON?.message ||
-                                    'Something went wrong while adding the comment.'
-                            });
+                        errorElement: 'span',
+                        errorClass: 'invalid-feedback d-block',
+                        highlight: function(element) {
+                            $(element).addClass('is-invalid');
+                        },
+                        unhighlight: function(element) {
+                            $(element).removeClass('is-invalid');
+                        },
+                        errorPlacement: function(error, element) {
+                            if (element.parent('.input-group').length) {
+                                error.insertAfter(element.parent());
+                            } else {
+                                error.insertAfter(element);
+                            }
                         }
                     });
-                });
 
 
-                // ==============================
-                // Removing the comment
-                // ==============================
-                $(document).on('click', '.delete-comment-btn', function() {
-                    var commentId = $(this).data('id');
-                    var type = $(this).data('type'); // Activity or Note
-                    var url = '';
+                    $('#loginActivity').submit(function(e) {
+                        e.preventDefault();
 
-                    // Determine URL based on type
-                    if (type === "Activity") {
-                        url = "/admin/activity/delete_comment/" + commentId;
-                    } else {
-                        url = "/admin/note/delete_comment/" + commentId;
-                    }
+                        var form = $(this);
 
-                    Swal.fire({
-                        title: "Are you sure?",
-                        text: "Do you want to remove this comment?",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#d33",
-                        cancelButtonColor: "#3085d6",
-                        confirmButtonText: "Yes, Remove"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: url,
-                                method: "POST",
-                                data: {
-                                    _token: "{{ csrf_token() }}"
-                                },
-                                success: function(response) {
-                                    Swal.fire({
-                                        icon: "success",
-                                        title: "Removed",
-                                        text: response.message,
-                                        timer: 2000,
-                                        showConfirmButton: false
-                                    }).then(() => {
-                                        location
-                                            .reload(); // reload to update comment list
-                                    });
-                                },
-                                error: function(xhr) {
-                                    Swal.fire({
-                                        icon: "error",
-                                        title: "Error",
-                                        text: xhr.responseJSON?.message ||
-                                            "Something went wrong."
-                                    });
-                                    console.error(xhr.responseText);
-                                }
-                            });
-                        }
+                        if (!form.valid()) return;
+
+                        // Get owner type and id from data attributes
+                        var ownerType = form.data('owner-type');
+                        var ownerId = form.data('owner-id');
+                        var status = form.data('status');
+
+
+                        // Collect selected participants with their entity types
+                        var selectedParticipants = $('#activity_participant_select option:selected').map(
+                            function() {
+                                return {
+                                    id: $(this).val(),
+                                    type: $(this).data('entity-type')
+                                };
+                            }).get();
+
+                        // Append them to serialized data
+                        var formData = form.serializeArray();
+                        formData.push({
+                            name: 'owner_type',
+                            value: ownerType
+                        });
+                        formData.push({
+                            name: 'owner_id',
+                            value: ownerId
+                        });
+                        formData.push({
+                            name: 'status',
+                            value: status
+                        });
+                        formData.push({
+                            name: 'participants',
+                            value: JSON.stringify(selectedParticipants)
+                        });
+
+                        $.ajax({
+                            url: "{{ route('admin.login.activity') }}",
+                            method: "POST",
+                            data: $.param(formData),
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(() => location.reload());
+                            },
+                            error: function(xhr) {
+                                alert('Error: ' + xhr.responseText);
+                                toastr.error('Something went wrong while logging an activity.');
+                            }
+                        });
                     });
-                });
 
-                // Log Note Form
-                $("#logNoteForm").validate({
-                    ignore: [],
-                    rules: {
-                        note: { // textarea
-                            required: true
+                    // ==============================
+                    // Log the scheduled Activity
+                    // ==============================
+                    $(document).on('click', '.log-activity-btn', function() {
+                        var activityId = $(this).data('id'); // Get the activity ID
+
+                        Swal.fire({
+                            title: 'Mark as Logged?',
+                            text: "Do you want to log this activity?",
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, log it!'
+                        }).then(function(result) {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "/admin/log_activity/" + activityId,
+                                    method: "POST",
+                                    data: {
+                                        _token: "{{ csrf_token() }}"
+                                    },
+                                    success: function(response) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Activity Logged!',
+                                            text: response.message ||
+                                                'Activity has been marked as logged.',
+                                            timer: 1500,
+                                            showConfirmButton: false
+                                        }).then(function() {
+                                            location
+                                                .reload(); // Reload to reflect the updated status
+                                        });
+                                    },
+                                    error: function(xhr) {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: xhr.responseJSON?.message ||
+                                                'Something went wrong while logging the activity.'
+                                        });
+                                        console.error(xhr.responseText);
+                                    }
+                                });
+                            }
+                        });
+                    });
+
+
+
+                    // ==============================
+                    // Delete Activity
+                    // ==============================
+
+                    $(document).on('click', '.delete-activity-btn', function() {
+                        var activityId = $(this).data('id'); // get task ID from button
+
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "Do you want to delete this activity?",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then(function(result) {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "/admin/delete_activity/" + activityId,
+                                    method: "POST",
+                                    data: {
+                                        _token: "{{ csrf_token() }}"
+                                    },
+                                    success: function(response) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Deleted!',
+                                            text: response.message ||
+                                                "Activity deleted successfully.",
+                                            timer: 1500,
+                                            showConfirmButton: false
+                                        }).then(function() {
+                                            location.reload(); // reload after deletion
+                                        });
+                                    },
+                                    error: function(xhr) {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: xhr.responseJSON?.message ||
+                                                'Something went wrong.'
+                                        });
+                                        console.error(xhr.responseText);
+                                    }
+                                });
+                            }
+                        });
+                    });
+
+                    // ==============================
+                    // Adding the comment
+                    // ==============================
+                    $(document).on('click', '.add-comment-submit', function() {
+                        let commentBox = $(this).closest('.add-comment');
+                        let type = commentBox.data('type'); // Activity or Note
+                        let id = commentBox.data('id'); // Item ID
+                        let commentText = commentBox.find('textarea[name="comment_text"]').val();
+
+                        if (!commentText.trim()) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Empty Comment',
+                                text: 'Please enter a comment before submitting.'
+                            });
+                            return;
                         }
-                    },
-                    messages: {
-                        note: {
-                            required: "Please enter some note details before saving."
-                        }
-                    },
-                    errorElement: 'span',
-                    errorClass: 'invalid-feedback d-block',
-                    highlight: function(element) {
-                        $(element).addClass('is-invalid');
-                    },
-                    unhighlight: function(element) {
-                        $(element).removeClass('is-invalid');
-                    },
-                    errorPlacement: function(error, element) {
-                        if (element.parent('.input-group').length) {
-                            error.insertAfter(element.parent());
+
+                        // Determine URL based on type (like delete)
+                        let url = '';
+                        if (type === 'Activity') {
+                            url = '/admin/activity/add_comment/' + id;
                         } else {
-                            error.insertAfter(element);
+                            url = '/admin/note/add_comment/' + id;
                         }
-                    }
-                });
 
-                $('#logNoteForm').submit(function(e) {
-                    e.preventDefault();
-
-                    var form = $(this);
-
-                    if (!form.valid()) return;
-
-                    // Get owner type and id
-                    var ownerType = form.data('owner-type');
-                    var ownerId = form.data('owner-id');
-
-                    // Serialize form data
-                    var formData = form.serializeArray();
-
-                    // Append owner details
-                    formData.push({
-                        name: 'owner_type',
-                        value: ownerType
+                        $.ajax({
+                            url: url,
+                            method: 'POST',
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                comment: commentText
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: response.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(() => location.reload());
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON?.message ||
+                                        'Something went wrong while adding the comment.'
+                                });
+                            }
+                        });
                     });
-                    formData.push({
-                        name: 'owner_id',
-                        value: ownerId
+
+
+                    // ==============================
+                    // Removing the comment
+                    // ==============================
+                    $(document).on('click', '.delete-comment-btn', function() {
+                        var commentId = $(this).data('id');
+                        var type = $(this).data('type'); // Activity or Note
+                        var url = '';
+
+                        // Determine URL based on type
+                        if (type === "Activity") {
+                            url = "/admin/activity/delete_comment/" + commentId;
+                        } else {
+                            url = "/admin/note/delete_comment/" + commentId;
+                        }
+
+                        Swal.fire({
+                            title: "Are you sure?",
+                            text: "Do you want to remove this comment?",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#d33",
+                            cancelButtonColor: "#3085d6",
+                            confirmButtonText: "Yes, Remove"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: url,
+                                    method: "POST",
+                                    data: {
+                                        _token: "{{ csrf_token() }}"
+                                    },
+                                    success: function(response) {
+                                        Swal.fire({
+                                            icon: "success",
+                                            title: "Removed",
+                                            text: response.message,
+                                            timer: 2000,
+                                            showConfirmButton: false
+                                        }).then(() => {
+                                            location
+                                                .reload(); // reload to update comment list
+                                        });
+                                    },
+                                    error: function(xhr) {
+                                        Swal.fire({
+                                            icon: "error",
+                                            title: "Error",
+                                            text: xhr.responseJSON?.message ||
+                                                "Something went wrong."
+                                        });
+                                        console.error(xhr.responseText);
+                                    }
+                                });
+                            }
+                        });
                     });
 
-                    $.ajax({
-                        url: "{{ route('admin.add.note') }}",
-                        method: "POST",
-                        data: $.param(formData),
-                        success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success',
-                                text: response.message || 'Note added successfully!',
-                                showConfirmButton: false,
-                                timer: 2000
-                            }).then(() => location.reload());
+                    // Log Note Form
+                    $("#logNoteForm").validate({
+                        ignore: [],
+                        rules: {
+                            note: { // textarea
+                                required: true
+                            }
                         },
-                        error: function(xhr) {
-                            console.error(xhr.responseText);
-                            toastr.error('Something went wrong while saving the note.');
+                        messages: {
+                            note: {
+                                required: "Please enter some note details before saving."
+                            }
+                        },
+                        errorElement: 'span',
+                        errorClass: 'invalid-feedback d-block',
+                        highlight: function(element) {
+                            $(element).addClass('is-invalid');
+                        },
+                        unhighlight: function(element) {
+                            $(element).removeClass('is-invalid');
+                        },
+                        errorPlacement: function(error, element) {
+                            if (element.parent('.input-group').length) {
+                                error.insertAfter(element.parent());
+                            } else {
+                                error.insertAfter(element);
+                            }
                         }
                     });
-                });
 
-                // Delete Note
-                $(document).on('click', '.delete-note-btn', function() {
-                    var noteId = $(this).data('id'); // get task ID from button
+                    $('#logNoteForm').submit(function(e) {
+                        e.preventDefault();
 
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "Do you want to delete this note?",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, delete it!'
-                    }).then(function(result) {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: "/admin/note_activity/" + noteId,
-                                method: "POST",
-                                data: {
-                                    _token: "{{ csrf_token() }}"
-                                },
-                                success: function(response) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Deleted!',
-                                        text: response.message ||
-                                            "Note deleted successfully.",
-                                        timer: 1500,
-                                        showConfirmButton: false
-                                    }).then(function() {
-                                        location.reload(); // reload after deletion
-                                    });
-                                },
-                                error: function(xhr) {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: xhr.responseJSON?.message ||
-                                            'Something went wrong.'
-                                    });
-                                    console.error(xhr.responseText);
-                                }
-                            });
-                        }
-                    });
-                });
+                        var form = $(this);
 
+                        if (!form.valid()) return;
 
-                const durationSelect = document.getElementById('duration');
-                const startInput = document.getElementById('start_time');
-                const endInput = document.getElementById('end_time');
+                        // Get owner type and id
+                        var ownerType = form.data('owner-type');
+                        var ownerId = form.data('owner-id');
 
-                if (durationSelect && startInput && endInput) {
-                    durationSelect.addEventListener('change', function() {
-                        const durationMinutes = parseInt(this.value);
-                        const now = new Date();
+                        // Serialize form data
+                        var formData = form.serializeArray();
 
-                        const pad = n => String(n).padStart(2, '0');
-                        const formatTime = date => `${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+                        // Append owner details
+                        formData.push({
+                            name: 'owner_type',
+                            value: ownerType
+                        });
+                        formData.push({
+                            name: 'owner_id',
+                            value: ownerId
+                        });
 
-                        const end = new Date(now.getTime() + durationMinutes * 60000);
-
-                        startInput.value = formatTime(now);
-                        endInput.value = formatTime(end);
+                        $.ajax({
+                            url: "{{ route('admin.add.note') }}",
+                            method: "POST",
+                            data: $.param(formData),
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success',
+                                    text: response.message || 'Note added successfully!',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(() => location.reload());
+                            },
+                            error: function(xhr) {
+                                console.error(xhr.responseText);
+                                toastr.error('Something went wrong while saving the note.');
+                            }
+                        });
                     });
 
-                    // Trigger default duration on load (optional)
-                    durationSelect.dispatchEvent(new Event('change'));
-                }
+                    // Delete Note
+                    $(document).on('click', '.delete-note-btn', function() {
+                        var noteId = $(this).data('id'); // get task ID from button
+
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "Do you want to delete this note?",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!'
+                        }).then(function(result) {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: "/admin/note_activity/" + noteId,
+                                    method: "POST",
+                                    data: {
+                                        _token: "{{ csrf_token() }}"
+                                    },
+                                    success: function(response) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Deleted!',
+                                            text: response.message ||
+                                                "Note deleted successfully.",
+                                            timer: 1500,
+                                            showConfirmButton: false
+                                        }).then(function() {
+                                            location.reload(); // reload after deletion
+                                        });
+                                    },
+                                    error: function(xhr) {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: xhr.responseJSON?.message ||
+                                                'Something went wrong.'
+                                        });
+                                        console.error(xhr.responseText);
+                                    }
+                                });
+                            }
+                        });
+                    });
+
+
+                    const durationSelect = document.getElementById('duration');
+                    const startInput = document.getElementById('start_time');
+                    const endInput = document.getElementById('end_time');
+
+                    if (durationSelect && startInput && endInput) {
+                        durationSelect.addEventListener('change', function() {
+                            const durationMinutes = parseInt(this.value);
+                            const now = new Date();
+
+                            const pad = n => String(n).padStart(2, '0');
+                            const formatTime = date => `${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+
+                            const end = new Date(now.getTime() + durationMinutes * 60000);
+
+                            startInput.value = formatTime(now);
+                            endInput.value = formatTime(end);
+                        });
+
+                        // Trigger default duration on load (optional)
+                        durationSelect.dispatchEvent(new Event('change'));
+                    }
 
 
 
 
 
-            });
-        </script>
+                });
+            </script>
 
-        {{-- <script>
+            {{-- <script>
             document.addEventListener('DOMContentLoaded', function() {
                 // --- Prepare mentions array ---
                 var mentions = [
@@ -3810,246 +4027,246 @@
                 }
             });
         </script> --}}
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
 
-                /**
-                 * Prepare mentions array dynamically from Blade variables
-                 */
-                var mentions = [
-                    @foreach ($companies as $company)
-                        {
-                            key: "{{ addslashes($company->name) }}",
-                            value: "company:{{ $company->id }}"
-                        }
-                        @if (!$loop->last || count($allpeoples) > 0 || count($users) > 0)
-                            ,
-                        @endif
-                    @endforeach
+                    /**
+                     * Prepare mentions array dynamically from Blade variables
+                     */
+                    var mentions = [
+                        @foreach ($companies as $company)
+                            {
+                                key: "{{ addslashes($company->name) }}",
+                                value: "company:{{ $company->id }}"
+                            }
+                            @if (!$loop->last || count($allpeoples) > 0 || count($users) > 0)
+                                ,
+                            @endif
+                        @endforeach
 
-                    @foreach ($allpeoples as $person)
-                        {
-                            key: "{{ addslashes($person->name) }}",
-                            value: "people:{{ $person->id }}"
-                        }
-                        @if (!$loop->last || count($users) > 0)
-                            ,
-                        @endif
-                    @endforeach
+                        @foreach ($allpeoples as $person)
+                            {
+                                key: "{{ addslashes($person->name) }}",
+                                value: "people:{{ $person->id }}"
+                            }
+                            @if (!$loop->last || count($users) > 0)
+                                ,
+                            @endif
+                        @endforeach
 
-                    @foreach ($users as $user)
-                        {
-                            key: "{{ addslashes($user->name) }}",
-                            value: "user:{{ $user->id }}"
-                        }
-                        @if (!$loop->last)
-                            ,
-                        @endif
-                    @endforeach
-                ];
+                        @foreach ($users as $user)
+                            {
+                                key: "{{ addslashes($user->name) }}",
+                                value: "user:{{ $user->id }}"
+                            }
+                            @if (!$loop->last)
+                                ,
+                            @endif
+                        @endforeach
+                    ];
 
-                /**
-                 * Initialize Tribute.js for a textarea
-                 * @param {string} textareaId - ID of the textarea
-                 */
-                function initTribute(textareaId, companyInputId, peopleInputId, userInputId, rawInputId) {
-                    var tribute = new Tribute({
-                        trigger: '@',
-                        values: mentions,
-                        lookup: 'key',
-                        fillAttr: 'key',
-                        menuItemTemplate: function(item) {
-                            var type = item.original.value.split(':')[0];
-                            return `<div><strong>${item.string}</strong> <small>(${type})</small></div>`;
-                        },
-                        selectTemplate: function(item) {
-                            return item.original ? item.original.key : '';
-                        }
-                    });
-
-                    tribute.attach(document.getElementById(textareaId));
-
-                    // Attach form submit handler
-                    var form = document.getElementById(textareaId).closest('form');
-                    form.addEventListener('submit', function() {
-                        var rawText = document.getElementById(textareaId).value;
-
-                        var companyIds = [];
-                        var peopleIds = [];
-                        var userIds = [];
-
-                        mentions.forEach(m => {
-                            var regex = new RegExp(`\\b${escapeRegExp(m.key)}\\b`, 'g');
-                            if (regex.test(rawText)) {
-                                let [type, id] = m.value.split(':');
-                                if (type === 'company') companyIds.push(id);
-                                else if (type === 'people') peopleIds.push(id);
-                                else if (type === 'user') userIds.push(id);
+                    /**
+                     * Initialize Tribute.js for a textarea
+                     * @param {string} textareaId - ID of the textarea
+                     */
+                    function initTribute(textareaId, companyInputId, peopleInputId, userInputId, rawInputId) {
+                        var tribute = new Tribute({
+                            trigger: '@',
+                            values: mentions,
+                            lookup: 'key',
+                            fillAttr: 'key',
+                            menuItemTemplate: function(item) {
+                                var type = item.original.value.split(':')[0];
+                                return `<div><strong>${item.string}</strong> <small>(${type})</small></div>`;
+                            },
+                            selectTemplate: function(item) {
+                                return item.original ? item.original.key : '';
                             }
                         });
 
-                        document.getElementById(companyInputId).value = companyIds.join(',');
-                        document.getElementById(peopleInputId).value = peopleIds.join(',');
-                        document.getElementById(userInputId).value = userIds.join(',');
-                        document.getElementById(rawInputId).value = rawText;
-                    });
-                }
+                        tribute.attach(document.getElementById(textareaId));
 
-                // Helper function to escape regex characters
-                function escapeRegExp(string) {
-                    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                }
+                        // Attach form submit handler
+                        var form = document.getElementById(textareaId).closest('form');
+                        form.addEventListener('submit', function() {
+                            var rawText = document.getElementById(textareaId).value;
 
-                // --- Initialize for Activity ---
-                initTribute(
-                    'activity-note',
-                    'mentioned_company_ids',
-                    'mentioned_people_ids',
-                    'mentioned_user_ids',
-                    'note_value'
-                );
+                            var companyIds = [];
+                            var peopleIds = [];
+                            var userIds = [];
 
-                // --- Initialize for Note ---
-                initTribute(
-                    'note-textarea',
-                    'note_mentioned_company_ids',
-                    'note_mentioned_people_ids',
-                    'note_mentioned_user_ids',
-                    'note_value'
-                );
+                            mentions.forEach(m => {
+                                var regex = new RegExp(`\\b${escapeRegExp(m.key)}\\b`, 'g');
+                                if (regex.test(rawText)) {
+                                    let [type, id] = m.value.split(':');
+                                    if (type === 'company') companyIds.push(id);
+                                    else if (type === 'people') peopleIds.push(id);
+                                    else if (type === 'user') userIds.push(id);
+                                }
+                            });
 
-            });
-        </script>
+                            document.getElementById(companyInputId).value = companyIds.join(',');
+                            document.getElementById(peopleInputId).value = peopleIds.join(',');
+                            document.getElementById(userInputId).value = userIds.join(',');
+                            document.getElementById(rawInputId).value = rawText;
+                        });
+                    }
 
-        <script>
-            $(document).ready(function() {
-                function fetchFilteredTimeline() {
-                    // ✅ Fetch lead_id dynamically from dropdown
-                    let leadId = $('#filter-range').data('lead-id');
-                    let filter_range = $('select[name="filter_range"]').val();
-                    let activity_type_id = $('#filter-activity').val();
-                    let user_id = $('#filter-user').val();
+                    // Helper function to escape regex characters
+                    function escapeRegExp(string) {
+                        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    }
+
+                    // --- Initialize for Activity ---
+                    initTribute(
+                        'activity-note',
+                        'mentioned_company_ids',
+                        'mentioned_people_ids',
+                        'mentioned_user_ids',
+                        'note_value'
+                    );
+
+                    // --- Initialize for Note ---
+                    initTribute(
+                        'note-textarea',
+                        'note_mentioned_company_ids',
+                        'note_mentioned_people_ids',
+                        'note_mentioned_user_ids',
+                        'note_value'
+                    );
+
+                });
+            </script>
+
+            <script>
+                $(document).ready(function() {
+                    function fetchFilteredTimeline() {
+                        // ✅ Fetch lead_id dynamically from dropdown
+                        let leadId = $('#filter-range').data('lead-id');
+                        let filter_range = $('select[name="filter_range"]').val();
+                        let activity_type_id = $('#filter-activity').val();
+                        let user_id = $('#filter-user').val();
 
 
-                    console.log("Fetching timeline with filters:", {
-                        lead_id: leadId,
-                        filter_range: filter_range,
-                        activity_type_id: activity_type_id,
-                        user_id: user_id
-                    });
-
-                    $.ajax({
-                        url: "/admin/leads/" + leadId + "/timeline",
-                        method: "GET",
-                        data: {
+                        console.log("Fetching timeline with filters:", {
+                            lead_id: leadId,
                             filter_range: filter_range,
                             activity_type_id: activity_type_id,
                             user_id: user_id
-                        },
-                        success: function(response) {
-                            $('#timeline').html(response.timeline_html);
-                        },
-                        error: function() {
-                            console.error('Error fetching filtered timeline data');
-                        }
-                    });
-                }
-
-                // ✅ Trigger AJAX when filters change
-                $('select[name="filter_range"], select[name="activity_type_id"], select[name="user_id"]').on('change',
-                    fetchFilteredTimeline);
-
-
-                const uploadBtn = document.getElementById("uploadLeadFileBtn");
-                const fileInput = document.getElementById("leadFileInput");
-                const uploadedList = document.getElementById("uploadedFilesList");
-                const leadId = document.getElementById("leadFileUploadForm").dataset.leadId;
-
-                uploadBtn.addEventListener("click", () => fileInput.click());
-
-                fileInput.addEventListener("change", function() {
-                    const file = this.files[0];
-                    if (!file) return;
-
-                    let formData = new FormData();
-                    formData.append("file", file);
-                    formData.append("_token", "{{ csrf_token() }}");
-
-                    uploadBtn.disabled = true;
-                    uploadBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-2"></i> Uploading...`;
-
-                    fetch(`/admin/leads/${leadId}/files/upload`, {
-                            method: "POST",
-                            body: formData,
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success) {
-                                location.reload();
-                            } else {
-                                alert("Upload failed: " + data.message);
-                            }
-                        })
-                        .catch(err => {
-                            console.error("Upload error:", err);
-                            alert("Something went wrong while uploading the file.");
-                        })
-                        .finally(() => {
-                            uploadBtn.disabled = false;
-                            uploadBtn.innerHTML = `<i class="fas fa-upload me-2"></i>Upload File`;
-                            fileInput.value = "";
                         });
-                });
+
+                        $.ajax({
+                            url: "/admin/leads/" + leadId + "/timeline",
+                            method: "GET",
+                            data: {
+                                filter_range: filter_range,
+                                activity_type_id: activity_type_id,
+                                user_id: user_id
+                            },
+                            success: function(response) {
+                                $('#timeline').html(response.timeline_html);
+                            },
+                            error: function() {
+                                console.error('Error fetching filtered timeline data');
+                            }
+                        });
+                    }
+
+                    // ✅ Trigger AJAX when filters change
+                    $('select[name="filter_range"], select[name="activity_type_id"], select[name="user_id"]').on('change',
+                        fetchFilteredTimeline);
 
 
-                $(document).on('click', '.delete-file-btn', function() {
-                    let fileId = $(this).data('id');
-                    let leadId = $(this).data('lead-id'); // available from your Blade
+                    const uploadBtn = document.getElementById("uploadLeadFileBtn");
+                    const fileInput = document.getElementById("leadFileInput");
+                    const uploadedList = document.getElementById("uploadedFilesList");
+                    const leadId = document.getElementById("leadFileUploadForm").dataset.leadId;
 
-                    Swal.fire({
-                        title: "Are you sure?",
-                        text: "This file will be permanently deleted.",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#d33",
-                        cancelButtonColor: "#3085d6",
-                        confirmButtonText: "Yes, delete it",
-                        cancelButtonText: "Cancel"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: `/admin/leads/files/delete`,
-                                type: "POST",
-                                data: {
-                                    _token: "{{ csrf_token() }}",
-                                    lead_id: leadId,
-                                    file_id: fileId
-                                },
-                                success: function(response) {
-                                    Swal.fire({
-                                        icon: "success",
-                                        title: "Deleted!",
-                                        text: response.message ||
-                                            "File deleted successfully.",
-                                        showConfirmButton: false,
-                                        timer: 2000
-                                    });
-                                    setTimeout(() => location.reload(), 2000);
-                                },
-                                error: function(xhr) {
-                                    Swal.fire({
-                                        icon: "error",
-                                        title: "Error!",
-                                        text: xhr.responseJSON?.message ||
-                                            "Something went wrong while deleting."
-                                    });
+                    uploadBtn.addEventListener("click", () => fileInput.click());
+
+                    fileInput.addEventListener("change", function() {
+                        const file = this.files[0];
+                        if (!file) return;
+
+                        let formData = new FormData();
+                        formData.append("file", file);
+                        formData.append("_token", "{{ csrf_token() }}");
+
+                        uploadBtn.disabled = true;
+                        uploadBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-2"></i> Uploading...`;
+
+                        fetch(`/admin/leads/${leadId}/files/upload`, {
+                                method: "POST",
+                                body: formData,
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    location.reload();
+                                } else {
+                                    alert("Upload failed: " + data.message);
                                 }
+                            })
+                            .catch(err => {
+                                console.error("Upload error:", err);
+                                alert("Something went wrong while uploading the file.");
+                            })
+                            .finally(() => {
+                                uploadBtn.disabled = false;
+                                uploadBtn.innerHTML = `<i class="fas fa-upload me-2"></i>Upload File`;
+                                fileInput.value = "";
                             });
-                        }
                     });
+
+
+                    $(document).on('click', '.delete-file-btn', function() {
+                        let fileId = $(this).data('id');
+                        let leadId = $(this).data('lead-id'); // available from your Blade
+
+                        Swal.fire({
+                            title: "Are you sure?",
+                            text: "This file will be permanently deleted.",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#d33",
+                            cancelButtonColor: "#3085d6",
+                            confirmButtonText: "Yes, delete it",
+                            cancelButtonText: "Cancel"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: `/admin/leads/files/delete`,
+                                    type: "POST",
+                                    data: {
+                                        _token: "{{ csrf_token() }}",
+                                        lead_id: leadId,
+                                        file_id: fileId
+                                    },
+                                    success: function(response) {
+                                        Swal.fire({
+                                            icon: "success",
+                                            title: "Deleted!",
+                                            text: response.message ||
+                                                "File deleted successfully.",
+                                            showConfirmButton: false,
+                                            timer: 2000
+                                        });
+                                        setTimeout(() => location.reload(), 2000);
+                                    },
+                                    error: function(xhr) {
+                                        Swal.fire({
+                                            icon: "error",
+                                            title: "Error!",
+                                            text: xhr.responseJSON?.message ||
+                                                "Something went wrong while deleting."
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    });
+
+
                 });
-
-
-            });
-        </script>
-    @endpush
+            </script>
+        @endpush

@@ -166,6 +166,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Lead - Detail Section
     Route::post('/leads/ajax-update', [LeadController::class, 'ajax_update'])->name('leads.ajax_update');
+    Route::post('leads/forecasting/store', [LeadController::class, 'storeForecasting'])->name('leads.forecasting.store');
     Route::post('/leads/check-stage-condition/{id}', [LeadController::class, 'checkStageCondition'])->name('leads.check.stage.condition');
     Route::post('/leads/change-stage/{id}', [LeadController::class, 'changeStage'])->name('leads.change.stage');
     Route::post('leads/{lead}/update-detail', [LeadController::class, 'updateDetail'])->name('lead.updateDetail');

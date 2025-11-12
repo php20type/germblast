@@ -13,9 +13,8 @@
                     <!-- Sidebar -->
                     @include('admin.settings.sidebar')
 
-
                     <!-- Main Content -->
-                    <div class="col-md-10 p-0">
+                    <div class="col-lg-9 col-md-9 p-0">
                         <div class="activity-type-content">
                             <div
                                 class="heading-area-sec d-md-flex justify-content-between align-items-center border-bottom pb-3 mb-2">

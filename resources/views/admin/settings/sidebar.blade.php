@@ -1,5 +1,5 @@
  <!-- Sidebar -->
- <div class="col-md-2">
+ <div class="col-lg-3 col-md-3">
      <div class="sidebar">
          <div class="settings-dropdown">
              <div class="p-3">

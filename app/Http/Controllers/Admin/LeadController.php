@@ -1800,6 +1800,42 @@ class LeadController extends Controller
         ]);
     }
 
+    public function storeForecasting(Request $request)
+    {
+        $validated = $request->validate([
+            'lead_id' => 'required|exists:leads,id',
+            'confidence' => 'required|string|max:255',
+            'expected_services' => 'required|integer',
+            'expected_months' => 'required|integer',
+            'expected_price' => 'required|string|max:255',
+            'expected_first_date' => 'required|string|max:255',
+        ]);
+
+        try {
+            $lead = Lead::findOrFail($validated['lead_id']);
+
+            // Store the forecasting details in leads table
+            $lead->confidence = $validated['confidence'];
+            $lead->expected_services = $validated['expected_services'];
+            $lead->expected_months = $validated['expected_months'];
+            $lead->expected_price = $validated['expected_price'];
+            $lead->expected_first_date = $validated['expected_first_date'];
+
+            $lead->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Sales Forecasting details saved successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while saving forecasting details.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function addTask(Request $request, $leadId)
     {
         $request->validate([

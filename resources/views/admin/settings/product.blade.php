@@ -13,7 +13,7 @@
                     @include('admin.settings.sidebar')
 
                     <!-- Main Content -->
-                    <div class="col-md-10 p-0">
+                    <div class="col-lg-9 col-md-9 p-0">
                         <div class="activity-type-content companies-section">
                             <div class="heading-area-sec p-0 pb-3">
                                 <div class="left-part-sec">

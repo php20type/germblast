@@ -20,6 +20,10 @@ class Lead extends Model
         'creator_id',
         'assignee_id',
         'close_date',
+        'expected_services',
+        'expected_months',
+        'expected_price',
+        'expected_first_date',
         'last_contacted',
         'last_modified',
         'market_id',
@@ -28,11 +32,12 @@ class Lead extends Model
     ];
 
     protected $morphClass = 'Lead';
-    protected $with = ['leadCompanies', 'leadProducts', 'leadPeople', 'leadSources', 'leadCompetitors', 'leadTags', 'leadFile','task'];
+
+    protected $with = ['leadCompanies', 'leadProducts', 'leadPeople', 'leadSources', 'leadCompetitors', 'leadTags', 'leadFile', 'task'];
+
     protected $casts = [
         'close_date' => 'datetime',
     ];
-
 
     public function activity(): MorphMany
     {
@@ -153,9 +158,8 @@ class Lead extends Model
         return $this->belongsTo(LeadStage::class, 'stage_id');
     }
 
-     public function leadFile()
+    public function leadFile()
     {
         return $this->hasMany(LeadFile::class, 'lead_id');
     }
-
 }
