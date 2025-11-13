@@ -280,29 +280,34 @@ class SaleController extends Controller
         // Handle AJAX requests
         if ($request->ajax()) {
             if ($request->input('section') === 'timeline') {
-                $timeline_html = view('admin.sales-timeline-partial', compact('timeline'))->render();
+                $timeline_html = view('admin.sales.sales-timeline-partial', compact('timeline'))->render();
 
                 return response()->json(['timeline_html' => $timeline_html]);
             }
 
             if ($request->input('section') === 'logged_activities') {
-                $activity_html = view('admin.sales-activity-partial', compact('allactivities'))->render();
+                $activity_html = view('admin.sales.sales-activity-partial', compact('allactivities'))->render();
 
                 return response()->json(['activity_html' => $activity_html]);
             }
 
             if ($request->ajax() && $request->input('section') === 'task') {
-                $task_html = view('admin.sales-task-partial', compact('pendingTasks', 'completedTasks'))->render();
+                $task_html = view('admin.sales.sales-task-partial', compact('pendingTasks', 'completedTasks'))->render();
 
                 return response()->json(['task_html' => $task_html]);
             }
 
         }
 
-        return view('admin.sales', array_merge(compact(
+        return view('admin.sales.index', array_merge(compact(
             'leads', 'peoples', 'users', 'activitytypes',
             'activities', 'logged_activities', 'allactivities',
             'notes', 'timeline', 'timelineEntries', 'alltasks', 'pendingTasks', 'completedTasks'
         ), $data));
+    }
+
+
+    public function schedule_meeting(){
+        return view('admin.sales.meetings');
     }
 }

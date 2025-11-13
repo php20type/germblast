@@ -6,7 +6,7 @@
     </div>
     <nav class="sidebar-nav">
         <ul class="list-inline">
-             <li class="{{ request()->routeIs('admin.sales.index') ? 'active' : '' }}">
+             <li class="{{ request()->routeIs('admin.sales.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.sales.index') }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon18.svg") }} alt="icon" />
@@ -78,18 +78,6 @@
                 </a>
             </li>
             <hr class="d-none">
-
-            <li class="d-none {{ request()->routeIs('admin.icimatrix.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.icimatrix.index') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon10.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        ICIMatrix
-                    </div>
-                </a>
-            </li>
-
             <hr>
              <li class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.settings.index') }}">

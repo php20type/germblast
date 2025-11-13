@@ -80,6 +80,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // sales section
     Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
+    Route::get('/schedule/meeting', [SaleController::class, 'schedule_meeting'])->name('sales.schedule.meeting');
 
     // Company Section
     Route::get('/company', [CompanyController::class, 'index'])->name('company.index');
