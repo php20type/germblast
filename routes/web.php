@@ -174,6 +174,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('leads/{lead}/tags/add', [LeadController::class, 'addTag'])->name('leads.tags.add');
     Route::post('leads/{lead}/tags/{tag}/remove', [LeadController::class, 'removeTag'])->name('leads.tags.remove');
     Route::post('/leads/{lead}/files/upload', [LeadController::class, 'fileUpload'])->name('leads.files.upload');
+    Route::get('/leads/{lead}/survey/proposal', [LeadController::class, 'survey_proposal'])->name('leads.survey.proposal');
+    Route::post('/leads/{lead}/survey/proposal/store', [LeadController::class, 'survey_proposal_store'])
+    ->name('leads.survey.proposal.store');
+    Route::get('/leads/{lead}/survey/facility', [LeadController::class, 'survey_facility'])->name('leads.survey.facility');
+    Route::get('/leads/{lead}/survey/equipment', [LeadController::class, 'survey_equipment'])->name('leads.survey.equipment');
     Route::post('/leads/files/delete', [LeadController::class, 'fileDelete'])->name('leads.files.delete');
 
     Route::post('leads/delete-field', [LeadController::class, 'deleteField'])->name('leads.delete-field');

@@ -186,25 +186,18 @@
                                     </div>
 
                                     {{-- Survey & Proposal --}}
-                                    <div class="task-section mt-2 d-none">
+                                    <div class="task-section mt-2">
                                         <div class="company-list mb-3 border rounded p-3">
                                             <div class="row align-items-start">
                                                 <div class="col-md-8">
                                                     <div class="company-name">
                                                         <p><strong>Survey & Proposal</strong></p>
-                                                        <p class="text-secondary">
-                                                            Completed On Aug 27, 2025 7:00 AM
-                                                            <span class="text-warning">
-                                                                By Jordan Barboza
-                                                            </span>
-                                                        </p>
                                                     </div>
                                                 </div>
-
                                                 <div class="col-md-4 d-flex justify-content-end">
                                                     <div class="d-flex gap-2">
-                                                        <a class="text-warning" href="javascript:void(0);"
-                                                            id="toggleAddProposal">Add Proposal</a>
+                                                        <a class="text-warning" href="{{ route('admin.leads.survey.proposal', $leads->id) }}"
+                                                            target="_blank" id="toggleAddProposal">Add Proposal</a>
                                                     </div>
                                                 </div>
                                             </div>

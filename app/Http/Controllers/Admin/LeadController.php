@@ -1836,6 +1836,27 @@ class LeadController extends Controller
         }
     }
 
+    public function survey_proposal($leadId)
+    {
+        $lead = Lead::findOrFail($leadId);
+
+        return view('admin.leads.survey-proposal', compact('lead'));
+    }
+
+    public function survey_facility($leadId)
+    {
+        $lead = Lead::findOrFail($leadId);
+
+        return view('admin.leads.survey-facility', compact('lead'));
+    }
+
+    public function survey_equipment($leadId)
+    {
+        $lead = Lead::findOrFail($leadId);
+
+        return view('admin.leads.survey-equipment', compact('lead'));
+    }
+
     public function addTask(Request $request, $leadId)
     {
         $request->validate([
