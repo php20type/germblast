@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\IcimatrixController;
+use App\Http\Controllers\SurveyProposalController;
 use App\Models\ActivityType;
 use App\Models\Company;
 use App\Models\CompanyType;
@@ -174,16 +175,22 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('leads/{lead}/tags/add', [LeadController::class, 'addTag'])->name('leads.tags.add');
     Route::post('leads/{lead}/tags/{tag}/remove', [LeadController::class, 'removeTag'])->name('leads.tags.remove');
     Route::post('/leads/{lead}/files/upload', [LeadController::class, 'fileUpload'])->name('leads.files.upload');
-    Route::get('/leads/{lead}/survey/proposal', [LeadController::class, 'survey_proposal'])->name('leads.survey.proposal');
-    Route::post('/leads/{lead}/survey/proposal/store', [LeadController::class, 'survey_proposal_store'])
-    ->name('leads.survey.proposal.store');
-    Route::get('/leads/{lead}/survey/facility', [LeadController::class, 'survey_facility'])->name('leads.survey.facility');
-    Route::get('/leads/{lead}/survey/equipment', [LeadController::class, 'survey_equipment'])->name('leads.survey.equipment');
     Route::post('/leads/files/delete', [LeadController::class, 'fileDelete'])->name('leads.files.delete');
 
     Route::post('leads/delete-field', [LeadController::class, 'deleteField'])->name('leads.delete-field');
     Route::post('leads/update-field', [LeadController::class, 'updateField'])->name('leads.update-field');
     Route::post('/leads/add-product', [LeadController::class, 'addProduct'])->name('leads.add-product');
+
+    // Lead - Survey Proposal Section
+       Route::get('/leads/{lead}/survey/proposal', [SurveyProposalController::class, 'survey_proposal'])->name('leads.survey.proposal');
+    Route::post('/leads/{lead}/survey/proposal/store', [SurveyProposalController::class, 'survey_proposal_store'])
+    ->name('leads.survey.proposal.store');
+    Route::get('/leads/{lead}/survey/facility', [SurveyProposalController::class, 'survey_facility'])->name('leads.survey.facility');
+    Route::post('/leads/{lead}/survey/facility/store', [SurveyProposalController::class, 'survey_facility_store'])
+    ->name('leads.survey.facility.store');
+    Route::get('/leads/{lead}/survey/equipment', [SurveyProposalController::class, 'survey_equipment'])->name('leads.survey.equipment');
+    Route::post('/leads/{lead}/survey/equipment/store', [SurveyProposalController::class, 'survey_equipment_store'])
+    ->name('leads.survey.equipment.store');
 
     // settings section
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');

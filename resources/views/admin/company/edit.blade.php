@@ -4045,7 +4045,7 @@
                             type: "POST",
                             data: {
                                 _token: "{{ csrf_token() }}",
-                                company_id: companyId, // ✅ pass company_id
+                                company_id: companyId, // pass company_id
                                 file_id: fileId
                             },
                             success: function(response) {

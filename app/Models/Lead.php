@@ -162,4 +162,29 @@ class Lead extends Model
     {
         return $this->hasMany(LeadFile::class, 'lead_id');
     }
+
+    public function surveyProposal()
+    {
+        return $this->hasMany(SurveyProposal::class, 'lead_id');
+    }
+
+    public function equipmentEvaluation()
+    {
+        return $this->hasMany(EquipmentEvaluation::class, 'lead_id');
+    }
+
+    public function surveyFacility()
+    {
+        return $this->hasMany(SurveyFacility::class, 'lead_id');
+    }
+
+    public function surveyFacilityMap()
+    {
+        return $this->hasMany(SurveyFacilityMap::class, 'lead_id');
+    }
+
+    public function surveyFacilityAtp()
+    {
+        return $this->hasMany(SurveyFacilityAtp::class, 'lead_id');
+    }
 }

@@ -121,4 +121,29 @@ class User extends Authenticatable
     {
         return $this->hasMany(Task::class, 'completed_user_id');
     }
+
+    public function surveyProposal()
+    {
+        return $this->hasMany(SurveyProposal::class, 'user_id');
+    }
+
+    public function equipmentEvaluation()
+    {
+        return $this->hasMany(EquipmentEvaluation::class, 'user_id');
+    }
+
+    public function surveyFacility()
+    {
+        return $this->hasMany(SurveyFacility::class, 'user_id');
+    }
+
+    public function surveyFacilityMap()
+    {
+        return $this->hasMany(SurveyFacilityMap::class, 'user_id');
+    }
+
+    public function surveyFacilityAtp()
+    {
+        return $this->hasMany(SurveyFacilityAtp::class, 'user_id');
+    }
 }
