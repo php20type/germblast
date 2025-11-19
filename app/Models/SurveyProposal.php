@@ -36,13 +36,13 @@ class SurveyProposal extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function equipmentEvaluations()
-    {
-        return $this->hasMany(EquipmentEvaluation::class, 'survey_proposal_id');
-    }
-
     public function facilities()
     {
         return $this->hasMany(SurveyFacility::class, 'survey_proposal_id');
+    }
+
+    public function equipmentEvaluations()
+    {
+        return $this->hasMany(EquipmentEvaluation::class, 'survey_proposal_id');
     }
 }

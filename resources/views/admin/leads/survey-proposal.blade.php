@@ -158,7 +158,7 @@
                                         <div class="section-header">
                                             <h3 class="section-title">Create Facility</h3>
                                             <div class="text-end">
-                                                <a href="{{ route('admin.leads.survey.facility', $lead->id) }}"
+                                                <a href="{{ route('admin.survey.proposal.facility', $surveyProposal->id) }}"
                                                     class="btn btn-success">
                                                     Add Facility
                                                 </a>
@@ -191,15 +191,31 @@
                                                 </thead>
 
                                                 <tbody>
-                                                    <!-- Example row: Totals (matches screenshot) -->
-                                                    <tr>
-                                                        <td>Totals</td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td>0</td>
-                                                        <td>0</td>
-                                                        <td>$0.00</td>
-                                                    </tr>
+
+                                                    @if ($facilities->isEmpty())
+                                                        <tr>
+                                                            <td colspan="6" class="text-center text-muted">No facilities
+                                                                added yet.</td>
+                                                        </tr>
+                                                    @else
+                                                        @foreach ($facilities as $facility)
+                                                            <tr>
+                                                                {{-- <td>{{ $facility->facility_name }}</td> --}}
+                                                                <td>
+                                                                    <a
+                                                                        href="{{ route('admin.survey.facility.edit', $facility->id) }}">
+                                                                        {{ $facility->facility_name }}
+                                                                    </a>
+                                                                </td>
+                                                                <td>{{ $facility->facility_type }}</td>
+                                                                <td>{{ $facility->address }}</td>
+                                                                <td>{{ $facility->square_footage }}</td>
+                                                                <td>{{ $facility->man_hours }}</td>
+                                                                <td>${{ number_format($facility->man_hours_cost, 2) }}</td>
+                                                            </tr>
+                                                        @endforeach
+                                                    @endif
+
                                                 </tbody>
                                             </table>
                                         </div>
@@ -217,7 +233,7 @@
                                         <div class="section-header">
                                             <h3 class="section-title">Create Equipment Evaluation</h3>
                                             <div class="text-end">
-                                                <a href="{{ route('admin.leads.survey.equipment', $lead->id) }}"
+                                                <a href="{{ route('admin.survey.proposal.equipment', $surveyProposal->id) }}"
                                                     class="btn btn-success">
                                                     Add Evaluation
                                                 </a>
@@ -248,12 +264,29 @@
                                                 </thead>
 
                                                 <tbody>
-                                                    <!-- Example row: Totals (matches screenshot) -->
-                                                    <tr>
-                                                        <td>Evaluation 1</td>
-                                                        <td>12</td>
-                                                        <td>$1200</td>
-                                                    </tr>
+                                                    @if ($equipments->isEmpty())
+                                                        <tr>
+                                                            <td colspan="3" class="text-center text-muted">
+                                                                No equipment evaluations added yet.
+                                                            </td>
+                                                        </tr>
+                                                    @else
+                                                        @foreach ($equipments as $evaluation)
+                                                            <tr>
+                                                                {{-- <td>{{ $evaluation->name ?? 'Evaluation' }}</td> --}}
+                                                                <td>
+                                                                    <a href="{{ route('admin.survey.equipment.edit', $evaluation->id) }}">
+                                                                        {{ $evaluation->name }}
+                                                                    </a>
+                                                                </td>
+
+                                                                <td>{{ $evaluation->cleaning_man_hours ?? 0 }}</td>
+                                                                <td>${{ number_format($evaluation->cleaning_man_hours_cost ?? 0, 2) }}
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    @endif
+
                                                 </tbody>
                                             </table>
                                         </div>

@@ -21,6 +21,7 @@ use App\Models\Market;
 use App\Models\Outcome;
 use App\Models\People;
 use App\Models\Product;
+use App\Models\SurveyProposal;
 use App\Models\Source;
 use App\Models\Tag;
 use App\Models\Task;
@@ -1001,6 +1002,11 @@ class LeadController extends Controller
             'close_date' => $request->close_date,
             'confidence' => $request->confidence,
             'creator_id' => auth()->id(),
+        ]);
+
+        SurveyProposal::create([
+            'user_id' => auth()->id(),
+            'lead_id' => $lead->id,
         ]);
 
         // Companies

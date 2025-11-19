@@ -2,24 +2,24 @@
 
 use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\CompanyController;
+use App\Http\Controllers\Admin\IcimatrixController;
 use App\Http\Controllers\Admin\LeadController;
 use App\Http\Controllers\Admin\NoteController;
-use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\Admin\PeopleController;
 use App\Http\Controllers\Admin\SaleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TaskController;
+use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\IcimatrixController;
 use App\Http\Controllers\SurveyProposalController;
 use App\Models\ActivityType;
 use App\Models\Company;
 use App\Models\CompanyType;
 use App\Models\Competitor;
 use App\Models\Industry;
+use App\Models\Lead;
 use App\Models\People;
 use App\Models\Product;
-use App\Models\Lead;
 use App\Models\Source;
 use App\Models\Tag;
 use App\Models\Territory;
@@ -52,7 +52,7 @@ Route::middleware(['auth'])->group(function () {
 
         $activity_types = ActivityType::all();
 
-        return view('admin.dashboard', compact('users', 'company_types', 'leads','industries', 'leadtags', 'companytags', 'persontags', 'activity_types', 'peoples', 'companies', 'sources', 'territories', 'products', 'competitors'));
+        return view('admin.dashboard', compact('users', 'company_types', 'leads', 'industries', 'leadtags', 'companytags', 'persontags', 'activity_types', 'peoples', 'companies', 'sources', 'territories', 'products', 'competitors'));
         // return view('admin.dashboard');
     })->name('admin.dashboard');
 
@@ -182,15 +182,36 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/leads/add-product', [LeadController::class, 'addProduct'])->name('leads.add-product');
 
     // Lead - Survey Proposal Section
-       Route::get('/leads/{lead}/survey/proposal', [SurveyProposalController::class, 'survey_proposal'])->name('leads.survey.proposal');
+    Route::get('/leads/{lead}/survey/proposal', [SurveyProposalController::class, 'survey_proposal'])->name('leads.survey.proposal');
     Route::post('/leads/{lead}/survey/proposal/store', [SurveyProposalController::class, 'survey_proposal_store'])
-    ->name('leads.survey.proposal.store');
-    Route::get('/leads/{lead}/survey/facility', [SurveyProposalController::class, 'survey_facility'])->name('leads.survey.facility');
-    Route::post('/leads/{lead}/survey/facility/store', [SurveyProposalController::class, 'survey_facility_store'])
-    ->name('leads.survey.facility.store');
-    Route::get('/leads/{lead}/survey/equipment', [SurveyProposalController::class, 'survey_equipment'])->name('leads.survey.equipment');
-    Route::post('/leads/{lead}/survey/equipment/store', [SurveyProposalController::class, 'survey_equipment_store'])
-    ->name('leads.survey.equipment.store');
+        ->name('leads.survey.proposal.store');
+
+    Route::get('/survey/proposal/{survey_proposal}/facility', [SurveyProposalController::class, 'survey_facility'])
+        ->name('survey.proposal.facility');
+    Route::post('/survey/proposal/{survey_proposal}/facility/store', [SurveyProposalController::class, 'survey_facility_store'])
+        ->name('survey.proposal.facility.store');
+    Route::get('/survey/proposal/facility/{facility}/edit', [SurveyProposalController::class, 'survey_facility_edit'])
+        ->name('survey.facility.edit');
+    Route::post('/survey/proposal/{facility}/facility/update', [SurveyProposalController::class, 'survey_facility_update'])
+        ->name('survey.proposal.facility.update');
+
+    // Route::get('/survey/proposal/{survey_proposal}/equipment', [SurveyProposalController::class, 'survey_equipment'])
+    //     ->name('survey.proposal.equipment');
+    // Route::post('/survey/proposal/{survey_proposal}/equipment/store', [SurveyProposalController::class, 'survey_equipment_store'])
+    //     ->name('survey.proposal.equipment.store');
+    // Route::get('/survey/proposal/equipment/{equipment}/edit', [SurveyProposalController::class, 'survey_equipment_edit'])
+    //     ->name('survey.equipment.edit');
+    // Route::post('/survey/proposal/{equipment}/equipment/update', [SurveyProposalController::class, 'survey_equipment_update'])
+    //     ->name('survey.proposal.equipment.update');
+
+    Route::get('/survey/proposal/{survey_proposal}/equipment', [SurveyProposalController::class, 'survey_equipment'])
+        ->name('survey.proposal.equipment');
+    Route::post('/survey/proposal/{survey_proposal}/equipment/store',[SurveyProposalController::class, 'survey_equipment_store'])
+        ->name('survey.proposal.equipment.store');
+    Route::get('/survey/proposal/equipment/{equipment}/edit',[SurveyProposalController::class, 'survey_equipment_edit'])
+        ->name('survey.equipment.edit');
+    Route::post('/survey/proposal/{equipment}/equipment/update',[SurveyProposalController::class, 'survey_equipment_update'])
+        ->name('survey.proposal.equipment.update');
 
     // settings section
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');

@@ -10,15 +10,17 @@
                 <!-- Main Content -->
                 <div class="col-md-12 p-0">
 
-                    <form action="#" method="POST" id="add-facility-form" enctype="multipart/form-data">
+                    <form action="{{ route('admin.survey.proposal.facility.update', $facility->id) }}" method="POST"
+                        id="update-facility-form" enctype="multipart/form-data">
+
                         @csrf
-                        <input type="hidden" name="survey_proposal_id" value="{{ $surveyProposal->id }}">
+                        <input type="hidden" name="facility_id" value="{{ $facility->id }}">
 
 
                         <div class="sales-dashboard">
                             <div class="dashboard-header section-card d-flex justify-content-between align-items-center">
                                 <div class="container-fluid px-0">
-                                    <h1 class="display-6 mb-2 fw-bold">Add Facility</h1>
+                                    <h1 class="display-6 mb-2 fw-bold">Edit Facility</h1>
                                     <p class="text-muted">Record survey results on this page</p>
                                 </div>
 
@@ -45,35 +47,40 @@
                                                 <tr>
                                                     <th>Facility Name</th>
                                                     <td>
-                                                        <input type="text" class="form-control" name="facility_name">
+                                                        <input type="text" class="form-control" name="facility_name"
+                                                            value="{{ $facility->facility_name ?? ' ' }}">
                                                     </td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>Address</th>
                                                     <td>
-                                                        <input type="text" class="form-control" name="address">
+                                                        <input type="text" class="form-control" name="address"
+                                                            value="{{ $facility->address ?? ' ' }}">
                                                     </td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>City</th>
                                                     <td>
-                                                        <input type="text" class="form-control" name="city">
+                                                        <input type="text" class="form-control" name="city"
+                                                            value="{{ $facility->city ?? ' ' }}">
                                                     </td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>State</th>
                                                     <td>
-                                                        <input type="text" class="form-control" name="state">
+                                                        <input type="text" class="form-control" name="state"
+                                                            value="{{ $facility->state ?? ' ' }}">
                                                     </td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>Zip</th>
                                                     <td>
-                                                        <input type="text" class="form-control" name="zip">
+                                                        <input type="text" class="form-control" name="zip"
+                                                            value="{{ $facility->zip ?? ' ' }}">
                                                     </td>
                                                 </tr>
 
@@ -81,22 +88,14 @@
                                                     <th>Facility Type</th>
                                                     <td>
                                                         <select name="facility_type" class="form-control">
-                                                            <option value="hospital">Hospital</option>
-                                                            <option value="clinic">Clinic</option>
-                                                            <option value="elementary school">Elementary School</option>
-                                                            <option value="middle school">Middle School</option>
-                                                            <option value="high school">High School</option>
-                                                            <option value="high school athletics">High School Athletics
+                                                            <option value="hospital"
+                                                                {{ $facility->facility_type == 'hospital' ? 'selected' : '' }}>
+                                                                Hospital
                                                             </option>
-                                                            <option value="middle school athletics">Middle School Athletics
+                                                            <option value="clinic"
+                                                                {{ $facility->facility_type == 'clinic' ? 'selected' : '' }}>
+                                                                Clinic
                                                             </option>
-                                                            <option value="buses">Buses</option>
-                                                            <option value="office">Office</option>
-                                                            <option value="office building">Office Building</option>
-                                                            <option value="church">Church</option>
-                                                            <option value="daycare">Daycare</option>
-                                                            <option value="hotel">Hotel</option>
-                                                            <option value="other">Other</option>
                                                         </select>
                                                     </td>
                                                 </tr>
@@ -133,7 +132,6 @@
                                                     <th>Upload Photo</th>
                                                     <td>
                                                         <input type="file" class="form-control" name="map_file" id="map_file">
-                                                        {{-- Preview Box --}}
                                                         <div id="map-preview" class="mt-2" style="display: none;">
                                                             <img src="" class="img-fluid rounded"
                                                                 style="width: 90px; height: 90px; object-fit: cover; border: 1px solid #ccc;">
@@ -155,8 +153,57 @@
                                             <h3 class="section-title">Facility Maps List</h3>
                                         </div>
 
-                                    </div>
+                                        <div class="row">
+                                            @forelse ($facilityMaps as $map)
+                                                <div class="col-md-3 mb-3">
+                                                    <div class="p-3 border rounded">
 
+                                                        <div class="preview row align-items-center">
+
+                                                            {{-- LEFT: Image --}}
+                                                            <div class="img-upload col-4 text-center">
+                                                                @if (in_array(strtolower(pathinfo($map->file_path, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif', 'webp']))
+                                                                    <img src="{{ asset('storage/' . $map->file_path) }}"
+                                                                        alt="{{ $map->file_name }}"
+                                                                        class="img-fluid rounded"
+                                                                        style="width: 70px; height: 70px; object-fit: cover;">
+                                                                @else
+                                                                    <i class="fa-regular fa-file fs-1 text-secondary"></i>
+                                                                @endif
+                                                            </div>
+
+                                                            {{-- MIDDLE: File Name + Size --}}
+                                                            <div class="text-upload col-6">
+                                                                <a href="{{ asset('storage/' . $map->file_path) }}"
+                                                                    download>
+                                                                    <p class="mb-1 fw-semibold">{{ $map->file_name }}</p>
+                                                                    <p class="text-muted mb-0 small">
+                                                                        {{ number_format(Storage::disk('public')->size($map->file_path) / 1024, 2) }}
+                                                                        KB
+                                                                    </p>
+                                                                </a>
+                                                            </div>
+
+                                                            {{-- RIGHT: Delete --}}
+                                                            <div class="col-2 text-end">
+                                                                <button type="button"
+                                                                    class="btn btn-sm btn-outline-danger delete-map-btn"
+                                                                    data-id="{{ $map->id }}" title="Delete file">
+                                                                    <i class="fa-solid fa-xmark"></i>
+                                                                </button>
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            @empty
+                                                <div class="col-md-12">
+                                                    <p class="text-muted">No facility maps uploaded yet.</p>
+                                                </div>
+                                            @endforelse
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -192,8 +239,7 @@
                                                     <th>Upload Photo</th>
                                                     <td>
                                                         <input type="file" class="form-control" name="atp_file" id="atp_file">
-                                                        {{-- Preview Box --}}
-                                                        <div id="atp-preview" class="mt-2" style="display: none;">
+                                                         <div id="atp-preview" class="mt-2" style="display: none;">
                                                             <img src="" class="img-fluid rounded"
                                                                 style="width: 90px; height: 90px; object-fit: cover; border: 1px solid #ccc;">
                                                         </div>
@@ -215,10 +261,68 @@
                                             <h3 class="section-title">Facility ATP List</h3>
                                         </div>
 
-                                    </div>
+                                        <div class="row">
+                                            @forelse ($facilityAtps as $atp)
+                                                <div class="col-md-3 mb-3">
+                                                    <div class="p-3 border rounded">
 
+                                                        <div class="preview row align-items-center">
+
+                                                            {{-- LEFT: Image Preview --}}
+                                                            <div class="img-upload col-4 text-center">
+                                                                @if (in_array(strtolower(pathinfo($atp->file_path, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif', 'webp']))
+                                                                    <img src="{{ asset('storage/' . $atp->file_path) }}"
+                                                                        alt="{{ $atp->file_name }}"
+                                                                        class="img-fluid rounded"
+                                                                        style="width: 70px; height: 70px; object-fit: cover;">
+                                                                @else
+                                                                    <i class="fa-regular fa-file fs-1 text-secondary"></i>
+                                                                @endif
+                                                            </div>
+
+                                                            {{-- MIDDLE: File Info + ATP Details --}}
+                                                            <div class="text-upload col-6">
+                                                                <a href="{{ asset('storage/' . $atp->file_path) }}"
+                                                                    download>
+                                                                    <p class="mb-1 fw-semibold">{{ $atp->file_name }}</p>
+                                                                    <p class="text-muted mb-0 small">
+                                                                        {{ number_format(Storage::disk('public')->size($atp->file_path) / 1024, 2) }}
+                                                                        KB
+                                                                    </p>
+                                                                </a>
+
+                                                                {{-- ATP extra info --}}
+                                                                <p class="mb-1 small"><strong>Location:</strong>
+                                                                    {{ $atp->location }}</p>
+                                                                <p class="mb-0 small"><strong>Value:</strong>
+                                                                    {{ $atp->atp_value }}</p>
+                                                            </div>
+
+                                                            {{-- RIGHT: Delete Button --}}
+                                                            <div class="col-2 text-end">
+                                                                <button type="button"
+                                                                    class="btn btn-sm btn-outline-danger delete-atp-btn"
+                                                                    data-id="{{ $atp->id }}" title="Delete file">
+                                                                    <i class="fa-solid fa-xmark"></i>
+                                                                </button>
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            @empty
+                                                <div class="col-md-12">
+                                                    <p class="text-muted">No ATP samples uploaded yet.</p>
+                                                </div>
+                                            @endforelse
+                                        </div>
+
+
+                                    </div>
                                 </div>
                             </div>
+
 
 
                             {{-- Survey Details --}}
@@ -244,35 +348,42 @@
 
                                                 <tr>
                                                     <th>Square Footage</th>
-                                                    <td><input type="number" class="form-control" name="square_footage">
+                                                    <td><input type="number" class="form-control" name="square_footage"
+                                                            value="{{ $facility->square_footage ?? '' }}">
                                                     </td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>Offices</th>
-                                                    <td><input type="number" class="form-control" name="offices"></td>
+                                                    <td><input type="number" class="form-control" name="offices"
+                                                            value="{{ $facility->offices ?? '' }}"></td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>Community Bathrooms</th>
                                                     <td><input type="number" class="form-control"
-                                                            name="standard_bathrooms"></td>
+                                                            name="standard_bathrooms"
+                                                            value="{{ $facility->standard_bathrooms ?? '' }}"></td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>Single Bathrooms</th>
                                                     <td><input type="number" class="form-control"
-                                                            name="single_bathrooms"></td>
+                                                            name="single_bathrooms"
+                                                            value="{{ $facility->single_bathrooms ?? '' }}"></td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>Total Man Hours</th>
-                                                    <td><input type="number" class="form-control" name="man_hours"></td>
+                                                    <td><input type="number" class="form-control" name="man_hours"
+                                                            value="{{ $facility->man_hours ?? '' }}"></td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>Total Man Hours Cost</th>
-                                                    <td><span id="man_hours_cost">$0.00</span></td>
+                                                    <td><span
+                                                            id="man_hours_cost">${{ $facility->man_hours_cost ?? '' }}</span>
+                                                    </td>
                                                 </tr>
 
                                             </tbody>
@@ -297,7 +408,7 @@
         // ---------------------------
         // JQUERY VALIDATION
         // ---------------------------
-        $("#add-facility-form").validate({
+        $("#update-facility-form").validate({
             ignore: [],
             rules: {
                 // Facility Info
@@ -319,27 +430,6 @@
                 facility_type: {
                     required: true
                 },
-
-                // Facility Maps
-                map_name: {
-                    required: true
-                },
-                map_file: {
-                    required: true
-                },
-
-                // ATP Sampling
-                atp_location: {
-                    required: true
-                },
-                atp_value: {
-                    required: true,
-                    number: true
-                },
-                atp_file: {
-                    required: true
-                },
-
                 // Survey Details
                 square_footage: {
                     required: true,
@@ -382,25 +472,6 @@
                 facility_type: {
                     required: "Select a facility type."
                 },
-
-                map_name: {
-                    required: "Enter map name."
-                },
-                map_file: {
-                    required: "Please upload a map image."
-                },
-
-                atp_location: {
-                    required: "ATP location is required."
-                },
-                atp_value: {
-                    required: "ATP value is required.",
-                    number: "Enter a valid number."
-                },
-                atp_file: {
-                    required: "Please upload ATP photo."
-                },
-
                 square_footage: {
                     required: "Square footage required.",
                     number: "Must be numeric."
@@ -447,10 +518,10 @@
         // ---------------------------
         // AJAX SUBMIT (with Swal)
         // ---------------------------
-        $('#add-facility-form').submit(function(e) {
+        $('#update-facility-form').submit(function(e) {
             e.preventDefault();
 
-            if (!$('#add-facility-form').valid()) {
+            if (!$('#update-facility-form').valid()) {
                 return;
             }
 
@@ -458,7 +529,7 @@
             let formData = new FormData(this);
 
             $.ajax({
-                url: "{{ route('admin.survey.proposal.facility.store', $surveyProposal->id) }}",
+                url: "{{ route('admin.survey.proposal.facility.update', $facility->id) }}",
                 method: "POST",
                 data: formData,
                 processData: false,
@@ -468,7 +539,7 @@
                     Swal.fire({
                         icon: "success",
                         title: "Facility Saved!",
-                        text: res.message || "Facility added successfully!",
+                        text: res.message || "Facility updated successfully!",
                         showConfirmButton: false,
                         timer: 2000
                     });
@@ -487,7 +558,6 @@
                 }
             });
         });
-
 
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -518,7 +588,6 @@
             // Attach previews
             setupPreview('atp_file', 'atp-preview');
             setupPreview('map_file', 'map-preview');
-
         });
     </script>
 @endpush

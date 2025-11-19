@@ -1662,7 +1662,7 @@
                                         </button>
                                     </form>
 
-                                    <div id="uploadedFilesList" class="mt-3"></div>
+                                    {{-- <div id="uploadedFilesList" class="mt-3"></div> --}}
                                 </div>
 
                             </div>

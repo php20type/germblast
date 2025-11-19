@@ -11,20 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('survey_facility_maps', function (Blueprint $table) {
+        Schema::create('survey_equipment_images', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->unsignedBigInteger('lead_id')->nullable();
-            $table->unsignedBigInteger('survey_facility_id')->nullable();
-            $table->string('map_name')->nullable();
+            $table->unsignedBigInteger('survey_equipment_id')->nullable();
+            $table->text('description')->nullable();
             $table->string('file_name')->nullable();
             $table->string('file_path')->nullable();
             $table->string('file_type')->nullable();
             $table->timestamps();
 
             $table->index('user_id');
-            // $table->index('lead_id');
-            $table->index('survey_facility_id');
+            $table->index('survey_equipment_id');
         });
     }
 
@@ -33,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('survey_facility_maps');
+        Schema::dropIfExists('survey_equipment_images');
     }
 };

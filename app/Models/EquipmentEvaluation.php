@@ -10,8 +10,8 @@ class EquipmentEvaluation extends Model
 
     protected $fillable = [
         'user_id',
-        'lead_id',
         'survey_proposal_id',
+        'name',
 
         'non_electric_gurney',
         'wheelchair',
@@ -86,8 +86,9 @@ class EquipmentEvaluation extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function lead()
+    public function images()
     {
-        return $this->belongsTo(Lead::class, 'lead_id');
+        return $this->hasMany(SurveyEquipmentImage::class, 'survey_equipment_id');
     }
+
 }

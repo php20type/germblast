@@ -8,7 +8,6 @@ class SurveyFacility extends Model
 {
     protected $fillable = [
         'user_id',
-        'lead_id',
         'survey_proposal_id',
 
         'facility_name',
@@ -46,11 +45,6 @@ class SurveyFacility extends Model
       public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function lead()
-    {
-        return $this->belongsTo(Lead::class, 'lead_id');
     }
 
     public function maps()

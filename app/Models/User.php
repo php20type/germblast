@@ -146,4 +146,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(SurveyFacilityAtp::class, 'user_id');
     }
+
+    public function surveyEquipmentImage()
+    {
+        return $this->hasMany(SurveyEquipmentImage::class, 'user_id');
+    }
 }

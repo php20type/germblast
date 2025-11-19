@@ -10,7 +10,6 @@ class SurveyFacilityAtp extends Model
 
     protected $fillable = [
         'user_id',
-        'lead_id',
         'survey_facility_id',
         'location',
         'atp_value',
@@ -19,7 +18,7 @@ class SurveyFacilityAtp extends Model
         'file_type',
     ];
 
-      public function facility()
+      public function surveyFacility()
     {
         return $this->belongsTo(SurveyFacility::class, 'survey_facility_id');
     }
@@ -29,9 +28,5 @@ class SurveyFacilityAtp extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-     public function lead()
-    {
-        return $this->belongsTo(Lead::class, 'lead_id');
-    }
 
 }

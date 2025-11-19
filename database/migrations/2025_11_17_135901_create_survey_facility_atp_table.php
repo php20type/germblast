@@ -29,7 +29,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index('user_id');
-            $table->index('lead_id');
+            // $table->index('lead_id');
             $table->index('survey_facility_id');
         });
     }
