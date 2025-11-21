@@ -1,0 +1,320 @@
+[
+    {
+        "id": 1,
+        "name": "Anesthesia Cart",
+        "input_name": "anesthesia_cart",
+        "type": "cleaning"
+    },
+    {
+        "id": 2,
+        "name": "OR Table",
+        "input_name": "or_table",
+        "type": "cleaning"
+    },
+    {
+        "id": 3,
+        "name": "Stainless Steel Cart",
+        "input_name": "stainless_steel_cart",
+        "type": "cleaning"
+    },
+    {
+        "id": 4,
+        "name": "Stainless Steel Table",
+        "input_name": "stainless_steel_table",
+        "type": "cleaning"
+    },
+    {
+        "id": 5,
+        "name": "Electrosurgical Device",
+        "input_name": "electrosurgical_device",
+        "type": "cleaning"
+    },
+    {
+        "id": 6,
+        "name": "Wall Mounted ECG/EKG Monitor",
+        "input_name": "wall_mounted_monitor",
+        "type": "cleaning"
+    },
+    {
+        "id": 7,
+        "name": "Vital Signs Monitor",
+        "input_name": "vital_signs_monitor",
+        "type": "cleaning"
+    },
+    {
+        "id": 8,
+        "name": "Vital Signs Monitor w/ECG",
+        "input_name": "vital_signs_monitor_ecg",
+        "type": "cleaning"
+    },
+    {
+        "id": 9,
+        "name": "DVT/SCD Device",
+        "input_name": "dvt_scd_device",
+        "type": "cleaning"
+    },
+    {
+        "id": 10,
+        "name": "CPM (Continuous Passive Motion)",
+        "input_name": "cpm",
+        "type": "cleaning"
+    },
+    {
+        "id": 11,
+        "name": "Infusion Pump",
+        "input_name": "infusion_pump",
+        "type": "cleaning"
+    },
+    {
+        "id": 12,
+        "name": "BiPap",
+        "input_name": "bipap",
+        "type": "cleaning"
+    },
+    {
+        "id": 13,
+        "name": "CPAP",
+        "input_name": "cpap",
+        "type": "cleaning"
+    },
+    {
+        "id": 14,
+        "name": "Pulse Oximeter",
+        "input_name": "pulse_oximeter",
+        "type": "cleaning"
+    },
+    {
+        "id": 15,
+        "name": "Hospital Bed",
+        "input_name": "hospital_bed",
+        "type": "cleaning"
+    },
+    {
+        "id": 16,
+        "name": "Electric Gurney",
+        "input_name": "electric_gurney",
+        "type": "cleaning"
+    },
+    {
+        "id": 17,
+        "name": "Manual Gurney",
+        "input_name": "manual_gurney",
+        "type": "cleaning"
+    },
+    {
+        "id": 18,
+        "name": "PCA (Patient Controlled Anesthesia)",
+        "input_name": "pca",
+        "type": "cleaning"
+    },
+    {
+        "id": 19,
+        "name": "COW/WOW (Computer on Wheels)",
+        "input_name": "cow",
+        "type": "cleaning"
+    },
+    {
+        "id": 20,
+        "name": "Patient Air Warmer",
+        "input_name": "patient_air_warmer",
+        "type": "cleaning"
+    },
+    {
+        "id": 21,
+        "name": "Enteral Feeding Pump",
+        "input_name": "enteral_feeding_pump",
+        "type": "cleaning"
+    },
+    {
+        "id": 22,
+        "name": "Geri Chair",
+        "input_name": "geri_chair",
+        "type": "cleaning"
+    },
+    {
+        "id": 23,
+        "name": "Electric Scale",
+        "input_name": "electric_scale",
+        "type": "cleaning"
+    },
+    {
+        "id": 24,
+        "name": "Defibrillator",
+        "input_name": "defibrillator",
+        "type": "cleaning"
+    },
+    {
+        "id": 25,
+        "name": "Med Cart",
+        "input_name": "med_cart",
+        "type": "cleaning"
+    },
+    {
+        "id": 26,
+        "name": "Crash Cart",
+        "input_name": "crash_cart",
+        "type": "cleaning"
+    },
+    {
+        "id": 27,
+        "name": "Bassinet",
+        "input_name": "bassinet",
+        "type": "cleaning"
+    },
+    {
+        "id": 28,
+        "name": "Infant Incubator",
+        "input_name": "infant_incubator",
+        "type": "cleaning"
+    },
+    {
+        "id": 29,
+        "name": "Infant Warmer",
+        "input_name": "infant_warmer",
+        "type": "cleaning"
+    },
+    {
+        "id": 30,
+        "name": "Ultrasound",
+        "input_name": "ultrasound",
+        "type": "cleaning"
+    },
+    {
+        "id": 31,
+        "name": "Overbed Table",
+        "input_name": "overbed_table",
+        "type": "cleaning"
+    },
+    {
+        "id": 32,
+        "name": "Portable Suction Pump",
+        "input_name": "portable_suction_pump",
+        "type": "cleaning"
+    },
+    {
+        "id": 33,
+        "name": "Stainless Steel Linen Cart",
+        "input_name": "stainless_steel_linen_cart",
+        "type": "cleaning"
+    },
+    {
+        "id": 34,
+        "name": "Stainless Steel Basin",
+        "input_name": "stainless_steel_basin",
+        "type": "cleaning"
+    },
+    {
+        "id": 35,
+        "name": "Radiology Vest",
+        "input_name": "radiology_vest",
+        "type": "cleaning"
+    },
+    {
+        "id": 36,
+        "name": "Wall Mounted Computer",
+        "input_name": "wall_mounted_computer",
+        "type": "cleaning"
+    },
+    {
+        "id": 37,
+        "name": "Telemedicine Device",
+        "input_name": "telemedicine_device",
+        "type": "cleaning"
+    },
+    {
+        "id": 38,
+        "name": "Blower & Mattress",
+        "input_name": "blower_mattress",
+        "type": "cleaning"
+    },
+    {
+        "id": 39,
+        "name": "Rolling Transfer Boards",
+        "input_name": "rolling_transfer_boards",
+        "type": "cleaning"
+    },
+    {
+        "id": 40,
+        "name": "Glucometer",
+        "input_name": "glucometer",
+        "type": "cleaning"
+    },
+    {
+        "id": 41,
+        "name": "Telemetry Monitor",
+        "input_name": "telemetry_monitor",
+        "type": "cleaning"
+    },
+    {
+        "id": 42,
+        "name": "Telemetry Pack",
+        "input_name": "telemetry_pack",
+        "type": "cleaning"
+    },
+    {
+        "id": 43,
+        "name": "Patient Lift",
+        "input_name": "patient_lift",
+        "type": "cleaning"
+    },
+    {
+        "id": 44,
+        "name": "Heat Lamp",
+        "input_name": "heat_lamp",
+        "type": "cleaning"
+    },
+    {
+        "id": 45,
+        "name": "Treadmill",
+        "input_name": "treadmill",
+        "type": "cleaning"
+    },
+    {
+        "id": 46,
+        "name": "Recumbant Bike",
+        "input_name": "recumbant_bike",
+        "type": "cleaning"
+    },
+    {
+        "id": 47,
+        "name": "Misc. Carts/Baskets",
+        "input_name": "misc_carts_baskets",
+        "type": "cleaning"
+    },
+    {
+        "id": 48,
+        "name": "Non Electric Gurney",
+        "input_name": "non_electric_gurney",
+        "type": "washing"
+    },
+    {
+        "id": 49,
+        "name": "Wheelchair",
+        "input_name": "wheelchair",
+        "type": "washing"
+    },
+    {
+        "id": 50,
+        "name": "Transport Chair",
+        "input_name": "transport_chair",
+        "type": "washing"
+    },
+    {
+        "id": 51,
+        "name": "IV Pole",
+        "input_name": "iv_pole",
+        "type": "washing"
+    },
+    {
+        "id": 52,
+        "name": "Food Cart",
+        "input_name": "food_cart",
+        "type": "washing"
+    },
+    {
+        "id": 53,
+        "name": "Miscellaneous Pieces to Wash",
+        "input_name": "miscellaneous_pieces",
+        "type": "washing"
+    }
+]

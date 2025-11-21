@@ -181,70 +181,29 @@
                                                     <th>Count</th>
                                                 </tr>
 
-                                                <tr>
-                                                    <th>Non electric Gurney</th>
-                                                    <td>
-                                                        <input type="text" class="form-control"
-                                                            name="non_electric_gurney"
-                                                            value="{{ $equipment->non_electric_gurney ?? '0' }}">
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Wheelchair</th>
-                                                    <td>
-                                                        <input type="text" class="form-control" name="wheelchair"
-                                                            value="{{ $equipment->wheelchair ?? '0' }}">
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Transport Chair</th>
-                                                    <td>
-                                                        <input type="text" class="form-control" name="transport_chair"
-                                                            value="{{ $equipment->transport_chair ?? '0' }}">
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>IV Pole</th>
-                                                    <td>
-                                                        <input type="text" class="form-control" name="iv_pole"
-                                                            value="{{ $equipment->iv_pole ?? '0' }}">
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Food Cart</th>
-                                                    <td>
-                                                        <input type="text" class="form-control" name="food_cart"
-                                                            value="{{ $equipment->food_cart ?? '0' }}">
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Miscellaneous Pieces to Wash</th>
-                                                    <td>
-                                                        <input type="text" class="form-control"
-                                                            name="miscellaneous_pieces"
-                                                            value="{{ $equipment->miscellaneous_pieces ?? '0' }}">
-                                                    </td>
-                                                </tr>
+                                                @foreach ($washingTypes as $type)
+                                                    <tr>
+                                                        <th>{{ $type->name }}</th>
+                                                        <td>
+                                                            <input type="number" class="form-control"
+                                                                name="{{ $type->input_name }}"
+                                                                value="{{ $equipment->{$type->input_name} ?? 0 }}">
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
 
                                                 <tr>
                                                     <th>Total Man Hours</th>
-                                                    <td>
-                                                        <input type="text" class="form-control" name="wash_man_hours"
-                                                            value="{{ $equipment->wash_man_hours ?? '0' }}">
+                                                    <td><span
+                                                            id="wash_man_hours">{{ $equipment->wash_man_hours ?? 0 }}</span>
                                                     </td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>Total Man Hours Cost</th>
                                                     <td>
-                                                        <input type="text" class="form-control"
-                                                            name="wash_man_hours_cost"
-                                                            value="{{ $equipment->wash_man_hours_cost ?? '0' }}">
+                                                        <span
+                                                            id="wash_man_hours_cost">${{ number_format($equipment->wash_man_hours_cost ?? 0, 2) }}</span>
                                                     </td>
                                                 </tr>
 
@@ -273,318 +232,28 @@
                                                     <th>Count</th>
                                                 </tr>
 
-                                                <tr>
-                                                    <th>Anesthesia Cart</th>
-                                                    <td><input type="text" class="form-control" name="anesthesia_cart"
-                                                            value="{{ $equipment->anesthesia_cart ?? '0' }}"></td>
-                                                </tr>
+                                                @foreach ($cleaningTypes as $type)
+                                                    <tr>
+                                                        <th>{{ $type->name }}</th>
+                                                        <td><input type="number" class="form-control"
+                                                                name="{{ $type->input_name }}"
+                                                                value="{{ $equipment->{$type->input_name} ?? 0 }}">
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
 
                                                 <tr>
-                                                    <th>OR Table</th>
-                                                    <td><input type="text" class="form-control" name="or_table"
-                                                            value="{{ $equipment->or_table ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Stainless Steel Cart</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="stainless_steel_cart"
-                                                            value="{{ $equipment->stainless_steel_cart ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Stainless Steel Table</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="stainless_steel_table"
-                                                            value="{{ $equipment->stainless_steel_table ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Electrosurgical Device</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="electrosurgical_device"
-                                                            value="{{ $equipment->electrosurgical_device ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Wall Mounted ECG/EKG Monitor</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="wall_mounted_monitor"
-                                                            value="{{ $equipment->wall_mounted_monitor ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Vital Signs Monitor</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="vital_signs_monitor"
-                                                            value="{{ $equipment->vital_signs_monitor ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Vital Signs Monitor w/ECG</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="vital_signs_monitor_ecg"
-                                                            value="{{ $equipment->vital_signs_monitor_ecg ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>DVT/SCD Device</th>
-                                                    <td><input type="text" class="form-control" name="dvt_scd_device"
-                                                            value="{{ $equipment->dvt_scd_device ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>CPM (Continuous Passive Motion)</th>
-                                                    <td><input type="text" class="form-control" name="cpm"
-                                                            value="{{ $equipment->cpm ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Infusion Pump</th>
-                                                    <td><input type="text" class="form-control" name="infusion_pump"
-                                                            value="{{ $equipment->infusion_pump ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>BiPap</th>
-                                                    <td><input type="text" class="form-control" name="bipap"
-                                                            value="{{ $equipment->bipap ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>CPAP</th>
-                                                    <td><input type="text" class="form-control" name="cpap"
-                                                            value="{{ $equipment->cpap ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Pulse Oximeter</th>
-                                                    <td><input type="text" class="form-control" name="pulse_oximeter"
-                                                            value="{{ $equipment->pulse_oximeter ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Hospital Bed</th>
-                                                    <td><input type="text" class="form-control" name="hospital_bed"
-                                                            value="{{ $equipment->hospital_bed ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Electric Gurney</th>
-                                                    <td><input type="text" class="form-control" name="electric_gurney"
-                                                            value="{{ $equipment->electric_gurney ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Manual Gurney</th>
-                                                    <td><input type="text" class="form-control" name="manual_gurney"
-                                                            value="{{ $equipment->manual_gurney ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>PCA (Patient Controlled Anesthesia)</th>
-                                                    <td><input type="text" class="form-control" name="pca"
-                                                            value="{{ $equipment->pca ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>COW/WOW (Computer on Wheels)</th>
-                                                    <td><input type="text" class="form-control" name="cow"
-                                                            value="{{ $equipment->cow ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Patient Air Warmer</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="patient_air_warmer"
-                                                            value="{{ $equipment->patient_air_warmer ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Enteral Feeding Pump</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="enteral_feeding_pump"
-                                                            value="{{ $equipment->enteral_feeding_pump ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Geri Chair</th>
-                                                    <td><input type="text" class="form-control" name="geri_chair"
-                                                            value="{{ $equipment->geri_chair ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Electric Scale</th>
-                                                    <td><input type="text" class="form-control" name="electric_scale"
-                                                            value="{{ $equipment->electric_scale ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Defibrillator</th>
-                                                    <td><input type="text" class="form-control" name="defibrillator"
-                                                            value="{{ $equipment->defibrillator ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Med Cart</th>
-                                                    <td><input type="text" class="form-control" name="med_cart"
-                                                            value="{{ $equipment->med_cart ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Crash Cart</th>
-                                                    <td><input type="text" class="form-control" name="crash_cart"
-                                                            value="{{ $equipment->crash_cart ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Bassinet</th>
-                                                    <td><input type="text" class="form-control" name="bassinet"
-                                                            value="{{ $equipment->bassinet ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Infant Incubator</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="infant_incubator"
-                                                            value="{{ $equipment->infant_incubator ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Infant Warmer</th>
-                                                    <td><input type="text" class="form-control" name="infant_warmer"
-                                                            value="{{ $equipment->infant_warmer ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Ultrasound</th>
-                                                    <td><input type="text" class="form-control" name="ultrasound"
-                                                            value="{{ $equipment->ultrasound ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Overbed Table</th>
-                                                    <td><input type="text" class="form-control" name="overbed_table"
-                                                            value="{{ $equipment->overbed_table ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Portable Suction Pump</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="portable_suction_pump"
-                                                            value="{{ $equipment->portable_suction_pump ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Stainless Steel Linen Cart</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="stainless_steel_linen_cart"
-                                                            value="{{ $equipment->stainless_steel_linen_cart ?? '0' }}">
+                                                    <th>Total Man Hours</th>
+                                                    <td><span
+                                                            id="cleaning_man_hours">{{ $equipment->cleaning_man_hours ?? 0 }}</span>
                                                     </td>
                                                 </tr>
 
                                                 <tr>
-                                                    <th>Stainless Steel Basin</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="stainless_steel_basin"
-                                                            value="{{ $equipment->stainless_steel_basin ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Radiology Vest</th>
-                                                    <td><input type="text" class="form-control" name="radiology_vest"
-                                                            value="{{ $equipment->radiology_vest ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Wall Mounted Computer</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="wall_mounted_computer"
-                                                            value="{{ $equipment->wall_mounted_computer ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Telemedicine Device</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="telemedicine_device"
-                                                            value="{{ $equipment->telemedicine_device ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Blower & Mattress</th>
-                                                    <td><input type="text" class="form-control" name="blower_mattress"
-                                                            value="{{ $equipment->blower_mattress ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Rolling Transfer Boards</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="rolling_transfer_boards"
-                                                            value="{{ $equipment->rolling_transfer_boards ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Glucometer</th>
-                                                    <td><input type="text" class="form-control" name="glucometer"
-                                                            value="{{ $equipment->glucometer ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Telemetry Monitor</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="telemetry_monitor"
-                                                            value="{{ $equipment->telemetry_monitor ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Telemetry Pack</th>
-                                                    <td><input type="text" class="form-control" name="telemetry_pack"
-                                                            value="{{ $equipment->telemetry_pack ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Patient Lift</th>
-                                                    <td><input type="text" class="form-control" name="patient_lift"
-                                                            value="{{ $equipment->patient_lift ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Heat Lamp</th>
-                                                    <td><input type="text" class="form-control" name="heat_lamp"
-                                                            value="{{ $equipment->heat_lamp ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Treadmill</th>
-                                                    <td><input type="text" class="form-control" name="treadmill"
-                                                            value="{{ $equipment->treadmill ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Recumbant Bike</th>
-                                                    <td><input type="text" class="form-control" name="recumbant_bike"
-                                                            value="{{ $equipment->recumbant_bike ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Misc. Carts/Baskets</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="misc_carts_baskets"
-                                                            value="{{ $equipment->misc_carts_baskets ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Total Man Hours</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="cleaning_man_hours"
-                                                            value="{{ $equipment->cleaning_man_hours ?? '0' }}"></td>
-                                                </tr>
-
-                                                <tr>
                                                     <th>Total Man Hours Cost</th>
-                                                    <td><input type="text" class="form-control"
-                                                            name="cleaning_man_hours_cost"
-                                                            value="{{ $equipment->cleaning_man_hours_cost ?? '0' }}"></td>
+                                                    <td><span
+                                                            id="cleaning_man_hours_cost">${{ number_format($equipment->cleaning_man_hours_cost ?? 0, 2) }}</span>
+                                                    </td>
                                                 </tr>
 
                                             </tbody>
@@ -613,243 +282,28 @@
     <script>
         $(document).ready(function() {
 
+            // BUILD DYNAMIC VALIDATION RULES
+            let dynamicRules = {
+                name: {
+                    required: true
+                }
+            };
+
+            // Add rules for ALL equipment fields dynamically
+            @foreach ($equipmentTypes as $type)
+                dynamicRules["{{ $type->input_name }}"] = {
+                    required: true,
+                    number: true
+                };
+            @endforeach
+
+            // INITIALIZE VALIDATOR
             $("#update-equipment-form").validate({
                 ignore: [],
-                rules: {
-                    name: {
-                        required: true,
-                    },
-                    non_electric_gurney: {
-                        required: true,
-                        number: true
-                    },
-                    wheelchair: {
-                        required: true,
-                        number: true
-                    },
-                    transport_chair: {
-                        required: true,
-                        number: true
-                    },
-                    iv_pole: {
-                        required: true,
-                        number: true
-                    },
-                    food_cart: {
-                        required: true,
-                        number: true
-                    },
-                    miscellaneous_pieces: {
-                        required: true,
-                        number: true
-                    },
-                    wash_man_hours: {
-                        required: true,
-                        number: true
-                    },
-                    wash_man_hours_cost: {
-                        required: true,
-                        number: true
-                    },
-                    anesthesia_cart: {
-                        required: true,
-                        number: true
-                    },
-                    or_table: {
-                        required: true,
-                        number: true
-                    },
-                    stainless_steel_cart: {
-                        required: true,
-                        number: true
-                    },
-                    stainless_steel_table: {
-                        required: true,
-                        number: true
-                    },
-                    electrosurgical_device: {
-                        required: true,
-                        number: true
-                    },
-                    wall_mounted_monitor: {
-                        required: true,
-                        number: true
-                    },
-                    vital_signs_monitor: {
-                        required: true,
-                        number: true
-                    },
-                    vital_signs_monitor_ecg: {
-                        required: true,
-                        number: true
-                    },
-                    dvt_scd_device: {
-                        required: true,
-                        number: true
-                    },
-                    cpm: {
-                        required: true,
-                        number: true
-                    },
-                    infusion_pump: {
-                        required: true,
-                        number: true
-                    },
-                    bipap: {
-                        required: true,
-                        number: true
-                    },
-                    cpap: {
-                        required: true,
-                        number: true
-                    },
-                    pulse_oximeter: {
-                        required: true,
-                        number: true
-                    },
-                    hospital_bed: {
-                        required: true,
-                        number: true
-                    },
-                    electric_gurney: {
-                        required: true,
-                        number: true
-                    },
-                    manual_gurney: {
-                        required: true,
-                        number: true
-                    },
-                    pca: {
-                        required: true,
-                        number: true
-                    },
-                    cow: {
-                        required: true,
-                        number: true
-                    },
-                    patient_air_warmer: {
-                        required: true,
-                        number: true
-                    },
-                    enteral_feeding_pump: {
-                        required: true,
-                        number: true
-                    },
-                    geri_chair: {
-                        required: true,
-                        number: true
-                    },
-                    electric_scale: {
-                        required: true,
-                        number: true
-                    },
-                    defibrillator: {
-                        required: true,
-                        number: true
-                    },
-                    med_cart: {
-                        required: true,
-                        number: true
-                    },
-                    crash_cart: {
-                        required: true,
-                        number: true
-                    },
-                    bassinet: {
-                        required: true,
-                        number: true
-                    },
-                    infant_incubator: {
-                        required: true,
-                        number: true
-                    },
-                    infant_warmer: {
-                        required: true,
-                        number: true
-                    },
-                    ultrasound: {
-                        required: true,
-                        number: true
-                    },
-                    overbed_table: {
-                        required: true,
-                        number: true
-                    },
-                    portable_suction_pump: {
-                        required: true,
-                        number: true
-                    },
-                    stainless_steel_linen_cart: {
-                        required: true,
-                        number: true
-                    },
-                    stainless_steel_basin: {
-                        required: true,
-                        number: true
-                    },
-                    radiology_vest: {
-                        required: true,
-                        number: true
-                    },
-                    wall_mounted_computer: {
-                        required: true,
-                        number: true
-                    },
-                    telemedicine_device: {
-                        required: true,
-                        number: true
-                    },
-                    blower_mattress: {
-                        required: true,
-                        number: true
-                    },
-                    rolling_transfer_boards: {
-                        required: true,
-                        number: true
-                    },
-                    glucometer: {
-                        required: true,
-                        number: true
-                    },
-                    telemetry_monitor: {
-                        required: true,
-                        number: true
-                    },
-                    telemetry_pack: {
-                        required: true,
-                        number: true
-                    },
-                    patient_lift: {
-                        required: true,
-                        number: true
-                    },
-                    heat_lamp: {
-                        required: true,
-                        number: true
-                    },
-                    treadmill: {
-                        required: true,
-                        number: true
-                    },
-                    recumbant_bike: {
-                        required: true,
-                        number: true
-                    },
-                    misc_carts_baskets: {
-                        required: true,
-                        number: true
-                    },
-                    cleaning_man_hours: {
-                        required: true,
-                        number: true
-                    },
-                    cleaning_man_hours_cost: {
-                        required: true,
-                        number: true
-                    }
-                },
+                rules: dynamicRules,
                 errorElement: 'span',
                 errorClass: 'invalid-feedback d-block',
+
                 highlight: function(element) {
                     $(element).addClass('is-invalid');
                 },
@@ -858,16 +312,20 @@
                 },
                 errorPlacement: function(error, element) {
                     if (element.parent('.input-group').length) {
-                        error.insertAfter(element.parent()); // Inserts after the .input-group
+                        error.insertAfter(element.parent());
                     } else {
-                        error.insertAfter(element); // Default
+                        error.insertAfter(element);
                     }
                 }
             });
 
-
+            // AJAX SUBMIT
             $('#update-equipment-form').submit(function(e) {
-                e.preventDefault(); // stop normal submit
+                e.preventDefault();
+
+                if (!$('#update-equipment-form').valid()) {
+                    return;
+                }
 
                 let formData = new FormData(this);
 
@@ -890,6 +348,7 @@
 
                         setTimeout(() => location.reload(), 2000);
                     },
+
                     error: function(xhr) {
                         console.log(xhr.responseText);
                         toastr.error('Something went wrong while updating the evaluation.');
@@ -897,9 +356,8 @@
                 });
             });
 
-
-
         });
+
 
         document.addEventListener("DOMContentLoaded", function() {
 

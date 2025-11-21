@@ -1,0 +1,67 @@
+[
+    {
+        "id": 1,
+        "name": "Square Footage",
+        "input_name": "square_footage"
+    },
+    {
+        "id": 2,
+        "name": "Offices",
+        "input_name": "offices"
+    },
+    {
+        "id": 3,
+        "name": "Community Bathrooms",
+        "input_name": "standard_bathrooms"
+    },
+    {
+        "id": 4,
+        "name": "Single Bathrooms",
+        "input_name": "single_bathrooms"
+    },
+    {
+        "id": 5,
+        "name": "Football Locker Room",
+        "input_name": "football_lockerroom"
+    },
+    {
+        "id": 6,
+        "name": "Regular Locker Rooms",
+        "input_name": "regular_lockerrooms"
+    },
+    {
+        "id": 7,
+        "name": "Weight Room",
+        "input_name": "weight_room"
+    },
+    {
+        "id": 8,
+        "name": "Training Room",
+        "input_name": "training_room"
+    },
+    {
+        "id": 9,
+        "name": "Equipment Room",
+        "input_name": "equipment_room"
+    },
+    {
+        "id": 10,
+        "name": "Coach's Office",
+        "input_name": "coachs_office"
+    },
+    {
+        "id": 11,
+        "name": "Shoulder Pads",
+        "input_name": "shoulder_pads"
+    },
+    {
+        "id": 12,
+        "name": "Helmets",
+        "input_name": "helmets"
+    },
+    {
+        "id": 13,
+        "name": "Wrestling Mats",
+        "input_name": "wrestling_mats"
+    }
+]

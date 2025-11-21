@@ -159,7 +159,7 @@
                                             <h3 class="section-title">Create Facility</h3>
                                             <div class="text-end">
                                                 <a href="{{ route('admin.survey.proposal.facility', $surveyProposal->id) }}"
-                                                    class="btn btn-success">
+                                                    class="btn btn-success"target="_blank">
                                                     Add Facility
                                                 </a>
                                             </div>
@@ -202,12 +202,12 @@
                                                             <tr>
                                                                 {{-- <td>{{ $facility->facility_name }}</td> --}}
                                                                 <td>
-                                                                    <a
-                                                                        href="{{ route('admin.survey.facility.edit', $facility->id) }}">
+                                                                    <a href="{{ route('admin.survey.facility.edit', $facility->id) }}"
+                                                                        target="_blank">
                                                                         {{ $facility->facility_name }}
                                                                     </a>
                                                                 </td>
-                                                                <td>{{ $facility->facility_type }}</td>
+                                                                <td>{{ ucfirst($facility->facility_type) }}</td>
                                                                 <td>{{ $facility->address }}</td>
                                                                 <td>{{ $facility->square_footage }}</td>
                                                                 <td>{{ $facility->man_hours }}</td>
@@ -215,6 +215,13 @@
                                                             </tr>
                                                         @endforeach
                                                     @endif
+
+                                                    <tr>
+                                                        <th colspan="3" class="text-start">Total</th>
+                                                        <th>{{ $totalSquareFootage }}</th>
+                                                        <th>{{ number_format($totalFacilityManHours, 2) }}</th>
+                                                        <th>${{ number_format($totalFacilityCost, 2) }}</th>
+                                                    </tr>
 
                                                 </tbody>
                                             </table>
@@ -234,7 +241,7 @@
                                             <h3 class="section-title">Create Equipment Evaluation</h3>
                                             <div class="text-end">
                                                 <a href="{{ route('admin.survey.proposal.equipment', $surveyProposal->id) }}"
-                                                    class="btn btn-success">
+                                                    class="btn btn-success" target="_blank">
                                                     Add Evaluation
                                                 </a>
                                             </div>
@@ -258,15 +265,17 @@
                                                 <thead class="bg-light">
                                                     <tr>
                                                         <th>Name</th>
-                                                        <th>Man Hours</th>
-                                                        <th>Cost</th>
+                                                        <th>Man Hours (Washing)</th>
+                                                        <th>Cost (Washing)</th>
+                                                        <th>Man Hours (Cleaning)</th>
+                                                        <th>Cost (Cleaning)</th>
                                                     </tr>
                                                 </thead>
 
                                                 <tbody>
                                                     @if ($equipments->isEmpty())
                                                         <tr>
-                                                            <td colspan="3" class="text-center text-muted">
+                                                            <td colspan="5" class="text-center text-muted">
                                                                 No equipment evaluations added yet.
                                                             </td>
                                                         </tr>
@@ -275,9 +284,14 @@
                                                             <tr>
                                                                 {{-- <td>{{ $evaluation->name ?? 'Evaluation' }}</td> --}}
                                                                 <td>
-                                                                    <a href="{{ route('admin.survey.equipment.edit', $evaluation->id) }}">
+                                                                    <a href="{{ route('admin.survey.equipment.edit', $evaluation->id) }}"
+                                                                        target="_blank">
                                                                         {{ $evaluation->name }}
                                                                     </a>
+                                                                </td>
+
+                                                                <td>{{ $evaluation->wash_man_hours ?? 0 }}</td>
+                                                                <td>${{ number_format($evaluation->wash_man_hours_cost ?? 0, 2) }}
                                                                 </td>
 
                                                                 <td>{{ $evaluation->cleaning_man_hours ?? 0 }}</td>
@@ -286,6 +300,16 @@
                                                             </tr>
                                                         @endforeach
                                                     @endif
+
+                                                    <tr>
+                                                        <th class="text-start">Total</th>
+
+                                                        <th>{{ number_format($totalWashHours, 2) }}</th>
+                                                        <th>${{ number_format($totalWashCost, 2) }}</th>
+
+                                                        <th>{{ number_format($totalCleanHours, 2) }}</th>
+                                                        <th>${{ number_format($totalCleanCost, 2) }}</th>
+                                                    </tr>
 
                                                 </tbody>
                                             </table>
@@ -296,6 +320,141 @@
                                 </div>
                             </div>
 
+
+                            {{-- Pricing Summary --}}
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="section-card">
+
+                                        <div class="section-header mb-3">
+                                            <h3 class="section-title">Pricing Summary</h3>
+                                            </p>
+                                        </div>
+
+                                        <table class="table table-bordered align-middle">
+
+                                            {{-- MAIN TOTAL --}}
+                                            <tr class="table-light">
+                                                <th colspan="2" class="fw-bold">Total Labor Cost for All Areas Included
+                                                    in Pricing</th>
+                                            </tr>
+
+                                            <tr>
+                                                <th style="width:35%">Estimated Pricing Total</th>
+                                                <td><input type="text" class="form-control" name="pricing_total"></td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Partial Cost of Service</th>
+                                                <td><input type="text" class="form-control"
+                                                        name="partial_cost_service"></td>
+                                            </tr>
+
+                                            {{-- INCLUDED COSTS --}}
+                                            <tr class="table-light">
+                                                <th colspan="2" class="fw-bold">Estimated Costs Already Included in
+                                                    Pricing Model</th>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Awareness</th>
+                                                <td><input type="text" class="form-control" name="awareness"></td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Education</th>
+                                                <td><input type="text" class="form-control" name="education"></td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Technology</th>
+                                                <td><input type="text" class="form-control" name="technology"></td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Response</th>
+                                                <td><input type="text" class="form-control" name="response"></td>
+                                            </tr>
+
+                                            {{-- NOT INCLUDED --}}
+                                            <tr class="table-light">
+                                                <th colspan="2" class="fw-bold">Estimated Cost Not Included in Pricing
+                                                    Model</th>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Logistics Expense</th>
+                                                <td><input type="text" class="form-control" name="logistics_expense">
+                                                </td>
+                                            </tr>
+
+                                            {{-- PROPOSAL SETTINGS --}}
+                                            <tr class="table-light">
+                                                <th colspan="2" class="fw-bold">Proposal Settings</th>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Proposal Name</th>
+                                                <td><input type="text" class="form-control" name="proposal_name"></td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Proposal Order</th>
+                                                <td><input type="number" class="form-control" name="proposal_order">
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Override Pricing</th>
+                                                <td><input type="text" class="form-control" name="override_pricing">
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Discounts (%)</th>
+                                                <td><input type="text" class="form-control" name="discounts"></td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Description</th>
+                                                <td>
+                                                    <textarea class="form-control" name="descriptions" rows="2"></textarea>
+                                                </td>
+                                            </tr>
+
+                                            {{-- CONTRACT DETAILS --}}
+                                            <tr class="table-light">
+                                                <th colspan="2" class="fw-bold">Contract Details</th>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Services per Year</th>
+                                                <td><input type="number" class="form-control" name="services_per_year">
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Contract Terms (Years)</th>
+                                                <td><input type="number" class="form-control" name="contract_terms">
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Prepayment Discount</th>
+                                                <td>
+                                                    <select name="prepayment_discount" class="form-control">
+                                                        <option value="">Select Option</option>
+                                                        <option value="yes">Yes</option>
+                                                        <option value="no">No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
 
                             {{-- Supplemental Offer --}}
                             <div class="row">

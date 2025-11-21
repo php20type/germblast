@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\EquipmentEvaluation;
+use App\Models\EquipmentType;
+use App\Models\FacilityRoomType;
 use App\Models\Lead;
 use App\Models\SurveyEquipmentImage;
 use App\Models\SurveyFacility;
@@ -22,11 +24,28 @@ class SurveyProposalController extends Controller
         $facilities = SurveyFacility::where('survey_proposal_id', $surveyProposal->id)->get();
         $equipments = EquipmentEvaluation::where('survey_proposal_id', $surveyProposal->id)->get();
 
+        $totalSquareFootage = $facilities->sum('square_footage');
+        $totalFacilityManHours = $facilities->sum('man_hours');
+        $totalFacilityCost = $facilities->sum('man_hours_cost');
+
+         $totalWashHours = $equipments->sum('wash_man_hours');
+    $totalWashCost  = $equipments->sum('wash_man_hours_cost');
+
+    $totalCleanHours = $equipments->sum('cleaning_man_hours');
+    $totalCleanCost  = $equipments->sum('cleaning_man_hours_cost');
+
         return view('admin.leads.survey-proposal', compact(
             'lead',
             'surveyProposal',
             'facilities',
-            'equipments'
+            'equipments',
+            'totalFacilityManHours',
+            'totalFacilityCost',
+            'totalSquareFootage',
+            'totalWashHours',
+            'totalWashCost',
+            'totalCleanHours',
+            'totalCleanCost'
         ));
     }
 
@@ -86,16 +105,18 @@ class SurveyProposalController extends Controller
 
         // Load existing facilities for this proposal
         $facilities = SurveyFacility::where('survey_proposal_id', $surveyProposalId)->get();
+        $facilityRoomTypes = FacilityRoomType::all();
 
         return view('admin.leads.survey-facility', compact(
             'surveyProposal',
-            'facilities'
+            'facilities',
+            'facilityRoomTypes'
         ));
     }
 
     public function survey_facility_store(Request $request, $surveyProposalId)
     {
-        // Validate inputs
+        // Validate only fixed fields (dynamic fields are validated in jQuery).
         $request->validate([
             'facility_name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
@@ -103,12 +124,6 @@ class SurveyProposalController extends Controller
             'state' => 'required|string|max:255',
             'zip' => 'required|string|max:20',
             'facility_type' => 'required|string',
-
-            'square_footage' => 'required|numeric|min:0',
-            'offices' => 'required|numeric|min:0',
-            'standard_bathrooms' => 'required|numeric|min:0',
-            'single_bathrooms' => 'required|numeric|min:0',
-            'man_hours' => 'required|numeric|min:0',
 
             'map_name' => 'required|string|max:255',
             'map_file' => 'required|file|max:10240',
@@ -119,11 +134,13 @@ class SurveyProposalController extends Controller
         ]);
 
         try {
-            // Get survey proposal
+
             $surveyProposal = SurveyProposal::findOrFail($surveyProposalId);
 
-            // 1. Save Facility
-            $facility = SurveyFacility::create([
+            // -----------------------------------------
+            // BUILD FACILITY DATA (fixed + dynamic)
+            // -----------------------------------------
+            $facilityData = [
                 'user_id' => auth()->id(),
                 'survey_proposal_id' => $surveyProposal->id,
 
@@ -133,24 +150,59 @@ class SurveyProposalController extends Controller
                 'state' => $request->state,
                 'zip' => $request->zip,
                 'facility_type' => $request->facility_type,
+            ];
 
-                'square_footage' => $request->square_footage,
-                'offices' => $request->offices,
-                'standard_bathrooms' => $request->standard_bathrooms,
-                'single_bathrooms' => $request->single_bathrooms,
+            // -----------------------------------------
+            // ADD ALL DYNAMIC FIELDS FROM facility_room_types TABLE
+            // -----------------------------------------
+            $totalCount = 0;
 
-                'man_hours' => $request->man_hours,
-                'man_hours_cost' => $request->man_hours * 15,
-            ]);
+            foreach (FacilityRoomType::all() as $type) {
+                $value = intval($request->{$type->input_name} ?? 0);
 
-            // 2. Save Map File
+                // Add field to data array
+                $facilityData[$type->input_name] = $value;
+
+                // Count for Man-Hours (all fields included)
+                $totalCount += $value;
+            }
+
+            // -----------------------------------------
+            // MAN-HOURS CALCULATION
+            // -----------------------------------------
+            // $manHours = $totalCount > 0 ? $totalCount * 0.5 : 0;
+            $manHours = 0;
+
+            foreach (FacilityRoomType::all() as $type) {
+
+                $value = intval($request->{$type->input_name} ?? 0);
+
+                // Save field dynamically
+                $facilityData[$type->input_name] = $value;
+
+                // Calculate man hours using DB value
+                $manHours += $value * floatval($type->hours_required);
+            }
+            $manHoursCost = $manHours * 28.75;
+
+            $facilityData['man_hours'] = $manHours;
+            $facilityData['man_hours_cost'] = $manHoursCost;
+
+            // -----------------------------------------
+            // CREATE FACILITY RECORD
+            // -----------------------------------------
+            $facility = SurveyFacility::create($facilityData);
+
+            // -----------------------------------------
+            // SAVE MAP FILE
+            // -----------------------------------------
             if ($request->hasFile('map_file')) {
 
                 $file = $request->file('map_file');
                 $original = $file->getClientOriginalName();
-                $cleanName = Str::slug(pathinfo($original, PATHINFO_FILENAME));
+                $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
                 $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10).'_'.$cleanName.'.'.$ext;
+                $filename = Str::random(10).'_'.$clean.'.'.$ext;
 
                 $path = $file->storeAs('facility/maps', $filename, 'public');
 
@@ -164,14 +216,16 @@ class SurveyProposalController extends Controller
                 ]);
             }
 
-            // 3. Save ATP File
+            // -----------------------------------------
+            // SAVE ATP FILE
+            // -----------------------------------------
             if ($request->hasFile('atp_file')) {
 
                 $file = $request->file('atp_file');
                 $original = $file->getClientOriginalName();
-                $cleanName = Str::slug(pathinfo($original, PATHINFO_FILENAME));
+                $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
                 $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10).'_'.$cleanName.'.'.$ext;
+                $filename = Str::random(10).'_'.$clean.'.'.$ext;
 
                 $path = $file->storeAs('facility/atp', $filename, 'public');
 
@@ -194,7 +248,7 @@ class SurveyProposalController extends Controller
 
         } catch (\Throwable $e) {
 
-            Log::error("SurveyFacility upload failed for survey_proposal={$surveyProposalId}: ".$e->getMessage());
+            Log::error("SurveyFacility upload failed (proposal={$surveyProposalId}): ".$e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -207,16 +261,22 @@ class SurveyProposalController extends Controller
     {
         $facility = SurveyFacility::findOrFail($facilityId);
         $surveyProposalId = $facility->survey_proposal_id;
-
+        $facilityRoomTypes = FacilityRoomType::all();
         $facilityMaps = SurveyFacilityMap::where('survey_facility_id', $facility->id)->get();
         $facilityAtps = SurveyFacilityAtp::where('survey_facility_id', $facility->id)->get();
 
-        return view('admin.leads.facility-edit', compact('facility', 'surveyProposalId', 'facilityMaps', 'facilityAtps'));
+        return view('admin.leads.facility-edit', compact(
+            'facility',
+            'surveyProposalId',
+            'facilityRoomTypes',
+            'facilityMaps',
+            'facilityAtps'
+        ));
     }
 
     public function survey_facility_update(Request $request, $facilityId)
     {
-        // Validate inputs (NO file required on update)
+        // Validate only fixed fields
         $request->validate([
             'facility_name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
@@ -224,12 +284,6 @@ class SurveyProposalController extends Controller
             'state' => 'required|string|max:255',
             'zip' => 'required|string|max:20',
             'facility_type' => 'required|string',
-
-            'square_footage' => 'required|numeric|min:0',
-            'offices' => 'required|numeric|min:0',
-            'standard_bathrooms' => 'required|numeric|min:0',
-            'single_bathrooms' => 'required|numeric|min:0',
-            'man_hours' => 'required|numeric|min:0',
 
             'map_name' => 'nullable|string|max:255',
             'map_file' => 'nullable|file|max:10240',
@@ -241,36 +295,71 @@ class SurveyProposalController extends Controller
 
         try {
 
-            // Find facility
             $facility = SurveyFacility::findOrFail($facilityId);
 
-            // UPDATE facility details
-            $facility->update([
+            // -----------------------------------------
+            // BUILD FACILITY DATA (fixed + dynamic)
+            // -----------------------------------------
+            $facilityData = [
                 'facility_name' => $request->facility_name,
                 'address' => $request->address,
                 'city' => $request->city,
                 'state' => $request->state,
                 'zip' => $request->zip,
                 'facility_type' => $request->facility_type,
+            ];
 
-                'square_footage' => $request->square_footage,
-                'offices' => $request->offices,
-                'standard_bathrooms' => $request->standard_bathrooms,
-                'single_bathrooms' => $request->single_bathrooms,
+            // -----------------------------------------
+            // DYNAMIC FIELDS FROM facility_room_types TABLE
+            // -----------------------------------------
+            $totalCount = 0;
 
-                'man_hours' => $request->man_hours,
-                'man_hours_cost' => $request->man_hours * 15,
-            ]);
+            foreach (FacilityRoomType::all() as $type) {
 
-            // UPDATE or CREATE MAP file if provided
+                $value = intval($request->{$type->input_name} ?? 0);
+
+                // Add dynamic fields to update array
+                $facilityData[$type->input_name] = $value;
+
+                $totalCount += $value;
+            }
+
+            // -----------------------------------------
+            // MAN-HOURS CALCULATION
+            // -----------------------------------------
+            // $manHours = $totalCount > 0 ? $totalCount * 0.5 : 0;
+            $manHours = 0;
+
+            foreach (FacilityRoomType::all() as $type) {
+
+                $value = intval($request->{$type->input_name} ?? 0);
+
+                // Save field dynamically
+                $facilityData[$type->input_name] = $value;
+
+                // Calculate man hours using DB value
+                $manHours += $value * floatval($type->hours_required);
+            }
+            $manHoursCost = $manHours * 28.75;
+
+            $facilityData['man_hours'] = $manHours;
+            $facilityData['man_hours_cost'] = $manHoursCost;
+
+            // -----------------------------------------
+            // UPDATE FACILITY RECORD
+            // -----------------------------------------
+            $facility->update($facilityData);
+
+            // -----------------------------------------
+            // UPDATE MAP FILE
+            // -----------------------------------------
             if ($request->hasFile('map_file')) {
 
                 $file = $request->file('map_file');
                 $original = $file->getClientOriginalName();
-                $ext = $file->getClientOriginalExtension();
                 $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
+                $ext = $file->getClientOriginalExtension();
                 $filename = Str::random(10).'_'.$clean.'.'.$ext;
-
                 $path = $file->storeAs('facility/maps', $filename, 'public');
 
                 SurveyFacilityMap::create([
@@ -283,22 +372,23 @@ class SurveyProposalController extends Controller
                 ]);
             }
 
-            // UPDATE or CREATE ATP file if provided
+            // -----------------------------------------
+            // UPDATE ATP FILE
+            // -----------------------------------------
             if ($request->hasFile('atp_file')) {
 
                 $file = $request->file('atp_file');
                 $original = $file->getClientOriginalName();
-                $ext = $file->getClientOriginalExtension();
                 $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
+                $ext = $file->getClientOriginalExtension();
                 $filename = Str::random(10).'_'.$clean.'.'.$ext;
-
                 $path = $file->storeAs('facility/atp', $filename, 'public');
 
                 SurveyFacilityAtp::create([
                     'user_id' => auth()->id(),
                     'survey_facility_id' => $facility->id,
                     'location' => $request->atp_location,
-                    'value' => $request->atp_value,
+                    'atp_value' => $request->atp_value,
                     'file_name' => $original,
                     'file_path' => $path,
                     'file_type' => $ext,
@@ -313,7 +403,7 @@ class SurveyProposalController extends Controller
 
         } catch (\Throwable $e) {
 
-            Log::error("Facility update failed for facility={$facilityId}: ".$e->getMessage());
+            Log::error("Facility update failed (facility={$facilityId}): ".$e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -326,56 +416,124 @@ class SurveyProposalController extends Controller
     {
         $surveyProposal = SurveyProposal::findOrFail($surveyProposalId);
         $equipments = EquipmentEvaluation::where('survey_proposal_id', $surveyProposalId)->get();
+        $washingTypes = EquipmentType::where('type', 'washing')->get();
+        $cleaningTypes = EquipmentType::where('type', 'cleaning')->get();
+        $equipmentTypes = EquipmentType::all();
 
         // Return the equipment page with proposal & equipment list
         return view('admin.leads.survey-equipment', compact(
             'surveyProposal',
-            'equipments'
+            'equipments',
+            'equipmentTypes',
+            'washingTypes',
+            'cleaningTypes'
         ));
     }
 
     public function survey_equipment_edit($equipmentId)
     {
-        // Get Equipment Evaluation
         $equipment = EquipmentEvaluation::findOrFail($equipmentId);
         $surveyProposalId = $equipment->survey_proposal_id;
         $equipmentImages = SurveyEquipmentImage::where('survey_equipment_id', $equipment->id)->get();
+        $washingTypes = EquipmentType::where('type', 'washing')->get();
+        $cleaningTypes = EquipmentType::where('type', 'cleaning')->get();
+        $equipmentTypes = EquipmentType::all(); // optional, but useful if needed
 
         return view('admin.leads.equipment-edit', compact(
             'equipment',
             'surveyProposalId',
-            'equipmentImages'
+            'equipmentImages',
+            'washingTypes',
+            'cleaningTypes',
+            'equipmentTypes'
         ));
     }
 
     public function survey_equipment_store(Request $request, $surveyProposalId)
     {
-        // Minimal validation
+        // Validate fixed fields only
         $request->validate([
+            'name' => 'required|string|max:255',
             'utility_file' => 'required|file|max:10240',
             'description' => 'nullable|string|max:500',
         ]);
 
         try {
-            // Get survey proposal
+
             $surveyProposal = SurveyProposal::findOrFail($surveyProposalId);
 
-            // Save Equipment Evaluation
-            $equipment = EquipmentEvaluation::create([
-                'name'=> $request->name,
+            // ------------------------------------------
+            // BASE EQUIPMENT RECORD
+            // ------------------------------------------
+            $equipmentData = [
                 'user_id' => auth()->id(),
                 'survey_proposal_id' => $surveyProposal->id,
-            ] + $request->except(['utility_file', 'description']));
-            // Add all numeric fields except the file + description
+                'name' => $request->name,
+            ];
 
-            // Save Equipment Image
+            // ------------------------------------------
+            // FETCH ALL EQUIPMENT TYPES
+            // ------------------------------------------
+            $washingTypes = EquipmentType::where('type', 'washing')->get();
+            $cleaningTypes = EquipmentType::where('type', 'cleaning')->get();
+
+            $washHours = 0;
+            $cleanHours = 0;
+
+            // ------------------------------------------
+            // PROCESS WASHING FIELDS
+            // ------------------------------------------
+            foreach ($washingTypes as $type) {
+
+                $count = intval($request->{$type->input_name} ?? 0);
+
+                // Store dynamic value
+                $equipmentData[$type->input_name] = $count;
+
+                // Man-hours = count × hours_required
+                $washHours += $count * floatval($type->hours_required);
+            }
+
+            // ------------------------------------------
+            // PROCESS CLEANING FIELDS
+            // ------------------------------------------
+            foreach ($cleaningTypes as $type) {
+
+                $count = intval($request->{$type->input_name} ?? 0);
+
+                // Store dynamic value
+                $equipmentData[$type->input_name] = $count;
+
+                // Man-hours = count × hours_required
+                $cleanHours += $count * floatval($type->hours_required);
+            }
+
+            // ------------------------------------------
+            // COST CALCULATION
+            // ------------------------------------------
+            $washCost = $washHours * 28.75;
+            $cleanCost = $cleanHours * 28.75;
+
+            $equipmentData['wash_man_hours'] = $washHours;
+            $equipmentData['wash_man_hours_cost'] = $washCost;
+            $equipmentData['cleaning_man_hours'] = $cleanHours;
+            $equipmentData['cleaning_man_hours_cost'] = $cleanCost;
+
+            // ------------------------------------------
+            // CREATE EQUIPMENT RECORD
+            // ------------------------------------------
+            $equipment = EquipmentEvaluation::create($equipmentData);
+
+            // ------------------------------------------
+            // SAVE IMAGE
+            // ------------------------------------------
             if ($request->hasFile('utility_file')) {
 
                 $file = $request->file('utility_file');
                 $original = $file->getClientOriginalName();
-                $cleanName = Str::slug(pathinfo($original, PATHINFO_FILENAME));
+                $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
                 $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10).'_'.$cleanName.'.'.$ext;
+                $filename = Str::random(10).'_'.$clean.'.'.$ext;
 
                 $path = $file->storeAs('equipment/images', $filename, 'public');
 
@@ -397,7 +555,7 @@ class SurveyProposalController extends Controller
 
         } catch (\Throwable $e) {
 
-            Log::error("EquipmentEvaluation upload failed for survey_proposal={$surveyProposalId}: ".$e->getMessage());
+            Log::error("EquipmentEvaluation store failed (proposal={$surveyProposalId}): ".$e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -407,59 +565,113 @@ class SurveyProposalController extends Controller
     }
 
     public function survey_equipment_update(Request $request, $equipmentId)
-{
-    // Minimal validation (same as store)
-    $request->validate([
-        'utility_file' => 'nullable|file|max:10240', // optional in update
-        'description' => 'nullable|string|max:500',
-    ]);
-
-    try {
-        // Fetch equipment record
-        $equipment = EquipmentEvaluation::findOrFail($equipmentId);
-
-        // Update Equipment (all numeric fields & name)
-        $equipment->update([
-            'name' => $request->name,
-        ] + $request->except(['utility_file', 'description']));  // exclude file & description
-
-        // -----------------------------
-        //  ✅ Handle NEW image upload
-        // -----------------------------
-        if ($request->hasFile('utility_file')) {
-
-            $file = $request->file('utility_file');
-            $original = $file->getClientOriginalName();
-            $cleanName = Str::slug(pathinfo($original, PATHINFO_FILENAME));
-            $ext = $file->getClientOriginalExtension();
-            $filename = Str::random(10).'_'.$cleanName.'.'.$ext;
-
-            $path = $file->storeAs('equipment/images', $filename, 'public');
-
-            SurveyEquipmentImage::create([
-                'user_id' => auth()->id(),
-                'survey_equipment_id' => $equipment->id,
-                'description' => $request->description,
-                'file_name' => $original,
-                'file_path' => $path,
-                'file_type' => $ext,
-            ]);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Equipment evaluation updated successfully!',
+    {
+        // Validate only fixed fields
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'utility_file' => 'nullable|file|max:10240',
+            'description' => 'nullable|string|max:500',
         ]);
 
-    } catch (\Throwable $e) {
+        try {
 
-        Log::error("EquipmentEvaluation update failed for equipment={$equipmentId}: ".$e->getMessage());
+            $equipment = EquipmentEvaluation::findOrFail($equipmentId);
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Equipment update failed. Please try again later.',
-        ], 500);
+            // ------------------------------------------
+            // BASE UPDATE DATA (fixed fields)
+            // ------------------------------------------
+            $equipmentData = [
+                'name' => $request->name,
+            ];
+
+            // ------------------------------------------
+            // FETCH ALL EQUIPMENT TYPES
+            // ------------------------------------------
+            $washingTypes = EquipmentType::where('type', 'washing')->get();
+            $cleaningTypes = EquipmentType::where('type', 'cleaning')->get();
+
+            $washHours = 0;
+            $cleanHours = 0;
+
+            // ------------------------------------------
+            // UPDATE WASHING FIELDS
+            // ------------------------------------------
+            foreach ($washingTypes as $type) {
+
+                $count = intval($request->{$type->input_name} ?? 0);
+
+                // Store dynamic value
+                $equipmentData[$type->input_name] = $count;
+
+                // Man-hours = count × hours_required
+                $washHours += $count * floatval($type->hours_required);
+            }
+
+            // ------------------------------------------
+            // UPDATE CLEANING FIELDS
+            // ------------------------------------------
+            foreach ($cleaningTypes as $type) {
+
+                $count = intval($request->{$type->input_name} ?? 0);
+
+                $equipmentData[$type->input_name] = $count;
+
+                // Man-hours = count × hours_required
+                $cleanHours += $count * floatval($type->hours_required);
+            }
+
+            // ------------------------------------------
+            // COST CALCULATION
+            // ------------------------------------------
+            $washCost = $washHours * 28.75;
+            $cleanCost = $cleanHours * 28.75;
+
+            $equipmentData['wash_man_hours'] = $washHours;
+            $equipmentData['wash_man_hours_cost'] = $washCost;
+            $equipmentData['cleaning_man_hours'] = $cleanHours;
+            $equipmentData['cleaning_man_hours_cost'] = $cleanCost;
+
+            // ------------------------------------------
+            // UPDATE EQUIPMENT RECORD
+            // ------------------------------------------
+            $equipment->update($equipmentData);
+
+            // ------------------------------------------
+            // SAVE NEW IMAGE (optional)
+            // ------------------------------------------
+            if ($request->hasFile('utility_file')) {
+
+                $file = $request->file('utility_file');
+                $original = $file->getClientOriginalName();
+                $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
+                $ext = $file->getClientOriginalExtension();
+                $filename = Str::random(10).'_'.$clean.'.'.$ext;
+
+                $path = $file->storeAs('equipment/images', $filename, 'public');
+
+                SurveyEquipmentImage::create([
+                    'user_id' => auth()->id(),
+                    'survey_equipment_id' => $equipment->id,
+                    'description' => $request->description,
+                    'file_name' => $original,
+                    'file_path' => $path,
+                    'file_type' => $ext,
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Equipment evaluation updated successfully!',
+            ]);
+
+        } catch (\Throwable $e) {
+
+            Log::error("EquipmentEvaluation update failed (id={$equipmentId}): ".$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Equipment update failed. Please try again later.',
+            ], 500);
+        }
     }
-}
-
 }

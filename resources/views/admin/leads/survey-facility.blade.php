@@ -132,7 +132,8 @@
                                                 <tr>
                                                     <th>Upload Photo</th>
                                                     <td>
-                                                        <input type="file" class="form-control" name="map_file" id="map_file">
+                                                        <input type="file" class="form-control" name="map_file"
+                                                            id="map_file">
                                                         {{-- Preview Box --}}
                                                         <div id="map-preview" class="mt-2" style="display: none;">
                                                             <img src="" class="img-fluid rounded"
@@ -191,7 +192,8 @@
                                                 <tr>
                                                     <th>Upload Photo</th>
                                                     <td>
-                                                        <input type="file" class="form-control" name="atp_file" id="atp_file">
+                                                        <input type="file" class="form-control" name="atp_file"
+                                                            id="atp_file">
                                                         {{-- Preview Box --}}
                                                         <div id="atp-preview" class="mt-2" style="display: none;">
                                                             <img src="" class="img-fluid rounded"
@@ -242,32 +244,17 @@
                                                     </th>
                                                 </tr>
 
-                                                <tr>
-                                                    <th>Square Footage</th>
-                                                    <td><input type="number" class="form-control" name="square_footage">
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Offices</th>
-                                                    <td><input type="number" class="form-control" name="offices"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Community Bathrooms</th>
-                                                    <td><input type="number" class="form-control"
-                                                            name="standard_bathrooms"></td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Single Bathrooms</th>
-                                                    <td><input type="number" class="form-control"
-                                                            name="single_bathrooms"></td>
-                                                </tr>
-
+                                                @foreach ($facilityRoomTypes as $types)
+                                                    <tr>
+                                                        <th>{{ $types->name }}</th>
+                                                        <td><input type="number" class="form-control"
+                                                                name="{{ $types->input_name }}" value="0">
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
                                                 <tr>
                                                     <th>Total Man Hours</th>
-                                                    <td><input type="number" class="form-control" name="man_hours"></td>
+                                                    <td><span id="man_hours">0</span></td>
                                                 </tr>
 
                                                 <tr>
@@ -294,13 +281,9 @@
 
 @push('scripts')
     <script>
-        // ---------------------------
-        // JQUERY VALIDATION
-        // ---------------------------
-        $("#add-facility-form").validate({
-            ignore: [],
-            rules: {
-                // Facility Info
+        $(document).ready(function() {
+
+            let facilityRules = {
                 facility_name: {
                     required: true
                 },
@@ -320,7 +303,7 @@
                     required: true
                 },
 
-                // Facility Maps
+                // MAP fields
                 map_name: {
                     required: true
                 },
@@ -328,7 +311,7 @@
                     required: true
                 },
 
-                // ATP Sampling
+                // ATP fields
                 atp_location: {
                     required: true
                 },
@@ -338,157 +321,83 @@
                 },
                 atp_file: {
                     required: true
-                },
-
-                // Survey Details
-                square_footage: {
-                    required: true,
-                    number: true
-                },
-                offices: {
-                    required: true,
-                    number: true
-                },
-                standard_bathrooms: {
-                    required: true,
-                    number: true
-                },
-                single_bathrooms: {
-                    required: true,
-                    number: true
-                },
-                man_hours: {
-                    required: true,
-                    number: true
-                },
-            },
-
-            messages: {
-                facility_name: {
-                    required: "Facility name is required."
-                },
-                address: {
-                    required: "Address is required."
-                },
-                city: {
-                    required: "City is required."
-                },
-                state: {
-                    required: "State is required."
-                },
-                zip: {
-                    required: "Zip code is required."
-                },
-                facility_type: {
-                    required: "Select a facility type."
-                },
-
-                map_name: {
-                    required: "Enter map name."
-                },
-                map_file: {
-                    required: "Please upload a map image."
-                },
-
-                atp_location: {
-                    required: "ATP location is required."
-                },
-                atp_value: {
-                    required: "ATP value is required.",
-                    number: "Enter a valid number."
-                },
-                atp_file: {
-                    required: "Please upload ATP photo."
-                },
-
-                square_footage: {
-                    required: "Square footage required.",
-                    number: "Must be numeric."
-                },
-                offices: {
-                    required: "Enter office count.",
-                    number: "Must be numeric."
-                },
-                standard_bathrooms: {
-                    required: "Enter community bathrooms.",
-                    number: "Must be numeric."
-                },
-                single_bathrooms: {
-                    required: "Enter single bathrooms.",
-                    number: "Must be numeric."
-                },
-                man_hours: {
-                    required: "Enter total man hours.",
-                    number: "Must be numeric."
-                },
-            },
-
-            errorElement: 'span',
-            errorClass: 'invalid-feedback d-block',
-
-            highlight: function(element) {
-                $(element).addClass('is-invalid');
-            },
-
-            unhighlight: function(element) {
-                $(element).removeClass('is-invalid');
-            },
-
-            errorPlacement: function(error, element) {
-                if (element.parent('.input-group').length) {
-                    error.insertAfter(element.parent());
-                } else {
-                    error.insertAfter(element);
                 }
-            }
-        });
+            };
 
+            // ---- Dynamic Survey Detail Fields ----
+            @foreach ($facilityRoomTypes as $type)
+                facilityRules["{{ $type->input_name }}"] = {
+                    required: true,
+                    number: true
+                };
+            @endforeach
 
-        // ---------------------------
-        // AJAX SUBMIT (with Swal)
-        // ---------------------------
-        $('#add-facility-form').submit(function(e) {
-            e.preventDefault();
+            $("#add-facility-form").validate({
+                ignore: [],
+                rules: facilityRules,
 
-            if (!$('#add-facility-form').valid()) {
-                return;
-            }
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
 
-            // Required for file uploads!
-            let formData = new FormData(this);
-
-            $.ajax({
-                url: "{{ route('admin.survey.proposal.facility.store', $surveyProposal->id) }}",
-                method: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-
-                success: function(res) {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Facility Saved!",
-                        text: res.message || "Facility added successfully!",
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
-
-                    setTimeout(() => location.reload(), 2000);
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
                 },
 
-                error: function(xhr) {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: "Something went wrong while saving the facility.",
-                    });
-
-                    console.log(xhr.responseText);
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
                 }
             });
+
+
+            // AJAX SUBMIT
+            $('#add-facility-form').submit(function(e) {
+                e.preventDefault();
+
+                if (!$('#add-facility-form').valid()) {
+                    return;
+                }
+
+                let formData = new FormData(this);
+
+                $.ajax({
+                    url: "{{ route('admin.survey.proposal.facility.store', $surveyProposal->id) }}",
+                    method: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+
+                    success: function(res) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Facility Saved!",
+                            text: res.message || "Facility added successfully!",
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+
+                        setTimeout(() => location.reload(), 2000);
+                    },
+
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "Something went wrong while saving the facility.",
+                        });
+
+                        console.log(xhr.responseText);
+                    }
+                });
+            });
+
         });
-
-
         document.addEventListener("DOMContentLoaded", function() {
 
             // Reusable preview function
