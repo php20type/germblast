@@ -195,23 +195,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/survey/proposal/{facility}/facility/update', [SurveyProposalController::class, 'survey_facility_update'])
         ->name('survey.proposal.facility.update');
 
-    // Route::get('/survey/proposal/{survey_proposal}/equipment', [SurveyProposalController::class, 'survey_equipment'])
-    //     ->name('survey.proposal.equipment');
-    // Route::post('/survey/proposal/{survey_proposal}/equipment/store', [SurveyProposalController::class, 'survey_equipment_store'])
-    //     ->name('survey.proposal.equipment.store');
-    // Route::get('/survey/proposal/equipment/{equipment}/edit', [SurveyProposalController::class, 'survey_equipment_edit'])
-    //     ->name('survey.equipment.edit');
-    // Route::post('/survey/proposal/{equipment}/equipment/update', [SurveyProposalController::class, 'survey_equipment_update'])
-    //     ->name('survey.proposal.equipment.update');
-
     Route::get('/survey/proposal/{survey_proposal}/equipment', [SurveyProposalController::class, 'survey_equipment'])
         ->name('survey.proposal.equipment');
-    Route::post('/survey/proposal/{survey_proposal}/equipment/store',[SurveyProposalController::class, 'survey_equipment_store'])
+    Route::post('/survey/proposal/{survey_proposal}/equipment/store', [SurveyProposalController::class, 'survey_equipment_store'])
         ->name('survey.proposal.equipment.store');
-    Route::get('/survey/proposal/equipment/{equipment}/edit',[SurveyProposalController::class, 'survey_equipment_edit'])
+    Route::get('/survey/proposal/equipment/{equipment}/edit', [SurveyProposalController::class, 'survey_equipment_edit'])
         ->name('survey.equipment.edit');
-    Route::post('/survey/proposal/{equipment}/equipment/update',[SurveyProposalController::class, 'survey_equipment_update'])
+    Route::post('/survey/proposal/{equipment}/equipment/update', [SurveyProposalController::class, 'survey_equipment_update'])
         ->name('survey.proposal.equipment.update');
+    Route::post('/pricing-proposal/create-empty', [SurveyProposalController::class, 'createEmpty'])->name('pricing-proposal.createEmpty');
+    Route::post('/pricing-proposal/save-full',[SurveyProposalController::class, 'saveFull'])->name('pricing-proposal.saveFull');
+    Route::post('/pricing-proposal/save-selections', [SurveyProposalController::class, 'saveSelections'])
+        ->name('pricing-proposal.saveSelections');
+    Route::post('/pricing-proposal/save-settings', [SurveyProposalController::class, 'saveSettings'])->name('pricing-proposal.saveSettings');
 
     // settings section
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');

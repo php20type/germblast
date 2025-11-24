@@ -327,134 +327,426 @@
                                 <div class="col-md-12">
                                     <div class="section-card">
 
-                                        <div class="section-header mb-3">
+                                        <!-- SECTION HEADER -->
+                                        <div class="section-header d-flex justify-content-between align-items-center mb-3">
                                             <h3 class="section-title">Pricing Summary</h3>
-                                            </p>
+
+                                            <button type="button" id="createPricingBtn" class="btn btn-success">
+                                                Add Pricing Summary
+                                            </button>
                                         </div>
 
-                                        <table class="table table-bordered align-middle">
 
-                                            {{-- MAIN TOTAL --}}
-                                            <tr class="table-light">
-                                                <th colspan="2" class="fw-bold">Total Labor Cost for All Areas Included
-                                                    in Pricing</th>
-                                            </tr>
+                                        <div id="pricing-proposal" style="display:none;"
+                                            data-survey-id="{{ $surveyProposal->id ?? '' }}" data-pricing-id="">
 
-                                            <tr>
-                                                <th style="width:35%">Estimated Pricing Total</th>
-                                                <td><input type="text" class="form-control" name="pricing_total"></td>
-                                            </tr>
+                                            <!-- PRICING TABLE -->
+                                            <table class="table table-bordered align-middle">
 
-                                            <tr>
-                                                <th>Partial Cost of Service</th>
-                                                <td><input type="text" class="form-control"
-                                                        name="partial_cost_service"></td>
-                                            </tr>
 
-                                            {{-- INCLUDED COSTS --}}
-                                            <tr class="table-light">
-                                                <th colspan="2" class="fw-bold">Estimated Costs Already Included in
-                                                    Pricing Model</th>
-                                            </tr>
+                                                <!-- SECTION HEADER -->
+                                                <tr class="table-light">
+                                                    <th colspan="2" class="fw-bold">Select Facilities & Equipment
+                                                        for
+                                                        Proposal</th>
+                                                </tr>
 
-                                            <tr>
-                                                <th>Awareness</th>
-                                                <td><input type="text" class="form-control" name="awareness"></td>
-                                            </tr>
+                                                <!-- FACILITIES SELECT -->
+                                                <tr>
+                                                    <td style="width:35%">Facilities in Proposal</td>
+                                                    <td>
+                                                        <select name="facility_ids[]" id="facility_select"
+                                                            class="form-control select2" multiple>
+                                                            @foreach ($facilities as $facility)
+                                                                <option value="{{ $facility->id }}">
+                                                                    {{ $facility->facility_name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                </tr>
 
-                                            <tr>
-                                                <th>Education</th>
-                                                <td><input type="text" class="form-control" name="education"></td>
-                                            </tr>
+                                                <!-- EQUIPMENT SELECT -->
+                                                <tr>
+                                                    <td>Equipment Packages in Proposal</td>
+                                                    <td>
+                                                        <select name="equipment_ids[]" id="equipment_select"
+                                                            class="form-control select2" multiple>
+                                                            @foreach ($equipments as $equipment)
+                                                                <option value="{{ $equipment->id }}">
+                                                                    {{ $equipment->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                </tr>
 
-                                            <tr>
-                                                <th>Technology</th>
-                                                <td><input type="text" class="form-control" name="technology"></td>
-                                            </tr>
+                                                <!-- MAIN TOTAL -->
+                                                <tr class="table-light">
+                                                    <th colspan="2" class="fw-bold">Total Labor Cost for All Areas
+                                                        Included
+                                                        in Pricing</th>
+                                                </tr>
 
-                                            <tr>
-                                                <th>Response</th>
-                                                <td><input type="text" class="form-control" name="response"></td>
-                                            </tr>
+                                                <tr>
+                                                    <td style="width:35%">Estimated Pricing Total</td>
+                                                    <td><input type="text" class="form-control" name="pricing_total"
+                                                            readonly>
+                                                    </td>
+                                                </tr>
 
-                                            {{-- NOT INCLUDED --}}
-                                            <tr class="table-light">
-                                                <th colspan="2" class="fw-bold">Estimated Cost Not Included in Pricing
-                                                    Model</th>
-                                            </tr>
+                                                <tr>
+                                                    <td>Partial Cost of Service</td>
+                                                    <td><input type="text" class="form-control"
+                                                            name="partial_cost_service" readonly></td>
+                                                </tr>
 
-                                            <tr>
-                                                <th>Logistics Expense</th>
-                                                <td><input type="text" class="form-control" name="logistics_expense">
-                                                </td>
-                                            </tr>
+                                                <!-- INCLUDED COSTS -->
+                                                <tr class="table-light">
+                                                    <th colspan="2" class="fw-bold">Estimated Costs Already
+                                                        Included in
+                                                        Pricing Model</th>
+                                                </tr>
 
-                                            {{-- PROPOSAL SETTINGS --}}
-                                            <tr class="table-light">
-                                                <th colspan="2" class="fw-bold">Proposal Settings</th>
-                                            </tr>
+                                                <tr>
+                                                    <td>Awareness</td>
+                                                    <td><input type="text" class="form-control" name="awareness"
+                                                            readonly></td>
+                                                </tr>
 
-                                            <tr>
-                                                <th>Proposal Name</th>
-                                                <td><input type="text" class="form-control" name="proposal_name"></td>
-                                            </tr>
+                                                <tr>
+                                                    <td>Education</td>
+                                                    <td><input type="text" class="form-control" name="education"
+                                                            readonly></td>
+                                                </tr>
 
-                                            <tr>
-                                                <th>Proposal Order</th>
-                                                <td><input type="number" class="form-control" name="proposal_order">
-                                                </td>
-                                            </tr>
+                                                <tr>
+                                                    <td>Technology</td>
+                                                    <td><input type="text" class="form-control" name="technology"
+                                                            readonly>
+                                                    </td>
+                                                </tr>
 
-                                            <tr>
-                                                <th>Override Pricing</th>
-                                                <td><input type="text" class="form-control" name="override_pricing">
-                                                </td>
-                                            </tr>
+                                                <tr>
+                                                    <td>Response</td>
+                                                    <td><input type="text" class="form-control" name="response"
+                                                            readonly></td>
+                                                </tr>
 
-                                            <tr>
-                                                <th>Discounts (%)</th>
-                                                <td><input type="text" class="form-control" name="discounts"></td>
-                                            </tr>
+                                                <!-- NOT INCLUDED COSTS -->
+                                                <tr class="table-light">
+                                                    <th colspan="2" class="fw-bold">Estimated Cost Not Included in
+                                                        Pricing
+                                                        Model</th>
+                                                </tr>
 
-                                            <tr>
-                                                <th>Description</th>
-                                                <td>
-                                                    <textarea class="form-control" name="descriptions" rows="2"></textarea>
-                                                </td>
-                                            </tr>
+                                                <tr>
+                                                    <td>Logistics Expense</td>
+                                                    <td><input type="text" class="form-control"
+                                                            name="logistics_expense" readonly>
+                                                    </td>
+                                                </tr>
 
-                                            {{-- CONTRACT DETAILS --}}
-                                            <tr class="table-light">
-                                                <th colspan="2" class="fw-bold">Contract Details</th>
-                                            </tr>
+                                                <!-- PROPOSAL SETTINGS -->
+                                                <tr class="table-light">
+                                                    <th colspan="2" class="fw-bold">Proposal Settings</th>
+                                                </tr>
 
-                                            <tr>
-                                                <th>Services per Year</th>
-                                                <td><input type="number" class="form-control" name="services_per_year">
-                                                </td>
-                                            </tr>
+                                                <tr>
+                                                    <td>Proposal Name
+                                                        <span class="text-danger">*</span>
+                                                    </td>
+                                                    <td><input type="text" class="form-control" name="proposal_name">
+                                                    </td>
+                                                </tr>
 
-                                            <tr>
-                                                <th>Contract Terms (Years)</th>
-                                                <td><input type="number" class="form-control" name="contract_terms">
-                                                </td>
-                                            </tr>
+                                                <tr>
+                                                    <td>Proposal Order
+                                                        <span class="text-danger">*</span>
+                                                    </td>
+                                                    <td><input type="number" class="form-control" name="proposal_order">
+                                                    </td>
+                                                </tr>
 
-                                            <tr>
-                                                <th>Prepayment Discount</th>
-                                                <td>
-                                                    <select name="prepayment_discount" class="form-control">
-                                                        <option value="">Select Option</option>
-                                                        <option value="yes">Yes</option>
-                                                        <option value="no">No</option>
-                                                    </select>
-                                                </td>
-                                            </tr>
+                                                <tr>
+                                                    <td>Override Pricing
+                                                        <span class="text-danger">*</span>
+                                                    </td>
+                                                    <td><input type="text" class="form-control"
+                                                            name="override_pricing">
+                                                    </td>
+                                                </tr>
 
-                                        </table>
+                                                <tr>
+                                                    <td>Discounts (%)
+                                                        <span class="text-danger">*</span>
+                                                    </td>
+                                                    <td><input type="text" class="form-control" name="discounts">
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>Description
+                                                        <span class="text-danger">*</span>
+                                                    </td>
+                                                    <td>
+                                                        <textarea class="form-control" name="descriptions" rows="2"></textarea>
+                                                    </td>
+                                                </tr>
+
+                                                <!-- CONTRACT DETAILS -->
+                                                <tr class="table-light">
+                                                    <th colspan="2" class="fw-bold">Contract Details</th>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>Services per Year
+                                                        <span class="text-danger">*</span>
+                                                    </td>
+                                                    <td><input type="number" class="form-control"
+                                                            name="services_per_year">
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>Contract Terms (Years)
+                                                        <span class="text-danger">*</span>
+                                                    </td>
+                                                    <td><input type="number" class="form-control" name="contract_terms">
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>Prepayment Discount
+                                                        <span class="text-danger">*</span>
+                                                    </td>
+                                                    <td>
+                                                        <select name="prepayment_discount" class="form-control">
+                                                            <option value="">Select Option</option>
+                                                            <option value="1">Yes</option>
+                                                            <option value="0">No</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td colspan="2">
+                                                        <button type="button" id="saveFullPricingBtn"
+                                                            class="btn btn-success">
+                                                            Save Pricing Proposal
+                                                        </button>
+                                                    </td>
+                                                </tr>
+
+
+                                            </table>
+
+                                        </div>
+
+                                        @foreach ($pricingProposals as $pricing)
+                                            <div class="pricing-edit-block mt-4 p-3 border rounded"
+                                                data-pricing-id="{{ $pricing->id }}">
+
+                                                <table class="table table-bordered align-middle">
+
+                                                    <!-- SECTION HEADER -->
+                                                    <tr class="table-light">
+                                                        <th colspan="2" class="fw-bold">
+                                                            Edit Pricing Proposal – #{{ $pricing->id }}
+                                                        </th>
+                                                    </tr>
+
+                                                    <!-- FACILITIES -->
+                                                    <tr>
+                                                        <td style="width:35%">Facilities in Proposal</td>
+                                                        <td>
+                                                            <select class="form-control select2 facility-select" multiple
+                                                                data-id="{{ $pricing->id }}">
+                                                                @foreach ($facilities as $facility)
+                                                                    <option value="{{ $facility->id }}"
+                                                                        {{ in_array($facility->id, $pricing->facilities->pluck('id')->toArray()) ? 'selected' : '' }}>
+                                                                        {{ $facility->facility_name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+
+                                                    <!-- EQUIPMENT -->
+                                                    <tr>
+                                                        <td>Equipment Packages in Proposal</td>
+                                                        <td>
+                                                            <select class="form-control select2 equipment-select" multiple
+                                                                data-id="{{ $pricing->id }}">
+                                                                @foreach ($equipments as $equipment)
+                                                                    <option value="{{ $equipment->id }}"
+                                                                        {{ in_array($equipment->id, $pricing->equipment->pluck('id')->toArray()) ? 'selected' : '' }}>
+                                                                        {{ $equipment->name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+
+                                                    <!-- TOTALS -->
+                                                    <tr class="table-light">
+                                                        <th colspan="2" class="fw-bold">Calculated Totals</th>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Estimated Pricing Total</td>
+                                                        <td>
+                                                            <input type="text" class="form-control pricing-total"
+                                                                value="{{ $pricing->pricing_total }}" readonly>
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Partial Cost of Service</td>
+                                                        <td>
+                                                            <input type="text" class="form-control partial-cost"
+                                                                value="{{ $pricing->partial_cost_service }}" readonly>
+                                                        </td>
+                                                    </tr>
+
+                                                    <!-- INCLUDED COSTS -->
+                                                    <tr class="table-light">
+                                                        <th colspan="2" class="fw-bold">Included Costs</th>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Awareness</td>
+                                                        <td><input type="text" class="form-control"
+                                                                value="{{ $pricing->awareness }}" readonly></td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Education</td>
+                                                        <td><input type="text" class="form-control"
+                                                                value="{{ $pricing->education }}" readonly></td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Technology</td>
+                                                        <td><input type="text" class="form-control"
+                                                                value="{{ $pricing->technology }}" readonly></td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Response</td>
+                                                        <td><input type="text" class="form-control"
+                                                                value="{{ $pricing->response }}" readonly></td>
+                                                    </tr>
+
+                                                    <!-- NOT INCLUDED -->
+                                                    <tr class="table-light">
+                                                        <th colspan="2" class="fw-bold">Not Included</th>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Logistics Expense</td>
+                                                        <td><input type="text" class="form-control"
+                                                                value="{{ $pricing->logistics_expense }}" readonly></td>
+                                                    </tr>
+
+                                                    <!-- PROPOSAL SETTINGS -->
+                                                    <tr class="table-light">
+                                                        <th colspan="2" class="fw-bold">Proposal Settings</th>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Proposal Name <span class="text-danger">*</span></td>
+                                                        <td>
+                                                            <input type="text" class="form-control proposal_name"
+                                                                value="{{ $pricing->proposal_name }}">
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Proposal Order <span class="text-danger">*</span></td>
+                                                        <td>
+                                                            <input type="number" class="form-control proposal_order"
+                                                                value="{{ $pricing->proposal_order }}">
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Override Pricing</td>
+                                                        <td>
+                                                            <input type="text" class="form-control override_pricing"
+                                                                value="{{ $pricing->override_pricing }}">
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Discounts (%) <span class="text-danger">*</span></td>
+                                                        <td>
+                                                            <input type="text" class="form-control discounts"
+                                                                value="{{ $pricing->discounts }}">
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Description <span class="text-danger">*</span></td>
+                                                        <td>
+                                                            <textarea class="form-control descriptions" rows="2">{{ $pricing->descriptions }}</textarea>
+                                                        </td>
+                                                    </tr>
+
+                                                    <!-- CONTRACT DETAILS -->
+                                                    <tr class="table-light">
+                                                        <th colspan="2" class="fw-bold">Contract Details</th>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Services per Year <span class="text-danger">*</span></td>
+                                                        <td>
+                                                            <input type="number" class="form-control services_per_year"
+                                                                value="{{ $pricing->services_per_year }}">
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Contract Terms (Years) <span class="text-danger">*</span></td>
+                                                        <td>
+                                                            <input type="number" class="form-control contract_terms"
+                                                                value="{{ $pricing->contract_terms }}">
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>Prepayment Discount <span class="text-danger">*</span></td>
+                                                        <td>
+                                                            <select class="form-control prepayment_discount">
+                                                                <option value="">Select Option</option>
+                                                                <option value="1"
+                                                                    {{ $pricing->prepayment_discount == 1 ? 'selected' : '' }}>
+                                                                    Yes</option>
+                                                                <option value="0"
+                                                                    {{ $pricing->prepayment_discount == 0 ? 'selected' : '' }}>
+                                                                    No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+
+                                                    <!-- SAVE BUTTON -->
+                                                    <tr>
+                                                        <td colspan="2">
+                                                            <button type="button"
+                                                                class="btn btn-primary saveExistingPricingBtn"
+                                                                data-id="{{ $pricing->id }}">
+                                                                Update Pricing Proposal
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+
+                                                </table>
+                                            </div>
+                                        @endforeach
+
+
                                     </div>
                                 </div>
                             </div>
+
 
                             {{-- Supplemental Offer --}}
                             <div class="row">
@@ -500,163 +792,242 @@
             </div>
         </div>
     </div>
-@endsection
 
+@endsection
 
 @push('scripts')
     <script>
-        $("#add-survey-form").validate({
-            ignore: [],
-            rules: {
-                client_name: {
-                    required: true
-                },
-                date: {
-                    required: true,
-                    date: true
-                },
-                description: {
-                    required: true
-                },
+        $(document).ready(function() {
 
-                enrollment: {
-                    required: true,
-                    number: true,
-                    min: 0
-                },
-                wada: {
-                    required: true,
-                    number: true,
-                    min: 0
-                },
-                aba: {
-                    required: true,
-                    number: true,
-                    min: 0
-                },
-                service_technicians: {
-                    required: true,
-                    number: true,
-                    min: 0
-                },
-                distance: {
-                    required: true,
-                    number: true,
-                    min: 0
-                },
-                man_hours: {
-                    required: true,
-                    number: true,
-                    min: 0
-                },
+            /* ---------------------------
+               INITIALIZE SELECT2
+            ----------------------------*/
+            $('#facility_select').select2({
+                dropdownParent: $('#pricing-proposal'),
+                placeholder: 'Choose...',
+                allowClear: true,
+                width: '100%'
+            });
 
-                specialist_narrative: {
-                    required: true
-                },
-
-                // Supplemental fields also required
-                supplemental_title: {
-                    required: true
-                },
-                supplemental_body: {
-                    required: true
-                }
-            },
-
-            messages: {
-                client_name: {
-                    required: "Please enter client name."
-                },
-                date: {
-                    required: "Please select a date."
-                },
-                description: {
-                    required: "Please enter description."
-                },
-
-                enrollment: {
-                    required: "Please enter enrollment."
-                },
-                wada: {
-                    required: "Please enter WADA value."
-                },
-                aba: {
-                    required: "Please enter ABA value."
-                },
-                service_technicians: {
-                    required: "Please enter number of technicians."
-                },
-                distance: {
-                    required: "Please enter distance."
-                },
-                man_hours: {
-                    required: "Please enter man hours."
-                },
-
-                specialist_narrative: {
-                    required: "Please enter the narrative."
-                },
-
-                supplemental_title: {
-                    required: "Please enter supplemental title."
-                },
-                supplemental_body: {
-                    required: "Please enter supplemental body."
-                }
-            },
-
-            errorElement: 'span',
-            errorClass: 'invalid-feedback d-block',
-
-            highlight: function(element) {
-                $(element).addClass('is-invalid');
-            },
-
-            unhighlight: function(element) {
-                $(element).removeClass('is-invalid');
-            },
-
-            errorPlacement: function(error, element) {
-                if (element.parent('.input-group').length) {
-                    error.insertAfter(element.parent());
-                } else {
-                    error.insertAfter(element);
-                }
-            }
-        });
+            $('#equipment_select').select2({
+                dropdownParent: $('#pricing-proposal'),
+                placeholder: 'Choose...',
+                allowClear: true,
+                width: '100%'
+            });
 
 
-        // AJAX SUBMIT
-        $('#add-survey-form').submit(function(e) {
-            e.preventDefault();
+            /* ---------------------------
+               CREATE NEW EMPTY PRICING PROPOSAL
+            ----------------------------*/
+            $('#createPricingBtn').on('click', function() {
 
-            if (!$('#add-survey-form').valid()) {
-                return;
+                let surveyId = $('#pricing-proposal').data('survey-id');
+
+                $.ajax({
+                    url: '/admin/pricing-proposal/create-empty',
+                    type: 'POST',
+                    data: {
+                        survey_proposal_id: surveyId,
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+
+                    success: function(res) {
+
+                        // attach id to div
+                        $('#pricing-proposal').attr('data-pricing-id', res.pricing_id);
+
+                        // show form
+                        $('#pricing-proposal').slideDown();
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Created!",
+                            text: "Pricing Proposal Created.",
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            });
+
+
+            /* ---------------------------
+            VALIDATION FOR PRICING FORM
+            ----------------------------*/
+            function validatePricingFields() {
+                let isValid = true;
+
+                // Required Fields
+                if (!$('input[name="proposal_name"]').val()) isValid = false;
+                if (!$('input[name="proposal_order"]').val()) isValid = false;
+                if (!$('input[name="discounts"]').val()) isValid = false;
+                if (!$('textarea[name="descriptions"]').val()) isValid = false;
+                if (!$('input[name="services_per_year"]').val()) isValid = false;
+                if (!$('input[name="contract_terms"]').val()) isValid = false; // FIXED
+                if (!$('select[name="prepayment_discount"]').val()) isValid = false;
+
+                // At least one facility or equipment
+                let facilities = $('#facility_select').val() || [];
+                let equipment = $('#equipment_select').val() || [];
+
+                if (facilities.length === 0 && equipment.length === 0) isValid = false;
+
+                return isValid;
             }
 
-            $.ajax({
-                url: "{{ route('admin.leads.survey.proposal.store', $lead->id) }}",
-                method: "POST",
-                data: $(this).serialize(),
 
-                success: function(res) {
-                    Swal.fire({
-                        icon: "success",
-                        title: "Saved!",
-                        text: res.message || "Survey Proposal Saved Successfully!",
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
+            /* ---------------------------
+               SAVE FULL PRICING PROPOSAL
+            ----------------------------*/
+            $('#saveFullPricingBtn').on('click', function() {
 
-                    setTimeout(() => location.reload(), 2000);
+                if (!validatePricingFields()) {
+                    toastr.error("Please input required fields.");
+                    return;
+                }
+
+
+                let pricingId = $('#pricing-proposal').data('pricing-id');
+
+                $.ajax({
+                    url: '/admin/pricing-proposal/save-full',
+                    type: 'POST',
+                    data: {
+                        pricing_proposal_id: pricingId,
+
+                        facility_ids: $('#facility_select').val() || [],
+                        equipment_ids: $('#equipment_select').val() || [],
+
+                        proposal_name: $('input[name="proposal_name"]').val(),
+                        proposal_order: $('input[name="proposal_order"]').val(),
+                        override_pricing: $('input[name="override_pricing"]').val(),
+                        discounts: $('input[name="discounts"]').val(),
+                        descriptions: $('textarea[name="descriptions"]').val(),
+
+                        services_per_year: $('input[name="services_per_year"]').val(),
+                        contract_terms: $('input[name="contract_terms"]').val(),
+                        prepayment_discount: $('select[name="prepayment_discount"]').val(),
+
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+
+                    success: function(res) {
+
+                        $('input[name="partial_cost_service"]').val(res.partial_cost_service);
+                        $('input[name="pricing_total"]').val(res.pricing_total);
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Saved Successfully",
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    },
+
+                    error: function(xhr) {
+                        console.log(xhr.responseText);
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error Saving",
+                            text: "Something went wrong."
+                        });
+                    }
+                });
+            });
+
+
+
+            /* ---------------------------
+               VALIDATION FOR MAIN SURVEY FORM (unchanged)
+            ----------------------------*/
+            $("#add-survey-form").validate({
+                ignore: [],
+                rules: {
+                    client_name: {
+                        required: true
+                    },
+                    date: {
+                        required: true
+                    },
+                    description: {
+                        required: true
+                    },
+                    enrollment: {
+                        required: true,
+                        number: true
+                    },
+                    wada: {
+                        required: true,
+                        number: true
+                    },
+                    aba: {
+                        required: true,
+                        number: true
+                    },
+                    service_technicians: {
+                        required: true,
+                        number: true
+                    },
+                    distance: {
+                        required: true,
+                        number: true
+                    },
+                    man_hours: {
+                        required: true,
+                        number: true
+                    },
+                    specialist_narrative: {
+                        required: true
+                    },
+                    supplemental_title: {
+                        required: true
+                    },
+                    supplemental_body: {
+                        required: true
+                    }
                 },
-
-
-                error: function(xhr) {
-                    toastr.error("Something went wrong while saving the proposal.");
-                    console.log(xhr.responseText);
+                messages: {},
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(el) {
+                    $(el).addClass('is-invalid');
+                },
+                unhighlight: function(el) {
+                    $(el).removeClass('is-invalid');
                 }
             });
+
+
+            /* ---------------------------
+               SAVE SURVEY FORM AJAX
+            ----------------------------*/
+            $('#add-survey-form').submit(function(e) {
+                e.preventDefault();
+
+                if (!$('#add-survey-form').valid()) return;
+
+                $.ajax({
+                    url: "{{ route('admin.leads.survey.proposal.store', $lead->id) }}",
+                    method: "POST",
+                    data: $(this).serialize(),
+                    success: function(res) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Saved!",
+                            text: res.message || "Survey Proposal Saved Successfully!",
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        setTimeout(() => location.reload(), 2000);
+                    },
+                    error: function(xhr) {
+                        toastr.error("Something went wrong while saving the proposal.");
+                        console.log(xhr.responseText);
+                    }
+                });
+            });
+
         });
     </script>
 @endpush
