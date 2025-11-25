@@ -3,56 +3,64 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-
 class TestEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
-   private $details;
+    public $type;
+    public $data;
 
-    public function __construct($details)
+    public function __construct($type, $data)
     {
-        $this->details = $details;
+        $this->type = $type;   // "company" or "lead"
+        $this->data = $data;   // dynamic details
     }
 
-    /**
-     * Get the message envelope.
-     */
-    public function envelope(): Envelope
+    // public function envelope(): Envelope
+    // {
+    //     return new Envelope(
+    //         subject: ucfirst($this->type) . ' Created Successfully',
+    //     );
+    // }
+     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Test Mail Submitted',
+            subject: match ($this->type) {
+                'lead_created' => 'New Lead Created',
+                'lead_assigned' => 'New Lead Assigned to You',
+                'meeting_required' => 'Initial Meeting Required',
+                'meeting_scheduled' => 'Initial Meeting Scheduled',
+                default => 'Lead Notification'
+            }
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
-    public function content(): Content
+    // public function content(): Content
+    // {
+    //     return new Content(
+    //         view: 'email-template.test',
+    //         with: [
+    //             'type' => $this->type,
+    //             'data' => $this->data
+    //         ],
+    //     );
+    // }
+      public function content(): Content
     {
-        // return new Content(
-        //     view: 'view.name',
-        // );
-         return new Content(
-            view: 'email-template.test',  //This is the blade path
-            with: ['details' => $this->details],
+        return new Content(
+            view: 'email-template.lead',
+            with: [
+                'type' => $this->type,
+                'data' => $this->data
+            ]
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
     public function attachments(): array
     {
         return [];

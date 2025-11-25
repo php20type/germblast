@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
+use App\Mail\TestEmail;
 use App\Models\ActivityType;
 use App\Models\Company;
 use App\Models\Competitor;
@@ -21,8 +22,8 @@ use App\Models\Market;
 use App\Models\Outcome;
 use App\Models\People;
 use App\Models\Product;
-use App\Models\SurveyProposal;
 use App\Models\Source;
+use App\Models\SurveyProposal;
 use App\Models\Tag;
 use App\Models\Task;
 use App\Models\Timeline;
@@ -30,7 +31,9 @@ use App\Models\User;
 use App\Services\ApprovalService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -973,81 +976,82 @@ class LeadController extends Controller
         ));
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'assignee_id' => 'nullable|exists:users,id',
-            'close_date' => 'nullable|date',
-            'confidence' => 'nullable|numeric',
-            'product_id' => 'nullable|array',
-            'product_id.*' => 'exists:products,id',
-            'quantity' => 'nullable|array',
-            'price' => 'nullable|array',
-            'company_id' => 'nullable|array',
-            'company_id.*' => 'exists:companies,id',
-            'person_id' => 'nullable|array',
-            'person_id.*' => 'nullable|exists:people,id',
-            'source_id' => 'nullable|array',
-            'source_id.*' => 'exists:sources,id',
-            'competitors_id' => 'nullable|array',
-            'competitors_id.*' => 'nullable|exists:competitors,id',
-            'tag_id' => 'required',
-        ]);
+    // public function store(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'name' => 'required|string|max:255',
+    //         'assignee_id' => 'nullable|exists:users,id',
+    //         'close_date' => 'nullable|date',
+    //         'confidence' => 'nullable|numeric',
+    //         'product_id' => 'nullable|array',
+    //         'product_id.*' => 'exists:products,id',
+    //         'quantity' => 'nullable|array',
+    //         'price' => 'nullable|array',
+    //         'company_id' => 'nullable|array',
+    //         'company_id.*' => 'exists:companies,id',
+    //         'person_id' => 'nullable|array',
+    //         'person_id.*' => 'nullable|exists:people,id',
+    //         'source_id' => 'nullable|array',
+    //         'source_id.*' => 'exists:sources,id',
+    //         'competitors_id' => 'nullable|array',
+    //         'competitors_id.*' => 'nullable|exists:competitors,id',
+    //         'tag_id' => 'required',
+    //     ]);
 
-        // Create one lead only
-        $lead = Lead::create([
-            'name' => $request->name,
-            'assignee_id' => $request->assignee_id,
-            'close_date' => $request->close_date,
-            'confidence' => $request->confidence,
-            'creator_id' => auth()->id(),
-        ]);
+    //     // Create one lead only
+    //     $lead = Lead::create([
+    //         'name' => $request->name,
+    //         'assignee_id' => $request->assignee_id,
+    //         'close_date' => $request->close_date,
+    //         'confidence' => $request->confidence,
+    //         'creator_id' => auth()->id(),
+    //     ]);
 
-        SurveyProposal::create([
-            'user_id' => auth()->id(),
-            'lead_id' => $lead->id,
-        ]);
+    //     SurveyProposal::create([
+    //         'user_id' => auth()->id(),
+    //         'lead_id' => $lead->id,
+    //     ]);
 
-        // Companies
-        if ($request->filled('company_id')) {
-            $lead->companies()->attach($request->company_id);
-        }
+    //     // Companies
+    //     if ($request->filled('company_id')) {
+    //         $lead->companies()->attach($request->company_id);
+    //     }
 
-        // People
-        if ($request->filled('person_id')) {
-            $lead->peoples()->attach($request->person_id);
-        }
+    //     // People
+    //     if ($request->filled('person_id')) {
+    //         $lead->peoples()->attach($request->person_id);
+    //     }
 
-        // Products with qty & price
-        if ($request->filled('product_id')) {
-            foreach ($request->product_id as $index => $productId) {
-                $lead->products()->attach($productId, [
-                    'qty' => $request->quantity[$index] ?? 1,
-                    'price' => $request->price[$index] ?? 0,
-                ]);
-            }
-        }
+    //     // Products with qty & price
+    //     if ($request->filled('product_id')) {
+    //         foreach ($request->product_id as $index => $productId) {
+    //             $lead->products()->attach($productId, [
+    //                 'qty' => $request->quantity[$index] ?? 1,
+    //                 'price' => $request->price[$index] ?? 0,
+    //             ]);
+    //         }
+    //     }
 
-        // Sources
-        if ($request->filled('source_id')) {
-            $lead->sources()->attach($request->source_id);
-        }
+    //     // Sources
+    //     if ($request->filled('source_id')) {
+    //         $lead->sources()->attach($request->source_id);
+    //     }
 
-        // Competitors
-        if ($request->filled('competitors_id')) {
-            $lead->competitors()->attach($request->competitors_id);
-        }
+    //     // Competitors
+    //     if ($request->filled('competitors_id')) {
+    //         $lead->competitors()->attach($request->competitors_id);
+    //     }
 
-        // Tags
-        if ($request->filled('tag_id')) {
-            $lead->tags()->attach($request->tag_id);
-        }
+    //     // Tags
+    //     if ($request->filled('tag_id')) {
+    //         $lead->tags()->attach($request->tag_id);
+    //     }
 
-        // return redirect()->route('admin.leads.index')->with('success', 'Leads created successfully');
-        return redirect()->back()->with('success', 'Leads created successfully');
-    }
+    //     // return redirect()->route('admin.leads.index')->with('success', 'Leads created successfully');
+    //     return redirect()->back()->with('success', 'Leads created successfully');
+    // }
 
+    // This is for approval workflow notification
     // public function store(Request $request)
     // {
     //     $validated = $request->validate([
@@ -1083,6 +1087,114 @@ class LeadController extends Controller
 
     //     return redirect()->back()->with('info', 'Approval email sent! The lead will be created after approval.');
     // }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'assignee_id' => 'nullable|exists:users,id',
+            'close_date' => 'nullable|date',
+            'confidence' => 'nullable|numeric',
+
+            'product_id' => 'nullable|array',
+            'product_id.*' => 'exists:products,id',
+            'quantity' => 'nullable|array',
+            'price' => 'nullable|array',
+
+            'company_id' => 'nullable|array',
+            'company_id.*' => 'exists:companies,id',
+
+            'person_id' => 'nullable|array',
+            'person_id.*' => 'nullable|exists:people,id',
+
+            'source_id' => 'nullable|array',
+            'source_id.*' => 'exists:sources,id',
+
+            'competitors_id' => 'nullable|array',
+            'competitors_id.*' => 'nullable|exists:competitors,id',
+
+            'tag_id' => 'required',
+        ]);
+
+        $lead = null;
+
+        DB::transaction(function () use ($request, &$lead) {
+
+            $lead = Lead::create([
+                'name' => $request->name,
+                'assignee_id' => $request->assignee_id,
+                'close_date' => $request->close_date,
+                'confidence' => $request->confidence,
+                'creator_id' => auth()->id(),
+            ]);
+
+            SurveyProposal::create([
+                'user_id' => auth()->id(),
+                'lead_id' => $lead->id,
+            ]);
+
+            if ($request->filled('company_id')) {
+                $lead->companies()->attach($request->company_id);
+            }
+
+            if ($request->filled('person_id')) {
+                $lead->peoples()->attach($request->person_id);
+            }
+
+            if ($request->filled('product_id')) {
+                foreach ($request->product_id as $index => $productId) {
+                    $lead->products()->attach($productId, [
+                        'qty' => $request->quantity[$index] ?? 1,
+                        'price' => $request->price[$index] ?? 0,
+                    ]);
+                }
+            }
+
+            if ($request->filled('source_id')) {
+                $lead->sources()->attach($request->source_id);
+            }
+
+            if ($request->filled('competitors_id')) {
+                $lead->competitors()->attach($request->competitors_id);
+            }
+
+            if ($request->filled('tag_id')) {
+                $lead->tags()->attach($request->tag_id);
+            }
+        });
+
+        // SEND LEAD CREATED EMAIL NOTIFICATIO - dynamic email for testing , when company and lead is created
+        // $emailTo = 'febev88675@bablace.com';
+        // $data = [
+        //     'lead_name' => $lead->name,
+        //     'assignee' => $lead->assignee->name ?? 'Unassigned',
+        //     'close_date' => $lead->close_date ?? 'Not Set',
+        //     'confidence' => $lead->confidence ?? 'N/A',
+        // ];
+
+        // Mail::to($emailTo)->send(new TestEmail(
+        //     'Lead',$data
+        // ));
+
+        // Email notification to assignee when lead is assigned and when lead is created - This code is still showing too many emails per second error , so will need to queue it later
+        $email = 'febev88675@bablace.com';
+        Mail::to($email)->send(new TestEmail('lead_created', [
+            'lead_name' => $lead->name,
+            'assignee' => $lead->assignee->name ?? 'Unassigned',
+            'close_date' => $lead->close_date,
+            'confidence' => $lead->confidence,
+        ]));
+        sleep(5);
+        if ($lead->assignee_id) {
+            $salesUser = User::find($lead->assignee_id);
+            Mail::to($salesUser->email)->send(new TestEmail('lead_assigned', [
+                'lead_name' => $lead->name,
+                'assignee' => $salesUser->name,
+            ]));
+        }
+
+        return redirect()->back()->with('success', 'Lead created successfully!');
+    }
 
     public function show(Request $request, $id)
     {
