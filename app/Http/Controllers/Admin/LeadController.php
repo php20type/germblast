@@ -1175,22 +1175,31 @@ class LeadController extends Controller
         // Mail::to($emailTo)->send(new TestEmail(
         //     'Lead',$data
         // ));
-
-        // Email notification to assignee when lead is assigned and when lead is created - This code is still showing too many emails per second error , so will need to queue it later
         $email = 'febev88675@bablace.com';
-        Mail::to($email)->send(new TestEmail('lead_created', [
-            'lead_name' => $lead->name,
-            'assignee' => $lead->assignee->name ?? 'Unassigned',
-            'close_date' => $lead->close_date,
-            'confidence' => $lead->confidence,
-        ]));
-        sleep(5);
+
+        // SEND LEAD CREATED EMAIL
+        Mail::to('febev88675@bablace.com')->send(
+            new TestEmail('lead_created', [
+                'lead_name' => $lead->name,
+                'assignee' => $lead->assignee->name ?? 'Unassigned',
+                'close_date' => $lead->close_date,
+                'confidence' => $lead->confidence,
+            ])
+        );
+
+        // WAIT 12 SECONDS (Mailtrap requirement)
+        sleep(12);
+
+        // SEND LEAD ASSIGNED EMAIL
         if ($lead->assignee_id) {
             $salesUser = User::find($lead->assignee_id);
-            Mail::to($salesUser->email)->send(new TestEmail('lead_assigned', [
-                'lead_name' => $lead->name,
-                'assignee' => $salesUser->name,
-            ]));
+
+            Mail::to($salesUser->email)->send(
+                new TestEmail('lead_assigned', [
+                    'lead_name' => $lead->name,
+                    'assignee' => $salesUser->name,
+                ])
+            );
         }
 
         return redirect()->back()->with('success', 'Lead created successfully!');
