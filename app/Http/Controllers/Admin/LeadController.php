@@ -29,6 +29,7 @@ use App\Models\Task;
 use App\Models\Timeline;
 use App\Models\User;
 use App\Services\ApprovalService;
+use App\Services\NotificationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -1051,44 +1052,7 @@ class LeadController extends Controller
     //     return redirect()->back()->with('success', 'Leads created successfully');
     // }
 
-    // This is for approval workflow notification
-    // public function store(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'name' => 'required|string|max:255',
-    //         'assignee_id' => 'nullable|exists:users,id',
-    //         'close_date' => 'nullable|date',
-    //         'confidence' => 'nullable|numeric',
-    //         'product_id' => 'nullable|array',
-    //         'product_id.*' => 'exists:products,id',
-    //         'quantity' => 'nullable|array',
-    //         'price' => 'nullable|array',
-    //         'company_id' => 'nullable|array',
-    //         'company_id.*' => 'exists:companies,id',
-    //         'person_id' => 'nullable|array',
-    //         'person_id.*' => 'nullable|exists:people,id',
-    //         'source_id' => 'nullable|array',
-    //         'source_id.*' => 'exists:sources,id',
-    //         'competitors_id' => 'nullable|array',
-    //         'competitors_id.*' => 'nullable|exists:competitors,id',
-    //         'tag_id' => 'required',
-    //     ]);
-
-    //     // Instead of directly storing lead — send for approval
-    //     ApprovalService::request(
-    //         auth()->user()->email,
-    //         'create_lead',
-    //         [
-    //             'data' => $validated,
-    //             'creator_id' => auth()->id(),
-    //         ],
-    //         url()->previous() // redirect back to same page
-    //     );
-
-    //     return redirect()->back()->with('info', 'Approval email sent! The lead will be created after approval.');
-    // }
-
-    public function store(Request $request)
+    public function store(Request $request, NotificationService $notify)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -1163,44 +1127,11 @@ class LeadController extends Controller
             }
         });
 
-        // SEND LEAD CREATED EMAIL NOTIFICATIO - dynamic email for testing , when company and lead is created
-        // $emailTo = 'febev88675@bablace.com';
-        // $data = [
-        //     'lead_name' => $lead->name,
-        //     'assignee' => $lead->assignee->name ?? 'Unassigned',
-        //     'close_date' => $lead->close_date ?? 'Not Set',
-        //     'confidence' => $lead->confidence ?? 'N/A',
-        // ];
+        // TRIGGER EMAIL 1: Lead Created
+        $notify->leadCreated($lead);
 
-        // Mail::to($emailTo)->send(new TestEmail(
-        //     'Lead',$data
-        // ));
-        $email = 'febev88675@bablace.com';
-
-        // SEND LEAD CREATED EMAIL
-        Mail::to('febev88675@bablace.com')->send(
-            new TestEmail('lead_created', [
-                'lead_name' => $lead->name,
-                'assignee' => $lead->assignee->name ?? 'Unassigned',
-                'close_date' => $lead->close_date,
-                'confidence' => $lead->confidence,
-            ])
-        );
-
-        // WAIT 12 SECONDS (Mailtrap requirement)
-        sleep(12);
-
-        // SEND LEAD ASSIGNED EMAIL
-        if ($lead->assignee_id) {
-            $salesUser = User::find($lead->assignee_id);
-
-            Mail::to($salesUser->email)->send(
-                new TestEmail('lead_assigned', [
-                    'lead_name' => $lead->name,
-                    'assignee' => $salesUser->name,
-                ])
-            );
-        }
+        // TRIGGER EMAIL 2: Lead Assigned (Delayed 12 sec)
+        $notify->leadAssigned($lead);
 
         return redirect()->back()->with('success', 'Lead created successfully!');
     }

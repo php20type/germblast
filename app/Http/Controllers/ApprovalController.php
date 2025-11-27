@@ -9,16 +9,25 @@ use Illuminate\Http\Request;
 
 class ApprovalController extends Controller
 {
-    public function process($token)
+    public function approve($token)
     {
         $result = ApprovalService::approve($token);
-
         $approval = Approval::where('approval_token', $token)->first();
+        $redirect = $approval->redirect_url ?? '/';
 
-        $redirectUrl = $approval->redirect_url ?? url('/'); // fallback to home
+        return redirect($redirect)
+            ->with($result['status'] ? 'success' : 'error', $result['message']);
+    }
 
-        return redirect($redirectUrl)
+    public function reject($token)
+    {
+        $result = ApprovalService::reject($token);
+        $approval = Approval::where('approval_token', $token)->first();
+        $redirect = $approval->redirect_url ?? '/';
+
+        return redirect($redirect)
             ->with($result['status'] ? 'success' : 'error', $result['message']);
     }
 }
+
 

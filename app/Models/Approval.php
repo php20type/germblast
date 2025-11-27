@@ -16,6 +16,7 @@ class Approval extends Model
         'redirect_url',
         'approval_token',
         'is_approved',
+        'is_rejected',
     ];
 
     protected $casts = [

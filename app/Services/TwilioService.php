@@ -6,30 +6,23 @@ use Twilio\Rest\Client;
 
 class TwilioService
 {
-    // protected $client;
-    // protected $from;
+    public function sendSMS($to, $message)
+    {
+        // DEV MODE → Fake SMS (logs only)
+        if (env('TWILIO_FAKE_MODE', true)) {
+            \Log::info("FAKE SMS → To: {$to} | Message: {$message}");
+            return true;
+        }
 
-    // public function __construct()
-    // {
-    //     $sid = config('services.twilio.sid');
-    //     $token = config('services.twilio.token');
-    //     $this->from = config('services.twilio.from');
+        // REAL Twilio SMS
+        $client = new Client(
+            env('TWILIO_SID'),
+            env('TWILIO_AUTH_TOKEN')
+        );
 
-    //     $this->client = new Client($sid, $token);
-    // }
-
-    // /**
-    //  * Send an SMS message.
-    //  *
-    //  * @param string $to
-    //  * @param string $message
-    //  * @return \Twilio\Rest\Api\V2010\Account\MessageInstance
-    //  */
-    // public function sendSms(string $to, string $message)
-    // {
-    //     return $this->client->messages->create($to, [
-    //         'from' => $this->from,
-    //         'body' => $message,
-    //     ]);
-    // }
+        return $client->messages->create($to, [
+            'from' => env('TWILIO_FROM'),
+            'body' => $message,
+        ]);
+    }
 }

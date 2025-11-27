@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Interfaces\CompanyRepositoryInterface;
-use App\Mail\TestEmail;
 use App\Models\ActivityType;
 use App\Models\Company;
 use App\Models\CompanyAddress;
@@ -26,11 +25,12 @@ use App\Models\Task;
 use App\Models\Territory;
 use App\Models\Timeline;
 use App\Models\User;
+use App\Services\ApprovalService;
+use App\Services\NotificationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -206,74 +206,7 @@ class CompanyController extends Controller
         ));
     }
 
-    // public function store(Request $request)
-    // {
-    //     DB::transaction(function () use ($request) {
-
-    //         // Step 1: Create company
-    //         $company = Company::create([
-    //             'user_id' => $request->user_id,
-    //             'name' => $request->name,
-    //             'description' => $request->description,
-    //             'company_type_id' => $request->company_type_id,
-    //             'industry_id' => $request->industry_id,
-    //             'territory_id' => $request->territory_id,
-    //         ]);
-
-    //         // Step 2: Store emails
-    //         if ($request->email) {
-    //             CompanyEmail::create([
-    //                 'company_id' => $company->id,
-    //                 'email' => $request->email,
-    //             ]);
-    //         }
-
-    //         // Step 3: Store phones
-    //         if ($request->phone) {
-    //             CompanyPhone::create([
-    //                 'company_id' => $company->id,
-    //                 'phone' => $request->phone,
-    //             ]);
-    //         }
-
-    //         // Step 4: Store addresses
-    //         if ($request->address) {
-    //             CompanyAddress::create([
-    //                 'company_id' => $company->id,
-    //                 'address' => $request->address,
-    //             ]);
-    //         }
-
-    //         // Step 5: Store URLs
-    //         if ($request->url) {
-    //             CompanyUrl::create([
-    //                 'company_id' => $company->id,
-    //                 'url' => $request->url,
-    //             ]);
-    //         }
-
-    //         // Step 6: Store people
-    //         if ($request->people_id) {
-    //             CompanyPeople::create([
-    //                 'company_id' => $company->id,
-    //                 'people_id' => $request->people_id,
-    //             ]);
-    //         }
-
-    //         // Step 7: Store tags
-    //         if ($request->tag_id) {
-    //             CompanyTag::create([
-    //                 'company_id' => $company->id,
-    //                 'tag_id' => $request->tag_id,
-    //             ]);
-    //         }
-
-    //     });
-
-    //     return redirect()->back()->with('success', 'Company created successfully!');
-    // }
-
-    public function store(Request $request)
+    public function store(Request $request, NotificationService $notify)
     {
         $company = null;
 
@@ -338,28 +271,29 @@ class CompanyController extends Controller
             }
         });
 
-        // SEND EMAIL NOTIFICATION - Sales Manager
-        // $salesManager = User::where('role', 'Sales Manager')->first();
-
-        // if ($salesManager) {
-        //     Mail::to($salesManager->email)->send(new TestEmail($company));
-        // }
-        $emailTo = 'febev88675@bablace.com'; // mailtrap temp or your testing email
-        $data = [
-            'name' => $company->name,
-            'description' => $company->description,
-            'company_type' => $company->companyType->type ?? 'N/A',
-            'industry' => $company->industry->name ?? 'N/A',
-            'territory' => $company->territory->name ?? 'N/A',
-        ];
-
-        Mail::to($emailTo)->send(new TestEmail(
-            'Company',
-            $data
-        ));
+        // SEND EMAIL NOTIFICATION
+        $notify->companyCreated($company);
 
         return redirect()->back()->with('success', 'Company created successfully!');
     }
+
+    // ======================
+    // This is for approval workflow
+    // ======================
+    // public function store(Request $request)
+    // {
+    //     ApprovalService::request(
+    //         'febev88675@bablace.com',
+    //         'company_create',
+    //         [
+    //             'request_data' => $request->all(),
+    //             'creator_id' => auth()->id(),
+    //         ],
+    //          url()->previous()
+    //     );
+
+    //     return redirect()->back()->with('success', 'Company creation request submitted for approval.');
+    // }
 
     public function ajax_store(Request $request)
     {

@@ -21,14 +21,12 @@ class ApprovalMail extends Mailable
         $this->approval = $approval;
     }
 
-    public function build()
-    {
-        $approvalUrl = route('approval.process', ['token' => $this->approval->approval_token]);
+   public function build()
+{
+    return $this->subject('Action Approval Required')
+                ->markdown('emails.approval', [
+                    'approval' => $this->approval,
+                ]);
+}
 
-        return $this->subject('Action Approval Required')
-                    ->markdown('emails.approval', [
-                        'approval' => $this->approval,
-                        'approvalUrl' => $approvalUrl,
-                    ]);
-    }
 }

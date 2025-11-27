@@ -7,8 +7,15 @@
     <!-- dashboard card start  -->
     <div class="dashboard-card my-4">
         @if (session('success'))
-            <div class="alert alert-success">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
         <div class="container-fluid">
@@ -742,7 +749,8 @@
                                 <div class="form-group">
                                     <label class="form-label">Due Date</label>
                                     <span class="text-danger">*</span>
-                                    <input type="text" name="due_date" placeholder="" class="form-control" id="due_date"/>
+                                    <input type="text" name="due_date" placeholder="" class="form-control"
+                                        id="due_date" />
                                 </div>
                             </div>
                             <div class="col-lg-12">
@@ -821,7 +829,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-             flatpickr("#due_date", {
+            flatpickr("#due_date", {
                 enableTime: true,
                 dateFormat: "Y-m-d h:i K", // h = 12-hour, K = AM/PM
                 minDate: "today",
@@ -1622,7 +1630,7 @@
                         value: "user:{{ $user->id }}"
                     }
                     @if (!$loop->last)
-                        ,w
+                        , w
                     @endif
                 @endforeach
             ];
@@ -1693,30 +1701,30 @@
     </script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const relatedToSelect = document.getElementById('related_to_select');
-        const relatedTypeInput = document.getElementById('related_type');
+        document.addEventListener('DOMContentLoaded', function() {
+            const relatedToSelect = document.getElementById('related_to_select');
+            const relatedTypeInput = document.getElementById('related_type');
 
-        // Function to update the hidden type field
-        const updateRelatedType = () => {
-            const selectedOption = relatedToSelect.options[relatedToSelect.selectedIndex];
-            // Check if an option is actually selected
-            if (selectedOption) {
-                // Get the entity type from the data attribute
-                const entityType = selectedOption.getAttribute('data-entity-type');
-                relatedTypeInput.value = entityType || ''; // Set value, default to empty string if not found
-            } else {
-                relatedTypeInput.value = '';
-            }
-        };
+            // Function to update the hidden type field
+            const updateRelatedType = () => {
+                const selectedOption = relatedToSelect.options[relatedToSelect.selectedIndex];
+                // Check if an option is actually selected
+                if (selectedOption) {
+                    // Get the entity type from the data attribute
+                    const entityType = selectedOption.getAttribute('data-entity-type');
+                    relatedTypeInput.value = entityType ||
+                        ''; // Set value, default to empty string if not found
+                } else {
+                    relatedTypeInput.value = '';
+                }
+            };
 
-        // Attach event listener to update on change
-        relatedToSelect.addEventListener('change', updateRelatedType);
+            // Attach event listener to update on change
+            relatedToSelect.addEventListener('change', updateRelatedType);
 
-        // Also run once on page load to initialize the hidden field
-        // in case an option is pre-selected (though not required by your current form)
-        updateRelatedType();
-    });
-</script>
-
+            // Also run once on page load to initialize the hidden field
+            // in case an option is pre-selected (though not required by your current form)
+            updateRelatedType();
+        });
+    </script>
 @endpush

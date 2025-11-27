@@ -13,6 +13,7 @@ class TestEmail extends Mailable
     use Queueable, SerializesModels;
 
     public $type;
+
     public $data;
 
     public function __construct($type, $data)
@@ -21,16 +22,11 @@ class TestEmail extends Mailable
         $this->data = $data;   // dynamic details
     }
 
-    // public function envelope(): Envelope
-    // {
-    //     return new Envelope(
-    //         subject: ucfirst($this->type) . ' Created Successfully',
-    //     );
-    // }
-     public function envelope(): Envelope
+    public function envelope(): Envelope
     {
         return new Envelope(
             subject: match ($this->type) {
+                'company_created' => 'New Company Added',
                 'lead_created' => 'New Lead Created',
                 'lead_assigned' => 'New Lead Assigned to You',
                 'meeting_required' => 'Initial Meeting Required',
@@ -40,23 +36,12 @@ class TestEmail extends Mailable
         );
     }
 
-    // public function content(): Content
-    // {
-    //     return new Content(
-    //         view: 'email-template.test',
-    //         with: [
-    //             'type' => $this->type,
-    //             'data' => $this->data
-    //         ],
-    //     );
-    // }
-      public function content(): Content
+    public function content(): Content
     {
         return new Content(
-            view: 'email-template.lead',
+            view: "email-template.{$this->type}",
             with: [
-                'type' => $this->type,
-                'data' => $this->data
+                'data' => $this->data,
             ]
         );
     }
