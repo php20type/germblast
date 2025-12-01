@@ -24,6 +24,7 @@ class Lead extends Model
         'expected_months',
         'expected_price',
         'expected_first_date',
+        'forecasting_status',
         'last_contacted',
         'last_modified',
         'market_id',
@@ -166,6 +167,11 @@ class Lead extends Model
     public function surveyProposal()
     {
         return $this->hasMany(SurveyProposal::class, 'lead_id');
+    }
+
+    public function leadStageProcess()
+    {
+        return $this->hasOne(LeadStageProcess::class, 'lead_id');
     }
 
 }

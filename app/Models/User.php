@@ -151,4 +151,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(SurveyEquipmentImage::class, 'user_id');
     }
+
+    public function initialMeetingCompleted()
+    {
+        return $this->hasMany(LeadStageProcess::class, 'initial_meeting_completed_by');
+    }
+
+    public function siteSurveyCompleted()
+    {
+        return $this->hasMany(LeadStageProcess::class, 'site_survey_completed_by');
+    }
 }

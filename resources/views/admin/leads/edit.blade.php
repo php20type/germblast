@@ -113,7 +113,7 @@
                                     <a href="#" class="d-none text-warning">Edit processes</a>
                                 </div>
 
-                                <div id="initial-meeting-stage" class="{{ $leads->stage_id == 1 ? '' : 'd-none' }}">
+                                {{-- <div id="initial-meeting-stage" class="{{ $leads->stage_id == 1 ? '' : 'd-none' }}">
                                     <div class="task-section mt-2">
                                         <div class="company-list mb-3 border rounded p-3">
                                             <div class="row align-items-start">
@@ -132,39 +132,122 @@
                                                 <div class="col-md-4 d-flex justify-content-end">
                                                     <div class="d-flex gap-2">
                                                         <!-- Completed -->
-                                                        {{-- <button class="btn btn-sm btn-outline-success"
+                                                        <button class="btn btn-sm btn-outline-success"
                                                             onclick="markCompleted()" title="Mark as Completed">
                                                             <i class="fas fa-check"></i>
-                                                        </button> --}}
-
-                                                        {{-- Reopen --}}
-                                                        {{-- <button class="btn btn-sm btn-outline-warning"
-                                                            onclick="reopenTask()" title="Reopen Task">
-                                                            <i class="fas fa-undo"></i>
-                                                        </button> --}}
-
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="timeline-container" style="font-size: small">
-                                                <div class="timeline-content p-3 mb-3">
-                                                    This is the first step in the process. During this meeting you should
-                                                    talk
-                                                    to the client about their organization and its needs. You should explain
-                                                    what GermBlast is using the company keynote presentation. <br><br>
-                                                    YOU SHOULD CLOSE FOR A SITE SURVEY AT THE VERY LEAST.
+                                            <div class="col-md-12 my-4">
+                                                <label for="meeting" class="form-label">Schedule meeting</label>
+                                                <input type="text" name="due_date" id="due_date" class="form-control"
+                                                    placeholder="Select meeting date" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> --}}
+
+                                <div id="initial-meeting-stage" class="{{ $leads->stage_id == 1 ? '' : 'd-none' }}">
+                                    <div class="task-section mt-2">
+                                        <div class="company-list mb-3 border rounded p-4 shadow-sm bg-white">
+
+                                            <!-- HEADER -->
+                                            <div class="row align-items-center mb-3">
+                                                <div class="col-md-8">
+                                                    <h5 class="mb-1">Initial Meeting</h5>
+
+                                                    {{-- If Completed --}}
+                                                    @if ($stage && $stage->initial_meeting_completed_at)
+                                                        <p class="text-secondary mb-0" style="font-size: 16px;">
+                                                            Completed On
+                                                            <strong>
+                                                                {{ \Carbon\Carbon::parse($stage->initial_meeting_completed_at)->format('M d, Y g:i A') }}
+                                                            </strong>
+                                                            <span class="text-warning">
+                                                                By {{ $stage->initialMeetingCompletedBy->name ?? 'N/A' }}
+                                                            </span>
+                                                        </p>
+                                                    @endif
+
+                                                    {{-- If Scheduled but not completed --}}
+                                                    @if ($stage && $stage->initial_meeting_scheduled_at && !$stage->initial_meeting_completed_at)
+                                                        <p class="text-secondary mb-0" style="font-size: 16px;">
+                                                            Scheduled On
+                                                            <strong>
+                                                                {{ \Carbon\Carbon::parse($stage->initial_meeting_scheduled_at)->format('M d, Y g:i A') }}
+                                                            </strong>
+                                                        </p>
+                                                    @endif
                                                 </div>
-                                                <div class="timeline-content p-3">
-                                                    You must have a person attached to the lead to complete this step.
+
+                                                <div class="col-md-4 d-flex justify-content-end">
+
+                                                    {{-- If COMPLETED → show "Reopen" button --}}
+                                                    @if ($stage && $stage->initial_meeting_completed_at)
+                                                        <button class="btn btn-sm btn-outline-warning"
+                                                            onclick="reopenInitialMeeting()" title="Reopen Stage">
+                                                            <i class="fas fa-undo"></i>
+                                                        </button>
+
+                                                        {{-- If NOT completed but scheduled → show "Complete" button --}}
+                                                    @elseif ($stage && $stage->initial_meeting_scheduled_at)
+                                                        <button class="btn btn-sm btn-outline-success mx-2"
+                                                            onclick="initialMeetingCompleted()">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+
+                                                        <!-- Edit -->
+                                                        <button class="btn btn-sm btn-outline-primary" title="Edit Stage"
+                                                            onclick="editInitialMeeting()">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                    @else
+                                                        <button class="btn btn-sm btn-outline-secondary" disabled
+                                                            title="Schedule meeting first">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    @endif
+
                                                 </div>
+                                            </div>
+
+                                            <!-- SCHEDULE MEETING SECTION -->
+                                            <div class="mt-3">
+                                                {{-- HIDE SCHEDULER IF COMPLETED --}}
+                                                @if (!$stage || !$stage->initial_meeting_completed_at)
+                                                    {{-- If scheduled already, show summary, NOT the input --}}
+                                                    @if ($stage && !$stage->initial_meeting_scheduled_at)
+                                                        {{-- Show scheduler input --}}
+                                                        <label class="form-label fw-bold">Schedule Meeting</label>
+                                                        <div class="row g-2 align-items-center">
+
+                                                            <div class="col-md-8 col-12">
+                                                                <input type="datetime-local" name="schedule_meeting_date"
+                                                                    id="schedule_meeting_date" class="form-control"
+                                                                    required>
+                                                            </div>
+
+                                                            <div class="col-md-4 col-12">
+                                                                <button class="btn btn-success w-100"
+                                                                    onclick="scheduleMeeting()">
+                                                                    Schedule
+                                                                </button>
+                                                            </div>
+
+                                                        </div>
+                                                    @endif
+                                                @endif
                                             </div>
 
                                         </div>
                                     </div>
                                 </div>
 
-                                <div id="site-survey-stage" class="{{ $leads->stage_id == 2 ? '' : 'd-none' }}">
-                                    {{-- Sales Forecasting --}}
+
+
+                                {{-- <div id="site-survey-stage" class="{{ $leads->stage_id == 2 ? '' : 'd-none' }}">
+                                    {{-- Sales Forecasting --}
                                     <div class="task-section mt-2">
                                         <div class="company-list mb-3 border rounded p-3">
                                             <div class="row align-items-start">
@@ -185,7 +268,7 @@
                                         </div>
                                     </div>
 
-                                    {{-- Survey & Proposal --}}
+                                    {{-- Survey & Proposal --}
                                     <div class="task-section mt-2">
                                         <div class="company-list mb-3 border rounded p-3">
                                             <div class="row align-items-start">
@@ -196,7 +279,8 @@
                                                 </div>
                                                 <div class="col-md-4 d-flex justify-content-end">
                                                     <div class="d-flex gap-2">
-                                                        <a class="text-warning" href="{{ route('admin.leads.survey.proposal', $leads->id) }}"
+                                                        <a class="text-warning"
+                                                            href="{{ route('admin.leads.survey.proposal', $leads->id) }}"
                                                             target="_blank" id="toggleAddProposal">Add Proposal</a>
                                                     </div>
                                                 </div>
@@ -221,7 +305,7 @@
 
                                                 <div class="col-md-4 d-flex justify-content-end">
                                                     <div class="d-flex gap-2">
-                                                        {{-- Buttons --}}
+                                                        {{-- Buttons --}
                                                     </div>
                                                 </div>
                                             </div>
@@ -234,6 +318,154 @@
 
                                         </div>
                                     </div>
+
+                                </div> --}}
+
+
+                                <div id="site-survey-stage" class="{{ $leads->stage_id == 2 ? '' : 'd-none' }}">
+
+                                    @php
+                                        // Only show forecasting & proposal AFTER site survey is COMPLETED
+                                        $isSurveyCompleted = $stage && $stage->site_survey_completed_at;
+                                    @endphp
+
+                                    {{-- PERFORM SITE SURVEY --}}
+                                    <div class="task-section mt-2">
+                                        <div class="company-list mb-3 border rounded p-4 shadow-sm bg-white">
+
+                                            <!-- HEADER -->
+                                            <div class="row align-items-center mb-3">
+                                                <div class="col-md-8">
+
+                                                    <h5 class="mb-1">Perform Site Survey</h5>
+
+                                                    {{-- Completed --}}
+                                                    @if ($stage && $stage->site_survey_completed_at)
+                                                        <p class="text-secondary mb-0" style="font-size: 16px;">
+                                                            Completed On
+                                                            <strong>
+                                                                {{ \Carbon\Carbon::parse($stage->site_survey_completed_at)->format('M d, Y g:i A') }}
+                                                            </strong>
+                                                            <span class="text-warning">
+                                                                By {{ $stage->siteSurveyCompletedBy->name ?? 'N/A' }}
+                                                            </span>
+                                                        </p>
+                                                    @endif
+
+                                                    {{-- Scheduled but not completed --}}
+                                                    @if ($stage && $stage->site_survey_scheduled_at && !$stage->site_survey_completed_at)
+                                                        <p class="text-secondary mb-0" style="font-size: 16px;">
+                                                            Scheduled On
+                                                            <strong>
+                                                                {{ \Carbon\Carbon::parse($stage->site_survey_scheduled_at)->format('M d, Y g:i A') }}
+                                                            </strong>
+                                                        </p>
+                                                    @endif
+
+                                                </div>
+
+                                                <div class="col-md-4 d-flex justify-content-end">
+
+                                                    {{-- Completed → Reopen --}}
+                                                    @if ($stage && $stage->site_survey_completed_at)
+                                                        <button class="btn btn-sm btn-outline-warning"
+                                                            onclick="reopenSiteSurvey()" title="Reopen Stage">
+                                                            <i class="fas fa-undo"></i>
+                                                        </button>
+
+                                                        {{-- Scheduled → Complete + Edit --}}
+                                                    @elseif ($stage && $stage->site_survey_scheduled_at)
+                                                        <button class="btn btn-sm btn-outline-success mx-2"
+                                                            onclick="completeSiteSurvey()" title="Mark as Completed">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+
+                                                        <button class="btn btn-sm btn-outline-primary"
+                                                            onclick="editSiteSurvey()" title="Edit Site Survey">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+
+                                                        {{-- Not Scheduled --}}
+                                                    @else
+                                                        <button class="btn btn-sm btn-outline-secondary" disabled
+                                                            title="Schedule survey first">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    @endif
+
+                                                </div>
+                                            </div>
+
+
+                                            <!-- SCHEDULE SITE SURVEY -->
+                                            <div class="mt-3">
+                                                @if (!$stage || !$stage->site_survey_completed_at)
+
+                                                    @if ($stage && !$stage->site_survey_scheduled_at)
+                                                        <label class="form-label fw-bold">Schedule Site Survey</label>
+
+                                                        <div class="row g-2 align-items-center">
+
+                                                            <div class="col-md-8 col-12">
+                                                                <input type="datetime-local" name="site_survey_date"
+                                                                    id="site_survey_date" class="form-control" required>
+                                                            </div>
+
+                                                            <div class="col-md-4 col-12">
+                                                                <button class="btn btn-success w-100"
+                                                                    onclick="scheduleSiteSurvey()">
+                                                                    Schedule
+                                                                </button>
+                                                            </div>
+
+                                                        </div>
+                                                    @endif
+
+                                                @endif
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    {{-- SHOW THESE SECTIONS ONLY WHEN SITE SURVEY IS COMPLETED --}}
+                                    @if ($isSurveyCompleted)
+                                        {{-- SALES FORECASTING --}}
+                                        <div class="task-section mt-2">
+                                            <div class="company-list mb-3 border rounded p-4 shadow-sm bg-white">
+                                                <div class="row align-items-center">
+                                                    <div class="col-md-8">
+                                                        <h5 class="mb-1">Sales Forecasting</h5>
+                                                    </div>
+
+                                                    <div class="col-md-4 d-flex justify-content-end">
+                                                        <a class="text-warning fw-semibold" href="javascript:void(0);"
+                                                            onclick="addForecasting()">
+                                                            Add Forecasting
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {{-- SURVEY & PROPOSAL --}}
+                                        <div class="task-section mt-2">
+                                            <div class="company-list mb-3 border rounded p-4 shadow-sm bg-white">
+                                                <div class="row align-items-center">
+                                                    <div class="col-md-8">
+                                                        <h5 class="mb-1">Survey & Proposal</h5>
+                                                    </div>
+
+                                                    <div class="col-md-4 d-flex justify-content-end">
+                                                        <a class="text-warning fw-semibold"
+                                                            href="{{ route('admin.leads.survey.proposal', $leads->id) }}"
+                                                            target="_blank">
+                                                            Add Proposal
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
 
                                 </div>
 
@@ -370,31 +602,6 @@
                                     </div>
                                 </div>
 
-                            </div>
-                        </div>
-
-                        <!-- Tasks Section -->
-                        <div class="section-card">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5>Custom fields</h5>
-                                <a href="javascript:void(0);" class="text-warning">Create custom fields</a>
-                            </div>
-                            <div class="d-flex align-items-start">
-                                <div class="task-icon me-3">
-                                    <i class="fas fa-list"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <h6>Customize relevant information about your leads</h6>
-                                    <p class="text-muted mb-0">Create your own fields to capture unique details
-                                        about your leads, benefiting both you and your company. Prioritize your
-                                        top three fields here; the remaining fields will be accessible on the
-                                        sidebar.</p>
-                                    <br>
-                                    <p class="text-muted mb-0">
-                                        Note: User will be redirected to settings > organization > custom fields
-                                        to create custom fields.
-                                    </p>
-                                </div>
                             </div>
                         </div>
 
@@ -1709,8 +1916,8 @@
                                             id="schedule_mentioned_company_ids" value="">
                                         <input type="hidden" name="mentioned_people_ids"
                                             id="schedule_mentioned_people_ids" value="">
-                                        <input type="hidden" name="mentioned_user_ids" id="schedule_mentioned_user_ids"
-                                            value="">
+                                        <input type="hidden" name="mentioned_user_ids"
+                                            id="schedule_mentioned_user_ids" value="">
 
                                         <!-- Hidden field to store processed note content -->
                                         <input type="hidden" name="schedule_note_value" id="schedule_note_value"
@@ -1742,7 +1949,8 @@
                                 <div class="col-lg-6 mt-2">
                                     <div class="form-group">
                                         <label class="form-label">Start Time</label>
-                                        <select class="form-select select2" id="start_time" name="start_time" required>
+                                        <select class="form-select select2" id="start_time" name="start_time"
+                                            required>
                                         </select>
                                     </div>
                                 </div>
@@ -1860,7 +2068,7 @@
                                     <label class="form-label">Number of Services <span
                                             class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="expected_services"
-                                    value="{{ $leads->expected_services ?? '' }}"
+                                        value="{{ $leads->expected_services ?? '' }}"
                                         placeholder="Enter expected number of services">
                                 </div>
 
@@ -1868,13 +2076,14 @@
                                     <label class="form-label">Number of Months <span
                                             class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="expected_months"
-                                    value="{{ $leads->expected_months ?? '' }}"
+                                        value="{{ $leads->expected_months ?? '' }}"
                                         placeholder="Enter expected number of months (e.g. 12)">
                                 </div>
 
                                 <div class="col-lg-12 mb-3">
                                     <label class="form-label">Price <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="expected_price" value="{{ $leads->expected_price ?? '' }}"
+                                    <input type="text" class="form-control" name="expected_price"
+                                        value="{{ $leads->expected_price ?? '' }}"
                                         placeholder="Enter expected price per service">
                                 </div>
 
@@ -1882,8 +2091,7 @@
                                     <label class="form-label">First Service Date <span
                                             class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="service_date"
-                                        name="expected_first_date"
-                                        value="{{ $leads->expected_first_date ?? '' }}"
+                                        name="expected_first_date" value="{{ $leads->expected_first_date ?? '' }}"
                                         placeholder="Select expected first service date">
                                 </div>
                             </div>
@@ -1905,6 +2113,206 @@
         @endsection
 
         @push('scripts')
+            <script>
+                function initialMeetingCompleted() {
+                    Swal.fire({
+                        title: "Complete Initial Meeting?",
+                        icon: "question",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, complete it"
+                    }).then((result) => {
+                        if (!result.isConfirmed) return;
+
+                        $.ajax({
+                            url: "{{ route('admin.lead.initial.complete', $leads->id) }}",
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                            },
+                            success: function(res) {
+                                Swal.fire("Success", res.message, "success").then(() => {
+                                    location.reload();
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire("Error", xhr.responseJSON?.message ?? "Failed", "error");
+                            }
+                        });
+                    });
+                }
+
+                function editInitialMeeting() {
+                    Swal.fire({
+                        title: "Edit Initial Meeting?",
+                        text: "This will remove scheduled & completed data.",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, Edit"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+
+                            $.post("{{ route('admin.lead.initial.reset', $leads->id) }}", {
+                                    _token: "{{ csrf_token() }}"
+                                })
+                                .done(function(res) {
+
+                                    Swal.fire({
+                                        title: "Updated!",
+                                        text: res.message,
+                                        icon: "success",
+                                        timer: 1200,
+                                        showConfirmButton: false
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+
+                                })
+                                .fail(function(xhr) {
+                                    Swal.fire("Error", xhr.responseJSON.message, "error");
+                                });
+                        }
+                    });
+                }
+
+
+                function reopenInitialMeeting() {
+                    Swal.fire({
+                        title: "Reopen Initial Meeting Stage?",
+                        text: "This will clear the scheduled date and completion status.",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, Reopen",
+                        cancelButtonText: "Cancel"
+                    }).then((result) => {
+
+                        if (!result.isConfirmed) return;
+
+                        $.ajax({
+                            url: "{{ route('admin.lead.initial.reopen', $leads->id) }}",
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(res) {
+                                Swal.fire("Reopened", res.message, "success").then(() => {
+                                    location.reload();
+                                });
+                            },
+                            error: function(xhr) {
+                                let msg = xhr.responseJSON?.message ?? "Something went wrong!";
+                                Swal.fire("Error", msg, "error");
+                            }
+                        });
+
+                    });
+                }
+
+                function scheduleMeeting() {
+
+                    let date = $('#schedule_meeting_date').val();
+                    let leadId = "{{ $leads->id }}";
+
+                    if (!date) {
+                        Swal.fire("Error", "Please select a meeting date.", "error");
+                        return;
+                    }
+
+                    $.ajax({
+                        url: "{{ route('admin.lead.initial.schedule', $leads->id) }}",
+                        type: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            schedule_meeting_date: date
+                        },
+                        success: function(res) {
+                            Swal.fire("Success", res.message, "success").then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function(xhr) {
+                            let msg = xhr.responseJSON?.message ?? "Something went wrong!";
+                            Swal.fire("Error", msg, "error");
+                        }
+                    });
+                }
+
+                function scheduleSiteSurvey() {
+                    let date = $("#site_survey_date").val();
+
+                    $.post("{{ route('admin.lead.site_survey.schedule', $leads->id) }}", {
+                            _token: "{{ csrf_token() }}",
+                            site_survey_date: date
+                        })
+                        .done(function(res) {
+                            Swal.fire("Success", res.message, "success")
+                                .then(() => location.reload());
+                        })
+                        .fail(function(xhr) {
+                            Swal.fire("Error", xhr.responseJSON.message, "error");
+                        });
+                }
+
+                function completeSiteSurvey() {
+                    $.post("{{ route('admin.lead.site_survey.complete', $leads->id) }}", {
+                            _token: "{{ csrf_token() }}"
+                        })
+                        .done(function(res) {
+                            Swal.fire("Completed", res.message, "success")
+                                .then(() => location.reload());
+                        })
+                        .fail(function(xhr) {
+                            Swal.fire("Error", xhr.responseJSON.message, "error");
+                        });
+                }
+
+                function reopenSiteSurvey() {
+                    Swal.fire({
+                        title: "Reopen Site Survey?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, Reopen",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.post("{{ route('admin.lead.site_survey.reopen', $leads->id) }}", {
+                                    _token: "{{ csrf_token() }}"
+                                })
+                                .done(function(res) {
+                                    Swal.fire("Reopened", res.message, "success")
+                                        .then(() => location.reload());
+                                })
+                                .fail(function(xhr) {
+                                    Swal.fire("Error", xhr.responseJSON.message, "error");
+                                });
+                        }
+                    });
+                }
+
+                function editSiteSurvey() {
+                    Swal.fire({
+                        title: "Edit Site Survey?",
+                        text: "This will remove scheduled date.",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, Edit",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.post("{{ route('admin.lead.site_survey.reset', $leads->id) }}", {
+                                    _token: "{{ csrf_token() }}"
+                                })
+                                .done(function(res) {
+                                    Swal.fire("Updated", res.message, "success")
+                                        .then(() => location.reload());
+                                })
+                                .fail(function(xhr) {
+                                    Swal.fire("Error", xhr.responseJSON.message, "error");
+                                });
+                        }
+                    });
+                }
+            </script>
+
             <script>
                 function scheduleActivity() {
                     $('#schedule-activity').modal('show');

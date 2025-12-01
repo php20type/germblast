@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\SaleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\ApprovalController;
+use App\Http\Controllers\LeadStageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SurveyProposalController;
 use App\Models\ActivityType;
@@ -181,6 +182,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('leads/update-field', [LeadController::class, 'updateField'])->name('leads.update-field');
     Route::post('/leads/add-product', [LeadController::class, 'addProduct'])->name('leads.add-product');
 
+    // Lead Stage Process
+    Route::post('/lead/{lead}/initial-meeting/schedule', [LeadStageController::class, 'scheduleInitialMeeting'])->name('lead.initial.schedule');
+    Route::post('/lead/{lead}/initial-meeting/complete', [LeadStageController::class, 'completeInitialMeeting'])->name('lead.initial.complete');
+    Route::post('/lead/{lead}/initial-meeting/reopen', [LeadStageController::class, 'reopenInitialMeeting'])->name('lead.initial.reopen');
+    Route::post('/leads/{lead}/initial-meeting/reset', [LeadStageController::class, 'resetInitialMeeting'])->name('lead.initial.reset');
+
+    Route::post('/lead/{lead}/site-survey/schedule', [LeadStageController::class, 'scheduleSiteSurvey'])->name('lead.site_survey.schedule');
+    Route::post('/lead/{lead}/site-survey/complete', [LeadStageController::class, 'completeSiteSurvey'])->name('lead.site_survey.complete');
+    Route::post('/lead/{lead}/site-survey/reopen', [LeadStageController::class, 'reopenSiteSurvey'])->name('lead.site_survey.reopen');
+    Route::post('/lead/{lead}/site-survey/reset', [LeadStageController::class, 'resetSiteSurvey'])->name('lead.site_survey.reset');
+
     // Lead - Survey Proposal Section
     Route::get('/leads/{lead}/survey/proposal', [SurveyProposalController::class, 'survey_proposal'])->name('leads.survey.proposal');
     Route::post('/leads/{lead}/survey/proposal/store', [SurveyProposalController::class, 'survey_proposal_store'])
@@ -204,7 +216,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/survey/proposal/{equipment}/equipment/update', [SurveyProposalController::class, 'survey_equipment_update'])
         ->name('survey.proposal.equipment.update');
     Route::post('/pricing-proposal/create-empty', [SurveyProposalController::class, 'createEmpty'])->name('pricing-proposal.createEmpty');
-    Route::post('/pricing-proposal/save-full',[SurveyProposalController::class, 'saveFull'])->name('pricing-proposal.saveFull');
+    Route::post('/pricing-proposal/save-full', [SurveyProposalController::class, 'saveFull'])->name('pricing-proposal.saveFull');
     Route::post('/pricing-proposal/save-selections', [SurveyProposalController::class, 'saveSelections'])
         ->name('pricing-proposal.saveSelections');
     Route::post('/pricing-proposal/save-settings', [SurveyProposalController::class, 'saveSettings'])->name('pricing-proposal.saveSettings');
@@ -250,4 +262,3 @@ Route::get('/states/{countryId}', [SettingController::class, 'getStatesByCountry
 Route::get('/cities/{stateId}', [SettingController::class, 'getCitiesByState'])->name('get.cities');
 Route::get('/approval/approve/{token}', [ApprovalController::class, 'approve'])->name('approval.approve');
 Route::get('/approval/reject/{token}', [ApprovalController::class, 'reject'])->name('approval.reject');
-

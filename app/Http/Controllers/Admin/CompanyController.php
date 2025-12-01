@@ -60,32 +60,28 @@ class CompanyController extends Controller
         return compact('formattedTotalCompanies', 'formattedMyCompanies');
     }
 
-    public function index(Request $request)
+    private function applyCompanyFilters($query, Request $request)
     {
-        $query = $this->companyRepo->getAllWithRelations();
-
-        // Apply filters here in Controller
         if ($request->filled('search')) {
             $query->where('name', 'like', "%{$request->search}%");
         }
+
         if ($request->filled('company_type_id')) {
             $query->where('company_type_id', $request->company_type_id);
         }
+
         if ($request->filled('user_id')) {
-            $query->whereHas('user', function ($q) use ($request) {
-                $q->where('user_id', $request->user_id);
-            });
+            $query->whereHas('user', fn ($q) => $q->where('user_id', $request->user_id));
         }
+
         if ($request->filled('people_id')) {
-            $query->whereHas('peoples', function ($q) use ($request) {
-                $q->where('people_id', $request->people_id);
-            });
+            $query->whereHas('peoples', fn ($q) => $q->where('people_id', $request->people_id));
         }
+
         if (! empty($request->company_tags_filter_id)) {
-            $query->whereHas('tags', function ($q) use ($request) {
-                $q->whereIn('tags.id', $request->company_tags_filter_id);
-            });
+            $query->whereHas('tags', fn ($q) => $q->whereIn('tags.id', $request->company_tags_filter_id));
         }
+
         if (! empty($request->industry_filter_id)) {
             $query->whereIn('industry_id', $request->industry_filter_id);
         }
@@ -93,32 +89,44 @@ class CompanyController extends Controller
         if (! empty($request->territory_filter_id)) {
             $query->whereIn('territory_id', $request->territory_filter_id);
         }
+
         if (! empty($request->activity_type_filter_id)) {
-            $query->whereHas('activity', function ($q) use ($request) {
-                $q->whereIn('activity_type_id', $request->activity_type_filter_id);
-            });
+            $query->whereHas('activity', fn ($q) => $q->whereIn('activity_type_id', $request->activity_type_filter_id));
         }
+
         if (! empty($request->leads_status)) {
-            $query->whereHas('leads', function ($q) use ($request) {
-                $q->whereIn('lead_status', $request->leads_status);
-            });
+            $query->whereHas('leads', fn ($q) => $q->whereIn('lead_status', $request->leads_status));
         }
+
+        return $query;
+    }
+
+    private function getCompanySharedData()
+    {
+        return [
+            'peoples' => People::all(),
+            'users' => User::all(),
+            'products' => Product::all(),
+            'allCompanies' => Company::all(),
+            'sources' => Source::all(),
+            'activity_types' => ActivityType::all(),
+            'industries' => Industry::all(),
+            'territories' => Territory::all(),
+            'competitors' => Competitor::all(),
+            'companytags' => Tag::where('tag_id', 2)->get(),
+            'company_types' => CompanyType::all(),
+        ];
+    }
+
+    public function index(Request $request)
+    {
+        $query = $this->applyCompanyFilters(
+            $this->companyRepo->getAllWithRelations(),
+            $request
+        );
 
         $companies = $query->get();
         $companiesCount = $companies->count();
-
-        $peoples = People::all();
-        $users = User::all();
-        $products = Product::all();
-        $allCompanies = Company::all();
-        $sources = Source::all();
-        $activity_types = ActivityType::all();
-        $industries = Industry::all();
-        $territories = Territory::all();
-        $competitors = Competitor::all();
-        $companytags = Tag::where('tag_id', 2)->get();
-        $company_types = CompanyType::all();
-        $sidebarStats = $this->getSidebarStats();
 
         if ($request->ajax()) {
             return response()->json([
@@ -128,70 +136,21 @@ class CompanyController extends Controller
         }
 
         return view('admin.company.index', array_merge(
-            compact('companies', 'peoples', 'users', 'products', 'allCompanies', 'sources', 'activity_types', 'industries', 'territories', 'competitors', 'companytags', 'company_types', 'companiesCount'),
-            $sidebarStats
+            compact('companies', 'companiesCount'),
+            $this->getCompanySharedData(),
+            $this->getSidebarStats()
         ));
     }
 
     public function my_companies(Request $request, $id)
     {
-        $query = $this->companyRepo->getByUserWithRelations($id);
-
-        // Apply filters here in Controller
-        if ($request->filled('search')) {
-            $query->where('name', 'like', "%{$request->search}%");
-        }
-        if ($request->filled('company_type_id')) {
-            $query->where('company_type_id', $request->company_type_id);
-        }
-        if ($request->filled('user_id')) {
-            $query->whereHas('user', function ($q) use ($request) {
-                $q->where('user_id', $request->user_id);
-            });
-        }
-        if ($request->filled('people_id')) {
-            $query->whereHas('peoples', function ($q) use ($request) {
-                $q->where('people_id', $request->people_id);
-            });
-        }
-        if (! empty($request->company_tags_filter_id)) {
-            $query->whereHas('tags', function ($q) use ($request) {
-                $q->whereIn('tags.id', $request->company_tags_filter_id);
-            });
-        }
-        if (! empty($request->industry_filter_id)) {
-            $query->whereIn('industry_id', $request->industry_filter_id);
-        }
-
-        if (! empty($request->territory_filter_id)) {
-            $query->whereIn('territory_id', $request->territory_filter_id);
-        }
-        if (! empty($request->activity_type_filter_id)) {
-            $query->whereHas('activity', function ($q) use ($request) {
-                $q->whereIn('activity_type_id', $request->activity_type_filter_id);
-            });
-        }
-        if (! empty($request->leads_status)) {
-            $query->whereHas('leads', function ($q) use ($request) {
-                $q->whereIn('lead_status', $request->leads_status);
-            });
-        }
+        $query = $this->applyCompanyFilters(
+            $this->companyRepo->getByUserWithRelations($id),
+            $request
+        );
 
         $companies = $query->get();
-        $totalMyCompanies = $query->count();
-
-        $peoples = People::all();
-        $users = User::all();
-        $products = Product::all();
-        $allCompanies = Company::all();
-        $sources = Source::all();
-        $activity_types = ActivityType::all();
-        $industries = Industry::all();
-        $territories = Territory::all();
-        $competitors = Competitor::all();
-        $companytags = Tag::where('tag_id', 2)->get();
-        $company_types = CompanyType::all();
-        $sidebarStats = $this->getSidebarStats();
+        $totalMyCompanies = $companies->count();
 
         if ($request->ajax()) {
             return response()->json([
@@ -201,8 +160,9 @@ class CompanyController extends Controller
         }
 
         return view('admin.company.my-companies', array_merge(
-            compact('companies', 'peoples', 'users', 'company_types', 'totalMyCompanies', 'products', 'allCompanies', 'activity_types', 'industries', 'territories', 'sources', 'competitors', 'companytags'),
-            $sidebarStats
+            compact('companies', 'totalMyCompanies'),
+            $this->getCompanySharedData(),
+            $this->getSidebarStats()
         ));
     }
 

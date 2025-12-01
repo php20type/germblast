@@ -8,9 +8,9 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class TestEmail extends Mailable
+class ActionEmail extends Mailable
 {
-    use Queueable, SerializesModels;
+      use Queueable, SerializesModels;
 
     public $type;
 
@@ -29,22 +29,23 @@ class TestEmail extends Mailable
                 'company_created' => 'New Company Added',
                 'lead_created' => 'New Lead Created',
                 'lead_assigned' => 'New Lead Assigned to You',
-                'meeting_required' => 'Initial Meeting Required',
-                'meeting_scheduled' => 'Initial Meeting Scheduled',
+                'initial_meeting_scheduled' => 'Initial Meeting Scheduled',
+                'initial_meeting_completed' => 'Initial Meeting Completed',
+                'site_survey_scheduled' => 'Site Survey Scheduled',
+                'site_survey_completed' => 'Site Survey Completed',
                 default => 'Lead Notification'
             }
         );
     }
 
-    public function content(): Content
+     public function content(): Content
     {
         return new Content(
-            view: "email-template.{$this->type}",
-            with: [
-                'data' => $this->data,
-            ]
+            markdown: "email-template.{$this->type}",
+            with: ['data' => $this->data]
         );
     }
+
 
     public function attachments(): array
     {

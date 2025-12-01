@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Mail\TestEmail;
+use App\Mail\ActionEmail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;
@@ -31,7 +31,7 @@ class SendEmailJob implements ShouldQueue
     public function handle(): void
     {
         Mail::to($this->email)->send(
-            new TestEmail($this->type, $this->data)
+            new ActionEmail($this->type, $this->data)
         );
     }
 }

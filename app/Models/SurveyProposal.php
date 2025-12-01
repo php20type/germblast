@@ -24,6 +24,7 @@ class SurveyProposal extends Model
         'specialist_narrative',
         'supplemental_title',
         'supplemental_body',
+        'status'
     ];
 
     public function lead()

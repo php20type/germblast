@@ -53,70 +53,74 @@ class PeopleController extends Controller
         return compact('myPeopleCount', 'formattedMyPeopleCount', 'totalPeoples', 'formattedTotalPeoples');
     }
 
-    public function index(Request $request)
+    private function applyPeopleFilters($query, Request $request)
     {
-        $user = auth()->user();
-        $query = People::with(['companies', 'tags', 'user', 'peopleEmail', 'peoplePhone',
-            'peopleAddress', 'peopleUrl', 'peopleCompany']);
-
-        // AJAX filters
-        if ($request->ajax()) {
-
-            // Search by people name
-            if ($request->filled('search')) {
-                $search = $request->search;
-                $query->where('name', 'like', "%{$search}%");
-            }
-
-            if ($request->filled('user_id')) {
-                $query->whereHas('user', function ($q) use ($request) {
-                    $q->where('user_id', $request->user_id);
-                });
-            }
-            if ($request->filled('company_id')) {
-                $query->whereHas('companiesAlt', function ($q) use ($request) {
-                    $q->where('company_id', $request->company_id);
-                });
-            }
-            if (! empty($request->people_tags_filter_id)) {
-                $query->whereHas('tags', function ($q) use ($request) {
-                    $q->whereIn('tags.id', $request->people_tags_filter_id);
-                });
-            }
-            if (! empty($request->territory_filter_id)) {
-                $query->whereIn('territory_id', $request->territory_filter_id);
-            }
-            if (! empty($request->activity_type_filter_id)) {
-                $query->whereHas('activity', function ($q) use ($request) {
-                    $q->whereIn('activity_type_id', $request->activity_type_filter_id);
-                });
-            }
-            if (! empty($request->leads_status)) {
-                $query->whereHas('leads', function ($q) use ($request) {
-                    $q->whereIn('lead_status', $request->leads_status);
-                });
-            }
-
+        if ($request->filled('search')) {
+            $query->where('name', 'like', "%{$request->search}%");
         }
 
-        // Get filtered people
+        if ($request->filled('user_id')) {
+            $query->whereHas('user', fn ($q) => $q->where('user_id', $request->user_id)
+            );
+        }
+
+        if ($request->filled('company_id')) {
+            $query->whereHas('companiesAlt', fn ($q) => $q->where('company_id', $request->company_id)
+            );
+        }
+
+        if (! empty($request->people_tags_filter_id)) {
+            $query->whereHas('tags', fn ($q) => $q->whereIn('tags.id', $request->people_tags_filter_id)
+            );
+        }
+
+        if (! empty($request->territory_filter_id)) {
+            $query->whereIn('territory_id', $request->territory_filter_id);
+        }
+
+        if (! empty($request->activity_type_filter_id)) {
+            $query->whereHas('activity', fn ($q) => $q->whereIn('activity_type_id', $request->activity_type_filter_id)
+            );
+        }
+
+        if (! empty($request->leads_status)) {
+            $query->whereHas('leads', fn ($q) => $q->whereIn('lead_status', $request->leads_status)
+            );
+        }
+
+        return $query;
+    }
+
+    private function getPeopleSharedData()
+    {
+        return [
+            'companies' => Company::all(),
+            'users' => User::all(),
+            'products' => Product::all(),
+            'allPeoples' => People::all(),
+            'sources' => Source::all(),
+            'activity_types' => ActivityType::all(),
+            'territories' => Territory::all(),
+            'competitors' => Competitor::all(),
+            'peopletags' => Tag::where('tag_id', 3)->get(),
+        ];
+    }
+
+    public function index(Request $request)
+    {
+        $query = People::with([
+            'companies', 'tags', 'user',
+            'peopleEmail', 'peoplePhone', 'peopleAddress',
+            'peopleUrl', 'peopleCompany',
+        ]);
+
+        // Apply shared filters
+        $this->applyPeopleFilters($query, $request);
+
         $peoples = $query->get();
         $peoplesCount = $peoples->count();
 
-        $companies = Company::all();
-        $users = User::all();
-        $products = Product::all();
-        $allPeoples = People::all();
-        $sources = Source::all();
-        $activity_types = ActivityType::all();
-        $territories = Territory::all();
-        $competitors = Competitor::all();
-        $peopletags = Tag::where('tag_id', 3)->get();
-
-        // Sidebar stats
-        $sidebarStats = $this->getSidebarStats();
-
-        // Return partial for AJAX
+        // AJAX response
         if ($request->ajax()) {
             return response()->json([
                 'table' => view('admin.peoples.partials.people-table-row', compact('peoples'))->render(),
@@ -124,80 +128,29 @@ class PeopleController extends Controller
             ]);
         }
 
-        // Normal page load
+        // Full page load
         return view('admin.peoples.index', array_merge(
-            compact('peoples', 'peoplesCount', 'companies', 'users', 'products', 'allPeoples', 'sources', 'activity_types', 'territories', 'competitors', 'peopletags'),
-            $sidebarStats
+            compact('peoples', 'peoplesCount'),
+            $this->getPeopleSharedData(),
+            $this->getSidebarStats()
         ));
     }
 
     public function my_peoples(Request $request, $id)
     {
-        $user = auth()->user();
-        $users = User::all();
+        $query = People::with([
+            'companies', 'tags', 'user',
+            'peopleEmail', 'peoplePhone', 'peopleAddress',
+            'peopleUrl', 'peopleCompany',
+        ])->where('user_id', $id);
 
-        // Base query: people assigned to the given user
-        $query = People::with(['companies', 'tags', 'user', 'peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleCompany'])
-            ->where('user_id', $id);
+        // Apply shared filters
+        $this->applyPeopleFilters($query, $request);
 
-        // AJAX filters
-        if ($request->ajax()) {
-
-            // Search by people name
-            if ($request->filled('search')) {
-                $search = $request->search;
-                $query->where('name', 'like', "%{$search}%");
-            }
-
-            if ($request->filled('user_id')) {
-                $query->whereHas('user', function ($q) use ($request) {
-                    $q->where('user_id', $request->user_id);
-                });
-            }
-            if ($request->filled('company_id')) {
-                $query->whereHas('companiesAlt', function ($q) use ($request) {
-                    $q->where('company_id', $request->company_id);
-                });
-            }
-            if (! empty($request->people_tags_filter_id)) {
-                $query->whereHas('tags', function ($q) use ($request) {
-                    $q->whereIn('tags.id', $request->people_tags_filter_id);
-                });
-            }
-            if (! empty($request->territory_filter_id)) {
-                $query->whereIn('territory_id', $request->territory_filter_id);
-            }
-            if (! empty($request->activity_type_filter_id)) {
-                $query->whereHas('activity', function ($q) use ($request) {
-                    $q->whereIn('activity_type_id', $request->activity_type_filter_id);
-                });
-            }
-            if (! empty($request->leads_status)) {
-                $query->whereHas('leads', function ($q) use ($request) {
-                    $q->whereIn('lead_status', $request->leads_status);
-                });
-            }
-
-        }
-
-        // Get filtered people
         $peoples = $query->get();
         $myPeoplesCount = $peoples->count();
 
-        $companies = Company::all();
-        $users = User::all();
-        $products = Product::all();
-        $allPeoples = People::all();
-        $sources = Source::all();
-        $activity_types = ActivityType::all();
-        $territories = Territory::all();
-        $competitors = Competitor::all();
-        $peopletags = Tag::where('tag_id', 3)->get();
-
-        // Sidebar stats
-        $sidebarStats = $this->getSidebarStats();
-
-        // Return partial for AJAX
+        // AJAX response
         if ($request->ajax()) {
             return response()->json([
                 'table' => view('admin.peoples.partials.people-table-row', compact('peoples'))->render(),
@@ -205,10 +158,11 @@ class PeopleController extends Controller
             ]);
         }
 
-        // Normal page load
+        // Full page load
         return view('admin.peoples.my-peoples', array_merge(
-            compact('users', 'peoples', 'myPeoplesCount', 'companies', 'users', 'products', 'allPeoples', 'sources', 'activity_types', 'territories', 'competitors', 'peopletags'),
-            $sidebarStats
+            compact('peoples', 'myPeoplesCount'),
+            $this->getPeopleSharedData(),
+            $this->getSidebarStats()
         ));
     }
 

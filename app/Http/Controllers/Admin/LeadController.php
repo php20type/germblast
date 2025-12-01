@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
-use App\Mail\TestEmail;
 use App\Models\ActivityType;
 use App\Models\Company;
 use App\Models\Competitor;
@@ -34,7 +33,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -86,10 +84,9 @@ class LeadController extends Controller
         ];
     }
 
-    public function index(Request $request)
+    private function baseLeadQuery()
     {
-        //  Base query with all needed relations
-        $query = Lead::with([
+        return Lead::with([
             'assignee',
             'companies',
             'products',
@@ -98,8 +95,10 @@ class LeadController extends Controller
             'competitors',
             'stages',
         ]);
+    }
 
-        // Apply Filters (same pattern as CompanyController)
+    private function applyFilters($query, $request)
+    {
         if ($request->filled('search')) {
             $query->where('name', 'like', "%{$request->search}%");
         }
@@ -108,56 +107,45 @@ class LeadController extends Controller
             $query->where('lead_status', $request->status);
         }
 
-        if ($request->has('hot') && $request->hot === 'hot') {
+        if ($request->hot === 'hot') {
             $query->where('is_hot', 1);
         }
 
         if ($request->filled('user_id')) {
             $query->where('assignee_id', $request->user_id);
         }
-        if (! empty($request->lead_tags_filter_id)) {
-            $query->whereHas('tags', function ($q) use ($request) {
-                $q->whereIn('tags.id', $request->lead_tags_filter_id);
-            });
+
+        if ($request->lead_tags_filter_id) {
+            $query->whereHas('tags', fn ($q) => $q->whereIn('tags.id', $request->lead_tags_filter_id)
+            );
         }
-        if (! empty($request->lead_stage_filter_id)) {
+
+        if ($request->lead_stage_filter_id) {
             $query->whereIn('stage_id', $request->lead_stage_filter_id);
         }
-        if (! empty($request->leads_status)) {
+
+        if ($request->leads_status) {
             $query->whereIn('lead_status', $request->leads_status);
         }
-        if (! empty($request->activity_type_filter_id)) {
-            $query->whereHas('activity', function ($q) use ($request) {
-                $q->whereIn('activity_type_id', $request->activity_type_filter_id);
-            });
+
+        if ($request->activity_type_filter_id) {
+            $query->whereHas('activity', fn ($q) => $q->whereIn('activity_type_id', $request->activity_type_filter_id)
+            );
         }
+
         if ($request->month_to_date) {
-            $startOfMonth = now()->startOfMonth();
-            $today = now();
-            $query->whereBetween('created_at', [$startOfMonth, $today]);
+            $query->whereBetween('created_at', [
+                now()->startOfMonth(),
+                now(),
+            ]);
         }
 
-        // Get all leads
-        $leads = $query->get();
+        return $query;
+    }
 
-        // Helper for count formatting (can move to a global helper later)
-        $formatCount = fn ($count) => $count >= 1000
-            ? number_format($count / 1000, 1).'k'
-            : $count;
-
-        // Calculations (use accessors where possible)
-        $totalValue = Helper::calculateTotalValue($leads);
-        $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = number_format($leads->avg('confidence'), 2);
-        $totalLeads = $leads->count();
-
-        // Format counts
-        $formattedTotalLeads = $formatCount($totalLeads);
-        $formattedTotalValue = $formatCount(round($totalValue));
-        $formattedAvgValue = $formatCount(round($avgValue));
-
-        // Grouped data for table
-        $groupedLeads = $leads->groupBy('name')->map(function ($group) {
+    private function groupLeads($leads)
+    {
+        return $leads->groupBy('name')->map(function ($group) {
             $lead = $group->first();
 
             return [
@@ -167,7 +155,7 @@ class LeadController extends Controller
                 'created_at' => $lead->created_at->diffForHumans(null, true),
                 'total_price' => Helper::calculateTotalValue($group),
                 'stage_name' => $lead->stages->name ?? 'N/A',
-                'assignee' => $lead->assignee->name ?? 'N/A',
+                'assignee' => $lead->assignee->name ?? 'Unassigned',
                 'sources' => $group->flatMap->sources->pluck('name')->unique()->join(', ') ?: 'N/A',
                 'confidence' => round($group->avg('confidence')),
                 'close_date' => $lead->close_date
@@ -175,882 +163,251 @@ class LeadController extends Controller
                     : 'N/A',
             ];
         });
+    }
 
-        // Sidebar and related data
-        $peoples = People::all();
-        $users = User::all();
-        $activity_types = ActivityType::all();
-        $lead_stages = LeadStage::all();
-        $leadtags = Tag::where('tag_id', 1)->get();
-        $sidebarStats = $this->getSidebarStats();
+    private function calculateStats($leads)
+    {
+        $format = fn ($count) => $count >= 1000 ? number_format($count / 1000, 1).'k' : $count;
 
-        // Handle AJAX requests
+        $totalValue = Helper::calculateTotalValue($leads);
+        $count = $leads->count();
+
+        return [
+            'formattedTotalLeads' => $format($count),
+            'formattedTotalValue' => $format(round($totalValue)),
+            'formattedAvgValue' => $format(round($count ? $totalValue / $count : 0)),
+            'avgConfidence' => number_format($leads->avg('confidence'), 2),
+        ];
+    }
+
+    private function sharedViewData()
+    {
+        return [
+            'peoples' => People::all(),
+            'users' => User::all(),
+            'activity_types' => ActivityType::all(),
+            'lead_stages' => LeadStage::all(),
+            'leadtags' => Tag::where('tag_id', 1)->get(),
+        ];
+    }
+
+    public function index(Request $request)
+    {
+        $query = $this->applyFilters($this->baseLeadQuery(), $request);
+
+        $leads = $query->get();
+        $groupedLeads = $this->groupLeads($leads);
+        $stats = $this->calculateStats($leads);
+
         if ($request->ajax()) {
             return response()->json([
                 'table' => view('admin.leads.partials.lead-table-rows', compact('groupedLeads'))->render(),
-                'count' => $formattedTotalLeads,
-                'total_value' => $formattedTotalValue,
-                'avg_value' => $formattedAvgValue,
-                'avg_confidence' => $avgConfidence,
+                'count' => $stats['formattedTotalLeads'],
+                'total_value' => $stats['formattedTotalValue'],
+                'avg_value' => $stats['formattedAvgValue'],
+                'avg_confidence' => $stats['avgConfidence'],
             ]);
         }
 
-        // Normal page load
-        return view('admin.leads.index', array_merge(
-            compact(
-                'groupedLeads',
-                'peoples',
-                'users',
-                'lead_stages',
-                'leadtags',
-                'activity_types',
-                'formattedTotalLeads',
-                'formattedTotalValue',
-                'formattedAvgValue',
-                'avgConfidence'
-            ),
-            $sidebarStats
-        ));
+        return view('admin.leads.index',
+            array_merge(
+                compact('groupedLeads'),
+                $stats,
+                $this->sharedViewData(),
+                $this->getSidebarStats()
+            )
+        );
     }
 
     public function my_leads(Request $request, $id)
     {
-        // Base query: only leads assigned to this user
-        $query = Lead::with([
-            'assignee',
-            'companies',
-            'products',
-            'peoples',
-            'sources',
-            'competitors',
-            'stages',
-        ])->where('assignee_id', $id);
+        $query = $this->applyFilters(
+            $this->baseLeadQuery()->where('assignee_id', $id),
+            $request
+        );
 
-        // Apply Filters
-        if ($request->filled('search')) {
-            $query->where('name', 'like', "%{$request->search}%");
-        }
-
-        if ($request->filled('status')) {
-            $query->where('lead_status', $request->status);
-        }
-
-        if ($request->has('hot') && $request->hot === 'hot') {
-            $query->where('is_hot', 1);
-        }
-
-        if ($request->filled('user_id')) {
-            $query->where('assignee_id', $request->user_id);
-        }
-        if (! empty($request->lead_tags_filter_id)) {
-            $query->whereHas('tags', function ($q) use ($request) {
-                $q->whereIn('tags.id', $request->lead_tags_filter_id);
-            });
-        }
-        if (! empty($request->lead_stage_filter_id)) {
-            $query->whereIn('stage_id', $request->lead_stage_filter_id);
-        }
-        if (! empty($request->leads_status)) {
-            $query->whereIn('lead_status', $request->leads_status);
-        }
-        if (! empty($request->activity_type_filter_id)) {
-            $query->whereHas('activity', function ($q) use ($request) {
-                $q->whereIn('activity_type_id', $request->activity_type_filter_id);
-            });
-        }
-        if ($request->month_to_date) {
-            $startOfMonth = now()->startOfMonth();
-            $today = now();
-            $query->whereBetween('created_at', [$startOfMonth, $today]);
-        }
-
-        // Get all leads
         $leads = $query->get();
+        $groupedLeads = $this->groupLeads($leads);
+        $stats = $this->calculateStats($leads);
 
-        // Helper for count formatting
-        $formatCount = fn ($count) => $count >= 1000
-            ? number_format($count / 1000, 1).'k'
-            : $count;
-
-        // Calculations
-        $totalValue = Helper::calculateTotalValue($leads);
-        $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = number_format($leads->avg('confidence'), 2);
-        $totalLeads = $leads->count();
-
-        // Format counts
-        $formattedTotalLeads = $formatCount($totalLeads);
-        $formattedTotalValue = $formatCount(round($totalValue));
-        $formattedAvgValue = $formatCount(round($avgValue));
-
-        // Grouped data for table
-        $groupedLeads = $leads->groupBy('name')->map(function ($group) {
-            $lead = $group->first();
-
-            return [
-                'id' => $lead->id,
-                'name' => $lead->name,
-                'people_name' => $lead->peoples->first()->name ?? 'N/A',
-                'created_at' => $lead->created_at->diffForHumans(null, true),
-                'total_price' => Helper::calculateTotalValue($group),
-                'stage_name' => $lead->stages->name ?? 'N/A',
-                'assignee' => $lead->assignee->name ?? 'Unassigned',
-                'sources' => $group->flatMap->sources->pluck('name')->unique()->join(', ') ?: 'N/A',
-                'confidence' => round($group->avg('confidence')),
-                'close_date' => $lead->close_date
-                    ? Carbon::parse($lead->close_date)->format('j F Y')
-                    : 'N/A',
-            ];
-        });
-
-        // Sidebar and related data
-        $peoples = People::all();
-        $users = User::all();
-        $activity_types = ActivityType::all();
-        $lead_stages = LeadStage::all();
-        $leadtags = Tag::where('tag_id', 1)->get();
-        $sidebarStats = $this->getSidebarStats();
-
-        // Handle AJAX requests
         if ($request->ajax()) {
             return response()->json([
                 'table' => view('admin.leads.partials.lead-table-rows', compact('groupedLeads'))->render(),
-                'count' => $formattedTotalLeads,
-                'total_value' => $formattedTotalValue,
-                'avg_value' => $formattedAvgValue,
-                'avg_confidence' => $avgConfidence,
+                'count' => $stats['formattedTotalLeads'],
+                'total_value' => $stats['formattedTotalValue'],
+                'avg_value' => $stats['formattedAvgValue'],
+                'avg_confidence' => $stats['avgConfidence'],
             ]);
         }
 
-        // Normal page load
-        return view('admin.leads.my-leads', array_merge(
-            compact(
-                'groupedLeads',
-                'peoples',
-                'users',
-                'activity_types',
-                'lead_stages',
-                'leadtags',
-                'formattedTotalLeads',
-                'formattedTotalValue',
-                'formattedAvgValue',
-                'avgConfidence'
-            ),
-            $sidebarStats
-        ));
+        return view('admin.leads.my-leads',
+            array_merge(
+                compact('groupedLeads'),
+                $stats,
+                $this->sharedViewData(),
+                $this->getSidebarStats()
+            )
+        );
     }
 
     public function open_leads(Request $request, $id)
     {
-        // Base query: only open leads assigned to current user
-        $query = Lead::with([
-            'assignee',
-            'companies',
-            'products',
-            'peoples',
-            'sources',
-            'competitors',
-            'stages',
-        ])->where('lead_status', 'open')
-            ->where('assignee_id', $id);
+        $query = $this->applyFilters(
+            $this->baseLeadQuery()
+                ->where('lead_status', 'open')
+                ->where('assignee_id', $id),
+            $request
+        );
 
-        // Apply Filters
-        if ($request->filled('search')) {
-            $query->where('name', 'like', "%{$request->search}%");
-        }
-
-        if ($request->filled('status')) {
-            $query->where('lead_status', $request->status);
-        }
-
-        if ($request->has('hot') && $request->hot === 'hot') {
-            $query->where('is_hot', 1);
-        }
-
-        if ($request->filled('user_id')) {
-            $query->where('assignee_id', $request->user_id);
-        }
-        if (! empty($request->lead_tags_filter_id)) {
-            $query->whereHas('tags', function ($q) use ($request) {
-                $q->whereIn('tags.id', $request->lead_tags_filter_id);
-            });
-        }
-        if (! empty($request->lead_stage_filter_id)) {
-            $query->whereIn('stage_id', $request->lead_stage_filter_id);
-        }
-        if (! empty($request->leads_status)) {
-            $query->whereIn('lead_status', $request->leads_status);
-        }
-        if (! empty($request->activity_type_filter_id)) {
-            $query->whereHas('activity', function ($q) use ($request) {
-                $q->whereIn('activity_type_id', $request->activity_type_filter_id);
-            });
-        }
-        if ($request->month_to_date) {
-            $startOfMonth = now()->startOfMonth();
-            $today = now();
-            $query->whereBetween('created_at', [$startOfMonth, $today]);
-        }
-
-        // Get all leads
         $leads = $query->get();
+        $groupedLeads = $this->groupLeads($leads);
+        $stats = $this->calculateStats($leads);
 
-        // Helper for count formatting
-        $formatCount = fn ($count) => $count >= 1000
-            ? number_format($count / 1000, 1).'k'
-            : $count;
-
-        // Calculations
-        $totalValue = Helper::calculateTotalValue($leads);
-        $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = number_format($leads->avg('confidence'), 2);
-        $totalLeads = $leads->count();
-
-        // Format counts
-        $formattedTotalLeads = $formatCount($totalLeads);
-        $formattedTotalValue = $formatCount(round($totalValue));
-        $formattedAvgValue = $formatCount(round($avgValue));
-
-        // Group leads by name and aggregate data
-        $groupedLeads = $leads->groupBy('name')->map(function ($group) {
-            $lead = $group->first();
-
-            return [
-                'id' => $lead->id,
-                'name' => $lead->name,
-                'people_name' => $lead->peoples->first()->name ?? 'N/A',
-                'created_at' => $lead->created_at->diffForHumans(null, true),
-                'total_price' => Helper::calculateTotalValue($group),
-                'stage_name' => $lead->stages->name ?? 'N/A',
-                'assignee' => $lead->assignee->name ?? 'Unassigned',
-                'sources' => $group->flatMap->sources->pluck('name')->unique()->join(', ') ?: 'N/A',
-                'confidence' => round($group->avg('confidence')),
-                'close_date' => $lead->close_date
-                    ? Carbon::parse($lead->close_date)->format('j F Y')
-                    : 'N/A',
-            ];
-        });
-
-        // Sidebar and related data
-        $peoples = People::all();
-        $users = User::all();
-        $activity_types = ActivityType::all();
-        $lead_stages = LeadStage::all();
-        $leadtags = Tag::where('tag_id', 1)->get();
-        $sidebarStats = $this->getSidebarStats();
-
-        // Handle AJAX requests
         if ($request->ajax()) {
             return response()->json([
                 'table' => view('admin.leads.partials.lead-table-rows', compact('groupedLeads'))->render(),
-                'count' => $formattedTotalLeads,
-                'total_value' => $formattedTotalValue,
-                'avg_value' => $formattedAvgValue,
-                'avg_confidence' => $avgConfidence,
+                'count' => $stats['formattedTotalLeads'],
+                'total_value' => $stats['formattedTotalValue'],
+                'avg_value' => $stats['formattedAvgValue'],
+                'avg_confidence' => $stats['avgConfidence'],
             ]);
         }
 
-        // Normal page load
-        return view('admin.leads.open-leads', array_merge(
-            compact(
-                'groupedLeads',
-                'peoples',
-                'users',
-                'lead_stages',
-                'leadtags',
-                'activity_types',
-                'formattedTotalLeads',
-                'formattedTotalValue',
-                'formattedAvgValue',
-                'avgConfidence'
-            ),
-            $sidebarStats
-        ));
+        return view('admin.leads.open-leads',
+            array_merge(
+                compact('groupedLeads'),
+                $stats,
+                $this->sharedViewData(),
+                $this->getSidebarStats()
+            )
+        );
     }
 
     public function hot_leads(Request $request)
     {
-        // Base query: only hot leads
-        $query = Lead::with([
-            'assignee',
-            'companies',
-            'products',
-            'peoples',
-            'sources',
-            'competitors',
-            'stages',
-        ])->where('is_hot', 1);
+        $query = $this->applyFilters(
+            $this->baseLeadQuery()->where('is_hot', 1),
+            $request
+        );
 
-        // Apply Filters
-        if ($request->filled('search')) {
-            $query->where('name', 'like', "%{$request->search}%");
-        }
-
-        if ($request->filled('status')) {
-            $query->where('lead_status', $request->status);
-        }
-
-        if ($request->has('hot') && $request->hot === 'hot') {
-            $query->where('is_hot', 1);
-        }
-
-        if ($request->filled('user_id')) {
-            $query->where('assignee_id', $request->user_id);
-        }
-        if (! empty($request->lead_tags_filter_id)) {
-            $query->whereHas('tags', function ($q) use ($request) {
-                $q->whereIn('tags.id', $request->lead_tags_filter_id);
-            });
-        }
-        if (! empty($request->lead_stage_filter_id)) {
-            $query->whereIn('stage_id', $request->lead_stage_filter_id);
-        }
-        if (! empty($request->leads_status)) {
-            $query->whereIn('lead_status', $request->leads_status);
-        }
-        if (! empty($request->activity_type_filter_id)) {
-            $query->whereHas('activity', function ($q) use ($request) {
-                $q->whereIn('activity_type_id', $request->activity_type_filter_id);
-            });
-        }
-        if ($request->month_to_date) {
-            $startOfMonth = now()->startOfMonth();
-            $today = now();
-            $query->whereBetween('created_at', [$startOfMonth, $today]);
-        }
-
-        // Get all leads
         $leads = $query->get();
+        $groupedLeads = $this->groupLeads($leads);
+        $stats = $this->calculateStats($leads);
 
-        // Helper for count formatting
-        $formatCount = fn ($count) => $count >= 1000
-            ? number_format($count / 1000, 1).'k'
-            : $count;
-
-        // Calculations
-        $totalValue = Helper::calculateTotalValue($leads);
-        $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = number_format($leads->avg('confidence'), 2);
-        $totalLeads = $leads->count();
-
-        // Format counts
-        $formattedTotalLeads = $formatCount($totalLeads);
-        $formattedTotalValue = $formatCount(round($totalValue));
-        $formattedAvgValue = $formatCount(round($avgValue));
-
-        // Group leads by name and aggregate
-        $groupedLeads = $leads->groupBy('name')->map(function ($group) {
-            $lead = $group->first();
-
-            return [
-                'id' => $lead->id,
-                'name' => $lead->name,
-                'people_name' => $lead->peoples->first()->name ?? 'N/A',
-                'created_at' => $lead->created_at->diffForHumans(null, true),
-                'total_price' => Helper::calculateTotalValue($group),
-                'stage_name' => $lead->stages->name ?? 'N/A',
-                'assignee' => $lead->assignee->name ?? 'Unassigned',
-                'sources' => $group->flatMap->sources->pluck('name')->unique()->join(', ') ?: 'N/A',
-                'confidence' => round($group->avg('confidence')),
-                'close_date' => $lead->close_date
-                    ? Carbon::parse($lead->close_date)->format('j F Y')
-                    : 'N/A',
-            ];
-        });
-
-        // Sidebar and related data
-        $peoples = People::all();
-        $users = User::all();
-        $activity_types = ActivityType::all();
-        $lead_stages = LeadStage::all();
-        $leadtags = Tag::where('tag_id', 1)->get();
-        $sidebarStats = $this->getSidebarStats();
-
-        // Handle AJAX requests
         if ($request->ajax()) {
             return response()->json([
                 'table' => view('admin.leads.partials.lead-table-rows', compact('groupedLeads'))->render(),
-                'count' => $formattedTotalLeads,
-                'total_value' => $formattedTotalValue,
-                'avg_value' => $formattedAvgValue,
-                'avg_confidence' => $avgConfidence,
+                'count' => $stats['formattedTotalLeads'],
+                'total_value' => $stats['formattedTotalValue'],
+                'avg_value' => $stats['formattedAvgValue'],
+                'avg_confidence' => $stats['avgConfidence'],
             ]);
         }
 
-        // Normal page load
         return view('admin.leads.hot-leads', array_merge(
-            compact('groupedLeads',
-                'peoples',
-                'users',
-                'lead_stages',
-                'leadtags',
-                'activity_types',
-                'formattedTotalLeads',
-                'formattedTotalValue',
-                'formattedAvgValue',
-                'avgConfidence'),
-            $sidebarStats
+            compact('groupedLeads'),
+            $stats,
+            $this->sharedViewData(),
+            $this->getSidebarStats()
         ));
     }
 
     public function watching_leads(Request $request, $id)
     {
-        // Base query: only leads assigned to current user and flagged as watching
-        $query = Lead::with([
-            'assignee',
-            'companies',
-            'products',
-            'peoples',
-            'sources',
-            'competitors',
-            'stages',
-        ])->where('assignee_id', $id)
-            ->where('is_watching', 1);
+        $query = $this->applyFilters(
+            $this->baseLeadQuery()
+                ->where('assignee_id', $id)
+                ->where('is_watching', 1),
+            $request
+        );
 
-        // Apply Filters
-        if ($request->filled('search')) {
-            $query->where('name', 'like', "%{$request->search}%");
-        }
-
-        if ($request->filled('status')) {
-            $query->where('lead_status', $request->status);
-        }
-
-        if ($request->has('hot') && $request->hot === 'hot') {
-            $query->where('is_hot', 1);
-        }
-
-        if ($request->filled('user_id')) {
-            $query->where('assignee_id', $request->user_id);
-        }
-        if (! empty($request->lead_tags_filter_id)) {
-            $query->whereHas('tags', function ($q) use ($request) {
-                $q->whereIn('tags.id', $request->lead_tags_filter_id);
-            });
-        }
-        if (! empty($request->lead_stage_filter_id)) {
-            $query->whereIn('stage_id', $request->lead_stage_filter_id);
-        }
-        if (! empty($request->leads_status)) {
-            $query->whereIn('lead_status', $request->leads_status);
-        }
-        if (! empty($request->activity_type_filter_id)) {
-            $query->whereHas('activity', function ($q) use ($request) {
-                $q->whereIn('activity_type_id', $request->activity_type_filter_id);
-            });
-        }
-        if ($request->month_to_date) {
-            $startOfMonth = now()->startOfMonth();
-            $today = now();
-            $query->whereBetween('created_at', [$startOfMonth, $today]);
-        }
-
-        // Get all leads
         $leads = $query->get();
+        $groupedLeads = $this->groupLeads($leads);
+        $stats = $this->calculateStats($leads);
 
-        // Helper for count formatting
-        $formatCount = fn ($count) => $count >= 1000
-            ? number_format($count / 1000, 1).'k'
-            : $count;
-
-        // Calculations
-        $totalValue = Helper::calculateTotalValue($leads);
-        $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = number_format($leads->avg('confidence'), 2);
-        $totalLeads = $leads->count();
-
-        // Format counts
-        $formattedTotalLeads = $formatCount($totalLeads);
-        $formattedTotalValue = $formatCount(round($totalValue));
-        $formattedAvgValue = $formatCount(round($avgValue));
-
-        // Group leads by name and aggregate data
-        $groupedLeads = $leads->groupBy('name')->map(function ($group) {
-            $lead = $group->first();
-
-            return [
-                'id' => $lead->id,
-                'name' => $lead->name,
-                'people_name' => $lead->peoples->first()->name ?? 'N/A',
-                'created_at' => $lead->created_at->diffForHumans(null, true),
-                'total_price' => Helper::calculateTotalValue($group),
-                'stage_name' => $lead->stages->name ?? 'N/A',
-                'assignee' => $lead->assignee->name ?? 'Unassigned',
-                'sources' => $group->flatMap->sources->pluck('name')->unique()->join(', ') ?: 'N/A',
-                'confidence' => round($group->avg('confidence')),
-                'close_date' => $lead->close_date
-                    ? Carbon::parse($lead->close_date)->format('j F Y')
-                    : 'N/A',
-            ];
-        });
-
-        // Sidebar and related data
-        $peoples = People::all();
-        $users = User::all();
-        $activity_types = ActivityType::all();
-        $lead_stages = LeadStage::all();
-        $leadtags = Tag::where('tag_id', 1)->get();
-        $sidebarStats = $this->getSidebarStats();
-
-        // Handle AJAX requests
         if ($request->ajax()) {
             return response()->json([
                 'table' => view('admin.leads.partials.lead-table-rows', compact('groupedLeads'))->render(),
-                'count' => $formattedTotalLeads,
-                'total_value' => $formattedTotalValue,
-                'avg_value' => $formattedAvgValue,
-                'avg_confidence' => $avgConfidence,
+                'count' => $stats['formattedTotalLeads'],
+                'total_value' => $stats['formattedTotalValue'],
+                'avg_value' => $stats['formattedAvgValue'],
+                'avg_confidence' => $stats['avgConfidence'],
             ]);
         }
 
-        // Normal page load
         return view('admin.leads.watching-leads', array_merge(
-            compact('groupedLeads',
-                'peoples',
-                'users',
-                'activity_types',
-                'lead_stages',
-                'leadtags',
-                'formattedTotalLeads',
-                'formattedTotalValue',
-                'formattedAvgValue',
-                'avgConfidence'),
-            $sidebarStats
+            compact('groupedLeads'),
+            $stats,
+            $this->sharedViewData(),
+            $this->getSidebarStats()
         ));
     }
 
     public function added_this_week(Request $request)
     {
-        $now = Carbon::now();
-        $startOfWeek = $now->copy()->startOfWeek();
-        $endOfWeek = $now->copy()->endOfWeek();
+        $query = $this->applyFilters(
+            $this->baseLeadQuery()
+                ->whereBetween('created_at', [
+                    now()->startOfWeek(),
+                    now()->endOfWeek(),
+                ]),
+            $request
+        );
 
-        // Base query: leads added this week
-        $query = Lead::with([
-            'assignee',
-            'companies',
-            'products',
-            'peoples',
-            'sources',
-            'competitors',
-            'stages',
-        ])->whereBetween('created_at', [$startOfWeek, $endOfWeek]);
-
-        // Apply Filters
-        if ($request->filled('search')) {
-            $query->where('name', 'like', "%{$request->search}%");
-        }
-
-        if ($request->filled('status')) {
-            $query->where('lead_status', $request->status);
-        }
-
-        if ($request->has('hot') && $request->hot === 'hot') {
-            $query->where('is_hot', 1);
-        }
-
-        if ($request->filled('user_id')) {
-            $query->where('assignee_id', $request->user_id);
-        }
-        if (! empty($request->lead_tags_filter_id)) {
-            $query->whereHas('tags', function ($q) use ($request) {
-                $q->whereIn('tags.id', $request->lead_tags_filter_id);
-            });
-        }
-        if (! empty($request->lead_stage_filter_id)) {
-            $query->whereIn('stage_id', $request->lead_stage_filter_id);
-        }
-        if (! empty($request->leads_status)) {
-            $query->whereIn('lead_status', $request->leads_status);
-        }
-        if (! empty($request->activity_type_filter_id)) {
-            $query->whereHas('activity', function ($q) use ($request) {
-                $q->whereIn('activity_type_id', $request->activity_type_filter_id);
-            });
-        }
-        if ($request->month_to_date) {
-            $startOfMonth = now()->startOfMonth();
-            $today = now();
-            $query->whereBetween('created_at', [$startOfMonth, $today]);
-        }
-
-        // Get all leads
         $leads = $query->get();
+        $groupedLeads = $this->groupLeads($leads);
+        $stats = $this->calculateStats($leads);
 
-        // Helper for count formatting
-        $formatCount = fn ($count) => $count >= 1000
-            ? number_format($count / 1000, 1).'k'
-            : $count;
-
-        // Calculations
-        $totalValue = Helper::calculateTotalValue($leads);
-        $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = number_format($leads->avg('confidence'), 2);
-        $totalLeads = $leads->count();
-
-        // Format counts
-        $formattedTotalLeads = $formatCount($totalLeads);
-        $formattedTotalValue = $formatCount(round($totalValue));
-        $formattedAvgValue = $formatCount(round($avgValue));
-
-        // Group leads by name and aggregate
-        $groupedLeads = $leads->groupBy('name')->map(function ($group) {
-            $lead = $group->first();
-
-            return [
-                'id' => $lead->id,
-                'name' => $lead->name,
-                'people_name' => $lead->peoples->first()->name ?? 'N/A',
-                'created_at' => $lead->created_at->diffForHumans(null, true),
-                'total_price' => Helper::calculateTotalValue($group),
-                'stage_name' => $lead->stages->name ?? 'N/A',
-                'assignee' => $lead->assignee->name ?? 'Unassigned',
-                'sources' => $group->flatMap->sources->pluck('name')->unique()->join(', ') ?: 'N/A',
-                'confidence' => round($group->avg('confidence')),
-                'close_date' => $lead->close_date
-                    ? Carbon::parse($lead->close_date)->format('j F Y')
-                    : 'N/A',
-            ];
-        });
-
-        // Sidebar and related data
-        $peoples = People::all();
-        $users = User::all();
-        $activity_types = ActivityType::all();
-        $lead_stages = LeadStage::all();
-        $leadtags = Tag::where('tag_id', 1)->get();
-        $sidebarStats = $this->getSidebarStats();
-
-        // Handle AJAX requests
         if ($request->ajax()) {
             return response()->json([
                 'table' => view('admin.leads.partials.lead-table-rows', compact('groupedLeads'))->render(),
-                'count' => $formattedTotalLeads,
-                'total_value' => $formattedTotalValue,
-                'avg_value' => $formattedAvgValue,
-                'avg_confidence' => $avgConfidence,
+                'count' => $stats['formattedTotalLeads'],
+                'total_value' => $stats['formattedTotalValue'],
+                'avg_value' => $stats['formattedAvgValue'],
+                'avg_confidence' => $stats['avgConfidence'],
             ]);
         }
 
-        // Normal page load
         return view('admin.leads.added-this-week', array_merge(
-            compact('groupedLeads',
-                'peoples',
-                'users',
-                'lead_stages',
-                'leadtags',
-                'activity_types',
-                'formattedTotalLeads',
-                'formattedTotalValue',
-                'formattedAvgValue',
-                'avgConfidence'),
-            $sidebarStats
+            compact('groupedLeads'),
+            $stats,
+            $this->sharedViewData(),
+            $this->getSidebarStats()
         ));
     }
 
     public function closing_this_week(Request $request)
     {
-        $now = Carbon::now();
-        $startOfWeek = $now->copy()->startOfWeek();
-        $endOfWeek = $now->copy()->endOfWeek();
+        $query = $this->applyFilters(
+            $this->baseLeadQuery()
+                ->whereBetween('close_date', [
+                    now()->startOfWeek(),
+                    now()->endOfWeek(),
+                ]),
+            $request
+        );
 
-        // Base query: leads closing this week
-        $query = Lead::with([
-            'assignee',
-            'companies',
-            'products',
-            'peoples',
-            'sources',
-            'competitors',
-            'stages',
-        ])->whereBetween('close_date', [$startOfWeek, $endOfWeek]);
-
-        // Apply Filters
-        if ($request->filled('search')) {
-            $query->where('name', 'like', "%{$request->search}%");
-        }
-
-        if ($request->filled('status')) {
-            $query->where('lead_status', $request->status);
-        }
-
-        if ($request->has('hot') && $request->hot === 'hot') {
-            $query->where('is_hot', 1);
-        }
-
-        if ($request->filled('user_id')) {
-            $query->where('assignee_id', $request->user_id);
-        }
-        if (! empty($request->lead_tags_filter_id)) {
-            $query->whereHas('tags', function ($q) use ($request) {
-                $q->whereIn('tags.id', $request->lead_tags_filter_id);
-            });
-        }
-        if (! empty($request->lead_stage_filter_id)) {
-            $query->whereIn('stage_id', $request->lead_stage_filter_id);
-        }
-        if (! empty($request->leads_status)) {
-            $query->whereIn('lead_status', $request->leads_status);
-        }
-        if (! empty($request->activity_type_filter_id)) {
-            $query->whereHas('activity', function ($q) use ($request) {
-                $q->whereIn('activity_type_id', $request->activity_type_filter_id);
-            });
-        }
-        if ($request->month_to_date) {
-            $startOfMonth = now()->startOfMonth();
-            $today = now();
-            $query->whereBetween('created_at', [$startOfMonth, $today]);
-        }
-
-        // Get all leads
         $leads = $query->get();
+        $groupedLeads = $this->groupLeads($leads);
+        $stats = $this->calculateStats($leads);
 
-        // Helper for count formatting
-        $formatCount = fn ($count) => $count >= 1000
-            ? number_format($count / 1000, 1).'k'
-            : $count;
-
-        // Calculations
-        $totalValue = Helper::calculateTotalValue($leads);
-        $avgValue = $leads->count() ? $totalValue / $leads->count() : 0;
-        $avgConfidence = number_format($leads->avg('confidence'), 2);
-        $totalLeads = $leads->count();
-
-        // Format counts
-        $formattedTotalLeads = $formatCount($totalLeads);
-        $formattedTotalValue = $formatCount(round($totalValue));
-        $formattedAvgValue = $formatCount(round($avgValue));
-
-        // Group leads by name and aggregate
-        $groupedLeads = $leads->groupBy('name')->map(function ($group) {
-            $lead = $group->first();
-
-            return [
-                'id' => $lead->id,
-                'name' => $lead->name,
-                'people_name' => $lead->peoples->first()->name ?? 'N/A',
-                'created_at' => $lead->created_at->diffForHumans(null, true),
-                'total_price' => Helper::calculateTotalValue($group),
-                'stage_name' => $lead->stages->name ?? 'N/A',
-                'assignee' => $lead->assignee->name ?? 'Unassigned',
-                'sources' => $group->flatMap->sources->pluck('name')->unique()->join(', ') ?: 'N/A',
-                'confidence' => round($group->avg('confidence')),
-                'close_date' => $lead->close_date
-                    ? Carbon::parse($lead->close_date)->format('j F Y')
-                    : 'N/A',
-            ];
-        });
-
-        // Sidebar and related data
-        $peoples = People::all();
-        $users = User::all();
-        $activity_types = ActivityType::all();
-        $lead_stages = LeadStage::all();
-        $leadtags = Tag::where('tag_id', 1)->get();
-        $sidebarStats = $this->getSidebarStats();
-
-        // Handle AJAX requests
         if ($request->ajax()) {
             return response()->json([
                 'table' => view('admin.leads.partials.lead-table-rows', compact('groupedLeads'))->render(),
-                'count' => $formattedTotalLeads,
-                'total_value' => $formattedTotalValue,
-                'avg_value' => $formattedAvgValue,
-                'avg_confidence' => $avgConfidence,
+                'count' => $stats['formattedTotalLeads'],
+                'total_value' => $stats['formattedTotalValue'],
+                'avg_value' => $stats['formattedAvgValue'],
+                'avg_confidence' => $stats['avgConfidence'],
             ]);
         }
 
-        // Normal page load
         return view('admin.leads.closing-this-week', array_merge(
-            compact('groupedLeads',
-                'peoples',
-                'users',
-                'activity_types',
-                'lead_stages',
-                'leadtags',
-                'formattedTotalLeads',
-                'formattedTotalValue',
-                'formattedAvgValue',
-                'avgConfidence'),
-            $sidebarStats
+            compact('groupedLeads'),
+            $stats,
+            $this->sharedViewData(),
+            $this->getSidebarStats()
         ));
     }
-
-    // public function store(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'name' => 'required|string|max:255',
-    //         'assignee_id' => 'nullable|exists:users,id',
-    //         'close_date' => 'nullable|date',
-    //         'confidence' => 'nullable|numeric',
-    //         'product_id' => 'nullable|array',
-    //         'product_id.*' => 'exists:products,id',
-    //         'quantity' => 'nullable|array',
-    //         'price' => 'nullable|array',
-    //         'company_id' => 'nullable|array',
-    //         'company_id.*' => 'exists:companies,id',
-    //         'person_id' => 'nullable|array',
-    //         'person_id.*' => 'nullable|exists:people,id',
-    //         'source_id' => 'nullable|array',
-    //         'source_id.*' => 'exists:sources,id',
-    //         'competitors_id' => 'nullable|array',
-    //         'competitors_id.*' => 'nullable|exists:competitors,id',
-    //         'tag_id' => 'required',
-    //     ]);
-
-    //     // Create one lead only
-    //     $lead = Lead::create([
-    //         'name' => $request->name,
-    //         'assignee_id' => $request->assignee_id,
-    //         'close_date' => $request->close_date,
-    //         'confidence' => $request->confidence,
-    //         'creator_id' => auth()->id(),
-    //     ]);
-
-    //     SurveyProposal::create([
-    //         'user_id' => auth()->id(),
-    //         'lead_id' => $lead->id,
-    //     ]);
-
-    //     // Companies
-    //     if ($request->filled('company_id')) {
-    //         $lead->companies()->attach($request->company_id);
-    //     }
-
-    //     // People
-    //     if ($request->filled('person_id')) {
-    //         $lead->peoples()->attach($request->person_id);
-    //     }
-
-    //     // Products with qty & price
-    //     if ($request->filled('product_id')) {
-    //         foreach ($request->product_id as $index => $productId) {
-    //             $lead->products()->attach($productId, [
-    //                 'qty' => $request->quantity[$index] ?? 1,
-    //                 'price' => $request->price[$index] ?? 0,
-    //             ]);
-    //         }
-    //     }
-
-    //     // Sources
-    //     if ($request->filled('source_id')) {
-    //         $lead->sources()->attach($request->source_id);
-    //     }
-
-    //     // Competitors
-    //     if ($request->filled('competitors_id')) {
-    //         $lead->competitors()->attach($request->competitors_id);
-    //     }
-
-    //     // Tags
-    //     if ($request->filled('tag_id')) {
-    //         $lead->tags()->attach($request->tag_id);
-    //     }
-
-    //     // return redirect()->route('admin.leads.index')->with('success', 'Leads created successfully');
-    //     return redirect()->back()->with('success', 'Leads created successfully');
-    // }
 
     public function store(Request $request, NotificationService $notify)
     {
@@ -1266,7 +623,7 @@ class LeadController extends Controller
             ->sortByDesc('timestamp')
             ->values(); // reindex after sorting
 
-        // 👉 ADD THIS SECTION — Handle AJAX requests
+        // ADD THIS SECTION — Handle AJAX requests
         if ($request->ajax()) {
             $timeline_html = view('admin.leads.partials.lead-timeline', compact('timeline'))->render();
 
@@ -1316,9 +673,11 @@ class LeadController extends Controller
         $lost_outcomes = Outcome::where('type', 'Lost')->get();
         $cancelled_outcomes = Outcome::where('type', 'Cancelled')->get();
         $markets = Market::all();
+        $stage = $leads->leadStageProcess;
 
         return view('admin.leads.edit', compact(
             'leads',
+            'stage',
             'formattedLeadValue',
             'activities',
             'logged_activities',
