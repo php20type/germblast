@@ -265,3 +265,4 @@ Route::get('/states/{countryId}', [SettingController::class, 'getStatesByCountry
 Route::get('/cities/{stateId}', [SettingController::class, 'getCitiesByState'])->name('get.cities');
 Route::get('/approval/approve/{token}', [ApprovalController::class, 'approve'])->name('approval.approve');
 Route::get('/approval/reject/{token}', [ApprovalController::class, 'reject'])->name('approval.reject');
+Route::view('survey-proposal.pdf', 'survey-proposal.pdf')->name('survey.proposal');

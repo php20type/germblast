@@ -1,0 +1,632 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    line-height: 1.4;
+    color: #000;
+    background: #e0e0e0;
+    font-size: 11pt;
+}
+
+.page {
+    background: white;
+    width: 8.5in;
+    min-height: 11in;
+    margin: 0 auto 20px auto;
+    padding: 0.5in 0.75in 0.5in 0.75in;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9pt;
+    color: #000;
+    margin-bottom: 20px;
+}
+
+.prepared-for {
+    text-align: left;
+    margin-bottom: 30px;
+}
+
+.prepared-for .label {
+    font-size: 10pt;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.prepared-for .org-name {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #000;
+}
+
+.intro-text {
+    font-size: 10pt;
+    line-height: 1.5;
+    text-align: justify;
+    margin-bottom: 25px;
+}
+
+h1 {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #000;
+    margin: 20px 0 10px 0;
+    text-transform: uppercase;
+}
+
+h2 {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #000;
+    margin: 18px 0 10px 0;
+}
+
+h3 {
+    font-size: 11pt;
+    font-weight: bold;
+    color: #000;
+    margin: 12px 0 8px 0;
+}
+
+p {
+    font-size: 10pt;
+    line-height: 1.5;
+    text-align: justify;
+    margin-bottom: 12px;
+}
+
+.sup-text {
+    font-size: 8pt;
+    vertical-align: super;
+}
+
+.pillars-section {
+    margin: 20px 0;
+}
+
+.pillar-item {
+    margin-bottom: 20px;
+    page-break-inside: avoid;
+}
+
+.pillar-item h2 {
+    font-size: 11pt;
+    margin-bottom: 8px;
+}
+
+.pillar-item p {
+    margin-left: 0;
+}
+
+.services-section {
+    margin: 20px 0;
+}
+
+.service-item {
+    margin-bottom: 18px;
+    page-break-inside: avoid;
+}
+
+.service-item h3 {
+    font-size: 10.5pt;
+    margin-bottom: 6px;
+}
+
+.proposal-container {
+    margin: 30px 0;
+    page-break-inside: avoid;
+}
+
+.proposal-info-bar {
+    display: flex;
+    border: 1px solid #000;
+    margin-bottom: 15px;
+}
+
+.proposal-info-bar>div {
+    flex: 1;
+    padding: 8px 10px;
+    border-right: 1px solid #000;
+    font-size: 9pt;
+}
+
+.proposal-info-bar>div:last-child {
+    border-right: none;
+}
+
+.proposal-info-bar .label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.proposal-title {
+    font-size: 13pt;
+    font-weight: bold;
+    text-align: center;
+    margin: 20px 0 25px 0;
+}
+
+.company-addresses {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    font-size: 9pt;
+    line-height: 1.4;
+}
+
+.company-addresses>div {
+    flex: 1;
+}
+
+.company-addresses h3 {
+    font-size: 10pt;
+    margin-bottom: 8px;
+}
+
+.pricing-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 10pt;
+}
+
+.pricing-table th {
+    background: #f0f0f0;
+    border: 1px solid #000;
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: bold;
+}
+
+.pricing-table td {
+    border: 1px solid #000;
+    padding: 8px 10px;
+}
+
+.pricing-table .text-right {
+    text-align: right;
+}
+
+.pricing-table .total-row {
+    font-weight: bold;
+    background: #f8f8f8;
+}
+
+.service-outline-box {
+    margin: 20px 0;
+}
+
+.service-outline-title {
+    font-weight: bold;
+    font-size: 12pt;
+    margin-bottom: 10px;
+}
+
+.service-list {
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 9.5pt;
+    line-height: 1.6;
+}
+
+.service-list-item {
+    width: 33.333%;
+    padding-right: 10px;
+    margin-bottom: 5px;
+}
+
+.service-list-item:before {
+    content: "• ";
+    font-weight: bold;
+}
+
+.note-box {
+    background: #fffacd;
+    border: 1px solid #f0e68c;
+    padding: 12px;
+    margin: 20px 0;
+    font-size: 9pt;
+    font-weight: bold;
+}
+
+.signature-area {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    font-size: 9.5pt;
+}
+
+.signature-line {
+    margin: 15px 0;
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.signature-line .label {
+    font-weight: 400;
+    margin-bottom: 0px;
+    flex-basis: 240px;
+}
+
+.signature-line .line {
+    border-bottom: 1px solid #000;
+    width: 100%;
+    height: 25px;
+}
+
+.signature-line .form-input {
+    border: none;
+    border-bottom: 1px solid #000;
+    width: 100%;
+    padding: 0.4rem 0.4rem;
+    color: #000;
+}
+
+.signature-line .form-input:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+.signature-line .form-field {
+    margin: 0px;
+    flex: 1;
+}
+
+.signature-line .form-field .input-flex {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+}
+
+.contact-form-section {
+    margin: 25px 0;
+}
+
+.contact-form-title {
+    font-size: 12pt;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.contact-form-subtitle {
+    font-size: 9.5pt;
+    margin-bottom: 15px;
+    font-style: italic;
+}
+
+.form-field {
+    margin: 12px 0;
+    font-size: 9.5pt;
+}
+
+.form-field .field-label {
+    display: inline-block;
+    width: 150px;
+    font-weight: normal;
+}
+
+.form-field .field-line {
+    display: inline-block;
+    border-bottom: 1px solid #000;
+    width: calc(100% - 160px);
+    height: 20px;
+}
+
+.coop-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    font-size: 9pt;
+}
+
+.coop-table td {
+    border: 1px solid #000;
+    padding: 10px;
+    vertical-align: top;
+}
+
+.coop-table .contract-id {
+    font-weight: bold;
+    font-size: 10pt;
+    margin-bottom: 3px;
+}
+
+.coop-table .contract-desc {
+    font-size: 9pt;
+    line-height: 1.3;
+}
+
+.coop-table .sig-cell {
+    width: 35%;
+    text-align: center;
+}
+
+.coop-table .sig-line {
+    border-bottom: 1px solid #000;
+    margin: 5px auto;
+    width: 80%;
+    height: 20px;
+}
+
+.warranty-section {
+    margin: 25px 0;
+    font-size: 8pt;
+    line-height: 1.4;
+}
+
+.warranty-section h2 {
+    font-size: 11pt;
+    margin-bottom: 12px;
+}
+
+.warranty-section p {
+    font-size: 8pt;
+    text-align: justify;
+    margin-bottom: 10px;
+}
+
+.added-value-section {
+    margin: 25px 0;
+    font-size: 10pt;
+}
+
+.added-value-section h2 {
+    font-size: 12pt;
+    margin-bottom: 12px;
+}
+
+.added-value-section h3 {
+    font-size: 10.5pt;
+    margin: 15px 0 8px 0;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0.4in;
+    left: 0.75in;
+    right: 0.75in;
+    text-align: center;
+    font-size: 8pt;
+    color: #666;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.page-number {
+    position: absolute;
+    bottom: 0.3in;
+    right: 0.75in;
+    font-size: 8pt;
+    color: #999;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mb-4 {
+    margin-bottom: 2rem;
+}
+
+img {
+    max-width: 100%;
+}
+
+.signature-area.group-purchasing p {
+    margin-bottom: 0px;
+}
+
+@media print {
+    body {
+        background: white;
+    }
+
+    .page {
+        margin: 0;
+        box-shadow: none;
+        page-break-after: always;
+    }
+}
+
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: white;
+    border: 2px solid #000;
+    padding: 0;
+}
+
+.form-container .form-header {
+    background-color: #fff;
+    padding: 15px 20px;
+    border-bottom: 2px solid #000;
+}
+
+.form-container .form-header h1 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-container .form-header .subtitle {
+    font-size: 11px;
+    font-style: italic;
+}
+
+.form-container .form-body {
+    padding: 20px;
+}
+
+.form-container .form-row {
+    display: flex;
+    border: 1px solid #000;
+    margin-bottom: -1px;
+}
+
+.form-container .form-field {
+    flex: 1;
+    padding: 8px 10px;
+    border-right: 1px solid #000;
+}
+
+.form-container .form-field:last-child {
+    border-right: none;
+}
+
+.form-container .form-field.phone {
+    flex: 0 0 200px;
+}
+
+.form-container .form-field label {
+    font-size: 9px;
+    display: block;
+    margin-bottom: 3px;
+}
+
+.form-container .form-field input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 12px;
+    padding: 2px 0;
+}
+
+.form-container .section {
+    margin-top: 25px;
+}
+
+.form-container .section-content {
+    font-size: 11px;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.form-container .input-line {
+    border-bottom: 1px solid #000;
+    min-height: 20px;
+    margin: 10px 0;
+    position: relative;
+}
+
+.form-container .input-line input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 11px;
+    padding: 2px 0;
+}
+
+.form-container .inline-label {
+    font-size: 11px;
+    margin-right: 10px;
+}
+
+.form-container .seller-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.form-container .seller-row .inline-label {
+    flex: 0 0 50px;
+}
+
+.form-container .seller-row .input-line {
+    flex: 1;
+    margin: 0;
+}
+
+.form-container .address-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.form-container .address-row .inline-label {
+    flex: 0 0 120px;
+}
+
+.form-container .address-row .input-line {
+    flex: 1;
+    margin: 0 10px 0 0;
+}
+
+.form-container .warning-text {
+    font-size: 10px;
+    font-style: italic;
+    line-height: 1.4;
+    margin: 15px 0;
+}
+
+.form-container .signature-section {
+    display: flex;
+    border: 1px solid #000;
+    margin-top: 20px;
+}
+
+.form-container .sig-box {
+    flex: 1;
+    padding: 8px 10px;
+    border-right: 1px solid #000;
+    position: relative;
+}
+
+.form-container .sig-box:last-child {
+    border-right: none;
+}
+
+.form-container .sig-box label {
+    font-size: 9px;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.form-container .sig-marker {
+    position: absolute;
+    left: 10px;
+    bottom: 8px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.form-container .note-section {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #000;
+}
+
+.form-container .note-section p {
+    font-size: 10px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+.form-container .note-section .bold {
+    font-weight: bold;
+    font-style: italic;
+}
+
+.form-container .footer-warning {
+    margin-top: 15px;
+    padding: 10px;
+    border: 2px solid #000;
+    text-align: center;
+}
+
+.form-container .footer-warning p {
+    font-size: 11px;
+    font-weight: bold;
+    margin: 3px 0;
+}
