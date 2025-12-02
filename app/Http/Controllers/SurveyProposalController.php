@@ -690,7 +690,6 @@ class SurveyProposalController extends Controller
         return response()->json(['pricing_id' => $pricing->id]);
     }
 
-
     public function saveSelections(Request $request)
     {
         $request->validate([
@@ -750,79 +749,179 @@ class SurveyProposalController extends Controller
         }
     }
 
-  public function saveFull(Request $request)
-{
-    $request->validate([
-        'pricing_proposal_id' => 'required|integer|exists:pricing_proposals,id',
+    public function saveFullPricing(Request $request)
+    {
+        $request->validate([
+            'pricing_proposal_id' => 'required|integer|exists:pricing_proposals,id',
 
-        // Facility & Equipment
-        'facility_ids' => 'nullable|array',
-        'facility_ids.*' => 'integer|exists:survey_facilities,id',
+            // Facility & Equipment
+            'facility_ids' => 'nullable|array',
+            'facility_ids.*' => 'integer|exists:survey_facilities,id',
 
-        'equipment_ids' => 'nullable|array',
-        'equipment_ids.*' => 'integer|exists:equipment_evaluations,id',
+            'equipment_ids' => 'nullable|array',
+            'equipment_ids.*' => 'integer|exists:equipment_evaluations,id',
 
-        // Proposal settings
-        'proposal_name' => 'nullable|string|max:255',
-        'proposal_order' => 'nullable|integer',
-        'override_pricing' => 'nullable|string|max:255',
-        'discounts' => 'nullable|numeric',
-        'descriptions' => 'nullable|string',
+            // Proposal settings
+            'proposal_name' => 'nullable|string|max:255',
+            'proposal_order' => 'nullable|integer',
+            'override_pricing' => 'nullable|string|max:255',
+            'discounts' => 'nullable|numeric',
+            'descriptions' => 'nullable|string',
 
-        // Contract details
-        'services_per_year' => 'nullable|integer',
-        'contract_terms' => 'nullable|integer',
-        'prepayment_discount' => 'nullable|in:yes,no',
-    ]);
-
-    try {
-        $pricing = PricingProposal::findOrFail($request->pricing_proposal_id);
-
-        /** STEP 1 — Sync facilities & equipment */
-        $pricing->facilities()->sync($request->facility_ids ?? []);
-        $pricing->equipment()->sync($request->equipment_ids ?? []);
-
-        /** STEP 2 — Calculate totals */
-        $totalFacilityCost = SurveyFacility::whereIn('id', $request->facility_ids ?? [])
-            ->sum('man_hours_cost');
-
-        $totalEquipmentCost = EquipmentEvaluation::whereIn('id', $request->equipment_ids ?? [])
-            ->sum('wash_man_hours_cost');
-
-        $partialCost = $totalFacilityCost + $totalEquipmentCost;
-        $estimatedPricingTotal = $partialCost * 4.76;
-
-        /** STEP 3 — Update database */
-        $pricing->update([
-            'partial_cost_service' => round($partialCost, 2),
-            'pricing_total' => round($estimatedPricingTotal, 2),
-
-            'proposal_name'        => $request->proposal_name,
-            'proposal_order'       => $request->proposal_order,
-            'override_pricing'     => $request->override_pricing,
-            'discounts'            => $request->discounts,
-            'descriptions'         => $request->descriptions,
-
-            'services_per_year'    => $request->services_per_year,
-            'contract_terms'       => $request->contract_terms,
-            'prepayment_discount'  => $request->prepayment_discount,
+            // Contract details
+            'services_per_year' => 'nullable|integer',
+            'contract_terms' => 'nullable|integer',
+            'prepayment_discount' => 'nullable',
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Pricing Proposal Saved Successfully!',
-            'partial_cost_service' => round($partialCost, 2),
-            'pricing_total' => round($estimatedPricingTotal, 2),
-        ]);
+        try {
+            $pricing = PricingProposal::findOrFail($request->pricing_proposal_id);
 
-    } catch (\Throwable $e) {
-        Log::error("Save full proposal failed: ".$e->getMessage());
+            /** STEP 1 — Sync facilities & equipment */
+            $pricing->facilities()->sync($request->facility_ids ?? []);
+            $pricing->equipment()->sync($request->equipment_ids ?? []);
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to save pricing proposal.'
-        ], 500);
+            /** STEP 2 — Calculate totals */
+            $totalFacilityCost = SurveyFacility::whereIn('id', $request->facility_ids ?? [])
+                ->sum('man_hours_cost');
+
+            $totalEquipmentCost = EquipmentEvaluation::whereIn('id', $request->equipment_ids ?? [])
+                ->sum('wash_man_hours_cost');
+
+            $partialCost = $totalFacilityCost + $totalEquipmentCost;
+            $estimatedPricingTotal = $partialCost * 4.76;
+
+            /** STEP 3 — Update database */
+            $pricing->update([
+                'partial_cost_service' => round($partialCost, 2),
+                'pricing_total' => round($estimatedPricingTotal, 2),
+
+                'proposal_name' => $request->proposal_name,
+                'proposal_order' => $request->proposal_order,
+                'override_pricing' => $request->override_pricing,
+                'discounts' => $request->discounts,
+                'descriptions' => $request->descriptions,
+
+                'services_per_year' => $request->services_per_year,
+                'contract_terms' => $request->contract_terms,
+                'prepayment_discount' => $request->prepayment_discount,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pricing Proposal Saved Successfully!',
+                'partial_cost_service' => round($partialCost, 2),
+                'pricing_total' => round($estimatedPricingTotal, 2),
+            ]);
+
+        } catch (\Throwable $e) {
+            Log::error('Save full proposal failed: '.$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to save pricing proposal.',
+            ], 500);
+        }
     }
-}
 
+    public function updateExistingPricing(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer|exists:pricing_proposals,id',
+
+            'facility_ids' => 'nullable|array',
+            'facility_ids.*' => 'integer|exists:survey_facilities,id',
+
+            'equipment_ids' => 'nullable|array',
+            'equipment_ids.*' => 'integer|exists:equipment_evaluations,id',
+
+            'proposal_name' => 'nullable|string|max:255',
+            'proposal_order' => 'nullable|integer',
+            'override_pricing' => 'nullable|string|max:255',
+            'discounts' => 'nullable|numeric',
+            'descriptions' => 'nullable|string',
+
+            'services_per_year' => 'nullable|integer',
+            'contract_terms' => 'nullable|integer',
+            'prepayment_discount' => 'nullable|in:1,0',
+        ]);
+
+        try {
+
+            $pricing = PricingProposal::findOrFail($request->id);
+
+            // Sync facilities / equipment
+            $pricing->facilities()->sync($request->facility_ids ?? []);
+            $pricing->equipment()->sync($request->equipment_ids ?? []);
+
+            // Recalculate totals
+            $totalFacilityCost = SurveyFacility::whereIn('id', $request->facility_ids ?? [])->sum('man_hours_cost');
+            $totalEquipmentCost = EquipmentEvaluation::whereIn('id', $request->equipment_ids ?? [])->sum('wash_man_hours_cost');
+
+            $partialCost = $totalFacilityCost + $totalEquipmentCost;
+            $estimatedPricingTotal = $partialCost * 4.76;
+
+            // Update record
+            $pricing->update([
+                'partial_cost_service' => round($partialCost, 2),
+                'pricing_total' => round($estimatedPricingTotal, 2),
+
+                'proposal_name' => $request->proposal_name,
+                'proposal_order' => $request->proposal_order,
+                'override_pricing' => $request->override_pricing,
+                'discounts' => $request->discounts,
+                'descriptions' => $request->descriptions,
+
+                'services_per_year' => $request->services_per_year,
+                'contract_terms' => $request->contract_terms,
+                'prepayment_discount' => $request->prepayment_discount,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pricing updated successfully!',
+                'pricing_total' => round($estimatedPricingTotal, 2),
+                'partial_cost_service' => round($partialCost, 2),
+            ]);
+
+        } catch (\Throwable $e) {
+            Log::error('Update pricing failed: '.$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update pricing proposal.',
+            ], 500);
+        }
+    }
+
+    public function deletePricing(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer|exists:pricing_proposals,id',
+        ]);
+
+        try {
+            $pricing = PricingProposal::findOrFail($request->id);
+
+            // delete pivot relations
+            $pricing->facilities()->detach();
+            $pricing->equipment()->detach();
+
+            // delete main entry
+            $pricing->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pricing proposal deleted successfully.',
+            ]);
+
+        } catch (\Throwable $e) {
+            Log::error('Delete pricing failed: '.$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Deletion failed.',
+            ], 500);
+        }
+    }
 }

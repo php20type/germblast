@@ -470,137 +470,9 @@
                                 </div>
 
 
-                                <div id="present-proposal-stage" class="{{ $leads->stage_id == 4 ? '' : 'd-none' }}">
-                                    <div class="task-section mt-2">
-                                        <div class="company-list mb-3 border rounded p-3">
-                                            <div class="row align-items-start">
-                                                <div class="col-md-8">
-                                                    <div class="company-name">
-                                                        <p><strong>Present Proposal</strong></p>
-                                                        <p class="text-secondary">
-                                                            Completed On Aug 27, 2025 7:00 AM
-                                                            <span class="text-warning">
-                                                                By Jordan Barboza
-                                                            </span>
-                                                        </p>
-                                                    </div>
-                                                </div>
+                                {{-- PROPOSAL PRESENTATION --}}
 
-                                                <div class="col-md-4 d-flex justify-content-end">
-                                                    <div class="d-flex gap-2">
-                                                        <!-- Completed -->
-                                                        {{-- <button class="btn btn-sm btn-outline-success"
-                                                            onclick="markCompleted()" title="Mark as Completed">
-                                                            <i class="fas fa-check"></i>
-                                                        </button> --}}
-
-                                                        {{-- Reopen --}}
-                                                        {{-- <button class="btn btn-sm btn-outline-warning"
-                                                            onclick="reopenTask()" title="Reopen Task">
-                                                            <i class="fas fa-undo"></i>
-                                                        </button> --}}
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="timeline-container" style="font-size: small">
-                                                <div class="timeline-content p-3 mb-3">
-                                                    Present your site survey data collected along with your proposal within
-                                                    7
-                                                    days of your survey. Address any issues with pricing at this time. Ask
-                                                    how
-                                                    long they think the decision process may take.
-                                                </div>
-                                                <div class="timeline-content p-3">
-                                                    You must have a product attached to the lead to complete this step.
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-                                    <div class="task-section mt-2">
-                                        <div class="company-list mb-3 border rounded p-3">
-                                            <div class="row align-items-start">
-                                                <div class="col-md-8">
-                                                    <div class="company-name">
-                                                        <p><strong>Follow Up</strong></p>
-                                                        <p class="text-secondary">
-                                                            Completed On Aug 27, 2025 7:00 AM
-                                                            <span class="text-warning">
-                                                                By Jordan Barboza
-                                                            </span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4 d-flex justify-content-end">
-                                                    <div class="d-flex gap-2">
-                                                        <!-- Completed -->
-                                                        {{-- <button class="btn btn-sm btn-outline-success"
-                                                            onclick="markCompleted()" title="Mark as Completed">
-                                                            <i class="fas fa-check"></i>
-                                                        </button> --}}
-
-                                                        {{-- Reopen --}}
-                                                        <button class="btn btn-sm btn-outline-warning"
-                                                            onclick="reopenTask()" title="Reopen Task">
-                                                            <i class="fas fa-undo"></i>
-                                                        </button>
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="timeline-container" style="font-size: small">
-                                                <div class="timeline-content p-3">
-                                                    Every Sales Representation must have certain skills sets to survive in
-                                                    sales. Selling is essential to GermBlast to create a consistent revenue
-                                                    stream, however, follow up is essential to maintain a client long-term.
-                                                    This will also prevent new market entrants from sneaking in the back
-                                                    door without your knowledge.
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div id="signed-proposal-stage" class="{{ $leads->stage_id == 5 ? '' : 'd-none' }}">
-                                    <div class="task-section mt-2">
-                                        <div class="company-list mb-3 border rounded p-3">
-                                            <div class="row align-items-start">
-                                                <div class="col-md-8">
-                                                    <div class="company-name">
-                                                        <p><strong>Provided contract Rodney for Processing</strong></p>
-                                                        <p class="text-secondary">
-                                                            Completed On Aug 27, 2025 7:00 AM
-                                                            <span class="text-warning">
-                                                                By Jordan Barboza
-                                                            </span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4 d-flex justify-content-end">
-                                                    <div class="d-flex gap-2">
-                                                        <!-- Completed -->
-                                                        {{-- <button class="btn btn-sm btn-outline-success"
-                                                            onclick="markCompleted()" title="Mark as Completed">
-                                                            <i class="fas fa-check"></i>
-                                                        </button> --}}
-
-                                                        {{-- Reopen --}}
-                                                        {{-- <button class="btn btn-sm btn-outline-warning"
-                                                            onclick="reopenTask()" title="Reopen Task">
-                                                            <i class="fas fa-undo"></i>
-                                                        </button> --}}
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                {{-- RECEIVE SIGNED PROPOSAL --}}
 
                             </div>
                         </div>
@@ -1916,8 +1788,8 @@
                                             id="schedule_mentioned_company_ids" value="">
                                         <input type="hidden" name="mentioned_people_ids"
                                             id="schedule_mentioned_people_ids" value="">
-                                        <input type="hidden" name="mentioned_user_ids"
-                                            id="schedule_mentioned_user_ids" value="">
+                                        <input type="hidden" name="mentioned_user_ids" id="schedule_mentioned_user_ids"
+                                            value="">
 
                                         <!-- Hidden field to store processed note content -->
                                         <input type="hidden" name="schedule_note_value" id="schedule_note_value"
@@ -1949,8 +1821,7 @@
                                 <div class="col-lg-6 mt-2">
                                     <div class="form-group">
                                         <label class="form-label">Start Time</label>
-                                        <select class="form-select select2" id="start_time" name="start_time"
-                                            required>
+                                        <select class="form-select select2" id="start_time" name="start_time" required>
                                         </select>
                                     </div>
                                 </div>
@@ -1984,8 +1855,8 @@
                                 <div class="col-lg-12">
                                     <div class="form-group mb-4">
                                         <label class="form-label">Participants</label>
-                                        <select id="participant_select" name="participant_id[]"
-                                            class="form-select mt-2" multiple>
+                                        <select id="participant_select" name="participant_id[]" class="form-select mt-2"
+                                            multiple>
                                             {{-- Companies --}}
                                             <optgroup label="Companies">
                                                 @foreach ($companies as $company)

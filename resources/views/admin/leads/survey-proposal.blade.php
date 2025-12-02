@@ -322,7 +322,6 @@
 
 
                             {{-- Pricing Summary --}}
-
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="section-card">
@@ -337,18 +336,28 @@
                                         </div>
 
 
-                                        <div id="pricing-proposal" style="display:none;"
+                                        <div id="pricing-proposal" style="display:none;" class="p-3 border rounded"
                                             data-survey-id="{{ $surveyProposal->id ?? '' }}" data-pricing-id="">
 
                                             <!-- PRICING TABLE -->
                                             <table class="table table-bordered align-middle">
 
-
                                                 <!-- SECTION HEADER -->
-                                                <tr class="table-light">
-                                                    <th colspan="2" class="fw-bold">Select Facilities & Equipment
-                                                        for
-                                                        Proposal</th>
+                                                <tr class="table-light align-middle">
+                                                    <th colspan="2" class="fw-bold">
+                                                        <div
+                                                            class="d-flex justify-content-between align-items-center w-100">
+
+                                                            <span>Select Facilities & Equipment for Proposal</span>
+
+                                                            <button type="button"
+                                                                class="btn btn-sm btn-outline-danger delete-pricing-btn"
+                                                                title="Delete pricing">
+                                                                Delete Pricing
+                                                            </button>
+
+                                                        </div>
+                                                    </th>
                                                 </tr>
 
                                                 <!-- FACILITIES SELECT -->
@@ -389,14 +398,14 @@
                                                 <tr>
                                                     <td style="width:35%">Estimated Pricing Total</td>
                                                     <td><input type="text" class="form-control" name="pricing_total"
-                                                            readonly>
+                                                            >
                                                     </td>
                                                 </tr>
 
                                                 <tr>
                                                     <td>Partial Cost of Service</td>
                                                     <td><input type="text" class="form-control"
-                                                            name="partial_cost_service" readonly></td>
+                                                            name="partial_cost_service"></td>
                                                 </tr>
 
                                                 <!-- INCLUDED COSTS -->
@@ -409,26 +418,26 @@
                                                 <tr>
                                                     <td>Awareness</td>
                                                     <td><input type="text" class="form-control" name="awareness"
-                                                            readonly></td>
+                                                            ></td>
                                                 </tr>
 
                                                 <tr>
                                                     <td>Education</td>
                                                     <td><input type="text" class="form-control" name="education"
-                                                            readonly></td>
+                                                            ></td>
                                                 </tr>
 
                                                 <tr>
                                                     <td>Technology</td>
                                                     <td><input type="text" class="form-control" name="technology"
-                                                            readonly>
+                                                            >
                                                     </td>
                                                 </tr>
 
                                                 <tr>
                                                     <td>Response</td>
                                                     <td><input type="text" class="form-control" name="response"
-                                                            readonly></td>
+                                                            ></td>
                                                 </tr>
 
                                                 <!-- NOT INCLUDED COSTS -->
@@ -441,7 +450,7 @@
                                                 <tr>
                                                     <td>Logistics Expense</td>
                                                     <td><input type="text" class="form-control"
-                                                            name="logistics_expense" readonly>
+                                                            name="logistics_expense">
                                                     </td>
                                                 </tr>
 
@@ -548,9 +557,18 @@
                                                 <table class="table table-bordered align-middle">
 
                                                     <!-- SECTION HEADER -->
-                                                    <tr class="table-light">
-                                                        <th colspan="2" class="fw-bold">
-                                                            Edit Pricing Proposal – #{{ $pricing->id }}
+                                                    <tr class="table-light align-middle">
+                                                        <th colspan="2" class="fw-bold p-3">
+                                                            <div
+                                                                class="d-flex justify-content-between align-items-center w-100">
+                                                                <span>Edit Pricing Proposal — #{{ $pricing->id }}</span>
+
+                                                                <button type="button"
+                                                                    class="btn btn-sm btn-outline-danger delete-pricing-btn"
+                                                                    data-id="{{ $pricing->id }}">
+                                                                    Delete Pricing
+                                                                </button>
+                                                            </div>
                                                         </th>
                                                     </tr>
 
@@ -588,132 +606,118 @@
 
                                                     <!-- TOTALS -->
                                                     <tr class="table-light">
-                                                        <th colspan="2" class="fw-bold">Calculated Totals</th>
+                                                        <th colspan="2">Calculated Totals</th>
                                                     </tr>
 
                                                     <tr>
                                                         <td>Estimated Pricing Total</td>
-                                                        <td>
-                                                            <input type="text" class="form-control pricing-total"
-                                                                value="{{ $pricing->pricing_total }}" readonly>
-                                                        </td>
+                                                        <td><input type="text" class="form-control pricing-total"
+                                                                value="{{ $pricing->pricing_total ?? '' }}" readonly></td>
                                                     </tr>
 
                                                     <tr>
                                                         <td>Partial Cost of Service</td>
-                                                        <td>
-                                                            <input type="text" class="form-control partial-cost"
-                                                                value="{{ $pricing->partial_cost_service }}" readonly>
-                                                        </td>
+                                                        <td><input type="text" class="form-control partial-cost"
+                                                                value="{{ $pricing->partial_cost_service ?? '' }}"
+                                                                readonly></td>
                                                     </tr>
 
                                                     <!-- INCLUDED COSTS -->
                                                     <tr class="table-light">
-                                                        <th colspan="2" class="fw-bold">Included Costs</th>
+                                                        <th colspan="2">Included Costs</th>
                                                     </tr>
 
                                                     <tr>
                                                         <td>Awareness</td>
                                                         <td><input type="text" class="form-control"
-                                                                value="{{ $pricing->awareness }}" readonly></td>
+                                                                value="{{ $pricing->awareness ?? '' }}" readonly></td>
                                                     </tr>
 
                                                     <tr>
                                                         <td>Education</td>
                                                         <td><input type="text" class="form-control"
-                                                                value="{{ $pricing->education }}" readonly></td>
+                                                                value="{{ $pricing->education ?? '' }}" readonly></td>
                                                     </tr>
 
                                                     <tr>
                                                         <td>Technology</td>
                                                         <td><input type="text" class="form-control"
-                                                                value="{{ $pricing->technology }}" readonly></td>
+                                                                value="{{ $pricing->technology ?? '' }}" readonly></td>
                                                     </tr>
 
                                                     <tr>
                                                         <td>Response</td>
                                                         <td><input type="text" class="form-control"
-                                                                value="{{ $pricing->response }}" readonly></td>
+                                                                value="{{ $pricing->response ?? '' }}" readonly></td>
                                                     </tr>
 
                                                     <!-- NOT INCLUDED -->
                                                     <tr class="table-light">
-                                                        <th colspan="2" class="fw-bold">Not Included</th>
+                                                        <th colspan="2">Not Included</th>
                                                     </tr>
 
                                                     <tr>
                                                         <td>Logistics Expense</td>
                                                         <td><input type="text" class="form-control"
-                                                                value="{{ $pricing->logistics_expense }}" readonly></td>
+                                                                value="{{ $pricing->logistics_expense ?? '' }}" readonly>
+                                                        </td>
                                                     </tr>
 
                                                     <!-- PROPOSAL SETTINGS -->
                                                     <tr class="table-light">
-                                                        <th colspan="2" class="fw-bold">Proposal Settings</th>
+                                                        <th colspan="2">Proposal Settings</th>
                                                     </tr>
 
                                                     <tr>
-                                                        <td>Proposal Name <span class="text-danger">*</span></td>
-                                                        <td>
-                                                            <input type="text" class="form-control proposal_name"
-                                                                value="{{ $pricing->proposal_name }}">
-                                                        </td>
+                                                        <td>Proposal Name *</td>
+                                                        <td><input type="text" class="form-control proposal_name"
+                                                                value="{{ $pricing->proposal_name ?? '' }}"></td>
                                                     </tr>
 
                                                     <tr>
-                                                        <td>Proposal Order <span class="text-danger">*</span></td>
-                                                        <td>
-                                                            <input type="number" class="form-control proposal_order"
-                                                                value="{{ $pricing->proposal_order }}">
-                                                        </td>
+                                                        <td>Proposal Order *</td>
+                                                        <td><input type="number" class="form-control proposal_order"
+                                                                value="{{ $pricing->proposal_order ?? '' }}"></td>
                                                     </tr>
 
                                                     <tr>
                                                         <td>Override Pricing</td>
-                                                        <td>
-                                                            <input type="text" class="form-control override_pricing"
-                                                                value="{{ $pricing->override_pricing }}">
-                                                        </td>
+                                                        <td><input type="text" class="form-control override_pricing"
+                                                                value="{{ $pricing->override_pricing ?? '' }}"></td>
                                                     </tr>
 
                                                     <tr>
-                                                        <td>Discounts (%) <span class="text-danger">*</span></td>
-                                                        <td>
-                                                            <input type="text" class="form-control discounts"
-                                                                value="{{ $pricing->discounts }}">
-                                                        </td>
+                                                        <td>Discounts (%) *</td>
+                                                        <td><input type="text" class="form-control discounts"
+                                                                value="{{ $pricing->discounts ?? '' }}"></td>
                                                     </tr>
 
                                                     <tr>
-                                                        <td>Description <span class="text-danger">*</span></td>
+                                                        <td>Description *</td>
                                                         <td>
-                                                            <textarea class="form-control descriptions" rows="2">{{ $pricing->descriptions }}</textarea>
+                                                            <textarea class="form-control descriptions" rows="2">{{ $pricing->descriptions ?? '' }}</textarea>
                                                         </td>
                                                     </tr>
 
                                                     <!-- CONTRACT DETAILS -->
                                                     <tr class="table-light">
-                                                        <th colspan="2" class="fw-bold">Contract Details</th>
+                                                        <th colspan="2">Contract Details</th>
                                                     </tr>
 
                                                     <tr>
-                                                        <td>Services per Year <span class="text-danger">*</span></td>
-                                                        <td>
-                                                            <input type="number" class="form-control services_per_year"
-                                                                value="{{ $pricing->services_per_year }}">
-                                                        </td>
+                                                        <td>Services per Year *</td>
+                                                        <td><input type="number" class="form-control services_per_year"
+                                                                value="{{ $pricing->services_per_year ?? '' }}"></td>
                                                     </tr>
 
                                                     <tr>
-                                                        <td>Contract Terms (Years) <span class="text-danger">*</span></td>
-                                                        <td>
-                                                            <input type="number" class="form-control contract_terms"
-                                                                value="{{ $pricing->contract_terms }}">
-                                                        </td>
+                                                        <td>Contract Terms (Years) *</td>
+                                                        <td><input type="number" class="form-control contract_terms"
+                                                                value="{{ $pricing->contract_terms ?? '' }}"></td>
                                                     </tr>
 
                                                     <tr>
-                                                        <td>Prepayment Discount <span class="text-danger">*</span></td>
+                                                        <td>Prepayment Discount *</td>
                                                         <td>
                                                             <select class="form-control prepayment_discount">
                                                                 <option value="">Select Option</option>
@@ -739,6 +743,7 @@
                                                     </tr>
 
                                                 </table>
+
                                             </div>
                                         @endforeach
 
@@ -747,6 +752,43 @@
                                 </div>
                             </div>
 
+
+                            {{-- Presentation --}}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="section-card">
+
+                                        <div class="section-header">
+                                            <h3 class="section-title">Presentation</h3>
+                                        </div>
+
+                                        <table class="table table-bordered align-middle" id="proposal_presentation">
+                                            <tbody>
+
+                                                <!-- PRICING SELECT -->
+                                                <tr>
+                                                    <td style="width:35%">Select Pricing Proposals You Want In The Contract</td>
+                                                    <td>
+                                                        <select name="pricing_proposal_ids[]" id="pricing_select"
+                                                            class="form-control select2" multiple>
+                                                            @foreach ($pricingProposals as $pricing_proposal)
+                                                                <option value="{{ $pricing_proposal->id }}">
+                                                                    {{ $pricing_proposal->proposal_name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+
+                                        <div class="btn btn-success">
+                                            View Proposal
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
 
                             {{-- Supplemental Offer --}}
                             <div class="row">
@@ -783,7 +825,6 @@
                                 </div>
                             </div>
 
-
                         </div>
                     </form>
                 </div>
@@ -816,6 +857,12 @@
                 width: '100%'
             });
 
+             $('#pricing_select').select2({
+                dropdownParent: $('#proposal_presentation'),
+                placeholder: 'Choose...',
+                allowClear: true,
+                width: '100%'
+            });
 
             /* ---------------------------
                CREATE NEW EMPTY PRICING PROPOSAL
@@ -887,55 +934,202 @@
                     return;
                 }
 
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Do you want to save this pricing proposal?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, save",
+                    cancelButtonText: "Cancel",
+                }).then((result) => {
+                    if (!result.isConfirmed) return;
 
-                let pricingId = $('#pricing-proposal').data('pricing-id');
+                    let pricingId = $('#pricing-proposal').data('pricing-id');
 
-                $.ajax({
-                    url: '/admin/pricing-proposal/save-full',
-                    type: 'POST',
-                    data: {
-                        pricing_proposal_id: pricingId,
+                    $.ajax({
+                        url: '/admin/pricing-proposal/save-full',
+                        type: 'POST',
+                        data: {
+                            pricing_proposal_id: pricingId,
 
-                        facility_ids: $('#facility_select').val() || [],
-                        equipment_ids: $('#equipment_select').val() || [],
+                            facility_ids: $('#facility_select').val() || [],
+                            equipment_ids: $('#equipment_select').val() || [],
 
-                        proposal_name: $('input[name="proposal_name"]').val(),
-                        proposal_order: $('input[name="proposal_order"]').val(),
-                        override_pricing: $('input[name="override_pricing"]').val(),
-                        discounts: $('input[name="discounts"]').val(),
-                        descriptions: $('textarea[name="descriptions"]').val(),
+                            proposal_name: $('input[name="proposal_name"]').val(),
+                            proposal_order: $('input[name="proposal_order"]').val(),
+                            override_pricing: $('input[name="override_pricing"]').val(),
+                            discounts: $('input[name="discounts"]').val(),
+                            descriptions: $('textarea[name="descriptions"]').val(),
 
-                        services_per_year: $('input[name="services_per_year"]').val(),
-                        contract_terms: $('input[name="contract_terms"]').val(),
-                        prepayment_discount: $('select[name="prepayment_discount"]').val(),
+                            services_per_year: $('input[name="services_per_year"]').val(),
+                            contract_terms: $('input[name="contract_terms"]').val(),
+                            prepayment_discount: $('select[name="prepayment_discount"]')
+                                .val(),
 
-                        _token: $('meta[name="csrf-token"]').attr('content')
-                    },
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        },
 
-                    success: function(res) {
+                        success: function(res) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Saved Successfully!",
+                                timer: 1200,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
 
-                        $('input[name="partial_cost_service"]').val(res.partial_cost_service);
-                        $('input[name="pricing_total"]').val(res.pricing_total);
+                        error: function(xhr) {
+                            let msg = "Something went wrong.";
 
-                        Swal.fire({
-                            icon: "success",
-                            title: "Saved Successfully",
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-                    },
+                            // Laravel validation or custom error message
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                msg = xhr.responseJSON.message;
+                            }
 
-                    error: function(xhr) {
-                        console.log(xhr.responseText);
-                        Swal.fire({
-                            icon: "error",
-                            title: "Error Saving",
-                            text: "Something went wrong."
-                        });
-                    }
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error Saving",
+                                text: msg
+                            });
+                        }
+                    });
                 });
             });
 
+
+
+            $(document).on("click", ".saveExistingPricingBtn", function() {
+                let id = $(this).data("id");
+                let block = $(this).closest(".pricing-edit-block");
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Do you want to update this pricing proposal?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, update",
+                    cancelButtonText: "Cancel",
+                }).then((result) => {
+                    if (!result.isConfirmed) return;
+
+                    $.ajax({
+                        url: "/admin/pricing-proposal/update",
+                        type: "POST",
+                        data: {
+                            _token: $('meta[name="csrf-token"]').attr("content"),
+                            id: id,
+
+                            facility_ids: block.find(".facility-select").val() || [],
+                            equipment_ids: block.find(".equipment-select").val() || [],
+
+                            proposal_name: block.find(".proposal_name").val(),
+                            proposal_order: block.find(".proposal_order").val(),
+                            override_pricing: block.find(".override_pricing").val(),
+                            discounts: block.find(".discounts").val(),
+                            descriptions: block.find(".descriptions").val(),
+
+                            services_per_year: block.find(".services_per_year").val(),
+                            contract_terms: block.find(".contract_terms").val(),
+                            prepayment_discount: block.find(".prepayment_discount").val(),
+                        },
+
+                        success: function(res) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Updated Successfully!",
+                                timer: 1200,
+                                showConfirmButton: false,
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
+
+                        error: function(xhr) {
+                            let msg = "Update failed!";
+
+                            // If Laravel validation or error exists
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                msg = xhr.responseJSON.message;
+                            }
+
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error!",
+                                text: msg,
+                            });
+                        },
+                    });
+                });
+            });
+
+            $(document).on("click", ".delete-pricing-btn", function() {
+                let btn = $(this);
+
+                // Priority 1: Edit mode (button contains data-id)
+                let pricingId = btn.data("id");
+
+                // Priority 2: Create mode (id stored in #pricing-proposal)
+                if (!pricingId) {
+                    pricingId = $("#pricing-proposal").data("pricing-id");
+                }
+
+                // Still not found?
+                if (!pricingId) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "No Pricing Found",
+                        text: "Cannot delete — pricing ID is missing."
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    title: "Delete Pricing?",
+                    text: "This action cannot be undone.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, delete",
+                    cancelButtonText: "Cancel"
+                }).then((result) => {
+                    if (!result.isConfirmed) return;
+
+                    $.ajax({
+                        url: "/admin/pricing-proposal/delete",
+                        type: "POST",
+                        data: {
+                            id: pricingId,
+                            _token: $('meta[name="csrf-token"]').attr("content")
+                        },
+
+                        success: function() {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Deleted!",
+                                timer: 1200,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
+
+                        error: function(xhr) {
+                            let msg = "Failed to delete pricing.";
+
+                            if (xhr.responseJSON?.message) {
+                                msg = xhr.responseJSON.message;
+                            }
+
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: msg
+                            });
+                        }
+                    });
+                });
+            });
 
 
             /* ---------------------------

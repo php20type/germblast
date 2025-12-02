@@ -216,10 +216,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/survey/proposal/{equipment}/equipment/update', [SurveyProposalController::class, 'survey_equipment_update'])
         ->name('survey.proposal.equipment.update');
     Route::post('/pricing-proposal/create-empty', [SurveyProposalController::class, 'createEmpty'])->name('pricing-proposal.createEmpty');
-    Route::post('/pricing-proposal/save-full', [SurveyProposalController::class, 'saveFull'])->name('pricing-proposal.saveFull');
+    Route::post('/pricing-proposal/save-full', [SurveyProposalController::class, 'saveFullPricing'])->name('pricing-proposal.saveFull');
+    Route::post('/pricing-proposal/update', [SurveyProposalController::class, 'updateExistingPricing'])->name('pricing-proposal.update');
+    Route::post('/pricing-proposal/delete', [SurveyProposalController::class, 'deletePricing'])->name('pricing-proposal.delete');
     Route::post('/pricing-proposal/save-selections', [SurveyProposalController::class, 'saveSelections'])
         ->name('pricing-proposal.saveSelections');
     Route::post('/pricing-proposal/save-settings', [SurveyProposalController::class, 'saveSettings'])->name('pricing-proposal.saveSettings');
+
 
     // settings section
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
