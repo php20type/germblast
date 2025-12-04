@@ -35,6 +35,9 @@ class SurveyFacility extends Model
         // Man hours + cost
         'man_hours',
         'man_hours_cost',
+
+        // Total cost
+        'total_cost'
     ];
 
     public function surveyProposal()

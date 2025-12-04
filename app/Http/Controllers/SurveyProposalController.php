@@ -39,7 +39,7 @@ class SurveyProposalController extends Controller
             ->where('survey_proposal_id', $surveyProposal->id)
             ->get();
 
-        return view('admin.leads.survey-proposal', compact(
+        return view('admin.leads.survey.survey-proposal', compact(
             'lead',
             'surveyProposal',
             'facilities',
@@ -113,7 +113,7 @@ class SurveyProposalController extends Controller
         $facilities = SurveyFacility::where('survey_proposal_id', $surveyProposalId)->get();
         $facilityRoomTypes = FacilityRoomType::all();
 
-        return view('admin.leads.survey-facility', compact(
+        return view('admin.leads.survey.survey-facility', compact(
             'surveyProposal',
             'facilities',
             'facilityRoomTypes'
@@ -194,6 +194,9 @@ class SurveyProposalController extends Controller
             $facilityData['man_hours'] = $manHours;
             $facilityData['man_hours_cost'] = $manHoursCost;
 
+            $facilityData['total_cost'] = round($manHoursCost, 2);
+
+
             // -----------------------------------------
             // CREATE FACILITY RECORD
             // -----------------------------------------
@@ -271,7 +274,7 @@ class SurveyProposalController extends Controller
         $facilityMaps = SurveyFacilityMap::where('survey_facility_id', $facility->id)->get();
         $facilityAtps = SurveyFacilityAtp::where('survey_facility_id', $facility->id)->get();
 
-        return view('admin.leads.facility-edit', compact(
+        return view('admin.leads.survey.facility-edit', compact(
             'facility',
             'surveyProposalId',
             'facilityRoomTypes',
@@ -427,7 +430,7 @@ class SurveyProposalController extends Controller
         $equipmentTypes = EquipmentType::all();
 
         // Return the equipment page with proposal & equipment list
-        return view('admin.leads.survey-equipment', compact(
+        return view('admin.leads.survey.survey-equipment', compact(
             'surveyProposal',
             'equipments',
             'equipmentTypes',
@@ -445,7 +448,7 @@ class SurveyProposalController extends Controller
         $cleaningTypes = EquipmentType::where('type', 'cleaning')->get();
         $equipmentTypes = EquipmentType::all(); // optional, but useful if needed
 
-        return view('admin.leads.equipment-edit', compact(
+        return view('admin.leads.survey.equipment-edit', compact(
             'equipment',
             'surveyProposalId',
             'equipmentImages',
@@ -524,6 +527,8 @@ class SurveyProposalController extends Controller
             $equipmentData['wash_man_hours_cost'] = $washCost;
             $equipmentData['cleaning_man_hours'] = $cleanHours;
             $equipmentData['cleaning_man_hours_cost'] = $cleanCost;
+
+            $equipmentData['total_cost'] = round($washCost + $cleanCost, 2);
 
             // ------------------------------------------
             // CREATE EQUIPMENT RECORD
@@ -681,75 +686,21 @@ class SurveyProposalController extends Controller
         }
     }
 
-    public function createEmpty(Request $request)
+    public function pricing_proposal($surveyProposalId)
     {
-        $pricing = PricingProposal::create([
-            'survey_proposal_id' => $request->survey_proposal_id,
-        ]);
+        $surveyProposal = SurveyProposal::findOrFail($surveyProposalId);
 
-        return response()->json(['pricing_id' => $pricing->id]);
+        $facilities = SurveyFacility::where('survey_proposal_id', $surveyProposalId)->get();
+        $equipments = EquipmentEvaluation::where('survey_proposal_id', $surveyProposalId)->get();
+
+        return view('admin.leads.survey.add-pricing-proposal', compact(
+            'surveyProposal',
+            'facilities',
+            'equipments'
+        ));
     }
 
-    public function saveSelections(Request $request)
-    {
-        $request->validate([
-            'pricing_proposal_id' => 'required|integer|exists:pricing_proposals,id',
-
-            'facility_ids' => 'nullable|array',
-            'facility_ids.*' => 'integer|exists:survey_facilities,id',
-
-            'equipment_ids' => 'nullable|array',
-            'equipment_ids.*' => 'integer|exists:equipment_evaluations,id',
-        ]);
-
-        try {
-
-            // 1. Fetch existing pricing proposal
-            $pricingProposal = PricingProposal::findOrFail($request->pricing_proposal_id);
-
-            // 2. Sync facilities and equipment
-            $pricingProposal->facilities()->sync($request->facility_ids ?? []);
-            $pricingProposal->equipment()->sync($request->equipment_ids ?? []);
-
-            // 3. Calculate totals
-            $totalFacilityCost = SurveyFacility::whereIn('id', $request->facility_ids ?? [])
-                ->sum('man_hours_cost');
-
-            $totalEquipmentCost = EquipmentEvaluation::whereIn('id', $request->equipment_ids ?? [])
-                ->sum('wash_man_hours_cost'); // OR whatever your cost field is
-
-            // 4. Calculate partial cost of service
-            $partialCost = $totalFacilityCost + $totalEquipmentCost;
-
-            // 5. Estimated pricing total = partial × 4.76
-            $estimatedPricingTotal = $partialCost * 4.76;
-
-            // 6. Update pricing proposal
-            $pricingProposal->update([
-                'partial_cost_service' => round($partialCost, 2),
-                'pricing_total' => round($estimatedPricingTotal, 2),
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Selections saved successfully!',
-                'pricing_proposal_id' => $pricingProposal->id,
-                'partial_cost_service' => round($partialCost, 2),
-                'pricing_total' => round($estimatedPricingTotal, 2),
-            ]);
-
-        } catch (\Throwable $e) {
-
-            Log::error('Save selections failed: '.$e->getMessage());
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to save selections. Please try again later.',
-            ], 500);
-        }
-    }
-
-    public function saveFullPricing(Request $request)
+    public function pricing_store(Request $request)
     {
         $request->validate([
             'pricing_proposal_id' => 'required|integer|exists:pricing_proposals,id',

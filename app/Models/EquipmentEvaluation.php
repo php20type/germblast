@@ -74,6 +74,9 @@ class EquipmentEvaluation extends Model
 
         'cleaning_man_hours',
         'cleaning_man_hours_cost',
+
+        // Total cost
+        'total_cost'
     ];
 
      public function surveyProposal()
