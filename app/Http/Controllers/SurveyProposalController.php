@@ -12,7 +12,9 @@ use App\Models\SurveyFacility;
 use App\Models\SurveyFacilityAtp;
 use App\Models\SurveyFacilityMap;
 use App\Models\SurveyProposal;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -875,4 +877,36 @@ class SurveyProposalController extends Controller
             ], 500);
         }
     }
+
+    public function survey_view(Request $request, $id)
+{
+    $survey = SurveyProposal::with(['facilities', 'equipmentEvaluations'])->findOrFail($id);
+
+    $date = Carbon::now();
+
+    $selectedIds = explode(',', $request->get('pricing_ids'));
+
+    $pricingDetails = PricingProposal::with(['facilities', 'equipment'])
+                        ->whereIn('id', $selectedIds)
+                        ->get();
+
+    return view('survey-proposal.view', compact('survey', 'pricingDetails','date'));
+}
+
+public function survey_download(Request $request, $id)
+{
+    $survey = SurveyProposal::with(['facilities', 'equipmentEvaluations'])->findOrFail($id);
+
+    $selectedIds = explode(',', $request->get('pricing_ids'));
+
+    $pricingDetails = PricingProposal::with(['facilities', 'equipment'])
+                        ->whereIn('id', $selectedIds)
+                        ->get();
+
+    $pdf = Pdf::loadView('survey-proposal.pdf', compact('survey', 'pricingDetails'));
+
+    return $pdf->download("survey_proposal_{$survey->id}.pdf");
+}
+
+
 }

@@ -260,6 +260,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // ICIMatrix sections
     Route::get('/icimatrix', [IcimatrixController::class, 'index'])->name('icimatrix.index');
+
+    Route::get('/survey/proposal/view/{id}', [SurveyProposalController::class, 'survey_view'])->name('survey.proposal.view');
+    Route::get('/survey/proposal/download/{id}', [SurveyProposalController::class, 'survey_download'])->name('survey.proposal.download');
 });
 
 Route::get('/states/{countryId}', [SettingController::class, 'getStatesByCountry'])->name('get.states');

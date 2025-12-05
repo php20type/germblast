@@ -441,9 +441,29 @@
                                             </tbody>
                                         </table>
 
-                                        <div class="btn btn-success">
-                                            View Proposal
+                                        @php
+                                            $viewRoute = route('admin.survey.proposal.view', $surveyProposal->id);
+                                            $downloadRoute = route(
+                                                'admin.survey.proposal.download',
+                                                $surveyProposal->id,
+                                            );
+                                        @endphp
+
+                                        <div class="d-flex justify-content-end align-items-center">
+
+                                            <a href="#" id="proposalViewBtn" class="btn btn-primary btn-sm mx-2"
+                                                target="_blank">
+                                                <i class="ti ti-eye me-1"></i> View Proposal
+                                            </a>
+
+                                            <a href="#" id="proposalDownloadBtn" class="btn btn-success btn-sm">
+                                                <i class="ti ti-download me-1"></i> Download Proposal
+                                            </a>
+
                                         </div>
+
+
+
 
                                     </div>
                                 </div>
@@ -809,6 +829,39 @@
                     }
                 });
             });
+
+
+            $("#proposalViewBtn").on("click", function(e) {
+                e.preventDefault();
+
+                let selected = $('#pricing_select').val();
+
+                if (!selected || selected.length === 0) {
+                    toastr.error("Please select at least 1 proposal.");
+                    return;
+                }
+
+                let url = "{{ route('admin.survey.proposal.view', $surveyProposal->id) }}?pricing_ids=" +
+                    selected.join(',');
+                window.open(url, "_blank");
+            });
+
+            $("#proposalDownloadBtn").on("click", function(e) {
+                e.preventDefault();
+
+                let selected = $('#pricing_select').val();
+
+                if (!selected || selected.length === 0) {
+                    toastr.error("Please select at least 1 proposal.");
+                    return;
+                }
+
+                let url =
+                    "{{ route('admin.survey.proposal.download', $surveyProposal->id) }}?pricing_ids=" +
+                    selected.join(',');
+                window.location.href = url;
+            });
+
 
         });
     </script>
