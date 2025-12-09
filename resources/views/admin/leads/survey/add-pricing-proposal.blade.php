@@ -215,7 +215,7 @@
                                                 <tr>
                                                     <th>Discounts (%)<span class="text-danger">*</span></th>
                                                     <td>
-                                                        <input type="text" class="form-control" name="discounts">
+                                                        <input type="number" class="form-control" name="discounts">
                                                     </td>
                                                 </tr>
 

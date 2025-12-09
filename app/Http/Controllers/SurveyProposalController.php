@@ -213,7 +213,7 @@ class SurveyProposalController extends Controller
                 $original = $file->getClientOriginalName();
                 $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
                 $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10).'_'.$clean.'.'.$ext;
+                $filename = Str::random(10) . '_' . $clean . '.' . $ext;
 
                 $path = $file->storeAs('facility/maps', $filename, 'public');
 
@@ -236,7 +236,7 @@ class SurveyProposalController extends Controller
                 $original = $file->getClientOriginalName();
                 $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
                 $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10).'_'.$clean.'.'.$ext;
+                $filename = Str::random(10) . '_' . $clean . '.' . $ext;
 
                 $path = $file->storeAs('facility/atp', $filename, 'public');
 
@@ -259,7 +259,7 @@ class SurveyProposalController extends Controller
 
         } catch (\Throwable $e) {
 
-            Log::error("SurveyFacility upload failed (proposal={$surveyProposalId}): ".$e->getMessage());
+            Log::error("SurveyFacility upload failed (proposal={$surveyProposalId}): " . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -370,7 +370,7 @@ class SurveyProposalController extends Controller
                 $original = $file->getClientOriginalName();
                 $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
                 $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10).'_'.$clean.'.'.$ext;
+                $filename = Str::random(10) . '_' . $clean . '.' . $ext;
                 $path = $file->storeAs('facility/maps', $filename, 'public');
 
                 SurveyFacilityMap::create([
@@ -392,7 +392,7 @@ class SurveyProposalController extends Controller
                 $original = $file->getClientOriginalName();
                 $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
                 $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10).'_'.$clean.'.'.$ext;
+                $filename = Str::random(10) . '_' . $clean . '.' . $ext;
                 $path = $file->storeAs('facility/atp', $filename, 'public');
 
                 SurveyFacilityAtp::create([
@@ -414,7 +414,7 @@ class SurveyProposalController extends Controller
 
         } catch (\Throwable $e) {
 
-            Log::error("Facility update failed (facility={$facilityId}): ".$e->getMessage());
+            Log::error("Facility update failed (facility={$facilityId}): " . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -546,7 +546,7 @@ class SurveyProposalController extends Controller
                 $original = $file->getClientOriginalName();
                 $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
                 $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10).'_'.$clean.'.'.$ext;
+                $filename = Str::random(10) . '_' . $clean . '.' . $ext;
 
                 $path = $file->storeAs('equipment/images', $filename, 'public');
 
@@ -568,7 +568,7 @@ class SurveyProposalController extends Controller
 
         } catch (\Throwable $e) {
 
-            Log::error("EquipmentEvaluation store failed (proposal={$surveyProposalId}): ".$e->getMessage());
+            Log::error("EquipmentEvaluation store failed (proposal={$surveyProposalId}): " . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -658,7 +658,7 @@ class SurveyProposalController extends Controller
                 $original = $file->getClientOriginalName();
                 $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
                 $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10).'_'.$clean.'.'.$ext;
+                $filename = Str::random(10) . '_' . $clean . '.' . $ext;
 
                 $path = $file->storeAs('equipment/images', $filename, 'public');
 
@@ -679,7 +679,7 @@ class SurveyProposalController extends Controller
 
         } catch (\Throwable $e) {
 
-            Log::error("EquipmentEvaluation update failed (id={$equipmentId}): ".$e->getMessage());
+            Log::error("EquipmentEvaluation update failed (id={$equipmentId}): " . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -705,7 +705,7 @@ class SurveyProposalController extends Controller
     public function pricing_store(Request $request)
     {
         $request->validate([
-            'pricing_proposal_id' => 'required|integer|exists:pricing_proposals,id',
+            'survey_proposal_id' => 'required|integer|exists:survey_proposals,id',
 
             // Facility & Equipment
             'facility_ids' => 'nullable|array',
@@ -728,7 +728,7 @@ class SurveyProposalController extends Controller
         ]);
 
         try {
-            $pricing = PricingProposal::findOrFail($request->pricing_proposal_id);
+            $pricing = PricingProposal::findOrFail($request->survey_proposal_id);
 
             /** STEP 1 — Sync facilities & equipment */
             $pricing->facilities()->sync($request->facility_ids ?? []);
@@ -768,7 +768,7 @@ class SurveyProposalController extends Controller
             ]);
 
         } catch (\Throwable $e) {
-            Log::error('Save full proposal failed: '.$e->getMessage());
+            Log::error('Save full proposal failed: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -776,6 +776,26 @@ class SurveyProposalController extends Controller
             ], 500);
         }
     }
+
+    public function pricing_proposal_edit($pricingProposalId)
+    {
+        $pricingProposal = PricingProposal::with(['facilities', 'equipment'])
+            ->findOrFail($pricingProposalId);
+
+        $allFacilities = SurveyFacility::where('survey_proposal_id', $pricingProposal->survey_proposal_id)->get();
+
+        $allEquipments = EquipmentEvaluation::where('survey_proposal_id', $pricingProposal->survey_proposal_id)->get();
+
+        return view('admin.leads.survey.edit-pricing-proposal', [
+            'pricingProposal' => $pricingProposal,        // proposal being edited
+            'allFacilities' => $allFacilities,          // dropdown list
+            'allEquipments' => $allEquipments,          // dropdown list
+            'facilities' => $pricingProposal->facilities,  // selected
+            'equipments' => $pricingProposal->equipment,   // selected
+        ]);
+    }
+
+
 
     public function updateExistingPricing(Request $request)
     {
@@ -838,7 +858,7 @@ class SurveyProposalController extends Controller
             ]);
 
         } catch (\Throwable $e) {
-            Log::error('Update pricing failed: '.$e->getMessage());
+            Log::error('Update pricing failed: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -869,7 +889,7 @@ class SurveyProposalController extends Controller
             ]);
 
         } catch (\Throwable $e) {
-            Log::error('Delete pricing failed: '.$e->getMessage());
+            Log::error('Delete pricing failed: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -879,34 +899,34 @@ class SurveyProposalController extends Controller
     }
 
     public function survey_view(Request $request, $id)
-{
-    $survey = SurveyProposal::with(['facilities', 'equipmentEvaluations'])->findOrFail($id);
+    {
+        $survey = SurveyProposal::with(['facilities', 'equipmentEvaluations'])->findOrFail($id);
 
-    $date = Carbon::now();
+        $date = Carbon::now();
 
-    $selectedIds = explode(',', $request->get('pricing_ids'));
+        $selectedIds = explode(',', $request->get('pricing_ids'));
 
-    $pricingDetails = PricingProposal::with(['facilities', 'equipment'])
-                        ->whereIn('id', $selectedIds)
-                        ->get();
+        $pricingDetails = PricingProposal::with(['facilities', 'equipment'])
+            ->whereIn('id', $selectedIds)
+            ->get();
 
-    return view('survey-proposal.view', compact('survey', 'pricingDetails','date'));
-}
+        return view('survey-proposal.view', compact('survey', 'pricingDetails', 'date'));
+    }
 
-public function survey_download(Request $request, $id)
-{
-    $survey = SurveyProposal::with(['facilities', 'equipmentEvaluations'])->findOrFail($id);
+    public function survey_download(Request $request, $id)
+    {
+        $survey = SurveyProposal::with(['facilities', 'equipmentEvaluations'])->findOrFail($id);
 
-    $selectedIds = explode(',', $request->get('pricing_ids'));
+        $selectedIds = explode(',', $request->get('pricing_ids'));
 
-    $pricingDetails = PricingProposal::with(['facilities', 'equipment'])
-                        ->whereIn('id', $selectedIds)
-                        ->get();
+        $pricingDetails = PricingProposal::with(['facilities', 'equipment'])
+            ->whereIn('id', $selectedIds)
+            ->get();
 
-    $pdf = Pdf::loadView('survey-proposal.pdf', compact('survey', 'pricingDetails'));
+        $pdf = Pdf::loadView('survey-proposal.pdf', compact('survey', 'pricingDetails'));
 
-    return $pdf->download("survey_proposal_{$survey->id}.pdf");
-}
+        return $pdf->download("survey_proposal_{$survey->id}.pdf");
+    }
 
 
 }
