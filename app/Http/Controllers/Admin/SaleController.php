@@ -6,10 +6,15 @@ use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityType;
 use App\Models\Lead;
+use App\Models\Meeting;
 use App\Models\People;
 use App\Models\User;
+use App\Models\ZoomMeeting;
+use App\Services\ZoomService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class SaleController extends Controller
 {
@@ -306,8 +311,118 @@ class SaleController extends Controller
         ), $data));
     }
 
+    public function schedule_meeting()
+    {
+        $meetings = Meeting::with(['user', 'zoom'])
+            ->orderBy('date', 'asc')
+            ->orderBy('start_time', 'asc')
+            ->get();
 
-    public function schedule_meeting(){
-        return view('admin.sales.meetings');
+        return view('admin.sales.meetings', compact('meetings'));
+    }
+
+    public function store(Request $request, ZoomService $zoomService)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'duration' => 'required|integer|min:1',
+            'day' => 'required|date',
+            'start_time' => 'required',
+            'end_time' => 'required',
+            'location' => 'required|string|max:255',
+            'meeting_type' => 'required|in:zoom,live',
+            'activity_type' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        try {
+            // STEP 1 — Create base meeting
+            $meeting = Meeting::create([
+                'user_id' => Auth::id(),
+                'name' => $request->name,
+                'duration' => $request->duration,
+                'date' => $request->day,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
+                'location' => $request->location,
+                'meeting_type' => $request->meeting_type,
+                'status' => 'Pending',
+                'description' => $request->description,
+                'activity_type_id' => null,
+            ]);
+
+            // If LIVE → done
+            if ($request->meeting_type === 'live') {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Live meeting scheduled successfully!',
+                    'meeting' => $meeting,
+                ]);
+            }
+
+            // STEP 2 — Prepare Zoom payload
+            $zoomStartTime = Carbon::parse(
+                $request->day.' '.$request->start_time
+            )->toIso8601String();
+
+            $zoomPayload = [
+                'topic' => $request->name,
+                'type' => 2,
+                'start_time' => $zoomStartTime,
+                'duration' => (int) $request->duration,
+                'agenda' => $request->description ?? 'Scheduled Zoom Meeting',
+                'settings' => [
+                    'join_before_host' => false,
+                    'waiting_room' => true,
+                    'mute_upon_entry' => true,
+                    'approval_type' => 0,
+                    'auto_recording' => 'none',
+                ],
+            ];
+
+            // THIS WAS THE PROBLEM EARLIER:
+            // You must pass BOTH user + meetingData
+            $zoomResponse = $zoomService->createMeeting(Auth::user(), $zoomPayload);
+
+            // STEP 3 — Store Zoom meeting details
+            ZoomMeeting::create([
+                'meeting_id' => $meeting->id,
+                'zoom_meeting_id' => $zoomResponse['id'] ?? null,
+                'uuid' => $zoomResponse['uuid'] ?? null,
+                'host_id' => $zoomResponse['host_id'] ?? null,
+                'host_email' => $zoomResponse['host_email'] ?? null,
+                'topic' => $zoomResponse['topic'] ?? null,
+                'status' => $zoomResponse['status'] ?? null,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
+                'duration' => $request->duration,
+                'date' => $request->day,
+                'timezone' => $zoomResponse['timezone'] ?? 'UTC',
+                'agenda' => $zoomResponse['agenda'] ?? ($request->description ?? ''),
+                'password' => $zoomResponse['password'] ?? null,
+                'start_url' => $zoomResponse['start_url'] ?? null,
+                'join_url' => $zoomResponse['join_url'] ?? null,
+                'response' => json_encode($zoomResponse),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Zoom meeting created successfully!',
+                'meeting' => $meeting,
+                'zoom' => $zoomResponse,
+            ]);
+
+        } catch (\Throwable $e) {
+            Log::error('Meeting store failed', [
+                'error' => $e->getMessage(),
+                'payload' => $request->all(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to schedule meeting.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

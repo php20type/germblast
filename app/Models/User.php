@@ -22,6 +22,9 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'zoom_access_token',
+        'zoom_refresh_token',
+        'zoom_token_expiry'
     ];
 
     /**
@@ -160,5 +163,10 @@ class User extends Authenticatable
     public function siteSurveyCompleted()
     {
         return $this->hasMany(LeadStageProcess::class, 'site_survey_completed_by');
+    }
+
+    public function meetings()
+    {
+        return $this->hasMany(Meeting::class,'user_id');
     }
 }

@@ -334,7 +334,7 @@
                                                         <span class="text-muted">
                                                             {{ $scheduled_activity->participant_names ?? 'N/A' }}
                                                         </span>
-                                                    </div>
+                                                    </div>  
                                                 </div>
                                             </div>
 
