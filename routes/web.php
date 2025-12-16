@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\LeadStageController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ZoomController;
 use App\Http\Controllers\SurveyProposalController;
 use App\Models\ActivityType;
 use App\Models\Company;
@@ -78,12 +79,13 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     // sales section
     Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
     Route::get('/schedule/meeting', [SaleController::class, 'schedule_meeting'])->name('sales.schedule.meeting');
     Route::post('/store/meeting', [SaleController::class, 'store_meeting'])->name('sales.store.meeting');
+
 
     // Company Section
     Route::get('/company', [CompanyController::class, 'index'])->name('company.index');

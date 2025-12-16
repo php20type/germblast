@@ -28,137 +28,41 @@
                         </div>
                     </div>
 
-                    {{-- ============================= --}}
                     {{-- MEETING TIMELINE CONTAINER --}}
-                    {{-- ============================= --}}
                     <div class="timeline-container">
-                        <div class="timeline position-relative" id="meetingTimeline">
+                        <div class="timeline-content">
 
-                            {{-- ===== MEETING 1: ZOOM — PENDING ===== --}}
-                            <div class="timeline-item" style="border: none;">
-                                <div class="timeline-content">
-
-                                    <div class="timeline-header">
-                                        <div class="timestamp">
-                                            10:00 AM on Jan 15, 2025
-                                        </div>
-                                    </div>
-
-                                    <div class="timeline-body">
-                                        <div class="row align-items-center">
-
-                                            <div class="col-8">
-                                                <p class="mb-0">
-                                                    <span class="fw-semibold">Client Demo Call</span>
-                                                    <span class="text-muted"> (Zoom)</span>
-                                                </p>
-
-                                            </div>
-
-                                            <div class="col-4 text-end">
-                                                <a href="#" class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <a href="#" class="btn btn-sm btn-outline-warning">
-                                                    <i class="fas fa-pen"></i>
-                                                </a>
-                                                <button class="btn btn-sm btn-outline-danger">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div class="mt-2 text-muted">
-                                            <i class="fas fa-file-alt text-warning me-1"></i>
-                                            Discuss onboarding, pricing, and proposal review.
-                                        </div>
-
-                                    </div>
+                            <div class="timeline-header">
+                                <div class="timestamp">
+                                    10:00 AM on Jan 15, 2025
                                 </div>
                             </div>
 
-                            {{-- ===== MEETING 2: LIVE — COMPLETED ===== --}}
-                            <div class="timeline-item">
-                                <div class="timeline-content">
-
-                                    <div class="timeline-header">
-                                        <div class="timestamp">
-                                            02:30 PM on Jan 10, 2025
-                                        </div>
+                            <div class="timeline-body">
+                                <div class="row align-items-center">
+                                    <div class="col-8">
+                                        <p class="mb-0">
+                                            <span class="fw-semibold">Client Demo Call</span>
+                                            <span class="text-muted"> (Zoom)</span>
+                                        </p>
                                     </div>
 
-                                    <div class="timeline-body">
-                                        <div class="row align-items-center">
-
-                                            <div class="col-8">
-                                                <p class="mb-0">
-                                                    <span class="fw-semibold">Office Strategy Meeting</span>
-                                                    <span class="text-muted"> (Live)</span>
-                                                </p>
-                                            </div>
-
-                                            <div class="col-4 text-end">
-                                                <a href="#" class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <a href="#" class="btn btn-sm btn-outline-warning">
-                                                    <i class="fas fa-pen"></i>
-                                                </a>
-                                                <button class="btn btn-sm btn-outline-danger">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div class="mt-2 text-muted">
-                                            <i class="fas fa-file-alt text-warning me-1"></i>
-                                            Internal team roadmap planning and Q1 execution review.
-                                        </div>
-
+                                    <div class="col-4 text-end">
+                                        <a href="#" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-sm btn-outline-warning">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-times"></i>
+                                        </button>
                                     </div>
                                 </div>
-                            </div>
 
-                            {{-- ===== MEETING 3: LIVE — CANCELLED ===== --}}
-                            <div class="timeline-item">
-                                <div class="timeline-content">
-
-                                    <div class="timeline-header">
-                                        <div class="timestamp">
-                                            09:00 AM on Jan 08, 2025
-                                        </div>
-                                    </div>
-
-                                    <div class="timeline-body">
-                                        <div class="row align-items-center">
-
-                                            <div class="col-8">
-                                                <p class="mb-0">
-                                                    <span class="fw-semibold">Client Site Visit</span>
-                                                    <span class="text-muted"> (Live)</span>
-                                                </p>
-
-                                            </div>
-
-                                            <div class="col-4 text-end">
-                                                <a href="#" class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <a href="#" class="btn btn-sm btn-outline-warning">
-                                                    <i class="fas fa-pen"></i>
-                                                </a>
-                                                <button class="btn btn-sm btn-outline-danger">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div class="mt-2 text-muted">
-                                            <i class="fas fa-file-alt text-warning me-1"></i>
-                                            Meeting cancelled due to unexpected scheduling conflict.
-                                        </div>
-
-                                    </div>
+                                <div class="mt-2 text-muted">
+                                    <i class="fas fa-file-alt text-warning me-1"></i>
+                                    Discuss onboarding, pricing, and proposal review.
                                 </div>
                             </div>
 
@@ -209,7 +113,7 @@
                                         <option value="15">15 Minutes</option>
                                         <option value="20">20 Minutes</option>
                                         <option value="25">25 Minutes</option>
-                                        <option value="30">30 Minutes</option>
+                                        <option value="30" selected>30 Minutes</option>
                                         <option value="45">45 Minutes</option>
                                         <option value="60">1 Hour</option>
                                         <option value="75">1.25 Hours</option>
@@ -223,7 +127,8 @@
                             <div class="col-lg-12 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">Meeting Date</label>
-                                    <input type="date" name="day" class="form-control" />
+                                    <input type="text" name="meeting_date" placeholder="" class="form-control"
+                                        id="meeting_date" />
                                 </div>
                             </div>
 
@@ -231,7 +136,7 @@
                             <div class="col-lg-6 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">Start Time</label>
-                                    <input type="time" name="start_time" class="form-control" />
+                                    <select class="form-select select2" id="start_time" name="start_time" required></select>
                                 </div>
                             </div>
 
@@ -239,7 +144,7 @@
                             <div class="col-lg-6 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">End Time</label>
-                                    <input type="time" name="end_time" class="form-control" />
+                                    <select class="form-select select2" id="end_time" name="end_time" required></select>
                                 </div>
                             </div>
 
@@ -268,8 +173,14 @@
                             <div class="col-lg-12 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">Activity Type</label>
-                                    <input type="text" name="activity_type" class="form-control"
-                                        placeholder="Sales Call, Demo, Review, Support etc..." />
+                                    <select class="form-select mt-2" name="activity_type_id">
+                                        <option selected>Choose...</option>
+                                        @foreach ($activity_types as $activity_type)
+                                            <option value="{{ $activity_type->id }}">
+                                                {{ $activity_type->type }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
 
@@ -303,18 +214,129 @@
     <script>
         $(document).ready(function() {
 
-            /** FORM VALIDATION **/
-            $("#create-meeting-form").validate({
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            });
+
+
+            flatpickr("#meeting_date", {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                time_24hr: false
+            });
+
+            const modal = $('#AddMeeting');
+
+            const startTimeSelect = modal.find('select[name="start_time"]');
+            const endTimeSelect = modal.find('select[name="end_time"]');
+            const durationSelect = modal.find('select[name="duration"]');
+
+            function generateTimeOptions(interval) {
+                const times = [];
+                let time = moment().startOf('day');
+                const end = moment().endOf('day');
+
+                while (time.isSameOrBefore(end)) {
+                    times.push({
+                        value: time.format('HH:mm:ss'),
+                        label: time.format('hh:mm A')
+                    });
+                    time.add(interval, 'minutes');
+                }
+
+                return times;
+            }
+
+            function populateTimeDropdowns(interval) {
+                startTimeSelect.empty().append('<option value="">Select Start Time</option>');
+                endTimeSelect.empty().append('<option value="">Select End Time</option>');
+
+                if (!interval) return;
+
+                const times = generateTimeOptions(interval);
+
+                times.forEach(t => {
+                    const option = `<option value="${t.value}">${t.label}</option>`;
+                    startTimeSelect.append(option);
+                    endTimeSelect.append(option);
+                });
+
+                startTimeSelect.val(null).trigger('change');
+                endTimeSelect.val(null).trigger('change');
+            }
+
+            function filterEndTimes() {
+                const startVal = startTimeSelect.val();
+                if (!startVal) {
+                    endTimeSelect.find('option').prop('disabled', false);
+                    return;
+                }
+
+                const startMoment = moment(startVal, 'HH:mm:ss');
+
+                endTimeSelect.find('option').each(function() {
+                    const val = $(this).val();
+                    if (!val) return;
+
+                    const optionMoment = moment(val, 'HH:mm:ss');
+                    $(this).prop(
+                        'disabled',
+                        optionMoment.isSameOrBefore(startMoment)
+                    );
+                });
+
+                if (endTimeSelect.find(':selected').prop('disabled')) {
+                    endTimeSelect.val('');
+                }
+            }
+
+            durationSelect.on('change', function() {
+                populateTimeDropdowns(parseInt(this.value));
+            });
+
+            const defaultDuration = parseInt(durationSelect.val());
+            if (defaultDuration) {
+                populateTimeDropdowns(defaultDuration);
+            }
+
+            startTimeSelect.on('change', filterEndTimes);
+
+            [startTimeSelect, endTimeSelect].forEach(select => {
+                select.select2({
+                    dropdownParent: modal,
+                    width: '100%',
+                    dropdownPosition: 'below'
+                });
+            });
+
+            function isValidTimeByDuration() {
+                const duration = parseInt($('select[name="duration"]').val());
+                const startTime = $('select[name="start_time"]').val();
+                const endTime = $('select[name="end_time"]').val();
+
+                if (!duration || !startTime || !endTime) return true;
+
+                const start = moment(startTime, 'HH:mm:ss');
+                const end = moment(endTime, 'HH:mm:ss');
+
+                const diffInMinutes = end.diff(start, 'minutes');
+
+                return diffInMinutes === duration;
+            }
+
+
+            $("#add-meeting-form").validate({
                 ignore: [],
                 rules: {
                     name: {
                         required: true
                     },
                     duration: {
-                        required: true,
-                        number: true
+                        required: true
                     },
-                    day: {
+                    meeting_date: {
                         required: true,
                         date: true
                     },
@@ -324,15 +346,41 @@
                     end_time: {
                         required: true
                     },
-                    location: {
-                        required: true
-                    },
                     meeting_type: {
                         required: true
                     },
-                    activity_type: {
+                    location: {
                         required: true
                     },
+                    activity_type_id: {
+                        required: true
+                    }
+                },
+                messages: {
+                    name: {
+                        required: "Please enter the name"
+                    },
+                    duration: {
+                        required: "Please select the duration"
+                    },
+                    meeting_date: {
+                        required: "Please select the date",
+                    },
+                    start_time: {
+                        required: "Please select the start time"
+                    },
+                    end_time: {
+                        required: "Please select the end time"
+                    },
+                    meeting_type: {
+                        required: "Please select the meeting type"
+                    },
+                    location: {
+                        required: "Please enter the location"
+                    },
+                    activity_type_id: {
+                        required: "Please select the activity type"
+                    }
                 },
                 errorElement: 'span',
                 errorClass: 'invalid-feedback d-block',
@@ -343,6 +391,38 @@
                     $(el).removeClass('is-invalid');
                 }
             });
+
+            $('#add-meeting-form').submit(function(e) {
+                e.preventDefault();
+
+                if (!$('#add-meeting-form').valid()) {
+                    return;
+                }
+
+                if (!isValidTimeByDuration()) {
+                    toastr.error('Please select start and end time according to the selected duration.');
+                    return;
+                }
+
+                $.ajax({
+                    url: "{{ route('admin.sales.store.meeting') }}",
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(res) {
+                        toastr.success('Meeting Scheduled Successfully!');
+                        $('#add-meeting-form')[0].reset();
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1500);
+                    },
+                    error: function(xhr) {
+                        console.log(xhr.responseText);
+                        toastr.error('Something went wrong while scheduling the meeting.');
+                    }
+                });
+            });
+
+
 
         });
     </script>
