@@ -7,172 +7,124 @@ use App\Models\ZoomMeeting;
 use App\Services\ZoomService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class ZoomController extends Controller
 {
-    protected ZoomService $zoomService;
+    protected $zoomService;
 
     public function __construct(ZoomService $zoomService)
     {
         $this->zoomService = $zoomService;
     }
 
-    // public function createMeeting(Request $request, $meetingId)
-    // {
-    //     $meeting = Meeting::findOrFail($meetingId);
+    public function createMeeting(Request $request, int $meetingId)
+    {
+        $meeting = Meeting::findOrFail($meetingId);
 
-    //     /** Allow only Zoom meetings */
-    //     if ($meeting->meeting_type !== 'zoom') {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Zoom meeting can only be created for Zoom type meetings.',
-    //         ], 422);
-    //     }
+        if ($meeting->meeting_type !== 'zoom') {
+            return response()->json([
+                'message' => 'Zoom meeting can only be created for Zoom type meetings.',
+            ], 422);
+        }
 
-    //     /** Normalize date + time */
-    //     $startTimeIso = Carbon::parse(
-    //         $meeting->date . ' ' . $meeting->start_time,
-    //         config('app.timezone')
-    //     )->toIso8601String();
+        /** Build ISO start time */
+        $startTime = Carbon::parse(
+            $meeting->date.' '.$meeting->start_time,
+            config('app.timezone')
+        )->toIso8601String();
 
-    //     /** Zoom payload */
-    //     $payload = [
-    //         'topic' => $meeting->name,
-    //         'type' => 2,
-    //         'start_time' => $startTimeIso,
-    //         'duration' => (int) $meeting->duration,
-    //         'agenda' => $meeting->description ?? 'Scheduled Zoom Meeting',
-    //         'settings' => [
-    //             'join_before_host' => false,
-    //             'waiting_room' => true,
-    //             'mute_upon_entry' => true,
-    //             'approval_type' => 0,
-    //             'auto_recording' => 'none',
-    //         ],
-    //     ];
+        /** Payload for Zoom */
+        $meetingData = [
+            'topic' => $meeting->name,
+            'type' => 2,
+            'start_time' => $startTime,
+            'duration' => (int) $meeting->duration,
+            'agenda' => $meeting->description ?? 'Scheduled meeting',
+            'settings' => [
+                'join_before_host' => false,
+                'waiting_room' => true,
+                'mute_upon_entry' => true,
+                'approval_type' => 0,
+                'auto_recording' => 'none',
+            ],
+        ];
 
-    //     try {
-    //         /** Create Zoom meeting */
-    //         $zoomResponse = $this->zoomService->createMeeting(
-    //             auth()->user(),
-    //             $payload
-    //         );
+        try {
+            $zoomMeeting = $this->zoomService->createMeeting($meetingData);
 
-    //         /** Store Zoom meeting locally */
-    //         ZoomMeeting::create([
-    //             'meeting_id'       => $meeting->id,
-    //             'zoom_meeting_id'  => $zoomResponse['id'] ?? null,
-    //             'uuid'             => $zoomResponse['uuid'] ?? null,
-    //             'host_id'          => $zoomResponse['host_id'] ?? null,
-    //             'host_email'       => $zoomResponse['host_email'] ?? null,
-    //             'topic'            => $zoomResponse['topic'] ?? null,
-    //             'status'           => $zoomResponse['status'] ?? null,
-    //             'start_time'       => $meeting->start_time,
-    //             'end_time'         => $meeting->end_time,
-    //             'duration'         => $meeting->duration,
-    //             'date'             => $meeting->date,
-    //             'timezone'         => $zoomResponse['timezone'] ?? 'UTC',
-    //             'agenda'           => $zoomResponse['agenda'] ?? null,
-    //             'password'         => $zoomResponse['password'] ?? null,
-    //             'start_url'        => $zoomResponse['start_url'] ?? null,
-    //             'join_url'         => $zoomResponse['join_url'] ?? null,
-    //             'response'         => json_encode($zoomResponse),
-    //         ]);
+            ZoomMeeting::create([
+                'meeting_id' => $meeting->id,
+                'zoom_meeting_id' => $zoomMeeting['id'] ?? null,
+                'uuid' => $zoomMeeting['uuid'] ?? null,
+                'host_id' => $zoomMeeting['host_id'] ?? null,
+                'topic' => $zoomMeeting['topic'] ?? null,
+                'status' => $zoomMeeting['status'] ?? null,
+                'start_time' => $meeting->start_time,
+                'end_time' => $meeting->end_time,
+                'duration' => $meeting->duration,
+                'date' => $meeting->date,
+                'timezone' => $zoomMeeting['timezone'] ?? 'UTC',
+                'agenda' => $zoomMeeting['agenda'] ?? null,
+                'password' => $zoomMeeting['password'] ?? null,
+                'start_url' => $zoomMeeting['start_url'] ?? null,
+                'join_url' => $zoomMeeting['join_url'] ?? null,
+                'response' => json_encode($zoomMeeting),
+            ]);
 
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Zoom meeting created successfully!',
-    //             'data'    => $zoomResponse,
-    //         ]);
+            return response()->json([
+                'message' => 'Zoom meeting created successfully!',
+                'data' => $zoomMeeting,
+            ]);
 
-    //     } catch (\Throwable $e) {
-    //         Log::error('Zoom meeting creation failed', [
-    //             'meeting_id' => $meeting->id,
-    //             'error'      => $e->getMessage(),
-    //         ]);
+        } catch (\Exception $e) {
+            \Log::error('Zoom meeting creation failed', [
+                'meeting_id' => $meetingId,
+                'message' => $e->getMessage(),
+            ]);
 
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Failed to create Zoom meeting.',
-    //         ], 500);
-    //     }
-    // }
-
-    public function createMeeting(Request $request, $meetingId)
-{
-    $meeting = Meeting::findOrFail($meetingId);
-
-    /** Allow only Zoom meetings */
-    if ($meeting->meeting_type !== 'zoom') {
-        return response()->json([
-            'success' => false,
-            'message' => 'Zoom meeting can only be created for Zoom type meetings.',
-        ], 422);
+            return response()->json([
+                'error' => 'Failed to create Zoom meeting',
+                'details' => $e->getMessage(),
+            ], 500);
+        }
     }
 
-    /** Build ISO start time */
+    public function updateMeeting(Meeting $meeting)
+{
+    $zoom = $meeting->zoom;
+
     $startTimeIso = Carbon::parse(
-        $meeting->date . ' ' . $meeting->start_time,
+        $meeting->date.' '.$meeting->start_time,
         config('app.timezone')
     )->toIso8601String();
 
-    /** Zoom payload */
     $payload = [
         'topic' => $meeting->name,
-        'type' => 2,
         'start_time' => $startTimeIso,
         'duration' => (int) $meeting->duration,
-        'agenda' => $meeting->description ?? 'Scheduled Zoom Meeting',
-        'settings' => [
-            'join_before_host' => false,
-            'waiting_room' => true,
-            'mute_upon_entry' => true,
-            'approval_type' => 0,
-            'auto_recording' => 'none',
-        ],
+        'agenda' => $meeting->description,
     ];
 
-    try {
-        /** Create Zoom meeting (S2S OAuth) */
-        $zoomResponse = $this->zoomService->createMeeting($payload);
+    $this->zoomService->updateMeeting(
+        $zoom->zoom_meeting_id,
+        $payload
+    );
 
-        /** Store Zoom meeting locally */
-        ZoomMeeting::create([
-            'meeting_id'      => $meeting->id,
-            'zoom_meeting_id' => $zoomResponse['id'] ?? null,
-            'uuid'            => $zoomResponse['uuid'] ?? null,
-            'host_id'         => $zoomResponse['host_id'] ?? null,
-            'host_email'      => $zoomResponse['host_email'] ?? null,
-            'topic'           => $zoomResponse['topic'] ?? null,
-            'status'          => $zoomResponse['status'] ?? null,
-            'start_time'      => $meeting->start_time,
-            'end_time'        => $meeting->end_time,
-            'duration'        => $meeting->duration,
-            'date'            => $meeting->date,
-            'timezone'        => $zoomResponse['timezone'] ?? 'UTC',
-            'agenda'          => $zoomResponse['agenda'] ?? null,
-            'password'        => $zoomResponse['password'] ?? null,
-            'start_url'       => $zoomResponse['start_url'] ?? null,
-            'join_url'        => $zoomResponse['join_url'] ?? null,
-            'response'        => json_encode($zoomResponse),
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Zoom meeting created successfully!',
-        ]);
-
-    } catch (\Throwable $e) {
-        Log::error('Zoom meeting creation failed', [
-            'meeting_id' => $meeting->id,
-            'error' => $e->getMessage(),
-        ]);
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to create Zoom meeting.',
-        ], 500);
-    }
+    $zoom->update([
+        'date' => $meeting->date,
+        'start_time' => $meeting->start_time,
+        'end_time' => $meeting->end_time,
+        'duration' => $meeting->duration,
+    ]);
 }
+
+public function deleteMeeting(Meeting $meeting)
+{
+    $zoom = $meeting->zoom;
+
+    $this->zoomService->deleteMeeting($zoom->zoom_meeting_id);
+
+    $zoom->delete();
+}
+
 }

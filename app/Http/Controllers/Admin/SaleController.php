@@ -10,12 +10,10 @@ use App\Models\Lead;
 use App\Models\Meeting;
 use App\Models\People;
 use App\Models\User;
-use App\Models\ZoomMeeting;
-use App\Services\ZoomService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class SaleController extends Controller
 {
@@ -323,160 +321,192 @@ class SaleController extends Controller
         return view('admin.sales.meetings', compact('meetings', 'activity_types'));
     }
 
-    // public function store_meeting(Request $request, ZoomService $zoomService)
-    // {
-    //     $validated = $request->validate([
-    //         'name' => 'required|string|max:255',
-    //         'duration' => 'required|integer|min:1',
-    //         'meeting_date' => 'required|date',
-    //         'start_time' => 'required',
-    //         'end_time' => 'required',
-    //         'location' => 'required|string|max:255',
-    //         'meeting_type' => 'required|in:zoom,live',
-    //         'activity_type_id' => 'required|exists:activity_types,id',
-    //         'description' => 'required|string',
-    //     ]);
-
-    //     /* Normalize time (AM/PM → HH:mm:ss) */
-    //     $start = Carbon::parse($validated['start_time']);
-    //     $end = Carbon::parse($validated['end_time']);
-
-    //     $startTime = $start->format('H:i:s'); // 12:00 AM → 00:00:00
-    //     $endTime = $end->format('H:i:s');   // 02:30 PM → 14:30:00
-
-    //     try {
-    //         /** STEP 1 — Create Meeting */
-    //         $meeting = Meeting::create([
-    //             'user_id' => auth()->user()->id,
-    //             'activity_type_id' => $validated['activity_type_id'],
-    //             'name' => $validated['name'],
-    //             'meeting_type' => $validated['meeting_type'],
-    //             'duration' => $validated['duration'],
-    //             'date' => $validated['meeting_date'],
-    //             'start_time' => $startTime,
-    //             'end_time' => $endTime,
-    //             'location' => $validated['location'],
-    //             'status' => 'Pending',
-    //             'description' => $validated['description'],
-    //         ]);
-
-    //         /** LIVE meeting → done */
-    //         if ($validated['meeting_type'] === 'live') {
-    //             return response()->json([
-    //                 'success' => true,
-    //                 'message' => 'Live meeting scheduled successfully!',
-    //             ]);
-    //         }
-
-    //         /** STEP 2 — Zoom meeting */
-    //         $zoomStartTime = Carbon::parse(
-    //             $validated['meeting_date'].' '.$startTime
-    //         )->toIso8601String();
-
-    //         $zoomResponse = $zoomService->createMeeting(auth()->user(), [
-    //             'topic' => $validated['name'],
-    //             'type' => 2,
-    //             'start_time' => $zoomStartTime,
-    //             'duration' => (int) $validated['duration'],
-    //             'agenda' => $validated['description'],
-    //             'settings' => [
-    //                 'join_before_host' => false,
-    //                 'waiting_room' => true,
-    //                 'mute_upon_entry' => true,
-    //             ],
-    //         ]);
-
-    //         /** STEP 3 — Save Zoom data */
-    //         ZoomMeeting::create([
-    //             'meeting_id' => $meeting->id,
-    //             'zoom_meeting_id' => $zoomResponse['id'] ?? null,
-    //             'uuid' => $zoomResponse['uuid'] ?? null,
-    //             'host_id' => $zoomResponse['host_id'] ?? null,
-    //             'host_email' => $zoomResponse['host_email'] ?? null,
-    //             'topic' => $zoomResponse['topic'] ?? null,
-    //             'status' => $zoomResponse['status'] ?? null,
-    //             'start_time' => $startTime,
-    //             'end_time' => $endTime,
-    //             'duration' => $validated['duration'],
-    //             'date' => $validated['meeting_date'],
-    //             'timezone' => $zoomResponse['timezone'] ?? 'UTC',
-    //             'agenda' => $zoomResponse['agenda'] ?? '',
-    //             'start_url' => $zoomResponse['start_url'] ?? null,
-    //             'join_url' => $zoomResponse['join_url'] ?? null,
-    //             'response' => json_encode($zoomResponse),
-    //         ]);
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Zoom meeting created successfully!',
-    //         ]);
-
-    //     } catch (\Throwable $e) {
-    //         Log::error('Meeting store failed', [
-    //             'error' => $e->getMessage(),
-    //         ]);
-
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Failed to schedule meeting.',
-    //         ], 500);
-    //     }
-    // }
-
     public function store_meeting(Request $request)
+    {
+        Log::info('STORE MEETING: Request received', [
+            'payload' => $request->all(),
+            'user_id' => auth()->id(),
+        ]);
+
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'duration' => 'required|integer|min:1',
+                'meeting_date' => 'required|date',
+                'start_time' => 'required',
+                'end_time' => 'required',
+                'meeting_type' => 'required|in:zoom,live',
+                'location' => 'nullable|required_if:meeting_type,live|string|max:255',
+                'activity_type_id' => 'required|exists:activity_types,id',
+                'description' => 'required|string',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+
+            $validated = $validator->validated();
+
+            $start = Carbon::parse($validated['meeting_date'].' '.$validated['start_time']);
+            $end = Carbon::parse($validated['meeting_date'].' '.$validated['end_time']);
+
+            $diffInMinutes = (int) $start->diffInMinutes($end);
+
+            if ($diffInMinutes !== (int) $validated['duration']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Start and end time must match selected duration.',
+                ], 422);
+            }
+
+            $meeting = Meeting::create([
+                'user_id' => auth()->id(),
+                'activity_type_id' => $validated['activity_type_id'],
+                'name' => $validated['name'],
+                'meeting_type' => $validated['meeting_type'],
+                'duration' => $validated['duration'],
+                'date' => $validated['meeting_date'],
+                'start_time' => $start->format('H:i:s'),
+                'end_time' => $end->format('H:i:s'),
+                // 'location' => $validated['location'],
+                'location' => $validated['meeting_type'] === 'live'
+                    ? $validated['location'] : null,
+                'status' => 'Pending',
+                'description' => $validated['description'],
+            ]);
+
+            Log::info('STORE MEETING: Meeting created', [
+                'meeting_id' => $meeting->id,
+            ]);
+
+            /** SAME AS APPOINTMENT PROJECT */
+            if ($meeting->meeting_type === 'zoom') {
+                try {
+                    app(ZoomController::class)
+                        ->createMeeting(new Request, $meeting->id);
+                } catch (\Throwable $e) {
+                    Log::error('Zoom meeting creation failed', [
+                        'meeting_id' => $meeting->id,
+                        'message' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Meeting scheduled successfully!',
+            ]);
+
+        } catch (\Throwable $e) {
+            Log::critical('STORE MEETING: Unexpected error', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error',
+            ], 500);
+        }
+    }
+
+    public function update_meeting(Request $request, Meeting $meeting)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'duration' => 'required|integer|min:1',
+            'meeting_type' => 'required|in:zoom,live',
             'meeting_date' => 'required|date',
             'start_time' => 'required',
             'end_time' => 'required',
+            'duration' => 'required|integer|min:1',
             'location' => 'required|string|max:255',
-            'meeting_type' => 'required|in:zoom,live',
             'activity_type_id' => 'required|exists:activity_types,id',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
+            'old_meeting_type' => 'required|in:zoom,live',
         ]);
 
-        $start = Carbon::parse($validated['start_time']);
-        $end = Carbon::parse($validated['end_time']);
+        /** TIME CHECK */
+        $start = Carbon::parse($validated['meeting_date'].' '.$validated['start_time']);
+        $end = Carbon::parse($validated['meeting_date'].' '.$validated['end_time']);
 
-        if ($end->diffInMinutes($start) !== (int) $validated['duration']) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Please select start and end time according to the selected duration.',
-            ], 422);
+        if ($start->diffInMinutes($end) !== (int) $validated['duration']) {
+            return back()->withErrors(['duration' => 'Duration mismatch']);
         }
 
-        $meeting = Meeting::create([
-            'user_id' => auth()->id(),
-            'activity_type_id' => $validated['activity_type_id'],
+        /** UPDATE LOCAL MEETING */
+        $meeting->update([
             'name' => $validated['name'],
             'meeting_type' => $validated['meeting_type'],
-            'duration' => $validated['duration'],
             'date' => $validated['meeting_date'],
             'start_time' => $start->format('H:i:s'),
             'end_time' => $end->format('H:i:s'),
+            'duration' => $validated['duration'],
             'location' => $validated['location'],
-            'status' => 'Pending',
+            'activity_type_id' => $validated['activity_type_id'],
             'description' => $validated['description'],
         ]);
 
-        /** Delegate Zoom creation */
-        if ($meeting->meeting_type === 'zoom') {
-            try {
+        /** ZOOM LOGIC */
+        $oldType = $validated['old_meeting_type'];
+        $newType = $validated['meeting_type'];
+
+        /** CASE 1: Zoom → Zoom (UPDATE) */
+        if ($oldType === 'zoom' && $newType === 'zoom') {
+            if ($meeting->zoom) {
+                app(ZoomController::class)->updateMeeting($meeting);
+            } else {
                 app(ZoomController::class)->createMeeting(new Request, $meeting->id);
-            } catch (\Throwable $e) {
-                Log::error('Zoom meeting creation failed', [
-                    'meeting_id' => $meeting->id,
-                    'error' => $e->getMessage(),
-                ]);
             }
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Meeting scheduled successfully!',
-        ]);
+        /** CASE 2: Live → Zoom (CREATE) */
+        if ($oldType === 'live' && $newType === 'zoom') {
+            app(ZoomController::class)->createMeeting(new Request, $meeting->id);
+        }
+
+        /** CASE 3: Zoom → Live (DELETE) */
+        if ($oldType === 'zoom' && $newType === 'live' && $meeting->zoom) {
+            app(ZoomController::class)->deleteMeeting($meeting);
+        }
+
+        return redirect()
+            ->route('admin.sales.schedule.meeting')
+            ->with('success', 'Meeting updated successfully');
     }
 
+    public function delete_meeting($id)
+{
+    $meeting = Meeting::with('zoom')->findOrFail($id);
+
+    try {
+        // If zoom meeting exists → delete from Zoom
+        if ($meeting->meeting_type === 'zoom' && $meeting->zoom) {
+            app(\App\Services\ZoomService::class)
+                ->deleteMeeting($meeting->zoom->zoom_meeting_id);
+
+            $meeting->zoom->delete();
+        }
+
+        // Delete meeting itself
+        $meeting->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Meeting deleted successfully',
+        ]);
+
+    } catch (\Throwable $e) {
+        Log::error('MEETING DELETE FAILED', [
+            'meeting_id' => $id,
+            'error' => $e->getMessage(),
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to delete meeting',
+        ], 500);
+    }
+}
 }

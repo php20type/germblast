@@ -6,73 +6,186 @@
     <div class="companies-section my-4">
         <div class="container-fluid">
             <div class="row">
-
-                {{-- Sidebar --}}
+                <!-- Sidebar -->
                 @include('admin.sales.sidebar')
 
-                {{-- Main Content --}}
+                <!-- Main Content -->
                 <div class="col-md-10 p-0">
-                    <div class="sales-dashboard">
-                        {{-- HEADER --}}
-                        <div class="dashboard-header section-card d-flex justify-content-between align-items-center">
-                            <div class="container-fluid px-0">
-                                <h1 class="display-6 mb-2 fw-bold">Schedule New Meeting</h1>
-                                <p class="text-muted">Schedule and manage internal or client meetings</p>
+                    <div class="main-content">
+                        <!-- Header -->
+                        <div class="heading-area-sec">
+                            <div class="left-part-sec">
+                                <h3 class="mb-1">Schedule New Meeting <i class="fas fa-thumbtack pinned-icon"></i></h3>
+                                <p class="text-muted mb-0">Schedule and manage internal or client meetings</p>
                             </div>
-
-                            <div>
+                            <div class="right-part">
                                 <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#AddMeeting">
                                     Add New Meeting
                                 </button>
                             </div>
                         </div>
-                    </div>
 
-                    {{-- MEETING TIMELINE CONTAINER --}}
-                    <div class="timeline-container">
-                        <div class="timeline-content">
-
-                            <div class="timeline-header">
-                                <div class="timestamp">
-                                    10:00 AM on Jan 15, 2025
-                                </div>
-                            </div>
-
-                            <div class="timeline-body">
-                                <div class="row align-items-center">
-                                    <div class="col-8">
-                                        <p class="mb-0">
-                                            <span class="fw-semibold">Client Demo Call</span>
-                                            <span class="text-muted"> (Zoom)</span>
-                                        </p>
-                                    </div>
-
-                                    <div class="col-4 text-end">
-                                        <a href="#" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="#" class="btn btn-sm btn-outline-warning">
-                                            <i class="fas fa-pen"></i>
-                                        </a>
-                                        <button class="btn btn-sm btn-outline-danger">
-                                            <i class="fas fa-times"></i>
-                                        </button>
+                        <!-- Filter Section -->
+                        <div class="filter-section">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center position-relative">
+                                        <div class="search-form">
+                                            <input type="search" class="form-control" placeholder="" aria-label="Search"
+                                                id="company-search">
+                                        </div>
+                                        <span class="company-count">Meetings Found</span>
                                     </div>
                                 </div>
-
-                                <div class="mt-2 text-muted">
-                                    <i class="fas fa-file-alt text-warning me-1"></i>
-                                    Discuss onboarding, pricing, and proposal review.
+                                <div class="col-md-6 ">
+                                    <div class="d-flex align-items-center justify-content-end dropdown">
+                                        <div class="me-2">
+                                            <select class="form-select" aria-label="Default select example"
+                                                name="company_type_id">
+                                                <option value="">Meeting Type</option>
+                                                <option value="zoom">Zoom</option>
+                                                <option value="live">Live</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-
                         </div>
+
+                        <!-- Table -->
+                        <div class="table-responsive">
+                            <div class="table-container mt-3">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th class="checkbox-cell">
+                                                <input type="checkbox" class="form-check-input" id="selectAll">
+                                            </th>
+                                            <th>Meeting Name</th>
+                                            <th>Type</th>
+                                            <th>Date & Time</th>
+                                            <th>Duration</th>
+                                            <th>Activity Type</th>
+                                            <th>Status</th>
+                                            <th>Location / Link</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse ($meetings as $meeting)
+                                            <tr>
+                                                {{-- Checkbox --}}
+                                                <td class="checkbox-cell">
+                                                    <input type="checkbox" class="form-check-input row-checkbox"
+                                                        data-id="{{ $meeting->id }}">
+                                                </td>
+
+                                                {{-- Meeting Name --}}
+                                                <td>
+                                                    <strong>{{ $meeting->name }}</strong>
+                                                </td>
+
+                                                {{-- Type --}}
+                                                <td>
+                                                    @if ($meeting->meeting_type === 'zoom')
+                                                        <span class="badge bg-primary">Zoom</span>
+                                                    @else
+                                                        <span class="badge bg-success">Live</span>
+                                                    @endif
+                                                </td>
+
+                                                {{-- Date & Time --}}
+                                                <td>
+                                                    {{ \Carbon\Carbon::parse($meeting->date)->format('d M Y') }}<br>
+                                                    <small class="text-muted">
+                                                        {{ \Carbon\Carbon::parse($meeting->start_time)->format('h:i A') }}
+                                                        –
+                                                        {{ \Carbon\Carbon::parse($meeting->end_time)->format('h:i A') }}
+                                                    </small>
+                                                </td>
+
+                                                {{-- Duration --}}
+                                                <td>
+                                                    {{ $meeting->duration }} mins
+                                                </td>
+
+                                                {{-- Activity Type --}}
+                                                <td>
+                                                    {{ $meeting->activityType->type ?? '-' }}
+                                                </td>
+
+                                                {{-- Status --}}
+                                                <td>
+                                                    @php
+                                                        $status = $meeting->zoom->status ?? $meeting->status;
+                                                    @endphp
+
+                                                    <span class="badge bg-secondary">
+                                                        {{ ucfirst($status) }}
+                                                    </span>
+                                                </td>
+
+                                                {{-- Location / Join Link --}}
+                                                <td>
+                                                    @if ($meeting->meeting_type === 'zoom' && $meeting->zoom?->join_url)
+                                                        <a href="{{ $meeting->zoom->join_url }}" target="_blank"
+                                                            class="btn btn-sm btn-outline-primary">
+                                                            Join Zoom
+                                                        </a>
+                                                    @else
+                                                        {{ $meeting->location }}
+                                                    @endif
+                                                </td>
+
+                                                {{-- Actions --}}
+                                                <td>
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-outline-primary view-meeting"
+                                                        data-id="{{ $meeting->id }}">
+                                                        <i class="fa fa-eye"></i>
+                                                    </button>
+
+                                                    <a href="{{ route('admin.sales.meetings.edit', $meeting->id) }}"
+                                                        class="btn btn-sm btn-outline-warning">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
+
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-outline-danger delete-meeting"
+                                                        data-id="{{ $meeting->id }}">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="9" class="text-center text-muted">
+                                                    No meetings scheduled.
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Action Bar -->
+                        <div class="action-bar" id="actionBar">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <span class="me-3"><strong id="selectedCount">1</strong> Selected</span>
+                                <button class="btn btn-delete btn-action">DELETE</button>
+                            </div>
+                        </div>
+
                     </div>
 
                 </div>
-
             </div>
+            <!-- All Companies Section End  -->
+
         </div>
+
     </div>
 
     <div class="modal fade" id="AddMeeting" tabindex="-1" aria-labelledby="meetingModalLabel" aria-hidden="true">
@@ -136,7 +249,8 @@
                             <div class="col-lg-6 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">Start Time</label>
-                                    <select class="form-select select2" id="start_time" name="start_time" required></select>
+                                    <select class="form-select select2" id="start_time" name="start_time"
+                                        required></select>
                                 </div>
                             </div>
 
@@ -161,7 +275,7 @@
                             </div>
 
                             {{-- Location --}}
-                            <div class="col-lg-12 mt-2">
+                            <div class="col-lg-12 mt-2" id="locationField" style="display: none;">
                                 <div class="form-group">
                                     <label class="form-label">Location</label>
                                     <input type="text" name="location" class="form-control"
@@ -207,12 +321,23 @@
         </div>
     </div>
 
+
 @endsection
 
 
 @push('scripts')
     <script>
         $(document).ready(function() {
+
+            $('select[name="meeting_type"]').on('change', function() {
+                if ($(this).val() === 'live') {
+                    $('#locationField').slideDown();
+                } else {
+                    $('#locationField').slideUp();
+                    $('input[name="location"]').val('');
+                }
+            });
+
 
             $.ajaxSetup({
                 headers: {
@@ -350,7 +475,10 @@
                         required: true
                     },
                     location: {
-                        required: true
+                        // required: true
+                        required: function() {
+                            return $('select[name="meeting_type"]').val() === 'live';
+                        }
                     },
                     activity_type_id: {
                         required: true
@@ -376,7 +504,12 @@
                         required: "Please select the meeting type"
                     },
                     location: {
-                        required: "Please enter the location"
+                        // required: "Please enter the location"
+                        required: function() {
+                            return $('select[name="meeting_type"]').val() === 'live' ?
+                                "Please enter the location" :
+                                false;
+                        }
                     },
                     activity_type_id: {
                         required: "Please select the activity type"
@@ -416,11 +549,53 @@
                         }, 1500);
                     },
                     error: function(xhr) {
-                        console.log(xhr.responseText);
-                        toastr.error('Something went wrong while scheduling the meeting.');
+                        if (xhr.status === 403 && xhr.responseJSON.redirect) {
+                            toastr.warning(xhr.responseJSON.message);
+                            window.location.href = xhr.responseJSON.redirect;
+                            return;
+                        }
+
+                        toastr.error('Something went wrong.');
                     }
                 });
             });
+
+
+            $(document).on('click', '.delete-meeting', function() {
+                let meetingId = $(this).data('id');
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This meeting will be permanently deleted.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "Yes, delete",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `/admin/delete/meeting/${meetingId}`,
+                            type: "GET",
+                            success: function(res) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Deleted!",
+                                    text: res.message ||
+                                        "Meeting deleted successfully.",
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+
+                                setTimeout(() => location.reload(), 1500);
+                            },
+                            error: function() {
+                                toastr.error("Failed to delete meeting");
+                            }
+                        });
+                    }
+                });
+            });
+
 
 
 
