@@ -371,6 +371,20 @@ class SaleController extends Controller
         $start = Carbon::parse($validated['meeting_date'].' '.$validated['start_time']);
         $end = Carbon::parse($validated['meeting_date'].' '.$validated['end_time']);
 
+        $isAvailable = $this->isMeetingSlotAvailable(
+            auth()->id(),
+            $validated['meeting_date'],
+            $start->format('H:i:s'),
+            $end->format('H:i:s')
+        );
+
+        if (! $isAvailable) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Selected time slot is already booked.',
+            ], 422);
+        }
+
         $meeting = Meeting::create([
             'user_id' => auth()->id(),
             'activity_type_id' => $validated['activity_type_id'],
@@ -403,6 +417,22 @@ class SaleController extends Controller
         return response()->json($meeting);
     }
 
+    public function isMeetingSlotAvailableForUpdate(int $userId, string $date, string $start, string $end, int $ignoreMeetingId): bool
+    {
+        return ! Meeting::where('user_id', $userId)
+            ->where('date', $date)
+            ->where('id', '!=', $ignoreMeetingId) // ⬅ ignore self
+            ->where(function ($q) use ($start, $end) {
+                $q->whereBetween('start_time', [$start, $end])
+                    ->orWhereBetween('end_time', [$start, $end])
+                    ->orWhere(function ($q) use ($start, $end) {
+                        $q->where('start_time', '<=', $start)
+                            ->where('end_time', '>=', $end);
+                    });
+            })
+            ->exists();
+    }
+
     public function update_meeting(Request $request, $id)
     {
         $meeting = Meeting::with('zoom')->findOrFail($id);
@@ -421,6 +451,21 @@ class SaleController extends Controller
 
         $start = Carbon::parse($validated['meeting_date'].' '.$validated['start_time']);
         $end = Carbon::parse($validated['meeting_date'].' '.$validated['end_time']);
+
+        $isAvailable = $this->isMeetingSlotAvailableForUpdate(
+            $meeting->user_id,
+            $validated['meeting_date'],
+            $start->format('H:i:s'),
+            $end->format('H:i:s'),
+            $meeting->id
+        );
+
+        if (! $isAvailable) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Selected time slot is already booked.',
+            ], 422);
+        }
 
         // keep old type for comparison
         $oldType = $meeting->meeting_type;

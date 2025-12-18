@@ -714,7 +714,13 @@
                         setTimeout(() => location.reload(), 1500);
                     },
                     error: function(xhr) {
-                        toastr.error('Something went wrong.');
+                        let message = 'Something went wrong.';
+
+                        if (xhr.status === 422 && xhr.responseJSON?.message) {
+                            message = xhr.responseJSON.message;
+                        }
+
+                        toastr.error(message);
                         $btn.prop('disabled', false).text('Save Meeting');
                     }
                 });
@@ -911,7 +917,13 @@
                         setTimeout(() => location.reload(), 1500);
                     },
                     error: function(xhr) {
-                        toastr.error('Something went wrong.');
+                        let message = 'Something went wrong.';
+
+                        if (xhr.status === 422 && xhr.responseJSON?.message) {
+                            message = xhr.responseJSON.message;
+                        }
+
+                        toastr.error(message);
                         $btn.prop('disabled', false).text('Update Meeting');
                     }
                 });
