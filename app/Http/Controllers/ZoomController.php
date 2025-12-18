@@ -6,6 +6,7 @@ use App\Models\Meeting;
 use App\Models\ZoomMeeting;
 use App\Services\ZoomService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
 class ZoomController extends Controller
@@ -89,42 +90,67 @@ class ZoomController extends Controller
         }
     }
 
-    public function updateMeeting(Meeting $meeting)
-{
-    $zoom = $meeting->zoom;
+     public function updateMeeting(Meeting $meeting)
+    {
+        $zoom = $meeting->zoom;
 
-    $startTimeIso = Carbon::parse(
-        $meeting->date.' '.$meeting->start_time,
-        config('app.timezone')
-    )->toIso8601String();
+        if (!$zoom) {
+            return;
+        }
 
-    $payload = [
-        'topic' => $meeting->name,
-        'start_time' => $startTimeIso,
-        'duration' => (int) $meeting->duration,
-        'agenda' => $meeting->description,
-    ];
+        $startTimeIso = Carbon::createFromFormat(
+            'Y-m-d H:i:s',
+            $meeting->date.' '.$meeting->start_time,
+            config('app.timezone')
+        )->toIso8601String();
 
-    $this->zoomService->updateMeeting(
-        $zoom->zoom_meeting_id,
-        $payload
-    );
+        $payload = [
+            'topic'      => $meeting->name,
+            'start_time'=> $startTimeIso,
+            'duration'  => (int) $meeting->duration,
+            'agenda'    => $meeting->description,
+        ];
 
-    $zoom->update([
-        'date' => $meeting->date,
-        'start_time' => $meeting->start_time,
-        'end_time' => $meeting->end_time,
-        'duration' => $meeting->duration,
-    ]);
-}
+        try {
+            $this->zoomService->updateMeeting(
+                $zoom->zoom_meeting_id,
+                $payload
+            );
 
-public function deleteMeeting(Meeting $meeting)
-{
-    $zoom = $meeting->zoom;
+            $zoom->update([
+                'date'       => $meeting->date,
+                'start_time' => $meeting->start_time,
+                'end_time'   => $meeting->end_time,
+                'duration'   => $meeting->duration,
+            ]);
 
-    $this->zoomService->deleteMeeting($zoom->zoom_meeting_id);
+        } catch (\Throwable $e) {
+            Log::error('Zoom meeting update failed', [
+                'meeting_id' => $meeting->id,
+                'zoom_id'    => $zoom->zoom_meeting_id,
+                'error'      => $e->getMessage(),
+            ]);
+        }
+    }
 
-    $zoom->delete();
-}
+      public function deleteMeeting(Meeting $meeting)
+    {
+        $zoom = $meeting->zoom;
 
+        if (!$zoom) {
+            return;
+        }
+
+        try {
+            $this->zoomService->deleteMeeting($zoom->zoom_meeting_id);
+            $zoom->delete();
+
+        } catch (\Throwable $e) {
+            Log::error('Zoom meeting deletion failed', [
+                'meeting_id' => $meeting->id,
+                'zoom_id'    => $zoom->zoom_meeting_id,
+                'error'      => $e->getMessage(),
+            ]);
+        }
+    }
 }

@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Http;
 class ZoomService
 {
     protected $baseUrl = 'https://api.zoom.us/v2/';
+
     protected $oauthUrl = 'https://zoom.us/oauth/token';
+
     protected $clientId;
 
     protected $clientSecret;
@@ -22,9 +24,9 @@ class ZoomService
 
     public function __construct()
     {
-        $this->clientId     = config('services.zoom.client_id');
+        $this->clientId = config('services.zoom.client_id');
         $this->clientSecret = config('services.zoom.client_secret');
-        $this->accountId    = config('services.zoom.account_id');
+        $this->accountId = config('services.zoom.account_id');
     }
 
     /**
@@ -73,14 +75,13 @@ class ZoomService
     }
 
     public function updateMeeting(string $zoomMeetingId, array $payload): void
-{
-    $token = $this->getAccessToken();
+    {
+        $token = $this->getAccessToken();
 
-    Http::withToken($token)
-        ->patch($this->baseUrl."meetings/{$zoomMeetingId}", $payload)
-        ->throw();
-}
-
+        Http::withToken($token)
+            ->patch($this->baseUrl."meetings/{$zoomMeetingId}", $payload)
+            ->throw();
+    }
 
     /**
      * Delete Zoom meeting
