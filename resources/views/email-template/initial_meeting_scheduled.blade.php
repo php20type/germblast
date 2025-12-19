@@ -22,12 +22,10 @@
     <strong>Time:</strong> {{ \Carbon\Carbon::parse($data['scheduled_at'])->format('g:i A') }} <br>
 </p>
 
-{{-- @component('mail::button', ['url' => config('app.url') . "/admin/leads/{$data['lead_id']}"])
-View Lead
-@endcomponent --}}
-@component('mail::button', ['url' => "http://germblast.test/admin/leads/{$data['lead_id']}"])
+@component('mail::button', ['url' => config('app.url') . "/admin/leads/{$data['lead_id']}"])
 View Lead
 @endcomponent
+
 
 <p style="font-size: 16px; line-height: 24px; margin-top: 20px;">
     Thanks

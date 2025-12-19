@@ -87,6 +87,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('meeting/{id}', [SaleController::class, 'show_meeting'])->name('sales.meetings.show');
     Route::post('meeting/{meeting}/update', [SaleController::class, 'update_meeting'])->name('sales.meetings.update');
     Route::post('meetings/delete', [SaleController::class, 'delete_meetings'])->name('sales.meetings.delete');
+    Route::post('meeting/{id}/complete', [SaleController::class, 'complete_meeting'])->name('sales.meeting.complete');
 
     // Company Section
     Route::get('/company', [CompanyController::class, 'index'])->name('company.index');

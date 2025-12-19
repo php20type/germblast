@@ -34,4 +34,9 @@ class Meeting extends Model
     {
         return $this->hasOne(ZoomMeeting::class, 'meeting_id');
     }
+
+     public function mentionedUsers()
+    {
+        return $this->belongsToMany(User::class,'meeting_users','meeting_id','user_id')->withTimestamps();
+    }
 }

@@ -9,6 +9,7 @@ use App\Models\ActivityType;
 use App\Models\Lead;
 use App\Models\Meeting;
 use App\Models\People;
+use App\Services\NotificationService;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -310,7 +311,14 @@ class SaleController extends Controller
 
     public function schedule_meeting(Request $request)
     {
-        $query = Meeting::with(['user', 'zoom', 'activityType'])
+        $query = Meeting::with(['user', 'zoom', 'activityType', 'mentionedUsers'])
+            // ->where('user_id', auth()->id())
+            ->where(function ($q) {
+                $q->where('user_id', auth()->id()) // meetings I created
+                    ->orWhereHas('mentionedUsers', function ($q) {
+                        $q->where('users.id', auth()->id()); // meetings I’m mentioned in
+                    });
+            })
             ->orderBy('date', 'desc')
             ->orderBy('start_time', 'desc');
 
@@ -327,6 +335,7 @@ class SaleController extends Controller
         $meetings = $query->get();
         $meetingsCount = $meetings->count();
         $activity_types = ActivityType::all();
+        $users = User::all();
 
         // AJAX response (same pattern as companies)
         if ($request->ajax()) {
@@ -336,7 +345,7 @@ class SaleController extends Controller
             ]);
         }
 
-        return view('admin.sales.meetings', compact('meetings', 'meetingsCount', 'activity_types'));
+        return view('admin.sales.meetings', compact('meetings', 'meetingsCount', 'activity_types', 'users'));
     }
 
     public function isMeetingSlotAvailable(int $userId, string $date, string $start, string $end): bool
@@ -366,6 +375,8 @@ class SaleController extends Controller
             'location' => 'nullable|string|max:255',
             'activity_type_id' => 'required|exists:activity_types,id',
             'description' => 'required|string',
+            'user_id' => 'nullable|array',
+            'user_id.*' => 'exists:users,id',
         ]);
 
         $start = Carbon::parse($validated['meeting_date'].' '.$validated['start_time']);
@@ -399,10 +410,16 @@ class SaleController extends Controller
             'description' => $validated['description'],
         ]);
 
+        if ($request->filled('user_id')) {
+            $meeting->mentionedUsers()->sync($request->user_id);
+        }
+
         // Create Zoom meeting if needed (S2S OAuth flow already handled)
         if ($meeting->meeting_type === 'zoom') {
             app(ZoomController::class)->createMeeting(new Request, $meeting->id);
         }
+
+        // $notificationService->meetingScheduled($meeting);
 
         return response()->json([
             'success' => true,
@@ -412,7 +429,7 @@ class SaleController extends Controller
 
     public function show_meeting($id)
     {
-        $meeting = Meeting::with('activityType')->findOrFail($id);
+        $meeting = Meeting::with('activityType', 'zoom', 'mentionedUsers')->findOrFail($id);
 
         return response()->json($meeting);
     }
@@ -435,7 +452,11 @@ class SaleController extends Controller
 
     public function update_meeting(Request $request, $id)
     {
-        $meeting = Meeting::with('zoom')->findOrFail($id);
+        $meeting = Meeting::with('activityType', 'zoom', 'mentionedUsers')->findOrFail($id);
+
+        if ($meeting->user_id !== auth()->id()) {
+            abort(403);
+        }
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -447,6 +468,8 @@ class SaleController extends Controller
             'location' => 'nullable|string|max:255',
             'activity_type_id' => 'required|exists:activity_types,id',
             'description' => 'required|string',
+            'user_id' => 'nullable|array',
+            'user_id.*' => 'exists:users,id',
         ]);
 
         $start = Carbon::parse($validated['meeting_date'].' '.$validated['start_time']);
@@ -483,6 +506,8 @@ class SaleController extends Controller
             'description' => $validated['description'],
         ]);
 
+        $meeting->mentionedUsers()->sync($request->user_id ?? []);
+
         // Zoom → Zoom (update or create)
         if ($oldType === 'zoom' && $newType === 'zoom') {
             if ($meeting->zoom) {
@@ -502,9 +527,29 @@ class SaleController extends Controller
             app(ZoomController::class)->deleteMeeting($meeting);
         }
 
+        //  $notificationService->meetingUpdated($meeting);
+
         return response()->json([
             'success' => true,
             'message' => 'Meeting updated successfully!',
+        ]);
+    }
+
+    public function complete_meeting($id)
+    {
+        $meeting = Meeting::findOrFail($id);
+
+        if ($meeting->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $meeting->update([
+            'status' => 'Completed',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Meeting marked as completed.',
         ]);
     }
 
@@ -519,9 +564,18 @@ class SaleController extends Controller
             ], 400);
         }
 
-        $meetings = Meeting::with('zoom')->whereIn('id', $ids)->get();
+        $meetings = Meeting::with('zoom', 'activityType', 'mentionedUsers')->whereIn('id', $ids)->get();
 
         foreach ($meetings as $meeting) {
+            if ($meeting->user_id !== auth()->id()) {
+                abort(403, 'Unauthorized action.');
+            }
+        }
+
+        foreach ($meetings as $meeting) {
+
+            $meeting->mentionedUsers()->detach();
+
             // Delete Zoom meeting if exists
             if ($meeting->meeting_type === 'zoom' && $meeting->zoom) {
                 try {

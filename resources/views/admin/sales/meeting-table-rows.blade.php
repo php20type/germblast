@@ -13,9 +13,9 @@
          {{-- Type --}}
          <td>
              @if ($meeting->meeting_type === 'zoom')
-                 <span class="badge bg-primary">Zoom</span>
+                 <span class="badge-customer">Zoom</span>
              @else
-                 <span class="badge bg-success">Live</span>
+                 <span class="badge-prospect">Live</span>
              @endif
          </td>
 
@@ -29,47 +29,39 @@
              </small>
          </td>
 
-         {{-- Duration --}}
          <td>
-             {{ $meeting->duration }} mins
+             {{ $meeting->status ?? 'N/A' }}
          </td>
 
-         {{-- Activity Type --}}
          <td>
-             {{ $meeting->activityType->type ?? '-' }}
-         </td>
-
-         {{-- Status --}}
-         <td>
-             @php
-                 $status = $meeting->zoom->status ?? $meeting->status;
-             @endphp
-
-             <span class="badge bg-secondary">
-                 {{ ucfirst($status) }}
-             </span>
-         </td>
-
-         {{-- Location / Join Link --}}
-         <td>
-             @if ($meeting->meeting_type === 'zoom' && $meeting->zoom?->join_url)
-                 <a href="{{ $meeting->zoom->join_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                     Join Zoom
-                 </a>
-             @else
-                 {{ $meeting->location }}
-             @endif
+             {{ $meeting->activityType->type ?? 'N/A' }}
          </td>
 
          {{-- Actions --}}
-         <td>
-             <button type="button" class="btn btn-sm btn-outline-primary edit-meeting" data-id="{{ $meeting->id }}">
-                 <i class="fa fa-edit"></i>
+         <td class="text-center">
+             <button class="btn btn-sm btn-outline-info view-meeting" data-id="{{ $meeting->id }}">
+                 <i class="fa fa-eye"></i>
              </button>
 
-             <button type="button" class="btn btn-sm btn-outline-danger delete-meeting" data-id="{{ $meeting->id }}">
-                 <i class="fa fa-trash"></i>
-             </button>
+             {{-- Edit & Delete ONLY for meeting owner --}}
+             @if ($meeting->user_id === auth()->id())
+                 @if ($meeting->status !== 'Completed')
+                     <button type="button" class="btn btn-sm btn-outline-primary edit-meeting"
+                         data-id="{{ $meeting->id }}">
+                         <i class="fa fa-edit"></i>
+                     </button>
+
+                     <button type="button" class="btn btn-sm btn-outline-success complete-meeting"
+                         data-id="{{ $meeting->id }}">
+                         <i class="fa fa-check"></i>
+                     </button>
+                 @endif
+
+                 <button type="button" class="btn btn-sm btn-outline-danger delete-meeting"
+                     data-id="{{ $meeting->id }}">
+                     <i class="fa fa-trash"></i>
+                 </button>
+             @endif
          </td>
      </tr>
  @empty

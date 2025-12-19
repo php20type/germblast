@@ -22,7 +22,7 @@
     <strong>Time:</strong> {{ \Carbon\Carbon::parse($data['scheduled_time'])->format('g:i A') }} <br>
 </p>
 
-@component('mail::button', ['url' => "http://germblast.test/admin/leads/{$data['lead_id']}"])
+@component('mail::button', ['url' => config('app.url') . "/admin/leads/{$data['lead_id']}"])
 View Lead
 @endcomponent
 

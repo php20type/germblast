@@ -23,12 +23,10 @@
     {{ \Carbon\Carbon::parse($data['completed_at'])->format('jS F Y g:i A') }} <br>
 </p>
 
-{{-- @component('mail::button', ['url' => config('app.url') . "/admin/leads/{$data['lead_id']}"])
-View Lead
-@endcomponent --}}
-@component('mail::button', ['url' => "http://germblast.test/admin/leads/{$data['lead_id']}"])
+@component('mail::button', ['url' => config('app.url') . "/admin/leads/{$data['lead_id']}"])
 View Lead
 @endcomponent
+
 
 <p style="font-size: 16px; line-height: 24px; margin-top: 20px;">
     Thanks

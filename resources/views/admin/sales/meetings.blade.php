@@ -31,24 +31,15 @@
                                 <div class="col-md-6">
                                     <div class="d-flex align-items-center position-relative">
                                         <div class="search-form">
-                                            {{-- <input type="search" class="form-control" placeholder="" aria-label="Search"
-                                                id="company-search"> --}}
                                             <input type="search" class="form-control" id="meeting-search"
                                                 placeholder="Search meeting name">
                                         </div>
-                                        {{-- <span class="company-count">Meetings Found</span> --}}
                                         <span class="company-count">{{ $meetingsCount }} Meetings Found</span>
                                     </div>
                                 </div>
                                 <div class="col-md-6 ">
                                     <div class="d-flex align-items-center justify-content-end dropdown">
                                         <div class="me-2">
-                                            {{-- <select class="form-select" aria-label="Default select example"
-                                                name="company_type_id">
-                                                <option value="">Meeting Type</option>
-                                                <option value="zoom">Zoom</option>
-                                                <option value="live">Live</option>
-                                            </select> --}}
                                             <select class="form-select" id="meeting-type" name="meeting_type">
                                                 <option value="">Meeting Type</option>
                                                 <option value="zoom">Zoom</option>
@@ -73,11 +64,9 @@
                                             <th>Meeting Name</th>
                                             <th>Type</th>
                                             <th>Date & Time</th>
-                                            <th>Duration</th>
-                                            <th>Activity Type</th>
                                             <th>Status</th>
-                                            <th>Location / Link</th>
-                                            <th>Actions</th>
+                                            <th>Activity Type</th>
+                                            <th class="text-center">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -97,9 +86,9 @@
                                                 {{-- Type --}}
                                                 <td>
                                                     @if ($meeting->meeting_type === 'zoom')
-                                                        <span class="badge bg-primary">Zoom</span>
+                                                        <span class="badge-customer">Zoom</span>
                                                     @else
-                                                        <span class="badge bg-success">Live</span>
+                                                        <span class="badge-prospect">Live</span>
                                                     @endif
                                                 </td>
 
@@ -113,52 +102,43 @@
                                                     </small>
                                                 </td>
 
-                                                {{-- Duration --}}
                                                 <td>
-                                                    {{ $meeting->duration }} mins
+                                                    {{ $meeting->status ?? 'N/A' }}
                                                 </td>
 
-                                                {{-- Activity Type --}}
                                                 <td>
-                                                    {{ $meeting->activityType->type ?? '-' }}
-                                                </td>
-
-                                                {{-- Status --}}
-                                                <td>
-                                                    @php
-                                                        $status = $meeting->zoom->status ?? $meeting->status;
-                                                    @endphp
-
-                                                    <span class="badge bg-secondary">
-                                                        {{ ucfirst($status) }}
-                                                    </span>
-                                                </td>
-
-                                                {{-- Location / Join Link --}}
-                                                <td>
-                                                    @if ($meeting->meeting_type === 'zoom' && $meeting->zoom?->join_url)
-                                                        <a href="{{ $meeting->zoom->join_url }}" target="_blank"
-                                                            class="btn btn-sm btn-outline-primary">
-                                                            Join Zoom
-                                                        </a>
-                                                    @else
-                                                        {{ $meeting->location }}
-                                                    @endif
+                                                    {{ $meeting->activityType->type ?? 'N/A' }}
                                                 </td>
 
                                                 {{-- Actions --}}
-                                                <td>
-                                                    <button type="button"
-                                                        class="btn btn-sm btn-outline-primary edit-meeting"
+                                                <td class="text-center">
+                                                    <button class="btn btn-sm btn-outline-info view-meeting"
                                                         data-id="{{ $meeting->id }}">
-                                                        <i class="fa fa-edit"></i>
+                                                        <i class="fa fa-eye"></i>
                                                     </button>
 
-                                                    <button type="button"
-                                                        class="btn btn-sm btn-outline-danger delete-meeting"
-                                                        data-id="{{ $meeting->id }}">
-                                                        <i class="fa fa-trash"></i>
-                                                    </button>
+                                                    {{-- Edit & Delete ONLY for meeting owner --}}
+                                                    @if ($meeting->user_id === auth()->id())
+                                                        @if ($meeting->status !== 'Completed')
+                                                            <button type="button"
+                                                                class="btn btn-sm btn-outline-primary edit-meeting"
+                                                                data-id="{{ $meeting->id }}">
+                                                                <i class="fa fa-edit"></i>
+                                                            </button>
+
+                                                            <button type="button"
+                                                                class="btn btn-sm btn-outline-success complete-meeting"
+                                                                data-id="{{ $meeting->id }}">
+                                                                <i class="fa fa-check"></i>
+                                                            </button>
+                                                        @endif
+
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-danger delete-meeting"
+                                                            data-id="{{ $meeting->id }}">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @empty
@@ -171,6 +151,7 @@
                                     </tbody>
 
                                 </table>
+
                             </div>
                         </div>
 
@@ -244,6 +225,7 @@
                             <div class="col-lg-12 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">Meeting Date</label>
+                                    <span class="text-danger">*</span>
                                     <input type="text" name="meeting_date" placeholder="" class="form-control"
                                         id="meeting_date" />
                                 </div>
@@ -253,6 +235,7 @@
                             <div class="col-lg-6 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">Start Time</label>
+                                    <span class="text-danger">*</span>
                                     <select class="form-select select2" id="start_time" name="start_time"
                                         required></select>
                                 </div>
@@ -262,6 +245,7 @@
                             <div class="col-lg-6 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">End Time</label>
+                                    <span class="text-danger">*</span>
                                     <select class="form-select select2" id="end_time" name="end_time" required></select>
                                 </div>
                             </div>
@@ -270,6 +254,7 @@
                             <div class="col-lg-12 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">Meeting Type</label>
+                                    <span class="text-danger">*</span>
                                     <select name="meeting_type" class="form-select">
                                         <option value="">Choose...</option>
                                         <option value="zoom">Zoom Meeting</option>
@@ -287,10 +272,27 @@
                                 </div>
                             </div>
 
+                            {{-- Users --}}
+                            <div class="col-lg-12 mt-2">
+                                <div class="form-group">
+                                    <label class="form-label">Users</label>
+                                    <select class="form-select select2 mt-2" id="userSelect" name="user_id[]" multiple>
+                                        @foreach ($users as $user)
+                                            @if ($user->id !== auth()->id())
+                                                <option value="{{ $user->id }}">
+                                                    {{ $user->name }}
+                                                </option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
                             {{-- Activity Type --}}
                             <div class="col-lg-12 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">Activity Type</label>
+                                    <span class="text-danger">*</span>
                                     <select class="form-select mt-2" name="activity_type_id">
                                         <option selected>Choose...</option>
                                         @foreach ($activity_types as $activity_type)
@@ -306,6 +308,7 @@
                             <div class="col-lg-12 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">Description</label>
+                                    <span class="text-danger">*</span>
                                     <textarea name="description" rows="4" class="form-control" placeholder="Meeting purpose, agenda, notes..."></textarea>
                                 </div>
                             </div>
@@ -376,6 +379,7 @@
                             <div class="col-lg-12 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">Meeting Date</label>
+                                    <span class="text-danger">*</span>
                                     <input type="text" name="meeting_date" id="edit_meeting_date"
                                         class="form-control edit-meeting-date" />
                                 </div>
@@ -385,6 +389,7 @@
                             <div class="col-lg-6 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">Start Time</label>
+                                    <span class="text-danger">*</span>
                                     <select class="form-select select2 edit-start-time" name="start_time"
                                         required></select>
                                 </div>
@@ -394,6 +399,7 @@
                             <div class="col-lg-6 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">End Time</label>
+                                    <span class="text-danger">*</span>
                                     <select class="form-select select2 edit-end-time" name="end_time" required></select>
                                 </div>
                             </div>
@@ -402,6 +408,7 @@
                             <div class="col-lg-12 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">Meeting Type</label>
+                                    <span class="text-danger">*</span>
                                     <select name="meeting_type" class="form-select">
                                         <option value="">Choose...</option>
                                         <option value="zoom">Zoom Meeting</option>
@@ -419,10 +426,28 @@
                                 </div>
                             </div>
 
+                            {{-- Users --}}
+                            <div class="col-lg-12 mt-2">
+                                <div class="form-group">
+                                    <label class="form-label">Users</label>
+                                    <select class="form-select select2 mt-2" id="editUserSelect" name="user_id[]"
+                                        multiple>
+                                        @foreach ($users as $user)
+                                            @if ($user->id !== auth()->id())
+                                                <option value="{{ $user->id }}">
+                                                    {{ $user->name }}
+                                                </option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
                             {{-- Activity Type --}}
                             <div class="col-lg-12 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">Activity Type</label>
+                                    <span class="text-danger">*</span>
                                     <select class="form-select mt-2" name="activity_type_id">
                                         <option value="">Choose...</option>
                                         @foreach ($activity_types as $activity_type)
@@ -438,6 +463,7 @@
                             <div class="col-lg-12 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">Description</label>
+                                    <span class="text-danger">*</span>
                                     <textarea name="description" rows="4" class="form-control" placeholder="Meeting purpose, agenda, notes..."></textarea>
                                 </div>
                             </div>
@@ -460,6 +486,126 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="ViewMeeting" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h1 class="modal-title">Meeting Details</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form class="meeting-form">
+
+                        <div class="row mx-0">
+
+                            {{-- Meeting Name --}}
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Meeting Name</label>
+                                    <input type="text" class="form-control" id="viewMeetingName" readonly>
+                                </div>
+                            </div>
+
+                            {{-- Duration --}}
+                            <div class="col-lg-12 mt-2">
+                                <div class="form-group">
+                                    <label class="form-label">Duration</label>
+                                    <input type="text" class="form-control" id="viewDuration" readonly>
+                                </div>
+                            </div>
+
+                            {{-- Date --}}
+                            <div class="col-lg-12 mt-2">
+                                <div class="form-group">
+                                    <label class="form-label">Meeting Date</label>
+                                    <input type="text" class="form-control" id="viewMeetingDate" readonly>
+                                </div>
+                            </div>
+
+                            {{-- Start Time --}}
+                            <div class="col-lg-6 mt-2">
+                                <div class="form-group">
+                                    <label class="form-label">Start Time</label>
+                                    <input type="text" class="form-control" id="viewStartTime" readonly>
+                                </div>
+                            </div>
+
+                            {{-- End Time --}}
+                            <div class="col-lg-6 mt-2">
+                                <div class="form-group">
+                                    <label class="form-label">End Time</label>
+                                    <input type="text" class="form-control" id="viewEndTime" readonly>
+                                </div>
+                            </div>
+
+                            {{-- Meeting Type --}}
+                            <div class="col-lg-12 mt-2">
+                                <div class="form-group">
+                                    <label class="form-label">Meeting Type</label>
+                                    <input type="text" class="form-control" id="viewMeetingType" readonly>
+                                </div>
+                            </div>
+
+                            {{-- Location --}}
+                            <div class="col-lg-12 mt-2">
+                                <div class="form-group">
+                                    <label class="form-label">Location / Link</label>
+                                    <input type="text" class="form-control" id="viewLocation" readonly>
+                                </div>
+                            </div>
+
+                            {{-- Users --}}
+                            <div class="col-lg-12 mt-2">
+                                <div class="form-group">
+                                    <label class="form-label">Users</label>
+                                    <input type="text" class="form-control" id="viewUsers" readonly>
+                                </div>
+                            </div>
+
+
+                            {{-- Activity Type --}}
+                            <div class="col-lg-12 mt-2">
+                                <div class="form-group">
+                                    <label class="form-label">Activity Type</label>
+                                    <input type="text" class="form-control" id="viewActivityType" readonly>
+                                </div>
+                            </div>
+
+                            {{-- Description --}}
+                            <div class="col-lg-12 mt-2">
+                                <div class="form-group">
+                                    <label class="form-label">Description</label>
+                                    <textarea rows="4" class="form-control" id="viewDescription" readonly></textarea>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer mt-4">
+                            <a href="#" target="_blank" id="viewJoinBtn" class="btn btn-success d-none">
+                                Join
+                            </a>
+
+                            <a href="#" target="_blank" id="viewStartBtn" class="btn btn-success d-none">
+                                Start
+                            </a>
+
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                Close
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
 
 
 
@@ -579,6 +725,8 @@
 
         $(document).ready(function() {
 
+            let user = {{ auth()->id() ?? 'null' }};
+
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
@@ -598,6 +746,21 @@
                 time_24hr: false
             });
 
+
+            //  Select2 script
+            $('#userSelect').select2({
+                dropdownParent: $('#AddMeeting'),
+                placeholder: '-- Select users --',
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('#editUserSelect').select2({
+                dropdownParent: $('#EditMeeting'),
+                placeholder: '-- Select users --',
+                allowClear: true,
+                width: '100%'
+            });
 
             initMeetingTimeControls('#AddMeeting');
             initMeetingTimeControls('#EditMeeting');
@@ -778,6 +941,13 @@
                                 setTimeout(() => location.reload(), 1500);
                             },
                             error: function(xhr) {
+                                if (xhr.status === 403) {
+                                    toastr.error(
+                                        'You are not allowed to delete this meeting.'
+                                    );
+                                    return;
+                                }
+
                                 Swal.fire(
                                     'Error!',
                                     xhr.responseJSON?.message ||
@@ -789,7 +959,6 @@
                     }
                 });
             });
-
 
 
             $(document).on('click', '.edit-meeting', function() {
@@ -813,6 +982,7 @@
                         'change');
                     form.find('textarea[name="description"]').val(data.description);
 
+                    // populate time dropdowns
                     const populateTimes = modal.data('populateTimes');
                     populateTimes(
                         parseInt(data.duration),
@@ -820,7 +990,22 @@
                         data.end_time
                     );
 
+                    // SHOW MODAL FIRST
                     modal.modal('show');
+
+                    // THEN set users
+                    modal.on('shown.bs.modal', function() {
+
+                        const userIds = (data.mentioned_users || data.mentionedUsers || [])
+                            .map(u => u.id);
+
+                        $('#editUserSelect')
+                            .val(userIds)
+                            .trigger('change');
+
+                        // prevent duplicate binding
+                        modal.off('shown.bs.modal');
+                    });
                 });
             });
 
@@ -928,6 +1113,108 @@
                     }
                 });
             });
+
+            $(document).on('click', '.view-meeting', function() {
+                const id = $(this).data('id');
+
+                $.get(`/admin/meeting/${id}`, function(data) {
+
+                    $('#viewMeetingName').val(data.name);
+                    $('#viewMeetingDate').val(moment(data.date).format('DD MMM YYYY'));
+
+                    $('#viewStartTime').val(
+                        moment(data.start_time, 'HH:mm:ss').format('hh:mm A')
+                    );
+
+                    $('#viewEndTime').val(
+                        moment(data.end_time, 'HH:mm:ss').format('hh:mm A')
+                    );
+
+                    $('#viewDuration').val(data.duration + ' mins');
+                    $('#viewMeetingType').val(data.meeting_type.toUpperCase());
+                    $('#viewActivityType').val(data.activity_type?.type ?? '-');
+                    $('#viewLocation').val(data.location ?? 'N/A');
+                    $('#viewDescription').val(data.description);
+
+                    let usersText = 'N/A';
+
+                    if (data.mentioned_users?.length || data.mentionedUsers?.length) {
+                        const users = data.mentioned_users || data.mentionedUsers;
+                        usersText = users.map(u => u.name).join(', ');
+                    }
+
+                    $('#viewUsers').val(usersText);
+
+                    // reset buttons
+                    $('#viewJoinBtn, #viewStartBtn').addClass('d-none');
+
+                    if (data.meeting_type === 'zoom' && data.zoom) {
+
+                        // Meeting owner → START
+                        if (data.user_id === user && data.zoom.start_url) {
+                            $('#viewStartBtn')
+                                .attr('href', data.zoom.start_url)
+                                .removeClass('d-none');
+                        }
+
+                        // Mentioned users → JOIN
+                        if (data.user_id !== user && data.zoom.join_url) {
+                            $('#viewJoinBtn')
+                                .attr('href', data.zoom.join_url)
+                                .removeClass('d-none');
+                        }
+                    }
+
+
+                    $('#ViewMeeting').modal('show');
+                });
+            });
+
+            $(document).on('click', '.complete-meeting', function() {
+
+                const id = $(this).data('id');
+
+                Swal.fire({
+                    title: 'Mark as completed?',
+                    text: 'This meeting will be marked as completed.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                        $.ajax({
+                            url: `/admin/meeting/${id}/complete`,
+                            type: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(res) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Completed!',
+                                    text: res.message,
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+
+                                setTimeout(() => location.reload(), 1500);
+                            },
+                            error: function(xhr) {
+                                Swal.fire(
+                                    'Error!',
+                                    xhr.status === 403 ?
+                                    'You are not allowed to complete this meeting.' :
+                                    'Something went wrong.',
+                                    'error'
+                                );
+                            }
+                        });
+
+                    }
+                });
+            });
+
 
 
         });

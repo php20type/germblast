@@ -24,12 +24,10 @@
     <strong>Territory:</strong> {{ $data['territory'] }} <br>
 </p>
 
-{{-- @component('mail::button', ['url' => config('app.url') . "/admin/companies/{$data['company_id']}"])
-View Company
-@endcomponent --}}
-@component('mail::button', ['url' => "http://germblast.test/admin/companies/{$data['company_id']}"])
+@component('mail::button', ['url' => config('app.url') . "/admin/companies/{$data['company_id']}"])
 View Company
 @endcomponent
+
 
 <p style="font-size: 16px; line-height: 24px; margin-top: 20px;">
     Thanks

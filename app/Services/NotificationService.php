@@ -199,6 +199,60 @@ class NotificationService
         }
     }
 
+    public function meetingScheduled($meeting)
+    {
+        $startTime = Carbon::parse($meeting->start_time)->format('h:i A');
+        $endTime = Carbon::parse($meeting->end_time)->format('h:i A');
+
+        if ($this->sendEmail) {
+            SendEmailJob::dispatch(
+                $this->testEmail,
+                'meeting_scheduled',
+                [
+                    'meeting_name' => $meeting->name,
+                    'date' => $meeting->date,
+                    'start_time' => $startTime,
+                    'end_time' => $endTime,
+                    'created_by' => $meeting->user->name,
+                ]
+            )->delay(now()->addSeconds(12)); // MAILTRAP rate-limit
+        }
+
+        if ($this->sendSMS) {
+            SendSMSJob::dispatch(
+                $this->testPhone,
+                "New meeting scheduled: {$meeting->name} on {$meeting->date} ({$startTime} - {$endTime}) by {$meeting->user->name}"
+            )->delay(now()->addSeconds(12)); // MAILTRAP rate-limit
+        }
+    }
+
+    public function meetingUpdated($meeting)
+    {
+        $startTime = Carbon::parse($meeting->start_time)->format('h:i A');
+        $endTime = Carbon::parse($meeting->end_time)->format('h:i A');
+
+        if ($this->sendEmail) {
+            SendEmailJob::dispatch(
+                $this->testEmail,
+                'meeting_updated',
+                [
+                    'meeting_name' => $meeting->name,
+                    'date' => $meeting->date,
+                    'start_time' => $startTime,
+                    'end_time' => $endTime,
+                    'updated_by' => $meeting->user->name,
+                ]
+            )->delay(now()->addSeconds(12)); // MAILTRAP rate-limit
+        }
+
+         if ($this->sendSMS) {
+            SendSMSJob::dispatch(
+                $this->testPhone,
+                "Meeting Updated: {$meeting->name} on {$meeting->date} ({$startTime} - {$endTime}) by {$meeting->user->name}"
+            )->delay(now()->addSeconds(12)); // MAILTRAP rate-limit
+        }
+    }
+
     // =======================
     // THIS IS FOR SENDING TO USER ROLE (e.g., all Sales Managers)
     // =======================

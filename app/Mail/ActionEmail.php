@@ -33,6 +33,8 @@ class ActionEmail extends Mailable
                 'initial_meeting_completed' => 'Initial Meeting Completed',
                 'site_survey_scheduled' => 'Site Survey Scheduled',
                 'site_survey_completed' => 'Site Survey Completed',
+                'meeting_scheduled' => 'New Meeting Scheduled',
+                'meeting_updated' => 'Meeting Updated',
                 default => 'Lead Notification'
             }
         );

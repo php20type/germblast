@@ -24,7 +24,7 @@ class User extends Authenticatable
         'role',
         'zoom_access_token',
         'zoom_refresh_token',
-        'zoom_token_expiry'
+        'zoom_token_expiry',
     ];
 
     /**
@@ -167,6 +167,11 @@ class User extends Authenticatable
 
     public function meetings()
     {
-        return $this->hasMany(Meeting::class,'user_id');
+        return $this->hasMany(Meeting::class, 'user_id');
+    }
+
+    public function mentionedMeetings()
+    {
+        return $this->belongsToMany(Meeting::class, 'meeting_users', 'user_id', 'meeting_id')->withTimestamps();
     }
 }

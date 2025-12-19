@@ -5,27 +5,26 @@
     <img src="{{ config('app.url') }}/public/img/logo/logo.png" alt="GermBlast" style="width:180px;">
 </p>
 
-<h2 style="margin-top: 0;">Lead Assigned — GermBlast</h2>
+<h2 style="margin-top: 0;">Meeting Updated — GermBlast</h2>
 
 <p style="font-size: 16px; line-height: 24px;">
     Hello,
 </p>
 
 <p style="font-size: 16px; line-height: 24px;">
-    A new lead has been assigned in the GermBlast.
-    Below are the lead details:
+    A meeting has been updated. Please review the updated details below:
 </p>
 
 <p style="font-size: 16px; line-height: 24px;">
-    <strong>Lead:</strong> {{ $data['lead_name'] }} <br>
-    <strong>Assigned To:</strong> {{ $data['assignee'] }} <br>
-    <strong>Company:</strong> {{ $data['company_name'] }} <br>
+    <strong>Meeting Name:</strong> {{ $data['meeting_name'] }} <br>
+    <strong>Date:</strong> {{ $data['date'] }} <br>
+    <strong>Time:</strong> {{ $data['start_time'] }} - {{ $data['end_time'] }} <br>
+    <strong>Updated By:</strong> {{ $data['updated_by'] }} <br>
 </p>
 
-@component('mail::button', ['url' => config('app.url') . "/admin/leads/{$data['lead_id']}"])
-View Lead
+@component('mail::button', ['url' => config('app.url') . '/admin/schedule/meeting'])
+View Meetings
 @endcomponent
-
 
 <p style="font-size: 16px; line-height: 24px; margin-top: 20px;">
     Thanks
@@ -33,7 +32,7 @@ View Lead
 
 @component('mail::subcopy')
 &copy; {{ date('Y') }} GermBlast<br>
-This is an automated notification. Please do not reply.
+This is an automated email. Please do not reply.
 @endcomponent
 
 @endcomponent
