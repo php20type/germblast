@@ -221,13 +221,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/survey/proposal/{equipment}/equipment/update', [SurveyProposalController::class, 'survey_equipment_update'])
         ->name('survey.proposal.equipment.update');
 
-    Route::get('/survey/proposal/{survey_proposal}/pricing', [SurveyProposalController::class, 'pricing_proposal'])
-        ->name('survey.proposal.pricing.proposal');
-    Route::get('/survey/proposal/pricing/{pricing}/edit', [SurveyProposalController::class, 'pricing_proposal_edit'])
-        ->name('pricing_proposal.edit');
-    Route::post('/pricing-proposal/store', [SurveyProposalController::class, 'pricing_store'])->name('pricing_proposal.store');
-
-    Route::post('/pricing-proposal/update', [SurveyProposalController::class, 'updateExistingPricing'])->name('pricing-proposal.update');
+    Route::get('/survey/proposal/{survey_proposal}/pricing', [SurveyProposalController::class, 'pricing_proposal'])->name('survey.proposal.pricing.proposal');
+    Route::post('/pricing-proposal/{survey_proposal}/store', [SurveyProposalController::class, 'pricing_store'])->name('pricing_proposal.store');
+    Route::get('/proposal-pricing/{pricing}/edit', [SurveyProposalController::class, 'pricing_proposal_edit'])->name('pricing_proposal.edit');
+    Route::post('/pricing-proposal/{pricing}/update', [SurveyProposalController::class, 'updateExistingPricing'])->name('pricing_proposal.update');
     Route::post('/pricing-proposal/delete', [SurveyProposalController::class, 'deletePricing'])->name('pricing-proposal.delete');
 
     // settings section

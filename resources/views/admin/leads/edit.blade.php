@@ -1985,206 +1985,122 @@
 
         @push('scripts')
             <script>
-                function initialMeetingCompleted() {
+                function confirmAndPost({
+                    title,
+                    text,
+                    url,
+                    data = {}
+                }) {
                     Swal.fire({
-                        title: "Complete Initial Meeting?",
-                        icon: "question",
+                        title,
+                        text,
+                        icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: "Yes, complete it"
+                        confirmButtonText: 'Yes',
                     }).then((result) => {
                         if (!result.isConfirmed) return;
 
                         $.ajax({
-                            url: "{{ route('admin.lead.initial.complete', $leads->id) }}",
-                            type: "POST",
+                            url: url,
+                            type: 'POST',
                             data: {
                                 _token: "{{ csrf_token() }}",
+                                ...data
                             },
                             success: function(res) {
-                                Swal.fire("Success", res.message, "success").then(() => {
-                                    location.reload();
-                                });
+                                Swal.fire('Success', res.message, 'success')
+                                    .then(() => location.reload());
                             },
                             error: function(xhr) {
-                                Swal.fire("Error", xhr.responseJSON?.message ?? "Failed", "error");
+                                Swal.fire(
+                                    'Error',
+                                    xhr.responseJSON?.message ?? 'Something went wrong',
+                                    'error'
+                                );
                             }
                         });
-                    });
-                }
-
-                function editInitialMeeting() {
-                    Swal.fire({
-                        title: "Edit Initial Meeting?",
-                        text: "This will remove scheduled & completed data.",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#3085d6",
-                        cancelButtonColor: "#d33",
-                        confirmButtonText: "Yes, Edit"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-
-                            $.post("{{ route('admin.lead.initial.reset', $leads->id) }}", {
-                                    _token: "{{ csrf_token() }}"
-                                })
-                                .done(function(res) {
-
-                                    Swal.fire({
-                                        title: "Updated!",
-                                        text: res.message,
-                                        icon: "success",
-                                        timer: 1200,
-                                        showConfirmButton: false
-                                    }).then(() => {
-                                        location.reload();
-                                    });
-
-                                })
-                                .fail(function(xhr) {
-                                    Swal.fire("Error", xhr.responseJSON.message, "error");
-                                });
-                        }
-                    });
-                }
-
-
-                function reopenInitialMeeting() {
-                    Swal.fire({
-                        title: "Reopen Initial Meeting Stage?",
-                        text: "This will clear the scheduled date and completion status.",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonText: "Yes, Reopen",
-                        cancelButtonText: "Cancel"
-                    }).then((result) => {
-
-                        if (!result.isConfirmed) return;
-
-                        $.ajax({
-                            url: "{{ route('admin.lead.initial.reopen', $leads->id) }}",
-                            type: "POST",
-                            data: {
-                                _token: "{{ csrf_token() }}"
-                            },
-                            success: function(res) {
-                                Swal.fire("Reopened", res.message, "success").then(() => {
-                                    location.reload();
-                                });
-                            },
-                            error: function(xhr) {
-                                let msg = xhr.responseJSON?.message ?? "Something went wrong!";
-                                Swal.fire("Error", msg, "error");
-                            }
-                        });
-
                     });
                 }
 
                 function scheduleMeeting() {
-
-                    let date = $('#schedule_meeting_date').val();
-                    let leadId = "{{ $leads->id }}";
+                    const date = $('#schedule_meeting_date').val();
 
                     if (!date) {
-                        Swal.fire("Error", "Please select a meeting date.", "error");
+                        Swal.fire('Error', 'Please select a meeting date.', 'error');
                         return;
                     }
 
-                    $.ajax({
+                    confirmAndPost({
+                        title: 'Schedule Initial Meeting?',
                         url: "{{ route('admin.lead.initial.schedule', $leads->id) }}",
-                        type: "POST",
                         data: {
-                            _token: "{{ csrf_token() }}",
                             schedule_meeting_date: date
-                        },
-                        success: function(res) {
-                            Swal.fire("Success", res.message, "success").then(() => {
-                                location.reload();
-                            });
-                        },
-                        error: function(xhr) {
-                            let msg = xhr.responseJSON?.message ?? "Something went wrong!";
-                            Swal.fire("Error", msg, "error");
                         }
+                    });
+                }
+
+                function initialMeetingCompleted() {
+                    confirmAndPost({
+                        title: 'Complete Initial Meeting?',
+                        url: "{{ route('admin.lead.initial.complete', $leads->id) }}"
+                    });
+                }
+
+                function editInitialMeeting() {
+                    confirmAndPost({
+                        title: 'Edit Initial Meeting?',
+                        text: 'This will remove scheduled and completed data.',
+                        url: "{{ route('admin.lead.initial.reset', $leads->id) }}"
+                    });
+                }
+
+                function reopenInitialMeeting() {
+                    confirmAndPost({
+                        title: 'Reopen Initial Meeting?',
+                        text: 'This will clear the scheduled date and completion status.',
+                        url: "{{ route('admin.lead.initial.reopen', $leads->id) }}"
                     });
                 }
 
                 function scheduleSiteSurvey() {
-                    let date = $("#site_survey_date").val();
+                    const date = $('#site_survey_date').val();
 
-                    $.post("{{ route('admin.lead.site_survey.schedule', $leads->id) }}", {
-                            _token: "{{ csrf_token() }}",
+                    if (!date) {
+                        Swal.fire('Error', 'Please select a site survey date.', 'error');
+                        return;
+                    }
+
+                    confirmAndPost({
+                        title: 'Schedule Site Survey?',
+                        url: "{{ route('admin.lead.site_survey.schedule', $leads->id) }}",
+                        data: {
                             site_survey_date: date
-                        })
-                        .done(function(res) {
-                            Swal.fire("Success", res.message, "success")
-                                .then(() => location.reload());
-                        })
-                        .fail(function(xhr) {
-                            Swal.fire("Error", xhr.responseJSON.message, "error");
-                        });
+                        }
+                    });
                 }
 
                 function completeSiteSurvey() {
-                    $.post("{{ route('admin.lead.site_survey.complete', $leads->id) }}", {
-                            _token: "{{ csrf_token() }}"
-                        })
-                        .done(function(res) {
-                            Swal.fire("Completed", res.message, "success")
-                                .then(() => location.reload());
-                        })
-                        .fail(function(xhr) {
-                            Swal.fire("Error", xhr.responseJSON.message, "error");
-                        });
-                }
-
-                function reopenSiteSurvey() {
-                    Swal.fire({
-                        title: "Reopen Site Survey?",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonText: "Yes, Reopen",
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.post("{{ route('admin.lead.site_survey.reopen', $leads->id) }}", {
-                                    _token: "{{ csrf_token() }}"
-                                })
-                                .done(function(res) {
-                                    Swal.fire("Reopened", res.message, "success")
-                                        .then(() => location.reload());
-                                })
-                                .fail(function(xhr) {
-                                    Swal.fire("Error", xhr.responseJSON.message, "error");
-                                });
-                        }
+                    confirmAndPost({
+                        title: 'Complete Site Survey?',
+                        url: "{{ route('admin.lead.site_survey.complete', $leads->id) }}"
                     });
                 }
 
                 function editSiteSurvey() {
-                    Swal.fire({
-                        title: "Edit Site Survey?",
-                        text: "This will remove scheduled date.",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonText: "Yes, Edit",
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.post("{{ route('admin.lead.site_survey.reset', $leads->id) }}", {
-                                    _token: "{{ csrf_token() }}"
-                                })
-                                .done(function(res) {
-                                    Swal.fire("Updated", res.message, "success")
-                                        .then(() => location.reload());
-                                })
-                                .fail(function(xhr) {
-                                    Swal.fire("Error", xhr.responseJSON.message, "error");
-                                });
-                        }
+                    confirmAndPost({
+                        title: 'Edit Site Survey?',
+                        text: 'This will remove the scheduled date.',
+                        url: "{{ route('admin.lead.site_survey.reset', $leads->id) }}"
                     });
                 }
-            </script>
 
-            <script>
+                function reopenSiteSurvey() {
+                    confirmAndPost({
+                        title: 'Reopen Site Survey?',
+                        url: "{{ route('admin.lead.site_survey.reopen', $leads->id) }}"
+                    });
+                }
+
                 function scheduleActivity() {
                     $('#schedule-activity').modal('show');
                 }

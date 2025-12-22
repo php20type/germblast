@@ -46,4 +46,9 @@ class SurveyProposal extends Model
     {
         return $this->hasMany(EquipmentEvaluation::class, 'survey_proposal_id');
     }
+
+    public function pricingProposal()
+    {
+        return $this->hasMany(PricingProposal::class, 'survey_proposal_id');
+    }
 }

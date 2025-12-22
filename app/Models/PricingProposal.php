@@ -57,4 +57,9 @@ class PricingProposal extends Model
         return $this->belongsToMany(EquipmentEvaluation::class, 'pricing_proposal_equipment', 'pricing_proposal_id', 'equipment_id')
                     ->withTimestamps();
     }
+
+    public function pricingServices()
+    {
+        return $this->hasMany(PricingService::class, 'pricing_id');
+    }
 }

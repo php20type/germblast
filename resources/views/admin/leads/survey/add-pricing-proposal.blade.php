@@ -1,6 +1,6 @@
 @extends('admin.includes.layout')
 
-@section('title', 'Pricing Proposal')
+@section('title', 'Add Pricing Proposal')
 
 @section('content')
     <!-- All Companies Section start  -->
@@ -12,7 +12,6 @@
 
                     <form action="#" method="POST" id="add-pricing-form" enctype="multipart/form-data">
                         @csrf
-                        <input type="hidden" name="survey_proposal_id" value="{{ $surveyProposal->id }}">
 
                         <div class="sales-dashboard">
                             <div class="dashboard-header section-card d-flex justify-content-between align-items-center">
@@ -28,8 +27,8 @@
                             </div>
 
                             <!-- ================================
-                                FACILITIES & EQUIPMENT SECTION
-                                ================================ -->
+                            FACILITIES & EQUIPMENT SECTION
+                            ================================ -->
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="section-card">
@@ -81,8 +80,8 @@
                             </div>
 
                             <!-- ================================
-                                    COST BREAKDOWN SECTION
-                                ================================ -->
+                            COST BREAKDOWN SECTION
+                            ================================ -->
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="section-card">
@@ -125,7 +124,7 @@
                                                     <th>Awareness</th>
                                                     <td>
                                                         <input type="text" class="form-control" name="awareness"
-                                                            value="200">
+                                                            value="">
                                                     </td>
                                                 </tr>
 
@@ -133,7 +132,7 @@
                                                     <th>Education</th>
                                                     <td>
                                                         <input type="text" class="form-control" name="education"
-                                                            value="300">
+                                                            value="">
                                                     </td>
                                                 </tr>
 
@@ -141,7 +140,7 @@
                                                     <th>Technology</th>
                                                     <td>
                                                         <input type="text" class="form-control" name="technology"
-                                                            value="500">
+                                                            value="">
                                                     </td>
                                                 </tr>
 
@@ -149,7 +148,7 @@
                                                     <th>Response</th>
                                                     <td>
                                                         <input type="text" class="form-control" name="response"
-                                                            value="600">
+                                                            value="">
                                                     </td>
                                                 </tr>
 
@@ -163,9 +162,18 @@
                                                     <th>Logistics Expense</th>
                                                     <td>
                                                         <input type="text" class="form-control" name="logistics_expense"
-                                                            value="1000">
+                                                            value="">
                                                     </td>
                                                 </tr>
+
+
+                                                <tr>
+                                                    <th>Multiplier</th>
+                                                    <td id="multiplier" data-value="5.882">
+                                                        5.882
+                                                    </td>
+                                                </tr>
+
 
                                             </tbody>
                                         </table>
@@ -177,8 +185,8 @@
 
 
                             <!-- ================================
-                                    PROPOSAL SETTINGS SECTION
-                                ================================ -->
+                            PROPOSAL SETTINGS SECTION
+                            ================================ -->
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="section-card">
@@ -201,21 +209,29 @@
                                                 <tr>
                                                     <th>Proposal Order <span class="text-danger">*</span></th>
                                                     <td>
-                                                        <input type="number" class="form-control" name="proposal_order">
+                                                        <input type="number" class="form-control" name="proposal_order" value="0">
                                                     </td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>Override Pricing<span class="text-danger">*</span></th>
                                                     <td>
-                                                        <input type="text" class="form-control" name="override_pricing">
+                                                        <input type="text" class="form-control" name="override_pricing" value="0.00">
                                                     </td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>Discounts (%)<span class="text-danger">*</span></th>
                                                     <td>
-                                                        <input type="number" class="form-control" name="discounts">
+                                                        <input type="number" class="form-control" name="discounts" value="0.00">
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <th>Services<span class="text-danger">*</span></th>
+                                                    <td>
+                                                        <input type="text" class="form-control" name="services"
+                                                            placeholder="Type a service and press Enter">
                                                     </td>
                                                 </tr>
 
@@ -236,8 +252,8 @@
 
 
                             <!-- ================================
-                                    CONTRACT DETAILS SECTION
-                                ================================ -->
+                            CONTRACT DETAILS SECTION
+                            ================================ -->
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="section-card">
@@ -319,17 +335,19 @@
 
         function calculateTotal() {
             let partial = parseFloat($('input[name="partial_cost_service"]').val()) || 0;
+            let multiplier = parseFloat($('#multiplier').data('value')) || 0;
 
-            let awareness = parseFloat($('input[name="awareness"]').val()) || 0;
-            let education = parseFloat($('input[name="education"]').val()) || 0;
-            let technology = parseFloat($('input[name="technology"]').val()) || 0;
-            let response = parseFloat($('input[name="response"]').val()) || 0;
-            let logistics_expense = parseFloat($('input[name="logistics_expense"]').val()) || 0;
-
-            let total = partial + awareness + education + technology + response + logistics_expense;
+            let total = partial * multiplier;
 
             $('input[name="pricing_total"]').val(total.toFixed(2));
+
+            // awareness & technology = total / 10
+            let splitValue = total / 10;
+
+            $('input[name="awareness"]').val(splitValue.toFixed(2));
+            $('input[name="technology"]').val(splitValue.toFixed(2));
         }
+
 
         // Trigger on select change
         $('#facility_select, #equipment_select').on('change select2:unselect', function() {
@@ -337,14 +355,10 @@
         });
 
 
-        // Trigger when cost inputs change
-        $('input[name="awareness"], input[name="education"], input[name="technology"], input[name="response"], input[name="logistics_expense"]')
-            .on('keyup change', function() {
-                calculateTotal();
-            });
-
-
         $(document).ready(function() {
+
+            var input = document.querySelector('input[name=services]');
+            if (input) new Tagify(input);
 
             /* ---------------------------
                INITIALIZE SELECT2
@@ -396,6 +410,9 @@
                         required: true,
                         number: true
                     },
+                    services: {
+                        required: true
+                    },
                     prepayment_discount: {
                         required: true
                     }
@@ -412,7 +429,7 @@
                 if (!$('#add-pricing-form').valid()) return;
 
                 $.ajax({
-                    url: "{{ route('admin.pricing_proposal.store') }}",
+                    url: "{{ route('admin.pricing_proposal.store', $surveyProposal->id) }}",
                     method: "POST",
                     data: $(this).serialize(),
 
