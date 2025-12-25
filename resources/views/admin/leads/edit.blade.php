@@ -469,11 +469,6 @@
 
                                 </div>
 
-
-                                {{-- PROPOSAL PRESENTATION --}}
-
-                                {{-- RECEIVE SIGNED PROPOSAL --}}
-
                             </div>
                         </div>
 

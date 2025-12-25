@@ -16,6 +16,7 @@ use App\Models\LeadPeople;
 use App\Models\LeadProduct;
 use App\Models\LeadSource;
 use App\Models\LeadStage;
+use App\Models\LeadStageProcess;
 use App\Models\LeadTag;
 use App\Models\Market;
 use App\Models\Outcome;
@@ -449,6 +450,10 @@ class LeadController extends Controller
                 'creator_id' => auth()->id(),
             ]);
 
+            LeadStageProcess::create([
+                'lead_id' => $lead->id,
+            ]);
+
             SurveyProposal::create([
                 'user_id' => auth()->id(),
                 'lead_id' => $lead->id,
@@ -561,30 +566,6 @@ class LeadController extends Controller
 
             return $note;
         });
-
-        // // Separate logged and scheduled activities
-        // $logged_activities = $activities->filter(function ($activity) {
-        //     return $activity->status === 'Logged';
-        // });
-
-        // $scheduled_activities = $activities->filter(function ($activity) {
-        //     return $activity->status === 'Scheduled';
-        // });
-
-        // // --- Fetch Timeline Entries ---
-        // $timelineEntries = Helper::getTimelineForEntity('lead', $leads->id);
-        // $timelineEntries->transform(function ($item) {
-        //     $item->type = 'timeline';
-        //     $item->timestamp = $item->created_at;
-
-        //     return $item;
-        // });
-
-        // $timeline = $logged_activities
-        //     ->concat($notes)
-        //     ->concat($timelineEntries)
-        //     ->sortByDesc('timestamp')
-        //     ->values(); // reindex after sorting
 
         $filters = [
             'filter_range' => $request->input('filter_range', 'all'),
