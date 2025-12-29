@@ -12,20 +12,16 @@ class Company extends Model
         'name',
         'description',
         'legacy_id',
-        'postalCode',
         'industry_id',
         'company_type_id',
         'territory_id',
-        'country_id',
-        'state_id',
-        'city_id',
         'annual_revenue',
         'employees_count',
     ];
 
     protected $morphClass = 'Company';
 
-    protected $with = ['companyEmail', 'companyPhone', 'companyAddress', 'companyUrl', 'companyPeople', 'companyTags','tags', 'companyFile','task'];
+    protected $with = ['companyEmail', 'companyPhone', 'companyAddress', 'companyUrl', 'companyPeople', 'companyTags', 'tags', 'companyFile', 'task'];
 
     // public function people()
     // {
@@ -78,21 +74,6 @@ class Company extends Model
         return $this->belongsTo(Territory::class, 'territory_id');
     }
 
-    public function country()
-    {
-        return $this->belongsTo(Country::class, 'country_id');
-    }
-
-    public function state()
-    {
-        return $this->belongsTo(State::class, 'state_id');
-    }
-
-    public function city()
-    {
-        return $this->belongsTo(City::class, 'city_id');
-    }
-
     /**
      * Has One relationships
      */
@@ -116,11 +97,15 @@ class Company extends Model
         return $this->hasOne(CompanyUrl::class, 'company_id');
     }
 
-     public function companyFile()
+    public function companyFile()
     {
         return $this->hasMany(CompanyFile::class, 'company_id');
     }
 
+    public function locations()
+    {
+        return $this->hasMany(CompanyLocation::class, 'company_id');
+    }
 
     // Company People pivot table
     public function companyPeople()

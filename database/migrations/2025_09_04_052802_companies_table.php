@@ -31,9 +31,6 @@ return new class extends Migration {
             $table->unsignedBigInteger('territory_id')->nullable();
             $table->foreign('territory_id')->references('id')->on('territories')->onDelete('set null');
 
-            $table->unsignedBigInteger('tag_id')->nullable();
-            $table->foreign('tag_id')->references('id')->on('tags')->onDelete('set null');
-
             $table->unsignedBigInteger('country_id')->nullable();
             $table->foreign('country_id')->references('id')->on('countries')->onDelete('set null');
 

@@ -19,9 +19,9 @@ class Country extends Model
         return $this->hasMany(State::class,'country_id');
     }
 
-    public function company()
+    public function companyLocations()
     {
-        return $this->hasMany(Company::class, 'country_id');
+        return $this->hasMany(CompanyLocation::class, 'country_id');
     }
 
     public function people()

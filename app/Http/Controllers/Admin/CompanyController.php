@@ -6,20 +6,26 @@ use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Interfaces\CompanyRepositoryInterface;
 use App\Models\ActivityType;
+use App\Models\City;
 use App\Models\Company;
 use App\Models\CompanyAddress;
 use App\Models\CompanyEmail;
 use App\Models\CompanyFile;
+use App\Models\CompanyLocation;
 use App\Models\CompanyPeople;
 use App\Models\CompanyPhone;
 use App\Models\CompanyTag;
 use App\Models\CompanyType;
 use App\Models\CompanyUrl;
 use App\Models\Competitor;
+use App\Models\Country;
+use App\Models\IAQDevice;
+use App\Models\IAQZone;
 use App\Models\Industry;
 use App\Models\People;
 use App\Models\Product;
 use App\Models\Source;
+use App\Models\State;
 use App\Models\Tag;
 use App\Models\Task;
 use App\Models\Territory;
@@ -366,6 +372,9 @@ class CompanyController extends Controller
             'companyAddress',
             'companyUrl',
             'leads',
+            'locations.country',
+            'locations.state',
+            'locations.city',
             'peoples', // <-- fetch related people via pivot
         ])->findOrFail($id);
 
@@ -531,6 +540,10 @@ class CompanyController extends Controller
         $company_types = CompanyType::all();
         $industries = Industry::all();
         $territories = Territory::all();
+        $countries = Country::all();
+        $cities = City::all();
+        $states = State::all();
+        $companyLocations = $company->locations;
         // Already coming from pivot relation, so no need for where('company_id', $id)
         $peoples = $company->peoples;
         $allpeoples = People::all();
@@ -647,8 +660,12 @@ class CompanyController extends Controller
             'competitors',
             'sources',
             'companies',
+            'countries',
+            'states',
+            'cities',
             'products',
             'peoples',
+            'companyLocations',
             'allpeoples',
             'availablePeoples',
             'industries',
@@ -662,6 +679,95 @@ class CompanyController extends Controller
             'urls',
             'urlTypes'
         ));
+    }
+
+    public function company_dashboard(Company $company)
+    {
+        $company = Company::with(['locations'])->findOrFail($company->id);
+        $companyLocations = $company->locations;
+
+        // Collect all zones
+        $iaqZones = $companyLocations
+            ->pluck('iaqZones')
+            ->flatten();
+
+        // Collect all devices
+        $iaqDevices = $iaqZones
+            ->pluck('iaqDevices')
+            ->flatten();
+
+        return view('admin.company.company-dashboard', [
+            'company'=>$company,
+            'companyLocations'=>$companyLocations,
+            'iaqZones'=>$iaqZones,
+            'iaqDevices'=>$iaqDevices,
+        ]);
+    }
+
+    public function storeIAQZone(Request $request, Company $company)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'company_location_id' => 'required|exists:company_locations,id',
+        ]);
+
+        IAQZone::create([
+            'name' => $validated['name'],
+            'company_location_id' => $validated['company_location_id'],
+        ]);
+
+        return response()->json([
+            'message' => 'IAQ Zone added successfully.',
+        ]);
+    }
+
+    public function storeIAQDevice(Request $request, Company $company)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'iaq_zone_id' => 'required|exists:iaq_zones,id',
+            'node_id' => 'required|string|max:255',
+        ]);
+
+        IAQDevice::create([
+            'name' => $validated['name'],
+            'iaq_zone_id' => $validated['iaq_zone_id'],
+            'node_id' => $validated['node_id'],
+        ]);
+
+        return response()->json([
+            'message' => 'IAQ Device added successfully.',
+        ]);
+    }
+
+    public function addLocation(Request $request, Company $company)
+    {
+        $validated = $request->validate([
+            'location_name' => 'required|string|max:255',
+            'address_1' => 'required|string|max:255',
+            'address_2' => 'required|string|max:255',
+            'country_id' => 'required|integer',
+            'state_id' => 'required|integer',
+            'city_id' => 'required|integer',
+            'zip' => 'required|string|max:20',
+        ]);
+
+        $location = CompanyLocation::create([
+            'company_id' => $company->id,
+            'location_name' => $validated['location_name'],
+            'address_1' => $validated['address_1'],
+            'address_2' => $validated['address_2'],
+            'country_id' => $validated['country_id'],
+            'state_id' => $validated['state_id'],
+            'city_id' => $validated['city_id'],
+            'zip' => $validated['zip'],
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Company location added successfully.',
+            'data' => $location,
+        ], 201);
     }
 
     public function addPeople(Request $request, $companyId)

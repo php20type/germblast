@@ -31,9 +31,9 @@ class City extends Model
         return $this->belongsTo(State::class);
     }
 
-    public function company()
+    public function companyLocations()
     {
-        return $this->hasMany(Company::class,'city_id');
+        return $this->hasMany(CompanyLocation::class,'city_id');
     }
 
     public function people()

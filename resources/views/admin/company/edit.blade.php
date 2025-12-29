@@ -152,6 +152,61 @@
                             </div>
                         </div>
 
+                       {{-- Locations Section --}}
+                        <div class="section-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5>LOCATIONS</h5>
+                                <a class="text-warning" href="javascript:void(0);" onclick="addLocation()">
+                                    Add A Location
+                                </a>
+                            </div>
+
+                            <div class="task-section">
+                                @forelse ($companyLocations as $location)
+                                    <div class="company-list mb-3 border rounded p-3">
+
+                                        <div class="d-flex align-items-start mb-3">
+                                            <div class="task-icon me-3">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                            </div>
+
+                                            <div class="flex-1">
+                                                <h6 class="mb-1 fw-semibold">
+                                                    {{ $location->location_name ?? 'Location' }}
+                                                </h6>
+
+                                                <p class="mb-0">
+                                                    {{ $location->address_1 }}
+                                                    {{ $location->address_2 ? ', ' . $location->address_2 : '' }}
+                                                </p>
+
+                                                <p class="text-muted mb-0">
+                                                    {{ optional($location->city)->name }},
+                                                    {{ optional($location->state)->name }},
+                                                    {{ optional($location->country)->name }}
+                                                    {{ $location->zip ? ' - ' . $location->zip : '' }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="d-flex align-items-start">
+                                        <div class="task-icon me-3">
+                                            <i class="fas fa-list"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h6>NO LOCATIONS</h6>
+                                            <p class="text-muted mb-0">
+                                                Nice work! Now, add locations to your company.
+                                            </p>
+                                        </div>
+                                    </div>
+                                @endforelse
+
+                            </div>
+                        </div>
+
+
                         <!-- Tasks Section -->
                         <div class="section-card">
                             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -334,7 +389,7 @@
                                                         <span class="text-muted">
                                                             {{ $scheduled_activity->participant_names ?? 'N/A' }}
                                                         </span>
-                                                    </div>  
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -1908,7 +1963,6 @@
             </div>
         </div>
     </div>
-
     {{-- Activities modal end --}}
 
     {{-- Leads List modal --}}
@@ -1970,6 +2024,122 @@
         </div>
     </div>
 
+    {{-- Company Locations Modal --}}
+    <div class="modal fade" id="AddLocation" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="exampleModalLabel">Add Location</h1>
+                    <div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('admin.companies.location.add', $company->id) }}" method="POST"
+                        class="company-form" id="add-company-location">
+                        @csrf
+
+                        <div class="row mx-0">
+
+                            {{-- Location Name --}}
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Location Name</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="text" name="location_name" class="form-control"
+                                        placeholder="Eg. Head Office, Warehouse, Branch A">
+                                </div>
+                            </div>
+
+                            {{-- Address Line 1 --}}
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Address Line 1</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="text" name="address_1" class="form-control"
+                                        placeholder="Street address">
+                                </div>
+                            </div>
+
+                            {{-- Address Line 2 --}}
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Address Line 2</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="text" name="address_2" class="form-control"
+                                        placeholder="Suite, floor, unit (optional)">
+                                </div>
+                            </div>
+
+                            {{-- Country --}}
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Country</label>
+                                    <span class="text-danger">*</span>
+                                    <select name="country_id" class="form-select select2" id="country_select">
+                                        <option value="">Select Country</option>
+                                        @foreach ($countries as $country)
+                                            <option value="{{ $country->id }}">
+                                                {{ $country->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">State</label>
+                                    <span class="text-danger">*</span>
+                                    <select name="state_id" class="form-select select2" id="state_select">
+                                        <option value="">Select State</option>
+                                    </select>
+                                </div>
+                            </div>
+
+
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">City</label>
+                                    <span class="text-danger">*</span>
+                                    <select name="city_id" class="form-select select2" id="city_select">
+                                        <option value="">Select City</option>
+                                    </select>
+
+                                </div>
+                            </div>
+
+
+                            {{-- Zip --}}
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Zip Code</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="text" name="zip" class="form-control"
+                                        placeholder="Postal / Zip code">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        {{-- FOOTER --}}
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                Close
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                Save Location
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
 
 @endsection
 
@@ -1988,6 +2158,10 @@
 
         function relatedLeads() {
             $('#related-leads-list').modal('show');
+        }
+
+        function addLocation() {
+            $('#AddLocation').modal('show');
         }
 
         $(document).ready(function() {
@@ -2747,6 +2921,194 @@
                     allowClear: true
                 });
             });
+
+            $('#AddLocation').on('shown.bs.modal', function() {
+
+                const modal = $('#AddLocation');
+
+                // INIT SELECT2
+                $('#country_select').select2({
+                    dropdownParent: modal,
+                    placeholder: 'Select Country',
+                    allowClear: true
+                });
+
+                $('#state_select').select2({
+                    dropdownParent: modal,
+                    placeholder: 'Select State',
+                    allowClear: true
+                });
+
+                $('#city_select').select2({
+                    dropdownParent: modal,
+                    placeholder: 'Select City',
+                    allowClear: true
+                });
+            });
+
+
+            // Country → States
+            $('#country_select').on('change', function() {
+                let countryId = $(this).val();
+                $('#state_select').empty()
+                    .append('<option value="">Select State</option>').prop('disabled', true).trigger(
+                        'change');
+                $('#city_select').empty()
+                    .append('<option value="">Select City</option>').prop('disabled', true).trigger(
+                        'change');
+
+                if (!countryId) return;
+                $.get(`/states/${countryId}`, function(states) {
+                    $('#state_select').prop('disabled', false);
+                    $.each(states, function(i, state) {
+                        $('#state_select').append(
+                            `<option value="${state.state_id}">${state.name}</option>`
+                        );
+                    });
+                });
+            });
+
+
+            // State → Cities
+            $('#state_select').on('change', function() {
+                let stateId = $(this).val();
+                $('#city_select').empty().append('<option value="">Select City</option>').prop('disabled',
+                    true).trigger('change');
+                if (!stateId) return;
+                $.get(`/cities/${stateId}`, function(cities) {
+                    $('#city_select').prop('disabled', false);
+                    $.each(cities, function(i, city) {
+                        $('#city_select').append(
+                            `<option value="${city.id}">${city.name}</option>`
+                        );
+                    });
+                });
+            });
+
+
+            $("#add-company-location").validate({
+                ignore: [],
+                rules: {
+                    location_name: {
+                        required: true
+                    },
+                    address_1: {
+                        required: true
+                    },
+                    address_2: {
+                        required: true
+                    },
+                    country_id: {
+                        required: true
+                    },
+                    state_id: {
+                        required: true
+                    },
+                    city_id: {
+                        required: true
+                    },
+                    zip: {
+                        required: true
+                    }
+                },
+                messages: {
+                    location_name: {
+                        required: "Please enter the location name."
+                    },
+                    address_1: {
+                        required: "Please enter address line 1."
+                    },
+                    address_2: {
+                        required: "Please enter address line 2."
+                    },
+                    country_id: {
+                        required: "Please select a country."
+                    },
+                    state_id: {
+                        required: "Please select a state."
+                    },
+                    city_id: {
+                        required: "Please select a city."
+                    },
+                    zip: {
+                        required: "Please enter the zip code."
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+
+                    // Handle Select2 fields
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next('.select2-container')
+                            .find('.select2-selection')
+                            .addClass('is-invalid');
+                    }
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next('.select2-container')
+                            .find('.select2-selection')
+                            .removeClass('is-invalid');
+                    }
+                },
+                errorPlacement: function(error, element) {
+                    if (element.hasClass('select2-hidden-accessible')) {
+                        error.insertAfter(element.next('.select2-container'));
+                    } else if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
+
+
+            $('#add-company-location').submit(function(e) {
+                e.preventDefault();
+
+                if (!$('#add-company-location').valid()) {
+                    return; // Stop if validation fails
+                }
+
+                let form = $(this);
+                let actionUrl = form.attr('action');
+                let method = form.attr('method');
+                let formData = form.serialize();
+
+                $.ajax({
+                    url: actionUrl,
+                    method: method,
+                    data: formData,
+                    success: function(response) {
+                        console.log('Company Location added successfully:', response);
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message || 'Location added successfully.',
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => {
+                            location.reload(); // Reload after popup closes
+                        });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON?.message ||
+                                'Something went wrong while adding the location.'
+                        });
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+
+
 
             $('#activity_participant_select').select2({
                 placeholder: '-- Select --',

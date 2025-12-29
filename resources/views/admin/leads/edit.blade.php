@@ -472,6 +472,7 @@
                             </div>
                         </div>
 
+
                         <!-- Tasks Section -->
                         <div class="section-card">
                             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -1393,6 +1394,11 @@
                                                             <p><b>{{ $leadCompany->name ?? 'N/A' }}</b></p>
                                                             <p>{{ $leadCompany->description ?? 'N/A' }}</p>
                                                             <p>{{ $leadCompany->companyAddress->address ?? 'N/A' }}</p>
+                                                            {{-- Go to Company Dashboard --}}
+                                                            <a href="{{ route('admin.companies.dashboard', $leadCompany->id) }}" target="_blank"
+                                                                class="text-warning">
+                                                                Go to Dashboard
+                                                            </a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1850,8 +1856,8 @@
                                 <div class="col-lg-12">
                                     <div class="form-group mb-4">
                                         <label class="form-label">Participants</label>
-                                        <select id="participant_select" name="participant_id[]" class="form-select mt-2"
-                                            multiple>
+                                        <select id="participant_select" name="participant_id[]"
+                                            class="form-select mt-2" multiple>
                                             {{-- Companies --}}
                                             <optgroup label="Companies">
                                                 @foreach ($companies as $company)
