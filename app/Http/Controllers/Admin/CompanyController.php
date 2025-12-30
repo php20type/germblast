@@ -19,8 +19,6 @@ use App\Models\CompanyType;
 use App\Models\CompanyUrl;
 use App\Models\Competitor;
 use App\Models\Country;
-use App\Models\IAQDevice;
-use App\Models\IAQZone;
 use App\Models\Industry;
 use App\Models\People;
 use App\Models\Product;
@@ -681,64 +679,6 @@ class CompanyController extends Controller
         ));
     }
 
-    public function company_dashboard(Company $company)
-    {
-        $company = Company::with(['locations'])->findOrFail($company->id);
-        $companyLocations = $company->locations;
-
-        // Collect all zones
-        $iaqZones = $companyLocations
-            ->pluck('iaqZones')
-            ->flatten();
-
-        // Collect all devices
-        $iaqDevices = $iaqZones
-            ->pluck('iaqDevices')
-            ->flatten();
-
-        return view('admin.company.company-dashboard', [
-            'company'=>$company,
-            'companyLocations'=>$companyLocations,
-            'iaqZones'=>$iaqZones,
-            'iaqDevices'=>$iaqDevices,
-        ]);
-    }
-
-    public function storeIAQZone(Request $request, Company $company)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'company_location_id' => 'required|exists:company_locations,id',
-        ]);
-
-        IAQZone::create([
-            'name' => $validated['name'],
-            'company_location_id' => $validated['company_location_id'],
-        ]);
-
-        return response()->json([
-            'message' => 'IAQ Zone added successfully.',
-        ]);
-    }
-
-    public function storeIAQDevice(Request $request, Company $company)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'iaq_zone_id' => 'required|exists:iaq_zones,id',
-            'node_id' => 'required|string|max:255',
-        ]);
-
-        IAQDevice::create([
-            'name' => $validated['name'],
-            'iaq_zone_id' => $validated['iaq_zone_id'],
-            'node_id' => $validated['node_id'],
-        ]);
-
-        return response()->json([
-            'message' => 'IAQ Device added successfully.',
-        ]);
-    }
 
     public function addLocation(Request $request, Company $company)
     {

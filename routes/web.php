@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\LeadStageController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CompanyDashboardController;
 use App\Http\Controllers\SurveyProposalController;
 use App\Models\ActivityType;
 use App\Models\Company;
@@ -104,9 +105,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     // Company - Detail Section
     Route::get('companies/{company}', [CompanyController::class, 'show'])->name('companies.show');
-    Route::get('companies/{company}/dashboard', [CompanyController::class, 'company_dashboard'])->name('companies.dashboard');
-    Route::post('companies/{company}/iaq-zones',[CompanyController::class, 'storeIAQZone'])->name('companies.iaq-zones.store');
-    Route::post('companies/{company}/iaq-devices',[CompanyController::class, 'storeIAQDevice'])->name('companies.iaq-devices.store');
+
     Route::post('companies/{company}/location/add', [CompanyController::class, 'addLocation'])->name('companies.location.add');
     Route::get('companies/{id}/timeline', [CompanyController::class, 'show'])->name('companies.timeline');
     Route::post('/company/ajax', [CompanyController::class, 'ajax_store'])->name('company.ajax.store');
@@ -120,6 +119,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/update-company-field', [CompanyController::class, 'updateCompanyField'])->name('update.company.field');
     Route::post('/companies/{company}/files/upload', [CompanyController::class, 'fileUpload'])->name('companies.files.upload');
     Route::post('/companies/files/delete', [CompanyController::class, 'fileDelete'])->name('companies.files.delete');
+
+    // Company Dashboard Section
+    Route::get('companies/{company}/dashboard', [CompanyDashboardController::class, 'company_dashboard'])->name('companies.dashboard');
+    Route::post('companies/{company}/iaq-zones',[CompanyDashboardController::class, 'storeIAQZone'])->name('companies.iaq-zones.store');
+    Route::post('companies/{company}/iaq-devices',[CompanyDashboardController::class, 'storeIAQDevice'])->name('companies.iaq-devices.store');
+    Route::get('/companies/{company}/biological-response', [CompanyDashboardController::class, 'biological_response'])->name('companies.biological.response');
+    Route::post('/companies/{company}/biological-response/store', [CompanyDashboardController::class, 'biological_response_store'])
+        ->name('companies.biological.response.store');
 
     // People Section
     Route::get('/people/index', [PeopleController::class, 'index'])->name('peoples.index');

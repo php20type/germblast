@@ -154,4 +154,9 @@ class Company extends Model
         return $this->belongsToMany(Tag::class, 'company_tags')
             ->withTimestamps();
     }
+
+    public function biologicalResponseIntakes()
+    {
+        return $this->hasMany(BiologicalResponseIntake::class,'company_id');
+    }
 }

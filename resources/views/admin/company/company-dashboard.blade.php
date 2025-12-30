@@ -32,16 +32,26 @@
                                         <thead>
                                             <tr>
                                                 <th>Zone Name</th>
-                                                <th>Description</th>
+                                                <th>Location</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td colspan="3" class="text-muted text-center">
-                                                    No zones created yet.
-                                                </td>
-                                            </tr>
+                                            @forelse ($iaqZones as $zone)
+                                                <tr>
+                                                    <td>{{ $zone->name }}</td>
+                                                    <td>{{ $zone->companyLocation->location_name ?? '-' }}</td>
+                                                    <td>
+                                                        <a href="#" class="btn btn-sm btn-outline-primary">Edit</a>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="3" class="text-muted text-center">
+                                                        No zones created yet.
+                                                    </td>
+                                                </tr>
+                                            @endforelse
                                         </tbody>
                                     </table>
                                 </div>
@@ -65,11 +75,23 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td colspan="5" class="text-muted text-center">
-                                                    No IAQ devices added yet.
-                                                </td>
-                                            </tr>
+                                            @forelse ($iaqDevices as $device)
+                                                <tr>
+                                                    <td>{{ $device->name }}</td>
+                                                    <td>{{ $device->iaqZone->name ?? '-' }}</td>
+                                                    <td>{{ $device->iaqZone->companyLocation->location_name ?? '-' }}</td>
+                                                    <td>{{ $device->node_id ?? '-' }}</td>
+                                                    <td>
+                                                        <a href="#" class="btn btn-sm btn-outline-primary">Edit</a>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="5" class="text-muted text-center">
+                                                        No IAQ devices added yet.
+                                                    </td>
+                                                </tr>
+                                            @endforelse
                                         </tbody>
                                     </table>
                                 </div>
@@ -82,14 +104,14 @@
                                 <div class="section-card">
                                     <div class="section-header d-flex justify-content-between">
                                         <h3 class="section-title">Biological Response Intake</h3>
-                                        <button class="btn btn-sm btn-success">Add Intake</button>
+                                        <a href="{{ route('admin.companies.biological.response', $company->id) }}" class="btn btn-sm btn-success">Add Intake</a>
                                     </div>
 
                                     <table class="table table-bordered align-middle">
                                         <thead>
                                             <tr>
                                                 <th>Project Name</th>
-                                                <th>Project Leader</th>
+                                                <th>Project Leader<audio/th>
                                                 <th>Service ID</th>
                                                 <th>Type of Loss</th>
                                             </tr>
