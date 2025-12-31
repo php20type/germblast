@@ -157,6 +157,11 @@ class Company extends Model
 
     public function biologicalResponseIntakes()
     {
-        return $this->hasMany(BiologicalResponseIntake::class,'company_id');
+        return $this->hasMany(BiologicalResponseIntake::class, 'company_id');
+    }
+
+    public function biologicalReadiness()
+    {
+        return $this->hasMany(BiologicalReadiness::class, 'company_id');
     }
 }

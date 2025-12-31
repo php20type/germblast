@@ -105,7 +105,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     // Company - Detail Section
     Route::get('companies/{company}', [CompanyController::class, 'show'])->name('companies.show');
-
     Route::post('companies/{company}/location/add', [CompanyController::class, 'addLocation'])->name('companies.location.add');
     Route::get('companies/{id}/timeline', [CompanyController::class, 'show'])->name('companies.timeline');
     Route::post('/company/ajax', [CompanyController::class, 'ajax_store'])->name('company.ajax.store');
@@ -123,10 +122,21 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Company Dashboard Section
     Route::get('companies/{company}/dashboard', [CompanyDashboardController::class, 'company_dashboard'])->name('companies.dashboard');
     Route::post('companies/{company}/iaq-zones',[CompanyDashboardController::class, 'storeIAQZone'])->name('companies.iaq-zones.store');
+    Route::get('companies/{company}/iaq-zones/{zoneId}/edit',[CompanyDashboardController::class, 'editIAQZone'])->name('companies.iaq-zones.edit');
+    Route::post('companies/{company}/iaq-zones/{zoneId}/update',[CompanyDashboardController::class, 'updateIAQZone'])->name('companies.iaq-zones.update');
     Route::post('companies/{company}/iaq-devices',[CompanyDashboardController::class, 'storeIAQDevice'])->name('companies.iaq-devices.store');
+    Route::get('companies/{company}/iaq-devices/{deviceId}/edit',[CompanyDashboardController::class, 'editIAQDevice'])->name('companies.iaq-devices.edit');
+    Route::post('companies/{company}/iaq-devices/{deviceId}/update',[CompanyDashboardController::class, 'updateIAQDevice'])->name('companies.iaq-devices.update');
     Route::get('/companies/{company}/biological-response', [CompanyDashboardController::class, 'biological_response'])->name('companies.biological.response');
     Route::post('/companies/{company}/biological-response/store', [CompanyDashboardController::class, 'biological_response_store'])
         ->name('companies.biological.response.store');
+    Route::get('/companies/{company}/biological-response/{intakeId}/edit', [CompanyDashboardController::class, 'biological_response_edit'])->name('companies.biological.response.edit');
+    Route::post('companies/{company}/biological-response/{intakeId}/update',[CompanyDashboardController::class, 'biological_response_update'])->name('companies.biological.response.update');
+    Route::get('/companies/{company}/biological-readiness', [CompanyDashboardController::class, 'biological_readiness'])->name('companies.biological.readiness');
+    Route::post('/companies/{company}/biological-readiness/store', [CompanyDashboardController::class, 'biological_readiness_store'])
+        ->name('companies.biological.readiness.store');
+    Route::get('/companies/{company}/biological-readiness/{readinessId}/edit', [CompanyDashboardController::class, 'biological_readiness_edit'])->name('companies.biological.readiness.edit');
+    Route::post('/companies/{company}/biological-readiness/{readinessId}/update', [CompanyDashboardController::class, 'biological_readiness_update'])->name('companies.biological.readiness.update');
 
     // People Section
     Route::get('/people/index', [PeopleController::class, 'index'])->name('peoples.index');

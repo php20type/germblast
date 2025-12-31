@@ -13,7 +13,7 @@
                         {{-- HEADER --}}
                         <div class="dashboard-header section-card d-flex justify-content-between align-items-center">
                             <div>
-                                <h1 class="display-6 mb-2 fw-bold">Company Dashboard</h1>
+                                <h1 class="display-6 mb-2 fw-bold">{{ $company->name }} - Company Dashboard</h1>
                                 <p class="text-muted">Overview of IAQ, Biological Response, Services and Surveys</p>
                             </div>
                         </div>
@@ -33,21 +33,22 @@
                                             <tr>
                                                 <th>Zone Name</th>
                                                 <th>Location</th>
-                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @forelse ($iaqZones as $zone)
                                                 <tr>
-                                                    <td>{{ $zone->name }}</td>
-                                                    <td>{{ $zone->companyLocation->location_name ?? '-' }}</td>
                                                     <td>
-                                                        <a href="#" class="btn btn-sm btn-outline-primary">Edit</a>
+                                                        <a href="javascript:void(0)"
+                                                            onclick="editZone({{ $zone->id }})">
+                                                            {{ $zone->name }}
+                                                        </a>
                                                     </td>
+                                                    <td>{{ $zone->companyLocation->location_name ?? '-' }}</td>
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="3" class="text-muted text-center">
+                                                    <td colspan="2" class="text-muted text-center">
                                                         No zones created yet.
                                                     </td>
                                                 </tr>
@@ -71,23 +72,24 @@
                                                 <th>Zone</th>
                                                 <th>Location</th>
                                                 <th>Node ID</th>
-                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @forelse ($iaqDevices as $device)
                                                 <tr>
-                                                    <td>{{ $device->name }}</td>
+                                                    <td>
+                                                        <a href="javascript:void(0)"
+                                                            onclick="editDevice({{ $device->id }})">
+                                                            {{ $device->name }}
+                                                        </a>
+                                                    </td>
                                                     <td>{{ $device->iaqZone->name ?? '-' }}</td>
                                                     <td>{{ $device->iaqZone->companyLocation->location_name ?? '-' }}</td>
                                                     <td>{{ $device->node_id ?? '-' }}</td>
-                                                    <td>
-                                                        <a href="#" class="btn btn-sm btn-outline-primary">Edit</a>
-                                                    </td>
                                                 </tr>
                                             @empty
                                                 <tr>
-                                                    <td colspan="5" class="text-muted text-center">
+                                                    <td colspan="4" class="text-muted text-center">
                                                         No IAQ devices added yet.
                                                     </td>
                                                 </tr>
@@ -104,24 +106,37 @@
                                 <div class="section-card">
                                     <div class="section-header d-flex justify-content-between">
                                         <h3 class="section-title">Biological Response Intake</h3>
-                                        <a href="{{ route('admin.companies.biological.response', $company->id) }}" class="btn btn-sm btn-success">Add Intake</a>
+                                        <a href="{{ route('admin.companies.biological.response', $company->id) }}"
+                                            class="btn btn-sm btn-success">Add Intake</a>
                                     </div>
 
                                     <table class="table table-bordered align-middle">
                                         <thead>
                                             <tr>
                                                 <th>Project Name</th>
-                                                <th>Project Leader<audio/th>
-                                                <th>Service ID</th>
+                                                <th>Project Leader</th>
+                                                <th>Project Zip</th>
                                                 <th>Type of Loss</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td colspan="4" class="text-muted text-center">
-                                                    No biological response records found.
-                                                </td>
-                                            </tr>
+                                            @forelse ($biologicalResponseIntakes as $intake)
+                                                <tr>
+                                                    <td><a
+                                                            href="{{ route('admin.companies.biological.response.edit', [$company->id, $intake->id]) }}">
+                                                            {{ $intake->project_name }}
+                                                        </a></td>
+                                                    <td>{{ $intake->project_leader }}</td>
+                                                    <td>{{ $intake->project_zip }}</td>
+                                                    <td>{{ $intake->type_of_loss }}</td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="4" class="text-muted text-center">
+                                                        No biological response records found.
+                                                    </td>
+                                                </tr>
+                                            @endforelse
                                         </tbody>
                                     </table>
                                 </div>
@@ -134,24 +149,45 @@
                                 <div class="section-card">
                                     <div class="section-header d-flex justify-content-between">
                                         <h3 class="section-title">Biological Readiness Intake</h3>
-                                        <button class="btn btn-sm btn-success">Add Intake</button>
+                                        {{-- <button class="btn btn-sm btn-success">Add Intake</button> --}}
+                                        <a href="{{ route('admin.companies.biological.readiness', $company->id) }}"
+                                            class="btn btn-sm btn-success">Add Intake</a>
                                     </div>
 
                                     <table class="table table-bordered align-middle">
                                         <thead>
                                             <tr>
-                                                <th>ID</th>
+                                                <th>Project Name</th>
                                                 <th>Status</th>
-                                                <th>Name</th>
+                                                <th>Length</th>
+                                                <th>Total</th>
                                                 <th>Date</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td colspan="4" class="text-muted text-center">
-                                                    No readiness records available.
-                                                </td>
-                                            </tr>
+                                            @forelse ($biologicalReadiness as $readiness)
+                                                <tr>
+                                                    <td>
+                                                        <a
+                                                            href="{{ route('admin.companies.biological.readiness.edit', [$readiness->id, $company->id]) }}">{{ $readiness->project_name }}</a>
+                                                    </td>
+                                                    <td>
+                                                        {{ $readiness->status }}
+                                                    </td>
+
+                                                    <td>{{ $readiness->length }}</td>
+
+                                                    <td>{{ $readiness->line_total }}</td>
+
+                                                    <td>{{ $readiness->created_at->format('d M Y') }}</td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="5" class="text-muted text-center">
+                                                        No readiness records available.
+                                                    </td>
+                                                </tr>
+                                            @endforelse
                                         </tbody>
                                     </table>
                                 </div>
@@ -395,6 +431,123 @@
         </div>
     </div>
 
+    {{-- Edit IAQ Zone Modal --}}
+    <div class="modal fade" id="EditIAQZone" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="exampleModalLabel">Edit IAQ Zone</h1>
+                    <div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                </div>
+                <div class="modal-body">
+                    <form method="POST" id="edit-iaq-zone-form">
+                        @csrf
+
+                        <div class="row mx-0">
+
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Name</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="text" name="name" id="edit_zone_name" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Location</label>
+                                    <span class="text-danger">*</span>
+                                    <select name="company_location_id" id="edit_company_location"
+                                        class="form-select select2">
+                                        @foreach ($companyLocations as $location)
+                                            <option value="{{ $location->id }}">
+                                                {{ $location->location_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                Close
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                Save Location
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Edit Edit IAQ Device Modal --}}
+    <div class="modal fade" id="EditIAQDevice" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="exampleModalLabel">Edit IAQ Device</h1>
+                    <div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                </div>
+                <div class="modal-body">
+                    <form method="POST" id="edit-iaq-device-form">
+                        @csrf
+                        <div class="row mx-0">
+
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Name</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="text" name="name" id="edit_device_name" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">IAQ Zone</label>
+                                    <span class="text-danger">*</span>
+                                    <select name="iaq_zone_id" id="edit_iaq_zone" class="form-select select2">
+                                        @foreach ($iaqZones as $zone)
+                                            <option value="{{ $zone->id }}">{{ $zone->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Node ID</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="text" name="node_id" id="edit_node_id" class="form-control">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                Close
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                Save Location
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
 
 @endsection
 @push('scripts')
@@ -405,6 +558,51 @@
 
         function addDevice() {
             $('#AddIAQDevice').modal('show');
+        }
+
+        function editZone(zoneId) {
+            $.get(
+                "{{ route('admin.companies.iaq-zones.edit', [$company->id, 'ZONE_ID']) }}"
+                .replace('ZONE_ID', zoneId),
+                function(res) {
+
+                    $('#edit_zone_name').val(res.data.name);
+                    $('#edit_company_location')
+                        .val(res.data.company_location_id)
+                        .trigger('change');
+
+                    $('#edit-iaq-zone-form')
+                        .attr('action',
+                            "{{ route('admin.companies.iaq-zones.update', [$company->id, 'ZONE_ID']) }}"
+                            .replace('ZONE_ID', zoneId)
+                        );
+
+                    $('#EditIAQZone').modal('show');
+                }
+            );
+        }
+
+        function editDevice(deviceId) {
+            $.get(
+                "{{ route('admin.companies.iaq-devices.edit', [$company->id, 'DEVICE_ID']) }}"
+                .replace('DEVICE_ID', deviceId),
+                function(res) {
+
+                    $('#edit_device_name').val(res.data.name);
+                    $('#edit_node_id').val(res.data.node_id);
+                    $('#edit_iaq_zone')
+                        .val(res.data.iaq_zone_id)
+                        .trigger('change');
+
+                    $('#edit-iaq-device-form')
+                        .attr('action',
+                            "{{ route('admin.companies.iaq-devices.update', [$company->id, 'DEVICE_ID']) }}"
+                            .replace('DEVICE_ID', deviceId)
+                        );
+
+                    $('#EditIAQDevice').modal('show');
+                }
+            );
         }
 
         $(document).ready(function() {
@@ -422,6 +620,21 @@
                 allowClear: true,
                 width: '100%'
             });
+
+            $('#edit_company_location').select2({
+                dropdownParent: $('#EditIAQZone'),
+                placeholder: 'Choose...',
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('#edit_iaq_zone').select2({
+                dropdownParent: $('#EditIAQDevice'),
+                placeholder: 'Choose...',
+                allowClear: true,
+                width: '100%'
+            });
+
 
             $("#add-iaq-zone").validate({
                 ignore: [],
@@ -593,6 +806,179 @@
                     }
                 });
             });
+
+
+            $("#edit-iaq-zone-form").validate({
+                ignore: [],
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    company_location_id: {
+                        required: true
+                    }
+                },
+                messages: {
+                    name: {
+                        required: "Please enter zone name."
+                    },
+                    company_location_id: {
+                        required: "Please select a location."
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next('.select2-container')
+                            .find('.select2-selection')
+                            .addClass('is-invalid');
+                    }
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next('.select2-container')
+                            .find('.select2-selection')
+                            .removeClass('is-invalid');
+                    }
+                },
+                errorPlacement: function(error, element) {
+                    if (element.hasClass('select2-hidden-accessible')) {
+                        error.insertAfter(element.next('.select2-container'));
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
+
+
+            $('#edit-iaq-zone-form').submit(function(e) {
+                e.preventDefault();
+
+                if (!$(this).valid()) {
+                    return;
+                }
+
+                let form = $(this);
+
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => {
+                            location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON?.message || 'Failed to update zone'
+                        });
+                    }
+                });
+            });
+
+
+            $("#edit-iaq-device-form").validate({
+                ignore: [],
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    iaq_zone_id: {
+                        required: true
+                    },
+                    node_id: {
+                        required: true
+                    }
+                },
+                messages: {
+                    name: {
+                        required: "Please enter device name."
+                    },
+                    iaq_zone_id: {
+                        required: "Please select IAQ zone."
+                    },
+                    node_id: {
+                        required: "Please enter node ID."
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next('.select2-container')
+                            .find('.select2-selection')
+                            .addClass('is-invalid');
+                    }
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+
+                    if ($(element).hasClass('select2-hidden-accessible')) {
+                        $(element).next('.select2-container')
+                            .find('.select2-selection')
+                            .removeClass('is-invalid');
+                    }
+                },
+                errorPlacement: function(error, element) {
+                    if (element.hasClass('select2-hidden-accessible')) {
+                        error.insertAfter(element.next('.select2-container'));
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
+
+
+            $('#edit-iaq-device-form').submit(function(e) {
+                e.preventDefault();
+
+                if (!$(this).valid()) {
+                    return;
+                }
+
+                let form = $(this);
+
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => {
+                            location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON?.message || 'Failed to update device'
+                        });
+                    }
+                });
+            });
+
 
 
         });
