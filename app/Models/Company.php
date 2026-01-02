@@ -164,4 +164,9 @@ class Company extends Model
     {
         return $this->hasMany(BiologicalReadiness::class, 'company_id');
     }
+
+    public function iaqSurveys()
+    {
+        return $this->hasMany(IAQSurvey::class, 'company_id');
+    }
 }

@@ -138,6 +138,18 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/companies/{company}/biological-readiness/{readinessId}/edit', [CompanyDashboardController::class, 'biological_readiness_edit'])->name('companies.biological.readiness.edit');
     Route::post('/companies/{company}/biological-readiness/{readinessId}/update', [CompanyDashboardController::class, 'biological_readiness_update'])->name('companies.biological.readiness.update');
 
+    Route::get('/companies/{company}/iaq-survey', [CompanyDashboardController::class, 'iaq_survey'])->name('companies.iaq.survey');
+    Route::post('/companies/{company}/iaq-survey/store', [CompanyDashboardController::class, 'iaq_survey_store'])
+        ->name('companies.iaq.survey.store');
+    Route::get('/companies/{company}/iaq-survey/{surveyId}/edit', [CompanyDashboardController::class, 'iaq_survey_edit'])->name('companies.iaq.survey.edit');
+    Route::post('/companies/{company}/iaq-survey/{surveyId}/update', [CompanyDashboardController::class, 'iaq_survey_update'])->name('companies.iaq.survey.update');
+
+    Route::get('/companies/{company}/water-management', [CompanyDashboardController::class, 'water_management'])->name('companies.water.management');
+    Route::post('/companies/{company}/water-management/store', [CompanyDashboardController::class, 'water_management_store'])
+        ->name('companies.water.management.store');
+    Route::get('/companies/{company}/water-management/{surveyId}/edit', [CompanyDashboardController::class, 'water_management_edit'])->name('companies.water.management.edit');
+    Route::post('/companies/{company}/water-management/{surveyId}/update', [CompanyDashboardController::class, 'water_management_update'])->name('companies.water.management.update');
+
     // People Section
     Route::get('/people/index', [PeopleController::class, 'index'])->name('peoples.index');
     Route::get('/people/my-peoples/{id}', [PeopleController::class, 'my_peoples'])->name('peoples.my_peoples');

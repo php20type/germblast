@@ -8,6 +8,7 @@ use App\Models\BiologicalResponseIntake;
 use App\Models\BiologicalResponseTreatedArea;
 use App\Models\Company;
 use App\Models\IAQDevice;
+use App\Models\IAQSurvey;
 use App\Models\IAQZone;
 use Illuminate\Http\Request;
 
@@ -15,7 +16,7 @@ class CompanyDashboardController extends Controller
 {
     public function company_dashboard(Company $company)
     {
-        $company = Company::with(['locations', 'biologicalResponseIntakes', 'biologicalReadiness'])->findOrFail($company->id);
+        $company = Company::with(['locations', 'biologicalResponseIntakes', 'biologicalReadiness','iaqSurveys',])->findOrFail($company->id);
         $companyLocations = $company->locations;
 
         // Collect all zones
@@ -34,6 +35,9 @@ class CompanyDashboardController extends Controller
         $biologicalReadiness = $company->biologicalReadiness
             ->sortByDesc('created_at');
 
+        $iaqSurveys = $company->iaqSurveys
+        ->sortByDesc('created_at');
+
         return view('admin.company.company-dashboard', [
             'company' => $company,
             'companyLocations' => $companyLocations,
@@ -41,6 +45,7 @@ class CompanyDashboardController extends Controller
             'iaqDevices' => $iaqDevices,
             'biologicalResponseIntakes' => $biologicalResponseIntakes,
             'biologicalReadiness' => $biologicalReadiness,
+            'iaqSurveys' => $iaqSurveys,
         ]);
     }
 
@@ -847,6 +852,154 @@ class CompanyDashboardController extends Controller
 
             return response()->json([
                 'message' => 'Failed to update biological readiness.',
+            ], 500);
+        }
+    }
+
+    public function iaq_survey(Company $company)
+    {
+        $company->load('locations');
+        $companyLocations = $company->locations;
+
+        return view('admin.company.iaq-survey', [
+            'company' => $company,
+            'company_locations' => $companyLocations,
+        ]);
+    }
+
+    public function iaq_survey_store(Request $request, Company $company)
+    {
+        $validated = $request->validate([
+
+            /* ====================
+               BASIC INFORMATION
+            ==================== */
+            'survey_name' => 'required|string',
+            'building_description' => 'required|string',
+            'reported_issues' => 'required|string',
+
+            /* ====================
+               GENERAL WALKTHROUGH
+            ==================== */
+            'odor' => 'required|boolean',
+            'dirty_unsanitary' => 'required|boolean',
+            'visible_microbial' => 'required|boolean',
+            'material_staining' => 'required|boolean',
+            'adequate_ventilation' => 'required|boolean',
+            'hvac_duct_blocked' => 'required|boolean',
+            'filter_adequate' => 'required|boolean',
+            'chemical_storage' => 'required|boolean',
+            'temp_within_ashre' => 'required|boolean',
+            'overcrowding' => 'required|boolean',
+            'poor_iaq_activities' => 'required|boolean',
+            'water_intrusion' => 'required|boolean',
+            'carpet_present' => 'required|boolean',
+            'pest_management' => 'required|boolean',
+            'dirty_air_diffusers' => 'required|boolean',
+            'mhvac_equipment' => 'required|boolean',
+
+            /* ====================
+               SAMPLING DETAILS
+            ==================== */
+            'location' => 'required|string|max:255',
+            'parameter' => 'required|string|max:100',
+            'volume' => 'required|string|max:100',
+            'sampler' => 'required|string|max:255',
+
+            /* optional text fields */
+            'result' => 'nullable|string',
+        ]);
+
+        try {
+
+            IAQSurvey::create(array_merge(
+                ['company_id' => $company->id],
+                $request->all()
+            ));
+
+            return response()->json([
+                'message' => 'IAQ survey created successfully.',
+            ]);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'message' => 'Failed to create IAQ survey.',
+            ], 500);
+        }
+    }
+
+    public function iaq_survey_edit(Company $company, $surveyId)
+    {
+        $company->load('locations');
+
+        $survey = IaqSurvey::where('company_id', $company->id)
+            ->findOrFail($surveyId);
+
+        return view('admin.company.iaq-survey-edit', [
+            'company' => $company,
+            'company_locations' => $company->locations,
+            'survey' => $survey,
+        ]);
+    }
+
+    public function iaq_survey_update(Request $request, Company $company, $surveyId)
+    {
+        $survey = IaqSurvey::where('company_id', $company->id)
+            ->findOrFail($surveyId);
+
+        $validated = $request->validate([
+
+            /* ====================
+               BASIC INFORMATION
+            ==================== */
+            'survey_name' => 'required|string',
+            'building_description' => 'required|string',
+            'reported_issues' => 'required|string',
+
+            /* ====================
+               GENERAL WALKTHROUGH
+            ==================== */
+            'odor' => 'required|boolean',
+            'dirty_unsanitary' => 'required|boolean',
+            'visible_microbial' => 'required|boolean',
+            'material_staining' => 'required|boolean',
+            'adequate_ventilation' => 'required|boolean',
+            'hvac_duct_blocked' => 'required|boolean',
+            'filter_adequate' => 'required|boolean',
+            'chemical_storage' => 'required|boolean',
+            'temp_within_ashre' => 'required|boolean',
+            'overcrowding' => 'required|boolean',
+            'poor_iaq_activities' => 'required|boolean',
+            'water_intrusion' => 'required|boolean',
+            'carpet_present' => 'required|boolean',
+            'pest_management' => 'required|boolean',
+            'dirty_air_diffusers' => 'required|boolean',
+            'mhvac_equipment' => 'required|boolean',
+
+            /* ====================
+               SAMPLING DETAILS
+            ==================== */
+            'location' => 'required|string|max:255',
+            'parameter' => 'required|string|max:100',
+            'volume' => 'required|string|max:100',
+            'sampler' => 'required|string|max:255',
+
+            'result' => 'nullable|string',
+        ]);
+
+        try {
+
+            $survey->update($request->all());
+
+            return response()->json([
+                'message' => 'IAQ survey updated successfully.',
+            ]);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'message' => 'Failed to update IAQ survey.',
             ], 500);
         }
     }

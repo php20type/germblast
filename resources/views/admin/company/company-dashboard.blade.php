@@ -200,24 +200,54 @@
                                 <div class="section-card">
                                     <div class="section-header d-flex justify-content-between">
                                         <h3 class="section-title">Indoor Air Quality</h3>
-                                        <button class="btn btn-sm btn-success">Create IAQ Survey</button>
+                                        {{-- <button class="btn btn-sm btn-success">Create IAQ Survey</button> --}}
+                                        <a href="{{ route('admin.companies.iaq.survey', $company->id) }}"
+                                            class="btn btn-sm btn-success">Create IAQ Survey</a>
                                     </div>
 
                                     <table class="table table-bordered align-middle">
                                         <thead>
                                             <tr>
+                                                <th>Survey Name</th>
                                                 <th>Date</th>
-                                                <th>Number</th>
-                                                <th>Created By</th>
-                                                <th>Action</th>
+                                                <th>Building Description</th>
+                                                <th>Reported Issues</th>
+                                                <th>Location</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td colspan="4" class="text-muted text-center">
-                                                    No IAQ surveys created.
-                                                </td>
-                                            </tr>
+                                            @forelse ($iaqSurveys as $survey)
+                                                <tr>
+                                                    <td>
+                                                        {{-- {{ $survey->survey_name ?? '-' }} --}}
+                                                        <a
+                                                            href="{{ route('admin.companies.iaq.survey.edit', [$survey->id, $company->id]) }}">{{ $survey->survey_name ?? '-' }}</a>
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $survey->created_at->format('d M Y') }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ \Illuminate\Support\Str::words($survey->building_description, 10, '...') }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ \Illuminate\Support\Str::words($survey->reported_issues, 10, '...') }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $survey->location ?? '-' }}
+                                                    </td>
+
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="5" class="text-muted text-center">
+                                                        No IAQ surveys created.
+                                                    </td>
+                                                </tr>
+                                            @endforelse
                                         </tbody>
                                     </table>
                                 </div>
