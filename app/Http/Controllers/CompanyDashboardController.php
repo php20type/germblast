@@ -10,13 +10,15 @@ use App\Models\Company;
 use App\Models\IAQDevice;
 use App\Models\IAQSurvey;
 use App\Models\IAQZone;
+use App\Models\WaterManagementPhase;
+use App\Models\WaterManagementTeam;
 use Illuminate\Http\Request;
 
 class CompanyDashboardController extends Controller
 {
     public function company_dashboard(Company $company)
     {
-        $company = Company::with(['locations', 'biologicalResponseIntakes', 'biologicalReadiness','iaqSurveys',])->findOrFail($company->id);
+        $company = Company::with(['locations', 'biologicalResponseIntakes', 'biologicalReadiness', 'iaqSurveys', 'waterManagementPhase'])->findOrFail($company->id);
         $companyLocations = $company->locations;
 
         // Collect all zones
@@ -36,7 +38,9 @@ class CompanyDashboardController extends Controller
             ->sortByDesc('created_at');
 
         $iaqSurveys = $company->iaqSurveys
-        ->sortByDesc('created_at');
+            ->sortByDesc('created_at');
+
+        $waterManagement = $company->waterManagementPhase->sortByDesc('created_at');
 
         return view('admin.company.company-dashboard', [
             'company' => $company,
@@ -46,6 +50,7 @@ class CompanyDashboardController extends Controller
             'biologicalResponseIntakes' => $biologicalResponseIntakes,
             'biologicalReadiness' => $biologicalReadiness,
             'iaqSurveys' => $iaqSurveys,
+            'waterManagement' => $waterManagement,
         ]);
     }
 
@@ -1000,6 +1005,194 @@ class CompanyDashboardController extends Controller
 
             return response()->json([
                 'message' => 'Failed to update IAQ survey.',
+            ], 500);
+        }
+    }
+
+    public function water_management(Company $company)
+    {
+        $company->load('locations');
+
+        return view('admin.company.water-management', [
+            'company' => $company,
+            'company_locations' => $company->locations,
+        ]);
+    }
+
+    public function water_management_store(Request $request, Company $company)
+    {
+        $validated = $request->validate([
+
+            /* =====================
+               BASIC DETAILS
+            ===================== */
+            'survey_name' => 'required|string|max:255',
+            'municipal_water_supplier' => 'required|string|max:255',
+
+            /* =====================
+               WMP TEAM DETAILS (ARRAY)
+            ===================== */
+            'wmp_team_name' => 'required|array|min:1',
+            'wmp_team_name.*' => 'required|string|max:255',
+
+            'wmp_team_role' => 'required|array|min:1',
+            'wmp_team_role.*' => 'required|string|max:255',
+
+            'wmp_team_email' => 'required|array|min:1',
+            'wmp_team_email.*' => 'required|email|max:255',
+
+            /* =====================
+               FACILITY RISK FACTORS
+            ===================== */
+            'is_healthcare_facility' => 'required|boolean',
+            'houses_elderly_patients' => 'required|boolean',
+            'has_multiple_housing_units' => 'required|boolean',
+            'has_more_than_two_floors' => 'required|boolean',
+            'has_cooling_tower' => 'required|boolean',
+            'has_hot_tub_or_spa' => 'required|boolean',
+            'has_indoor_fountain' => 'required|boolean',
+            'has_central_mister_or_humidifier' => 'required|boolean',
+            'conducts_organ_transplant' => 'required|boolean',
+            'history_of_legionella' => 'required|boolean',
+
+            /* =====================
+               MONITORING DETAILS
+            ===================== */
+            'current_monitoring_activities' => 'nullable|string',
+        ]);
+
+        try {
+
+            /* =====================
+               CREATE WATER MANAGEMENT PHASE
+            ===================== */
+            $phase = WaterManagementPhase::create([
+                'company_id' => $company->id,
+                'survey_name' => $validated['survey_name'],
+                'municipal_water_supplier' => $validated['municipal_water_supplier'],
+
+                'is_healthcare_facility' => $validated['is_healthcare_facility'],
+                'houses_elderly_patients' => $validated['houses_elderly_patients'],
+                'has_multiple_housing_units' => $validated['has_multiple_housing_units'],
+                'has_more_than_two_floors' => $validated['has_more_than_two_floors'],
+                'has_cooling_tower' => $validated['has_cooling_tower'],
+                'has_hot_tub_or_spa' => $validated['has_hot_tub_or_spa'],
+                'has_indoor_fountain' => $validated['has_indoor_fountain'],
+                'has_central_mister_or_humidifier' => $validated['has_central_mister_or_humidifier'],
+                'conducts_organ_transplant' => $validated['conducts_organ_transplant'],
+                'history_of_legionella' => $validated['history_of_legionella'],
+
+                'current_monitoring_activities' => $validated['current_monitoring_activities'] ?? null,
+            ]);
+
+            /* =====================
+               STORE WMP TEAM MEMBERS
+            ===================== */
+            foreach ($validated['wmp_team_name'] as $index => $name) {
+
+                WaterManagementTeam::create([
+                    'water_management_phase_id' => $phase->id,
+                    'name' => $name,
+                    'role' => $validated['wmp_team_role'][$index] ?? null,
+                    'email' => $validated['wmp_team_email'][$index] ?? null,
+                ]);
+            }
+
+            return response()->json([
+                'message' => 'Water management details saved successfully.',
+            ]);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'message' => 'Failed to save water management details.',
+            ], 500);
+        }
+    }
+
+    public function water_management_edit(Company $company, $surveyId)
+    {
+        $waterManagement = WaterManagementPhase::with('waterManagementTeams')
+            ->where('company_id', $company->id)
+            ->findOrFail($surveyId);
+
+        return view('admin.company.water-management-edit', [
+            'company' => $company,
+            'waterManagement' => $waterManagement,
+        ]);
+    }
+
+    public function water_management_update(Request $request, Company $company, $surveyId)
+    {
+        $waterManagement = WaterManagementPhase::where('company_id', $company->id)
+            ->findOrFail($surveyId);
+
+        $validated = $request->validate([
+            'survey_name' => 'required|string|max:255',
+            'municipal_water_supplier' => 'required|string|max:255',
+
+            'wmp_team_name' => 'required|array|min:1',
+            'wmp_team_name.*' => 'required|string|max:255',
+
+            'wmp_team_role' => 'required|array|min:1',
+            'wmp_team_role.*' => 'required|string|max:255',
+
+            'wmp_team_email' => 'required|array|min:1',
+            'wmp_team_email.*' => 'required|email|max:255',
+
+            'is_healthcare_facility' => 'required|boolean',
+            'houses_elderly_patients' => 'required|boolean',
+            'has_multiple_housing_units' => 'required|boolean',
+            'has_more_than_two_floors' => 'required|boolean',
+            'has_cooling_tower' => 'required|boolean',
+            'has_hot_tub_or_spa' => 'required|boolean',
+            'has_indoor_fountain' => 'required|boolean',
+            'has_central_mister_or_humidifier' => 'required|boolean',
+            'conducts_organ_transplant' => 'required|boolean',
+            'history_of_legionella' => 'required|boolean',
+
+            'current_monitoring_activities' => 'nullable|string',
+        ]);
+
+        try {
+
+            $waterManagement->update([
+                'survey_name' => $validated['survey_name'],
+                'municipal_water_supplier' => $validated['municipal_water_supplier'],
+                'is_healthcare_facility' => $validated['is_healthcare_facility'],
+                'houses_elderly_patients' => $validated['houses_elderly_patients'],
+                'has_multiple_housing_units' => $validated['has_multiple_housing_units'],
+                'has_more_than_two_floors' => $validated['has_more_than_two_floors'],
+                'has_cooling_tower' => $validated['has_cooling_tower'],
+                'has_hot_tub_or_spa' => $validated['has_hot_tub_or_spa'],
+                'has_indoor_fountain' => $validated['has_indoor_fountain'],
+                'has_central_mister_or_humidifier' => $validated['has_central_mister_or_humidifier'],
+                'conducts_organ_transplant' => $validated['conducts_organ_transplant'],
+                'history_of_legionella' => $validated['history_of_legionella'],
+                'current_monitoring_activities' => $validated['current_monitoring_activities'] ?? null,
+            ]);
+
+            $waterManagement->waterManagementTeams()->delete();
+            /* =====================
+            STORE WMP TEAM MEMBERS
+            ===================== */
+            foreach ($validated['wmp_team_name'] as $index => $name) {
+
+                WaterManagementTeam::create([
+                    'water_management_phase_id' => $waterManagement->id,
+                    'name' => $name,
+                    'role' => $validated['wmp_team_role'][$index] ?? null,
+                    'email' => $validated['wmp_team_email'][$index] ?? null,
+                ]);
+            }
+
+            return response()->json([
+                'message' => 'Water management details saved successfully.',
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to update water management details.',
             ], 500);
         }
     }

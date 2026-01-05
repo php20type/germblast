@@ -169,7 +169,7 @@
                                                 <tr>
                                                     <td>
                                                         <a
-                                                            href="{{ route('admin.companies.biological.readiness.edit', [$readiness->id, $company->id]) }}">{{ $readiness->project_name }}</a>
+                                                            href="{{ route('admin.companies.biological.readiness.edit', [$company->id, $readiness->id]) }}">{{ $readiness->project_name }}</a>
                                                     </td>
                                                     <td>
                                                         {{ $readiness->status }}
@@ -221,7 +221,7 @@
                                                     <td>
                                                         {{-- {{ $survey->survey_name ?? '-' }} --}}
                                                         <a
-                                                            href="{{ route('admin.companies.iaq.survey.edit', [$survey->id, $company->id]) }}">{{ $survey->survey_name ?? '-' }}</a>
+                                                            href="{{ route('admin.companies.iaq.survey.edit', [$company->id, $survey->id]) }}">{{ $survey->survey_name ?? '-' }}</a>
                                                     </td>
 
                                                     <td>
@@ -260,24 +260,46 @@
                                 <div class="section-card">
                                     <div class="section-header d-flex justify-content-between">
                                         <h3 class="section-title">Water Management</h3>
-                                        <button class="btn btn-sm btn-success">Create H2O Survey</button>
+                                        {{-- <button class="btn btn-sm btn-success">Create H2O Survey</button> --}}
+                                        <a href="{{ route('admin.companies.water.management', $company->id) }}"
+                                            class="btn btn-sm btn-success">Create H2O Survey</a>
                                     </div>
 
                                     <table class="table table-bordered align-middle">
                                         <thead>
                                             <tr>
+                                                <th>Survey Name</th>
                                                 <th>Date</th>
-                                                <th>Number</th>
-                                                <th>Created By</th>
-                                                <th>Action</th>
+                                                <th>Municipal Water Supplier</th>
+                                                <th>No. of Teams</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td colspan="4" class="text-muted text-center">
-                                                    No water surveys created.
-                                                </td>
-                                            </tr>
+                                            @forelse ($waterManagement as $water)
+                                                <tr>
+                                                    <td>
+                                                        {{-- {{ $water->survey_name ?? '-' }} --}}
+                                                        <a
+                                                            href="{{ route('admin.companies.water.management.edit', [$company->id, $water->id]) }}">
+                                                        {{ $water->survey_name ?? '-' }}
+                                                        </a>
+                                                    </td>
+
+                                                    <td>{{ $water->created_at->format('d M Y') }}</td>
+
+                                                    <td>{{ $water->municipal_water_supplier ?? '-' }}</td>
+
+                                                    <td>
+                                                        {{ $water->waterManagementTeams->count() }}
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="4" class="text-muted text-center">
+                                                        No water surveys created.
+                                                    </td>
+                                                </tr>
+                                            @endforelse
                                         </tbody>
                                     </table>
                                 </div>

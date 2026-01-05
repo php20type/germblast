@@ -169,4 +169,9 @@ class Company extends Model
     {
         return $this->hasMany(IAQSurvey::class, 'company_id');
     }
+
+    public function waterManagementPhase()
+    {
+        return $this->hasMany(WaterManagementPhase::class, 'company_id');
+    }
 }
