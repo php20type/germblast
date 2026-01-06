@@ -8,7 +8,7 @@
             <div class="row">
                 <div class="col-md-12 p-0">
 
-                    <form action="{{ route('admin.companies.water.management.store', $company->id) }}" method="POST"
+                    <form action="{{ route('admin.company.water.management.store', $company->id) }}" method="POST"
                         id="water-management-form">
                         @csrf
 

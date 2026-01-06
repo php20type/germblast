@@ -71,9 +71,19 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <button class="btn btn-primary me-2" onclick="addFilter()">
+                                        {{-- <button class="btn btn-primary me-2" onclick="addFilter()">
                                             <img src="{{ asset('img/icons/filter.svg') }}" alt="" />
+                                        </button> --}}
+                                        <button class="btn btn-primary me-2 position-relative" onclick="addFilter()">
+                                            <img src="{{ asset('img/icons/filter.svg') }}" alt="" />
+
+                                            <!-- Filter Count Badge -->
+                                            <span id="filterCount"
+                                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+                                                0
+                                            </span>
                                         </button>
+
                                         <button class="d-none btn btn-primary"><img src="{{ asset('img/icons/bar.svg') }}"
                                                 alt="" /></button>
                                     </div>
@@ -107,7 +117,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="company-name">
-                                                        <a href="{{ route('admin.companies.show', $company->id) }}"
+                                                        <a href="{{ route('admin.company.show', $company->id) }}"
                                                             class="text-decoration-none text-dark">
                                                             {{ $company->name ?? 'N/A' }}
                                                         </a>
@@ -183,7 +193,7 @@
                 <div class="modal-body">
 
                     {{-- <form class="company-form" id="add-lead-form"> --}}
-                    <form action="{{ route('admin.leads.store') }}" class="company-form" id="add-lead-form" method="POST">
+                    <form action="{{ route('admin.lead.store') }}" class="company-form" id="add-lead-form" method="POST">
                         @csrf
 
 
@@ -491,7 +501,6 @@
     @endsection
     @push('scripts')
         <script>
-
             function addFilter() {
                 $('#AddFilter').modal('show');
             }
@@ -513,6 +522,16 @@
                 $('#AddLead').modal('show');
             }
 
+            function updateFilterCount() {
+                let count = $('#filter-section input[type="checkbox"]:checked').length;
+
+                if (count > 0) {
+                    $('#filterCount').text(count).removeClass('d-none');
+                } else {
+                    $('#filterCount').addClass('d-none');
+                }
+            }
+
 
             const userId = {{ auth()->id() }};
             $(document).ready(function() {
@@ -522,30 +541,30 @@
                     let user_id = $('select[name="user_id"]').val();
                     let people_id = $('select[name="people_id"]').val();
                     // collect checkbox values
-                        let company_tags_filter_id = [];
-                        $('input[name="company_tags_filter_id[]"]:checked').each(function() {
-                            company_tags_filter_id.push($(this).val());
-                        });
+                    let company_tags_filter_id = [];
+                    $('input[name="company_tags_filter_id[]"]:checked').each(function() {
+                        company_tags_filter_id.push($(this).val());
+                    });
 
-                        let industry_filter_id = [];
-                        $('input[name="industry_filter_id[]"]:checked').each(function() {
-                            industry_filter_id.push($(this).val());
-                        });
+                    let industry_filter_id = [];
+                    $('input[name="industry_filter_id[]"]:checked').each(function() {
+                        industry_filter_id.push($(this).val());
+                    });
 
-                        let territory_filter_id = [];
-                        $('input[name="territory_filter_id[]"]:checked').each(function() {
-                            territory_filter_id.push($(this).val());
-                        });
+                    let territory_filter_id = [];
+                    $('input[name="territory_filter_id[]"]:checked').each(function() {
+                        territory_filter_id.push($(this).val());
+                    });
 
-                        let leads_status = [];
-                        $('input[name="leads_status[]"]:checked').each(function() {
-                            leads_status.push($(this).val());
-                        });
+                    let leads_status = [];
+                    $('input[name="leads_status[]"]:checked').each(function() {
+                        leads_status.push($(this).val());
+                    });
 
-                        let activity_type_filter_id = [];
-                        $('input[name="activity_type_filter_id[]"]:checked').each(function() {
-                            activity_type_filter_id.push($(this).val());
-                        });
+                    let activity_type_filter_id = [];
+                    $('input[name="activity_type_filter_id[]"]:checked').each(function() {
+                        activity_type_filter_id.push($(this).val());
+                    });
 
 
 
@@ -558,10 +577,10 @@
                             user_id: user_id,
                             people_id: people_id,
                             company_tags_filter_id: company_tags_filter_id,
-                                industry_filter_id: industry_filter_id,
-                                territory_filter_id: territory_filter_id,
-                                leads_status: leads_status,
-                                activity_type_filter_id: activity_type_filter_id,
+                            industry_filter_id: industry_filter_id,
+                            territory_filter_id: territory_filter_id,
+                            leads_status: leads_status,
+                            activity_type_filter_id: activity_type_filter_id,
                         },
                         success: function(response) {
                             $('table tbody').html(response.table);
@@ -577,8 +596,11 @@
                 $('select[name="company_type_id"], select[name="user_id"], select[name="people_id"]').on('change',
                     fetchCompanies);
                 // catch all checkbox changes
-                    $('#filter-section input[type="checkbox"]').on('change', fetchCompanies);
-
+                // $('#filter-section input[type="checkbox"]').on('change', fetchCompanies);
+                $('#filter-section input[type="checkbox"]').on('change', function() {
+                    fetchCompanies();
+                    updateFilterCount();
+                });
 
                 // ==============================
                 // Lead & Activities Form - Select2 Integration
@@ -733,7 +755,7 @@
                     }
 
                     $.ajax({
-                        url: '{{ route('admin.leads.store') }}',
+                        url: '{{ route('admin.lead.store') }}',
                         method: 'POST',
                         data: $(this).serialize(),
 
@@ -768,7 +790,7 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             $.ajax({
-                                url: "{{ route('admin.companies.delete') }}",
+                                url: "{{ route('admin.company.delete') }}",
                                 type: "POST",
                                 data: {
                                     _token: "{{ csrf_token() }}",

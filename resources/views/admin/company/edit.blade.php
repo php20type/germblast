@@ -156,7 +156,7 @@
                         <div class="section-card">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5>COMPANY DASHBOARD</h5>
-                                <a class="text-warning" href="{{ route('admin.companies.dashboard',$company->id) }}">Go to Dashboard</a>
+                                <a class="text-warning" href="{{ route('admin.company.dashboard',$company->id) }}">Go to Dashboard</a>
                             </div>
                             <div class="d-flex align-items-start">
                                 <div class="task-icon me-3">
@@ -336,7 +336,7 @@
                         {{-- Task form --}}
                         <div id="addTaskForm" class="my-3" style="display: none;">
 
-                            <form id="addTaskAjaxForm" action="{{ route('admin.companies.tasks.store', $company->id) }}"
+                            <form id="addTaskAjaxForm" action="{{ route('admin.company.tasks.store', $company->id) }}"
                                 method="POST">
                                 @csrf
                                 <div class="row">
@@ -1635,7 +1635,7 @@
                 <div class="modal-body">
 
                     {{-- <form class="company-form" id="add-lead-form"> --}}
-                    <form action="{{ route('admin.leads.store') }}" class="company-form" id="add-lead-form"
+                    <form action="{{ route('admin.lead.store') }}" class="company-form" id="add-lead-form"
                         method="POST">
                         @csrf
 
@@ -2011,7 +2011,7 @@
                                     <div class="col-10">
                                         <div class="company-name">
                                             <p title="Lead Name">
-                                                <a href="{{ route('admin.leads.show', $related_lead->id) }}">
+                                                <a href="{{ route('admin.lead.show', $related_lead->id) }}">
                                                     <strong>{{ $related_lead->name }}</strong>
                                                 </a>
                                             </p>
@@ -2055,7 +2055,7 @@
 
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('admin.companies.location.add', $company->id) }}" method="POST"
+                    <form action="{{ route('admin.company.location.add', $company->id) }}" method="POST"
                         class="company-form" id="add-company-location">
                         @csrf
 
@@ -2329,7 +2329,7 @@
                     confirmButtonText: 'Yes, update'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        $.post(`/admin/companies/${companyId}/update-detail`, {
+                        $.post(`/admin/company/${companyId}/update-detail`, {
                                 _token: '{{ csrf_token() }}',
                                 field: fieldName,
                                 value: newValue
@@ -2383,7 +2383,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: "/admin/companies/{{ $company->id }}/tags/add", //  new route for tags
+                            url: "/admin/company/{{ $company->id }}/tags/add", //  new route for tags
                             method: "POST",
                             data: {
                                 _token: "{{ csrf_token() }}",
@@ -2434,7 +2434,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: "/admin/companies/{{ $company->id }}/tags/" + tagId +
+                            url: "/admin/company/{{ $company->id }}/tags/" + tagId +
                                 "/remove",
                             method: "POST",
                             data: {
@@ -2497,7 +2497,7 @@
 
                     // Reset form action back to store route
                     form.setAttribute('action',
-                        "{{ route('admin.companies.tasks.store', $company->id) }}");
+                        "{{ route('admin.company.tasks.store', $company->id) }}");
 
                     // Reset button text and style
                     const submitBtn = form.querySelector('button[type="submit"]');
@@ -2532,7 +2532,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: "/admin/companies/{{ $company->id }}/people/add",
+                            url: "/admin/company/{{ $company->id }}/people/add",
                             method: "POST",
                             data: {
                                 _token: "{{ csrf_token() }}",
@@ -2585,7 +2585,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: `/admin/companies/${companyId}/remove-person`,
+                            url: `/admin/company/${companyId}/remove-person`,
                             method: 'POST',
                             data: {
                                 _token: '{{ csrf_token() }}',
@@ -2726,7 +2726,7 @@
                 }).then(function(result) {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: '/admin/companies/tasks/' + taskId + '/complete',
+                            url: '/admin/company/tasks/' + taskId + '/complete',
                             method: 'POST',
                             data: {
                                 _token: '{{ csrf_token() }}'
@@ -2775,7 +2775,7 @@
                 }).then(function(result) {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: '/admin/companies/tasks/' + taskId + '/reopen',
+                            url: '/admin/company/tasks/' + taskId + '/reopen',
                             method: 'POST',
                             data: {
                                 _token: '{{ csrf_token() }}'
@@ -2823,7 +2823,7 @@
                 }).then(function(result) {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: "/admin/companies/tasks/delete/" + taskId,
+                            url: "/admin/company/tasks/delete/" + taskId,
                             method: "POST",
                             data: {
                                 _token: "{{ csrf_token() }}"
@@ -2876,7 +2876,7 @@
                 $('#addTaskForm textarea[name="description"]').val(description);
                 $('#addTaskAjaxForm').attr('method', 'PUT');
                 // Change form action for update (FIX: point to update route)
-                $('#addTaskAjaxForm').attr('action', '/admin/companies/tasks/' + taskId + '/update');
+                $('#addTaskAjaxForm').attr('action', '/admin/company/tasks/' + taskId + '/update');
                 // Optional: Change button text to "Update Task"
                 $('#addTaskAjaxForm button[type="submit"]').text('Update Task');
                 // Change button text
@@ -3257,7 +3257,7 @@
                 }
 
                 $.ajax({
-                    url: '{{ route('admin.leads.store') }}',
+                    url: '{{ route('admin.lead.store') }}',
                     method: 'POST',
                     data: $(this).serialize(),
 
@@ -3333,7 +3333,7 @@
                     if (result.isConfirmed) {
                         // Perform AJAX update
                         $.ajax({
-                            url: `/admin/companies/${companyId}/update-field`,
+                            url: `/admin/company/${companyId}/update-field`,
                             type: 'POST',
                             data: {
                                 field: field,
@@ -3505,7 +3505,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: "{{ route('admin.companies.delete-field') }}",
+                            url: "{{ route('admin.company.delete-field') }}",
                             type: 'POST',
                             data: {
                                 company_id: companyId,
@@ -4144,7 +4144,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: "{{ route('admin.companies.delete') }}",
+                            url: "{{ route('admin.company.delete') }}",
                             type: "POST",
                             data: {
                                 _token: "{{ csrf_token() }}",
@@ -4341,7 +4341,7 @@
                 });
 
                 $.ajax({
-                    url: "/admin/companies/" + companyId + "/timeline",
+                    url: "/admin/company/" + companyId + "/timeline",
                     method: "GET",
                     data: {
                         filter_range: filter_range,
@@ -4380,7 +4380,7 @@
                 uploadBtn.disabled = true;
                 uploadBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-2"></i> Uploading...`;
 
-                fetch(`/admin/companies/${companyId}/files/upload`, {
+                fetch(`/admin/company/${companyId}/files/upload`, {
                         method: "POST",
                         body: formData,
                     })
@@ -4420,7 +4420,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: `/admin/companies/files/delete`,
+                            url: `/admin/company/files/delete`,
                             type: "POST",
                             data: {
                                 _token: "{{ csrf_token() }}",

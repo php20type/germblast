@@ -24,7 +24,7 @@
     <strong>Confidence:</strong> {{ $data['confidence'] ?? 'N/A' }}% <br>
 </p>
 
-@component('mail::button', ['url' => config('app.url') . "/admin/leads/{$data['lead_id']}"])
+@component('mail::button', ['url' => config('app.url') . "/admin/lead/{$data['lead_id']}"])
 View Lead
 @endcomponent
 

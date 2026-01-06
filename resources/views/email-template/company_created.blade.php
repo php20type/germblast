@@ -24,7 +24,7 @@
     <strong>Territory:</strong> {{ $data['territory'] }} <br>
 </p>
 
-@component('mail::button', ['url' => config('app.url') . "/admin/companies/{$data['company_id']}"])
+@component('mail::button', ['url' => config('app.url') . "/admin/company/{$data['company_id']}"])
 View Company
 @endcomponent
 

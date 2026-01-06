@@ -4,7 +4,7 @@
         </td>
         <td>
             <div class="person-name">
-                <a href="{{ route('admin.peoples.show', $people->id) }}" class="text-decoration-none text-dark">
+                <a href="{{ route('admin.people.show', $people->id) }}" class="text-decoration-none text-dark">
                     {{ $people->name ?? 'N/A' }}
                 </a>
             </div>

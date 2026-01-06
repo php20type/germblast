@@ -2,7 +2,7 @@
  <div class="col-md-2">
      <div class="sidebar">
          <div class="">
-             <a class="nav-link {{ request()->routeIs('admin.leads.index') ? 'active' : '' }}" href="{{ route('admin.leads.index') }}">
+             <a class="nav-link {{ request()->routeIs('admin.lead.index') ? 'active' : '' }}" href="{{ route('admin.lead.index') }}">
                  All leads
                  <span class="badge bg-light text-dark">{{ $totalLeads }}</span>
              </a>
@@ -24,33 +24,33 @@
                  LISTS ⚙️</h6>
 
              <div id="shared-lists">
-                 <a class="nav-link lead-filter {{ request()->routeIs('admin.leads.my_leads') ? 'active' : '' }}"
-                     href="{{ route('admin.leads.my_leads', auth()->id()) }}">
+                 <a class="nav-link lead-filter {{ request()->routeIs('admin.lead.my_leads') ? 'active' : '' }}"
+                     href="{{ route('admin.lead.my_leads', auth()->id()) }}">
                      My leads
                      <span class="badge bg-light text-dark">{{ $myLeadsCount }}</span>
                  </a>
-                 <a class="nav-link lead-filter {{ request()->routeIs('admin.leads.added_this_week') ? 'active' : '' }}"
-                     href="{{ route('admin.leads.added_this_week') }}">
+                 <a class="nav-link lead-filter {{ request()->routeIs('admin.lead.added_this_week') ? 'active' : '' }}"
+                     href="{{ route('admin.lead.added_this_week') }}">
                      Added this week
                      <span class="badge bg-light text-dark">{{ $addedThisWeekCount }}</span>
                  </a>
-                 <a class="nav-link lead-filter {{ request()->routeIs('admin.leads.closing_this_week') ? 'active' : '' }}"
-                     href="{{ route('admin.leads.closing_this_week') }}">
+                 <a class="nav-link lead-filter {{ request()->routeIs('admin.lead.closing_this_week') ? 'active' : '' }}"
+                     href="{{ route('admin.lead.closing_this_week') }}">
                      Closing this week
                      <span class="badge bg-light text-dark">{{ $closingThisWeekCount }}</span>
                  </a>
-                 <a class="nav-link lead-filter {{ request()->routeIs('admin.leads.watching_leads') ? 'active' : '' }}"
-                     href="{{ route('admin.leads.watching_leads', auth()->id()) }}">
+                 <a class="nav-link lead-filter {{ request()->routeIs('admin.lead.watching_leads') ? 'active' : '' }}"
+                     href="{{ route('admin.lead.watching_leads', auth()->id()) }}">
                      Leads I’m watching
                      <span class="badge bg-light text-dark">{{ $myWatchingLeadsCount }}</span>
                  </a>
-                 <a class="nav-link lead-filter {{ request()->routeIs('admin.leads.open_leads') ? 'active' : '' }}"
-                     href="{{ route('admin.leads.open_leads', auth()->id()) }}">
+                 <a class="nav-link lead-filter {{ request()->routeIs('admin.lead.open_leads') ? 'active' : '' }}"
+                     href="{{ route('admin.lead.open_leads', auth()->id()) }}">
                      My open leads
                      <span class="badge bg-light text-dark">{{ $myLeadOpenStatusCount }}</span>
                  </a>
-                 <a class="nav-link lead-filter {{ request()->routeIs('admin.leads.hot_leads') ? 'active' : '' }}"
-                     href="{{ route('admin.leads.hot_leads') }}">
+                 <a class="nav-link lead-filter {{ request()->routeIs('admin.lead.hot_leads') ? 'active' : '' }}"
+                     href="{{ route('admin.lead.hot_leads') }}">
                      Hot leads
                      <span class="badge bg-light text-dark">{{ $hotLeadsCount }}</span>
                  </a>

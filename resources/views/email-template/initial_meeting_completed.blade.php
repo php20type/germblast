@@ -23,7 +23,7 @@
     {{ \Carbon\Carbon::parse($data['completed_at'])->format('jS F Y g:i A') }} <br>
 </p>
 
-@component('mail::button', ['url' => config('app.url') . "/admin/leads/{$data['lead_id']}"])
+@component('mail::button', ['url' => config('app.url') . "/admin/lead/{$data['lead_id']}"])
 View Lead
 @endcomponent
 

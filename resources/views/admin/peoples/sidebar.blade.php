@@ -2,7 +2,7 @@
 <div class="col-md-2">
     <div class="sidebar">
         <div class="">
-            <a class="nav-link {{ request()->routeIs('admin.peoples.index') ? 'active' : '' }}" href="{{ route('admin.peoples.index') }}">
+            <a class="nav-link {{ request()->routeIs('admin.people.index') ? 'active' : '' }}" href="{{ route('admin.people.index') }}">
                 All peoples
                 <span class="badge bg-light text-dark">{{ $formattedTotalPeoples }}</span>
             </a>
@@ -23,13 +23,13 @@
             <div class="mt-4">
                 <h6 class="text-uppercase text-light mb-2">SHARED
                     LISTS ⚙️</h6>
-                <a class="nav-link people-filter {{ request()->routeIs('admin.peoples.my_peoples') ? 'active' : '' }}"
-                    href="{{ route('admin.peoples.my_peoples', auth()->id()) }}">
+                <a class="nav-link people-filter {{ request()->routeIs('admin.people.my_peoples') ? 'active' : '' }}"
+                    href="{{ route('admin.people.my_peoples', auth()->id()) }}">
                     My people
                     <span class="badge bg-light text-dark">{{ $formattedMyPeopleCount }}</span>
                 </a>
                 <a class="d-none nav-link people-filter {{ request()->routeIs('admin.peoples.marketing_contacts') ? 'active' : '' }}"
-                    href="{{ route('admin.peoples.marketing_contacts') }}">
+                    href="{{ route('admin.people.marketing_contacts') }}">
                     Marketing contacts
                     <span class="badge bg-light text-dark">13.8K</span>
                 </a>
@@ -38,12 +38,12 @@
             <div class="mt-4 d-none">
                 <h6 class="text-uppercase text-light mb-2">Audiences </h6>
                 <a class="nav-link people-filter {{ request()->routeIs('admin.peoples.animal_care') ? 'active' : '' }}"
-                    href="{{ route('admin.peoples.animal_care') }}">
+                    href="{{ route('admin.people.animal_care') }}">
                     Pet/Animal care
                     <span class="badge bg-light text-dark">3</span>
                 </a>
                 <a class="nav-link people-filter {{ request()->routeIs('admin.peoples.sequence_healthcare') ? 'active' : '' }}"
-                    href="{{ route('admin.peoples.sequence_healthcare') }}">
+                    href="{{ route('admin.people.sequence_healthcare') }}">
                     1st drip sequence..
                     <span class="badge bg-light text-dark">76</span>
                 </a>

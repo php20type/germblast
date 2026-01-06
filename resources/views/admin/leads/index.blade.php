@@ -66,9 +66,19 @@
                                                 </select>
                                             </div>
 
-                                            <button class="btn btn-primary me-2" onclick="addFilter()">
+                                            {{-- <button class="btn btn-primary me-2" onclick="addFilter()">
                                                 <img src="{{ asset('img/icons/filter.svg') }}" alt="" />
+                                            </button> --}}
+                                            <button class="btn btn-primary me-2 position-relative" onclick="addFilter()">
+                                                <img src="{{ asset('img/icons/filter.svg') }}" alt="" />
+
+                                                <!-- Active Filter Count -->
+                                                <span id="filterCount"
+                                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+                                                    0
+                                                </span>
                                             </button>
+
                                             <button class="d-none btn btn-primary"><img
                                                     src="{{ asset('img/icons/bar.svg') }}" alt="" /></button>
                                         </div>
@@ -128,7 +138,7 @@
 
                                                     <td>
                                                         <div class="company-name">
-                                                            <a href="{{ route('admin.leads.show', $lead['id']) }}"
+                                                            <a href="{{ route('admin.lead.show', $lead['id']) }}"
                                                                 class="text-decoration-none text-dark">
                                                                 {{ $lead['name'] }}
                                                             </a>
@@ -290,6 +300,17 @@
             $('#AddFilter').modal('show');
         }
 
+        function updateFilterCount() {
+            let count = $('#filter-section input[type="checkbox"]:checked').length;
+
+            if (count > 0) {
+                $('#filterCount').text(count).removeClass('d-none');
+            } else {
+                $('#filterCount').addClass('d-none');
+            }
+        }
+
+
         $(document).ready(function() {
 
             // ==============================
@@ -300,6 +321,7 @@
             if (selectedStage) {
                 $('#lead_stage_' + selectedStage).prop('checked', true);
                 fetchLeads();
+                updateFilterCount();
                 sessionStorage.removeItem('selectedLeadStage'); // clear after use
             }
 
@@ -324,6 +346,7 @@
 
                 // Fetch leads with filters applied
                 fetchLeads();
+                updateFilterCount();
 
                 // Clear after applying once
                 sessionStorage.removeItem('lead_filters');
@@ -365,7 +388,7 @@
                 let month_to_date = $('#month_to_date').is(':checked') ? 1 : 0;
 
                 $.ajax({
-                    url: "{{ route('admin.leads.index') }}",
+                    url: "{{ route('admin.lead.index') }}",
                     method: "GET",
                     data: {
                         search: search,
@@ -394,7 +417,12 @@
             $('#lead-search').on('keyup', fetchLeads);
             $('#checkDefault, select[name="status"], select[name="user_id"]').on('change', fetchLeads);
             // catch all checkbox changes
-            $('#filter-section input[type="checkbox"]').on('change', fetchLeads);
+            // $('#filter-section input[type="checkbox"]').on('change', fetchLeads);
+            $('#filter-section input[type="checkbox"]').on('change', function() {
+                fetchLeads();
+                updateFilterCount();
+            });
+
 
 
             $(document).on('click', '.btn-delete', function() {
@@ -414,7 +442,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: "{{ route('admin.leads.delete') }}",
+                            url: "{{ route('admin.lead.delete') }}",
                             type: "POST",
                             data: {
                                 _token: "{{ csrf_token() }}",

@@ -8,7 +8,7 @@
             <div class="row">
                 <div class="col-md-12 p-0">
 
-                    <form action="{{ route('admin.companies.biological.response.store', $company->id) }}" method="POST"
+                    <form action="{{ route('admin.company.biological.response.store', $company->id) }}" method="POST"
                         id="biological-response-intake-form">
                         @csrf
 

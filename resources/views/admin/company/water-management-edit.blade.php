@@ -9,7 +9,7 @@
                 <div class="col-md-12 p-0">
 
                     <form
-                        action="{{ route('admin.companies.water.management.update', [$company->id, $waterManagement->id]) }}"
+                        action="{{ route('admin.company.water.management.update', [$company->id, $waterManagement->id]) }}"
                         method="POST" id="water-management-form">
                         @csrf
 

@@ -5,7 +5,7 @@
          </td>
          <td>
              <div class="company-name">
-                 <a href="{{ route('admin.companies.show', $company->id) }}" class="text-decoration-none text-dark">
+                 <a href="{{ route('admin.company.show', $company->id) }}" class="text-decoration-none text-dark">
                      {{ $company->name ?? 'N/A' }}
                  </a>
              </div>

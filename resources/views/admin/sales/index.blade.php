@@ -90,14 +90,14 @@
                                         <tbody>
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('admin.leads.index') }}">All Leads</a>
+                                                    <a href="{{ route('admin.lead.index') }}">All Leads</a>
                                                 </td>
                                                 <td>{{ $allLeadsCount }}</td>
                                                 <td>${{ $allLeadsValueFormatted }}</td>
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('admin.leads.my_leads', auth()->id()) }}">My
+                                                    <a href="{{ route('admin.lead.my_leads', auth()->id()) }}">My
                                                         Leads</a>
                                                 </td>
                                                 <td>{{ $myLeadsCount }}</td>
@@ -105,7 +105,7 @@
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('admin.leads.added_this_week') }}">Added this
+                                                    <a href="{{ route('admin.lead.added_this_week') }}">Added this
                                                         week</a>
                                                 </td>
                                                 <td>{{ $addedThisWeekCount }}</td>
@@ -114,7 +114,7 @@
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('admin.leads.closing_this_week') }}">Closing this
+                                                    <a href="{{ route('admin.lead.closing_this_week') }}">Closing this
                                                         week</a>
                                                 </td>
                                                 <td>{{ $closingThisWeekCount }}</td>
@@ -122,7 +122,7 @@
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('admin.leads.hot_leads') }}">Hot leads</a>
+                                                    <a href="{{ route('admin.lead.hot_leads') }}">Hot leads</a>
                                                 </td>
                                                 <td>{{ $hotLeadsCount }}</td>
                                                 <td>${{ $hotLeadsValueFormatted }}</td>
@@ -1653,7 +1653,7 @@
             }).then(function(result) {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '/admin/companies/tasks/' + taskId + '/complete',
+                        url: '/admin/company/tasks/' + taskId + '/complete',
                         method: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}'
@@ -1702,7 +1702,7 @@
             }).then(function(result) {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '/admin/companies/tasks/' + taskId + '/reopen',
+                        url: '/admin/company/tasks/' + taskId + '/reopen',
                         method: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}'
@@ -1750,7 +1750,7 @@
             }).then(function(result) {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: "/admin/companies/tasks/delete/" + taskId,
+                        url: "/admin/company/tasks/delete/" + taskId,
                         method: "POST",
                         data: {
                             _token: "{{ csrf_token() }}"
@@ -1877,7 +1877,7 @@
         $('.pipeline-stage').on('click', function() {
             const stageId = $(this).data('lead-stage');
             sessionStorage.setItem('selectedLeadStage', stageId);
-            window.location.href = "{{ route('admin.leads.index') }}";
+            window.location.href = "{{ route('admin.lead.index') }}";
         });
 
         // When user clicks on "NEW LEAD" metric card
@@ -1885,7 +1885,7 @@
             sessionStorage.setItem('lead_filters', JSON.stringify({
                 month_to_date: true,
             }));
-            window.location.href = "{{ route('admin.leads.index') }}";
+            window.location.href = "{{ route('admin.lead.index') }}";
         });
 
         // Handle "OPEN LEADS" card click
@@ -1895,7 +1895,7 @@
                 month_to_date: true,
                 leads_status: ['open']
             }));
-            window.location.href = "{{ route('admin.leads.index') }}";
+            window.location.href = "{{ route('admin.lead.index') }}";
         });
 
         // Handle "SALE LEADS" card click
@@ -1905,7 +1905,7 @@
                 month_to_date: true,
                 leads_status: ['won']
             }));
-            window.location.href = "{{ route('admin.leads.index') }}";
+            window.location.href = "{{ route('admin.lead.index') }}";
         });
     </script>
 @endpush

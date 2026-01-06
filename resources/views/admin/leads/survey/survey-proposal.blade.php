@@ -810,7 +810,7 @@
                 if (!$('#add-survey-form').valid()) return;
 
                 $.ajax({
-                    url: "{{ route('admin.leads.survey.proposal.store', $lead->id) }}",
+                    url: "{{ route('admin.lead.survey.proposal.store', $lead->id) }}",
                     method: "POST",
                     data: $(this).serialize(),
                     success: function(res) {

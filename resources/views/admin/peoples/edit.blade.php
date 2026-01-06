@@ -1465,7 +1465,7 @@
                 <div class="modal-body">
 
                     {{-- <form class="company-form" id="add-lead-form"> --}}
-                    <form action="{{ route('admin.leads.store') }}" class="company-form" id="add-lead-form"
+                    <form action="{{ route('admin.lead.store') }}" class="company-form" id="add-lead-form"
                         method="POST">
                         @csrf
 
@@ -1846,7 +1846,7 @@
                                     <div class="col-10">
                                         <div class="company-name">
                                             <p title="Lead Name">
-                                                <a href="{{ route('admin.leads.show', $related_lead->id) }}">
+                                                <a href="{{ route('admin.lead.show', $related_lead->id) }}">
                                                     <strong>{{ $related_lead->name }}</strong>
                                                 </a>
                                             </p>
@@ -2776,7 +2776,7 @@
                 }
 
                 $.ajax({
-                    url: '{{ route('admin.leads.store') }}',
+                    url: '{{ route('admin.lead.store') }}',
                     method: 'POST',
                     data: $(this).serialize(),
 
@@ -2829,7 +2829,7 @@
                     if (result.isConfirmed) {
                         // Perform AJAX update
                         $.ajax({
-                            url: `/admin/peoples/${peopleId}/update-field`,
+                            url: `/admin/people/${peopleId}/update-field`,
                             type: 'POST',
                             data: {
                                 field: field,
@@ -3001,7 +3001,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: "{{ route('admin.peoples.delete-field') }}",
+                            url: "{{ route('admin.people.delete-field') }}",
                             type: 'POST',
                             data: {
                                 people_id: peopleId,
@@ -3658,7 +3658,7 @@
                                 });
                                 setTimeout(() => {
                                     window.location.href =
-                                        "{{ route('admin.peoples.index') }}";
+                                        "{{ route('admin.people.index') }}";
                                 }, 2000);
                             },
 
@@ -3830,7 +3830,7 @@
                 });
 
                 $.ajax({
-                    url: "/admin/peoples/" + peopleId + "/timeline",
+                    url: "/admin/people/" + peopleId + "/timeline",
                     method: "GET",
                     data: {
                         filter_range: filter_range,
@@ -3869,7 +3869,7 @@
                 uploadBtn.disabled = true;
                 uploadBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-2"></i> Uploading...`;
 
-                fetch(`/admin/peoples/${peopleId}/files/upload`, {
+                fetch(`/admin/people/${peopleId}/files/upload`, {
                         method: "POST",
                         body: formData,
                     })
@@ -3909,7 +3909,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: `/admin/peoples/files/delete`,
+                            url: `/admin/people/files/delete`,
                             type: "POST",
                             data: {
                                 _token: "{{ csrf_token() }}",

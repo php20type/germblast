@@ -8,7 +8,7 @@
             <div class="row">
                 <div class="col-md-12 p-0">
 
-                    <form action="{{ route('admin.companies.iaq.survey.update', [$company->id, $survey->id]) }}"
+                    <form action="{{ route('admin.company.iaq.survey.update', [$company->id, $survey->id]) }}"
                         method="POST" id="iaq-survey-form">
                         @csrf
 

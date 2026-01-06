@@ -37,7 +37,7 @@
                 </a>
             </li>
             <hr>
-            <li class="{{ request()->routeIs('admin.company.*') || request()->routeIs('admin.companies.*') ? 'active' : '' }}">
+            <li class="{{ request()->routeIs('admin.company.*') || request()->routeIs('admin.company.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.company.index') }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon3.svg") }} alt="icon" />
@@ -47,8 +47,8 @@
                     </div>
                 </a>
             </li>
-            <li class=" {{ request()->routeIs('admin.peoples.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.peoples.index') }}">
+            <li class=" {{ request()->routeIs('admin.people.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.people.index') }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon4.svg") }} alt="icon" />
                     </div>
@@ -57,8 +57,8 @@
                     </div>
                 </a>
             </li>
-            <li class="{{ request()->routeIs('admin.leads.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.leads.index') }}">
+            <li class="{{ request()->routeIs('admin.lead.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.lead.index') }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon5.svg") }} alt="icon" />
                     </div>

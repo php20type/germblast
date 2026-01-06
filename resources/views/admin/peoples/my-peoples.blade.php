@@ -70,9 +70,20 @@
                                                             @endforeach
                                                         </select>
                                                     </div>
-                                                    <button class="btn btn-primary me-2" onclick="addFilter()">
+                                                    {{-- <button class="btn btn-primary me-2" onclick="addFilter()">
                                                         <img src="{{ asset('img/icons/filter.svg') }}" alt="" />
+                                                    </button> --}}
+                                                    <button class="btn btn-primary me-2 position-relative"
+                                                        onclick="addFilter()">
+                                                        <img src="{{ asset('img/icons/filter.svg') }}" alt="" />
+
+                                                        <!-- Active Filter Count -->
+                                                        <span id="filterCount"
+                                                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+                                                            0
+                                                        </span>
                                                     </button>
+
                                                     <button class="d-none btn btn-primary"><img
                                                             src="{{ asset('img/icons/bar.svg') }}" alt=""></button>
                                                 </div>
@@ -106,7 +117,7 @@
                                                             </td>
                                                             <td>
                                                                 <div class="person-name">
-                                                                    <a href="{{ route('admin.peoples.show', $people->id) }}"
+                                                                    <a href="{{ route('admin.people.show', $people->id) }}"
                                                                         class="text-decoration-none text-dark">
                                                                         {{ $people->name ?? 'N/A' }}
                                                                     </a>
@@ -188,7 +199,7 @@
                 <div class="modal-body">
 
                     {{-- <form class="company-form" id="add-lead-form"> --}}
-                    <form action="{{ route('admin.leads.store') }}" class="company-form" id="add-lead-form" method="POST">
+                    <form action="{{ route('admin.lead.store') }}" class="company-form" id="add-lead-form" method="POST">
                         @csrf
 
 
@@ -496,6 +507,17 @@
                 $('#AddLead').modal('show');
             }
 
+            function updateFilterCount() {
+                let count = $('#filter-section input[type="checkbox"]:checked').length;
+
+                if (count > 0) {
+                    $('#filterCount').text(count).removeClass('d-none');
+                } else {
+                    $('#filterCount').addClass('d-none');
+                }
+            }
+
+
             const userId = {{ auth()->id() }};
             $(document).ready(function() {
                 function fetchPeoples() {
@@ -550,7 +572,12 @@
                 $('#checkDefault, select[name="user_id"], select[name="company_id"]').on('change',
                     fetchPeoples);
                 // catch all checkbox changes
-                $('#filter-section input[type="checkbox"]').on('change', fetchPeoples);
+                // $('#filter-section input[type="checkbox"]').on('change', fetchPeoples);
+                $('#filter-section input[type="checkbox"]').on('change', function() {
+                    fetchPeoples();
+                    updateFilterCount();
+                });
+
 
 
                 // ==============================
@@ -706,7 +733,7 @@
                     }
 
                     $.ajax({
-                        url: '{{ route('admin.leads.store') }}',
+                        url: '{{ route('admin.lead.store') }}',
                         method: 'POST',
                         data: $(this).serialize(),
 

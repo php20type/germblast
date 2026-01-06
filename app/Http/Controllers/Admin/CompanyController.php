@@ -170,12 +170,27 @@ class CompanyController extends Controller
         ));
     }
 
+    // ======================
+    // This is for approval workflow
+    // ======================
+    // public function store(Request $request)
+    // {
+    //     ApprovalService::request(
+    //         'febev88675@bablace.com',
+    //         'company_create',
+    //         [
+    //             'request_data' => $request->all(),
+    //             'creator_id' => auth()->id(),
+    //         ],
+    //          url()->previous()
+    //     );
+
+    //     return redirect()->back()->with('success', 'Company creation request submitted for approval.');
+    // }
+
     public function store(Request $request, NotificationService $notify)
     {
-        $company = null;
-
-        DB::transaction(function () use ($request, &$company) {
-
+        try {
             // Step 1: Create company
             $company = Company::create([
                 'user_id' => $request->user_id,
@@ -233,31 +248,16 @@ class CompanyController extends Controller
                     'tag_id' => $request->tag_id,
                 ]);
             }
-        });
 
-        // SEND EMAIL NOTIFICATION
-        $notify->companyCreated($company);
+            // SEND EMAIL NOTIFICATION
+            $notify->companyCreated($company);
 
-        return redirect()->back()->with('success', 'Company created successfully!');
+            return redirect()->back()->with('success', 'Company created successfully!');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Something went wrong!');
+        }
     }
-
-    // ======================
-    // This is for approval workflow
-    // ======================
-    // public function store(Request $request)
-    // {
-    //     ApprovalService::request(
-    //         'febev88675@bablace.com',
-    //         'company_create',
-    //         [
-    //             'request_data' => $request->all(),
-    //             'creator_id' => auth()->id(),
-    //         ],
-    //          url()->previous()
-    //     );
-
-    //     return redirect()->back()->with('success', 'Company creation request submitted for approval.');
-    // }
 
     public function ajax_store(Request $request)
     {
@@ -679,7 +679,6 @@ class CompanyController extends Controller
         ));
     }
 
-
     public function addLocation(Request $request, Company $company)
     {
         $validated = $request->validate([
@@ -1011,135 +1010,6 @@ class CompanyController extends Controller
             'status' => 'success',
             'message' => ucfirst(str_replace('_', ' ', $request->type)).' updated successfully',
             'data' => $record,
-        ]);
-    }
-
-    public function addTask(Request $request, $companyId)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'due_date' => 'required|string', // will parse manually
-            'user_id' => 'required|exists:users,id',
-            'description' => 'nullable|string',
-        ]);
-
-        $assignee = User::findOrFail($request->user_id);
-
-        // Convert the due_date from "2025-09-24 6:30 PM" → "2025-09-24 18:30:00"
-        $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
-
-        // Create the task in the unified tasks table
-        $task = Task::create([
-            'owner_type' => 'Company',
-            'owner_id' => $companyId,
-            'title' => $request->title,
-            'description' => $request->description,
-            'created_time' => now(),
-            'due_time' => $dueTime,
-            'assignee_id' => $assignee->id,
-            'assignee_name' => $assignee->name,
-            'subject_type' => 'company',
-            'subject_legacy_id' => $companyId,
-        ]);
-
-        // Return JSON response for AJAX
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Task added successfully',
-            'task' => $task,
-        ]);
-    }
-
-    public function updateTask(Request $request, $taskId)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'due_date' => 'required|string', // will parse manually
-            'user_id' => 'required|exists:users,id',
-            'description' => 'nullable|string',
-        ]);
-
-        // Fetch from unified tasks table
-        $task = Task::findOrFail($taskId);
-        $assignee = User::findOrFail($request->user_id);
-
-        // Convert due date properly
-        $dueTime = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
-
-        // Update fields
-        $task->update([
-            'title' => $request->title,
-            'description' => $request->description,
-            'due_time' => $dueTime,
-            'assignee_id' => $assignee->id,
-            'assignee_name' => $assignee->name,
-        ]);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Task updated successfully',
-            'task' => $task,
-        ]);
-    }
-
-    public function markCompleted($taskId)
-    {
-        // Fetch from unified tasks table
-        $task = Task::findOrFail($taskId);
-
-        // Get the logged-in user
-        $user = auth()->user();
-
-        // Update completion fields
-        $task->update([
-            'completed_time' => now(),
-            'completed_user_id' => $user->id,
-            'completed_user_name' => $user->name,
-        ]);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Task marked as completed successfully!',
-            'task' => $task,
-        ]);
-    }
-
-    public function reopenTask($taskId)
-    {
-        // Fetch the task from the unified tasks table
-        $task = Task::findOrFail($taskId);
-
-        // Reset completion fields
-        $task->update([
-            'completed_time' => null,
-            'completed_user_id' => null,
-            'completed_user_name' => null,
-        ]);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Task reopened successfully',
-            'task' => $task,
-        ]);
-    }
-
-    public function deleteTask($task_id)
-    {
-        // Find the task in the unified tasks table
-        $task = Task::find($task_id);
-
-        if (! $task) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Task not found.',
-            ], 404);
-        }
-
-        $task->delete();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Task deleted successfully.',
         ]);
     }
 

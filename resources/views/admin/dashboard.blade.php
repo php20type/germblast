@@ -105,7 +105,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('admin.companies.store') }}" method="POST" class="company-form"
+                    <form action="{{ route('admin.company.store') }}" method="POST" class="company-form"
                         id="add-company-form">
                         @csrf
                         <div class="row mx-0">
@@ -376,7 +376,7 @@
                 <div class="modal-body">
 
                     {{-- <form class="company-form" id="add-lead-form"> --}}
-                    <form action="{{ route('admin.leads.store') }}" class="company-form" id="add-lead-form"
+                    <form action="{{ route('admin.lead.store') }}" class="company-form" id="add-lead-form"
                         method="POST">
                         @csrf
 
@@ -1100,7 +1100,7 @@
                 }
 
                 $.ajax({
-                    url: '{{ route('admin.leads.store') }}',
+                    url: '{{ route('admin.lead.store') }}',
                     method: 'POST',
                     data: $(this).serialize(),
 
@@ -1110,7 +1110,7 @@
 
                         // 1.5 seconds delay
                         setTimeout(function() {
-                            window.location.href = "{{ route('admin.leads.index') }}";
+                            window.location.href = "{{ route('admin.lead.index') }}";
                         }, 1500);
                     },
                     error: function(xhr) {
@@ -1230,7 +1230,7 @@
                 }
 
                 $.ajax({
-                    url: '{{ route('admin.companies.store') }}',
+                    url: '{{ route('admin.company.store') }}',
                     method: 'POST',
                     data: $(this).serialize(),
 
@@ -1361,7 +1361,7 @@
                         // 1.5 seconds delay
                         setTimeout(function() {
                             window.location.href =
-                                "{{ route('admin.peoples.index') }}";
+                                "{{ route('admin.people.index') }}";
                         }, 1500);
                     },
                     error: function(xhr) {

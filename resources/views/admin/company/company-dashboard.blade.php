@@ -106,7 +106,7 @@
                                 <div class="section-card">
                                     <div class="section-header d-flex justify-content-between">
                                         <h3 class="section-title">Biological Response Intake</h3>
-                                        <a href="{{ route('admin.companies.biological.response', $company->id) }}"
+                                        <a href="{{ route('admin.company.biological.response', $company->id) }}"
                                             class="btn btn-sm btn-success">Add Intake</a>
                                     </div>
 
@@ -123,7 +123,7 @@
                                             @forelse ($biologicalResponseIntakes as $intake)
                                                 <tr>
                                                     <td><a
-                                                            href="{{ route('admin.companies.biological.response.edit', [$company->id, $intake->id]) }}">
+                                                            href="{{ route('admin.company.biological.response.edit', [$company->id, $intake->id]) }}">
                                                             {{ $intake->project_name }}
                                                         </a></td>
                                                     <td>{{ $intake->project_leader }}</td>
@@ -150,7 +150,7 @@
                                     <div class="section-header d-flex justify-content-between">
                                         <h3 class="section-title">Biological Readiness Intake</h3>
                                         {{-- <button class="btn btn-sm btn-success">Add Intake</button> --}}
-                                        <a href="{{ route('admin.companies.biological.readiness', $company->id) }}"
+                                        <a href="{{ route('admin.company.biological.readiness', $company->id) }}"
                                             class="btn btn-sm btn-success">Add Intake</a>
                                     </div>
 
@@ -169,7 +169,7 @@
                                                 <tr>
                                                     <td>
                                                         <a
-                                                            href="{{ route('admin.companies.biological.readiness.edit', [$company->id, $readiness->id]) }}">{{ $readiness->project_name }}</a>
+                                                            href="{{ route('admin.company.biological.readiness.edit', [$company->id, $readiness->id]) }}">{{ $readiness->project_name }}</a>
                                                     </td>
                                                     <td>
                                                         {{ $readiness->status }}
@@ -201,7 +201,7 @@
                                     <div class="section-header d-flex justify-content-between">
                                         <h3 class="section-title">Indoor Air Quality</h3>
                                         {{-- <button class="btn btn-sm btn-success">Create IAQ Survey</button> --}}
-                                        <a href="{{ route('admin.companies.iaq.survey', $company->id) }}"
+                                        <a href="{{ route('admin.company.iaq.survey', $company->id) }}"
                                             class="btn btn-sm btn-success">Create IAQ Survey</a>
                                     </div>
 
@@ -221,7 +221,7 @@
                                                     <td>
                                                         {{-- {{ $survey->survey_name ?? '-' }} --}}
                                                         <a
-                                                            href="{{ route('admin.companies.iaq.survey.edit', [$company->id, $survey->id]) }}">{{ $survey->survey_name ?? '-' }}</a>
+                                                            href="{{ route('admin.company.iaq.survey.edit', [$company->id, $survey->id]) }}">{{ $survey->survey_name ?? '-' }}</a>
                                                     </td>
 
                                                     <td>
@@ -261,7 +261,7 @@
                                     <div class="section-header d-flex justify-content-between">
                                         <h3 class="section-title">Water Management</h3>
                                         {{-- <button class="btn btn-sm btn-success">Create H2O Survey</button> --}}
-                                        <a href="{{ route('admin.companies.water.management', $company->id) }}"
+                                        <a href="{{ route('admin.company.water.management', $company->id) }}"
                                             class="btn btn-sm btn-success">Create H2O Survey</a>
                                     </div>
 
@@ -280,7 +280,7 @@
                                                     <td>
                                                         {{-- {{ $water->survey_name ?? '-' }} --}}
                                                         <a
-                                                            href="{{ route('admin.companies.water.management.edit', [$company->id, $water->id]) }}">
+                                                            href="{{ route('admin.company.water.management.edit', [$company->id, $water->id]) }}">
                                                         {{ $water->survey_name ?? '-' }}
                                                         </a>
                                                     </td>
@@ -361,7 +361,7 @@
 
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('admin.companies.iaq-zones.store', $company->id) }}" method="POST"
+                    <form action="{{ route('admin.company.iaq-zones.store', $company->id) }}" method="POST"
                         class="company-form" id="add-iaq-zone">
                         @csrf
 
@@ -425,7 +425,7 @@
 
                 {{-- BODY --}}
                 <div class="modal-body">
-                    <form action="{{ route('admin.companies.iaq-devices.store', $company->id) }}" method="POST"
+                    <form action="{{ route('admin.company.iaq-devices.store', $company->id) }}" method="POST"
                         class="company-form" id="add-iaq-device">
                         @csrf
 
@@ -614,7 +614,7 @@
 
         function editZone(zoneId) {
             $.get(
-                "{{ route('admin.companies.iaq-zones.edit', [$company->id, 'ZONE_ID']) }}"
+                "{{ route('admin.company.iaq-zones.edit', [$company->id, 'ZONE_ID']) }}"
                 .replace('ZONE_ID', zoneId),
                 function(res) {
 
@@ -625,7 +625,7 @@
 
                     $('#edit-iaq-zone-form')
                         .attr('action',
-                            "{{ route('admin.companies.iaq-zones.update', [$company->id, 'ZONE_ID']) }}"
+                            "{{ route('admin.company.iaq-zones.update', [$company->id, 'ZONE_ID']) }}"
                             .replace('ZONE_ID', zoneId)
                         );
 
@@ -636,7 +636,7 @@
 
         function editDevice(deviceId) {
             $.get(
-                "{{ route('admin.companies.iaq-devices.edit', [$company->id, 'DEVICE_ID']) }}"
+                "{{ route('admin.company.iaq-devices.edit', [$company->id, 'DEVICE_ID']) }}"
                 .replace('DEVICE_ID', deviceId),
                 function(res) {
 
@@ -648,7 +648,7 @@
 
                     $('#edit-iaq-device-form')
                         .attr('action',
-                            "{{ route('admin.companies.iaq-devices.update', [$company->id, 'DEVICE_ID']) }}"
+                            "{{ route('admin.company.iaq-devices.update', [$company->id, 'DEVICE_ID']) }}"
                             .replace('DEVICE_ID', deviceId)
                         );
 

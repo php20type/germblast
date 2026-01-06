@@ -280,7 +280,7 @@
                                                 <div class="col-md-4 d-flex justify-content-end">
                                                     <div class="d-flex gap-2">
                                                         <a class="text-warning"
-                                                            href="{{ route('admin.leads.survey.proposal', $leads->id) }}"
+                                                            href="{{ route('admin.lead.survey.proposal', $leads->id) }}"
                                                             target="_blank" id="toggleAddProposal">Add Proposal</a>
                                                     </div>
                                                 </div>
@@ -457,7 +457,7 @@
 
                                                     <div class="col-md-4 d-flex justify-content-end">
                                                         <a class="text-warning fw-semibold"
-                                                            href="{{ route('admin.leads.survey.proposal', $leads->id) }}"
+                                                            href="{{ route('admin.lead.survey.proposal', $leads->id) }}"
                                                             target="_blank">
                                                             Add Proposal
                                                         </a>
@@ -584,7 +584,7 @@
                         {{-- Task form --}}
                         <div id="addTaskForm" class="my-3" style="display: none;">
 
-                            <form id="addTaskAjaxForm" action="{{ route('admin.leads.tasks.store', $leads->id) }}"
+                            <form id="addTaskAjaxForm" action="{{ route('admin.lead.tasks.store', $leads->id) }}"
                                 method="POST">
                                 @csrf
                                 <div class="row">
@@ -1395,7 +1395,7 @@
                                                             <p>{{ $leadCompany->description ?? 'N/A' }}</p>
                                                             <p>{{ $leadCompany->companyAddress->address ?? 'N/A' }}</p>
                                                             {{-- Go to Company Dashboard --}}
-                                                            <a href="{{ route('admin.companies.dashboard', $leadCompany->id) }}" target="_blank"
+                                                            <a href="{{ route('admin.company.dashboard', $leadCompany->id) }}" target="_blank"
                                                                 class="text-warning">
                                                                 Go to Dashboard
                                                             </a>
@@ -1922,7 +1922,7 @@
 
 
                         <form id="add_forecasting" class="company-form"
-                            action="{{ route('admin.leads.forecasting.store') }}" method="POST"
+                            action="{{ route('admin.lead.forecasting.store') }}" method="POST"
                             data-owner-id="{{ $leads->id }}">
                             @csrf
 
@@ -2269,7 +2269,7 @@
                             confirmButtonText: 'Yes, update'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                $.post(`/admin/leads/${leadId}/update-detail`, {
+                                $.post(`/admin/lead/${leadId}/update-detail`, {
                                         _token: '{{ csrf_token() }}',
                                         field: fieldName,
                                         value: newValue
@@ -2321,7 +2321,7 @@
                         }).then(function(result) {
                             if (result.isConfirmed) {
                                 $.ajax({
-                                    url: '/admin/leads/check-stage-condition/' + leadId,
+                                    url: '/admin/lead/check-stage-condition/' + leadId,
                                     method: 'POST',
                                     data: {
                                         _token: "{{ csrf_token() }}",
@@ -2331,7 +2331,7 @@
                                         if (response.allowed) {
                                             // Stage change allowed
                                             $.ajax({
-                                                url: '/admin/leads/change-stage/' +
+                                                url: '/admin/lead/change-stage/' +
                                                     leadId,
                                                 method: 'POST',
                                                 data: {
@@ -2387,7 +2387,7 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 $.ajax({
-                                    url: "/admin/leads/{{ $leads->id }}/tags/add", // new route for tags
+                                    url: "/admin/lead/{{ $leads->id }}/tags/add", // new route for tags
                                     method: "POST",
                                     data: {
                                         _token: "{{ csrf_token() }}",
@@ -2437,7 +2437,7 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 $.ajax({
-                                    url: "/admin/leads/{{ $leads->id }}/tags/" + tagId +
+                                    url: "/admin/lead/{{ $leads->id }}/tags/" + tagId +
                                         "/remove",
                                     method: "POST",
                                     data: {
@@ -2486,7 +2486,7 @@
                             form.reset();
 
                             // Reset form action back to store route
-                            form.setAttribute('action', "{{ route('admin.leads.tasks.store', $leads->id) }}");
+                            form.setAttribute('action', "{{ route('admin.lead.tasks.store', $leads->id) }}");
 
                             // Reset button text and style
                             const submitBtn = form.querySelector('button[type="submit"]');
@@ -2701,7 +2701,7 @@
                         }).then(function(result) {
                             if (result.isConfirmed) {
                                 $.ajax({
-                                    url: '/admin/leads/tasks/' + taskId + '/complete',
+                                    url: '/admin/lead/tasks/' + taskId + '/complete',
                                     method: 'POST',
                                     data: {
                                         _token: '{{ csrf_token() }}'
@@ -2750,7 +2750,7 @@
                         }).then(function(result) {
                             if (result.isConfirmed) {
                                 $.ajax({
-                                    url: '/admin/leads/tasks/' + taskId + '/reopen',
+                                    url: '/admin/lead/tasks/' + taskId + '/reopen',
                                     method: 'POST',
                                     data: {
                                         _token: '{{ csrf_token() }}'
@@ -2797,7 +2797,7 @@
                         }).then(function(result) {
                             if (result.isConfirmed) {
                                 $.ajax({
-                                    url: "/admin/leads/tasks/delete/" + taskId,
+                                    url: "/admin/lead/tasks/delete/" + taskId,
                                     method: "POST",
                                     data: {
                                         _token: "{{ csrf_token() }}"
@@ -2848,7 +2848,7 @@
                         $('#addTaskForm textarea[name="description"]').val(description);
                         $('#addTaskAjaxForm').attr('method', 'PUT');
                         // Change form action for update (FIX: point to update route)
-                        $('#addTaskAjaxForm').attr('action', '/admin/leads/tasks/' + taskId + '/update');
+                        $('#addTaskAjaxForm').attr('action', '/admin/lead/tasks/' + taskId + '/update');
                         // Optional: Change button text to "Update Task"
                         $('#addTaskAjaxForm button[type="submit"]').text('Update Task');
 
@@ -2887,7 +2887,7 @@
                     // Updating lead and flags status
                     // ==============================
                     // function updateLead(data, onSuccess) {
-                    //     fetch("{{ route('admin.leads.ajax_update') }}", {
+                    //     fetch("{{ route('admin.lead.ajax_update') }}", {
                     //             method: "POST",
                     //             headers: {
                     //                 "Content-Type": "application/json",
@@ -2906,7 +2906,7 @@
                     //         .catch(err => console.error(err));
                     // }
                     function updateLead(data, onSuccess) {
-                        fetch("{{ route('admin.leads.ajax_update') }}", {
+                        fetch("{{ route('admin.lead.ajax_update') }}", {
                                 method: "POST",
                                 headers: {
                                     "Content-Type": "application/json",
@@ -3274,7 +3274,7 @@
                             if (result.isConfirmed) {
                                 // Proceed with update via AJAX
                                 $.ajax({
-                                    url: "{{ route('admin.leads.update-field') }}",
+                                    url: "{{ route('admin.lead.update-field') }}",
                                     type: "POST",
                                     data: {
                                         _token: "{{ csrf_token() }}",
@@ -3335,7 +3335,7 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 $.ajax({
-                                    url: "{{ route('admin.leads.add-product') }}",
+                                    url: "{{ route('admin.lead.add-product') }}",
                                     method: "POST",
                                     data: {
                                         _token: "{{ csrf_token() }}",
@@ -3400,7 +3400,7 @@
                     //     }).then((result) => {
                     //         if (result.isConfirmed) {
                     //             $.ajax({
-                    //                 url: "{{ route('admin.leads.delete-field') }}",
+                    //                 url: "{{ route('admin.lead.delete-field') }}",
                     //                 type: "POST",
                     //                 data: {
                     //                     _token: "{{ csrf_token() }}",
@@ -3459,7 +3459,7 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 $.ajax({
-                                    url: "{{ route('admin.leads.delete-field') }}",
+                                    url: "{{ route('admin.lead.delete-field') }}",
                                     type: "POST",
                                     data: {
                                         _token: "{{ csrf_token() }}",
@@ -4345,7 +4345,7 @@
                         });
 
                         $.ajax({
-                            url: "/admin/leads/" + leadId + "/timeline",
+                            url: "/admin/lead/" + leadId + "/timeline",
                             method: "GET",
                             data: {
                                 filter_range: filter_range,
@@ -4384,7 +4384,7 @@
                         uploadBtn.disabled = true;
                         uploadBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-2"></i> Uploading...`;
 
-                        fetch(`/admin/leads/${leadId}/files/upload`, {
+                        fetch(`/admin/lead/${leadId}/files/upload`, {
                                 method: "POST",
                                 body: formData,
                             })
@@ -4424,7 +4424,7 @@
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 $.ajax({
-                                    url: `/admin/leads/files/delete`,
+                                    url: `/admin/lead/files/delete`,
                                     type: "POST",
                                     data: {
                                         _token: "{{ csrf_token() }}",
