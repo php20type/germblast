@@ -1010,7 +1010,7 @@ class SurveyProposalController extends Controller
             ->whereIn('id', $selectedIds)
             ->get();
 
-        $pdf = Pdf::loadView('survey-proposal.pdf', compact('survey', 'pricingDetails'));
+        $pdf = Pdf::loadView('survey-proposal.final-pdf', compact('survey', 'pricingDetails'));
 
         return $pdf->download("survey_proposal_{$survey->id}.pdf");
     }

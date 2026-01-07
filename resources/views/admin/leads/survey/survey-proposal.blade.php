@@ -202,7 +202,7 @@
                                                             <tr>
                                                                 {{-- <td>{{ $facility->facility_name }}</td> --}}
                                                                 <td>
-                                                                    <a href="{{ route('admin.survey.facility.edit', $facility->id) }}"
+                                                                    <a href="{{ route('admin.survey.proposal.facility.edit', $facility->id) }}"
                                                                         target="_blank">
                                                                         {{ $facility->facility_name }}
                                                                     </a>
@@ -284,7 +284,7 @@
                                                             <tr>
                                                                 {{-- <td>{{ $evaluation->name ?? 'Evaluation' }}</td> --}}
                                                                 <td>
-                                                                    <a href="{{ route('admin.survey.equipment.edit', $evaluation->id) }}"
+                                                                    <a href="{{ route('admin.survey.proposal.equipment.edit', $evaluation->id) }}"
                                                                         target="_blank">
                                                                         {{ $evaluation->name }}
                                                                     </a>

@@ -5,6 +5,15 @@
     <meta charset="utf-8">
 
     <style>
+        @page {
+            size: 612pt 792pt;
+            margin: 0;
+        }
+
+        @page {
+            size: A4;
+        }
+
         body {
             margin: 0;
             padding: 0;
@@ -14,20 +23,14 @@
         }
 
         .page {
-            width: 794px;
-            min-height: 1123px;
-            margin: 40px auto;
-            background: #fff;
             position: relative;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, .15);
-            overflow: hidden;
+            page-break-after: always;
         }
-
 
         /* FOOTER */
         .footer {
             position: absolute;
-            bottom: 40px;
+            bottom: 26pt;
             left: 0;
             width: 100%;
             text-align: center;
@@ -35,13 +38,13 @@
             color: #777;
         }
 
-
         /* CONTENT BLOCK */
         .content {
-            position: relative;
-            padding: 40px 60px 60px 60px;
+            position: absolute;
+            left: 60pt;
+            right: 60pt;
+            top: 160pt;
         }
-
 
         /* HEADINGS */
         .h1 {
@@ -56,22 +59,17 @@
             margin-bottom: 14pt;
         }
 
+        h4 {
+            font-size: 10pt;
+            line-height: 1.2;
+            margin: 0 0 10pt 0;
+        }
+
         p {
             font-size: 10pt;
-            line-height: 1.4;
+            line-height: 1.2;
+            margin: 0 0 8pt 0;
         }
-
-        h4 {
-            font-size: 11pt;
-            margin-top: 14px;
-        }
-
-
-        .page-bg img {
-            width: 100%;
-            display: block;
-        }
-
 
         /* TABLE */
         .table {
@@ -90,15 +88,6 @@
         .table th {
             background: #eee;
         }
-
-        .page::before {
-            content: "Preview Page";
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            font-size: 10px;
-            color: #aaa;
-        }
     </style>
 </head>
 
@@ -108,9 +97,8 @@
     <div class="page">
 
         <!-- FULL COVER ART -->
-        <div class="page-bg">
-            <img src="{{ asset('img/survey-proposal/page1_img1.png') }}">
-        </div>
+        <img src="{{ public_path('img/survey-proposal/page1_img1.png') }}"
+            style="position:absolute; top:0; left:0; width:612pt; height:792pt;">
 
         <div class="footer">
             © 2025 GermBlast. All Rights Reserved.
@@ -121,9 +109,8 @@
     <div class="page">
 
         <!-- HEADER STRIP -->
-        <div class="page-bg">
-            <img src="{{ asset('img/survey-proposal/page2_img1.png') }}">
-        </div>
+        <img src="{{ public_path('img/survey-proposal/page2_img1.png') }}"
+            style="position:absolute; top:0; left:0; width:612pt;">
 
         <div class="content">
             <p>
@@ -199,16 +186,15 @@
     <!-- ================= PAGE 3 ================= -->
     <div class="page">
 
-        <div class="page-bg">
-            <img src="{{ asset('img/survey-proposal/page3_img1.png') }}">
-        </div>
+        <img src="{{ public_path('img/survey-proposal/page3_img1.png') }}"
+            style="position:absolute; top:0; left:0; width:612pt;">
 
         <div class="content">
             <h4>The GermBlast Pillars</h4>
 
             <div style="text-align: center; margin:0px auto;">
-                <img src="{{ asset('img/survey-proposal/page3_img2.png') }}"
-                    style="display:block; width:306pt; margin:18pt auto 20pt auto;">
+                <img src="{{ public_path('img/survey-proposal/page3_img2.png') }}"
+                style="display:block; width:306pt; margin:18pt auto 20pt auto;">
             </div>
 
             <h4>GermBlast Service</h4>
@@ -263,9 +249,8 @@
     <!-- ================= PAGE 4 ================= -->
     <div class="page">
 
-        <div class="page-bg">
-            <img src="{{ asset('img/survey-proposal/page4_img1.png') }}">
-        </div>
+        <img src="{{ public_path('img/survey-proposal/page4_img1.png') }}"
+            style="position:absolute; top:0; left:0; width:612pt;">
 
         <div class="content">
 
@@ -349,10 +334,8 @@
 
     <!-- ================= PAGE 5 ================= -->
     <div class="page">
-
-        <div class="page-bg">
-            <img src="{{ asset('img/survey-proposal/page5_img1.png') }}">
-        </div>
+        <img src="{{ public_path('img/survey-proposal/page5_img1.png') }}"
+            style="position:absolute; top:0; left:0; width:612pt;">
 
         <div class="content">
 
@@ -480,9 +463,8 @@
     <!-- ================= PAGE 4 ================= -->
     <div class="page">
 
-        <div class="page-bg">
-            <img src="{{ asset('img/survey-proposal/page4_img1.png') }}">
-        </div>
+        <img src="{{ public_path('img/survey-proposal/page4_img1.png') }}"
+            style="position:absolute; top:0; left:0; width:612pt;">
 
         <div class="content">
 
@@ -563,12 +545,11 @@
 
     </div>
 
-    <!-- ================= PAGE 6 ================= -->
+        <!-- ================= PAGE 6 ================= -->
     <div class="page">
 
-        <div class="page-bg">
-            <img src="{{ asset('img/survey-proposal/page4_img1.png') }}">
-        </div>
+        <img src="{{ public_path('img/survey-proposal/page4_img1.png') }}"
+            style="position:absolute; top:0; left:0; width:612pt;">
 
         <div class="content">
 
@@ -650,9 +631,8 @@
     <!-- ================= PAGE 7 ================= -->
     <div class="page">
 
-        <div class="page-bg">
-            <img src="{{ asset('img/survey-proposal/page4_img1.png') }}">
-        </div>
+        <img src="{{ public_path('img/survey-proposal/page4_img1.png') }}"
+            style="position:absolute; top:0; left:0; width:612pt;">
 
         <div class="content">
 
@@ -761,9 +741,8 @@
     <!-- ================= PAGE 8 ================= -->
     <div class="page">
 
-        <div class="page-bg">
-            <img src="{{ asset('img/survey-proposal/page4_img1.png') }}">
-        </div>
+        <img src="{{ public_path('img/survey-proposal/page4_img1.png') }}"
+            style="position:absolute; top:0; left:0; width:612pt;">
 
         <div class="content">
 
@@ -845,9 +824,8 @@
     <!-- ================= PAGE 9 ================= -->
     <div class="page">
 
-        <div class="page-bg">
-            <img src="{{ asset('img/survey-proposal/page4_img1.png') }}">
-        </div>
+        <img src="{{ public_path('img/survey-proposal/page4_img1.png') }}"
+            style="position:absolute; top:0; left:0; width:612pt;">
 
         <div class="content" style="font-size:11pt;">
 
@@ -938,9 +916,8 @@
     <!-- ================= PAGE 10 ================= -->
     <div class="page">
 
-        <div class="page-bg">
-            <img src="{{ asset('img/survey-proposal/page4_img1.png') }}">
-        </div>
+        <img src="{{ public_path('img/survey-proposal/page4_img1.png') }}"
+            style="position:absolute; top:0; left:0; width:612pt;">
 
         <div class="content" style="font-size:11pt;">
 

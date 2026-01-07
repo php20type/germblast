@@ -236,12 +236,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
         Route::get('{survey_proposal}/facility', [SurveyProposalController::class, 'survey_facility'])->name('facility');
         Route::post('{survey_proposal}/facility/store', [SurveyProposalController::class, 'survey_facility_store'])->name('facility.store');
-        Route::get('facility/{facility}/edit', [SurveyProposalController::class, 'survey_facility_edit'])->name('survey.facility.edit');
+        Route::get('facility/{facility}/edit', [SurveyProposalController::class, 'survey_facility_edit'])->name('facility.edit');
         Route::post('{facility}/facility/update', [SurveyProposalController::class, 'survey_facility_update'])->name('facility.update');
 
         Route::get('{survey_proposal}/equipment', [SurveyProposalController::class, 'survey_equipment'])->name('equipment');
         Route::post('{survey_proposal}/equipment/store', [SurveyProposalController::class, 'survey_equipment_store'])->name('equipment.store');
-        Route::get('equipment/{equipment}/edit', [SurveyProposalController::class, 'survey_equipment_edit'])->name('survey.equipment.edit');
+        Route::get('equipment/{equipment}/edit', [SurveyProposalController::class, 'survey_equipment_edit'])->name('equipment.edit');
         Route::post('{equipment}/equipment/update', [SurveyProposalController::class, 'survey_equipment_update'])->name('equipment.update');
 
         Route::get('{survey_proposal}/pricing', [SurveyProposalController::class, 'pricing_proposal'])->name('pricing.proposal');
