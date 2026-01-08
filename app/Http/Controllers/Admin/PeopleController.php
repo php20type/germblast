@@ -977,7 +977,7 @@ class PeopleController extends Controller
         return response()->json(['success' => true, 'field' => $request->field, 'value' => $request->value]);
     }
 
-   
+
     public function fileUpload(Request $request, People $people)
     {
         $request->validate([
