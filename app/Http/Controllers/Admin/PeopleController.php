@@ -20,13 +20,10 @@ use App\Models\PeopleUrl;
 use App\Models\Product;
 use App\Models\Source;
 use App\Models\Tag;
-use App\Models\Task;
 use App\Models\Territory;
 use App\Models\Timeline;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -289,23 +286,6 @@ class PeopleController extends Controller
             return $note;
         });
 
-        // // Separate logged and scheduled activities
-        // $logged_activities = $activities->filter(function ($activity) {
-        //     return $activity->status === 'Logged';
-        // });
-
-        // $scheduled_activities = $activities->filter(function ($activity) {
-        //     return $activity->status === 'Scheduled';
-        // });
-
-        // $timelineEntries = Helper::getTimelineForEntity('people', $peoples->id);
-        // $timelineEntries->transform(function ($item) {
-        //     $item->type = 'timeline';
-        //     $item->timestamp = $item->created_at;
-
-        //     return $item;
-        // });
-
         $filters = [
             'filter_range' => $request->input('filter_range', 'all'),
             'activity_type_id' => $request->input('activity_type_id', 'all'),
@@ -374,13 +354,6 @@ class PeopleController extends Controller
 
         }
 
-        // $timeline = $logged_activities
-        //     ->concat($notes)
-        //     ->concat($timelineEntries)
-        //     ->concat($milestones)
-        //     ->sortByDesc('timestamp')
-        //     ->values(); // reindex after sorting
-
         $timeline = $logged_activities
             ->concat($notes)
             ->concat($timelineEntries)
@@ -388,7 +361,7 @@ class PeopleController extends Controller
             ->sortByDesc('timestamp')
             ->values(); // reindex after sorting
 
-        // 👉 ADD THIS SECTION — Handle AJAX requests
+        // ADD THIS SECTION — Handle AJAX requests
         if ($request->ajax()) {
             $timeline_html = view('admin.peoples.partials.people-timeline', compact('timeline'))->render();
 
@@ -437,7 +410,7 @@ class PeopleController extends Controller
         $products = Product::all();
         $companies = Company::all();
 
-        $assignedCompanyIds = $peoples->companiesAlt->pluck('id'); // already linked company IDs
+        $assignedCompanyIds = $peoples->companiesAlt->pluck('id');
         $availableCompanies = Company::whereNotIn('id', $assignedCompanyIds)->get();
 
         // Fetch all leads with their relations
@@ -458,13 +431,13 @@ class PeopleController extends Controller
 
         $emails = [];
 
-        $emailRecord = $peoples->peopleEmail; // hasOne → single record
+        $emailRecord = $peoples->peopleEmail;
         if ($emailRecord) {
             foreach ($emailTypes as $field => $label) {
                 if (! empty($emailRecord->$field)) {
                     $emails[] = [
                         'id' => $emailRecord->id,
-                        'selected' => $field,   // which option should be selected
+                        'selected' => $field,
                         'value' => $emailRecord->$field,
                     ];
                 }
@@ -482,13 +455,13 @@ class PeopleController extends Controller
 
         $addresses = [];
 
-        $addressRecord = $peoples->peopleAddress; // hasOne → single record
+        $addressRecord = $peoples->peopleAddress;
         if ($addressRecord) {
             foreach ($addressTypes as $field => $label) {
                 if (! empty($addressRecord->$field)) {
                     $addresses[] = [
                         'id' => $addressRecord->id,
-                        'selected' => $field,   // which option should be selected
+                        'selected' => $field,
                         'value' => $addressRecord->$field,
                     ];
                 }
@@ -505,13 +478,13 @@ class PeopleController extends Controller
 
         $phones = [];
 
-        $phoneRecord = $peoples->peoplePhone; // hasOne → single record
+        $phoneRecord = $peoples->peoplePhone;
         if ($phoneRecord) {
             foreach ($phoneTypes as $field => $label) {
                 if (! empty($phoneRecord->$field)) {
                     $phones[] = [
                         'id' => $phoneRecord->id,
-                        'selected' => $field,   // which option should be selected
+                        'selected' => $field,
                         'value' => $phoneRecord->$field,
                     ];
                 }
@@ -526,13 +499,13 @@ class PeopleController extends Controller
 
         $urls = [];
 
-        $urlRecord = $peoples->peopleUrl; // hasOne → single record
+        $urlRecord = $peoples->peopleUrl;
         if ($urlRecord) {
             foreach ($urlTypes as $field => $label) {
                 if (! empty($urlRecord->$field)) {
                     $urls[] = [
                         'id' => $urlRecord->id,
-                        'selected' => $field, // which option should be selected
+                        'selected' => $field,
                         'value' => $urlRecord->$field,
                     ];
                 }
@@ -713,60 +686,51 @@ class PeopleController extends Controller
 
     public function updatePeopleField(Request $request)
     {
-        // Define config for each category
-        $config = [
-            'email' => [
-                'model' => PeopleEmail::class,
-                'valid_types' => ['email', 'personal_email', 'support_email'],
-                'validation' => 'email',
-            ],
-            'address' => [
-                'model' => PeopleAddress::class,
-                'valid_types' => ['address', 'main_address', 'work_address', 'home_address', 'billing_address', 'mailing_address'],
-                'validation' => 'string',
-            ],
-            'phone' => [
-                'model' => PeoplePhone::class,
-                'valid_types' => ['phone', 'home_phones', 'mobile_phones', 'work_phones', 'fax_phones'],
-                'validation' => 'string',
-            ],
-            'url' => [
-                'model' => PeopleUrl::class,
-                'valid_types' => ['url', 'blog_url', 'twitter_url'],
-                'validation' => 'url',
-            ],
-        ];
-
         $request->validate([
             'people_id' => 'required|exists:people,id',
-            'category' => 'required|in:'.implode(',', array_keys($config)),
+            'category' => 'required|in:email,address,phone,url',
             'type' => 'required|string',
             'value' => 'required',
         ]);
 
-        $category = $request->category;
+        switch ($request->category) {
+            case 'email':
+                $request->validate([
+                    'type' => 'in:email,personal_email,support_email',
+                    'value' => 'email',
+                ]);
 
-        if (! in_array($request->type, $config[$category]['valid_types'])) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Invalid type for category '.$category,
-            ], 422);
+                $record = PeopleEmail::firstOrNew(['people_id' => $request->people_id]);
+                break;
+
+            case 'address':
+                $request->validate([
+                    'type' => 'in:address,main_address,work_address,home_address,billing_address,mailing_address',
+                    'value' => 'string',
+                ]);
+
+                $record = PeopleAddress::firstOrNew(['people_id' => $request->people_id]);
+                break;
+
+            case 'phone':
+                $request->validate([
+                    'type' => 'in:phone,home_phones,mobile_phones,work_phones,fax_phones',
+                    'value' => 'string',
+                ]);
+
+                $record = PeoplePhone::firstOrNew(['people_id' => $request->people_id]);
+                break;
+
+            case 'url':
+                $request->validate([
+                    'type' => 'in:url,blog_url,twitter_url',
+                    'value' => 'url',
+                ]);
+
+                $record = PeopleUrl::firstOrNew(['people_id' => $request->people_id]);
+                break;
         }
 
-        // Validate value based on category-specific validation
-        $validator = \Validator::make($request->all(), [
-            'value' => $config[$category]['validation'],
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $validator->errors()->first('value'),
-            ], 422);
-        }
-
-        $modelClass = $config[$category]['model'];
-        $record = $modelClass::firstOrNew(['people_id' => $request->people_id]);
         $record->{$request->type} = $request->value;
         $record->save();
 
@@ -796,9 +760,8 @@ class PeopleController extends Controller
 
     public function store(Request $request)
     {
-        DB::transaction(function () use ($request) {
-
-            // Step 1: Create People record
+        try {
+            // Step 1: Create people
             $people = People::create([
                 'user_id' => $request->user_id,
                 'name' => $request->name,
@@ -806,7 +769,7 @@ class PeopleController extends Controller
                 'territory_id' => $request->territory_id,
             ]);
 
-            // Step 2: Store Emails
+            // Step 2: Store emails
             if ($request->email) {
                 PeopleEmail::create([
                     'people_id' => $people->id,
@@ -814,7 +777,7 @@ class PeopleController extends Controller
                 ]);
             }
 
-            // Step 3: Store Phones
+            // Step 3: Store phones
             if ($request->phone) {
                 PeoplePhone::create([
                     'people_id' => $people->id,
@@ -822,7 +785,7 @@ class PeopleController extends Controller
                 ]);
             }
 
-            // Step 4: Store Addresses
+            // Step 4: Store addresses
             if ($request->address) {
                 PeopleAddress::create([
                     'people_id' => $people->id,
@@ -838,7 +801,7 @@ class PeopleController extends Controller
                 ]);
             }
 
-            // Step 6: Store Pivot (People Company)
+            // Step 6: Store company
             if ($request->company_id) {
                 PeopleCompany::create([
                     'people_id' => $people->id,
@@ -846,7 +809,7 @@ class PeopleController extends Controller
                 ]);
             }
 
-            // Step 7: Store Tags
+            // Step 7: Store tags
             if ($request->tag_id) {
                 PeopleTag::create([
                     'people_id' => $people->id,
@@ -854,85 +817,81 @@ class PeopleController extends Controller
                 ]);
             }
 
-        });
+            return redirect()
+                ->back()
+                ->with('success', 'Person created successfully!');
 
-        return redirect()->back()->with('success', 'Person created successfully!');
-    }
-
-    public function ajax_store(Request $request)
-    {
-        // Validate input
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'nullable|email',
-            'phone' => 'nullable|string|max:20',
-            'code' => 'nullable|string|max:50',
-        ]);
-
-        // Step 1: Create Person
-        $people = People::create([
-            'name' => $validated['name'],
-            'phone' => $validated['phone'] ?? null,
-            'postalCode' => $validated['code'] ?? null,
-            'user_id' => auth()->id(),
-        ]);
-
-        // Step 2: Store Email in people_emails table
-        if (! empty($validated['email'])) {
-            DB::table('people_emails')->insert([
-                'people_id' => $people->id,
-                'email' => $validated['email'],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+        } catch (\Exception $e) {
+            return redirect()
+                ->back()
+                ->with('error', 'Something went wrong!');
         }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Person added successfully!',
-            'people' => $people,
-        ]);
     }
 
     public function deleteField(Request $request)
     {
         $request->validate([
             'people_id' => 'required|exists:people,id',
+            'category' => 'required|in:email,address,phone,url',
             'type' => 'required|string',
-            'field_name' => 'required|string', // email, address, phone, url
         ]);
 
-        // Map field_name to model and allowed types
-        $models = [
-            'email' => [PeopleEmail::class, ['email', 'personal_email', 'support_email']],
-            'address' => [PeopleAddress::class, ['address', 'main_address', 'work_address', 'home_address', 'billing_address', 'mailing_address']],
-            'phone' => [PeoplePhone::class, ['phone', 'home_phones', 'mobile_phones', 'work_phones', 'fax_phones']],
-            'url' => [PeopleUrl::class, ['url', 'blog_url', 'twitter_url']],
-        ];
+        switch ($request->category) {
 
-        if (! isset($models[$request->field_name])) {
-            return response()->json(['status' => 'error', 'message' => 'Invalid field name'], 400);
+            case 'email':
+                $allowed = ['email', 'personal_email', 'support_email'];
+                $model = PeopleEmail::where('people_id', $request->people_id)->first();
+                break;
+
+            case 'address':
+                $allowed = [
+                    'address', 'main_address', 'work_address',
+                    'home_address', 'billing_address', 'mailing_address',
+                ];
+                $model = PeopleAddress::where('people_id', $request->people_id)->first();
+                break;
+
+            case 'phone':
+                $allowed = [
+                    'phone', 'home_phones', 'mobile_phones',
+                    'work_phones', 'fax_phones',
+                ];
+                $model = PeoplePhone::where('people_id', $request->people_id)->first();
+                break;
+
+            case 'url':
+                $allowed = ['url', 'blog_url', 'twitter_url'];
+                $model = PeopleUrl::where('people_id', $request->people_id)->first();
+                break;
+
+            default:
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Invalid category',
+                ], 400);
         }
 
-        [$modelClass, $allowedTypes] = $models[$request->field_name];
-
-        if (! in_array($request->type, $allowedTypes)) {
-            return response()->json(['status' => 'error', 'message' => 'Invalid type'], 400);
+        if (! in_array($request->type, $allowed)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid field type',
+            ], 422);
         }
 
-        $record = $modelClass::where('people_id', $request->people_id)->first();
-
-        if (! $record) {
-            return response()->json(['status' => 'error', 'message' => ucfirst($request->field_name).' record not found'], 404);
+        if (! $model) {
+            return response()->json([
+                'status' => 'error',
+                'message' => ucfirst($request->category).' record not found',
+            ], 404);
         }
 
-        $record->{$request->type} = null;
-        $record->save();
+        $model->{$request->type} = null;
+        $model->save();
 
         return response()->json([
             'status' => 'success',
             'message' => ucfirst(str_replace('_', ' ', $request->type)).' deleted successfully',
-            'data' => $record,
+            'data' => $model,
         ]);
     }
 
@@ -943,40 +902,44 @@ class PeopleController extends Controller
             'value' => 'nullable|string',
         ]);
 
-        $allowed = ['territory_id', 'user_id'];
-
-        if (! in_array($request->field, $allowed)) {
-            return response()->json(['error' => 'Invalid field'], 422);
-        }
-
-        $people->update([
-            $request->field => $request->value,
-        ]);
-
         $peopleName = $people->name ?? 'Unknown Person';
-        $newAssignee = User::find($request->value)->name ?? 'Unassigned';
-        $description = null;
-        $actionType = null;
 
-        // Add timeline entries for key updates
-        if ($request->field === 'user_id') {
-            $description = "reassigned {$peopleName} to {$newAssignee}";
-            $actionType = 'updated_assignee';
+        switch ($request->field) {
+
+            case 'territory_id':
+                $people->update([
+                    'territory_id' => $request->value,
+                ]);
+                break;
+
+            case 'user_id':
+                $people->update([
+                    'user_id' => $request->value,
+                ]);
+
+                $newAssignee = User::find($request->value)->name ?? 'Unassigned';
+
+                Timeline::create([
+                    'user_id' => auth()->id(),
+                    'owner_type' => 'people',
+                    'owner_id' => $people->id,
+                    'action_type' => 'updated_assignee',
+                    'description' => "reassigned {$peopleName} to {$newAssignee}",
+                ]);
+                break;
+
+            default:
+                return response()->json([
+                    'error' => 'Invalid field',
+                ], 422);
         }
 
-        if ($description) {
-            Timeline::create([
-                'user_id' => auth()->id(),
-                'owner_type' => 'people',
-                'owner_id' => $people->id,
-                'action_type' => $actionType,
-                'description' => $description,
-            ]);
-        }
-
-        return response()->json(['success' => true, 'field' => $request->field, 'value' => $request->value]);
+        return response()->json([
+            'success' => true,
+            'field' => $request->field,
+            'value' => $request->value,
+        ]);
     }
-
 
     public function fileUpload(Request $request, People $people)
     {
@@ -1028,10 +991,8 @@ class PeopleController extends Controller
                 ->where('people_id', $request->people_id)
                 ->firstOrFail();
 
-            // Delete file from storage
             Storage::disk('public')->delete($file->file_path);
 
-            // Delete record from DB
             $file->delete();
 
             return response()->json([

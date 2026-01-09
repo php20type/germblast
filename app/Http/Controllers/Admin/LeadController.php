@@ -802,29 +802,6 @@ class LeadController extends Controller
         return response()->json(['message' => 'Lead stage updated successfully.']);
     }
 
-    // public function changeStage(Request $request, $leadId)
-    // {
-    //     $lead = Lead::findOrFail($leadId);
-
-    //     $oldStage = $lead->stages->name ?? 'Unknown Stage';
-    //     $newStage = LeadStage::find($request->stage_id)->name ?? 'Unknown Stage';
-
-    //     ApprovalService::request(
-    //         auth()->user()->email,
-    //         'update_lead_stage',
-    //         [
-    //             'lead_id' => $lead->id,
-    //             'new_stage_id' => $request->stage_id,
-    //             'old_stage' => $oldStage,
-    //             'new_stage' => $newStage,
-    //             'user_id' => auth()->id(),
-    //         ],
-    //         url()->previous()
-    //     );
-
-    //     return response()->json(['message' => 'Approval email sent! The stage will update after approval.']);
-    // }
-
     public function updateDetail(Request $request, $leadId)
     {
         $request->validate([
@@ -894,76 +871,11 @@ class LeadController extends Controller
         ]);
     }
 
-    // public function deleteField(Request $request)
-    // {
-    //     $request->validate([
-    //         'lead_id' => 'required|exists:leads,id',
-    //         'related_id' => 'required|integer', // pivot row id
-    //         'type' => 'required|string|in:company,people,product,competitor,source',
-    //     ]);
-
-    //     $relatedId = $request->related_id;
-    //     $type = $request->type;
-
-    //     try {
-    //         switch ($type) {
-    //             case 'company':
-    //                 $deleted = LeadCompany::where('lead_id', $request->lead_id)
-    //                     ->where('company_id', $relatedId)
-    //                     ->delete();
-    //                 break;
-
-    //             case 'people':
-    //                 $deleted = LeadPeople::where('lead_id', $request->lead_id)
-    //                     ->where('people_id', $relatedId)
-    //                     ->delete();
-    //                 break;
-
-    //             case 'product':
-    //                 $deleted = LeadProduct::where('id', $relatedId)->delete();
-    //                 break;
-
-    //             case 'competitor':
-    //                 $deleted = LeadCompetitor::where('id', $relatedId)->delete();
-    //                 break;
-
-    //             case 'source':
-    //                 $deleted = LeadSource::where('id', $relatedId)->delete();
-    //                 break;
-
-    //             default:
-    //                 return response()->json([
-    //                     'success' => false,
-    //                     'message' => 'Invalid type provided.',
-    //                 ], 422);
-    //         }
-
-    //         if ($deleted) {
-    //             return response()->json([
-    //                 'success' => true,
-    //                 'message' => ucfirst($type).' removed successfully from lead.',
-    //             ]);
-    //         }
-
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => ucfirst($type).' not found or already deleted.',
-    //         ], 404);
-
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Error deleting '.$type,
-    //             'error' => $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
-
     public function deleteField(Request $request)
     {
         $request->validate([
             'lead_id' => 'required|exists:leads,id',
-            'related_id' => 'required|integer', // pivot row id
+            'related_id' => 'required|integer',
             'type' => 'required|string|in:company,people,product,competitor,source',
         ]);
 
@@ -1285,10 +1197,7 @@ class LeadController extends Controller
                 ->where('lead_id', $request->lead_id)
                 ->firstOrFail();
 
-            // Delete file from storage
             Storage::disk('public')->delete($file->file_path);
-
-            // Delete record from DB
             $file->delete();
 
             return response()->json([

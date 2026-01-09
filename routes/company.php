@@ -18,7 +18,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::get('my_companies/{id}', [CompanyController::class, 'my_companies'])->name('my_companies');
         Route::post('store', [CompanyController::class, 'store'])->name('store');
         Route::post('delete', [CompanyController::class, 'delete'])->name('delete');
-        Route::post('ajax', [CompanyController::class, 'ajax_store'])->name('ajax.store');
 
         /*
         |--------------------------------------------------------------------------
@@ -51,7 +50,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
         /*
         |--------------------------------------------------------------------------
-        | Company Dashboard Routes
+        | Company Dashboard
         |--------------------------------------------------------------------------
         */
         Route::get('{company}/dashboard', [CompanyDashboardController::class, 'company_dashboard'])->name('dashboard');

@@ -25,15 +25,11 @@ use App\Models\Product;
 use App\Models\Source;
 use App\Models\State;
 use App\Models\Tag;
-use App\Models\Task;
 use App\Models\Territory;
 use App\Models\Timeline;
 use App\Models\User;
-use App\Services\ApprovalService;
 use App\Services\NotificationService;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -170,24 +166,6 @@ class CompanyController extends Controller
         ));
     }
 
-    // ======================
-    // This is for approval workflow
-    // ======================
-    // public function store(Request $request)
-    // {
-    //     ApprovalService::request(
-    //         'febev88675@bablace.com',
-    //         'company_create',
-    //         [
-    //             'request_data' => $request->all(),
-    //             'creator_id' => auth()->id(),
-    //         ],
-    //          url()->previous()
-    //     );
-
-    //     return redirect()->back()->with('success', 'Company creation request submitted for approval.');
-    // }
-
     public function store(Request $request, NotificationService $notify)
     {
         try {
@@ -257,99 +235,6 @@ class CompanyController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Something went wrong!');
         }
-    }
-
-    public function ajax_store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'address' => 'nullable|string',
-            'phone' => 'nullable|string',
-            'email' => 'nullable|email',
-            'url' => 'nullable|url',
-            'people_id' => 'nullable|exists:people,id',
-            'company_type_id' => 'nullable|exists:company_types,id',
-            'tag_id' => 'nullable|exists:tags,id',
-            'industry_id' => 'nullable|exists:industries,id',
-            'territory_id' => 'nullable|exists:territories,id',
-        ]);
-
-        DB::transaction(function () use ($request, &$company) {
-            // Create base company
-            $company = Company::create([
-                'user_id' => auth()->id(),
-                'name' => $request->name,
-                'description' => $request->description,
-                'company_type_id' => $request->company_type_id,
-                'industry_id' => $request->industry_id,
-                'territory_id' => $request->territory_id,
-            ]);
-
-            // Store email
-            if ($request->filled('email')) {
-                CompanyEmail::create([
-                    'company_id' => $company->id,
-                    'email' => $request->email,
-                ]);
-            }
-
-            // Store tag
-            if ($request->filled('tag_id')) {
-                CompanyTag::create([
-                    'company_id' => $company->id,
-                    'tag_id' => $request->tag_id,
-                ]);
-            }
-
-            // Store phone
-            if ($request->filled('phone')) {
-                CompanyPhone::create([
-                    'company_id' => $company->id,
-                    'phone' => $request->phone,
-                ]);
-            }
-
-            // Store address
-            if ($request->filled('address')) {
-                CompanyAddress::create([
-                    'company_id' => $company->id,
-                    'address' => $request->address,
-                ]);
-            }
-
-            // Store URL
-            if ($request->filled('url')) {
-                CompanyUrl::create([
-                    'company_id' => $company->id,
-                    'url' => $request->url,
-                ]);
-            }
-
-            // Store related person (only one for now)
-            if ($request->filled('people_id')) {
-                CompanyPeople::create([
-                    'company_id' => $company->id,
-                    'people_id' => $request->people_id,
-                ]);
-            }
-        });
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Company added successfully.',
-                'company' => $company->load([
-                    'companyEmail',
-                    'companyPhone',
-                    'companyAddress',
-                    'companyUrl',
-                    'peoples',
-                ]),
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Company added successfully.');
     }
 
     public function show(Request $request, $id)
@@ -867,142 +752,135 @@ class CompanyController extends Controller
             'value' => 'nullable|string',
         ]);
 
-        $allowed = ['company_type_id', 'industry_id', 'territory_id', 'user_id', 'annual_revenue', 'employees_count'];
-
-        if (! in_array($request->field, $allowed)) {
-            return response()->json(['error' => 'Invalid field'], 422);
-        }
-
-        $company->update([
-            $request->field => $request->value,
-        ]);
-
         $companyName = $company->name ?? 'Unknown Company';
-        $description = null;
-        $actionType = null;
 
-        // Add timeline entries for key updates
-        if ($request->field === 'company_type_id') {
-            $newType = CompanyType::find($request->value)->type;
-            $description = "changed the company type of {$companyName} to {$newType}";
-            $actionType = 'updated_company_type';
-        } elseif ($request->field === 'user_id') {
-            $newAssignee = User::find($request->value)->name;
-            $description = "reassigned {$companyName} to {$newAssignee}";
-            $actionType = 'updated_assignee';
+        switch ($request->field) {
+
+            case 'company_type_id':
+                $company->update([
+                    'company_type_id' => $request->value,
+                ]);
+
+                $newType = CompanyType::find($request->value)->type ?? 'Unknown';
+
+                Timeline::create([
+                    'user_id' => auth()->id(),
+                    'owner_type' => 'company',
+                    'owner_id' => $company->id,
+                    'action_type' => 'updated_company_type',
+                    'description' => "changed the company type of {$companyName} to {$newType}",
+                ]);
+                break;
+
+            case 'user_id':
+                $company->update([
+                    'user_id' => $request->value,
+                ]);
+
+                $newAssignee = User::find($request->value)->name ?? 'Unassigned';
+
+                Timeline::create([
+                    'user_id' => auth()->id(),
+                    'owner_type' => 'company',
+                    'owner_id' => $company->id,
+                    'action_type' => 'updated_assignee',
+                    'description' => "reassigned {$companyName} to {$newAssignee}",
+                ]);
+                break;
+
+            case 'industry_id':
+                $company->update([
+                    'industry_id' => $request->value,
+                ]);
+                break;
+
+            case 'territory_id':
+                $company->update([
+                    'territory_id' => $request->value,
+                ]);
+                break;
+
+            case 'annual_revenue':
+                $company->update([
+                    'annual_revenue' => $request->value,
+                ]);
+                break;
+
+            case 'employees_count':
+                $company->update([
+                    'employees_count' => $request->value,
+                ]);
+                break;
+
+            default:
+                return response()->json([
+                    'error' => 'Invalid field',
+                ], 422);
         }
-
-        if ($description) {
-            Timeline::create([
-                'user_id' => auth()->id(),
-                'owner_type' => 'company',
-                'owner_id' => $company->id,
-                'action_type' => $actionType,
-                'description' => $description,
-            ]);
-        }
-
-        return response()->json(['success' => true, 'field' => $request->field, 'value' => $request->value]);
-    }
-
-    public function deleteField(Request $request)
-    {
-        $request->validate([
-            'company_id' => 'required|exists:companies,id',
-            'type' => 'required|string',
-            'field_name' => 'required|string', // email, address, phone, url
-        ]);
-
-        // Map field_name to model and allowed types
-        $models = [
-            'email' => [CompanyEmail::class, ['email', 'personal_email', 'support_email', 'work_email']],
-            'address' => [CompanyAddress::class, ['address', 'main_address', 'work_address', 'home_address', 'billing_address', 'mailing_address']],
-            'phone' => [CompanyPhone::class, ['phone', 'home_phones', 'mobile_phones', 'work_phones', 'fax_phones']],
-            'url' => [CompanyUrl::class, ['url', 'blog_url', 'twitter_url']],
-        ];
-
-        if (! isset($models[$request->field_name])) {
-            return response()->json(['status' => 'error', 'message' => 'Invalid field name'], 400);
-        }
-
-        [$modelClass, $allowedTypes] = $models[$request->field_name];
-
-        if (! in_array($request->type, $allowedTypes)) {
-            return response()->json(['status' => 'error', 'message' => 'Invalid type'], 400);
-        }
-
-        $record = $modelClass::where('company_id', $request->company_id)->first();
-
-        if (! $record) {
-            return response()->json(['status' => 'error', 'message' => ucfirst($request->field_name).' record not found'], 404);
-        }
-
-        $record->{$request->type} = null;
-        $record->save();
 
         return response()->json([
-            'status' => 'success',
-            'message' => ucfirst(str_replace('_', ' ', $request->type)).' deleted successfully',
-            'data' => $record,
+            'success' => true,
+            'field' => $request->field,
+            'value' => $request->value,
         ]);
     }
 
     public function updateCompanyField(Request $request)
     {
-        // Define config for each category
-        $config = [
-            'email' => [
-                'model' => CompanyEmail::class,
-                'valid_types' => ['email', 'personal_email', 'support_email', 'work_email'],
-                'validation' => 'email',
-            ],
-            'address' => [
-                'model' => CompanyAddress::class,
-                'valid_types' => ['address', 'main_address', 'work_address', 'home_address', 'billing_address', 'mailing_address'],
-                'validation' => 'string',
-            ],
-            'phone' => [
-                'model' => CompanyPhone::class,
-                'valid_types' => ['phone', 'home_phones', 'mobile_phones', 'work_phones', 'fax_phones'],
-                'validation' => 'string',
-            ],
-            'url' => [
-                'model' => CompanyUrl::class,
-                'valid_types' => ['url', 'blog_url', 'twitter_url'],
-                'validation' => 'url',
-            ],
-        ];
-
         $request->validate([
             'company_id' => 'required|exists:companies,id',
-            'category' => 'required|in:'.implode(',', array_keys($config)),
+            'category' => 'required|in:email,address,phone,url',
             'type' => 'required|string',
             'value' => 'required',
         ]);
 
-        $category = $request->category;
+        switch ($request->category) {
 
-        if (! in_array($request->type, $config[$category]['valid_types'])) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Invalid type for category '.$category,
-            ], 422);
+            case 'email':
+                $request->validate([
+                    'type' => 'in:email,personal_email,support_email,work_email',
+                    'value' => 'email',
+                ]);
+
+                $record = CompanyEmail::firstOrNew([
+                    'company_id' => $request->company_id,
+                ]);
+                break;
+
+            case 'address':
+                $request->validate([
+                    'type' => 'in:address,main_address,work_address,home_address,billing_address,mailing_address',
+                    'value' => 'string',
+                ]);
+
+                $record = CompanyAddress::firstOrNew([
+                    'company_id' => $request->company_id,
+                ]);
+                break;
+
+            case 'phone':
+                $request->validate([
+                    'type' => 'in:phone,home_phones,mobile_phones,work_phones,fax_phones',
+                    'value' => 'string',
+                ]);
+
+                $record = CompanyPhone::firstOrNew([
+                    'company_id' => $request->company_id,
+                ]);
+                break;
+
+            case 'url':
+                $request->validate([
+                    'type' => 'in:url,blog_url,twitter_url',
+                    'value' => 'url',
+                ]);
+
+                $record = CompanyUrl::firstOrNew([
+                    'company_id' => $request->company_id,
+                ]);
+                break;
         }
 
-        // Validate value based on category-specific validation
-        $validator = \Validator::make($request->all(), [
-            'value' => $config[$category]['validation'],
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => $validator->errors()->first('value'),
-            ], 422);
-        }
-
-        $modelClass = $config[$category]['model'];
-        $record = $modelClass::firstOrNew(['company_id' => $request->company_id]);
         $record->{$request->type} = $request->value;
         $record->save();
 
@@ -1010,6 +888,73 @@ class CompanyController extends Controller
             'status' => 'success',
             'message' => ucfirst(str_replace('_', ' ', $request->type)).' updated successfully',
             'data' => $record,
+        ]);
+    }
+
+    public function deleteField(Request $request)
+    {
+        $request->validate([
+            'company_id' => 'required|exists:companies,id',
+            'category' => 'required|in:email,address,phone,url',
+            'type' => 'required|string',
+        ]);
+
+        switch ($request->category) {
+
+            case 'email':
+                $allowed = ['email', 'personal_email', 'support_email', 'work_email'];
+                $model = CompanyEmail::where('company_id', $request->company_id)->first();
+                break;
+
+            case 'address':
+                $allowed = [
+                    'address', 'main_address', 'work_address',
+                    'home_address', 'billing_address', 'mailing_address',
+                ];
+                $model = CompanyAddress::where('company_id', $request->company_id)->first();
+                break;
+
+            case 'phone':
+                $allowed = [
+                    'phone', 'home_phones', 'mobile_phones',
+                    'work_phones', 'fax_phones',
+                ];
+                $model = CompanyPhone::where('company_id', $request->company_id)->first();
+                break;
+
+            case 'url':
+                $allowed = ['url', 'blog_url', 'twitter_url'];
+                $model = CompanyUrl::where('company_id', $request->company_id)->first();
+                break;
+
+            default:
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Invalid category',
+                ], 400);
+        }
+
+        if (! in_array($request->type, $allowed)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid field type',
+            ], 422);
+        }
+
+        if (! $model) {
+            return response()->json([
+                'status' => 'error',
+                'message' => ucfirst($request->category).' record not found',
+            ], 404);
+        }
+
+        $model->{$request->type} = null;
+        $model->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => ucfirst(str_replace('_', ' ', $request->type)).' deleted successfully',
+            'data' => $model,
         ]);
     }
 
@@ -1063,10 +1008,7 @@ class CompanyController extends Controller
                 ->where('company_id', $request->company_id)
                 ->firstOrFail();
 
-            // Delete file from storage
             Storage::disk('public')->delete($file->file_path);
-
-            // Delete record from DB
             $file->delete();
 
             return response()->json([

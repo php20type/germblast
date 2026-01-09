@@ -12,7 +12,6 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | Authenticated Dashboards
@@ -28,7 +27,6 @@ Route::middleware(['auth'])->group(function () {
     Route::view('/client/dashboard', 'client.dashboard')->name('client.dashboard');
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | Profile
@@ -39,7 +37,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -66,7 +63,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | Approval Routes
@@ -75,7 +71,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 Route::get('/approval/approve/{token}', [ApprovalController::class, 'approve'])->name('approval.approve');
 Route::get('/approval/reject/{token}', [ApprovalController::class, 'reject'])->name('approval.reject');
 Route::view('survey-proposal.pdf', 'survey-proposal.pdf')->name('survey.proposal');
-
 
 /*
 |--------------------------------------------------------------------------

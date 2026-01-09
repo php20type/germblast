@@ -1231,7 +1231,7 @@
                                                             disabled>
                                                         <button class="btn btn-sm btn-outline-secondary delete-field-btn"
                                                             data-company-id="{{ $company->id }}"
-                                                            data-type="{{ $email['selected'] }}" data-field-name="email"
+                                                            data-type="{{ $email['selected'] }}" data-category="email"
                                                             {{ $email['selected'] === 'email' ? 'disabled' : '' }}>
                                                             <i class="fas fa-times"></i>
                                                         </button>
@@ -1317,8 +1317,7 @@
                                                             disabled>
                                                         <button class="btn btn-sm btn-outline-secondary delete-field-btn"
                                                             data-company-id="{{ $company->id }}"
-                                                            data-type="{{ $address['selected'] }}"
-                                                            data-field-name="address"
+                                                            data-type="{{ $address['selected'] }}" data-category="address"
                                                             {{ $address['selected'] === 'address' ? 'disabled' : '' }}>
                                                             <i class="fas fa-times"></i>
                                                         </button>
@@ -1405,7 +1404,7 @@
                                                             placeholder="Enter phone number" disabled>
                                                         <button class="btn btn-sm btn-outline-secondary delete-field-btn"
                                                             data-company-id="{{ $company->id }}"
-                                                            data-type="{{ $phone['selected'] }}" data-field-name="phone"
+                                                            data-type="{{ $phone['selected'] }}" data-category="phone"
                                                             {{ $phone['selected'] === 'phone' ? 'disabled' : '' }}>
                                                             <i class="fas fa-times"></i>
                                                         </button>
@@ -1491,7 +1490,7 @@
                                                             disabled>
                                                         <button class="btn btn-sm btn-outline-secondary delete-field-btn"
                                                             data-company-id="{{ $company->id }}"
-                                                            data-type="{{ $url['selected'] }}" data-field-name="url"
+                                                            data-type="{{ $url['selected'] }}" data-category="url"
                                                             {{ $url['selected'] === 'url' ? 'disabled' : '' }}>
                                                             <i class="fas fa-times"></i>
                                                         </button>
@@ -3484,19 +3483,19 @@
             $(document).on('click', '.delete-field-btn', function() {
                 let companyId = $(this).data('company-id');
                 let type = $(this).data('type');
-                let fieldName = $(this).data('field-name');
+                let category = $(this).data('category');
 
-                let list = $(`#${fieldName}-list`);
+                let list = $(`#${category}-list`);
                 let count = list.children().length;
 
                 if (count <= 1) {
-                    toastr.warning(`At least one ${fieldName} is required.`);
+                    toastr.warning(`At least one ${category} is required.`);
                     return false;
                 }
 
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: `This ${fieldName} will be removed from the company record!`,
+                    text: `This ${category} will be removed from the company record!`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
@@ -3510,7 +3509,7 @@
                             data: {
                                 company_id: companyId,
                                 type: type,
-                                field_name: fieldName,
+                                category: category,
                                 _token: $('meta[name="csrf-token"]').attr('content')
                             },
                             success: function(response) {
