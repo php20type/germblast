@@ -1095,30 +1095,37 @@
             $('#add-lead-form').submit(function(e) {
                 e.preventDefault();
 
-                if (!$('#add-lead-form').valid()) {
-                    return; // Stop if validation fails
-                }
+                const $form = $(this);
+                const $submitBtn = $form.find('button[type="submit"]');
+
+                if (!$form.valid()) return;
 
                 $.ajax({
                     url: '{{ route('admin.lead.store') }}',
                     method: 'POST',
-                    data: $(this).serialize(),
+                    data: $form.serialize(),
 
-                    success: function(response) {
+                    beforeSend: function() {
+                        $submitBtn.prop('disabled', true).text('Saving...');
+                    },
+
+                    success: function() {
                         toastr.success('Lead created successfully! Redirecting...');
-                        $('#add-lead-form')[0].reset();
+                        $form[0].reset();
 
-                        // 1.5 seconds delay
                         setTimeout(function() {
                             window.location.href = "{{ route('admin.lead.index') }}";
                         }, 1500);
                     },
+
                     error: function(xhr) {
                         alert(xhr.responseText);
                         toastr.error('Something went wrong while creating the lead.');
+                        $submitBtn.prop('disabled', false).text('Submit');
                     }
                 });
             });
+
 
 
             // Companies storing and validation
@@ -1225,28 +1232,33 @@
             $('#add-company-form').submit(function(e) {
                 e.preventDefault();
 
-                if (!$('#add-company-form').valid()) {
-                    return; // Stop if validation fails
-                }
+                const $form = $(this);
+                const $submitBtn = $form.find('button[type="submit"]');
+
+                if (!$form.valid()) return;
 
                 $.ajax({
                     url: '{{ route('admin.company.store') }}',
                     method: 'POST',
-                    data: $(this).serialize(),
+                    data: $form.serialize(),
 
-                    success: function(response) {
+                    beforeSend: function() {
+                        $submitBtn.prop('disabled', true).text('Saving...');
+                    },
+
+                    success: function() {
                         toastr.success('Company created successfully! Redirecting...');
-                        $('#add-company-form')[0].reset();
+                        $form[0].reset();
 
-                        // 1.5 seconds delay
-                        setTimeout(function() {
+                        setTimeout(() => {
                             window.location.href =
                                 "{{ route('admin.company.index') }}";
                         }, 1500);
                     },
-                    error: function(xhr) {
-                        console.log(xhr.responseText);
+
+                    error: function() {
                         toastr.error('Something went wrong while creating the company.');
+                        $submitBtn.prop('disabled', false).text('Submit');
                     }
                 });
             });
@@ -1344,32 +1356,37 @@
             $('#add-person-form').submit(function(e) {
                 e.preventDefault();
 
-                if (!$('#add-person-form').valid()) {
-                    return; // Stop if validation fails
-                }
+                const $form = $(this);
+                const $submitBtn = $form.find('button[type="submit"]');
+
+                if (!$form.valid()) return;
 
                 $.ajax({
                     url: '{{ route('admin.people.store') }}',
                     method: 'POST',
-                    data: $(this).serialize(),
+                    data: $form.serialize(),
 
-                    success: function(response) {
+                    beforeSend: function() {
+                        $submitBtn.prop('disabled', true).text('Saving...');
+                    },
+
+                    success: function() {
                         toastr.success('Person created successfully! Redirecting...');
-                        $('#add-person-form')[0].reset();
-                        // $('#AddPerson').modal('hide');
+                        $form[0].reset();
 
-                        // 1.5 seconds delay
-                        setTimeout(function() {
-                            window.location.href =
-                                "{{ route('admin.people.index') }}";
+                        setTimeout(() => {
+                            window.location.href = "{{ route('admin.people.index') }}";
                         }, 1500);
                     },
+
                     error: function(xhr) {
                         console.log(xhr.responseText);
                         toastr.error('Something went wrong while adding the person.');
+                        $submitBtn.prop('disabled', false).text('Submit');
                     }
                 });
             });
+
             // ========
 
 
@@ -1566,26 +1583,36 @@
                 }
             });
 
-            // Submit Task form
+            // // Submit Task form
             $('#add-task').submit(function(e) {
                 e.preventDefault();
 
-                if (!$('#add-task').valid()) {
-                    return; // Stop if validation fails
-                }
+                const $form = $(this);
+                const $submitBtn = $form.find('button[type="submit"]');
+
+                if (!$form.valid()) return;
 
                 $.ajax({
                     url: '{{ route('admin.task.ajax.store') }}',
                     method: 'POST',
-                    data: $(this).serialize(),
-                    success: function(response) {
-                        toastr.success('Task added successfully!');
-                        $('#add-task')[0].reset();
-                        $('#AddTask').modal('hide');
+                    data: $form.serialize(),
+
+                    beforeSend: function() {
+                        $submitBtn.prop('disabled', true).text('Saving...');
                     },
+
+                    success: function() {
+                        toastr.success('Task added successfully!');
+                        $form[0].reset();
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    },
+
                     error: function(xhr) {
                         console.log(xhr.responseText);
                         toastr.error('Something went wrong while adding the task.');
+                        $submitBtn.prop('disabled', false).text('Submit');
                     }
                 });
             });
@@ -1630,7 +1657,7 @@
                         value: "user:{{ $user->id }}"
                     }
                     @if (!$loop->last)
-                        , w
+                        ,
                     @endif
                 @endforeach
             ];
