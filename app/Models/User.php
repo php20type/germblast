@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -48,6 +49,94 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // =====================
+    // Roles
+    // =====================
+    public function isCustomer(): bool
+    {
+        return $this->hasRole('Customer');
+    }
+
+    public function isTechnician(): bool
+    {
+        return $this->hasRole('Technician');
+    }
+
+    public function isWarehouseTechnician(): bool
+    {
+        return $this->hasRole('Warehouse Technician');
+    }
+
+    public function isTrainingSupervisor(): bool
+    {
+        return $this->hasRole('Training Supervisor');
+    }
+
+    public function isSupervisor(): bool
+    {
+        return $this->hasRole('Supervisor');
+    }
+
+    public function isJobManager(): bool
+    {
+        return $this->hasRole('Job Manager');
+    }
+
+    public function isWarehouseManager(): bool
+    {
+        return $this->hasRole('Warehouse Manager');
+    }
+
+    public function isSalesRepresentative(): bool
+    {
+        return $this->hasRole('Sales Representative');
+    }
+
+    public function isSalesTeam(): bool
+    {
+        return $this->hasRole('Sales Team');
+    }
+
+    public function isSalesManager(): bool
+    {
+        return $this->hasRole('Sales Manager');
+    }
+
+    public function isAssistantOperationsManager(): bool
+    {
+        return $this->hasRole('Assistant Operations Manager');
+    }
+
+    public function isOperationsManager(): bool
+    {
+        return $this->hasRole('Operations Manager');
+    }
+
+    public function isRegionalOperationsManager(): bool
+    {
+        return $this->hasRole('Regional Operations Manager');
+    }
+
+    public function isFieldEpidemiologyTeam(): bool
+    {
+        return $this->hasRole('Field Epidemiology Team');
+    }
+
+    public function isCorporateTeam(): bool
+    {
+        return $this->hasRole('Corporate Team');
+    }
+
+    public function isSeniorCorporate(): bool
+    {
+        return $this->hasRole('Senior Corporate');
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole('Super Admin');
     }
 
     public function task()
