@@ -79,6 +79,16 @@
             </li>
             <hr class="d-none">
             <hr>
+            <li class="{{ request()->routeIs('admin.roles.permissions') ? 'active' : '' }}">
+                <a href="{{ route('admin.roles.permissions') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon4.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Role
+                    </div>
+                </a>
+            </li>
              <li class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.settings.index') }}">
                     <div class="icon-round">

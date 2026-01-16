@@ -56,87 +56,87 @@ class User extends Authenticatable
     // =====================
     public function isCustomer(): bool
     {
-        return $this->hasRole('Customer');
+        return $this->hasRole('customer');
     }
 
     public function isTechnician(): bool
     {
-        return $this->hasRole('Technician');
+        return $this->hasRole('technician');
     }
 
     public function isWarehouseTechnician(): bool
     {
-        return $this->hasRole('Warehouse Technician');
+        return $this->hasRole('warehouse_technician');
     }
 
     public function isTrainingSupervisor(): bool
     {
-        return $this->hasRole('Training Supervisor');
+        return $this->hasRole('training_supervisor');
     }
 
     public function isSupervisor(): bool
     {
-        return $this->hasRole('Supervisor');
+        return $this->hasRole('supervisor');
     }
 
     public function isJobManager(): bool
     {
-        return $this->hasRole('Job Manager');
+        return $this->hasRole('job_manager');
     }
 
     public function isWarehouseManager(): bool
     {
-        return $this->hasRole('Warehouse Manager');
+        return $this->hasRole('warehouse_manager');
     }
 
     public function isSalesRepresentative(): bool
     {
-        return $this->hasRole('Sales Representative');
+        return $this->hasRole('sales_representative');
     }
 
     public function isSalesTeam(): bool
     {
-        return $this->hasRole('Sales Team');
+        return $this->hasRole('sales_team');
     }
 
     public function isSalesManager(): bool
     {
-        return $this->hasRole('Sales Manager');
+        return $this->hasRole('sales_manager');
     }
 
     public function isAssistantOperationsManager(): bool
     {
-        return $this->hasRole('Assistant Operations Manager');
+        return $this->hasRole('assistant_operations_manager');
     }
 
     public function isOperationsManager(): bool
     {
-        return $this->hasRole('Operations Manager');
+        return $this->hasRole('operations_manager');
     }
 
     public function isRegionalOperationsManager(): bool
     {
-        return $this->hasRole('Regional Operations Manager');
+        return $this->hasRole('regional_operations_manager');
     }
 
     public function isFieldEpidemiologyTeam(): bool
     {
-        return $this->hasRole('Field Epidemiology Team');
+        return $this->hasRole('field_epidemiology_team');
     }
 
     public function isCorporateTeam(): bool
     {
-        return $this->hasRole('Corporate Team');
+        return $this->hasRole('corporate_team');
     }
 
     public function isSeniorCorporate(): bool
     {
-        return $this->hasRole('Senior Corporate');
+        return $this->hasRole('senior_corporate');
     }
 
     public function isSuperAdmin(): bool
     {
-        return $this->hasRole('Super Admin');
+        return $this->hasRole('super_admin');
     }
 
     public function task()

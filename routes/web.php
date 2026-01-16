@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\NoteController;
 use App\Http\Controllers\Admin\TaskController;
+use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -60,6 +61,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/delete_note/{id}', [NoteController::class, 'delete_note'])->name('delete.note');
     Route::post('note/add_comment/{id}', [NoteController::class, 'add_comment'])->name('add.note.comment');
     Route::post('note/delete_comment/{id}', [NoteController::class, 'delete_comment'])->name('delete.note.comment');
+
+    // Roles
+    Route::get('roles/permissions', [RolePermissionController::class, 'index'])->name('roles.permissions');
+    Route::post('roles/permissions/update', [RolePermissionController::class, 'update'])->name('roles.permissions.update');
 
 });
 
