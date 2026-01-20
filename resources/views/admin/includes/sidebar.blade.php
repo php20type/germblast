@@ -89,6 +89,16 @@
                     </div>
                 </a>
             </li>
+            <li class="{{ request()->routeIs('admin.employee.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.employee.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon4.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Employees
+                    </div>
+                </a>
+            </li>
              <li class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.settings.index') }}">
                     <div class="icon-round">

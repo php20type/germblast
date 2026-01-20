@@ -13,113 +13,73 @@ class PermissionSeeder extends Seeder
 
             /*
             |--------------------------------------------------
-            | Company Module (1–15)
+            | Company Module
             |--------------------------------------------------
             */
-            1  => 'company.view',
-            2  => 'company.my.view',
-            3  => 'company.create',
-            4  => 'company.update',
-            5  => 'company.delete',
+            1 => 'company.create',
+            2  => 'company.delete',
 
-            6  => 'company.location.manage',
-            7  => 'company.people.manage',
-            8  => 'company.tag.manage',
-            9  => 'company.file.manage',
+            3  => 'company.list.all.view',
+            4  => 'company.list.my.view',
 
-            10 => 'company.task.manage',
-            11 => 'company.activity.manage',
+            5  => 'company.detail.view',
+            6  => 'company.detail.edit',
 
-            12 => 'company.dashboard.view',
-            13 => 'company.iaq.manage',
-            14 => 'company.biological.manage',
-            15 => 'company.survey.manage',
-            16 => 'company.water.manage',
+            7  => 'company.dashboard.view',
+            8  => 'company.dashboard.edit',
+
 
             /*
             |--------------------------------------------------
-            | People Module (17–30)
+            | People Module
             |--------------------------------------------------
             */
-            17 => 'people.view',
-            18 => 'people.create',
-            19 => 'people.update',
-            20 => 'people.delete',
+            9 => 'people.create',
+            10 => 'people.delete',
 
-            21 => 'people.my.view',
-            22 => 'people.animal_care.view',
-            23 => 'people.marketing_contacts.view',
-            24 => 'people.sequence_healthcare.view',
+            11 => 'people.list.all.view',
+            12 => 'people.list.my.view',
+            13 => 'people.list.animal_care.view',
+            14 => 'people.list.marketing_contacts.view',
+            15 => 'people.list.sequence_healthcare.view',
 
-            25 => 'people.task.manage',
-            26 => 'people.activity.manage',
+            16 => 'people.detail.view',
+            17 => 'people.detail.edit',
 
-            27 => 'people.company.manage',
-            28 => 'people.tag.manage',
-            29 => 'people.file.manage',
-            30 => 'people.field.manage',
 
             /*
             |--------------------------------------------------
-            | Lead Module (31–50)
+            | Lead Module
             |--------------------------------------------------
             */
-            31 => 'lead.view',
-            32 => 'lead.create',
-            33 => 'lead.update',
-            34 => 'lead.delete',
+            18 => 'lead.create',
+            19 => 'lead.delete',
 
-            35 => 'lead.my.view',
-            36 => 'lead.hot.view',
-            37 => 'lead.added_this_week.view',
-            38 => 'lead.closing_this_week.view',
-            39 => 'lead.open.view',
-            40 => 'lead.watching.view',
+            20 => 'lead.list.all.view',
+            21 => 'lead.list.my.view',
+            22 => 'lead.list.hot.view',
+            23 => 'lead.list.added_this_week.view',
+            24 => 'lead.list.closing_this_week.view',
+            25 => 'lead.list.open.view',
+            26 => 'lead.list.watching.view',
 
-            41 => 'lead.task.manage',
-            42 => 'lead.activity.manage',
-
-            43 => 'lead.tag.manage',
-            44 => 'lead.file.manage',
-            45 => 'lead.field.manage',
-            46 => 'lead.product.manage',
-
-            47 => 'lead.forecasting.manage',
-            48 => 'lead.ajax.update',
-
-            49 => 'lead.stage.initial.schedule',
-            50 => 'lead.stage.initial.complete',
-            51 => 'lead.stage.initial.reopen',
-            52 => 'lead.stage.initial.reset',
-
-            53 => 'lead.stage.site_survey.schedule',
-            54 => 'lead.stage.site_survey.complete',
-            55 => 'lead.stage.site_survey.reopen',
-            56 => 'lead.stage.site_survey.reset',
+            27 => 'lead.detail.view',
+            28 => 'lead.detail.edit',
 
             /*
             |--------------------------------------------------
-            | Survey / Pricing Proposal (57–70)
+            | Survey / Pricing Proposal
             |--------------------------------------------------
             */
-            57 => 'survey.proposal.view',
-            58 => 'survey.proposal.create',
+            29 => 'survey.proposal.view',
+            30 => 'survey.proposal.create',
+            31 => 'survey.proposal.edit',
+            32 => 'survey.proposal.delete',
 
-            59 => 'survey.proposal.facility.view',
-            60 => 'survey.proposal.facility.create',
-            61 => 'survey.proposal.facility.update',
-
-            62 => 'survey.proposal.equipment.view',
-            63 => 'survey.proposal.equipment.create',
-            64 => 'survey.proposal.equipment.update',
-
-            65 => 'survey.proposal.pricing.view',
-            66 => 'survey.proposal.view.details',
-            67 => 'survey.proposal.download',
-
-            68 => 'pricing.proposal.create',
-            69 => 'pricing.proposal.update',
-            70 => 'pricing.proposal.delete',
+            33 => 'pricing.proposal.view',
+            34 => 'pricing.proposal.create',
+            35 => 'pricing.proposal.edit',
+            36 => 'pricing.proposal.delete',
         ];
 
         foreach ($permissions as $id => $name) {

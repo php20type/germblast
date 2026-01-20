@@ -7,18 +7,23 @@ return [
         'People',
         'Lead',
         'Survey Proposal',
+        'Pricing Proposal',
     ],
 
     'sales_manager' => [
         'Company',
         'People',
         'Lead',
+        'Survey Proposal',
+        'Pricing Proposal',
     ],
 
     'sales_representative' => [
         'Company',
         'People',
         'Lead',
+        'Survey Proposal',
+        'Pricing Proposal',
     ],
 
     'technician' => [
@@ -29,4 +34,5 @@ return [
     'customer' => [
         'Company',
     ],
+
 ];

@@ -48,7 +48,7 @@ class AppServiceProvider extends ServiceProvider
         'Company' => \App\Models\Company::class,
         'People'  => \App\Models\People::class,
         'Lead'    => \App\Models\Lead::class,
-        'User'    => \App\Models\User::class,
+        // 'User'    => \App\Models\User::class,
     ]);
     }
 }

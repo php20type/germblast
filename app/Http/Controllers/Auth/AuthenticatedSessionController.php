@@ -28,15 +28,23 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if (auth()->user()->role == 'admin') {
-            return redirect()->intended('/admin/dashboard');
-        } elseif (auth()->user()->role == 'sales') {
-            return redirect()->intended('/sales/dashboard');
-        } else {
-            return redirect()->intended('client/dashboard');
+        // if (auth()->user()->role == 'admin') {
+        //     return redirect()->intended('/admin/dashboard');
+        // } elseif (auth()->user()->role == 'sales') {
+        //     return redirect()->intended('/sales/dashboard');
+        // } else {
+        //     return redirect()->intended('client/dashboard');
+        // }
+
+        $user = auth()->user();
+
+        // Using Spatie roles instead of users.role
+        if ($user->hasRole('customer')) {
+            return redirect()->intended(route('client.dashboard'));
         }
 
-        // return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(route('admin.dashboard'));
+
     }
 
     /**

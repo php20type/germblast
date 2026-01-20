@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\NoteController;
 use App\Http\Controllers\Admin\TaskController;
+use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\ProfileController;
@@ -65,6 +66,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Roles
     Route::get('roles/permissions', [RolePermissionController::class, 'index'])->name('roles.permissions');
     Route::post('roles/permissions/update', [RolePermissionController::class, 'update'])->name('roles.permissions.update');
+
+    // Employees
+    Route::get('employee/index', [EmployeeController::class, 'index'])->name('employee.index');
+    Route::get('employee/create', [EmployeeController::class, 'create'])->name('employee.create');
+    Route::post('employee/store', [EmployeeController::class, 'store'])->name('employee.store');
+    Route::get('employee/edit/{id}', [EmployeeController::class, 'edit'])->name('employee.edit');
+    Route::post('employee/update/{id}', [EmployeeController::class, 'update'])->name('employee.update');
 
 });
 

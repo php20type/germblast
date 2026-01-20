@@ -31,16 +31,21 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
+
+        $defaultRole = 'customer';
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'client',  // ✅ Set the default role here
+            'role' => $defaultRole, // users table column
         ]);
+
+        // Assign Spatie role
+        $user->assignRole($defaultRole);
 
         event(new Registered($user));
 
@@ -51,17 +56,26 @@ class RegisteredUserController extends Controller
         // return redirect(route('dashboard', absolute: false));
     }
 
+    // protected function redirectToDashboard($user)
+    // {
+    //     switch ($user->role) {
+    //         case 'admin':
+    //             return redirect()->route('admin.dashboard');
+    //         case 'sales':
+    //             return redirect()->route('sales.dashboard');
+    //         case 'technician':
+    //             return redirect()->route('technician.dashboard');
+    //         default:
+    //             return redirect()->route('client.dashboard');
+    //     }
+    // }
+
     protected function redirectToDashboard($user)
     {
-        switch ($user->role) {
-            case 'admin':
-                return redirect()->route('admin.dashboard');
-            case 'sales':
-                return redirect()->route('sales.dashboard');
-            case 'technician':
-                return redirect()->route('technician.dashboard');
-            default:
-                return redirect()->route('client.dashboard');
+        if ($user->hasRole('customer')) {
+            return redirect()->route('client.dashboard');
         }
+
+        return redirect()->route('admin.dashboard');
     }
 }
