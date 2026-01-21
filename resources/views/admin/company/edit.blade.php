@@ -25,42 +25,52 @@
                                 <div class="d-flex">
                                     <img src="{{ asset('img/home/image25.png') }}" alt="Company" class="company-logo me-3">
                                     <div>
-                                        <!-- Company Name -->
-                                        <div class="d-flex align-items-center mb-2" style="gap: 5px;">
-                                            <h4 class="mb-1 editable-field" contenteditable="true" spellcheck="false"
-                                                id="company-update-name" data-company-id="{{ $company->id }}">
+                                        @can('company.detail.edit')
+                                            <!-- Company Name -->
+                                            <div class="d-flex align-items-center mb-2" style="gap: 5px;">
+                                                <h4 class="mb-1 editable-field" contenteditable="true" spellcheck="false"
+                                                    id="company-update-name" data-company-id="{{ $company->id }}">
+                                                    {{ $company->name ?? 'N/A' }}
+                                                </h4>
+                                                <button
+                                                    class="btn btn-sm btn-outline-success editable-icon editable-submit d-none"
+                                                    id="company-name-submit" title="Save Company Name" data-field="name">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button
+                                                    class="btn btn-sm btn-outline-danger editable-icon editable-cancel d-none"
+                                                    id="company-name-cancel" title="Cancel">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+
+                                            <!-- Company Description -->
+                                            <div class="d-flex align-items-center mb-2" style="gap: 5px;">
+                                                <div class="editable-field" contenteditable="true" spellcheck="false"
+                                                    id="company-update-description" data-company-id="{{ $company->id }}">
+                                                    {{ $company->description }}
+                                                </div>
+                                                <button
+                                                    class="btn btn-sm btn-outline-success editable-icon editable-submit d-none"
+                                                    id="company-description-submit" title="Save Company Description"
+                                                    data-field="description">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button
+                                                    class="btn btn-sm btn-outline-danger editable-icon editable-cancel d-none"
+                                                    id="company-description-cancel" title="Cancel">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        @else
+                                            <h4>
                                                 {{ $company->name ?? 'N/A' }}
                                             </h4>
-                                            <button
-                                                class="btn btn-sm btn-outline-success editable-icon editable-submit d-none"
-                                                id="company-name-submit" title="Save Company Name" data-field="name">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                            <button
-                                                class="btn btn-sm btn-outline-danger editable-icon editable-cancel d-none"
-                                                id="company-name-cancel" title="Cancel">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
 
-                                        <!-- Company Description -->
-                                        <div class="d-flex align-items-center mb-2" style="gap: 5px;">
-                                            <div class="editable-field" contenteditable="true" spellcheck="false"
-                                                id="company-update-description" data-company-id="{{ $company->id }}">
+                                            <div>
                                                 {{ $company->description }}
                                             </div>
-                                            <button
-                                                class="btn btn-sm btn-outline-success editable-icon editable-submit d-none"
-                                                id="company-description-submit" title="Save Company Description"
-                                                data-field="description">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                            <button
-                                                class="btn btn-sm btn-outline-danger editable-icon editable-cancel d-none"
-                                                id="company-description-cancel" title="Cancel">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
+                                        @endcan
 
                                         <div class="star-rating">
                                             <i class="fas fa-star"></i>
@@ -72,9 +82,11 @@
                                     </div>
 
                                 </div>
-                                <button class="delete-btn delete-company-btn" data-id="{{ $company->id }}">
-                                    <i class="fas fa-trash me-2"></i>DELETE
-                                </button>
+                                @can('company.detail.edit')
+                                    <button class="delete-btn delete-company-btn" data-id="{{ $company->id }}">
+                                        <i class="fas fa-trash me-2"></i>DELETE
+                                    </button>
+                                @endcan
                             </div>
                             <div class="mt-3">
                                 <small class="text-muted">Created by <span
@@ -85,23 +97,27 @@
                                 @foreach ($company->tags as $tag)
                                     <span class="badge-customer mx-1 px-2">
                                         {{ $tag->name }}
-                                        <button type="button" class="btn btn-sm delete-tag-btn"
-                                            data-id="{{ $tag->id }}">
-                                            <i class="fas fa-times"></i>
-                                        </button>
+                                        @can('company.detail.edit')
+                                            <button type="button" class="btn btn-sm delete-tag-btn"
+                                                data-id="{{ $tag->id }}">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        @endcan
                                     </span>
                                 @endforeach
                             </div>
 
-                            <div class="mt-4" id="addCompanyTag">
-                                <select class="form-select d-inline-block w-100 tag-update"
-                                    aria-label="Default select example" id="tagSelect">
-                                    <option value="">Add tags...</option>
-                                    @foreach ($companytags as $companytag)
-                                        <option value="{{ $companytag->id }}">{{ $companytag->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            @can('company.detail.edit')
+                                <div class="mt-4" id="addCompanyTag">
+                                    <select class="form-select d-inline-block w-100 tag-update"
+                                        aria-label="Default select example" id="tagSelect">
+                                        <option value="">Add tags...</option>
+                                        @foreach ($companytags as $companytag)
+                                            <option value="{{ $companytag->id }}">{{ $companytag->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endcan
 
                         </div>
 
@@ -109,7 +125,9 @@
                         <div class="section-card">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5>PEOPLE</h5>
-                                <a href="javascript:void(0);" class="text-warning" id="toggleAddPeople">Add A Person</a>
+                                @can('company.detail.edit')
+                                    <a href="javascript:void(0);" class="text-warning" id="toggleAddPeople">Add A Person</a>
+                                @endcan
                             </div>
 
                             @foreach ($company->peoples as $people)
@@ -129,10 +147,12 @@
                                             <div class="text-muted">{{ $people->peopleEmail->email ?? 'N/A' }}</div>
                                         </div>
 
-                                        <button class="btn btn-sm btn-outline-secondary remove-person-btn"
-                                            data-people-id="{{ $people->id }}" data-company-id="{{ $company->id }}">
-                                            <i class="fas fa-times"></i>
-                                        </button>
+                                        @can('company.detail.edit')
+                                            <button class="btn btn-sm btn-outline-secondary remove-person-btn"
+                                                data-people-id="{{ $people->id }}" data-company-id="{{ $company->id }}">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        @endcan
 
                                     </div>
                                 </div>
@@ -152,30 +172,35 @@
                             </div>
                         </div>
 
-                          <!-- Tasks Section -->
-                        <div class="section-card">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5>COMPANY DASHBOARD</h5>
-                                <a class="text-warning" href="{{ route('admin.company.dashboard',$company->id) }}">Go to Dashboard</a>
-                            </div>
-                            <div class="d-flex align-items-start">
-                                <div class="task-icon me-3">
-                                    <i class="fas fa-list"></i>
+                        @can('company.dashboard.view')
+                            <div class="section-card">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5>COMPANY DASHBOARD</h5>
+                                    <a class="text-warning" href="{{ route('admin.company.dashboard', $company->id) }}">Go to
+                                        Dashboard</a>
                                 </div>
-                                <div class="flex-1">
-                                    <h6>DASHBOARD</h6>
-                                    <p class="text-muted mb-0">Overview of IAQ, Biological Response, Services and Surveys.</p>
+                                <div class="d-flex align-items-start">
+                                    <div class="task-icon me-3">
+                                        <i class="fas fa-list"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h6>DASHBOARD</h6>
+                                        <p class="text-muted mb-0">Overview of IAQ, Biological Response, Services and Surveys.
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        @endcan
 
-                       {{-- Locations Section --}}
+                        {{-- Locations Section --}}
                         <div class="section-card">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5>LOCATIONS</h5>
-                                <a class="text-warning" href="javascript:void(0);" onclick="addLocation()">
-                                    Add A Location
-                                </a>
+                                @can('company.detail.edit')
+                                    <a class="text-warning" href="javascript:void(0);" onclick="addLocation()">
+                                        Add A Location
+                                    </a>
+                                @endcan
                             </div>
 
                             <div class="task-section">
@@ -228,7 +253,9 @@
                         <div class="section-card">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5>TASKS</h5>
-                                <a class="text-warning" href="javascript:void(0);" id="toggleAddTask">Add A Task</a>
+                                @can('company.detail.edit')
+                                    <a class="text-warning" href="javascript:void(0);" id="toggleAddTask">Add A Task</a>
+                                @endcan
                             </div>
 
                             @foreach ($completed_tasks as $task)
@@ -248,21 +275,23 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-6 d-flex justify-content-end">
-                                                <div class="d-flex gap-2">
-                                                    <!-- Reopen Task -->
-                                                    <button class="btn btn-sm btn-outline-warning reopen-task-btn"
-                                                        title="Reopen Task" data-id="{{ $task->id }}">
-                                                        <i class="fas fa-undo"></i>
-                                                    </button>
+                                            @can('company.detail.edit')
+                                                <div class="col-md-6 d-flex justify-content-end">
+                                                    <div class="d-flex gap-2">
+                                                        <!-- Reopen Task -->
+                                                        <button class="btn btn-sm btn-outline-warning reopen-task-btn"
+                                                            title="Reopen Task" data-id="{{ $task->id }}">
+                                                            <i class="fas fa-undo"></i>
+                                                        </button>
 
-                                                    <!-- Delete -->
-                                                    <button class="btn btn-sm btn-outline-secondary delete-task-btn"
-                                                        title="Delete Task" data-id="{{ $task->id }}">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
+                                                        <!-- Delete -->
+                                                        <button class="btn btn-sm btn-outline-secondary delete-task-btn"
+                                                            title="Delete Task" data-id="{{ $task->id }}">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            @endcan
                                         </div>
 
                                     </div>
@@ -284,30 +313,32 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-6 d-flex justify-content-end">
-                                                <div class="d-flex gap-2">
-                                                    <!-- Completed -->
-                                                    <button class="btn btn-sm btn-outline-success mark-complete-btn"
-                                                        title="Mark as Completed" data-id="{{ $task->id }}">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
+                                            @can('company.detail.edit')
+                                                <div class="col-md-6 d-flex justify-content-end">
+                                                    <div class="d-flex gap-2">
+                                                        <!-- Completed -->
+                                                        <button class="btn btn-sm btn-outline-success mark-complete-btn"
+                                                            title="Mark as Completed" data-id="{{ $task->id }}">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
 
-                                                    <!-- Edit -->
-                                                    <button class="btn btn-sm btn-outline-primary toggleEditTask"
-                                                        data-id="{{ $task->id }}" data-title="{{ $task->title }}"
-                                                        data-due="{{ $task->due_time }}"
-                                                        data-user="{{ $task->assignee_id }}"
-                                                        data-description="{{ $task->description }}" title="Edit Task">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
+                                                        <!-- Edit -->
+                                                        <button class="btn btn-sm btn-outline-primary toggleEditTask"
+                                                            data-id="{{ $task->id }}" data-title="{{ $task->title }}"
+                                                            data-due="{{ $task->due_time }}"
+                                                            data-user="{{ $task->assignee_id }}"
+                                                            data-description="{{ $task->description }}" title="Edit Task">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
 
-                                                    <!-- Delete -->
-                                                    <button class="btn btn-sm btn-outline-secondary delete-task-btn"
-                                                        title="Delete Task" data-id="{{ $task->id }}">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
+                                                        <!-- Delete -->
+                                                        <button class="btn btn-sm btn-outline-secondary delete-task-btn"
+                                                            title="Delete Task" data-id="{{ $task->id }}">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            @endcan
                                         </div>
 
                                         <div class="row mt-2">
@@ -383,8 +414,10 @@
                         <div class="section-card">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5>ACTIVITIES</h5>
-                                <a href="javascript:void(0)" onclick="scheduleActivity()" class="text-warning">Schedule
-                                    an activity</a>
+                                @can('company.detail.edit')
+                                    <a href="javascript:void(0)" onclick="scheduleActivity()" class="text-warning">Schedule
+                                        an activity</a>
+                                @endcan
                             </div>
 
                             @foreach ($scheduled_activities as $scheduled_activity)
@@ -410,22 +443,25 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-4 d-flex justify-content-end">
-                                                <div class="d-flex gap-2">
-                                                    <!-- Completed -->
-                                                    <button class="btn btn-sm btn-outline-success log-activity-btn"
-                                                        title="Mark as Completed"
-                                                        data-id="{{ $scheduled_activity->id }}">
-                                                        Log Activity
-                                                    </button>
+                                            @can('company.detail.edit')
+                                                <div class="col-md-4 d-flex justify-content-end">
+                                                    <div class="d-flex gap-2">
+                                                        <!-- Completed -->
+                                                        <button class="btn btn-sm btn-outline-success log-activity-btn"
+                                                            title="Mark as Completed"
+                                                            data-id="{{ $scheduled_activity->id }}">
+                                                            Log Activity
+                                                        </button>
 
-                                                    <!-- Delete -->
-                                                    <button class="btn btn-sm btn-outline-secondary delete-activity-btn"
-                                                        title="Delete Task" data-id="{{ $scheduled_activity->id }}">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
+                                                        <!-- Delete -->
+                                                        <button class="btn btn-sm btn-outline-secondary delete-activity-btn"
+                                                            title="Delete Task" data-id="{{ $scheduled_activity->id }}">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            @endcan
+
                                         </div>
 
                                         <div class="row mt-2">
@@ -466,242 +502,201 @@
                                 </div>
                             </div>
                         </div>
+
+
                         <!-- Notes Section -->
                         <div class="section-card">
-                            <!-- Header Tabs -->
-                            <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link active" id="activity-tab" data-bs-toggle="tab"
-                                        data-bs-target="#write-activity-content" type="button" role="tab"
-                                        aria-controls="write-activity-content" aria-selected="true">
-                                        LOG AN ACTIVITY
-                                    </button>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link" id="note-tab" data-bs-toggle="tab"
-                                        data-bs-target="#write-note-content" type="button" role="tab"
-                                        aria-controls="write-note-content" aria-selected="false">
-                                        <i class="fas fa-edit me-2"></i>WRITE A NOTE
-                                    </button>
-                                </li>
-                                <li class="nav-item ms-auto">
-                                    <button class="btn btn-outline-secondary btn-sm me-2">
-                                        <i class="fas fa-arrow-up me-1"></i>SEND A TEXT
-                                    </button>
-                                    <button class="btn btn-dark btn-sm">
-                                        <i class="fas fa-envelope me-1"></i>SEND AN EMAIL
-                                    </button>
-                                </li>
-                            </ul>
 
-                            <!-- Tab Content -->
-                            <div class="tab-content">
-                                <!-- Activity Tab -->
-                                <div class="tab-pane fade show active activity-form" id="write-activity-content"
-                                    role="tabpanel" aria-labelledby="activity-tab">
-
-                                    <form action="{{ route('admin.login.activity') }}" method="post"
-                                        data-owner-type="Company" data-owner-id="{{ $company->id }}"
-                                        data-status="Logged" id="loginActivity">
-                                        @csrf
-
-                                        <textarea id="activity-note" name="note" class="form-textarea w-100"
-                                            placeholder="Log what happened in your activity… @Mention other users to grab their attention, or reference other companies, people, or users."></textarea>
-
-                                        <!-- Related Leads of this entity -->
-                                        @foreach ($related_leads as $related_lead)
-                                            <input type="hidden" name="leads_ids[]" value="{{ $related_lead->id }}">
-                                        @endforeach
-
-                                        <!-- hidden fields populated before submit -->
-                                        <input type="hidden" name="mentioned_company_ids" id="mentioned_company_ids"
-                                            value="">
-                                        <input type="hidden" name="mentioned_people_ids" id="mentioned_people_ids"
-                                            value="">
-                                        <input type="hidden" name="mentioned_user_ids" id="mentioned_user_ids"
-                                            value="">
-                                        <input type="hidden" name="note_value" id="note_value" value="">
-
-                                        <div class="form-row">
-                                            <div class="activity-form-group">
-                                                <label class="form-label">PARTICIPANTS</label>
-                                                <select id="activity_participant_select" name="participant_id[]"
-                                                    class="form-select-custom" multiple>
-                                                    {{-- Companies --}}
-                                                    <optgroup label="Companies">
-                                                        @foreach ($companies as $c)
-                                                            <option value="{{ $c->id }}"
-                                                                data-entity-type="company"
-                                                                {{ $c->id == $company->id ? 'selected' : '' }}>
-                                                                {{ $c->name }}
-                                                            </option>
-                                                        @endforeach
-
-                                                    </optgroup>
-
-                                                    {{-- Peoples --}}
-                                                    <optgroup label="Peoples">
-                                                        @foreach ($allpeoples as $people)
-                                                            <option value="{{ $people->id }}"
-                                                                data-entity-type="people">
-                                                                {{ $people->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </optgroup>
-
-                                                    {{-- Users --}}
-                                                    <optgroup label="Users">
-                                                        @foreach ($users as $user)
-                                                            <option value="{{ $user->id }}" data-entity-type="user">
-                                                                {{ $user->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </optgroup>
-                                                </select>
-                                            </div>
-
-                                            <div class="activity-form-group">
-                                                <label class="form-label">DESCRIPTION</label>
-                                                <input type="text" style="width: 380px;"
-                                                    placeholder="Add an agenda to share with your attendees..."
-                                                    class="form-select-custom" name="description" />
-                                            </div>
-
-                                        </div>
-
-                                        <div class="form-row">
-                                            <div class="activity-form-group">
-                                                <label class="form-label">ACTIVITY</label>
-                                                <select class="form-select-custom" name="activity_type">
-                                                    <option value="">-- Select --</option>
-                                                    @foreach ($activity_types as $activity_type)
-                                                        <option value="{{ $activity_type->id }}">
-                                                            {{ $activity_type->type }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-
-                                            <div class="activity-form-group">
-                                                <label class="form-label">DURATION</label>
-                                                <input type="hidden" name="start_time" id="start_time">
-                                                <input type="hidden" name="end_time" id="end_time">
-
-                                                <select class="form-select-custom" name="duration" id="duration">
-                                                    <option value="">-- Select --</option>
-                                                    <option value="15">15 Min</option>
-                                                    <option value="30">30 Min</option>
-                                                    <option value="60">1 Hour</option>
-                                                    <option value="120">2 Hours</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="activity-form-group">
-                                                <label class="form-label">DATE</label>
-                                                <input type="date" name="date" id="date"
-                                                    class="activity-date">
-                                            </div>
-
-                                            <div class="activity-form-group">
-                                                <label class="form-label">LOCATION</label>
-                                                <input type="text" placeholder="Add a Location"
-                                                    class="form-select-custom" name="location" />
-                                            </div>
-
-                                        </div>
-
-
-                                        <div class="my-4">
-                                            <button type="submit" class="btn-login">LOGIN ACTIVITY</button>
-                                        </div>
-
-                                    </form>
-                                </div>
-
-                                <!-- Note Tab -->
-                                {{-- <div class="tab-pane fade activity-form" id="write-note-content" role="tabpanel"
-                                    aria-labelledby="note-tab">
-                                    <textarea class="form-textarea w-100" placeholder="Write a note… @Mention other users to grab their attention, or reference other companies and people." rows="6"></textarea>
-                                    <div class="form-row">
-                                        <button class="btn-login">SAVE NOTE</button>
-                                    </div>
-                                </div> --}}
-                                <div class="tab-pane fade activity-form" id="write-note-content" role="tabpanel"
-                                    aria-labelledby="note-tab">
-
-                                    <form action="{{ route('admin.add.note') }}" method="POST"
-                                        data-owner-type="Company" data-owner-id="{{ $company->id }}" id="logNoteForm">
-                                        @csrf
-
-                                        <textarea id="note-textarea" name="note" class="form-textarea w-100"
-                                            placeholder="Write a note… @Mention other users to grab their attention, or reference other companies and people."
-                                            rows="6"></textarea>
-
-                                        <!-- Hidden fields for mentioned entities -->
-                                        <input type="hidden" name="mentioned_company_ids"
-                                            id="note_mentioned_company_ids" value="">
-                                        <input type="hidden" name="mentioned_people_ids" id="note_mentioned_people_ids"
-                                            value="">
-                                        <input type="hidden" name="mentioned_user_ids" id="note_mentioned_user_ids"
-                                            value="">
-
-                                        <!-- Hidden field to store processed note content -->
-                                        <input type="hidden" name="note_value" id="note_value" value="">
-
-                                        <div class="form-row mt-4">
-                                            <button type="submit" class="btn-login">SAVE NOTE</button>
-                                        </div>
-                                    </form>
-                                </div>
-
-                            </div>
-
-
-                            <!-- Filter Section -->
-                            {{-- <div class="filter-section">
-                                <div class="row g-2">
-                                    <div class="col-auto">
-                                        <select class="form-select dropdown-orange">
-                                            <option selected>All Entries</option>
-                                            <option value="1">Last 7 Days</option>
-                                            <option value="2">Last 30 Days</option>
-                                            <option value="3">Last 90 Days</option>
-                                        </select>
-
-                                    </div>
-                                    <div class="col-auto">
-                                        <select name="activity_id" class="form-select dropdown-orange">
-                                            <option value="">-- Select Activity --</option>
-                                            @foreach ($activity_types as $activity_type)
-                                                <option value="{{ $activity_type->id }}">{{ $activity_type->type }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-auto">
-                                        <select class="form-select dropdown-orange">
-                                            <option selected>All Users & Team</option>
-                                            <option value="1">User 1</option>
-                                            <option value="2">User 2</option>
-                                            <option value="3">Team A</option>
-                                        </select>
-
-                                    </div>
-                                    <div class="col-auto">
-                                        <select class="form-select dropdown-orange">
-                                            <option selected>All Time</option>
-                                            <option value="1">Open</option>
-                                            <option value="2">Closed</option>
-                                            <option value="3">Pending</option>
-                                        </select>
-
-                                    </div>
-                                    <div class="col-auto ms-auto d-none">
-                                        <button class="btn btn-warning">
-                                            <i class="fa-regular fa-gear"></i>
+                            @can('company.detail.edit')
+                                <!-- Header Tabs -->
+                                <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="activity-tab" data-bs-toggle="tab"
+                                            data-bs-target="#write-activity-content" type="button" role="tab"
+                                            aria-controls="write-activity-content" aria-selected="true">
+                                            LOG AN ACTIVITY
                                         </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="note-tab" data-bs-toggle="tab"
+                                            data-bs-target="#write-note-content" type="button" role="tab"
+                                            aria-controls="write-note-content" aria-selected="false">
+                                            <i class="fas fa-edit me-2"></i>WRITE A NOTE
+                                        </button>
+                                    </li>
+                                    <li class="nav-item ms-auto">
+                                        <button class="btn btn-outline-secondary btn-sm me-2">
+                                            <i class="fas fa-arrow-up me-1"></i>SEND A TEXT
+                                        </button>
+                                        <button class="btn btn-dark btn-sm">
+                                            <i class="fas fa-envelope me-1"></i>SEND AN EMAIL
+                                        </button>
+                                    </li>
+                                </ul>
+
+                                <!-- Tab Content -->
+                                <div class="tab-content">
+                                    <!-- Activity Tab -->
+                                    <div class="tab-pane fade show active activity-form" id="write-activity-content"
+                                        role="tabpanel" aria-labelledby="activity-tab">
+
+                                        <form action="{{ route('admin.login.activity') }}" method="post"
+                                            data-owner-type="Company" data-owner-id="{{ $company->id }}"
+                                            data-status="Logged" id="loginActivity">
+                                            @csrf
+
+                                            <textarea id="activity-note" name="note" class="form-textarea w-100"
+                                                placeholder="Log what happened in your activity… @Mention other users to grab their attention, or reference other companies, people, or users."></textarea>
+
+                                            <!-- Related Leads of this entity -->
+                                            @foreach ($related_leads as $related_lead)
+                                                <input type="hidden" name="leads_ids[]" value="{{ $related_lead->id }}">
+                                            @endforeach
+
+                                            <!-- hidden fields populated before submit -->
+                                            <input type="hidden" name="mentioned_company_ids" id="mentioned_company_ids"
+                                                value="">
+                                            <input type="hidden" name="mentioned_people_ids" id="mentioned_people_ids"
+                                                value="">
+                                            <input type="hidden" name="mentioned_user_ids" id="mentioned_user_ids"
+                                                value="">
+                                            <input type="hidden" name="note_value" id="note_value" value="">
+
+                                            <div class="form-row">
+                                                <div class="activity-form-group mt-2">
+                                                    <label class="form-label">PARTICIPANTS</label>
+                                                    <select id="activity_participant_select" name="participant_id[]"
+                                                        class="form-select-custom" multiple>
+                                                        {{-- Companies --}}
+                                                        <optgroup label="Companies">
+                                                            @foreach ($companies as $c)
+                                                                <option value="{{ $c->id }}"
+                                                                    data-entity-type="company"
+                                                                    {{ $c->id == $company->id ? 'selected' : '' }}>
+                                                                    {{ $c->name }}
+                                                                </option>
+                                                            @endforeach
+
+                                                        </optgroup>
+
+                                                        {{-- Peoples --}}
+                                                        <optgroup label="Peoples">
+                                                            @foreach ($allpeoples as $people)
+                                                                <option value="{{ $people->id }}"
+                                                                    data-entity-type="people">
+                                                                    {{ $people->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </optgroup>
+
+                                                        {{-- Users --}}
+                                                        <optgroup label="Users">
+                                                            @foreach ($users as $user)
+                                                                <option value="{{ $user->id }}" data-entity-type="user">
+                                                                    {{ $user->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </optgroup>
+                                                    </select>
+                                                </div>
+
+                                                <div class="activity-form-group mt-2">
+                                                    <label class="form-label">DESCRIPTION</label>
+                                                    <input type="text" style="width: 380px;"
+                                                        placeholder="Add an agenda to share with your attendees..."
+                                                        class="form-select-custom" name="description" />
+                                                </div>
+
+                                            </div>
+
+                                            <div class="form-row">
+                                                <div class="activity-form-group mt-2">
+                                                    <label class="form-label">ACTIVITY</label>
+                                                    <select class="form-select-custom" name="activity_type">
+                                                        <option value="">-- Select --</option>
+                                                        @foreach ($activity_types as $activity_type)
+                                                            <option value="{{ $activity_type->id }}">
+                                                                {{ $activity_type->type }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                                <div class="activity-form-group mt-2">
+                                                    <label class="form-label">DURATION</label>
+                                                    <input type="hidden" name="start_time" id="start_time">
+                                                    <input type="hidden" name="end_time" id="end_time">
+
+                                                    <select class="form-select-custom" name="duration" id="duration">
+                                                        <option value="">-- Select --</option>
+                                                        <option value="15">15 Min</option>
+                                                        <option value="30">30 Min</option>
+                                                        <option value="60">1 Hour</option>
+                                                        <option value="120">2 Hours</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="activity-form-group mt-2">
+                                                    <label class="form-label">DATE</label>
+                                                    <input type="date" name="date" id="date"
+                                                        class="activity-date">
+                                                </div>
+
+                                                <div class="activity-form-group mt-2">
+                                                    <label class="form-label">LOCATION</label>
+                                                    <input type="text" placeholder="Add a Location"
+                                                        class="form-select-custom" name="location" />
+                                                </div>
+
+                                            </div>
+
+
+                                            <div class="my-4">
+                                                <button type="submit" class="btn-login">LOGIN ACTIVITY</button>
+                                            </div>
+
+                                        </form>
                                     </div>
+
+                                    <!-- Note Tab -->
+                                    {{-- <div class="tab-pane fade activity-form" id="write-note-content" role="tabpanel"
+                                        aria-labelledby="note-tab">
+                                        <textarea class="form-textarea w-100" placeholder="Write a note… @Mention other users to grab their attention, or reference other companies and people." rows="6"></textarea>
+                                        <div class="form-row">
+                                            <button class="btn-login">SAVE NOTE</button>
+                                        </div>
+                                    </div> --}}
+                                    <div class="tab-pane fade activity-form" id="write-note-content" role="tabpanel"
+                                        aria-labelledby="note-tab">
+
+                                        <form action="{{ route('admin.add.note') }}" method="POST"
+                                            data-owner-type="Company" data-owner-id="{{ $company->id }}" id="logNoteForm">
+                                            @csrf
+
+                                            <textarea id="note-textarea" name="note" class="form-textarea w-100"
+                                                placeholder="Write a note… @Mention other users to grab their attention, or reference other companies and people."
+                                                rows="6"></textarea>
+
+                                            <!-- Hidden fields for mentioned entities -->
+                                            <input type="hidden" name="mentioned_company_ids"
+                                                id="note_mentioned_company_ids" value="">
+                                            <input type="hidden" name="mentioned_people_ids" id="note_mentioned_people_ids"
+                                                value="">
+                                            <input type="hidden" name="mentioned_user_ids" id="note_mentioned_user_ids"
+                                                value="">
+
+                                            <!-- Hidden field to store processed note content -->
+                                            <input type="hidden" name="note_value" id="note_value" value="">
+
+                                            <div class="form-row mt-4">
+                                                <button type="submit" class="btn-login">SAVE NOTE</button>
+                                            </div>
+                                        </form>
+                                    </div>
+
                                 </div>
-                            </div> --}}
+
+                            @endcan
+
                             <div class="filter-section">
                                 <div class="row g-2">
                                     <div class="col-auto">
@@ -845,20 +840,22 @@
                                                                 </p>
                                                             </div>
 
-                                                            <div class="col-4 text-end">
-                                                                <button
-                                                                    class="btn btn-sm btn-outline-primary me-1 add-comment-btn"
-                                                                    title="Add Comment" data-type="Activity"
-                                                                    data-id="{{ $item->id }}">
-                                                                    <i class="fas fa-comment"></i>
-                                                                </button>
-                                                                <button
-                                                                    class="btn btn-sm btn-outline-danger delete-activity-btn"
-                                                                    title="Delete Activity" data-type="Activity"
-                                                                    data-id="{{ $item->id }}">
-                                                                    <i class="fas fa-times"></i>
-                                                                </button>
-                                                            </div>
+                                                            @can('company.detail.edit')
+                                                                <div class="col-4 text-end">
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-primary me-1 add-comment-btn"
+                                                                        title="Add Comment" data-type="Activity"
+                                                                        data-id="{{ $item->id }}">
+                                                                        <i class="fas fa-comment"></i>
+                                                                    </button>
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-danger delete-activity-btn"
+                                                                        title="Delete Activity" data-type="Activity"
+                                                                        data-id="{{ $item->id }}">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </button>
+                                                                </div>
+                                                            @endcan
                                                         </div>
 
                                                         <div class="activity-details">
@@ -901,32 +898,36 @@
                                                                             <span
                                                                                 class="comment-text">{{ $comment->comment }}</span>
                                                                         </div>
-                                                                        <span class="btn btn-sm delete-comment-btn"
-                                                                            data-id="{{ $comment->id }}"
-                                                                            data-type="Activity">
-                                                                            <i class="fas fa-times"></i>
-                                                                        </span>
+                                                                        @can('company.detail.edit')
+                                                                            <span class="btn btn-sm delete-comment-btn"
+                                                                                data-id="{{ $comment->id }}"
+                                                                                data-type="Activity">
+                                                                                <i class="fas fa-times"></i>
+                                                                            </span>
+                                                                        @endcan
                                                                     </div>
                                                                 @endforeach
                                                             </div>
                                                         @endif
 
-                                                        <div class="mt-3 d-none add-comment"
-                                                            data-id="{{ $item->id }}" data-type="Activity">
-                                                            <textarea id="activity-comment-textarea" name="comment_text" class="form-textarea"
-                                                                placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
+                                                        @can('company.detail.edit')
+                                                            <div class="mt-3 d-none add-comment"
+                                                                data-id="{{ $item->id }}" data-type="Activity">
+                                                                <textarea id="activity-comment-textarea" name="comment_text" class="form-textarea"
+                                                                    placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
 
-                                                            <button
-                                                                class="mt-3 btn btn-sm btn-outline-success add-comment-submit"
-                                                                title="">
-                                                                Add Comment
-                                                            </button>
-                                                            <button
-                                                                class="mt-3 btn btn-sm btn-outline-danger comment-cancel"
-                                                                title="Close">
-                                                                Close
-                                                            </button>
-                                                        </div>
+                                                                <button
+                                                                    class="mt-3 btn btn-sm btn-outline-success add-comment-submit"
+                                                                    title="">
+                                                                    Add Comment
+                                                                </button>
+                                                                <button
+                                                                    class="mt-3 btn btn-sm btn-outline-danger comment-cancel"
+                                                                    title="Close">
+                                                                    Close
+                                                                </button>
+                                                            </div>
+                                                        @endcan
 
                                                     </div>
 
@@ -958,20 +959,22 @@
                                                                 </p>
                                                             </div>
 
-                                                            <div class="col-4 text-end">
-                                                                <button
-                                                                    class="btn btn-sm btn-outline-primary me-1 add-comment-btn"
-                                                                    title="Add Comment" data-type="Note"
-                                                                    data-id="{{ $item->id }}">
-                                                                    <i class="fas fa-comment"></i>
-                                                                </button>
-                                                                <button
-                                                                    class="btn btn-sm btn-outline-danger delete-note-btn"
-                                                                    title="Delete Note" data-type="Note"
-                                                                    data-id="{{ $item->id }}">
-                                                                    <i class="fas fa-times"></i>
-                                                                </button>
-                                                            </div>
+                                                            @can('company.detail.edit')
+                                                                <div class="col-4 text-end">
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-primary me-1 add-comment-btn"
+                                                                        title="Add Comment" data-type="Note"
+                                                                        data-id="{{ $item->id }}">
+                                                                        <i class="fas fa-comment"></i>
+                                                                    </button>
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-danger delete-note-btn"
+                                                                        title="Delete Note" data-type="Note"
+                                                                        data-id="{{ $item->id }}">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </button>
+                                                                </div>
+                                                            @endcan
                                                         </div>
 
 
@@ -1008,32 +1011,37 @@
                                                                             <span
                                                                                 class="comment-text">{{ $comment->comment }}</span>
                                                                         </div>
-                                                                        <span class="btn btn-sm delete-comment-btn"
-                                                                            data-id="{{ $comment->id }}"
-                                                                            data-type="Activity">
-                                                                            <i class="fas fa-times"></i>
-                                                                        </span>
+
+                                                                        @can('company.detail.edit')
+                                                                            <span class="btn btn-sm delete-comment-btn"
+                                                                                data-id="{{ $comment->id }}"
+                                                                                data-type="Activity">
+                                                                                <i class="fas fa-times"></i>
+                                                                            </span>
+                                                                        @endcan
                                                                     </div>
                                                                 @endforeach
                                                             </div>
                                                         @endif
 
-                                                        <div class="mt-3 d-none add-comment"
-                                                            data-id="{{ $item->id }}" data-type="Note">
-                                                            <textarea id="note-comment-textarea" name="comment_text" class="form-textarea"
-                                                                placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
+                                                        @can('company.detail.edit')
+                                                            <div class="mt-3 d-none add-comment"
+                                                                data-id="{{ $item->id }}" data-type="Note">
+                                                                <textarea id="note-comment-textarea" name="comment_text" class="form-textarea"
+                                                                    placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
 
-                                                            <button
-                                                                class="mt-3 btn btn-sm btn-outline-success add-comment-submit"
-                                                                title="">
-                                                                Add Comment
-                                                            </button>
-                                                            <button
-                                                                class="mt-3 btn btn-sm btn-outline-danger comment-cancel"
-                                                                title="Close">
-                                                                Close
-                                                            </button>
-                                                        </div>
+                                                                <button
+                                                                    class="mt-3 btn btn-sm btn-outline-success add-comment-submit"
+                                                                    title="">
+                                                                    Add Comment
+                                                                </button>
+                                                                <button
+                                                                    class="mt-3 btn btn-sm btn-outline-danger comment-cancel"
+                                                                    title="Close">
+                                                                    Close
+                                                                </button>
+                                                            </div>
+                                                        @endcan
 
                                                     </div>
 
@@ -1092,9 +1100,13 @@
                         <div class="sidebar-section">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h6>LEADS</h6>
-                                <a href="javascript:void(0)" onclick="addLead()" class="text-warning">Create a lead</a>
+                                @can('company.detail.edit')
+                                    @can('lead.create')
+                                        <a href="javascript:void(0)" onclick="addLead()" class="text-warning">Create a lead</a>
+                                    @endcan
+                                @endcan
                             </div>
-                            <div class="lead-carder" onclick="relatedLeads()">
+                            <div class="lead-carder" @can('company.detail.edit') onclick="relatedLeads()" @endcan>
                                 <div class="row text-center">
                                     <div class="col-3">
                                         <div class="metric-value">${{ $formattedLeadsCount }}</div>
@@ -1116,7 +1128,7 @@
                         <div class="sidebar-section">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h6>KEEP IN TOUCH</h6>
-                                <a href="#" class="text-warning">Remind me to follow up</a>
+                                <a href="#" class="text-warning d-none">Remind me to follow up</a>
                             </div>
                             <p class="small text-muted">Last Contacted 3 Years Ago<br>
                                 You've Never Contacted This Company</p>
@@ -1125,57 +1137,104 @@
                         <div id="company-details-container" data-company-id="{{ $company->id }}">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h6>COMPANY DETAILS</h6>
-                                {{-- <button class="btn btn-outline-secondary btn-sm">Update</button> --}}
-                            </div>
-                            <div class="form-group mb-3">
-                                <label class="form-label"><b>COMPANY Type</b></label>
-                                <select class="form-select company-update" data-field-name="Company Type"
-                                    data-field="company_type_id">
-                                    @foreach ($company_types as $company_type)
-                                        <option value="{{ $company_type->id }}"
-                                            {{ $company->company_type_id == $company_type->id ? 'selected' : '' }}>
-                                            {{ $company_type->type }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group mb-3">
-                                <label class="form-label"><b>INDUSTRY</b></label>
-                                <select class="form-select company-update" data-field-name="Industry"
-                                    data-field="industry_id">
-                                    @foreach ($industries as $industry)
-                                        <option value="{{ $industry->id }}"
-                                            {{ $company->industry_id == $industry->id ? 'selected' : '' }}>
-                                            {{ $industry->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group mb-3">
-                                <label class="form-label"><b>ASSIGNEE</b></label>
-                                <select class="form-select company-update" data-field-name="Assignee"
-                                    data-field="user_id">
-                                    @foreach ($users as $user)
-                                        <option value="{{ $user->id }}"
-                                            {{ $company->user_id == $user->id ? 'selected' : '' }}>
-                                            {{ $user->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group mb-3">
-                                <label class="form-label"><b>TERRITORY</b></label>
-                                <select class="form-select company-update" data-field-name="Territory"
-                                    data-field="territory_id">
-                                    @foreach ($territories as $territory)
-                                        <option value="{{ $territory->id }}"
-                                            {{ $company->territory_id == $territory->id ? 'selected' : '' }}>
-                                            {{ $territory->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
                             </div>
 
                             <div class="form-group mb-3">
+                                <label class="form-label"><b>COMPANY Type</b></label>
+                                @can('company.detail.edit')
+                                    <select class="form-select company-update" data-field-name="Company Type"
+                                        data-field="company_type_id">
+                                        @foreach ($company_types as $company_type)
+                                            <option value="{{ $company_type->id }}"
+                                                {{ $company->company_type_id == $company_type->id ? 'selected' : '' }}>
+                                                {{ $company_type->type }}</option>
+                                        @endforeach
+                                    </select>
+                                @else
+                                    <select class="form-select" disabled>
+                                        @foreach ($company_types as $company_type)
+                                            <option value="{{ $company_type->id }}"
+                                                {{ $company->company_type_id == $company_type->id ? 'selected' : '' }}>
+                                                {{ $company_type->type }}</option>
+                                        @endforeach
+                                    </select>
+                                @endcan
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label"><b>INDUSTRY</b></label>
+                                @can('company.detail.edit')
+                                    <select class="form-select company-update" data-field-name="Industry"
+                                        data-field="industry_id">
+                                        @foreach ($industries as $industry)
+                                            <option value="{{ $industry->id }}"
+                                                {{ $company->industry_id == $industry->id ? 'selected' : '' }}>
+                                                {{ $industry->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @else
+                                    <select class="form-select" disabled>
+                                        @foreach ($industries as $industry)
+                                            <option value="{{ $industry->id }}"
+                                                {{ $company->industry_id == $industry->id ? 'selected' : '' }}>
+                                                {{ $industry->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @endcan
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label"><b>ASSIGNEE</b></label>
+                                @can('company.detail.edit')
+                                    <select class="form-select company-update" data-field-name="Assignee"
+                                        data-field="user_id">
+                                        @foreach ($users as $user)
+                                            <option value="{{ $user->id }}"
+                                                {{ $company->user_id == $user->id ? 'selected' : '' }}>
+                                                {{ $user->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @else
+                                    <select class="form-select" disabled>
+                                        @foreach ($users as $user)
+                                            <option value="{{ $user->id }}"
+                                                {{ $company->user_id == $user->id ? 'selected' : '' }}>
+                                                {{ $user->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @endcan
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label"><b>TERRITORY</b></label>
+                                @can('company.detail.edit')
+                                    <select class="form-select company-update" data-field-name="Territory"
+                                        data-field="territory_id">
+                                        @foreach ($territories as $territory)
+                                            <option value="{{ $territory->id }}"
+                                                {{ $company->territory_id == $territory->id ? 'selected' : '' }}>
+                                                {{ $territory->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @else
+                                    <select class="form-select" disabled>
+                                        @foreach ($territories as $territory)
+                                            <option value="{{ $territory->id }}"
+                                                {{ $company->territory_id == $territory->id ? 'selected' : '' }}>
+                                                {{ $territory->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @endcan
+                            </div>
+
+                            <div class="form-group mb-3">
+                                @can('company.detail.edit')
                                 <div class="row">
                                     <div class="col-6">
                                         <label class="form-label"><b>ANNUAL RE.</b></label>
@@ -1191,6 +1250,20 @@
                                             value="{{ $company->employees_count }}">
                                     </div>
                                 </div>
+                                @else
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label class="form-label"><b>ANNUAL RE.</b></label>
+                                        <input type="text" class="form-control" placeholder="00.00"
+                                        value="{{ $company->annual_revenue}}" readonly>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label"><b>NU. OF EMPLOYEE</b></label>
+                                        <input type="text" class="form-control" placeholder="Enter number of employees"
+                                            value="{{ $company->employees_count }}" readonly>
+                                    </div>
+                                </div>
+                                @endcan
                             </div>
                         </div>
 
@@ -1201,9 +1274,11 @@
                             <div class="sidebar-section" id="email">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <h6 class="form-label">EMAIL</h6>
-                                    <div class="text-warning small toggle-inline-email" style="cursor: pointer;">
-                                        Add/Update Email
-                                    </div>
+                                    @can('company.detail.edit')
+                                        <div class="text-warning small toggle-inline-email" style="cursor: pointer;">
+                                            Add/Update Email
+                                        </div>
+                                    @endcan
                                 </div>
 
                                 <div class="col-12 inline-detail-input">
@@ -1229,12 +1304,15 @@
                                                         <input type="text" name="detail_value[]" class="form-control"
                                                             value="{{ $email['value'] }}" placeholder="Enter email"
                                                             disabled>
-                                                        <button class="btn btn-sm btn-outline-secondary delete-field-btn"
-                                                            data-company-id="{{ $company->id }}"
-                                                            data-type="{{ $email['selected'] }}" data-category="email"
-                                                            {{ $email['selected'] === 'email' ? 'disabled' : '' }}>
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
+
+                                                        @can('company.detail.edit')
+                                                            <button class="btn btn-sm btn-outline-secondary delete-field-btn"
+                                                                data-company-id="{{ $company->id }}"
+                                                                data-type="{{ $email['selected'] }}" data-category="email"
+                                                                {{ $email['selected'] === 'email' ? 'disabled' : '' }}>
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        @endcan
 
                                                     </div>
 
@@ -1288,9 +1366,11 @@
                             <div class="sidebar-section" id="address">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <h6 class="form-label">ADDRESS</h6>
-                                    <div class="text-warning small toggle-inline-address" style="cursor: pointer;">
-                                        Add/Update Address
-                                    </div>
+                                    @can('company.detail.edit')
+                                        <div class="text-warning small toggle-inline-address" style="cursor: pointer;">
+                                            Add/Update Address
+                                        </div>
+                                    @endcan
                                 </div>
 
                                 <div class="col-12 inline-detail-input">
@@ -1315,12 +1395,16 @@
                                                         <input type="text" name="address_value[]" class="form-control"
                                                             value="{{ $address['value'] }}" placeholder="Enter address"
                                                             disabled>
-                                                        <button class="btn btn-sm btn-outline-secondary delete-field-btn"
-                                                            data-company-id="{{ $company->id }}"
-                                                            data-type="{{ $address['selected'] }}" data-category="address"
-                                                            {{ $address['selected'] === 'address' ? 'disabled' : '' }}>
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
+
+                                                        @can('company.detail.edit')
+                                                            <button class="btn btn-sm btn-outline-secondary delete-field-btn"
+                                                                data-company-id="{{ $company->id }}"
+                                                                data-type="{{ $address['selected'] }}"
+                                                                data-category="address"
+                                                                {{ $address['selected'] === 'address' ? 'disabled' : '' }}>
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        @endcan
                                                     </div>
 
                                                 </div>
@@ -1375,9 +1459,11 @@
                             <div class="sidebar-section" id="phone">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <h6 class="form-label">PHONE</h6>
-                                    <div class="text-warning small toggle-inline-phone" style="cursor: pointer;">
-                                        Add/Update Phone
-                                    </div>
+                                    @can('company.detail.edit')
+                                        <div class="text-warning small toggle-inline-phone" style="cursor: pointer;">
+                                            Add/Update Phone
+                                        </div>
+                                    @endcan
                                 </div>
 
                                 <div class="col-12 inline-detail-input">
@@ -1402,12 +1488,15 @@
                                                         <input type="text" name="phone_value[]" class="form-control"
                                                             value="{{ $phone['value'] }}"
                                                             placeholder="Enter phone number" disabled>
-                                                        <button class="btn btn-sm btn-outline-secondary delete-field-btn"
-                                                            data-company-id="{{ $company->id }}"
-                                                            data-type="{{ $phone['selected'] }}" data-category="phone"
-                                                            {{ $phone['selected'] === 'phone' ? 'disabled' : '' }}>
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
+
+                                                        @can('company.detail.edit')
+                                                            <button class="btn btn-sm btn-outline-secondary delete-field-btn"
+                                                                data-company-id="{{ $company->id }}"
+                                                                data-type="{{ $phone['selected'] }}" data-category="phone"
+                                                                {{ $phone['selected'] === 'phone' ? 'disabled' : '' }}>
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        @endcan
 
                                                     </div>
                                                 </div>
@@ -1461,9 +1550,11 @@
                             <div class="sidebar-section" id="url">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <h6 class="form-label">URL</h6>
-                                    <div class="text-warning small toggle-inline-url" style="cursor: pointer;">
-                                        Add/Update URL
-                                    </div>
+                                    @can('company.detail.edit')
+                                        <div class="text-warning small toggle-inline-url" style="cursor: pointer;">
+                                            Add/Update URL
+                                        </div>
+                                    @endcan
                                 </div>
 
                                 <div class="col-12 inline-detail-input">
@@ -1488,12 +1579,14 @@
                                                         <input type="text" name="url_value[]" class="form-control"
                                                             value="{{ $url['value'] }}" placeholder="Enter URL"
                                                             disabled>
-                                                        <button class="btn btn-sm btn-outline-secondary delete-field-btn"
-                                                            data-company-id="{{ $company->id }}"
-                                                            data-type="{{ $url['selected'] }}" data-category="url"
-                                                            {{ $url['selected'] === 'url' ? 'disabled' : '' }}>
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
+                                                        @can('company.detail.edit')
+                                                            <button class="btn btn-sm btn-outline-secondary delete-field-btn"
+                                                                data-company-id="{{ $company->id }}"
+                                                                data-type="{{ $url['selected'] }}" data-category="url"
+                                                                {{ $url['selected'] === 'url' ? 'disabled' : '' }}>
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        @endcan
 
 
                                                     </div>
@@ -1579,35 +1672,37 @@
                                             </a>
                                         </div>
 
-                                        <div class="col-2 text-end">
-                                            {{-- <button class="btn btn-sm btn-outline-danger" title="Cancel">
-                                                <i class="fas fa-times"></i>
-                                            </button> --}}
-                                            <button type="button" class="btn btn-sm btn-outline-danger delete-file-btn"
-                                                data-id="{{ $file->id }}" data-company-id="{{ $company->id }}"
-                                                title="Delete file">
-                                                <i class="fa-solid fa-xmark"></i>
-                                            </button>
-                                        </div>
+                                        @can('company.detail.edit')
+                                            <div class="col-2 text-end">
+                                                <button type="button" class="btn btn-sm btn-outline-danger delete-file-btn"
+                                                    data-id="{{ $file->id }}" data-company-id="{{ $company->id }}"
+                                                    title="Delete file">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                </button>
+                                            </div>
+                                        @endcan
+
                                     </div>
                                 @endforeach
                             </div>
 
 
-                            <form id="companyFileUploadForm" enctype="multipart/form-data"
-                                data-company-id="{{ $company->id }}">
-                                @csrf
-                                <input type="file" id="companyFileInput" name="file" class="d-none" />
-                                <button type="button" class="btn btn-outline-secondary w-100" id="uploadCompanyFileBtn">
-                                    <i class="fas fa-upload me-2"></i>Upload File
-                                </button>
-                            </form>
+                            @can('company.detail.edit')
+                                <form id="companyFileUploadForm" enctype="multipart/form-data"
+                                    data-company-id="{{ $company->id }}">
+                                    @csrf
+                                    <input type="file" id="companyFileInput" name="file" class="d-none" />
+                                    <button type="button" class="btn btn-outline-secondary w-100" id="uploadCompanyFileBtn">
+                                        <i class="fas fa-upload me-2"></i>Upload File
+                                    </button>
+                                </form>
+                            @endcan
 
                             <div id="uploadedFilesList" class="mt-3"></div>
                         </div>
 
 
-                        <div class="sidebar-section">
+                        <div class="sidebar-section d-none">
                             <h6 class="form-label">COMPANY HIERARCHY</h6>
                             <button class="btn btn-outline-secondary w-100">
                                 Upgrade <i class="fas fa-arrow-up ms-2"></i>
@@ -2469,45 +2564,92 @@
             // ==============================
             // Toggle Add people and task
             // ==============================
+            // const toggleBtn = document.getElementById('toggleAddPeople');
+            // const formDiv = document.getElementById('addPeopleForm');
+
+            // const toggleTaskBtn = document.getElementById('toggleAddTask');
+            // const formTaskDiv = document.getElementById('addTaskForm');
+
+            // toggleBtn.addEventListener('click', function(e) {
+            //     e.preventDefault();
+            //     if (formDiv.style.display === "none" || formDiv.style.display === "") {
+            //         formDiv.style.display = "block";
+            //     } else {
+            //         formDiv.style.display = "none";
+            //     }
+            // });
+
+            // toggleTaskBtn.addEventListener('click', function(e) {
+            //     e.preventDefault();
+
+            //     if (formTaskDiv.style.display === "none" || formTaskDiv.style.display === "") {
+            //         formTaskDiv.style.display = "block";
+
+            //         // Reset form
+            //         const form = formTaskDiv.querySelector('form');
+            //         form.reset();
+
+            //         // Reset form action back to store route
+            //         form.setAttribute('action',
+            //             "{{ route('admin.company.tasks.store', $company->id) }}");
+
+            //         // Reset button text and style
+            //         const submitBtn = form.querySelector('button[type="submit"]');
+            //         submitBtn.textContent = "Add Task";
+            //         submitBtn.classList.remove('btn-primary');
+            //         submitBtn.classList.add('btn-warning');
+
+            //     } else {
+            //         formTaskDiv.style.display = "none";
+            //     }
+            // });
+
             const toggleBtn = document.getElementById('toggleAddPeople');
             const formDiv = document.getElementById('addPeopleForm');
 
             const toggleTaskBtn = document.getElementById('toggleAddTask');
             const formTaskDiv = document.getElementById('addTaskForm');
 
-            toggleBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (formDiv.style.display === "none" || formDiv.style.display === "") {
-                    formDiv.style.display = "block";
-                } else {
-                    formDiv.style.display = "none";
-                }
-            });
+            // ---- Add People toggle (permission-safe)
+            if (toggleBtn && formDiv) {
+                toggleBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    formDiv.style.display =
+                        (formDiv.style.display === "none" || formDiv.style.display === "") ?
+                        "block" :
+                        "none";
+                });
+            }
 
-            toggleTaskBtn.addEventListener('click', function(e) {
-                e.preventDefault();
+            // ---- Add Task toggle (permission-safe)
+            if (toggleTaskBtn && formTaskDiv) {
+                toggleTaskBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
 
-                if (formTaskDiv.style.display === "none" || formTaskDiv.style.display === "") {
-                    formTaskDiv.style.display = "block";
+                    if (formTaskDiv.style.display === "none" || formTaskDiv.style.display === "") {
+                        formTaskDiv.style.display = "block";
 
-                    // Reset form
-                    const form = formTaskDiv.querySelector('form');
-                    form.reset();
+                        const form = formTaskDiv.querySelector('form');
+                        if (!form) return;
 
-                    // Reset form action back to store route
-                    form.setAttribute('action',
-                        "{{ route('admin.company.tasks.store', $company->id) }}");
+                        form.reset();
+                        form.setAttribute(
+                            'action',
+                            "{{ route('admin.company.tasks.store', $company->id) }}"
+                        );
 
-                    // Reset button text and style
-                    const submitBtn = form.querySelector('button[type="submit"]');
-                    submitBtn.textContent = "Add Task";
-                    submitBtn.classList.remove('btn-primary');
-                    submitBtn.classList.add('btn-warning');
+                        const submitBtn = form.querySelector('button[type="submit"]');
+                        if (submitBtn) {
+                            submitBtn.textContent = "Add Task";
+                            submitBtn.classList.remove('btn-primary');
+                            submitBtn.classList.add('btn-warning');
+                        }
+                    } else {
+                        formTaskDiv.style.display = "none";
+                    }
+                });
+            }
 
-                } else {
-                    formTaskDiv.style.display = "none";
-                }
-            });
 
 
             // ==============================
@@ -3129,7 +3271,7 @@
             $('#activity_participant_select').select2({
                 placeholder: '-- Select --',
                 allowClear: true,
-                width: '450px' // make it fit the parent width
+                width: '380px' // make it fit the parent width
             });
 
             // ==============================

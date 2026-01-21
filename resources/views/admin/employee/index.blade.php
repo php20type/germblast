@@ -92,7 +92,7 @@
                         <div class="action-bar" id="actionBar">
                             <div class="d-flex align-items-center justify-content-center">
                                 <span class="me-3"><strong id="selectedCount">1</strong> Selected</span>
-                                <button class="btn btn-delete btn-action">DELETE</button>
+                                {{-- <button class="btn btn-delete btn-action">DELETE</button> --}}
                             </div>
                         </div>
 

@@ -1972,6 +1972,7 @@ title {
 .company-details-section .section-card .form-row {
     margin-top: 20px;
     display: flex;
+    flex-wrap: wrap;
     align-items: end;
 }
 

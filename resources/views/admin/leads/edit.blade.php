@@ -2879,7 +2879,7 @@
                     $('#activity_participant_select').select2({
                         placeholder: '-- Select --',
                         allowClear: true,
-                        width: '450px' // make it fit the parent width
+                        width: '380px' // make it fit the parent width
                     });
 
 

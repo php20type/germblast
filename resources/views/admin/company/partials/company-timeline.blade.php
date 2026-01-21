@@ -28,16 +28,18 @@
                             </p>
                         </div>
 
-                        <div class="col-4 text-end">
-                            <button class="btn btn-sm btn-outline-primary me-1 add-comment-btn" title="Add Comment"
-                                data-type="Activity" data-id="{{ $item->id }}">
-                                <i class="fas fa-comment"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger delete-activity-btn" title="Delete Activity"
-                                data-type="Activity" data-id="{{ $item->id }}">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
+                        @can('company.detail.edit')
+                            <div class="col-4 text-end">
+                                <button class="btn btn-sm btn-outline-primary me-1 add-comment-btn" title="Add Comment"
+                                    data-type="Activity" data-id="{{ $item->id }}">
+                                    <i class="fas fa-comment"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger delete-activity-btn" title="Delete Activity"
+                                    data-type="Activity" data-id="{{ $item->id }}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        @endcan
                     </div>
 
                     <div class="activity-details">
@@ -76,26 +78,30 @@
                                         </span>
                                         <span class="comment-text">{{ $comment->comment }}</span>
                                     </div>
-                                    <span class="btn btn-sm delete-comment-btn" data-id="{{ $comment->id }}"
-                                        data-type="Activity">
-                                        <i class="fas fa-times"></i>
-                                    </span>
+                                    @can('company.detail.edit')
+                                        <span class="btn btn-sm delete-comment-btn" data-id="{{ $comment->id }}"
+                                            data-type="Activity">
+                                            <i class="fas fa-times"></i>
+                                        </span>
+                                    @endcan
                                 </div>
                             @endforeach
                         </div>
                     @endif
 
-                    <div class="mt-3 d-none add-comment" data-id="{{ $item->id }}" data-type="Activity">
-                        <textarea id="activity-comment-textarea" name="comment_text" class="form-textarea"
-                            placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
+                    @can('company.detail.edit')
+                        <div class="mt-3 d-none add-comment" data-id="{{ $item->id }}" data-type="Activity">
+                            <textarea id="activity-comment-textarea" name="comment_text" class="form-textarea"
+                                placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
 
-                        <button class="mt-3 btn btn-sm btn-outline-success add-comment-submit" title="">
-                            Add Comment
-                        </button>
-                        <button class="mt-3 btn btn-sm btn-outline-danger comment-cancel" title="Close">
-                            Close
-                        </button>
-                    </div>
+                            <button class="mt-3 btn btn-sm btn-outline-success add-comment-submit" title="">
+                                Add Comment
+                            </button>
+                            <button class="mt-3 btn btn-sm btn-outline-danger comment-cancel" title="Close">
+                                Close
+                            </button>
+                        </div>
+                    @endcan
 
                 </div>
 
@@ -127,16 +133,18 @@
                             </p>
                         </div>
 
-                        <div class="col-4 text-end">
-                            <button class="btn btn-sm btn-outline-primary me-1 add-comment-btn" title="Add Comment"
-                                data-type="Note" data-id="{{ $item->id }}">
-                                <i class="fas fa-comment"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger delete-note-btn" title="Delete Note"
-                                data-type="Note" data-id="{{ $item->id }}">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
+                        @can('company.detail.edit')
+                            <div class="col-4 text-end">
+                                <button class="btn btn-sm btn-outline-primary me-1 add-comment-btn" title="Add Comment"
+                                    data-type="Note" data-id="{{ $item->id }}">
+                                    <i class="fas fa-comment"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger delete-note-btn" title="Delete Note"
+                                    data-type="Note" data-id="{{ $item->id }}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        @endcan
                     </div>
 
 
@@ -170,26 +178,31 @@
                                         </span>
                                         <span class="comment-text">{{ $comment->comment }}</span>
                                     </div>
-                                    <span class="btn btn-sm delete-comment-btn" data-id="{{ $comment->id }}"
-                                        data-type="Activity">
-                                        <i class="fas fa-times"></i>
-                                    </span>
+
+                                    @can('company.detail.edit')
+                                        <span class="btn btn-sm delete-comment-btn" data-id="{{ $comment->id }}"
+                                            data-type="Activity">
+                                            <i class="fas fa-times"></i>
+                                        </span>
+                                    @endcan
                                 </div>
                             @endforeach
                         </div>
                     @endif
 
-                    <div class="mt-3 d-none add-comment" data-id="{{ $item->id }}" data-type="Note">
-                        <textarea id="note-comment-textarea" name="comment_text" class="form-textarea"
-                            placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
+                    @can('company.detail.edit')
+                        <div class="mt-3 d-none add-comment" data-id="{{ $item->id }}" data-type="Note">
+                            <textarea id="note-comment-textarea" name="comment_text" class="form-textarea"
+                                placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
 
-                        <button class="mt-3 btn btn-sm btn-outline-success add-comment-submit" title="">
-                            Add Comment
-                        </button>
-                        <button class="mt-3 btn btn-sm btn-outline-danger comment-cancel" title="Close">
-                            Close
-                        </button>
-                    </div>
+                            <button class="mt-3 btn btn-sm btn-outline-success add-comment-submit" title="">
+                                Add Comment
+                            </button>
+                            <button class="mt-3 btn btn-sm btn-outline-danger comment-cancel" title="Close">
+                                Close
+                            </button>
+                        </div>
+                    @endcan
 
                 </div>
 
