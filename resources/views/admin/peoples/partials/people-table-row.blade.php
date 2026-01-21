@@ -4,9 +4,15 @@
         </td>
         <td>
             <div class="person-name">
-                <a href="{{ route('admin.people.show', $people->id) }}" class="text-decoration-none text-dark">
-                    {{ $people->name ?? 'N/A' }}
-                </a>
+                @can('people.detail.view')
+                    <a href="{{ route('admin.people.show', $people->id) }}" class="text-decoration-none text-dark">
+                        {{ $people->name ?? 'N/A' }}
+                    </a>
+                @else
+                    <span class="text-dark">
+                        {{ $people->name ?? 'N/A' }}
+                    </span>
+                @endcan
             </div>
             <div class="company-name">
                 {{ $people->companiesAlt->first()->name ?? 'N/A' }}

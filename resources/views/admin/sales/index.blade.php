@@ -74,8 +74,8 @@
                                             <p class="section-subtitle">List Summary</p>
                                         </div>
                                         <div class="info-icon d-none">
-                                            <a href="#" data-bs-toggle="modal"
-                                                data-bs-target="#LeadSummaryModal"><i class="fa-regular fa-gear"></i></a>
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#LeadSummaryModal"><i
+                                                    class="fa-regular fa-gear"></i></a>
                                         </div>
                                     </div>
 
@@ -90,23 +90,33 @@
                                         <tbody>
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('admin.lead.index') }}">All Leads</a>
+                                                    @can('lead.list.all.view')
+                                                        <a href="{{ route('admin.lead.index') }}">All Leads</a>
+                                                    @else
+                                                        <span>All Leads</span>
+                                                    @endcan
                                                 </td>
                                                 <td>{{ $allLeadsCount }}</td>
                                                 <td>${{ $allLeadsValueFormatted }}</td>
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('admin.lead.my_leads', auth()->id()) }}">My
-                                                        Leads</a>
+                                                    @can('lead.list.my.view')
+                                                        <a href="{{ route('admin.lead.my_leads', auth()->id()) }}">My Leads</a>
+                                                    @else
+                                                        <span>My Leads</span>
+                                                    @endcan
                                                 </td>
                                                 <td>{{ $myLeadsCount }}</td>
                                                 <td>${{ $myLeadsValueFormatted }}</td>
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('admin.lead.added_this_week') }}">Added this
-                                                        week</a>
+                                                     @can('lead.list.added_this_week.view')
+                                                        <a href="{{ route('admin.lead.added_this_week') }}">Added this week</a>
+                                                    @else
+                                                        <span>Added this week</span>
+                                                    @endcan
                                                 </td>
                                                 <td>{{ $addedThisWeekCount }}</td>
                                                 {{-- <td>$8.99k</td> --}}
@@ -114,15 +124,22 @@
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('admin.lead.closing_this_week') }}">Closing this
-                                                        week</a>
+                                                    @can('lead.list.closing_this_week.view')
+                                                        <a href="{{ route('admin.lead.closing_this_week') }}">Closing this week</a>
+                                                    @else
+                                                        <span>Closing this week</span>
+                                                    @endcan
                                                 </td>
                                                 <td>{{ $closingThisWeekCount }}</td>
                                                 <td>${{ $closingThisWeekValueFormatted }}</td>
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <a href="{{ route('admin.lead.hot_leads') }}">Hot leads</a>
+                                                     @can('lead.list.hot.view')
+                                                        <a href="{{ route('admin.lead.hot_leads') }}">Hot leads</a>
+                                                    @else
+                                                        <span>Hot leads</span>
+                                                    @endcan
                                                 </td>
                                                 <td>{{ $hotLeadsCount }}</td>
                                                 <td>${{ $hotLeadsValueFormatted }}</td>

@@ -4,9 +4,15 @@
 
          <td>
              <div class="company-name">
-                 <a href="{{ route('admin.lead.show', $lead['id']) }}" class="text-decoration-none text-dark">
-                     {{ $lead['name'] }}
-                 </a>
+                 @can('lead.detail.view')
+                     <a href="{{ route('admin.lead.show', $lead['id']) }}" class="text-decoration-none text-dark">
+                         {{ $lead['name'] }}
+                     </a>
+                 @else
+                     <span class="text-dark">
+                         {{ $lead['name'] }}
+                     </span>
+                 @endcan
              </div>
              <div class="company-name">{{ $lead['people_name'] }}</div>
          </td>

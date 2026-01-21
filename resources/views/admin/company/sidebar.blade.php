@@ -24,11 +24,14 @@
             <div class="mt-4">
                 <h6 class="text-uppercase text-light mb-2">SHARED
                     LISTS ⚙️</h6>
+                @can('company.list.my.view')
                 <a class="nav-link company-filter {{ request()->routeIs('admin.company.my_companies') ? 'active' : '' }}"
                     href="{{ route('admin.company.my_companies', auth()->id()) }}">
                     My companies
                     <span class="badge bg-light text-dark">{{ $formattedMyCompanies }}</span>
                 </a>
+                @endcan
+
                 <div id="nothing-found" style="display:none;">Nothing found.</div>
             </div>
         </div>

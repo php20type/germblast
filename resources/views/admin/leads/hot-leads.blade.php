@@ -65,9 +65,7 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            {{-- <button class="btn btn-primary me-2" onclick="addFilter()">
-                                                <img src="{{ asset('img/icons/filter.svg') }}" alt="" />
-                                            </button> --}}
+
                                             <button class="btn btn-primary me-2 position-relative" onclick="addFilter()">
                                                 <img src="{{ asset('img/icons/filter.svg') }}" alt="" />
 
@@ -137,10 +135,18 @@
 
                                                     <td>
                                                         <div class="company-name">
-                                                            <a href="{{ route('admin.lead.show', $lead['id']) }}"
-                                                                class="text-decoration-none text-dark">
-                                                                {{ $lead['name'] }}
-                                                            </a>
+
+                                                             @can('lead.detail.view')
+                                                                <a href="{{ route('admin.lead.show', $lead['id']) }}"
+                                                                    class="text-decoration-none text-dark">
+                                                                    {{ $lead['name'] }}
+                                                                </a>
+                                                            @else
+                                                                <span class="text-dark">
+                                                                    {{ $lead['name'] }}
+                                                                </span>
+                                                            @endcan
+
                                                         </div>
                                                         <div class="company-name">{{ $lead['people_name'] }}</div>
                                                     </td>
@@ -167,7 +173,11 @@
                             <div class="action-bar" id="actionBar">
                                 <div class="d-flex align-items-center justify-content-center">
                                     <span class="me-3"><strong id="selectedCount">1</strong> Selected</span>
-                                    <button class="btn btn-delete btn-action">DELETE</button>
+                                    @can('lead.delete')
+                                        <button class="btn btn-delete btn-action">
+                                            DELETE
+                                        </button>
+                                    @endcan
                                 </div>
                             </div>
 

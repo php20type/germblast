@@ -70,9 +70,7 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                        {{-- <button class="btn btn-primary me-2" onclick="addFilter()">
-                                            <img src="{{ asset('img/icons/filter.svg') }}" alt="" />
-                                        </button> --}}
+
                                         <button class="btn btn-primary me-2 position-relative" onclick="addFilter()">
                                             <img src="{{ asset('img/icons/filter.svg') }}" alt="" />
 
@@ -116,10 +114,16 @@
                                                 </td>
                                                 <td>
                                                     <div class="company-name">
-                                                        <a href="{{ route('admin.company.show', $company->id) }}"
-                                                            class="text-decoration-none text-dark">
-                                                            {{ $company->name ?? 'N/A' }}
-                                                        </a>
+                                                        @can('company.detail.view')
+                                                            <a href="{{ route('admin.company.show', $company->id) }}"
+                                                                class="text-decoration-none text-dark">
+                                                                {{ $company->name ?? 'N/A' }}
+                                                            </a>
+                                                        @else
+                                                            <span class="text-dark">
+                                                                {{ $company->name ?? 'N/A' }}
+                                                            </span>
+                                                        @endcan
                                                     </div>
                                                     <div class="company-name">
                                                         {{ $company->peoples->first()?->name ?? 'N/A' }}
@@ -162,8 +166,15 @@
                         <div class="action-bar" id="actionBar">
                             <div class="d-flex align-items-center justify-content-center">
                                 <span class="me-3"><strong id="selectedCount">1</strong> Selected</span>
+
+                                @can('lead.create')
                                 <button class="btn btn-edit btn-action" onclick="addLead()">CREATE LEAD</button>
+                                @endcan
+
+                                @can('company.delete')
                                 <button class="btn btn-delete btn-action">DELETE</button>
+                                @endcan
+
                             </div>
                         </div>
 

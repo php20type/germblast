@@ -21,6 +21,7 @@
         <div class="container-fluid">
             <div class="row">
                 <!-- Top Row -->
+                @can('company.create')
                 <div class="col-lg-3 col-md-6 col-module">
                     <div class="card-module" data-bs-toggle="modal" data-bs-target="#AddCompany">
                         <div class="icon-wrapper icon-company">
@@ -30,7 +31,9 @@
                         <p class="card-text">Organizations And Groups You May Do Business With</p>
                     </div>
                 </div>
+                @endcan
 
+                @can('people.create')
                 <div class="col-lg-3 col-md-6 col-module">
                     <div class="card-module" data-bs-toggle="modal" data-bs-target="#AddPerson">
                         <div class="icon-wrapper icon-person">
@@ -40,7 +43,9 @@
                         <p class="card-text">Individuals You Know Or May Do Business With</p>
                     </div>
                 </div>
+                @endcan
 
+                @can('lead.create')
                 <div class="col-lg-3 col-md-6 col-module">
                     <div class="card-module" data-bs-toggle="modal" data-bs-target="#AddLead">
                         <div class="icon-wrapper icon-lead">
@@ -50,6 +55,7 @@
                         <p class="card-text">A Deal Or Opportunity To Make A Sale</p>
                     </div>
                 </div>
+                @endcan
 
                 <div class="col-lg-3 col-md-6 col-module">
                     <div class="card-module" data-bs-toggle="modal" data-bs-target="#AddActivity">
