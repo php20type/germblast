@@ -25,7 +25,9 @@
                                 <div class="section-card">
                                     <div class="section-header d-flex justify-content-between">
                                         <h3 class="section-title">IAQ Zones</h3>
-                                        <a href="#" class="btn btn-sm btn-primary" onclick="addZone()">Add Zone</a>
+                                        @can('company.dashboard.edit')
+                                            <a href="#" class="btn btn-sm btn-primary" onclick="addZone()">Add Zone</a>
+                                        @endcan
                                     </div>
 
                                     <table class="table table-bordered align-middle">
@@ -39,10 +41,14 @@
                                             @forelse ($iaqZones as $zone)
                                                 <tr>
                                                     <td>
-                                                        <a href="javascript:void(0)"
-                                                            onclick="editZone({{ $zone->id }})">
+                                                        @can('company.dashboard.edit')
+                                                            <a href="javascript:void(0)"
+                                                                onclick="editZone({{ $zone->id }})">
+                                                                {{ $zone->name }}
+                                                            </a>
+                                                        @else
                                                             {{ $zone->name }}
-                                                        </a>
+                                                        @endcan
                                                     </td>
                                                     <td>{{ $zone->companyLocation->location_name ?? '-' }}</td>
                                                 </tr>
@@ -62,7 +68,9 @@
                                 <div class="section-card">
                                     <div class="section-header d-flex justify-content-between">
                                         <h3 class="section-title">IAQ Devices</h3>
-                                        <a href="#" class="btn btn-sm btn-primary" onclick="addDevice()">Add Meter</a>
+                                        @can('company.dashboard.edit')
+                                            <a href="#" class="btn btn-sm btn-primary" onclick="addDevice()">Add Meter</a>
+                                        @endcan
                                     </div>
 
                                     <table class="table table-bordered align-middle">
@@ -78,10 +86,14 @@
                                             @forelse ($iaqDevices as $device)
                                                 <tr>
                                                     <td>
-                                                        <a href="javascript:void(0)"
-                                                            onclick="editDevice({{ $device->id }})">
+                                                        @can('company.dashboard.edit')
+                                                            <a href="javascript:void(0)"
+                                                                onclick="editDevice({{ $device->id }})">
+                                                                {{ $device->name }}
+                                                            </a>
+                                                        @else
                                                             {{ $device->name }}
-                                                        </a>
+                                                        @endcan
                                                     </td>
                                                     <td>{{ $device->iaqZone->name ?? '-' }}</td>
                                                     <td>{{ $device->iaqZone->companyLocation->location_name ?? '-' }}</td>
@@ -106,8 +118,10 @@
                                 <div class="section-card">
                                     <div class="section-header d-flex justify-content-between">
                                         <h3 class="section-title">Biological Response Intake</h3>
-                                        <a href="{{ route('admin.company.biological.response', $company->id) }}"
-                                            class="btn btn-sm btn-success">Add Intake</a>
+                                        @can('company.dashboard.edit')
+                                            <a href="{{ route('admin.company.biological.response', $company->id) }}"
+                                                class="btn btn-sm btn-success">Add Intake</a>
+                                        @endcan
                                     </div>
 
                                     <table class="table table-bordered align-middle">
@@ -122,10 +136,15 @@
                                         <tbody>
                                             @forelse ($biologicalResponseIntakes as $intake)
                                                 <tr>
-                                                    <td><a
-                                                            href="{{ route('admin.company.biological.response.edit', [$company->id, $intake->id]) }}">
+                                                    <td>
+                                                        @can('company.dashboard.edit')
+                                                            <a href="{{ route('admin.company.biological.response.edit', [$company->id, $intake->id]) }}">
+                                                                {{ $intake->project_name }}
+                                                            </a>
+                                                        @else
                                                             {{ $intake->project_name }}
-                                                        </a></td>
+                                                        @endcan
+                                                    </td>
                                                     <td>{{ $intake->project_leader }}</td>
                                                     <td>{{ $intake->project_zip }}</td>
                                                     <td>{{ $intake->type_of_loss }}</td>
@@ -150,8 +169,10 @@
                                     <div class="section-header d-flex justify-content-between">
                                         <h3 class="section-title">Biological Readiness Intake</h3>
                                         {{-- <button class="btn btn-sm btn-success">Add Intake</button> --}}
-                                        <a href="{{ route('admin.company.biological.readiness', $company->id) }}"
-                                            class="btn btn-sm btn-success">Add Intake</a>
+                                        @can('company.dashboard.edit')
+                                            <a href="{{ route('admin.company.biological.readiness', $company->id) }}"
+                                                class="btn btn-sm btn-success">Add Intake</a>
+                                        @endcan
                                     </div>
 
                                     <table class="table table-bordered align-middle">
@@ -168,8 +189,11 @@
                                             @forelse ($biologicalReadiness as $readiness)
                                                 <tr>
                                                     <td>
-                                                        <a
-                                                            href="{{ route('admin.company.biological.readiness.edit', [$company->id, $readiness->id]) }}">{{ $readiness->project_name }}</a>
+                                                        @can('company.dashboard.edit')
+                                                            <a href="{{ route('admin.company.biological.readiness.edit', [$company->id, $readiness->id]) }}">{{ $readiness->project_name }}</a>
+                                                        @else
+                                                            {{ $readiness->project_name }}
+                                                        @endcan
                                                     </td>
                                                     <td>
                                                         {{ $readiness->status }}
@@ -200,9 +224,10 @@
                                 <div class="section-card">
                                     <div class="section-header d-flex justify-content-between">
                                         <h3 class="section-title">Indoor Air Quality</h3>
-                                        {{-- <button class="btn btn-sm btn-success">Create IAQ Survey</button> --}}
-                                        <a href="{{ route('admin.company.iaq.survey', $company->id) }}"
+                                        @can('company.dashboard.edit')
+                                            <a href="{{ route('admin.company.iaq.survey', $company->id) }}"
                                             class="btn btn-sm btn-success">Create IAQ Survey</a>
+                                        @endcan
                                     </div>
 
                                     <table class="table table-bordered align-middle">
@@ -219,9 +244,12 @@
                                             @forelse ($iaqSurveys as $survey)
                                                 <tr>
                                                     <td>
-                                                        {{-- {{ $survey->survey_name ?? '-' }} --}}
+                                                        @can('company.dashboard.edit')
                                                         <a
                                                             href="{{ route('admin.company.iaq.survey.edit', [$company->id, $survey->id]) }}">{{ $survey->survey_name ?? '-' }}</a>
+                                                        @else
+                                                            {{ $survey->survey_name ?? '-' }}
+                                                        @endcan
                                                     </td>
 
                                                     <td>
@@ -260,9 +288,10 @@
                                 <div class="section-card">
                                     <div class="section-header d-flex justify-content-between">
                                         <h3 class="section-title">Water Management</h3>
-                                        {{-- <button class="btn btn-sm btn-success">Create H2O Survey</button> --}}
+                                        @can('company.dashboard.edit')
                                         <a href="{{ route('admin.company.water.management', $company->id) }}"
                                             class="btn btn-sm btn-success">Create H2O Survey</a>
+                                        @endcan
                                     </div>
 
                                     <table class="table table-bordered align-middle">
@@ -278,11 +307,14 @@
                                             @forelse ($waterManagement as $water)
                                                 <tr>
                                                     <td>
-                                                        {{-- {{ $water->survey_name ?? '-' }} --}}
+                                                        @can('company.dashboard.edit')
                                                         <a
                                                             href="{{ route('admin.company.water.management.edit', [$company->id, $water->id]) }}">
                                                         {{ $water->survey_name ?? '-' }}
                                                         </a>
+                                                        @else
+                                                            {{ $water->survey_name ?? '-' }}
+                                                        @endcan
                                                     </td>
 
                                                     <td>{{ $water->created_at->format('d M Y') }}</td>

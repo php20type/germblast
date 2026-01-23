@@ -15,29 +15,38 @@
                             <div class="project-header">
                                 <div class="title-row">
                                     <div class="title-section">
-                                        <div class="d-flex justify-content-between align-items-center">
 
-                                            <img src="{{ $leadStatusIcon }}" alt="Lead Status" id="lead-status-icon">
-
-                                            <!-- Lead Name -->
-                                            <div class="d-flex align-items-center mb-2" style="gap: 5px;">
-                                                <h1 class="mb-1 editable-field" contenteditable="true" spellcheck="false"
-                                                    id="lead-update-name" data-lead-id="{{ $leads->id }}">
+                                        @can('lead.detail.edit')
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <img src="{{ $leadStatusIcon }}" alt="Lead Status" id="lead-status-icon">
+                                                <!-- Lead Name -->
+                                                <div class="d-flex align-items-center mb-2" style="gap: 5px;">
+                                                    <h1 class="mb-1 editable-field" contenteditable="true" spellcheck="false"
+                                                        id="lead-update-name" data-lead-id="{{ $leads->id }}">
+                                                        {{ $leads->name ?? 'N/A' }}
+                                                    </h1>
+                                                    <button
+                                                        class="btn btn-sm btn-outline-success editable-icon editable-submit d-none"
+                                                        id="lead-name-submit" title="Save Lead Name" data-field="name">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                    <button
+                                                        class="btn btn-sm btn-outline-danger editable-icon editable-cancel d-none"
+                                                        id="lead-name-cancel" title="Cancel">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="d-flex justify-content-left align-items-center">
+                                                <img src="{{ $leadStatusIcon }}" alt="Lead Status" id="lead-status-icon">
+                                                <h1 class="mb-1">
                                                     {{ $leads->name ?? 'N/A' }}
                                                 </h1>
-                                                <button
-                                                    class="btn btn-sm btn-outline-success editable-icon editable-submit d-none"
-                                                    id="lead-name-submit" title="Save Lead Name" data-field="name">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
-                                                <button
-                                                    class="btn btn-sm btn-outline-danger editable-icon editable-cancel d-none"
-                                                    id="lead-name-cancel" title="Cancel">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
                                             </div>
+                                        @endcan
 
-                                        </div>
+
                                         <div class="project-id">#{{ $leads->id }}</div>
 
                                         <div class="mt-3">
@@ -45,10 +54,12 @@
                                                 @foreach ($leads->tags as $tag)
                                                     <span class="badge-customer mx-1 px-2">
                                                         {{ $tag->name }}
-                                                        <button type="button" class="btn btn-sm delete-tag-btn"
-                                                            data-id="{{ $tag->id }}">
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
+                                                        @can('lead.detail.edit')
+                                                            <button type="button" class="btn btn-sm delete-tag-btn"
+                                                                data-id="{{ $tag->id }}">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        @endcan
                                                     </span>
                                                 @endforeach
                                             </div>
@@ -58,15 +69,17 @@
                                     <div class="amount">${{ $formattedLeadValue }}</div>
                                 </div>
 
-                                <div class="mt-4 my-3" id="addLeadTag">
-                                    <select class="form-select d-inline-block w-100 tag-update"
-                                        aria-label="Default select example" id="tagSelect">
-                                        <option value="">Add tags...</option>
-                                        @foreach ($tags as $tag)
-                                            <option value="{{ $tag->id }}">{{ $tag->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                @can('lead.detail.edit')
+                                    <div class="mt-4 my-3" id="addLeadTag">
+                                        <select class="form-select d-inline-block w-100 tag-update"
+                                            aria-label="Default select example" id="tagSelect">
+                                            <option value="">Add tags...</option>
+                                            @foreach ($tags as $tag)
+                                                <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endcan
 
                                 <div class="info-grid">
                                     <div class="info-item">
@@ -92,384 +105,295 @@
                                 </div>
                             </div>
 
-                            <div class="pipeline-section">
-                                <div class="pipeline-header">
-                                    <div class="pipeline-title">Pipeline: Default Pipeline</div>
+
+                            @can('lead.detail.edit')
+                                <div class="pipeline-section">
+                                    <div class="pipeline-header">
+                                        <div class="pipeline-title">Pipeline: Default Pipeline</div>
+                                    </div>
+
+                                    <ul class="step-menu list-inline">
+                                        @foreach ($leadStages as $leadStage)
+                                            <li role="button"
+                                                class="stage-item {{ $leadStage->id <= $leads->stage_id ? 'current' : '' }}"
+                                                data-stage-id="{{ $leadStage->id }}" data-lead-id="{{ $leads->id }}">
+                                                {{ $leadStage->name }}
+                                            </li>
+                                        @endforeach
+                                    </ul>
                                 </div>
-
-                                <ul class="step-menu list-inline">
-                                    @foreach ($leadStages as $leadStage)
-                                        <li role="button"
-                                            class="stage-item {{ $leadStage->id <= $leads->stage_id ? 'current' : '' }}"
-                                            data-stage-id="{{ $leadStage->id }}" data-lead-id="{{ $leads->id }}">
-                                            {{ $leadStage->name }}
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                            <div class="pipeline-section">
-                                <div class="pipeline-header">
-                                    <div class="pipeline-title d-none">Stage Tasks</div>
-                                    <a href="#" class="d-none text-warning">Edit processes</a>
-                                </div>
-
-                                {{-- <div id="initial-meeting-stage" class="{{ $leads->stage_id == 1 ? '' : 'd-none' }}">
-                                    <div class="task-section mt-2">
-                                        <div class="company-list mb-3 border rounded p-3">
-                                            <div class="row align-items-start">
-                                                <div class="col-md-8">
-                                                    <div class="company-name">
-                                                        <p><strong>Initial Meeting</strong></p>
-                                                        <p class="text-secondary">
-                                                            Completed On Aug 27, 2025 7:00 AM
-                                                            <span class="text-warning">
-                                                                By Jordan Barboza
-                                                            </span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4 d-flex justify-content-end">
-                                                    <div class="d-flex gap-2">
-                                                        <!-- Completed -->
-                                                        <button class="btn btn-sm btn-outline-success"
-                                                            onclick="markCompleted()" title="Mark as Completed">
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12 my-4">
-                                                <label for="meeting" class="form-label">Schedule meeting</label>
-                                                <input type="text" name="due_date" id="due_date" class="form-control"
-                                                    placeholder="Select meeting date" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> --}}
-
-                                <div id="initial-meeting-stage" class="{{ $leads->stage_id == 1 ? '' : 'd-none' }}">
-                                    <div class="task-section mt-2">
-                                        <div class="company-list mb-3 border rounded p-4 shadow-sm bg-white">
-
-                                            <!-- HEADER -->
-                                            <div class="row align-items-center mb-3">
-                                                <div class="col-md-8">
-                                                    <h5 class="mb-1">Initial Meeting</h5>
-
-                                                    {{-- If Completed --}}
-                                                    @if ($stage && $stage->initial_meeting_completed_at)
-                                                        <p class="text-secondary mb-0" style="font-size: 16px;">
-                                                            Completed On
-                                                            <strong>
-                                                                {{ \Carbon\Carbon::parse($stage->initial_meeting_completed_at)->format('M d, Y g:i A') }}
-                                                            </strong>
-                                                            <span class="text-warning">
-                                                                By {{ $stage->initialMeetingCompletedBy->name ?? 'N/A' }}
-                                                            </span>
-                                                        </p>
-                                                    @endif
-
-                                                    {{-- If Scheduled but not completed --}}
-                                                    @if ($stage && $stage->initial_meeting_scheduled_at && !$stage->initial_meeting_completed_at)
-                                                        <p class="text-secondary mb-0" style="font-size: 16px;">
-                                                            Scheduled On
-                                                            <strong>
-                                                                {{ \Carbon\Carbon::parse($stage->initial_meeting_scheduled_at)->format('M d, Y g:i A') }}
-                                                            </strong>
-                                                        </p>
-                                                    @endif
-                                                </div>
-
-                                                <div class="col-md-4 d-flex justify-content-end">
-
-                                                    {{-- If COMPLETED → show "Reopen" button --}}
-                                                    @if ($stage && $stage->initial_meeting_completed_at)
-                                                        <button class="btn btn-sm btn-outline-warning"
-                                                            onclick="reopenInitialMeeting()" title="Reopen Stage">
-                                                            <i class="fas fa-undo"></i>
-                                                        </button>
-
-                                                        {{-- If NOT completed but scheduled → show "Complete" button --}}
-                                                    @elseif ($stage && $stage->initial_meeting_scheduled_at)
-                                                        <button class="btn btn-sm btn-outline-success mx-2"
-                                                            onclick="initialMeetingCompleted()">
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
-
-                                                        <!-- Edit -->
-                                                        <button class="btn btn-sm btn-outline-primary" title="Edit Stage"
-                                                            onclick="editInitialMeeting()">
-                                                            <i class="fas fa-edit"></i>
-                                                        </button>
-                                                    @else
-                                                        <button class="btn btn-sm btn-outline-secondary" disabled
-                                                            title="Schedule meeting first">
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
-                                                    @endif
-
-                                                </div>
-                                            </div>
-
-                                            <!-- SCHEDULE MEETING SECTION -->
-                                            <div class="mt-3">
-                                                {{-- HIDE SCHEDULER IF COMPLETED --}}
-                                                @if (!$stage || !$stage->initial_meeting_completed_at)
-                                                    {{-- If scheduled already, show summary, NOT the input --}}
-                                                    @if ($stage && !$stage->initial_meeting_scheduled_at)
-                                                        {{-- Show scheduler input --}}
-                                                        <label class="form-label fw-bold">Schedule Meeting</label>
-                                                        <div class="row g-2 align-items-center">
-
-                                                            <div class="col-md-8 col-12">
-                                                                <input type="datetime-local" name="schedule_meeting_date"
-                                                                    id="schedule_meeting_date" class="form-control"
-                                                                    required>
-                                                            </div>
-
-                                                            <div class="col-md-4 col-12">
-                                                                <button class="btn btn-success w-100"
-                                                                    onclick="scheduleMeeting()">
-                                                                    Schedule
-                                                                </button>
-                                                            </div>
-
-                                                        </div>
-                                                    @endif
-                                                @endif
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-
-
-
-                                {{-- <div id="site-survey-stage" class="{{ $leads->stage_id == 2 ? '' : 'd-none' }}">
-                                    {{-- Sales Forecasting --}
-                                    <div class="task-section mt-2">
-                                        <div class="company-list mb-3 border rounded p-3">
-                                            <div class="row align-items-start">
-                                                <div class="col-md-8">
-                                                    <div class="company-name">
-                                                        <p><strong>Sales Forecasting</strong></p>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4 d-flex justify-content-end">
-                                                    <div class="d-flex gap-2">
-                                                        <a class="text-warning" href="javascript:void(0);"
-                                                            onclick="addForecasting()">
-                                                            Add Forecasting</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <div class="pipeline-section">
+                                    <div class="pipeline-header">
+                                        <div class="pipeline-title d-none">Stage Tasks</div>
+                                        <a href="#" class="d-none text-warning">Edit processes</a>
                                     </div>
 
-                                    {{-- Survey & Proposal --}
-                                    <div class="task-section mt-2">
-                                        <div class="company-list mb-3 border rounded p-3">
-                                            <div class="row align-items-start">
-                                                <div class="col-md-8">
-                                                    <div class="company-name">
-                                                        <p><strong>Survey & Proposal</strong></p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4 d-flex justify-content-end">
-                                                    <div class="d-flex gap-2">
-                                                        <a class="text-warning"
-                                                            href="{{ route('admin.lead.survey.proposal', $leads->id) }}"
-                                                            target="_blank" id="toggleAddProposal">Add Proposal</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
 
-                                    <div class="task-section mt-2">
-                                        <div class="company-list mb-3 border rounded p-3">
-                                            <div class="row align-items-start">
-                                                <div class="col-md-8">
-                                                    <div class="company-name">
-                                                        <p><strong>Perform Site Survey</strong></p>
-                                                        <p class="text-secondary">
-                                                            Completed On Aug 27, 2025 7:00 AM
-                                                            <span class="text-warning">
-                                                                By Jordan Barboza
-                                                            </span>
-                                                        </p>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-4 d-flex justify-content-end">
-                                                    <div class="d-flex gap-2">
-                                                        {{-- Buttons --}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="timeline-container" style="font-size: small">
-                                                <div class="timeline-content p-3">
-                                                    You must have a logged activity attached to the lead to complete this
-                                                    step.
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-                                </div> --}}
-
-
-                                <div id="site-survey-stage" class="{{ $leads->stage_id == 2 ? '' : 'd-none' }}">
-
-                                    @php
-                                        // Only show forecasting & proposal AFTER site survey is COMPLETED
-                                        $isSurveyCompleted = $stage && $stage->site_survey_completed_at;
-                                    @endphp
-
-                                    {{-- PERFORM SITE SURVEY --}}
-                                    <div class="task-section mt-2">
-                                        <div class="company-list mb-3 border rounded p-4 shadow-sm bg-white">
-
-                                            <!-- HEADER -->
-                                            <div class="row align-items-center mb-3">
-                                                <div class="col-md-8">
-
-                                                    <h5 class="mb-1">Perform Site Survey</h5>
-
-                                                    {{-- Completed --}}
-                                                    @if ($stage && $stage->site_survey_completed_at)
-                                                        <p class="text-secondary mb-0" style="font-size: 16px;">
-                                                            Completed On
-                                                            <strong>
-                                                                {{ \Carbon\Carbon::parse($stage->site_survey_completed_at)->format('M d, Y g:i A') }}
-                                                            </strong>
-                                                            <span class="text-warning">
-                                                                By {{ $stage->siteSurveyCompletedBy->name ?? 'N/A' }}
-                                                            </span>
-                                                        </p>
-                                                    @endif
-
-                                                    {{-- Scheduled but not completed --}}
-                                                    @if ($stage && $stage->site_survey_scheduled_at && !$stage->site_survey_completed_at)
-                                                        <p class="text-secondary mb-0" style="font-size: 16px;">
-                                                            Scheduled On
-                                                            <strong>
-                                                                {{ \Carbon\Carbon::parse($stage->site_survey_scheduled_at)->format('M d, Y g:i A') }}
-                                                            </strong>
-                                                        </p>
-                                                    @endif
-
-                                                </div>
-
-                                                <div class="col-md-4 d-flex justify-content-end">
-
-                                                    {{-- Completed → Reopen --}}
-                                                    @if ($stage && $stage->site_survey_completed_at)
-                                                        <button class="btn btn-sm btn-outline-warning"
-                                                            onclick="reopenSiteSurvey()" title="Reopen Stage">
-                                                            <i class="fas fa-undo"></i>
-                                                        </button>
-
-                                                        {{-- Scheduled → Complete + Edit --}}
-                                                    @elseif ($stage && $stage->site_survey_scheduled_at)
-                                                        <button class="btn btn-sm btn-outline-success mx-2"
-                                                            onclick="completeSiteSurvey()" title="Mark as Completed">
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
-
-                                                        <button class="btn btn-sm btn-outline-primary"
-                                                            onclick="editSiteSurvey()" title="Edit Site Survey">
-                                                            <i class="fas fa-edit"></i>
-                                                        </button>
-
-                                                        {{-- Not Scheduled --}}
-                                                    @else
-                                                        <button class="btn btn-sm btn-outline-secondary" disabled
-                                                            title="Schedule survey first">
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
-                                                    @endif
-
-                                                </div>
-                                            </div>
-
-
-                                            <!-- SCHEDULE SITE SURVEY -->
-                                            <div class="mt-3">
-                                                @if (!$stage || !$stage->site_survey_completed_at)
-
-                                                    @if ($stage && !$stage->site_survey_scheduled_at)
-                                                        <label class="form-label fw-bold">Schedule Site Survey</label>
-
-                                                        <div class="row g-2 align-items-center">
-
-                                                            <div class="col-md-8 col-12">
-                                                                <input type="datetime-local" name="site_survey_date"
-                                                                    id="site_survey_date" class="form-control" required>
-                                                            </div>
-
-                                                            <div class="col-md-4 col-12">
-                                                                <button class="btn btn-success w-100"
-                                                                    onclick="scheduleSiteSurvey()">
-                                                                    Schedule
-                                                                </button>
-                                                            </div>
-
-                                                        </div>
-                                                    @endif
-
-                                                @endif
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-                                    {{-- SHOW THESE SECTIONS ONLY WHEN SITE SURVEY IS COMPLETED --}}
-                                    @if ($isSurveyCompleted)
-                                        {{-- SALES FORECASTING --}}
+                                    <div id="initial-meeting-stage" class="{{ $leads->stage_id == 1 ? '' : 'd-none' }}">
                                         <div class="task-section mt-2">
                                             <div class="company-list mb-3 border rounded p-4 shadow-sm bg-white">
-                                                <div class="row align-items-center">
+
+                                                <!-- HEADER -->
+                                                <div class="row align-items-center mb-3">
                                                     <div class="col-md-8">
-                                                        <h5 class="mb-1">Sales Forecasting</h5>
+                                                        <h5 class="mb-1">Initial Meeting</h5>
+
+                                                        {{-- If Completed --}}
+                                                        @if ($stage && $stage->initial_meeting_completed_at)
+                                                            <p class="text-secondary mb-0" style="font-size: 16px;">
+                                                                Completed On
+                                                                <strong>
+                                                                    {{ \Carbon\Carbon::parse($stage->initial_meeting_completed_at)->format('M d, Y g:i A') }}
+                                                                </strong>
+                                                                <span class="text-warning">
+                                                                    By {{ $stage->initialMeetingCompletedBy->name ?? 'N/A' }}
+                                                                </span>
+                                                            </p>
+                                                        @endif
+
+                                                        {{-- If Scheduled but not completed --}}
+                                                        @if ($stage && $stage->initial_meeting_scheduled_at && !$stage->initial_meeting_completed_at)
+                                                            <p class="text-secondary mb-0" style="font-size: 16px;">
+                                                                Scheduled On
+                                                                <strong>
+                                                                    {{ \Carbon\Carbon::parse($stage->initial_meeting_scheduled_at)->format('M d, Y g:i A') }}
+                                                                </strong>
+                                                            </p>
+                                                        @endif
                                                     </div>
 
                                                     <div class="col-md-4 d-flex justify-content-end">
-                                                        <a class="text-warning fw-semibold" href="javascript:void(0);"
-                                                            onclick="addForecasting()">
-                                                            Add Forecasting
-                                                        </a>
+
+                                                        {{-- If COMPLETED → show "Reopen" button --}}
+                                                        @if ($stage && $stage->initial_meeting_completed_at)
+                                                            <button class="btn btn-sm btn-outline-warning"
+                                                                onclick="reopenInitialMeeting()" title="Reopen Stage">
+                                                                <i class="fas fa-undo"></i>
+                                                            </button>
+
+                                                            {{-- If NOT completed but scheduled → show "Complete" button --}}
+                                                        @elseif ($stage && $stage->initial_meeting_scheduled_at)
+                                                            <button class="btn btn-sm btn-outline-success mx-2"
+                                                                onclick="initialMeetingCompleted()">
+                                                                <i class="fas fa-check"></i>
+                                                            </button>
+
+                                                            <!-- Edit -->
+                                                            <button class="btn btn-sm btn-outline-primary" title="Edit Stage"
+                                                                onclick="editInitialMeeting()">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                        @else
+                                                            <button class="btn btn-sm btn-outline-secondary" disabled
+                                                                title="Schedule meeting first">
+                                                                <i class="fas fa-check"></i>
+                                                            </button>
+                                                        @endif
+
                                                     </div>
                                                 </div>
+
+                                                <!-- SCHEDULE MEETING SECTION -->
+                                                <div class="mt-3">
+                                                    {{-- HIDE SCHEDULER IF COMPLETED --}}
+                                                    @if (!$stage || !$stage->initial_meeting_completed_at)
+                                                        {{-- If scheduled already, show summary, NOT the input --}}
+                                                        @if ($stage && !$stage->initial_meeting_scheduled_at)
+                                                            {{-- Show scheduler input --}}
+                                                            <label class="form-label fw-bold">Schedule Meeting</label>
+                                                            <div class="row g-2 align-items-center">
+
+                                                                <div class="col-md-8 col-12">
+                                                                    <input type="datetime-local" name="schedule_meeting_date"
+                                                                        id="schedule_meeting_date" class="form-control"
+                                                                        required>
+                                                                </div>
+
+                                                                <div class="col-md-4 col-12">
+                                                                    <button class="btn btn-success w-100"
+                                                                        onclick="scheduleMeeting()">
+                                                                        Schedule
+                                                                    </button>
+                                                                </div>
+
+                                                            </div>
+                                                        @endif
+                                                    @endif
+                                                </div>
+
                                             </div>
                                         </div>
+                                    </div>
 
-                                        {{-- SURVEY & PROPOSAL --}}
+
+                                    <div id="site-survey-stage" class="{{ $leads->stage_id == 2 ? '' : 'd-none' }}">
+
+                                        @php
+                                            // Only show forecasting & proposal AFTER site survey is COMPLETED
+                                            $isSurveyCompleted = $stage && $stage->site_survey_completed_at;
+                                        @endphp
+
+                                        {{-- PERFORM SITE SURVEY --}}
                                         <div class="task-section mt-2">
                                             <div class="company-list mb-3 border rounded p-4 shadow-sm bg-white">
-                                                <div class="row align-items-center">
+
+                                                <!-- HEADER -->
+                                                <div class="row align-items-center mb-3">
                                                     <div class="col-md-8">
-                                                        <h5 class="mb-1">Survey & Proposal</h5>
+
+                                                        <h5 class="mb-1">Perform Site Survey</h5>
+
+                                                        {{-- Completed --}}
+                                                        @if ($stage && $stage->site_survey_completed_at)
+                                                            <p class="text-secondary mb-0" style="font-size: 16px;">
+                                                                Completed On
+                                                                <strong>
+                                                                    {{ \Carbon\Carbon::parse($stage->site_survey_completed_at)->format('M d, Y g:i A') }}
+                                                                </strong>
+                                                                <span class="text-warning">
+                                                                    By {{ $stage->siteSurveyCompletedBy->name ?? 'N/A' }}
+                                                                </span>
+                                                            </p>
+                                                        @endif
+
+                                                        {{-- Scheduled but not completed --}}
+                                                        @if ($stage && $stage->site_survey_scheduled_at && !$stage->site_survey_completed_at)
+                                                            <p class="text-secondary mb-0" style="font-size: 16px;">
+                                                                Scheduled On
+                                                                <strong>
+                                                                    {{ \Carbon\Carbon::parse($stage->site_survey_scheduled_at)->format('M d, Y g:i A') }}
+                                                                </strong>
+                                                            </p>
+                                                        @endif
+
                                                     </div>
 
                                                     <div class="col-md-4 d-flex justify-content-end">
-                                                        <a class="text-warning fw-semibold"
-                                                            href="{{ route('admin.lead.survey.proposal', $leads->id) }}"
-                                                            target="_blank">
-                                                            Add Proposal
-                                                        </a>
+
+                                                        {{-- Completed → Reopen --}}
+                                                        @if ($stage && $stage->site_survey_completed_at)
+                                                            <button class="btn btn-sm btn-outline-warning"
+                                                                onclick="reopenSiteSurvey()" title="Reopen Stage">
+                                                                <i class="fas fa-undo"></i>
+                                                            </button>
+
+                                                            {{-- Scheduled → Complete + Edit --}}
+                                                        @elseif ($stage && $stage->site_survey_scheduled_at)
+                                                            <button class="btn btn-sm btn-outline-success mx-2"
+                                                                onclick="completeSiteSurvey()" title="Mark as Completed">
+                                                                <i class="fas fa-check"></i>
+                                                            </button>
+
+                                                            <button class="btn btn-sm btn-outline-primary"
+                                                                onclick="editSiteSurvey()" title="Edit Site Survey">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+
+                                                            {{-- Not Scheduled --}}
+                                                        @else
+                                                            <button class="btn btn-sm btn-outline-secondary" disabled
+                                                                title="Schedule survey first">
+                                                                <i class="fas fa-check"></i>
+                                                            </button>
+                                                        @endif
+
+                                                    </div>
+                                                </div>
+
+
+                                                <!-- SCHEDULE SITE SURVEY -->
+                                                <div class="mt-3">
+                                                    @if (!$stage || !$stage->site_survey_completed_at)
+
+                                                        @if ($stage && !$stage->site_survey_scheduled_at)
+                                                            <label class="form-label fw-bold">Schedule Site Survey</label>
+
+                                                            <div class="row g-2 align-items-center">
+
+                                                                <div class="col-md-8 col-12">
+                                                                    <input type="datetime-local" name="site_survey_date"
+                                                                        id="site_survey_date" class="form-control" required>
+                                                                </div>
+
+                                                                <div class="col-md-4 col-12">
+                                                                    <button class="btn btn-success w-100"
+                                                                        onclick="scheduleSiteSurvey()">
+                                                                        Schedule
+                                                                    </button>
+                                                                </div>
+
+                                                            </div>
+                                                        @endif
+
+                                                    @endif
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        {{-- SHOW THESE SECTIONS ONLY WHEN SITE SURVEY IS COMPLETED --}}
+                                        @if ($isSurveyCompleted)
+                                            {{-- SALES FORECASTING --}}
+                                            <div class="task-section mt-2">
+                                                <div class="company-list mb-3 border rounded p-4 shadow-sm bg-white">
+                                                    <div class="row align-items-center">
+                                                        <div class="col-md-8">
+                                                            <h5 class="mb-1">Sales Forecasting</h5>
+                                                        </div>
+
+                                                        <div class="col-md-4 d-flex justify-content-end">
+                                                            <a class="text-warning fw-semibold" href="javascript:void(0);"
+                                                                onclick="addForecasting()">
+                                                                Add Forecasting
+                                                            </a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    @endif
+
+                                            {{-- SURVEY & PROPOSAL --}}
+                                            <div class="task-section mt-2">
+                                                <div class="company-list mb-3 border rounded p-4 shadow-sm bg-white">
+                                                    <div class="row align-items-center">
+                                                        <div class="col-md-8">
+                                                            <h5 class="mb-1">Survey & Proposal</h5>
+                                                        </div>
+
+                                                        <div class="col-md-4 d-flex justify-content-end">
+                                                            <a class="text-warning fw-semibold"
+                                                                href="{{ route('admin.lead.survey.proposal', $leads->id) }}"
+                                                                target="_blank">
+                                                                Add Proposal
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                    </div>
 
                                 </div>
 
-                            </div>
+                            @else
+
+                                <div class="pipeline-section">
+                                    <div class="pipeline-header">
+                                        <div class="pipeline-title">Pipeline: Default Pipeline</div>
+                                    </div>
+
+                                    <ul class="step-menu list-inline">
+                                        @foreach ($leadStages as $leadStage)
+                                            <li
+                                                class="{{ $leadStage->id <= $leads->stage_id ? 'current' : '' }}">
+                                                {{ $leadStage->name }}
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+
+                            @endcan
+
                         </div>
 
 
@@ -477,7 +401,9 @@
                         <div class="section-card">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5>TASKS</h5>
-                                <a class="text-warning" href="javascript:void(0);" id="toggleAddTask">Add A Task</a>
+                                @can('lead.detail.edit')
+                                    <a class="text-warning" href="javascript:void(0);" id="toggleAddTask">Add A Task</a>
+                                @endcan
                             </div>
 
                             @foreach ($completed_tasks as $task)
@@ -496,21 +422,23 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-6 d-flex justify-content-end">
-                                                <div class="d-flex gap-2">
-                                                    <!-- Reopen Task -->
-                                                    <button class="btn btn-sm btn-outline-warning reopen-task-btn"
-                                                        title="Reopen Task" data-id="{{ $task->id }}">
-                                                        <i class="fas fa-undo"></i>
-                                                    </button>
+                                            @can('lead.detail.edit')
+                                                <div class="col-md-6 d-flex justify-content-end">
+                                                    <div class="d-flex gap-2">
+                                                        <!-- Reopen Task -->
+                                                        <button class="btn btn-sm btn-outline-warning reopen-task-btn"
+                                                            title="Reopen Task" data-id="{{ $task->id }}">
+                                                            <i class="fas fa-undo"></i>
+                                                        </button>
 
-                                                    <!-- Delete -->
-                                                    <button class="btn btn-sm btn-outline-secondary delete-task-btn"
-                                                        title="Delete Task" data-id="{{ $task->id }}">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
+                                                        <!-- Delete -->
+                                                        <button class="btn btn-sm btn-outline-secondary delete-task-btn"
+                                                            title="Delete Task" data-id="{{ $task->id }}">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            @endcan
                                         </div>
 
                                     </div>
@@ -532,30 +460,32 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-6 d-flex justify-content-end">
-                                                <div class="d-flex gap-2">
-                                                    <!-- Completed -->
-                                                    <button class="btn btn-sm btn-outline-success mark-complete-btn"
-                                                        title="Mark as Completed" data-id="{{ $task->id }}">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
+                                            @can('lead.detail.edit')
+                                                <div class="col-md-6 d-flex justify-content-end">
+                                                    <div class="d-flex gap-2">
+                                                        <!-- Completed -->
+                                                        <button class="btn btn-sm btn-outline-success mark-complete-btn"
+                                                            title="Mark as Completed" data-id="{{ $task->id }}">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
 
-                                                    <!-- Edit -->
-                                                    <button class="btn btn-sm btn-outline-primary toggleEditTask"
-                                                        data-id="{{ $task->id }}" data-title="{{ $task->title }}"
-                                                        data-due="{{ $task->due_time }}"
-                                                        data-user="{{ $task->assignee_id }}"
-                                                        data-description="{{ $task->description }}" title="Edit Task">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
+                                                        <!-- Edit -->
+                                                        <button class="btn btn-sm btn-outline-primary toggleEditTask"
+                                                            data-id="{{ $task->id }}" data-title="{{ $task->title }}"
+                                                            data-due="{{ $task->due_time }}"
+                                                            data-user="{{ $task->assignee_id }}"
+                                                            data-description="{{ $task->description }}" title="Edit Task">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
 
-                                                    <!-- Delete -->
-                                                    <button class="btn btn-sm btn-outline-secondary delete-task-btn"
-                                                        title="Delete Task" data-id="{{ $task->id }}">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
+                                                        <!-- Delete -->
+                                                        <button class="btn btn-sm btn-outline-secondary delete-task-btn"
+                                                            title="Delete Task" data-id="{{ $task->id }}">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            @endcan
                                         </div>
 
                                         <div class="row mt-2">
@@ -581,103 +511,107 @@
                             </div>
                         </div>
 
-                        {{-- Task form --}}
-                        <div id="addTaskForm" class="my-3" style="display: none;">
+                        @can('lead.detail.edit')
+                            {{-- Task form --}}
+                            <div id="addTaskForm" class="my-3" style="display: none;">
 
-                            <form id="addTaskAjaxForm" action="{{ route('admin.lead.tasks.store', $leads->id) }}"
-                                method="POST">
-                                @csrf
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-2">
-                                            <input type="text" name="title" class="form-control" id="title"
-                                                placeholder="Add a Task" required>
+                                <form id="addTaskAjaxForm" action="{{ route('admin.lead.tasks.store', $leads->id) }}"
+                                    method="POST">
+                                    @csrf
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-2">
+                                                <input type="text" name="title" class="form-control" id="title"
+                                                    placeholder="Add a Task" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="mb-2">
+                                                <input type="text" name="due_date" id="due_date" class="form-control"
+                                                    placeholder="Select due date" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="mb-2">
+                                                <select class="form-select" name="user_id" required>
+                                                    <option value="">-- Select User --</option>
+                                                    @foreach ($users as $user)
+                                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="mb-2">
+                                                <textarea rows="3" placeholder="Include any description you need to help complete this task…"
+                                                    name="description" class="form-control"></textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <button type="submit" class="btn btn-warning btn-sm">Add
+                                                Task</button>
                                         </div>
                                     </div>
+                                </form>
 
-                                    <div class="col-md-6">
-                                        <div class="mb-2">
-                                            <input type="text" name="due_date" id="due_date" class="form-control"
-                                                placeholder="Select due date" required>
+                            </div>
+
+
+                            <div id="EditTaskForm" class="my-3" style="display: none;">
+
+                                <form id="editTaskAjaxForm" action="" method="POST">
+                                    @csrf
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-2">
+                                                <input type="text" name="title" class="form-control"
+                                                    placeholder="Add a Task" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="mb-2">
+                                                <input type="text" name="due_date" id="due_date" class="form-control"
+                                                    placeholder="Select due date" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="mb-2">
+                                                <select class="form-select" name="user_id" required>
+                                                    <option value="">-- Select User --</option>
+                                                    @foreach ($users as $user)
+                                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="mb-2">
+                                                <textarea rows="3" placeholder="Include any description you need to help complete this task…"
+                                                    name="description" class="form-control"></textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <button type="submit" class="btn btn-warning btn-sm">Update
+                                                Task</button>
                                         </div>
                                     </div>
-                                    <div class="col-md-12">
-                                        <div class="mb-2">
-                                            <select class="form-select" name="user_id" required>
-                                                <option value="">-- Select User --</option>
-                                                @foreach ($users as $user)
-                                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="mb-2">
-                                            <textarea rows="3" placeholder="Include any description you need to help complete this task…"
-                                                name="description" class="form-control"></textarea>
-                                        </div>
-                                    </div>
+                                </form>
 
-                                    <div class="col-md-12">
-                                        <button type="submit" class="btn btn-warning btn-sm">Add
-                                            Task</button>
-                                    </div>
-                                </div>
-                            </form>
-
-                        </div>
-
-
-                        <div id="EditTaskForm" class="my-3" style="display: none;">
-
-                            <form id="editTaskAjaxForm" action="" method="POST">
-                                @csrf
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-2">
-                                            <input type="text" name="title" class="form-control"
-                                                placeholder="Add a Task" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <div class="mb-2">
-                                            <input type="text" name="due_date" id="due_date" class="form-control"
-                                                placeholder="Select due date" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="mb-2">
-                                            <select class="form-select" name="user_id" required>
-                                                <option value="">-- Select User --</option>
-                                                @foreach ($users as $user)
-                                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="mb-2">
-                                            <textarea rows="3" placeholder="Include any description you need to help complete this task…"
-                                                name="description" class="form-control"></textarea>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-12">
-                                        <button type="submit" class="btn btn-warning btn-sm">Update
-                                            Task</button>
-                                    </div>
-                                </div>
-                            </form>
-
-                        </div>
+                            </div>
+                        @endcan
 
                         <!-- Activities Section -->
                         <div class="section-card">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5>ACTIVITIES</h5>
-                                <a href="javascript:void(0)" onclick="scheduleActivity()" class="text-warning">Schedule
-                                    an activity</a>
+                                @can('lead.detail.edit')
+                                    <a href="javascript:void(0)" onclick="scheduleActivity()" class="text-warning">Schedule
+                                        an activity</a>
+                                @endcan
                             </div>
 
                             @foreach ($scheduled_activities as $scheduled_activity)
@@ -703,22 +637,24 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-4 d-flex justify-content-end">
-                                                <div class="d-flex gap-2">
-                                                    <!-- Completed -->
-                                                    <button class="btn btn-sm btn-outline-success log-activity-btn"
-                                                        title="Mark as Completed"
-                                                        data-id="{{ $scheduled_activity->id }}">
-                                                        Log Activity
-                                                    </button>
+                                            @can('lead.detail.edit')
+                                                <div class="col-md-4 d-flex justify-content-end">
+                                                    <div class="d-flex gap-2">
+                                                        <!-- Completed -->
+                                                        <button class="btn btn-sm btn-outline-success log-activity-btn"
+                                                            title="Mark as Completed"
+                                                            data-id="{{ $scheduled_activity->id }}">
+                                                            Log Activity
+                                                        </button>
 
-                                                    <!-- Delete -->
-                                                    <button class="btn btn-sm btn-outline-secondary delete-activity-btn"
-                                                        title="Delete Task" data-id="{{ $scheduled_activity->id }}">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
+                                                        <!-- Delete -->
+                                                        <button class="btn btn-sm btn-outline-secondary delete-activity-btn"
+                                                            title="Delete Task" data-id="{{ $scheduled_activity->id }}">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            @endcan
                                         </div>
 
                                         <div class="row mt-2">
@@ -760,191 +696,187 @@
                                 </div>
                             </div>
                         </div>
+
                         <!-- Notes Section -->
                         <div class="section-card">
-                            <!-- Header Tabs -->
-                            <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link active" id="activity-tab" data-bs-toggle="tab"
-                                        data-bs-target="#write-activity-content" type="button" role="tab"
-                                        aria-controls="write-activity-content" aria-selected="true">
-                                        LOG AN ACTIVITY
-                                    </button>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link" id="note-tab" data-bs-toggle="tab"
-                                        data-bs-target="#write-note-content" type="button" role="tab"
-                                        aria-controls="write-note-content" aria-selected="false">
-                                        <i class="fas fa-edit me-2"></i>WRITE A NOTE
-                                    </button>
-                                </li>
-                                <li class="nav-item ms-auto">
-                                    <button class="btn btn-outline-secondary btn-sm me-2">
-                                        <i class="fas fa-arrow-up me-1"></i>SEND A TEXT
-                                    </button>
-                                    <button class="btn btn-dark btn-sm">
-                                        <i class="fas fa-envelope me-1"></i>SEND AN EMAIL
-                                    </button>
-                                </li>
-                            </ul>
 
-                            <!-- Tab Content -->
-                            <div class="tab-content">
-                                <!-- Activity Tab -->
-                                <div class="tab-pane fade show active activity-form" id="write-activity-content"
-                                    role="tabpanel" aria-labelledby="activity-tab">
+                            @can('lead.detail.edit')
+                                <!-- Header Tabs -->
+                                <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="activity-tab" data-bs-toggle="tab"
+                                            data-bs-target="#write-activity-content" type="button" role="tab"
+                                            aria-controls="write-activity-content" aria-selected="true">
+                                            LOG AN ACTIVITY
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="note-tab" data-bs-toggle="tab"
+                                            data-bs-target="#write-note-content" type="button" role="tab"
+                                            aria-controls="write-note-content" aria-selected="false">
+                                            <i class="fas fa-edit me-2"></i>WRITE A NOTE
+                                        </button>
+                                    </li>
+                                    <li class="nav-item ms-auto">
+                                        <button class="btn btn-outline-secondary btn-sm me-2">
+                                            <i class="fas fa-arrow-up me-1"></i>SEND A TEXT
+                                        </button>
+                                        <button class="btn btn-dark btn-sm">
+                                            <i class="fas fa-envelope me-1"></i>SEND AN EMAIL
+                                        </button>
+                                    </li>
+                                </ul>
 
-                                    <form action="{{ route('admin.login.activity') }}" method="post"
-                                        data-owner-type="Lead" data-owner-id="{{ $leads->id }}" data-status="Logged"
-                                        id="loginActivity">
-                                        @csrf
+                                <!-- Tab Content -->
+                                <div class="tab-content">
+                                    <!-- Activity Tab -->
+                                    <div class="tab-pane fade show active activity-form" id="write-activity-content"
+                                        role="tabpanel" aria-labelledby="activity-tab">
 
-                                        <textarea id="activity-note" name="note" class="form-textarea w-100"
-                                            placeholder="Log what happened in your activity… @Mention other users to grab their attention, or reference other companies, people, or users."></textarea>
+                                        <form action="{{ route('admin.login.activity') }}" method="post"
+                                            data-owner-type="Lead" data-owner-id="{{ $leads->id }}" data-status="Logged"
+                                            id="loginActivity">
+                                            @csrf
 
-                                        <!-- Related Leads of this entity -->
-                                        <input type="hidden" name="leads_ids[]" value="{{ $leads->id }}">
+                                            <textarea id="activity-note" name="note" class="form-textarea w-100"
+                                                placeholder="Log what happened in your activity… @Mention other users to grab their attention, or reference other companies, people, or users."></textarea>
 
-                                        <!-- hidden fields populated before submit -->
-                                        <input type="hidden" name="mentioned_company_ids" id="mentioned_company_ids"
-                                            value="">
-                                        <input type="hidden" name="mentioned_people_ids" id="mentioned_people_ids"
-                                            value="">
-                                        <input type="hidden" name="mentioned_user_ids" id="mentioned_user_ids"
-                                            value="">
-                                        <input type="hidden" name="note_value" id="note_value" value="">
+                                            <!-- Related Leads of this entity -->
+                                            <input type="hidden" name="leads_ids[]" value="{{ $leads->id }}">
+
+                                            <!-- hidden fields populated before submit -->
+                                            <input type="hidden" name="mentioned_company_ids" id="mentioned_company_ids"
+                                                value="">
+                                            <input type="hidden" name="mentioned_people_ids" id="mentioned_people_ids"
+                                                value="">
+                                            <input type="hidden" name="mentioned_user_ids" id="mentioned_user_ids"
+                                                value="">
+                                            <input type="hidden" name="note_value" id="note_value" value="">
 
 
-                                        <div class="form-row">
-                                            <div class="activity-form-group">
-                                                <label class="form-label">PARTICIPANTS</label>
-                                                <select id="activity_participant_select" name="participant_id[]"
-                                                    class="form-select-custom" multiple>
-                                                    {{-- Companies --}}
-                                                    <optgroup label="Companies">
-                                                        @foreach ($companies as $company)
-                                                            <option value="{{ $company->id }}"
-                                                                data-entity-type="company">
-                                                                {{ $company->name }}
-                                                            </option>
+                                            <div class="form-row">
+                                                <div class="activity-form-group">
+                                                    <label class="form-label">PARTICIPANTS</label>
+                                                    <select id="activity_participant_select" name="participant_id[]"
+                                                        class="form-select-custom" multiple>
+                                                        {{-- Companies --}}
+                                                        <optgroup label="Companies">
+                                                            @foreach ($companies as $company)
+                                                                <option value="{{ $company->id }}"
+                                                                    data-entity-type="company">
+                                                                    {{ $company->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </optgroup>
+
+                                                        {{-- Peoples --}}
+                                                        <optgroup label="Peoples">
+                                                            @foreach ($allpeoples as $people)
+                                                                <option value="{{ $people->id }}"
+                                                                    data-entity-type="people">
+                                                                    {{ $people->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </optgroup>
+
+                                                        {{-- Users --}}
+                                                        <optgroup label="Users">
+                                                            @foreach ($users as $user)
+                                                                <option value="{{ $user->id }}" data-entity-type="user">
+                                                                    {{ $user->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </optgroup>
+                                                    </select>
+                                                </div>
+
+                                                <div class="activity-form-group">
+                                                    <label class="form-label">DESCRIPTION</label>
+                                                    <input type="text" style="width: 380px;"
+                                                        placeholder="Add an agenda to share with your attendees..."
+                                                        class="form-select-custom" name="description" />
+                                                </div>
+
+                                            </div>
+
+                                            <div class="form-row">
+                                                <div class="activity-form-group">
+                                                    <label class="form-label">ACTIVITY</label>
+                                                    <select class="form-select-custom" name="activity_type">
+                                                        <option value="">-- Select --</option>
+                                                        @foreach ($activity_types as $activity_type)
+                                                            <option value="{{ $activity_type->id }}">
+                                                                {{ $activity_type->type }}</option>
                                                         @endforeach
-                                                    </optgroup>
+                                                    </select>
+                                                </div>
 
-                                                    {{-- Peoples --}}
-                                                    <optgroup label="Peoples">
-                                                        @foreach ($allpeoples as $people)
-                                                            <option value="{{ $people->id }}"
-                                                                data-entity-type="people">
-                                                                {{ $people->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </optgroup>
+                                                <div class="activity-form-group">
+                                                    <label class="form-label">DURATION</label>
+                                                    <input type="hidden" name="start_time" id="start_time">
+                                                    <input type="hidden" name="end_time" id="end_time">
 
-                                                    {{-- Users --}}
-                                                    <optgroup label="Users">
-                                                        @foreach ($users as $user)
-                                                            <option value="{{ $user->id }}" data-entity-type="user">
-                                                                {{ $user->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </optgroup>
-                                                </select>
+                                                    <select class="form-select-custom" name="duration" id="duration">
+                                                        <option value="">-- Select --</option>
+                                                        <option value="15">15 Min</option>
+                                                        <option value="30">30 Min</option>
+                                                        <option value="60">1 Hour</option>
+                                                        <option value="120">2 Hours</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="activity-form-group">
+                                                    <label class="form-label">DATE</label>
+                                                    <input type="date" name="date" id="date"
+                                                        class="activity-date">
+                                                </div>
+
+                                                <div class="activity-form-group">
+                                                    <label class="form-label">LOCATION</label>
+                                                    <input type="text" placeholder="Add a Location"
+                                                        class="form-select-custom" name="location" />
+                                                </div>
+
                                             </div>
 
-                                            <div class="activity-form-group">
-                                                <label class="form-label">DESCRIPTION</label>
-                                                <input type="text" style="width: 380px;"
-                                                    placeholder="Add an agenda to share with your attendees..."
-                                                    class="form-select-custom" name="description" />
+
+                                            <div class="my-4">
+                                                <button type="submit" class="btn-login">LOGIN ACTIVITY</button>
                                             </div>
 
-                                        </div>
+                                        </form>
 
-                                        <div class="form-row">
-                                            <div class="activity-form-group">
-                                                <label class="form-label">ACTIVITY</label>
-                                                <select class="form-select-custom" name="activity_type">
-                                                    <option value="">-- Select --</option>
-                                                    @foreach ($activity_types as $activity_type)
-                                                        <option value="{{ $activity_type->id }}">
-                                                            {{ $activity_type->type }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-
-                                            <div class="activity-form-group">
-                                                <label class="form-label">DURATION</label>
-                                                <input type="hidden" name="start_time" id="start_time">
-                                                <input type="hidden" name="end_time" id="end_time">
-
-                                                <select class="form-select-custom" name="duration" id="duration">
-                                                    <option value="">-- Select --</option>
-                                                    <option value="15">15 Min</option>
-                                                    <option value="30">30 Min</option>
-                                                    <option value="60">1 Hour</option>
-                                                    <option value="120">2 Hours</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="activity-form-group">
-                                                <label class="form-label">DATE</label>
-                                                <input type="date" name="date" id="date"
-                                                    class="activity-date">
-                                            </div>
-
-                                            <div class="activity-form-group">
-                                                <label class="form-label">LOCATION</label>
-                                                <input type="text" placeholder="Add a Location"
-                                                    class="form-select-custom" name="location" />
-                                            </div>
-
-                                        </div>
-
-
-                                        <div class="my-4">
-                                            <button type="submit" class="btn-login">LOGIN ACTIVITY</button>
-                                        </div>
-
-                                    </form>
-
-                                </div>
-
-                                <!-- Note Tab -->
-                                {{-- <div class="tab-pane fade activity-form" id="write-note-content" role="tabpanel"
-                                    aria-labelledby="note-tab">
-                                    <textarea class="form-textarea w-100" placeholder="Write your note here..." rows="6"></textarea>
-                                    <div class="form-row">
-                                        <button class="btn-login">SAVE NOTE</button>
                                     </div>
-                                </div> --}}
-                                <div class="tab-pane fade activity-form" id="write-note-content" role="tabpanel"
-                                    aria-labelledby="note-tab">
 
-                                    <form action="{{ route('admin.add.note') }}" method="POST" data-owner-type="Lead"
-                                        data-owner-id="{{ $leads->id }}" id="logNoteForm">
-                                        @csrf
+                                    <div class="tab-pane fade activity-form" id="write-note-content" role="tabpanel"
+                                        aria-labelledby="note-tab">
 
-                                        <textarea id="note-textarea" name="note" class="form-textarea w-100"
-                                            placeholder="Write a note… @Mention other users to grab their attention, or reference other companies and people."
-                                            rows="6"></textarea>
+                                        <form action="{{ route('admin.add.note') }}" method="POST" data-owner-type="Lead"
+                                            data-owner-id="{{ $leads->id }}" id="logNoteForm">
+                                            @csrf
 
-                                        <!-- Hidden fields for mentioned entities -->
-                                        <input type="hidden" name="mentioned_company_ids"
-                                            id="note_mentioned_company_ids" value="">
-                                        <input type="hidden" name="mentioned_people_ids" id="note_mentioned_people_ids"
-                                            value="">
-                                        <input type="hidden" name="mentioned_user_ids" id="note_mentioned_user_ids"
-                                            value="">
+                                            <textarea id="note-textarea" name="note" class="form-textarea w-100"
+                                                placeholder="Write a note… @Mention other users to grab their attention, or reference other companies and people."
+                                                rows="6"></textarea>
 
-                                        <!-- Hidden field to store processed note content -->
-                                        <input type="hidden" name="note_value" id="note_value" value="">
+                                            <!-- Hidden fields for mentioned entities -->
+                                            <input type="hidden" name="mentioned_company_ids"
+                                                id="note_mentioned_company_ids" value="">
+                                            <input type="hidden" name="mentioned_people_ids" id="note_mentioned_people_ids"
+                                                value="">
+                                            <input type="hidden" name="mentioned_user_ids" id="note_mentioned_user_ids"
+                                                value="">
 
-                                        <div class="form-row mt-4">
-                                            <button type="submit" class="btn-login">SAVE NOTE</button>
-                                        </div>
-                                    </form>
+                                            <!-- Hidden field to store processed note content -->
+                                            <input type="hidden" name="note_value" id="note_value" value="">
+
+                                            <div class="form-row mt-4">
+                                                <button type="submit" class="btn-login">SAVE NOTE</button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
+                            @endcan
 
 
                             <!-- Filter Section -->
@@ -1019,20 +951,22 @@
                                                                 </p>
                                                             </div>
 
-                                                            <div class="col-4 text-end">
-                                                                <button
-                                                                    class="btn btn-sm btn-outline-primary me-1 add-comment-btn"
-                                                                    title="Add Comment" data-type="Activity"
-                                                                    data-id="{{ $item->id }}">
-                                                                    <i class="fas fa-comment"></i>
-                                                                </button>
-                                                                <button
-                                                                    class="btn btn-sm btn-outline-danger delete-activity-btn"
-                                                                    title="Delete Activity" data-type="Activity"
-                                                                    data-id="{{ $item->id }}">
-                                                                    <i class="fas fa-times"></i>
-                                                                </button>
-                                                            </div>
+                                                            @can('lead.detail.edit')
+                                                                <div class="col-4 text-end">
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-primary me-1 add-comment-btn"
+                                                                        title="Add Comment" data-type="Activity"
+                                                                        data-id="{{ $item->id }}">
+                                                                        <i class="fas fa-comment"></i>
+                                                                    </button>
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-danger delete-activity-btn"
+                                                                        title="Delete Activity" data-type="Activity"
+                                                                        data-id="{{ $item->id }}">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </button>
+                                                                </div>
+                                                            @endcan
                                                         </div>
 
 
@@ -1076,32 +1010,36 @@
                                                                             <span
                                                                                 class="comment-text">{{ $comment->comment }}</span>
                                                                         </div>
-                                                                        <span class="btn btn-sm delete-comment-btn"
-                                                                            data-id="{{ $comment->id }}"
-                                                                            data-type="Activity">
-                                                                            <i class="fas fa-times"></i>
-                                                                        </span>
+                                                                        @can('lead.detail.edit')
+                                                                            <span class="btn btn-sm delete-comment-btn"
+                                                                                data-id="{{ $comment->id }}"
+                                                                                data-type="Activity">
+                                                                                <i class="fas fa-times"></i>
+                                                                            </span>
+                                                                        @endcan
                                                                     </div>
                                                                 @endforeach
                                                             </div>
                                                         @endif
 
-                                                        <div class="mt-3 d-none add-comment"
-                                                            data-id="{{ $item->id }}" data-type="Activity">
-                                                            <textarea id="activity-comment-textarea" name="comment_text" class="form-textarea"
-                                                                placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
+                                                        @can('lead.detail.edit')
+                                                            <div class="mt-3 d-none add-comment"
+                                                                data-id="{{ $item->id }}" data-type="Activity">
+                                                                <textarea id="activity-comment-textarea" name="comment_text" class="form-textarea"
+                                                                    placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
 
-                                                            <button
-                                                                class="mt-3 btn btn-sm btn-outline-success add-comment-submit"
-                                                                title="">
-                                                                Add Comment
-                                                            </button>
-                                                            <button
-                                                                class="mt-3 btn btn-sm btn-outline-danger comment-cancel"
-                                                                title="Close">
-                                                                Close
-                                                            </button>
-                                                        </div>
+                                                                <button
+                                                                    class="mt-3 btn btn-sm btn-outline-success add-comment-submit"
+                                                                    title="">
+                                                                    Add Comment
+                                                                </button>
+                                                                <button
+                                                                    class="mt-3 btn btn-sm btn-outline-danger comment-cancel"
+                                                                    title="Close">
+                                                                    Close
+                                                                </button>
+                                                            </div>
+                                                        @endcan
 
                                                     </div>
 
@@ -1133,20 +1071,22 @@
                                                                 </p>
                                                             </div>
 
-                                                            <div class="col-4 text-end">
-                                                                <button
-                                                                    class="btn btn-sm btn-outline-primary me-1 add-comment-btn"
-                                                                    title="Add Comment" data-type="Note"
-                                                                    data-id="{{ $item->id }}">
-                                                                    <i class="fas fa-comment"></i>
-                                                                </button>
-                                                                <button
-                                                                    class="btn btn-sm btn-outline-danger delete-note-btn"
-                                                                    title="Delete Note" data-type="Note"
-                                                                    data-id="{{ $item->id }}">
-                                                                    <i class="fas fa-times"></i>
-                                                                </button>
-                                                            </div>
+                                                            @can('lead.detail.edit')
+                                                                <div class="col-4 text-end">
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-primary me-1 add-comment-btn"
+                                                                        title="Add Comment" data-type="Note"
+                                                                        data-id="{{ $item->id }}">
+                                                                        <i class="fas fa-comment"></i>
+                                                                    </button>
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-danger delete-note-btn"
+                                                                        title="Delete Note" data-type="Note"
+                                                                        data-id="{{ $item->id }}">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </button>
+                                                                </div>
+                                                            @endcan
                                                         </div>
 
 
@@ -1183,31 +1123,35 @@
                                                                             <span
                                                                                 class="comment-text">{{ $comment->comment }}</span>
                                                                         </div>
-                                                                        <span class="btn btn-sm delete-comment-btn"
-                                                                            data-id="{{ $comment->id }}"
-                                                                            data-type="Activity">
-                                                                            <i class="fas fa-times"></i>
-                                                                        </span>
+                                                                        @can('lead.detail.edit')
+                                                                            <span class="btn btn-sm delete-comment-btn"
+                                                                                data-id="{{ $comment->id }}"
+                                                                                data-type="Activity">
+                                                                                <i class="fas fa-times"></i>
+                                                                            </span>
+                                                                        @endcan
                                                                     </div>
                                                                 @endforeach
                                                             </div>
                                                         @endif
 
-                                                        <div class="mt-3 d-none add-comment"
-                                                            data-id="{{ $item->id }}" data-type="Note">
-                                                            <textarea id="note-comment-textarea" name="comment_text" class="form-textarea"
-                                                                placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
-                                                            <button
-                                                                class="mt-3 btn btn-sm btn-outline-success add-comment-submit"
-                                                                title="">
-                                                                Add Comment
-                                                            </button>
-                                                            <button
-                                                                class="mt-3 btn btn-sm btn-outline-danger comment-cancel"
-                                                                title="Close">
-                                                                Close
-                                                            </button>
-                                                        </div>
+                                                        @can('lead.detail.edit')
+                                                            <div class="mt-3 d-none add-comment"
+                                                                data-id="{{ $item->id }}" data-type="Note">
+                                                                <textarea id="note-comment-textarea" name="comment_text" class="form-textarea"
+                                                                    placeholder="Write a comment…"data-tribute="true" style="width:100%"></textarea>
+                                                                <button
+                                                                    class="mt-3 btn btn-sm btn-outline-success add-comment-submit"
+                                                                    title="">
+                                                                    Add Comment
+                                                                </button>
+                                                                <button
+                                                                    class="mt-3 btn btn-sm btn-outline-danger comment-cancel"
+                                                                    title="Close">
+                                                                    Close
+                                                                </button>
+                                                            </div>
+                                                        @endcan
 
                                                     </div>
 
@@ -1256,59 +1200,122 @@
 
                         {{-- Starting of leads-details-container --}}
                         <div id="leads-details-container" data-lead-id="{{ $leads->id }}">
-                            <form class="assignee-form" id="assigneeForm" method="post">
-                                @csrf
 
+                            @can('lead.detail.edit')
+                                <form class="assignee-form" id="assigneeForm" method="post">
+                                    @csrf
+
+                                    {{-- Lead Status --}}
+                                    <div class="form-group mb-3">
+                                        <label for="leadStatusSelect" class="form-label">
+                                            <b>LEAD STATUS</b>
+                                        </label>
+                                        <select class="form-select" id="leadStatusSelect"
+                                            data-lead-id="{{ $leads->id }}">
+                                            <option value="open" {{ $leads->lead_status == 'open' ? 'selected' : '' }}>Open
+                                            </option>
+                                            <option value="won" {{ $leads->lead_status == 'won' ? 'selected' : '' }}>Won
+                                            </option>
+                                            <option value="lost" {{ $leads->lead_status == 'lost' ? 'selected' : '' }}>Lost
+                                            </option>
+                                            <option value="cancelled"
+                                                {{ $leads->lead_status == 'cancelled' ? 'selected' : '' }}>
+                                                Cancelled</option>
+                                            <option value="pending" {{ $leads->lead_status == 'pending' ? 'selected' : '' }}>
+                                                Pending</option>
+                                        </select>
+                                    </div>
+
+                                    {{-- Lost outcome wrapper --}}
+                                    <div class="form-group mb-3 d-none" id="lostOutcomeWrapper">
+                                        <label for="lostOutcomeSelect" class="form-label">
+                                            <b>OUTCOME</b>
+                                        </label>
+                                        <select class="form-select" id="lostOutcomeSelect">
+                                            <option value="">Select reason</option>
+                                            @foreach ($lost_outcomes as $outcome)
+                                                <option value="{{ $outcome->id }}"
+                                                    {{ $leads->outcome_id == $outcome->id && $leads->lead_status == 'lost' ? 'selected' : '' }}>
+                                                    {{ $outcome->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    {{-- Cancelled outcome wrapper --}}
+                                    <div class="form-group mb-3 d-none" id="cancelledOutcomeWrapper">
+                                        <label for="cancelledOutcomeSelect" class="form-label">
+                                            <b>OUTCOME</b>
+                                        </label>
+                                        <select class="form-select" id="cancelledOutcomeSelect">
+                                            <option value="">Select reason</option>
+                                            @foreach ($cancelled_outcomes as $outcome)
+                                                <option value="{{ $outcome->id }}"
+                                                    {{ $leads->outcome_id == $outcome->id && $leads->lead_status == 'cancelled' ? 'selected' : '' }}>
+                                                    {{ $outcome->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    {{-- Lead Flags --}}
+                                    <div class="form-group mb-3">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input lead-flag" name="lead_flag"
+                                                        type="checkbox" value="is_watching" id="checkbox1"
+                                                        data-lead-id="{{ $leads->id }}"
+                                                        @if ($leads->is_watching) checked @endif>
+                                                    <label class="form-check-label" for="checkbox1"><b>Watching</b></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input lead-flag" name="lead_flag"
+                                                        type="checkbox" value="is_hot" id="checkbox2"
+                                                        data-lead-id="{{ $leads->id }}"
+                                                        @if ($leads->is_hot) checked @endif>
+                                                    <label class="form-check-label" for="checkbox2"><b>Hot</b></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Assignee --}}
+                                    <div class="form-group mb-3">
+                                        <label for="assigneeSelect" class="form-label">
+                                            <b>ASSIGNEE</b>
+                                        </label>
+                                        <select class="form-select update-field-select" id="assigneeSelect"
+                                            data-type="assignee">
+                                            <option selected>Select assignee</option>
+                                            @foreach ($users as $user)
+                                                <option value="{{ $user->id }}"
+                                                    {{ $leads->assignee_id == $user->id ? 'selected' : '' }}>
+                                                    {{ $user->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </form>
+                            @else
                                 {{-- Lead Status --}}
                                 <div class="form-group mb-3">
-                                    <label for="leadStatusSelect" class="form-label">
+                                    <label class="form-label">
                                         <b>LEAD STATUS</b>
                                     </label>
-                                    <select class="form-select" id="leadStatusSelect"
-                                        data-lead-id="{{ $leads->id }}">
+                                    <select class="form-select" disabled>
                                         <option value="open" {{ $leads->lead_status == 'open' ? 'selected' : '' }}>Open
                                         </option>
                                         <option value="won" {{ $leads->lead_status == 'won' ? 'selected' : '' }}>Won
                                         </option>
                                         <option value="lost" {{ $leads->lead_status == 'lost' ? 'selected' : '' }}>Lost
                                         </option>
-                                        <option value="cancelled"
-                                            {{ $leads->lead_status == 'cancelled' ? 'selected' : '' }}>
+                                        <option value="cancelled" {{ $leads->lead_status == 'cancelled' ? 'selected' : '' }}>
                                             Cancelled</option>
                                         <option value="pending" {{ $leads->lead_status == 'pending' ? 'selected' : '' }}>
                                             Pending</option>
-                                    </select>
-                                </div>
-
-                                {{-- Lost outcome wrapper --}}
-                                <div class="form-group mb-3 d-none" id="lostOutcomeWrapper">
-                                    <label for="lostOutcomeSelect" class="form-label">
-                                        <b>OUTCOME</b>
-                                    </label>
-                                    <select class="form-select" id="lostOutcomeSelect">
-                                        <option value="">Select reason</option>
-                                        @foreach ($lost_outcomes as $outcome)
-                                            <option value="{{ $outcome->id }}"
-                                                {{ $leads->outcome_id == $outcome->id && $leads->lead_status == 'lost' ? 'selected' : '' }}>
-                                                {{ $outcome->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                {{-- Cancelled outcome wrapper --}}
-                                <div class="form-group mb-3 d-none" id="cancelledOutcomeWrapper">
-                                    <label for="cancelledOutcomeSelect" class="form-label">
-                                        <b>OUTCOME</b>
-                                    </label>
-                                    <select class="form-select" id="cancelledOutcomeSelect">
-                                        <option value="">Select reason</option>
-                                        @foreach ($cancelled_outcomes as $outcome)
-                                            <option value="{{ $outcome->id }}"
-                                                {{ $leads->outcome_id == $outcome->id && $leads->lead_status == 'cancelled' ? 'selected' : '' }}>
-                                                {{ $outcome->name }}
-                                            </option>
-                                        @endforeach
                                     </select>
                                 </div>
 
@@ -1317,19 +1324,17 @@
                                     <div class="row">
                                         <div class="col-6">
                                             <div class="form-check">
-                                                <input class="form-check-input lead-flag" name="lead_flag"
-                                                    type="checkbox" value="is_watching" id="checkbox1"
-                                                    data-lead-id="{{ $leads->id }}"
-                                                    @if ($leads->is_watching) checked @endif>
+                                                <input class="form-check-input lead-flag" name="lead_flag" type="checkbox"
+                                                    value="is_watching" id="checkbox1" data-lead-id="{{ $leads->id }}"
+                                                    @if ($leads->is_watching) checked @endif disabled>
                                                 <label class="form-check-label" for="checkbox1"><b>Watching</b></label>
                                             </div>
                                         </div>
                                         <div class="col-6">
                                             <div class="form-check">
-                                                <input class="form-check-input lead-flag" name="lead_flag"
-                                                    type="checkbox" value="is_hot" id="checkbox2"
-                                                    data-lead-id="{{ $leads->id }}"
-                                                    @if ($leads->is_hot) checked @endif>
+                                                <input class="form-check-input lead-flag" name="lead_flag" type="checkbox"
+                                                    value="is_hot" id="checkbox2" data-lead-id="{{ $leads->id }}"
+                                                    @if ($leads->is_hot) checked @endif disabled>
                                                 <label class="form-check-label" for="checkbox2"><b>Hot</b></label>
                                             </div>
                                         </div>
@@ -1338,11 +1343,10 @@
 
                                 {{-- Assignee --}}
                                 <div class="form-group mb-3">
-                                    <label for="assigneeSelect" class="form-label">
+                                    <label class="form-label">
                                         <b>ASSIGNEE</b>
                                     </label>
-                                    <select class="form-select update-field-select" id="assigneeSelect"
-                                        data-type="assignee">
+                                    <select class="form-select" disabled>
                                         <option selected>Select assignee</option>
                                         @foreach ($users as $user)
                                             <option value="{{ $user->id }}"
@@ -1352,7 +1356,10 @@
                                         @endforeach
                                     </select>
                                 </div>
-                            </form>
+
+                            @endcan
+
+
                             <hr>
 
                             <div class="sidebar-section">
@@ -1361,22 +1368,26 @@
                                 <div id="company-container">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <h6 class="text-uppercase">Companies</h6>
-                                        <div id="toggle-add-company" class="text-warning" style="cursor: pointer;">
-                                            Add a company
-                                        </div>
+                                        @can('lead.detail.edit')
+                                            <div id="toggle-add-company" class="text-warning" style="cursor: pointer;">
+                                                Add a company
+                                            </div>
+                                        @endcan
                                     </div>
 
-                                    <div class="d-none mb-3" id="add-company">
-                                        <select class="form-select update-field-select" data-type="company"
-                                            id="companySelect">
-                                            <option selected>Add a company</option>
-                                            @foreach ($companies as $company)
-                                                <option value="{{ $company->id }}">
-                                                    {{ $company->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                    @can('lead.detail.edit')
+                                        <div class="d-none mb-3" id="add-company">
+                                            <select class="form-select update-field-select" data-type="company"
+                                                id="companySelect">
+                                                <option selected>Add a company</option>
+                                                @foreach ($companies as $company)
+                                                    <option value="{{ $company->id }}">
+                                                        {{ $company->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    @endcan
 
                                     <div id="company-list">
                                         @foreach ($leads->companies as $leadCompany)
@@ -1395,22 +1406,26 @@
                                                             <p>{{ $leadCompany->description ?? 'N/A' }}</p>
                                                             <p>{{ $leadCompany->companyAddress->address ?? 'N/A' }}</p>
                                                             {{-- Go to Company Dashboard --}}
-                                                            <a href="{{ route('admin.company.dashboard', $leadCompany->id) }}" target="_blank"
-                                                                class="text-warning">
-                                                                Go to Dashboard
-                                                            </a>
+                                                            @can('company.dashboard.view')
+                                                                <a href="{{ route('admin.company.dashboard', $leadCompany->id) }}"
+                                                                    target="_blank" class="text-warning">
+                                                                    Go to Dashboard
+                                                                </a>
+                                                            @endcan
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <div id="delete-company">
-                                                    <button class="btn btn-sm btn-outline-secondary delete-item"
-                                                        data-lead="{{ $leads->id }}"
-                                                        data-id="{{ $leadCompany->id }}" data-type="company"
-                                                        data-target="company-{{ $leadCompany->id }}">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
+                                                @can('lead.detail.edit')
+                                                    <div id="delete-company">
+                                                        <button class="btn btn-sm btn-outline-secondary delete-item"
+                                                            data-lead="{{ $leads->id }}"
+                                                            data-id="{{ $leadCompany->id }}" data-type="company"
+                                                            data-target="company-{{ $leadCompany->id }}">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                @endcan
 
                                             </div>
                                         @endforeach
@@ -1422,22 +1437,26 @@
                                 <div id="people-container">
                                     <div class="d-flex justify-content-between align-items-center mb-2 mt-3">
                                         <h6 class="text-uppercase">Peoples</h6>
-                                        <div id="toggle-add-person" class="text-warning" style="cursor: pointer;">
-                                            Add a people
-                                        </div>
+                                        @can('lead.detail.edit')
+                                            <div id="toggle-add-person" class="text-warning" style="cursor: pointer;">
+                                                Add a people
+                                            </div>
+                                        @endcan
                                     </div>
 
-                                    <div class="d-none mb-3" id="add-person">
-                                        <select class="form-select update-field-select" data-type="people"
-                                            id="personSelect">
-                                            <option selected>Add a person</option>
-                                            @foreach ($allpeoples as $allpeople)
-                                                <option value="{{ $allpeople->id }}">
-                                                    {{ $allpeople->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                    @can('lead.detail.edit')
+                                        <div class="d-none mb-3" id="add-person">
+                                            <select class="form-select update-field-select" data-type="people"
+                                                id="personSelect">
+                                                <option selected>Add a person</option>
+                                                @foreach ($allpeoples as $allpeople)
+                                                    <option value="{{ $allpeople->id }}">
+                                                        {{ $allpeople->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    @endcan
 
                                     <div id="people-list">
                                         @foreach ($leads->peoples as $person)
@@ -1461,13 +1480,15 @@
                                                     </div>
                                                 </div>
 
-                                                <div id="delete-people">
-                                                    <button class="btn btn-sm btn-outline-secondary delete-item"
-                                                        data-lead="{{ $leads->id }}" data-id="{{ $person->id }}"
-                                                        data-type="people" data-target="person-{{ $person->id }}">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
+                                                @can('lead.detail.edit')
+                                                    <div id="delete-people">
+                                                        <button class="btn btn-sm btn-outline-secondary delete-item"
+                                                            data-lead="{{ $leads->id }}" data-id="{{ $person->id }}"
+                                                            data-type="people" data-target="person-{{ $person->id }}">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                @endcan
 
                                             </div>
                                         @endforeach
@@ -1485,35 +1506,39 @@
                                         <h6 class="text-uppercase">
                                             Products <span style="font-weight: normal;"> U.S. (USD)</span>
                                         </h6>
-                                        <div id="toggle-add-product" class="text-warning" style="cursor: pointer;">
-                                            Add a product
-                                        </div>
+                                        @can('lead.detail.edit')
+                                            <div id="toggle-add-product" class="text-warning" style="cursor: pointer;">
+                                                Add a product
+                                            </div>
+                                        @endcan
                                     </div>
 
-                                    <div id="add-product" class="mb-3 p-3 border rounded bg-light d-none">
-                                        <div class="row">
-                                            <div class="col-md-12 mb-2">
-                                                <label>Name</label>
-                                                <select class="form-select" id="product-name">
-                                                    @foreach ($products as $product)
-                                                        <option value="{{ $product->id }}">
-                                                            {{ $product->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
+                                    @can('lead.detail.edit')
+                                        <div id="add-product" class="mb-3 p-3 border rounded bg-light d-none">
+                                            <div class="row">
+                                                <div class="col-md-12 mb-2">
+                                                    <label>Name</label>
+                                                    <select class="form-select" id="product-name">
+                                                        @foreach ($products as $product)
+                                                            <option value="{{ $product->id }}">
+                                                                {{ $product->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6 mb-2">
+                                                    <label>Qty</label>
+                                                    <input type="number" name="inline_qty" class="form-control" required>
+                                                </div>
+                                                <div class="col-md-6 mb-2">
+                                                    <label>Price</label>
+                                                    <input type="text" name="inline_price" class="form-control" required>
+                                                </div>
                                             </div>
-                                            <div class="col-md-6 mb-2">
-                                                <label>Qty</label>
-                                                <input type="number" name="inline_qty" class="form-control" required>
-                                            </div>
-                                            <div class="col-md-6 mb-2">
-                                                <label>Price</label>
-                                                <input type="text" name="inline_price" class="form-control" required>
-                                            </div>
+                                            <button type="button" class="btn btn-success mt-2" id="submitAddProduct">Add
+                                                Product</button>
                                         </div>
-                                        <button type="button" class="btn btn-success mt-2" id="submitAddProduct">Add
-                                            Product</button>
-                                    </div>
+                                    @endcan
 
                                     <div id="product-list">
                                         @foreach ($leads->leadProducts as $leadProduct)
@@ -1534,14 +1559,16 @@
                                                     </div>
                                                 </div>
 
-                                                <div id="delete-product">
-                                                    <button class="btn btn-sm btn-outline-secondary delete-item"
-                                                        data-lead="{{ $leads->id }}"
-                                                        data-id="{{ $leadProduct->id }}" data-type="product"
-                                                        data-target="product-{{ $leadProduct->id }}">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
+                                                @can('lead.detail.edit')
+                                                    <div id="delete-product">
+                                                        <button class="btn btn-sm btn-outline-secondary delete-item"
+                                                            data-lead="{{ $leads->id }}"
+                                                            data-id="{{ $leadProduct->id }}" data-type="product"
+                                                            data-target="product-{{ $leadProduct->id }}">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                @endcan
 
                                             </div>
                                         @endforeach
@@ -1555,22 +1582,26 @@
                                         <h6 class="text-uppercase">
                                             Competitors
                                         </h6>
-                                        <div id="toggle-add-competitor" class="text-warning" style="cursor: pointer;">
-                                            Add a competitor
-                                        </div>
+                                        @can('lead.detail.edit')
+                                            <div id="toggle-add-competitor" class="text-warning" style="cursor: pointer;">
+                                                Add a competitor
+                                            </div>
+                                        @endcan
                                     </div>
 
-                                    <div id="add-competitor" class="mb-3 d-none">
-                                        <select class="form-select update-field-select" data-type="competitor"
-                                            id="urlInput">
-                                            <option selected>Add a Competitors</option>
-                                            @foreach ($competitors as $competitor)
-                                                <option value="{{ $competitor->id }}">
-                                                    {{ $competitor->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                    @can('lead.detail.edit')
+                                        <div id="add-competitor" class="mb-3 d-none">
+                                            <select class="form-select update-field-select" data-type="competitor"
+                                                id="urlInput">
+                                                <option selected>Add a Competitors</option>
+                                                @foreach ($competitors as $competitor)
+                                                    <option value="{{ $competitor->id }}">
+                                                        {{ $competitor->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    @endcan
 
                                     <div id="competitor-list">
                                         @foreach ($leads->leadCompetitors as $leadCompetitor)
@@ -1590,17 +1621,16 @@
                                                     </div>
                                                 </div>
 
-                                                <div id="delete-competitor">
-                                                    {{-- <button class="btn btn-sm btn-outline-secondary">
-                                                    <i class="fas fa-times"></i>
-                                                </button> --}}
-                                                    <button class="btn btn-sm btn-outline-secondary delete-item"
-                                                        data-lead="{{ $leads->id }}"
-                                                        data-id="{{ $leadCompetitor->id }}" data-type="competitor"
-                                                        data-target="competitor-{{ $leadCompetitor->id }}">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
+                                                @can('lead.detail.edit')
+                                                    <div id="delete-competitor">
+                                                        <button class="btn btn-sm btn-outline-secondary delete-item"
+                                                            data-lead="{{ $leads->id }}"
+                                                            data-id="{{ $leadCompetitor->id }}" data-type="competitor"
+                                                            data-target="competitor-{{ $leadCompetitor->id }}">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                @endcan
 
                                             </div>
                                         @endforeach
@@ -1614,22 +1644,26 @@
                                         <h6 class="text-uppercase">
                                             Sources
                                         </h6>
-                                        <div id="toggle-add-source" class="text-warning" style="cursor: pointer;">
-                                            Add a source
-                                        </div>
+                                        @can('lead.detail.edit')
+                                            <div id="toggle-add-source" class="text-warning" style="cursor: pointer;">
+                                                Add a source
+                                            </div>
+                                        @endcan
                                     </div>
 
-                                    <div id="add-source" class="mb-3 d-none">
-                                        <select class="form-select update-field-select" data-type="source"
-                                            id="urlInput">
-                                            <option selected>Add a Source</option>
-                                            @foreach ($sources as $source)
-                                                <option value="{{ $source->id }}">
-                                                    {{ $source->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                    @can('lead.detail.edit')
+                                        <div id="add-source" class="mb-3 d-none">
+                                            <select class="form-select update-field-select" data-type="source"
+                                                id="urlInput">
+                                                <option selected>Add a Source</option>
+                                                @foreach ($sources as $source)
+                                                    <option value="{{ $source->id }}">
+                                                        {{ $source->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    @endcan
 
                                     <div id="source-list">
                                         @foreach ($leads->leadSources as $leadSource)
@@ -1649,17 +1683,16 @@
                                                     </div>
                                                 </div>
 
-                                                <div id="delete-source">
-                                                    {{-- <button class="btn btn-sm btn-outline-secondary">
-                                                    <i class="fas fa-times"></i>
-                                                </button> --}}
-                                                    <button class="btn btn-sm btn-outline-secondary delete-item"
-                                                        data-lead="{{ $leads->id }}"
-                                                        data-id="{{ $leadSource->id }}" data-type="source"
-                                                        data-target="source-{{ $leadSource->id }}">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
+                                                @can('lead.detail.edit')
+                                                    <div id="delete-source">
+                                                        <button class="btn btn-sm btn-outline-secondary delete-item"
+                                                            data-lead="{{ $leads->id }}"
+                                                            data-id="{{ $leadSource->id }}" data-type="source"
+                                                            data-target="source-{{ $leadSource->id }}">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                @endcan
 
                                             </div>
                                         @endforeach
@@ -1668,11 +1701,8 @@
                                 </div>
 
                                 {{-- Quotes --}}
-                                <div class="form-group mb-3" id="quote-container">
+                                <div class="form-group mb-3 d-none" id="quote-container">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
-                                        {{-- <label for="urlInput" class="form-label text-uppercase">
-                                        <b>Quotes</b>
-                                    </label> --}}
                                         <h6 class="text-uppercase">
                                             Quotes
                                         </h6>
@@ -1682,15 +1712,8 @@
                                     </div>
                                 </div>
 
-                                {{-- Attached Files
-                                <div class="form-group mb-3">
-                                    <label class="form-label"><b>ATTACHED FILES</b> </label>
-                                    <button class="btn btn-outline-secondary w-100">
-                                        <i class="fas fa-upload me-2"></i>Upload File
-                                    </button>
-                                </div> --}}
-
                                 <hr>
+
                                 <div class="sidebar-section">
                                     <h6 class="form-label">ATTACHED FILES</h6>
 
@@ -1719,28 +1742,33 @@
                                                     </a>
                                                 </div>
 
-                                                <div class="col-2 text-end">
-                                                    <button type="button"
-                                                        class="btn btn-sm btn-outline-danger delete-file-btn"
-                                                        data-id="{{ $file->id }}"
-                                                        data-lead-id="{{ $leads->id }}" title="Delete file">
-                                                        <i class="fa-solid fa-xmark"></i>
-                                                    </button>
-                                                </div>
+                                                @can('lead.detail.edit')
+                                                    <div class="col-2 text-end">
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline-danger delete-file-btn"
+                                                            data-id="{{ $file->id }}"
+                                                            data-lead-id="{{ $leads->id }}" title="Delete file">
+                                                            <i class="fa-solid fa-xmark"></i>
+                                                        </button>
+                                                    </div>
+                                                @endcan
                                             </div>
                                         @endforeach
                                     </div>
 
 
-                                    <form id="leadFileUploadForm" enctype="multipart/form-data"
-                                        data-lead-id="{{ $leads->id }}">
-                                        @csrf
-                                        <input type="file" id="leadFileInput" name="file" class="d-none" />
-                                        <button type="button" class="btn btn-outline-secondary w-100"
-                                            id="uploadLeadFileBtn">
-                                            <i class="fas fa-upload me-2"></i>Upload File
-                                        </button>
-                                    </form>
+                                    @can('lead.detail.edit')
+                                        {{-- File Upload Form --}}
+                                        <form id="leadFileUploadForm" enctype="multipart/form-data"
+                                            data-lead-id="{{ $leads->id }}">
+                                            @csrf
+                                            <input type="file" id="leadFileInput" name="file" class="d-none" />
+                                            <button type="button" class="btn btn-outline-secondary w-100"
+                                                id="uploadLeadFileBtn">
+                                                <i class="fas fa-upload me-2"></i>Upload File
+                                            </button>
+                                        </form>
+                                    @endcan
 
                                     {{-- <div id="uploadedFilesList" class="mt-3"></div> --}}
                                 </div>
@@ -1822,7 +1850,8 @@
                                 <div class="col-lg-6 mt-2">
                                     <div class="form-group">
                                         <label class="form-label">Start Time</label>
-                                        <select class="form-select select2" id="start_time" name="start_time" required>
+                                        <select class="form-select select2" id="start_time" name="start_time"
+                                            required>
                                         </select>
                                     </div>
                                 </div>
@@ -2475,29 +2504,38 @@
                     const toggleTaskBtn = document.getElementById('toggleAddTask');
                     const formTaskDiv = document.getElementById('addTaskForm');
 
-                    toggleTaskBtn.addEventListener('click', function(e) {
-                        e.preventDefault();
+                    if (toggleTaskBtn && formTaskDiv) {
+                        toggleTaskBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
 
-                        if (formTaskDiv.style.display === "none" || formTaskDiv.style.display === "") {
-                            formTaskDiv.style.display = "block";
+                            if (formTaskDiv.style.display === "none" || formTaskDiv.style.display === "") {
+                                formTaskDiv.style.display = "block";
 
-                            // Reset form
-                            const form = formTaskDiv.querySelector('form');
-                            form.reset();
+                                // Reset form
+                                const form = formTaskDiv.querySelector('form');
+                                if (form) {
+                                    form.reset();
 
-                            // Reset form action back to store route
-                            form.setAttribute('action', "{{ route('admin.lead.tasks.store', $leads->id) }}");
+                                    // Reset form action back to store route
+                                    form.setAttribute(
+                                        'action',
+                                        "{{ route('admin.lead.tasks.store', $leads->id) }}"
+                                    );
 
-                            // Reset button text and style
-                            const submitBtn = form.querySelector('button[type="submit"]');
-                            submitBtn.textContent = "Add Task";
-                            submitBtn.classList.remove('btn-primary');
-                            submitBtn.classList.add('btn-warning');
+                                    // Reset button text and style
+                                    const submitBtn = form.querySelector('button[type="submit"]');
+                                    if (submitBtn) {
+                                        submitBtn.textContent = "Add Task";
+                                        submitBtn.classList.remove('btn-primary');
+                                        submitBtn.classList.add('btn-warning');
+                                    }
+                                }
+                            } else {
+                                formTaskDiv.style.display = "none";
+                            }
+                        });
+                    }
 
-                        } else {
-                            formTaskDiv.style.display = "none";
-                        }
-                    });
 
 
                     // ==============================
@@ -2883,28 +2921,6 @@
                     });
 
 
-                    // ==============================
-                    // Updating lead and flags status
-                    // ==============================
-                    // function updateLead(data, onSuccess) {
-                    //     fetch("{{ route('admin.lead.ajax_update') }}", {
-                    //             method: "POST",
-                    //             headers: {
-                    //                 "Content-Type": "application/json",
-                    //                 "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                    //             },
-                    //             body: JSON.stringify(data)
-                    //         })
-                    //         .then(response => response.json())
-                    //         .then(resp => {
-                    //             if (resp.success) {
-                    //                 if (typeof onSuccess === "function") onSuccess();
-                    //             } else {
-                    //                 Swal.fire("Error", "Failed to update lead!", "error");
-                    //             }
-                    //         })
-                    //         .catch(err => console.error(err));
-                    // }
                     function updateLead(data, onSuccess) {
                         fetch("{{ route('admin.lead.ajax_update') }}", {
                                 method: "POST",
@@ -2926,78 +2942,31 @@
                     }
 
 
-                    // ==============================
-                    // Handle lead status selection
-                    // ==============================
-                    // let statusSelect = document.getElementById("leadStatusSelect");
-                    // if (statusSelect) {
-                    //     // Store initial value
-                    //     let previousValue = statusSelect.value;
-
-                    //     statusSelect.addEventListener("change", function() {
-                    //         let leadId = this.dataset.leadId;
-                    //         let leadStatus = this.value;
-
-                    //         Swal.fire({
-                    //             title: 'Are you sure?',
-                    //             text: `Do you want to update the lead status`,
-                    //             icon: 'question',
-                    //             showCancelButton: true,
-                    //             confirmButtonColor: '#28a745',
-                    //             cancelButtonColor: '#dc3545',
-                    //             confirmButtonText: 'Yes, update'
-                    //         }).then((result) => {
-                    //             if (result.isConfirmed) {
-                    //                 updateLead({
-                    //                         lead_status: leadStatus,
-                    //                         lead_id: leadId
-                    //                     },
-                    //                     () => {
-                    //                         Swal.fire({
-                    //                             icon: "success",
-                    //                             title: "Updated!",
-                    //                             text: "Lead status updated successfully.",
-                    //                             timer: 1500,
-                    //                             showConfirmButton: false
-                    //                         }).then(() => {
-                    //                             location.reload();
-                    //                         });
-                    //                     }
-                    //                 );
-                    //                 // Update previous value on success
-                    //                 previousValue = leadStatus;
-                    //             } else {
-                    //                 // Revert select back to previous value on cancel
-                    //                 this.value = previousValue;
-                    //             }
-                    //         });
-                    //     });
-                    // }
                     const statusSelect = document.getElementById('leadStatusSelect');
+                    if (!statusSelect) {
+                        return;
+                    }
+
                     const lostWrapper = document.getElementById('lostOutcomeWrapper');
                     const cancelledWrapper = document.getElementById('cancelledOutcomeWrapper');
                     const lostSelect = document.getElementById('lostOutcomeSelect');
                     const cancelledSelect = document.getElementById('cancelledOutcomeSelect');
 
-                    // store previous to revert if cancelled
                     let previousStatus = statusSelect.value;
 
-                    // helper to hide both wrappers
                     function hideBoth() {
-                        lostWrapper.classList.add('d-none');
-                        cancelledWrapper.classList.add('d-none');
+                        lostWrapper?.classList.add('d-none');
+                        cancelledWrapper?.classList.add('d-none');
                     }
 
-                    // initial state: show correct wrapper if lead already lost/cancelled
-                    (function init() {
-                        if (statusSelect.value === 'lost') {
-                            lostWrapper.classList.remove('d-none');
-                        } else if (statusSelect.value === 'cancelled') {
-                            cancelledWrapper.classList.remove('d-none');
-                        } else {
-                            hideBoth();
-                        }
-                    })();
+                    // initial state
+                    if (statusSelect.value === 'lost') {
+                        lostWrapper?.classList.remove('d-none');
+                    } else if (statusSelect.value === 'cancelled') {
+                        cancelledWrapper?.classList.remove('d-none');
+                    } else {
+                        hideBoth();
+                    }
 
                     // When status changes
                     statusSelect.addEventListener('change', function() {
@@ -3020,8 +2989,6 @@
                             toastr.warning('Please select an outcome reason before submitting.',
                                 'Action Required');
 
-                            // Do NOT auto-send update here; wait for user to choose a reason.
-                            // Keep previousStatus so we can revert if they cancel at confirmation step.
                             return;
                         }
 
@@ -3133,54 +3100,6 @@
                         });
                     });
 
-                    // ==============================
-                    // Handle lead flag checkboxes
-                    // ==============================
-                    // document.querySelectorAll(".lead-flag").forEach((flagSelect) => {
-                    //     flagSelect.addEventListener("change", function() {
-                    //         let leadId = this.dataset.leadId;
-
-                    //         // Collect all checked flags for this lead
-                    //         let checkedFlags = [];
-                    //         document.querySelectorAll('.lead-flag[data-lead-id="' + leadId + '"]:checked')
-                    //             .forEach(cb => checkedFlags.push(cb.value));
-
-                    //         // Show confirmation popup before update
-                    //         Swal.fire({
-                    //             title: 'Are you sure?',
-                    //             text: 'Do you want to update the lead flags?',
-                    //             icon: 'question',
-                    //             showCancelButton: true,
-                    //             confirmButtonColor: '#28a745',
-                    //             cancelButtonColor: '#dc3545',
-                    //             confirmButtonText: 'Yes, update',
-                    //             cancelButtonText: 'Cancel'
-                    //         }).then((result) => {
-                    //             if (result.isConfirmed) {
-                    //                 updateLead({
-                    //                         lead_flags: checkedFlags,
-                    //                         lead_id: leadId
-                    //                     },
-                    //                     () => {
-                    //                         Swal.fire({
-                    //                             icon: "success",
-                    //                             title: "Updated!",
-                    //                             text: "Lead flags updated successfully.",
-                    //                             timer: 1500,
-                    //                             showConfirmButton: false
-                    //                         }).then(() => {
-                    //                             location.reload();
-                    //                         });
-                    //                     }
-                    //                 );
-                    //             } else {
-                    //                 // Revert checkbox state
-                    //                 // Uncheck the one that triggered this change
-                    //                 this.checked = !this.checked;
-                    //             }
-                    //         });
-                    //     });
-                    // });
 
                     document.querySelectorAll(".lead-flag").forEach((checkbox) => {
                         checkbox.addEventListener("change", function() {
@@ -3368,69 +3287,6 @@
                     });
 
 
-                    // ==============================
-                    // Delete fields on sidebar of leads details section
-                    // ==============================
-                    // $(document).on("click", ".delete-item", function(e) {
-                    //     e.preventDefault();
-
-                    //     let leadId = $(this).data("lead");
-                    //     let relatedId = $(this).data("id");
-                    //     let type = $(this).data("type");
-                    //     let target = $(this).data("target");
-
-                    //     // Use the new container-list structure
-                    //     let container = $(`#${type}-container`);
-                    //     let list = container.find(`#${type}-list`);
-                    //     let count = list.children().length;
-
-                    //     if (count <= 1) {
-                    //         toastr.warning(`At least one ${type} is required.`);
-                    //         return false;
-                    //     }
-
-                    //     Swal.fire({
-                    //         title: 'Are you sure?',
-                    //         text: `This ${type} will be removed from the lead record!`,
-                    //         icon: 'warning',
-                    //         showCancelButton: true,
-                    //         confirmButtonColor: '#3085d6',
-                    //         cancelButtonColor: '#d33',
-                    //         confirmButtonText: 'Yes, delete it!'
-                    //     }).then((result) => {
-                    //         if (result.isConfirmed) {
-                    //             $.ajax({
-                    //                 url: "{{ route('admin.lead.delete-field') }}",
-                    //                 type: "POST",
-                    //                 data: {
-                    //                     _token: "{{ csrf_token() }}",
-                    //                     lead_id: leadId,
-                    //                     related_id: relatedId,
-                    //                     type: type
-                    //                 },
-                    //                 success: function(response) {
-                    //                     if (response.success) {
-                    //                         // toastr.success(response.message);
-                    //                         // location.reload();
-                    //                         Swal.fire({
-                    //                             icon: 'success',
-                    //                             title: 'Updated!',
-                    //                             text: response.message,
-                    //                             timer: 1500,
-                    //                             showConfirmButton: false
-                    //                         }).then(() => location.reload());
-                    //                     } else {
-                    //                         toastr.error(response.message || "Delete failed.");
-                    //                     }
-                    //                 },
-                    //                 error: function(xhr) {
-                    //                     toastr.error("Something went wrong.");
-                    //                     console.error(xhr.responseText);
-                    //                 }
-                    //             });
-                    //         }
-                    //     });
-                    // });
                     $(document).on("click", ".delete-item", function(e) {
                         e.preventDefault();
 
@@ -4125,97 +3981,6 @@
                 });
             </script>
 
-            {{-- <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // --- Prepare mentions array ---
-                var mentions = [
-                    // companies
-                    @foreach ($companies as $company)
-                        {
-                            key: "{{ addslashes($company->name) }}",
-                            value: "company:{{ $company->id }}"
-                        }
-                        @if (!$loop->last || count($allpeoples) > 0 || count($users) > 0)
-                            ,
-                        @endif
-                    @endforeach
-
-                    // people
-                    @foreach ($allpeoples as $person)
-                        {
-                            key: "{{ addslashes($person->name) }}",
-                            value: "people:{{ $person->id }}"
-                        }
-                        @if (!$loop->last || count($users) > 0)
-                            ,
-                        @endif
-                    @endforeach
-
-                    // users
-                    @foreach ($users as $user)
-                        {
-                            key: "{{ addslashes($user->name) }}",
-                            value: "user:{{ $user->id }}"
-                        }
-                        @if (!$loop->last)
-                            ,
-                        @endif
-                    @endforeach
-                ];
-
-                // --- Initialize Tribute ---
-                var tribute = new Tribute({
-                    trigger: '@',
-                    values: mentions,
-                    lookup: 'key',
-                    fillAttr: 'key',
-                    menuItemTemplate: function(item) {
-                        var type = item.original.value.split(':')[0];
-                        return `<div><strong>${item.string}</strong> <small>(${type})</small></div>`;
-                    },
-                    selectTemplate: function(item) {
-                        // Insert only the display name
-                        return item.original ? item.original.key : '';
-                    }
-                });
-
-                tribute.attach(document.getElementById('activity-note'));
-
-                // --- Handle form submit ---
-                var form = document.getElementById('loginActivity');
-                form.addEventListener('submit', function(e) {
-                    var textarea = document.getElementById('activity-note');
-                    var rawText = textarea.value;
-
-                    var companyIds = [];
-                    var peopleIds = [];
-                    var userIds = [];
-
-                    // Match exact names to database IDs
-                    mentions.forEach(m => {
-                        var regex = new RegExp(`\\b${escapeRegExp(m.key)}\\b`,
-                            'g'); // avoid substring issues
-                        if (regex.test(rawText)) {
-                            let [type, id] = m.value.split(':');
-                            if (type === 'company') companyIds.push(id);
-                            else if (type === 'people') peopleIds.push(id);
-                            else if (type === 'user') userIds.push(id);
-                        }
-                    });
-
-                    // Populate hidden inputs
-                    document.getElementById('mentioned_company_ids').value = companyIds.join(',');
-                    document.getElementById('mentioned_people_ids').value = peopleIds.join(',');
-                    document.getElementById('mentioned_user_ids').value = userIds.join(',');
-                    document.getElementById('note_value').value = rawText;
-                });
-
-                // --- Helper: escape RegExp special characters ---
-                function escapeRegExp(string) {
-                    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                }
-            });
-        </script> --}}
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
 
@@ -4361,15 +4126,21 @@
                         });
                     }
 
-                    // ✅ Trigger AJAX when filters change
+                    // Trigger AJAX when filters change
                     $('select[name="filter_range"], select[name="activity_type_id"], select[name="user_id"]').on('change',
                         fetchFilteredTimeline);
 
 
                     const uploadBtn = document.getElementById("uploadLeadFileBtn");
                     const fileInput = document.getElementById("leadFileInput");
-                    const uploadedList = document.getElementById("uploadedFilesList");
-                    const leadId = document.getElementById("leadFileUploadForm").dataset.leadId;
+                    const uploadForm = document.getElementById("leadFileUploadForm");
+
+                    // RBAC guard
+                    if (!uploadBtn || !fileInput || !uploadForm) {
+                        return;
+                    }
+
+                    const leadId = uploadForm.dataset.leadId;
 
                     uploadBtn.addEventListener("click", () => fileInput.click());
 
@@ -4406,6 +4177,7 @@
                                 fileInput.value = "";
                             });
                     });
+
 
 
                     $(document).on('click', '.delete-file-btn', function() {
