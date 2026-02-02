@@ -146,7 +146,7 @@ class User extends Authenticatable
 
     public function leads()
     {
-        return $this->hasMany(Lead::class, 'assingee_id');
+        return $this->hasMany(Lead::class, 'assignee_id');
     }
 
     public function company()
@@ -262,5 +262,25 @@ class User extends Authenticatable
     public function mentionedMeetings()
     {
         return $this->belongsToMany(Meeting::class, 'meeting_users', 'user_id', 'meeting_id')->withTimestamps();
+    }
+
+    public function assignedPeople()
+    {
+        return $this->hasMany(People::class, 'assignee_id');
+    }
+
+    public function assignedCompanies()
+    {
+        return $this->hasMany(Company::class, 'assignee_id');
+    }
+
+    public function salesRepCompanies()
+    {
+        return $this->hasMany(Company::class, 'sales_rep_id');
+    }
+
+    public function accountManagedCompanies()
+    {
+        return $this->hasMany(Company::class, 'account_manager_id');
     }
 }

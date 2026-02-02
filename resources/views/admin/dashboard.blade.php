@@ -201,7 +201,7 @@
                                 <div class="form-group">
                                     <label class="form-label">Assignee</label>
                                     <span class="text-danger">*</span>
-                                    <select name="user_id" class="form-select">
+                                    <select name="assignee_id" class="form-select">
                                         <option value="">Select assignee</option>
                                         @foreach ($users as $user)
                                             <option value="{{ $user->id }}">{{ $user->name }}</option>
@@ -334,7 +334,7 @@
                                 <div class="form-group">
                                     <label class="form-label">Assignee</label>
                                     <span class="text-danger">*</span>
-                                    <select name="user_id" class="form-select">
+                                    <select name="assignee_id" class="form-select">
                                         <option value="">Select assignee</option>
                                         @foreach ($users as $user)
                                             <option value="{{ $user->id }}">{{ $user->name }}</option>
@@ -483,7 +483,7 @@
                                         class="form-control" />
                                 </div>
                             </div>
-                            <div class="col-lg-12">
+                            {{-- <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Companies</label>
                                     <span class="text-danger">*</span>
@@ -491,6 +491,21 @@
                                         {{ $message }}
                                     @enderror
                                     <select name="company_id[]" id="companySelect" class="form-select select2" multiple>
+                                        @foreach ($companies as $company)
+                                            <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div> --}}
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Companies</label>
+                                    <span class="text-danger">*</span>
+                                    @error('company_id')
+                                        {{ $message }}
+                                    @enderror
+                                    <select name="company_id" id="companySelect" class="form-select select2">
+                                        <option value=""></option>
                                         @foreach ($companies as $company)
                                             <option value="{{ $company->id }}">{{ $company->name }}</option>
                                         @endforeach
@@ -1025,7 +1040,10 @@
                     confidence: {
                         required: true
                     },
-                    "company_id[]": {
+                    // "company_id[]": {
+                    //     required: true
+                    // },
+                    "company_id": {
                         required: true
                     },
                     "person_id[]": {
@@ -1063,7 +1081,10 @@
                     confidence: {
                         required: "Please enter the confidence level."
                     },
-                    "company_id[]": {
+                    // "company_id[]": {
+                    //     required: "Please select a company."
+                    // },
+                    "company_id": {
                         required: "Please select a company."
                     },
                     "person_id[]": {
@@ -1166,7 +1187,7 @@
                     company_type_id: {
                         required: true
                     },
-                    user_id: {
+                    assignee_id: {
                         required: true
                     },
                     industry_id: {
@@ -1205,7 +1226,7 @@
                     company_type_id: {
                         required: "Please select a company type."
                     },
-                    user_id: {
+                    assignee_id: {
                         required: "Please select an assignee."
                     },
                     industry_id: {
@@ -1298,7 +1319,7 @@
                     tag_id: {
                         required: true
                     },
-                    user_id: {
+                    assignee_id: {
                         required: true
                     },
                     territory_id: {
@@ -1331,7 +1352,7 @@
                     tag_id: {
                         required: "Please select a tag."
                     },
-                    user_id: {
+                    assignee_id: {
                         required: "Please select an assignee."
                     },
                     territory_id: {

@@ -9,6 +9,9 @@ class Company extends Model
 {
     protected $fillable = [
         'user_id',
+        'assignee_id',
+        'sales_rep_id',
+        'account_manager_id',
         'name',
         'description',
         'legacy_id',
@@ -57,6 +60,21 @@ class Company extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function assignee()
+    {
+        return $this->belongsTo(User::class, 'assignee_id');
+    }
+
+    public function salesRep()
+    {
+        return $this->belongsTo(User::class, 'sales_rep_id');
+    }
+
+    public function accountManager()
+    {
+        return $this->belongsTo(User::class, 'account_manager_id');
     }
 
     public function industry()
@@ -131,6 +149,12 @@ class Company extends Model
             ->withTimestamps();
     }
 
+    public function leadCompany()
+    {
+        return $this->hasMany(Lead::class, 'company_id');
+    }
+
+
     // Lead Company pivot table
     public function leadCompanies()
     {
@@ -174,4 +198,5 @@ class Company extends Model
     {
         return $this->hasMany(WaterManagementPhase::class, 'company_id');
     }
+
 }

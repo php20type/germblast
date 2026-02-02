@@ -52,7 +52,7 @@
                                             </select>
                                         </div>
                                         <div class="me-2">
-                                            <select class="form-select" aria-label="Default select example" name="user_id">
+                                            <select class="form-select" aria-label="Default select example" name="assignee_id">
                                                 <option value="">Assignee</option>
                                                 @foreach ($users as $user)
                                                     <option value="{{ $user->id }}">{{ $user->name }}

@@ -763,7 +763,8 @@ class PeopleController extends Controller
         try {
             // Step 1: Create people
             $people = People::create([
-                'user_id' => $request->user_id,
+                'user_id' => auth()->id(),
+                'assignee_id' => $request->assignee_id,
                 'name' => $request->name,
                 'bio' => $request->bio,
                 'territory_id' => $request->territory_id,

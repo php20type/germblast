@@ -19,6 +19,7 @@ class Lead extends Model
         'unknown_field',
         'creator_id',
         'assignee_id',
+        'company_id',
         'close_date',
         'expected_services',
         'expected_months',
@@ -174,4 +175,8 @@ class Lead extends Model
         return $this->hasOne(LeadStageProcess::class, 'lead_id');
     }
 
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id');
+    }
 }

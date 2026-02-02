@@ -11,6 +11,7 @@ class People extends Model
 
     protected $fillable = [
         'user_id',
+        'assignee_id',
         'name',
         'bio',
         'legacy_id',
@@ -24,7 +25,7 @@ class People extends Model
 
     protected $morphClass = 'People';
 
-    protected $with = ['peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleCompany','peopleTags','tags', 'peopleFile','task'];
+    protected $with = ['peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleCompany', 'peopleTags', 'tags', 'peopleFile', 'task'];
 
     public function activity(): MorphMany
     {
@@ -93,7 +94,6 @@ class People extends Model
         return $this->hasOne(PeopleUrl::class, 'people_id');
     }
 
-
     public function peopleCompany()
     {
         return $this->hasMany(PeopleCompany::class, 'people_id');
@@ -142,11 +142,14 @@ class People extends Model
             ->withTimestamps();
     }
 
-
-     public function peopleFile()
+    public function peopleFile()
     {
         return $this->hasMany(PeopleFile::class, 'people_id');
     }
 
-
+    // People.php
+    public function assignee()
+    {
+        return $this->belongsTo(User::class, 'assignee_id');
+    }
 }

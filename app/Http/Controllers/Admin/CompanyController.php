@@ -171,7 +171,8 @@ class CompanyController extends Controller
         try {
             // Step 1: Create company
             $company = Company::create([
-                'user_id' => $request->user_id,
+                'user_id' => auth()->id(),
+                'assignee_id' => $request->assignee_id,
                 'name' => $request->name,
                 'description' => $request->description,
                 'company_type_id' => $request->company_type_id,
