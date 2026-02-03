@@ -11,7 +11,8 @@ class SurveyProposal extends Model
     protected $fillable = [
         'user_id',
         'lead_id',
-        'client_name',
+        // 'client_name',
+        'company_id',
         'date',
         'description',
         'enrollment',
@@ -30,6 +31,11 @@ class SurveyProposal extends Model
     public function lead()
     {
         return $this->belongsTo(Lead::class, 'lead_id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id');
     }
 
     public function user()

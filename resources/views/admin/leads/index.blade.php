@@ -57,7 +57,7 @@
                                                 </select>
                                             </div>
                                             <div class="me-2">
-                                                <select class="form-select" name="user_id" aria-label="Assigned to select">
+                                                <select class="form-select" name="assignee_id" aria-label="Assigned to select">
                                                     <option value="">Assignee</option>
                                                     @foreach ($users as $user)
                                                         <option value="{{ $user->id }}">{{ $user->name }}
@@ -372,7 +372,7 @@
             function fetchLeads() {
                 let search = $('#lead-search').val();
                 let status = $('select[name="status"]').val();
-                let user_id = $('select[name="user_id"]').val();
+                let assignee_id = $('select[name="assignee_id"]').val();
                 let hot = $('#checkDefault').is(':checked') ? 'hot' : '';
 
                 // collect checkbox values
@@ -405,7 +405,7 @@
                     data: {
                         search: search,
                         status: status,
-                        user_id: user_id,
+                        assignee_id: assignee_id,
                         hot: hot,
                         lead_tags_filter_id: lead_tags_filter_id,
                         lead_stage_filter_id: lead_stage_filter_id,
@@ -427,7 +427,7 @@
             }
 
             $('#lead-search').on('keyup', fetchLeads);
-            $('#checkDefault, select[name="status"], select[name="user_id"]').on('change', fetchLeads);
+            $('#checkDefault, select[name="status"], select[name="assignee_id"]').on('change', fetchLeads);
             // catch all checkbox changes
             // $('#filter-section input[type="checkbox"]').on('change', fetchLeads);
             $('#filter-section input[type="checkbox"]').on('change', function() {

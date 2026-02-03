@@ -53,7 +53,7 @@
                                             </select>
                                         </div>
                                         <div class="me-2">
-                                            <select class="form-select" aria-label="Default select example" name="user_id">
+                                            <select class="form-select" aria-label="Default select example" name="assignee_id">
                                                 <option value="">Assignee</option>
                                                 @foreach ($users as $user)
                                                     <option value="{{ $user->id }}">{{ $user->name }}
@@ -553,7 +553,7 @@
                 function fetchCompanies() {
                     let search = $('#company-search').val();
                     let company_type_id = $('select[name="company_type_id"]').val();
-                    let user_id = $('select[name="user_id"]').val();
+                    let assignee_id = $('select[name="assignee_id"]').val();
                     let people_id = $('select[name="people_id"]').val();
                     // collect checkbox values
                     let company_tags_filter_id = [];
@@ -589,7 +589,7 @@
                         data: {
                             search: search,
                             company_type_id: company_type_id,
-                            user_id: user_id,
+                            assignee_id: assignee_id,
                             people_id: people_id,
                             company_tags_filter_id: company_tags_filter_id,
                             industry_filter_id: industry_filter_id,
@@ -608,7 +608,7 @@
                 }
 
                 $('#company-search').on('keyup', fetchCompanies);
-                $('select[name="company_type_id"], select[name="user_id"], select[name="people_id"]').on('change',
+                $('select[name="company_type_id"], select[name="assignee_id"], select[name="people_id"]').on('change',
                     fetchCompanies);
                 // catch all checkbox changes
                 // $('#filter-section input[type="checkbox"]').on('change', fetchCompanies);

@@ -199,4 +199,10 @@ class Company extends Model
         return $this->hasMany(WaterManagementPhase::class, 'company_id');
     }
 
+    public function surveyProposals()
+    {
+        return $this->hasMany(SurveyProposal::class, 'company_id');
+    }
+
+
 }

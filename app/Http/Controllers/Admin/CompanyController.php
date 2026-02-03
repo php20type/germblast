@@ -70,8 +70,8 @@ class CompanyController extends Controller
             $query->where('company_type_id', $request->company_type_id);
         }
 
-        if ($request->filled('user_id')) {
-            $query->whereHas('user', fn ($q) => $q->where('user_id', $request->user_id));
+        if ($request->filled('assignee_id')) {
+            $query->whereHas('assignee', fn ($q) => $q->where('assignee_id', $request->assignee_id));
         }
 
         if ($request->filled('people_id')) {

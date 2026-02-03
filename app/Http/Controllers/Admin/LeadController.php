@@ -112,8 +112,8 @@ class LeadController extends Controller
             $query->where('is_hot', 1);
         }
 
-        if ($request->filled('user_id')) {
-            $query->where('assignee_id', $request->user_id);
+        if ($request->filled('assignee_id')) {
+            $query->where('assignee_id', $request->assignee_id);
         }
 
         if ($request->lead_tags_filter_id) {
@@ -410,93 +410,96 @@ class LeadController extends Controller
         ));
     }
 
-    public function store(Request $request, NotificationService $notify)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'assignee_id' => 'nullable|exists:users,id',
-            'close_date' => 'nullable|date',
-            'confidence' => 'nullable|numeric',
+        public function store(Request $request, NotificationService $notify)
+        {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'assignee_id' => 'nullable|exists:users,id',
+                'close_date' => 'nullable|date',
+                'confidence' => 'nullable|numeric',
 
-            'product_id' => 'nullable|array',
-            'product_id.*' => 'exists:products,id',
-            'quantity' => 'nullable|array',
-            'price' => 'nullable|array',
+                'product_id' => 'nullable|array',
+                'product_id.*' => 'exists:products,id',
+                'quantity' => 'nullable|array',
+                'price' => 'nullable|array',
 
-            'company_id' => 'nullable|array',
-            'company_id.*' => 'exists:companies,id',
+                // 'company_id' => 'nullable|array',
+                // 'company_id.*' => 'exists:companies,id',
+                'company_id' => 'required|exists:companies,id',
 
-            'person_id' => 'nullable|array',
-            'person_id.*' => 'nullable|exists:people,id',
+                'person_id' => 'nullable|array',
+                'person_id.*' => 'nullable|exists:people,id',
 
-            'source_id' => 'nullable|array',
-            'source_id.*' => 'exists:sources,id',
+                'source_id' => 'nullable|array',
+                'source_id.*' => 'exists:sources,id',
 
-            'competitors_id' => 'nullable|array',
-            'competitors_id.*' => 'nullable|exists:competitors,id',
+                'competitors_id' => 'nullable|array',
+                'competitors_id.*' => 'nullable|exists:competitors,id',
 
-            'tag_id' => 'required',
-        ]);
-
-        $lead = null;
-
-        DB::transaction(function () use ($request, &$lead) {
-
-            $lead = Lead::create([
-                'name' => $request->name,
-                'assignee_id' => $request->assignee_id,
-                'close_date' => $request->close_date,
-                'confidence' => $request->confidence,
-                'creator_id' => auth()->id(),
+                'tag_id' => 'required',
             ]);
 
-            LeadStageProcess::create([
-                'lead_id' => $lead->id,
-            ]);
+            $lead = null;
 
-            SurveyProposal::create([
-                'user_id' => auth()->id(),
-                'lead_id' => $lead->id,
-            ]);
+            DB::transaction(function () use ($request, &$lead) {
 
-            if ($request->filled('company_id')) {
-                $lead->companies()->attach($request->company_id);
-            }
+                $lead = Lead::create([
+                    'name' => $request->name,
+                    'assignee_id' => $request->assignee_id,
+                    'company_id' => $request->company_id,
+                    'close_date' => $request->close_date,
+                    'confidence' => $request->confidence,
+                    'creator_id' => auth()->id(),
+                ]);
 
-            if ($request->filled('person_id')) {
-                $lead->peoples()->attach($request->person_id);
-            }
+                LeadStageProcess::create([
+                    'lead_id' => $lead->id,
+                ]);
 
-            if ($request->filled('product_id')) {
-                foreach ($request->product_id as $index => $productId) {
-                    $lead->products()->attach($productId, [
-                        'qty' => $request->quantity[$index] ?? 1,
-                        'price' => $request->price[$index] ?? 0,
-                    ]);
+                SurveyProposal::create([
+                    'user_id' => auth()->id(),
+                    'lead_id' => $lead->id,
+                    'company_id' => $lead->company_id,
+                ]);
+
+                // if ($request->filled('company_id')) {
+                //     $lead->companies()->attach($request->company_id);
+                // }
+
+                if ($request->filled('person_id')) {
+                    $lead->peoples()->attach($request->person_id);
                 }
-            }
 
-            if ($request->filled('source_id')) {
-                $lead->sources()->attach($request->source_id);
-            }
+                if ($request->filled('product_id')) {
+                    foreach ($request->product_id as $index => $productId) {
+                        $lead->products()->attach($productId, [
+                            'qty' => $request->quantity[$index] ?? 1,
+                            'price' => $request->price[$index] ?? 0,
+                        ]);
+                    }
+                }
 
-            if ($request->filled('competitors_id')) {
-                $lead->competitors()->attach($request->competitors_id);
-            }
+                if ($request->filled('source_id')) {
+                    $lead->sources()->attach($request->source_id);
+                }
 
-            if ($request->filled('tag_id')) {
-                $lead->tags()->attach($request->tag_id);
-            }
-        });
+                if ($request->filled('competitors_id')) {
+                    $lead->competitors()->attach($request->competitors_id);
+                }
 
-        // TRIGGER EMAIL 1: Lead Created
-        $notify->leadCreated($lead);
+                if ($request->filled('tag_id')) {
+                    $lead->tags()->attach($request->tag_id);
+                }
+            });
 
-        // TRIGGER EMAIL 2: Lead Assigned (Delayed 12 sec)
-        $notify->leadAssigned($lead);
+            // TRIGGER EMAIL 1: Lead Created
+            $notify->leadCreated($lead);
 
-        return redirect()->back()->with('success', 'Lead created successfully!');
-    }
+            // TRIGGER EMAIL 2: Lead Assigned (Delayed 12 sec)
+            $notify->leadAssigned($lead);
+
+            return redirect()->back()->with('success', 'Lead created successfully!');
+        }
 
     public function show(Request $request, $id)
     {

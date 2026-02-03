@@ -304,7 +304,6 @@
                                                 <!-- SCHEDULE SITE SURVEY -->
                                                 <div class="mt-3">
                                                     @if (!$stage || !$stage->site_survey_completed_at)
-
                                                         @if ($stage && !$stage->site_survey_scheduled_at)
                                                             <label class="form-label fw-bold">Schedule Site Survey</label>
 
@@ -324,7 +323,6 @@
 
                                                             </div>
                                                         @endif
-
                                                     @endif
                                                 </div>
 
@@ -374,9 +372,7 @@
                                     </div>
 
                                 </div>
-
                             @else
-
                                 <div class="pipeline-section">
                                     <div class="pipeline-header">
                                         <div class="pipeline-title">Pipeline: Default Pipeline</div>
@@ -384,8 +380,7 @@
 
                                     <ul class="step-menu list-inline">
                                         @foreach ($leadStages as $leadStage)
-                                            <li
-                                                class="{{ $leadStage->id <= $leads->stage_id ? 'current' : '' }}">
+                                            <li class="{{ $leadStage->id <= $leads->stage_id ? 'current' : '' }}">
                                                 {{ $leadStage->name }}
                                             </li>
                                         @endforeach
@@ -1365,7 +1360,7 @@
                             <div class="sidebar-section">
 
                                 {{-- Companies --}}
-                                <div id="company-container">
+                                {{-- <div id="company-container">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <h6 class="text-uppercase">Companies</h6>
                                         @can('lead.detail.edit')
@@ -1405,7 +1400,7 @@
                                                             <p><b>{{ $leadCompany->name ?? 'N/A' }}</b></p>
                                                             <p>{{ $leadCompany->description ?? 'N/A' }}</p>
                                                             <p>{{ $leadCompany->companyAddress->address ?? 'N/A' }}</p>
-                                                            {{-- Go to Company Dashboard --}}
+
                                                             @can('company.dashboard.view')
                                                                 <a href="{{ route('admin.company.dashboard', $leadCompany->id) }}"
                                                                     target="_blank" class="text-warning">
@@ -1429,6 +1424,41 @@
 
                                             </div>
                                         @endforeach
+                                    </div>
+
+                                </div> --}}
+                                <div id="company-container">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="text-uppercase">Company</h6>
+                                    </div>
+
+                                    <div id="company-list">
+                                        <div class="company-list d-flex justify-content-between align-items-center mb-3"
+                                            id="company-{{ $leads->company->id }}">
+                                            <div class="row">
+                                                <div class="col-2">
+                                                    <div class="company-icon">
+                                                        <img src="{{ asset('img/home/companyimages1.png') }}"
+                                                            alt="Company Logo" class="img-fluid">
+                                                    </div>
+                                                </div>
+                                                <div class="col-10">
+                                                    <div class="company-name">
+                                                        <p><b>{{ $leads->company->name ?? 'N/A' }}</b></p>
+                                                        <p>{{ $leads->company->description ?? 'N/A' }}</p>
+                                                        <p>{{ $leads->company->companyAddress->address ?? 'N/A' }}</p>
+
+                                                        @can('company.dashboard.view')
+                                                            <a href="{{ route('admin.company.dashboard', $leads->company->id) }}"
+                                                                target="_blank" class="text-warning">
+                                                                Go to Dashboard
+                                                            </a>
+                                                        @endcan
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
                                     </div>
 
                                 </div>

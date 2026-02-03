@@ -62,7 +62,7 @@
                                                     </div>
                                                     <div class="me-2">
                                                         <select class="form-select" aria-label="Default select example"
-                                                            name="user_id">
+                                                            name="assignee_id">
                                                             <option value="">Assingee</option>
                                                             @foreach ($users as $user)
                                                                 <option value="{{ $user->id }}">{{ $user->name }}
@@ -537,7 +537,7 @@
             $(document).ready(function() {
                 function fetchPeoples() {
                     let search = $('#people-search').val();
-                    let user_id = $('select[name="user_id"]').val();
+                    let assignee_id = $('select[name="assignee_id"]').val();
                     let company_id = $('select[name="company_id"]').val();
 
                     // collect checkbox values
@@ -566,7 +566,7 @@
                         method: "GET",
                         data: {
                             search: search,
-                            user_id: user_id,
+                            assignee_id: assignee_id,
                             company_id: company_id,
                             people_tags_filter_id: people_tags_filter_id,
                             territory_filter_id: territory_filter_id,
@@ -584,7 +584,7 @@
                 }
 
                 $('#people-search').on('keyup', fetchPeoples);
-                $('#checkDefault, select[name="user_id"], select[name="company_id"]').on('change',
+                $('#checkDefault, select[name="assignee_id"], select[name="company_id"]').on('change',
                     fetchPeoples);
                 // catch all checkbox changes
                 // $('#filter-section input[type="checkbox"]').on('change', fetchPeoples);
