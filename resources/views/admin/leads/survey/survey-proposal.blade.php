@@ -43,7 +43,7 @@
                                                     <th>Client</th>
                                                     <td>
                                                         <input type="text" class="form-control" name="client_name"
-                                                            value="{{ $surveyProposal->client_name ?? '' }}">
+                                                            value="{{ $surveyProposal->company->name ?? '' }}" readonly>
                                                     </td>
                                                 </tr>
 
@@ -746,9 +746,6 @@
             $("#add-survey-form").validate({
                 ignore: [],
                 rules: {
-                    client_name: {
-                        required: true
-                    },
                     date: {
                         required: true
                     },

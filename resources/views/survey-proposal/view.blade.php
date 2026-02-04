@@ -368,6 +368,7 @@
                         877.771.3558<br>
                         Fax: 806.771.3559
                     </td>
+                    {{-- Company Address  --}}
                     <td style="width:50%; vertical-align:top;">
                         <strong>Borger ISD</strong><br>
                         200 East Ninth St<br>
@@ -445,6 +446,8 @@
                 </tr>
             </table>
 
+            <hr>
+
             <!-- NOTE -->
             <p style="font-size:10pt; margin-top:14pt;">
                 <em>
@@ -476,6 +479,144 @@
         </div>
 
     </div>
+
+    {{-- Page 5.2 --}}
+    @foreach ($pricingDetails as $pricing)
+        <div class="page">
+
+            <div class="page-bg">
+                <img src="{{ asset('img/survey-proposal/page5_img1.png') }}">
+            </div>
+
+            <div class="content">
+
+                <h4>
+                    GermBlast Proposal - {{ $pricing->proposal_name ?? '' }}
+                </h4>
+
+                <!-- COMPANY DETAILS -->
+                <table style="width:100%; font-size:10pt; margin-bottom:12pt;">
+                    <tr>
+                        <td style="width:50%; vertical-align:top;">
+                            <strong>Infection Controls, Inc.</strong><br>
+                            1414 Avenue J<br>
+                            Lubbock, TX 79401<br>
+                            877.771.3558
+                        </td>
+
+                        <td style="width:50%; vertical-align:top;">
+                            <strong>{{ $survey->company->name }}</strong><br>
+                            {{ $survey->company->companyAddress->address ?? '' }}<br>
+                            {{ $survey->company->companyPhone->phone ?? '' }}
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- PROPOSAL META -->
+                <table class="table" style="margin-bottom:14pt;">
+                    <tr>
+                        <th>Proposal ID</th>
+                        <th>Services / Year</th>
+                        <th>Contract Term</th>
+                        <th>Payment Terms</th>
+                    </tr>
+                    <tr>
+                        <td>{{ $pricing->id }}</td>
+                        <td>{{ $pricing->services_per_year }}</td>
+                        <td>{{ $pricing->contract_terms }} year(s)</td>
+                        <td>Due on Receipt</td>
+                    </tr>
+                </table>
+
+                <!-- PRICING TABLE -->
+                <table class="table">
+                    <tr>
+                        <th>Solution Description</th>
+                        <th>Quantity</th>
+                        <th>Per Service Total</th>
+                        <th>Annual Total</th>
+                    </tr>
+
+                    <tr>
+                        <td>Germblast Service</td>
+                        <td>{{ $pricing->services_per_year }}</td>
+                        <td>${{ number_format($pricing->partial_cost_service, 2) }}</td>
+                        <td>${{ number_format($pricing->pricing_total, 2) }}</td>
+                    </tr>
+
+                    <tr>
+                        <td><strong>Total</strong></td>
+                        <td></td>
+                        <td></td>
+                        <td><strong>${{ number_format($pricing->pricing_total, 2) }}</strong></td>
+                    </tr>
+                </table>
+
+                <!-- SERVICE OUTLINE -->
+                <h4 style="margin-top:16pt;">Germblast Service Outline</h4>
+
+                @php
+                    // Take only first 9 services (3 columns × 3 rows)
+                    $services = $pricing->pricingServices->take(9);
+
+                    // Split into columns of 3 items
+                    $columns = $services->chunk(3);
+                @endphp
+
+                <table style="width:100%; font-size:10pt;">
+                    <tr>
+                        @for ($i = 0; $i < 3; $i++)
+                            <td style="width:33%; vertical-align:top;">
+                                @if (isset($columns[$i]))
+                                    @foreach ($columns[$i] as $service)
+                                        • {{ $service->service_name }}<br>
+                                    @endforeach
+                                @endif
+                            </td>
+                        @endfor
+                    </tr>
+                </table>
+
+                <hr>
+
+                <!-- NOTE -->
+                <p style="font-size:10pt; margin-top:14pt;">
+                    <em>
+                        Please be advised. Beginning September 1, 2023, a 3% fee will be added to all credit card
+                        payments
+                        greater than $10,000.00.
+                    </em>
+                </p>
+
+                <!-- SIGNATURES -->
+                <table style="width:100%; font-size:10pt; margin-top:18pt;">
+                    <tr>
+                        <td style="width:25%;">Quote Prepared By:</td>
+                        <td style="width:75%;">{{ $survey->user->name }}  {{ now()->format('d/m/Y') }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top:10pt;">To Approve, Sign and Return:</td>
+                        <td style="padding-top:10pt;">__________________________________________</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top:10pt;">Date Signed (Effective Date):</td>
+                        <td style="padding-top:10pt;">__________________________________________</td>
+                    </tr>
+                </table>
+
+            </div>
+
+            <div class="footer">
+                © {{ now()->year }} GermBlast. All Rights Reserved.
+            </div>
+
+        </div>
+
+        @if (!$loop->last)
+            <div style="page-break-after: always;"></div>
+        @endif
+    @endforeach
+
 
     <!-- ================= PAGE 4 ================= -->
     <div class="page">

@@ -333,132 +333,163 @@
 
 
     <!-- ================= PAGE 5 ================= -->
-    <div class="page">
-        <img src="{{ public_path('img/survey-proposal/page5_img1.png') }}"
-            style="position:absolute; top:0; left:0; width:612pt;">
+    @foreach ($pricingDetails as $pricing)
+        <div class="page">
+            <img src="{{ public_path('img/survey-proposal/page5_img1.png') }}"
+                style="position:absolute; top:0; left:0; width:612pt;">
 
-        <div class="content">
+            <div class="content">
 
-            <h4>GermBlast Proposal - Borger ISD - Entire District - 3 Service Program</h4>
+                <h4>GermBlast Proposal - {{ $pricing->proposal_name ?? '' }}</h4>
 
-            <!-- COMPANY DETAILS -->
-            <table style="width:100%; font-size:10pt; margin-bottom:12pt;">
-                <tr>
-                    <td style="width:50%; vertical-align:top;">
-                        <strong>Infection Controls, Inc.</strong><br>
-                        1414 Avenue J<br>
-                        Lubbock, TX 79401<br>
-                        877.771.3558<br>
-                        Fax: 806.771.3559
-                    </td>
-                    <td style="width:50%; vertical-align:top;">
-                        <strong>Borger ISD</strong><br>
-                        200 East Ninth St<br>
-                        Borger, TX 79007<br>
-                        806.273.1000
-                    </td>
-                </tr>
-            </table>
+                <!-- COMPANY DETAILS -->
+                <table style="width:100%; font-size:10pt; margin-bottom:12pt;">
+                    <tr>
+                        <td style="width:50%; vertical-align:top;">
+                            <strong>Infection Controls, Inc.</strong><br>
+                            1414 Avenue J<br>
+                            Lubbock, TX 79401<br>
+                            877.771.3558<br>
+                            Fax: 806.771.3559
+                        </td>
+                        <td style="width:50%; vertical-align:top;">
+                            <strong>{{ $survey->company->name }}</strong><br>
+                            {{ $survey->company->companyAddress->address ?? '' }}<br>
+                            {{ $survey->company->companyPhone->phone ?? '' }}
+                        </td>
+                    </tr>
+                </table>
 
-            <!-- PROPOSAL META -->
-            <table class="table" style="margin-bottom:14pt;">
-                <tr>
-                    <th>Proposal ID</th>
-                    <th>Services Per Year</th>
-                    <th>Contract Term</th>
-                    <th>Payment Terms</th>
-                </tr>
-                <tr>
-                    <td>107655</td>
-                    <td>3</td>
-                    <td>1 year(s)</td>
-                    <td>Due on Receipt</td>
-                </tr>
-            </table>
+                <!-- PROPOSAL META -->
+                <table class="table" style="margin-bottom:14pt;">
+                    <tr>
+                        <th>Proposal ID</th>
+                        <th>Services Per Year</th>
+                        <th>Contract Term</th>
+                        <th>Payment Terms</th>
+                    </tr>
+                    <tr>
+                        <td>{{ $pricing->id }}</td>
+                        <td>{{ $pricing->services_per_year }}</td>
+                        <td>{{ $pricing->contract_terms }} year(s)</td>
+                        <td>Due on Receipt</td>
+                    </tr>
+                </table>
 
-            <!-- PRICING TABLE -->
-            <table class="table">
-                <tr>
-                    <th>Solution Description</th>
-                    <th>Quantity</th>
-                    <th>Per Service Total</th>
-                    <th>Annual Total</th>
-                </tr>
-                <tr>
-                    <td>GermBlast Service</td>
-                    <td>3</td>
-                    <td>$28,825.58</td>
-                    <td>$86,476.74</td>
-                </tr>
-                <tr>
-                    <td>Discount 7.50%</td>
-                    <td></td>
-                    <td>$2,161.92</td>
-                    <td>$6,485.76</td>
-                </tr>
-                <tr>
-                    <td><strong>Total</strong></td>
-                    <td></td>
-                    <td><strong>$26,663.66</strong></td>
-                    <td><strong>$79,990.98</strong></td>
-                </tr>
-            </table>
+                <!-- PRICING TABLE -->
+                <table class="table">
+                    <tr>
+                        <th>Solution Description</th>
+                        <th>Quantity</th>
+                        <th>Per Service Total</th>
+                        <th>Annual Total</th>
+                    </tr>
+                    <tr>
+                        <td>Germblast Service</td>
+                        <td>{{ $pricing->services_per_year }}</td>
+                        <td>${{ number_format($pricing->partial_cost_service, 2) }}</td>
+                        <td>${{ number_format($pricing->pricing_total, 2) }}</td>
+                    </tr>
+                    {{-- <tr>
+                        <td>Discount 7.50%</td>
+                        <td></td>
+                        <td>$2,161.92</td>
+                        <td>$6,485.76</td>
+                    </tr> --}}
+                    <tr>
+                        <td><strong>Total</strong></td>
+                        <td></td>
+                        <td></td>
+                        <td><strong>${{ number_format($pricing->pricing_total, 2) }}</strong></td>
+                    </tr>
+                </table>
 
-            <!-- SERVICE OUTLINE -->
-            <h4 style="margin-top:16pt;">GermBlast Service Outline</h4>
+                {{-- <!-- SERVICE OUTLINE -->
+                <h4 style="margin-top:16pt;">GermBlast Service Outline</h4>
 
-            <table style="width:100%; font-size:10pt;">
-                <tr>
-                    <td style="width:33%; vertical-align:top;">
-                        • High School<br>
-                        • Paul Belton Elementary School<br>
-                        • High School Athletic Equipment<br>
-                        • Buses
-                    </td>
-                    <td style="width:33%; vertical-align:top;">
-                        • Middle School<br>
-                        • Bulldog Academy<br>
-                        • Middle School Athletics
-                    </td>
-                    <td style="width:33%; vertical-align:top;">
-                        • Crockett & Gateway Elementary School<br>
-                        • High School Athletics<br>
-                        • Middle School Athletic Equipment
-                    </td>
-                </tr>
-            </table>
+                <table style="width:100%; font-size:10pt;">
+                    <tr>
+                        <td style="width:33%; vertical-align:top;">
+                            • High School<br>
+                            • Paul Belton Elementary School<br>
+                            • High School Athletic Equipment<br>
+                            • Buses
+                        </td>
+                        <td style="width:33%; vertical-align:top;">
+                            • Middle School<br>
+                            • Bulldog Academy<br>
+                            • Middle School Athletics
+                        </td>
+                        <td style="width:33%; vertical-align:top;">
+                            • Crockett & Gateway Elementary School<br>
+                            • High School Athletics<br>
+                            • Middle School Athletic Equipment
+                        </td>
+                    </tr>
+                </table> --}}
+                 <!-- SERVICE OUTLINE -->
+                <h4 style="margin-top:16pt;">Germblast Service Outline</h4>
 
-            <!-- NOTE -->
-            <p style="font-size:10pt; margin-top:14pt;">
-                <em>
-                    Please be advised. Beginning September 1, 2023, a 3% fee will be added to all credit card payments
-                    greater than $10,000.00.
-                </em>
-            </p>
+                @php
+                    // Take only first 9 services (3 columns × 3 rows)
+                    $services = $pricing->pricingServices->take(9);
 
-            <!-- SIGNATURES -->
-            <table style="width:100%; font-size:10pt; margin-top:18pt;">
-                <tr>
-                    <td style="width:25%;">Quote Prepared By:</td>
-                    <td style="width:75%;">Heath Herrington 11/11/25</td>
-                </tr>
-                <tr>
-                    <td style="padding-top:10pt;">To Approve, Sign and Return:</td>
-                    <td style="padding-top:10pt;">__________________________________________</td>
-                </tr>
-                <tr>
-                    <td style="padding-top:10pt;">Date Signed (Effective Date):</td>
-                    <td style="padding-top:10pt;">__________________________________________</td>
-                </tr>
-            </table>
+                    // Split into columns of 3 items
+                    $columns = $services->chunk(3);
+                @endphp
+
+                <table style="width:100%; font-size:10pt;">
+                    <tr>
+                        @for ($i = 0; $i < 3; $i++)
+                            <td style="width:33%; vertical-align:top;">
+                                @if (isset($columns[$i]))
+                                    @foreach ($columns[$i] as $service)
+                                        • {{ $service->service_name }}<br>
+                                    @endforeach
+                                @endif
+                            </td>
+                        @endfor
+                    </tr>
+                </table>
+
+                <hr>
+
+             <!-- NOTE -->
+                <p style="font-size:10pt; margin-top:14pt;">
+                    <em>
+                        Please be advised. Beginning September 1, 2023, a 3% fee will be added to all credit card
+                        payments
+                        greater than $10,000.00.
+                    </em>
+                </p>
+
+                <!-- SIGNATURES -->
+                <table style="width:100%; font-size:10pt; margin-top:18pt;">
+                    <tr>
+                        <td style="width:25%;">Quote Prepared By:</td>
+                        <td style="width:75%;">{{ $survey->user->name }}  {{ now()->format('d/m/Y') }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top:10pt;">To Approve, Sign and Return:</td>
+                        <td style="padding-top:10pt;">__________________________________________</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top:10pt;">Date Signed (Effective Date):</td>
+                        <td style="padding-top:10pt;">__________________________________________</td>
+                    </tr>
+                </table>
+
+            </div>
+
+            <div class="footer">
+                © {{ now()->year }} GermBlast. All Rights Reserved.
+            </div>
 
         </div>
-
-        <div class="footer">
-            © 2025 GermBlast. All Rights Reserved.
-        </div>
-
-    </div>
+        @if (!$loop->last)
+            <div style="page-break-after: always;"></div>
+        @endif
+    @endforeach
 
     <!-- ================= PAGE 4 ================= -->
     <div class="page">

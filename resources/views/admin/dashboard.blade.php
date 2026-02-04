@@ -366,8 +366,6 @@
     </div>
     <!-- Add Person Modal End -->
 
-
-
     <!-- Add Lead Modal Start -->
     <div class="modal fade" id="AddLead" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-fullscreen">
@@ -1015,7 +1013,6 @@
                 }
             });
 
-
             $("#add-lead-form").validate({
                 ignore: [],
                 rules: {
@@ -1152,7 +1149,6 @@
                     }
                 });
             });
-
 
 
             // Companies storing and validation
@@ -1416,7 +1412,6 @@
 
             // ========
 
-
             $("#store_activity").validate({
                 ignore: [],
                 rules: {
@@ -1643,9 +1638,6 @@
                     }
                 });
             });
-
-
-
 
         });
     </script>

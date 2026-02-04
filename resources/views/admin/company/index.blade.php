@@ -167,9 +167,9 @@
                             <div class="d-flex align-items-center justify-content-center">
                                 <span class="me-3"><strong id="selectedCount">1</strong> Selected</span>
 
-                                @can('lead.create')
+                                {{-- @can('lead.create')
                                 <button class="btn btn-edit btn-action" onclick="addLead()">CREATE LEAD</button>
-                                @endcan
+                                @endcan --}}
 
                                 @can('company.delete')
                                 <button class="btn btn-delete btn-action">DELETE</button>

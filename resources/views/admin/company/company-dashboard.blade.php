@@ -432,7 +432,7 @@
                                 Close
                             </button>
                             <button type="submit" class="btn btn-primary">
-                                Save Location
+                                Save Zone
                             </button>
                         </div>
                     </form>

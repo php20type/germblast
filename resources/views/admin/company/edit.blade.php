@@ -1638,12 +1638,6 @@
 
                         <hr>
 
-                        {{-- <div class="sidebar-section">
-                            <h6 class="form-label">ATTACHED FILES</h6>
-                            <button class="btn btn-outline-secondary w-100">
-                                <i class="fas fa-upload me-2"></i>Upload File
-                            </button>
-                        </div> --}}
                         <div class="sidebar-section">
                             <h6 class="form-label">ATTACHED FILES</h6>
 
@@ -1721,7 +1715,6 @@
                 <div class="modal-header">
                     <h1 class="modal-title" id="exampleModalLabel">Add a lead</h1>
                     <div>
-                        <a href="#" class="link-decoration">Customize fields</a>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
@@ -1733,25 +1726,26 @@
                         method="POST">
                         @csrf
 
-
                         <div class="row mx-0">
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Lead name</label>
+                                    <span class="text-danger">*</span>
                                     @error('name')
-                                        <span class="text-danger">* {{ $message }}</span>
+                                        {{ $message }}
                                     @enderror
-                                    <input type="text" name="name" placeholder="Lead Name" class="form-control" />
+                                    <input type="text" name="name" placeholder="Lead name" class="form-control" />
                                 </div>
                             </div>
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Assignee</label>
+                                    <span class="text-danger">*</span>
                                     @error('assignee_id')
-                                        <span class="text-danger">* {{ $message }}</span>
+                                        {{ $message }}
                                     @enderror
                                     <select name="assignee_id" class="form-select">
-                                        <option value="">Choose...</option>
+                                        <option value="">Select assignee</option>
                                         @foreach ($users as $user)
                                             <option value="{{ $user->id }}">
                                                 {{ $user->name }}
@@ -1762,23 +1756,25 @@
                             </div>
                             <div class="col-lg-12">
                                 <div class="form-group">
-                                    <label class="form-label">Anticipated closed date</label>
+                                    <label class="form-label">Anticipated close date</label>
+                                    <span class="text-danger">*</span>
                                     @error('close_date')
-                                        <span class="text-danger">* {{ $message }}</span>
+                                        {{ $message }}
                                     @enderror
                                     <input type="text" name="close_date" placeholder="04-Apr-2004"
-                                        pattern="\d{2}-[A-Za-z]{3}-\d{4}" class="form-control" />
+                                        class="form-control" />
                                 </div>
                             </div>
 
                             <!-- Product Row Container -->
                             <div id="productRowContainer" class="mt-3">
                                 <div class="row product-row">
-                                    <div class="col-lg-4">
+                                    <div class="col-lg-12">
                                         <div class="form-group">
-                                            <label class="form-label">Products</label>
+                                            <label class="form-label">Product</label>
+                                            <span class="text-danger">*</span>
                                             <select class="form-select mt-2" name="product_id[]">
-                                                <option value="">Choose...</option>
+                                                <option value="">Select product...</option>
                                                 @foreach ($products as $product)
                                                     <option value="{{ $product->id }}">{{ $product->name }}</option>
                                                 @endforeach
@@ -1786,18 +1782,21 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-4">
+                                    <div class="col-lg-6">
                                         <div class="form-group">
                                             <label class="form-label">Qty :</label>
+                                            <span class="text-danger">*</span>
                                             <input type="number" name="quantity[]" placeholder="Add quantity"
                                                 class="form-control" />
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-4">
+                                    <div class="col-lg-6">
                                         <div class="form-group d-flex justify-content-between align-items-end">
                                             <div style="width: 100%">
-                                                <label class="form-label fw-light">U.S(USD)</label>
+                                                <label class="form-label">Price <span
+                                                        class="fw-light">(USD)</span></label>
+                                                <span class="text-danger">*</span>
                                                 <input type="number" name="price[]" step="0.01"
                                                     placeholder="Add price" class="form-control" />
                                             </div>
@@ -1816,14 +1815,16 @@
                             <div class="col-lg-12 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">Confidence</label>
+                                    <span class="text-danger">*</span>
                                     @error('confidence')
-                                        <span class="text-danger">* {{ $message }}</span>
+                                        {{ $message }}
                                     @enderror
                                     <input type="number" name="confidence" placeholder="Confidence %"
                                         class="form-control" />
                                 </div>
                             </div>
-                            <div class="col-lg-12">
+
+                            {{-- <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Companies</label>
                                     @error('company_id')
@@ -1839,7 +1840,24 @@
                                     </select>
 
                                 </div>
+                            </div> --}}
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Companies</label>
+                                    @error('company_id')
+                                        <span class="text-danger">* {{ $message }}</span>
+                                    @enderror
+                                    <select name="company_id" id="companySelect" class="form-select select2">
+                                        <option value=""></option>
+                                        @foreach ($companies as $c)
+                                            <option value="{{ $c->id }}"
+                                                {{ $c->id == $company->id ? 'selected' : '' }}>{{ $c->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
+
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Select Person</label>
@@ -1880,8 +1898,7 @@
                                     @error('competitors_id')
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
-                                    <select id="competitor_select" name="competitors_id[]" class="form-select mt-2"
-                                        multiple>
+                                    <select id="competitor_select" name="competitors_id[]" class="form-select mt-2" multiple>
                                         <option value="">Choose...</option>
                                         @foreach ($competitors as $competitor)
                                             <option value="{{ $competitor->id }}">
@@ -2063,7 +2080,6 @@
                             </div>
 
                         </div>
-
 
                 </div>
                 <div class="modal-footer">

@@ -61,7 +61,6 @@ class SurveyProposalController extends Controller
     public function survey_proposal_store(Request $request, $leadId)
     {
         $rules = [
-            'client_name' => 'required|string|max:255',
             'date' => 'required|date',
             'description' => 'required|string',
 
@@ -705,7 +704,7 @@ class SurveyProposalController extends Controller
     public function pricing_store(Request $request, SurveyProposal $survey_proposal)
     {
         $validated = $request->validate([
-            // Pricing values (already calculated in JS)
+            // Pricing values
             'pricing_total' => 'required|numeric|min:0',
             'partial_cost_service' => 'required|numeric|min:0',
             'awareness' => 'nullable|numeric|min:0',
@@ -737,47 +736,49 @@ class SurveyProposalController extends Controller
 
         try {
             /** --------------------------------
-             * STEP 1 — Create or Update Pricing Proposal
+             * STEP 1 — Create Pricing Proposal (NO UPDATE)
              * -------------------------------- */
-            $pricing = PricingProposal::updateOrCreate(
-                ['survey_proposal_id' => $survey_proposal->id],
-                [
-                    'pricing_total' => $validated['pricing_total'],
-                    'partial_cost_service' => $validated['partial_cost_service'],
-                    'awareness' => $validated['awareness'] ?? 0,
-                    'education' => $validated['education'] ?? 0,
-                    'technology' => $validated['technology'] ?? 0,
-                    'response' => $validated['response'] ?? 0,
-                    'logistics_expense' => $validated['logistics_expense'] ?? 0,
+            $pricing = PricingProposal::create([
+                'survey_proposal_id' => $survey_proposal->id,
 
-                    'proposal_name' => $validated['proposal_name'],
-                    'proposal_order' => $validated['proposal_order'],
-                    'override_pricing' => $validated['override_pricing'],
-                    'discounts' => $validated['discounts'] ?? 0,
-                    'descriptions' => $validated['descriptions'],
+                'pricing_total' => $validated['pricing_total'],
+                'partial_cost_service' => $validated['partial_cost_service'],
+                'awareness' => $validated['awareness'] ?? 0,
+                'education' => $validated['education'] ?? 0,
+                'technology' => $validated['technology'] ?? 0,
+                'response' => $validated['response'] ?? 0,
+                'logistics_expense' => $validated['logistics_expense'] ?? 0,
 
-                    'services_per_year' => $validated['services_per_year'],
-                    'contract_terms' => $validated['contract_terms'],
-                    'prepayment_discount' => $validated['prepayment_discount'],
-                ]
-            );
+                'proposal_name' => $validated['proposal_name'],
+                'proposal_order' => $validated['proposal_order'],
+                'override_pricing' => $validated['override_pricing'],
+                'discounts' => $validated['discounts'] ?? 0,
+                'descriptions' => $validated['descriptions'],
+
+                'services_per_year' => $validated['services_per_year'],
+                'contract_terms' => $validated['contract_terms'],
+                'prepayment_discount' => $validated['prepayment_discount'],
+            ]);
 
             /** --------------------------------
-             * STEP 2 — Sync Facilities & Equipment
+             * STEP 2 — Attach Facilities & Equipment
              * -------------------------------- */
-            $pricing->facilities()->sync($validated['facility_ids'] ?? []);
-            $pricing->equipment()->sync($validated['equipment_ids'] ?? []);
+            if (! empty($validated['facility_ids'])) {
+                $pricing->facilities()->attach($validated['facility_ids']);
+            }
+
+            if (! empty($validated['equipment_ids'])) {
+                $pricing->equipment()->attach($validated['equipment_ids']);
+            }
 
             /** --------------------------------
-             * STEP 3 — Save Services
+             * STEP 3 — Save Services (CREATE ONLY)
              * -------------------------------- */
             $services = json_decode($validated['services'], true);
 
             if (! is_array($services)) {
                 throw new \Exception('Invalid services payload');
             }
-
-            $pricing->pricingServices()->delete();
 
             foreach ($services as $service) {
                 if (! empty($service['value'])) {
@@ -790,18 +791,19 @@ class SurveyProposalController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Pricing Proposal Saved Successfully!',
+                'message' => 'Pricing Proposal Created Successfully!',
+                'pricing_id' => $pricing->id,
             ]);
 
         } catch (\Throwable $e) {
-            Log::error('Pricing proposal save failed', [
+            Log::error('Pricing proposal creation failed', [
                 'survey_proposal_id' => $survey_proposal->id,
                 'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to save pricing proposal.',
+                'message' => 'Failed to create pricing proposal.',
             ], 500);
         }
     }
@@ -963,8 +965,8 @@ class SurveyProposalController extends Controller
 
     public function survey_view(Request $request, $id)
     {
-        // $survey = SurveyProposal::with(['facilities', 'equipmentEvaluations'])->findOrFail($id);
         $survey = SurveyProposal::with([
+            'lead', 'company', 'user',
             'facilities',
             'equipmentEvaluations',
             'pricingProposal.pricingServices',
@@ -974,13 +976,6 @@ class SurveyProposalController extends Controller
 
         $date = Carbon::now();
 
-        // $selectedIds = explode(',', $request->get('pricing_ids'));
-
-        // $pricingDetails = PricingProposal::with(['facilities', 'equipment'])
-        //     ->whereIn('id', $selectedIds)
-        //     ->get();
-
-        // Selected pricing IDs (optional filter)
         $selectedIds = collect(explode(',', $request->get('pricing_ids')))
             ->filter()
             ->map(fn ($id) => (int) $id)
@@ -1002,7 +997,14 @@ class SurveyProposalController extends Controller
 
     public function survey_download(Request $request, $id)
     {
-        $survey = SurveyProposal::with(['facilities', 'equipmentEvaluations'])->findOrFail($id);
+        $survey = SurveyProposal::with([
+            'lead', 'company', 'user',
+            'facilities',
+            'equipmentEvaluations',
+            'pricingProposal.pricingServices',
+            'pricingProposal.facilities',
+            'pricingProposal.equipment',
+        ])->findOrFail($id);
 
         $selectedIds = explode(',', $request->get('pricing_ids'));
 
