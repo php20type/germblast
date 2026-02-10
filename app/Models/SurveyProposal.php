@@ -11,7 +11,6 @@ class SurveyProposal extends Model
     protected $fillable = [
         'user_id',
         'lead_id',
-        // 'client_name',
         'company_id',
         'date',
         'description',
@@ -57,4 +56,10 @@ class SurveyProposal extends Model
     {
         return $this->hasMany(PricingProposal::class, 'survey_proposal_id');
     }
+
+    public function proposalComments()
+    {
+        return $this->hasMany(ProposalComment::class,'survey_proposal_id');
+    }
+
 }

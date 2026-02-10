@@ -6,7 +6,6 @@ use App\Http\Controllers\Admin\NoteController;
 use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\RolePermissionController;
-use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,7 +30,7 @@ Route::middleware(['auth'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Profile   
+| Profile
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
@@ -76,13 +75,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
 });
 
-/*
-|--------------------------------------------------------------------------
-| Approval Routes
-|--------------------------------------------------------------------------
-*/
-Route::get('/approval/approve/{token}', [ApprovalController::class, 'approve'])->name('approval.approve');
-Route::get('/approval/reject/{token}', [ApprovalController::class, 'reject'])->name('approval.reject');
 Route::view('survey-proposal.pdf', 'survey-proposal.pdf')->name('survey.proposal');
 
 /*

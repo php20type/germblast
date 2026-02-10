@@ -283,4 +283,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Company::class, 'account_manager_id');
     }
+
+    public function proposalComments()
+    {
+        return $this->hasMany(ProposalComment::class,'user_id');
+    }
 }
