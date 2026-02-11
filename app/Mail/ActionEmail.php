@@ -10,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 
 class ActionEmail extends Mailable
 {
-      use Queueable, SerializesModels;
+    use Queueable, SerializesModels;
 
     public $type;
 
@@ -35,12 +35,13 @@ class ActionEmail extends Mailable
                 'site_survey_completed' => 'Site Survey Completed',
                 'meeting_scheduled' => 'New Meeting Scheduled',
                 'meeting_updated' => 'Meeting Updated',
+                'proposal_approval_stage' => 'Survey Proposal Ready for Review',
                 default => 'Lead Notification'
             }
         );
     }
 
-     public function content(): Content
+    public function content(): Content
     {
         return new Content(
             markdown: "email-template.{$this->type}",

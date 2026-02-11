@@ -245,11 +245,42 @@ class NotificationService
             )->delay(now()->addSeconds(12)); // MAILTRAP rate-limit
         }
 
-         if ($this->sendSMS) {
+        if ($this->sendSMS) {
             SendSMSJob::dispatch(
                 $this->testPhone,
                 "Meeting Updated: {$meeting->name} on {$meeting->date} ({$startTime} - {$endTime}) by {$meeting->user->name}"
             )->delay(now()->addSeconds(12)); // MAILTRAP rate-limit
+        }
+    }
+
+    public function proposalApprovalStage($lead, $surveyProposal)
+    {
+        // Generate the survey proposal link
+        $surveyProposalLink = route('admin.lead.survey.proposal', $lead->id);
+
+        // Get company name - handle both direct and many-to-many relationships
+        $companyName = $lead->company->name;
+
+        if ($this->sendEmail) {
+            SendEmailJob::dispatch(
+                $this->testEmail,
+                'proposal_approval_stage',
+                [
+                    'lead_id' => $lead->id,
+                    'lead_name' => $lead->name,
+                    'company_name' => $companyName,
+                    'survey_proposal_link' => $surveyProposalLink,
+                    'status' => 'pending_review',
+                    'updated_by' => auth()->user()->name,
+                ]
+            );
+        }
+
+        if ($this->sendSMS) {
+            SendSMSJob::dispatch(
+                $this->testPhone,
+                "Proposal Approval Stage reached for Lead: {$lead->name}. Survey Proposal Link: {$surveyProposalLink}"
+            );
         }
     }
 

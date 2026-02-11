@@ -8,6 +8,7 @@ use App\Models\FacilityRoomType;
 use App\Models\Lead;
 use App\Models\PricingProposal;
 use App\Models\PricingService;
+use App\Models\ProposalComment;
 use App\Models\SurveyEquipmentImage;
 use App\Models\SurveyFacility;
 use App\Models\SurveyFacilityAtp;
@@ -42,6 +43,15 @@ class SurveyProposalController extends Controller
             ->where('survey_proposal_id', $surveyProposal->id)
             ->get();
 
+        // Determine if the proposal is editable (only draft or rejected)
+        $isEditable = in_array($surveyProposal->status, ['draft', 'rejected', null]);
+
+        // Get proposal comments/suggestions
+        $proposalComments = ProposalComment::with('user')
+            ->where('survey_proposal_id', $surveyProposal->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         return view('admin.leads.survey.survey-proposal', compact(
             'lead',
             'surveyProposal',
@@ -54,12 +64,23 @@ class SurveyProposalController extends Controller
             'totalWashCost',
             'totalCleanHours',
             'totalCleanCost',
-            'pricingProposals'
+            'pricingProposals',
+            'isEditable',
+            'proposalComments'
         ));
     }
 
     public function survey_proposal_store(Request $request, $leadId)
     {
+        // Check if the proposal is editable
+        $existingProposal = SurveyProposal::where('lead_id', $leadId)->first();
+        if ($existingProposal && !in_array($existingProposal->status, ['draft', 'rejected', null])) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'This survey proposal is locked and cannot be edited. Status: ' . ucfirst(str_replace('_', ' ', $existingProposal->status)),
+            ], 403);
+        }
+
         $rules = [
             'date' => 'required|date',
             'description' => 'required|string',
@@ -212,7 +233,7 @@ class SurveyProposalController extends Controller
                 $original = $file->getClientOriginalName();
                 $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
                 $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10).'_'.$clean.'.'.$ext;
+                $filename = Str::random(10) . '_' . $clean . '.' . $ext;
 
                 $path = $file->storeAs('facility/maps', $filename, 'public');
 
@@ -235,7 +256,7 @@ class SurveyProposalController extends Controller
                 $original = $file->getClientOriginalName();
                 $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
                 $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10).'_'.$clean.'.'.$ext;
+                $filename = Str::random(10) . '_' . $clean . '.' . $ext;
 
                 $path = $file->storeAs('facility/atp', $filename, 'public');
 
@@ -258,7 +279,7 @@ class SurveyProposalController extends Controller
 
         } catch (\Throwable $e) {
 
-            Log::error("SurveyFacility upload failed (proposal={$surveyProposalId}): ".$e->getMessage());
+            Log::error("SurveyFacility upload failed (proposal={$surveyProposalId}): " . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -369,7 +390,7 @@ class SurveyProposalController extends Controller
                 $original = $file->getClientOriginalName();
                 $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
                 $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10).'_'.$clean.'.'.$ext;
+                $filename = Str::random(10) . '_' . $clean . '.' . $ext;
                 $path = $file->storeAs('facility/maps', $filename, 'public');
 
                 SurveyFacilityMap::create([
@@ -391,7 +412,7 @@ class SurveyProposalController extends Controller
                 $original = $file->getClientOriginalName();
                 $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
                 $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10).'_'.$clean.'.'.$ext;
+                $filename = Str::random(10) . '_' . $clean . '.' . $ext;
                 $path = $file->storeAs('facility/atp', $filename, 'public');
 
                 SurveyFacilityAtp::create([
@@ -413,7 +434,7 @@ class SurveyProposalController extends Controller
 
         } catch (\Throwable $e) {
 
-            Log::error("Facility update failed (facility={$facilityId}): ".$e->getMessage());
+            Log::error("Facility update failed (facility={$facilityId}): " . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -545,7 +566,7 @@ class SurveyProposalController extends Controller
                 $original = $file->getClientOriginalName();
                 $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
                 $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10).'_'.$clean.'.'.$ext;
+                $filename = Str::random(10) . '_' . $clean . '.' . $ext;
 
                 $path = $file->storeAs('equipment/images', $filename, 'public');
 
@@ -567,7 +588,7 @@ class SurveyProposalController extends Controller
 
         } catch (\Throwable $e) {
 
-            Log::error("EquipmentEvaluation store failed (proposal={$surveyProposalId}): ".$e->getMessage());
+            Log::error("EquipmentEvaluation store failed (proposal={$surveyProposalId}): " . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -657,7 +678,7 @@ class SurveyProposalController extends Controller
                 $original = $file->getClientOriginalName();
                 $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
                 $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10).'_'.$clean.'.'.$ext;
+                $filename = Str::random(10) . '_' . $clean . '.' . $ext;
 
                 $path = $file->storeAs('equipment/images', $filename, 'public');
 
@@ -678,7 +699,7 @@ class SurveyProposalController extends Controller
 
         } catch (\Throwable $e) {
 
-            Log::error("EquipmentEvaluation update failed (id={$equipmentId}): ".$e->getMessage());
+            Log::error("EquipmentEvaluation update failed (id={$equipmentId}): " . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -763,11 +784,11 @@ class SurveyProposalController extends Controller
             /** --------------------------------
              * STEP 2 — Attach Facilities & Equipment
              * -------------------------------- */
-            if (! empty($validated['facility_ids'])) {
+            if (!empty($validated['facility_ids'])) {
                 $pricing->facilities()->attach($validated['facility_ids']);
             }
 
-            if (! empty($validated['equipment_ids'])) {
+            if (!empty($validated['equipment_ids'])) {
                 $pricing->equipment()->attach($validated['equipment_ids']);
             }
 
@@ -776,12 +797,12 @@ class SurveyProposalController extends Controller
              * -------------------------------- */
             $services = json_decode($validated['services'], true);
 
-            if (! is_array($services)) {
+            if (!is_array($services)) {
                 throw new \Exception('Invalid services payload');
             }
 
             foreach ($services as $service) {
-                if (! empty($service['value'])) {
+                if (!empty($service['value'])) {
                     PricingService::create([
                         'pricing_id' => $pricing->id,
                         'service_name' => $service['value'],
@@ -899,14 +920,14 @@ class SurveyProposalController extends Controller
              * -------------------------------- */
             $services = json_decode($validated['services'], true);
 
-            if (! is_array($services)) {
+            if (!is_array($services)) {
                 throw new \Exception('Invalid services payload');
             }
 
             $pricing->pricingServices()->delete();
 
             foreach ($services as $service) {
-                if (! empty($service['value'])) {
+                if (!empty($service['value'])) {
                     PricingService::create([
                         'pricing_id' => $pricing->id,
                         'service_name' => $service['value'],
@@ -954,7 +975,7 @@ class SurveyProposalController extends Controller
             ]);
 
         } catch (\Throwable $e) {
-            Log::error('Delete pricing failed: '.$e->getMessage());
+            Log::error('Delete pricing failed: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -966,7 +987,9 @@ class SurveyProposalController extends Controller
     public function survey_view(Request $request, $id)
     {
         $survey = SurveyProposal::with([
-            'lead', 'company', 'user',
+            'lead',
+            'company',
+            'user',
             'facilities',
             'equipmentEvaluations',
             'pricingProposal.pricingServices',
@@ -978,7 +1001,7 @@ class SurveyProposalController extends Controller
 
         $selectedIds = collect(explode(',', $request->get('pricing_ids')))
             ->filter()
-            ->map(fn ($id) => (int) $id)
+            ->map(fn($id) => (int) $id)
             ->values();
 
         $pricingDetails = PricingProposal::with([
@@ -998,7 +1021,9 @@ class SurveyProposalController extends Controller
     public function survey_download(Request $request, $id)
     {
         $survey = SurveyProposal::with([
-            'lead', 'company', 'user',
+            'lead',
+            'company',
+            'user',
             'facilities',
             'equipmentEvaluations',
             'pricingProposal.pricingServices',
@@ -1015,5 +1040,67 @@ class SurveyProposalController extends Controller
         $pdf = Pdf::loadView('survey-proposal.final-pdf', compact('survey', 'pricingDetails'));
 
         return $pdf->download("survey_proposal_{$survey->id}.pdf");
+    }
+
+
+    /**
+     * Approve the proposal (change status to approved)
+     */
+    public function approve(Request $request, $surveyProposalId)
+    {
+        $surveyProposal = SurveyProposal::findOrFail($surveyProposalId);
+
+        // Only managers can approve
+        if (!auth()->user()->isSalesManager()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only sales managers can approve proposals.',
+            ], 403);
+        }
+
+        // Update proposal status to approved
+        $surveyProposal->status = 'approved';
+        $surveyProposal->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Proposal approved successfully.',
+        ]);
+    }
+
+    /**
+     * Reject the proposal (change status to rejected)
+     */
+    public function reject(Request $request, $surveyProposalId)
+    {
+        $request->validate([
+            'comment' => 'required|string|max:5000',
+        ]);
+
+        $surveyProposal = SurveyProposal::findOrFail($surveyProposalId);
+
+        // Only managers can reject
+        if (!auth()->user()->isSalesManager()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only sales managers can reject proposals.',
+            ], 403);
+        }
+
+        // Update proposal status to rejected
+        $surveyProposal->status = 'rejected';
+        $surveyProposal->save();
+
+        // Store rejection comment (required)
+        ProposalComment::create([
+            'survey_proposal_id' => $surveyProposalId,
+            'user_id' => auth()->id(),
+            'comment' => $request->comment
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Proposal rejected. Sales rep can now make changes.',
+        ]);
     }
 }

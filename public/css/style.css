@@ -679,6 +679,15 @@ title {
     border: none;
 }
 
+.modal-fullscreen .modal-footer .btn-danger {
+    background: rgb(209, 17, 17);
+    border-radius: 40px;
+    padding: 0.6rem 2rem;
+    font-size: 18px;
+    text-transform: uppercase;
+    border: none;
+}
+
 .modal-fullscreen .modal-body .form-label {
     color: #121212;
     font-size: 16px;

@@ -55,7 +55,7 @@ class LeadController extends Controller
         // Helper function to format counts
         $formatCount = function ($count) {
             return $count >= 1000
-                ? number_format($count / 1000, 1).'k'
+                ? number_format($count / 1000, 1) . 'k'
                 : $count;
         };
 
@@ -116,7 +116,9 @@ class LeadController extends Controller
         }
 
         if ($request->lead_tags_filter_id) {
-            $query->whereHas('tags', fn ($q) => $q->whereIn('tags.id', $request->lead_tags_filter_id)
+            $query->whereHas(
+                'tags',
+                fn($q) => $q->whereIn('tags.id', $request->lead_tags_filter_id)
             );
         }
 
@@ -129,7 +131,9 @@ class LeadController extends Controller
         }
 
         if ($request->activity_type_filter_id) {
-            $query->whereHas('activity', fn ($q) => $q->whereIn('activity_type_id', $request->activity_type_filter_id)
+            $query->whereHas(
+                'activity',
+                fn($q) => $q->whereIn('activity_type_id', $request->activity_type_filter_id)
             );
         }
 
@@ -167,7 +171,7 @@ class LeadController extends Controller
 
     private function calculateStats($leads)
     {
-        $format = fn ($count) => $count >= 1000 ? number_format($count / 1000, 1).'k' : $count;
+        $format = fn($count) => $count >= 1000 ? number_format($count / 1000, 1) . 'k' : $count;
 
         $totalValue = Helper::calculateTotalValue($leads);
         $count = $leads->count();
@@ -209,7 +213,8 @@ class LeadController extends Controller
             ]);
         }
 
-        return view('admin.leads.index',
+        return view(
+            'admin.leads.index',
             array_merge(
                 compact('groupedLeads'),
                 $stats,
@@ -240,7 +245,8 @@ class LeadController extends Controller
             ]);
         }
 
-        return view('admin.leads.my-leads',
+        return view(
+            'admin.leads.my-leads',
             array_merge(
                 compact('groupedLeads'),
                 $stats,
@@ -273,7 +279,8 @@ class LeadController extends Controller
             ]);
         }
 
-        return view('admin.leads.open-leads',
+        return view(
+            'admin.leads.open-leads',
             array_merge(
                 compact('groupedLeads'),
                 $stats,
@@ -409,96 +416,96 @@ class LeadController extends Controller
         ));
     }
 
-        public function store(Request $request, NotificationService $notify)
-        {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'assignee_id' => 'nullable|exists:users,id',
-                'close_date' => 'nullable|date',
-                'confidence' => 'nullable|numeric',
+    public function store(Request $request, NotificationService $notify)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'assignee_id' => 'nullable|exists:users,id',
+            'close_date' => 'nullable|date',
+            'confidence' => 'nullable|numeric',
 
-                'product_id' => 'nullable|array',
-                'product_id.*' => 'exists:products,id',
-                'quantity' => 'nullable|array',
-                'price' => 'nullable|array',
+            'product_id' => 'nullable|array',
+            'product_id.*' => 'exists:products,id',
+            'quantity' => 'nullable|array',
+            'price' => 'nullable|array',
 
-                // 'company_id' => 'nullable|array',
-                // 'company_id.*' => 'exists:companies,id',
-                'company_id' => 'required|exists:companies,id',
+            // 'company_id' => 'nullable|array',
+            // 'company_id.*' => 'exists:companies,id',
+            'company_id' => 'required|exists:companies,id',
 
-                'person_id' => 'nullable|array',
-                'person_id.*' => 'nullable|exists:people,id',
+            'person_id' => 'nullable|array',
+            'person_id.*' => 'nullable|exists:people,id',
 
-                'source_id' => 'nullable|array',
-                'source_id.*' => 'exists:sources,id',
+            'source_id' => 'nullable|array',
+            'source_id.*' => 'exists:sources,id',
 
-                'competitors_id' => 'nullable|array',
-                'competitors_id.*' => 'nullable|exists:competitors,id',
+            'competitors_id' => 'nullable|array',
+            'competitors_id.*' => 'nullable|exists:competitors,id',
 
-                'tag_id' => 'required',
+            'tag_id' => 'required',
+        ]);
+
+        $lead = null;
+
+        DB::transaction(function () use ($request, &$lead) {
+
+            $lead = Lead::create([
+                'name' => $request->name,
+                'assignee_id' => $request->assignee_id,
+                'company_id' => $request->company_id,
+                'close_date' => $request->close_date,
+                'confidence' => $request->confidence,
+                'creator_id' => auth()->id(),
             ]);
 
-            $lead = null;
+            LeadStageProcess::create([
+                'lead_id' => $lead->id,
+            ]);
 
-            DB::transaction(function () use ($request, &$lead) {
+            SurveyProposal::create([
+                'user_id' => auth()->id(),
+                'lead_id' => $lead->id,
+                'company_id' => $lead->company_id,
+            ]);
 
-                $lead = Lead::create([
-                    'name' => $request->name,
-                    'assignee_id' => $request->assignee_id,
-                    'company_id' => $request->company_id,
-                    'close_date' => $request->close_date,
-                    'confidence' => $request->confidence,
-                    'creator_id' => auth()->id(),
-                ]);
+            // if ($request->filled('company_id')) {
+            //     $lead->companies()->attach($request->company_id);
+            // }
 
-                LeadStageProcess::create([
-                    'lead_id' => $lead->id,
-                ]);
+            if ($request->filled('person_id')) {
+                $lead->peoples()->attach($request->person_id);
+            }
 
-                SurveyProposal::create([
-                    'user_id' => auth()->id(),
-                    'lead_id' => $lead->id,
-                    'company_id' => $lead->company_id,
-                ]);
-
-                // if ($request->filled('company_id')) {
-                //     $lead->companies()->attach($request->company_id);
-                // }
-
-                if ($request->filled('person_id')) {
-                    $lead->peoples()->attach($request->person_id);
+            if ($request->filled('product_id')) {
+                foreach ($request->product_id as $index => $productId) {
+                    $lead->products()->attach($productId, [
+                        'qty' => $request->quantity[$index] ?? 1,
+                        'price' => $request->price[$index] ?? 0,
+                    ]);
                 }
+            }
 
-                if ($request->filled('product_id')) {
-                    foreach ($request->product_id as $index => $productId) {
-                        $lead->products()->attach($productId, [
-                            'qty' => $request->quantity[$index] ?? 1,
-                            'price' => $request->price[$index] ?? 0,
-                        ]);
-                    }
-                }
+            if ($request->filled('source_id')) {
+                $lead->sources()->attach($request->source_id);
+            }
 
-                if ($request->filled('source_id')) {
-                    $lead->sources()->attach($request->source_id);
-                }
+            if ($request->filled('competitors_id')) {
+                $lead->competitors()->attach($request->competitors_id);
+            }
 
-                if ($request->filled('competitors_id')) {
-                    $lead->competitors()->attach($request->competitors_id);
-                }
+            if ($request->filled('tag_id')) {
+                $lead->tags()->attach($request->tag_id);
+            }
+        });
 
-                if ($request->filled('tag_id')) {
-                    $lead->tags()->attach($request->tag_id);
-                }
-            });
+        // TRIGGER EMAIL 1: Lead Created
+        $notify->leadCreated($lead);
 
-            // TRIGGER EMAIL 1: Lead Created
-            $notify->leadCreated($lead);
+        // TRIGGER EMAIL 2: Lead Assigned (Delayed 12 sec)
+        $notify->leadAssigned($lead);
 
-            // TRIGGER EMAIL 2: Lead Assigned (Delayed 12 sec)
-            $notify->leadAssigned($lead);
-
-            return redirect()->back()->with('success', 'Lead created successfully!');
-        }
+        return redirect()->back()->with('success', 'Lead created successfully!');
+    }
 
     public function show(Request $request, $id)
     {
@@ -758,7 +765,7 @@ class LeadController extends Controller
         // Example stage-wise validation
         switch ($newStageId) {
             case 2: // Site Survey
-                if (! $lead->activity()->where('status', 'Logged')->exists()) {
+                if (!$lead->activity()->where('status', 'Logged')->exists()) {
                     return response()->json([
                         'allowed' => false,
                         'message' => 'Please log an activity first.',
@@ -768,7 +775,27 @@ class LeadController extends Controller
                 break;
 
             case 4: // Present Proposal
-                if (! $lead->products()->exists()) {
+            case 5: // Rec. Signed Proposal
+                // Check if survey proposal is approved
+                $surveyProposal = SurveyProposal::where('lead_id', $leadId)->first();
+
+                if (!$surveyProposal) {
+                    return response()->json([
+                        'allowed' => false,
+                        'message' => 'Survey proposal not found. Please create a survey proposal first.',
+                        'current_stage_id' => $lead->stage_id,
+                    ]);
+                }
+
+                if ($surveyProposal->status !== 'approved') {
+                    return response()->json([
+                        'allowed' => false,
+                        'message' => 'Survey proposal must be approved by management before moving to Proposal Presentation stage.',
+                        'current_stage_id' => $lead->stage_id,
+                    ]);
+                }
+
+                if (!$lead->products()->exists()) {
                     return response()->json([
                         'allowed' => false,
                         'message' => 'Attach a product before moving to this stage.',
@@ -781,7 +808,7 @@ class LeadController extends Controller
         return response()->json(['allowed' => true]);
     }
 
-    public function changeStage(Request $request, $leadId)
+    public function changeStage(Request $request, $leadId, NotificationService $notify)
     {
         $lead = Lead::findOrFail($leadId);
         $oldStage = $lead->stages->name ?? 'Unknown Stage';
@@ -801,6 +828,20 @@ class LeadController extends Controller
             'description' => "changed the stage of {$leadName} from {$oldStage} to {$newStage}",
         ]);
 
+        // Handle Proposal Approval stage (stage 3)
+        if ($request->stage_id == 3) {
+            // Update survey proposal status to pending_review
+            $surveyProposal = SurveyProposal::where('lead_id', $lead->id)->first();
+
+            if ($surveyProposal) {
+                $surveyProposal->status = 'pending_review';
+                $surveyProposal->save();
+
+                // Send email notification with survey proposal link
+                $notify->proposalApprovalStage($lead, $surveyProposal);
+            }
+        }
+
         return response()->json(['message' => 'Lead stage updated successfully.']);
     }
 
@@ -817,7 +858,7 @@ class LeadController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => ucfirst($request->field).' updated successfully!',
+            'message' => ucfirst($request->field) . ' updated successfully!',
         ]);
     }
 
@@ -858,7 +899,7 @@ class LeadController extends Controller
             ->where('tag_id', $tagId)
             ->first();
 
-        if (! $leadTag) {
+        if (!$leadTag) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Tag not found for this lead.',
@@ -936,7 +977,7 @@ class LeadController extends Controller
             }
 
             if ($deleted) {
-                if (! empty($actionType)) {
+                if (!empty($actionType)) {
                     Timeline::create([
                         'user_id' => auth()->id(),
                         'owner_type' => 'lead',
@@ -948,19 +989,19 @@ class LeadController extends Controller
 
                 return response()->json([
                     'success' => true,
-                    'message' => ucfirst($type).' removed successfully from lead.',
+                    'message' => ucfirst($type) . ' removed successfully from lead.',
                 ]);
             }
 
             return response()->json([
                 'success' => false,
-                'message' => ucfirst($type).' not found or already deleted.',
+                'message' => ucfirst($type) . ' not found or already deleted.',
             ], 404);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error deleting '.$type,
+                'message' => 'Error deleting ' . $type,
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -1049,7 +1090,7 @@ class LeadController extends Controller
         if ($exists) {
             return response()->json([
                 'success' => false,
-                'message' => ucfirst($request->type).' is already attached to this lead.',
+                'message' => ucfirst($request->type) . ' is already attached to this lead.',
             ]);
         }
 
@@ -1057,7 +1098,7 @@ class LeadController extends Controller
         $lead->$relation()->attach($item->id);
 
         // Log timeline entry only if $actionType is defined
-        if (! empty($actionType)) {
+        if (!empty($actionType)) {
             $leadName = $lead->name ?? 'Unnamed Lead';
             $itemName = $item->name ?? ucfirst($request->type);
 
@@ -1072,7 +1113,7 @@ class LeadController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => ucfirst($request->type).' added successfully.',
+            'message' => ucfirst($request->type) . ' added successfully.',
         ]);
     }
 
@@ -1160,7 +1201,7 @@ class LeadController extends Controller
             $originalName = $file->getClientOriginalName();
             $cleanName = Str::slug(pathinfo($originalName, PATHINFO_FILENAME));
             $extension = $file->getClientOriginalExtension();
-            $filename = Str::random(10).'_'.$cleanName.'.'.$extension;
+            $filename = Str::random(10) . '_' . $cleanName . '.' . $extension;
 
             $path = $file->storeAs('lead_files', $filename, 'public');
 
@@ -1178,7 +1219,7 @@ class LeadController extends Controller
                 'file' => $leadFile,
             ]);
         } catch (\Throwable $e) {
-            Log::error("Lead file upload failed for lead ID {$lead->id}: ".$e->getMessage());
+            Log::error("Lead file upload failed for lead ID {$lead->id}: " . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -1208,7 +1249,7 @@ class LeadController extends Controller
             ]);
 
         } catch (\Throwable $e) {
-            Log::error("File delete failed for lead {$request->lead_id}: ".$e->getMessage());
+            Log::error("File delete failed for lead {$request->lead_id}: " . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -1240,7 +1281,7 @@ class LeadController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to delete lead(s): '.$e->getMessage(),
+                'message' => 'Failed to delete lead(s): ' . $e->getMessage(),
             ], 500);
         }
     }

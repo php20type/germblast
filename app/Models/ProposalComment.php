@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProposalComment extends Model
 {
-        protected $table = 'proposal_comments';
+    protected $table = 'proposal_comments';
 
     protected $fillable = [
         'user_id',

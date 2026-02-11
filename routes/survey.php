@@ -32,31 +32,31 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::middleware('permission:survey.proposal.edit')->group(function () {
 
             Route::get('{survey_proposal}/facility', [SurveyProposalController::class, 'survey_facility'])
-            ->name('facility');
+                ->name('facility');
 
             Route::post('{survey_proposal}/facility/store', [SurveyProposalController::class, 'survey_facility_store'])
-            ->name('facility.store');
+                ->name('facility.store');
 
             Route::get('facility/{facility}/edit', [SurveyProposalController::class, 'survey_facility_edit'])
-            ->name('facility.edit');
+                ->name('facility.edit');
 
             Route::post('{facility}/facility/update', [SurveyProposalController::class, 'survey_facility_update'])
-            ->name('facility.update');
+                ->name('facility.update');
 
             Route::get('{survey_proposal}/equipment', [SurveyProposalController::class, 'survey_equipment'])
-            ->name('equipment');
+                ->name('equipment');
 
             Route::post('{survey_proposal}/equipment/store', [SurveyProposalController::class, 'survey_equipment_store'])
-            ->name('equipment.store');
+                ->name('equipment.store');
 
             Route::get('equipment/{equipment}/edit', [SurveyProposalController::class, 'survey_equipment_edit'])
-            ->name('equipment.edit');
+                ->name('equipment.edit');
 
             Route::post('{equipment}/equipment/update', [SurveyProposalController::class, 'survey_equipment_update'])
-            ->name('equipment.update');
+                ->name('equipment.update');
 
             Route::get('{survey_proposal}/pricing', [SurveyProposalController::class, 'pricing_proposal'])
-            ->name('pricing.proposal');
+                ->name('pricing.proposal');
 
         });
 
@@ -67,6 +67,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::get('download/{id}', [SurveyProposalController::class, 'survey_download'])
             ->middleware('permission:survey.proposal.view')
             ->name('download');
+
+        // Action buttons 
+        Route::post('{survey_proposal}/approve', [SurveyProposalController::class, 'approve'])
+            ->name('approve');
+
+        Route::post('{survey_proposal}/reject', [SurveyProposalController::class, 'reject'])
+            ->name('reject');
 
     });
 
