@@ -26,6 +26,16 @@
                                         <button type="submit" class="btn btn-success">
                                             Save Survey Proposal
                                         </button>
+                                    @elseif (auth()->user()->isSalesManager() && !$isEditable)
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-success" id="approveProposalBtn">
+                                                <i class="ti ti-check me-1"></i> Approve
+                                            </button>
+                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                                data-bs-target="#rejectModal">
+                                                <i class="ti ti-x me-1"></i> Reject
+                                            </button>
+                                        </div>
                                     @endif
                                 </div>
                             </div>
@@ -54,7 +64,7 @@
                                                     <td>
                                                         <input type="date" class="form-control" name="date"
                                                             value="{{ isset($surveyProposal->date) ? date('Y-m-d', strtotime($surveyProposal->date)) : '' }}"
-                                                                {{ !$isEditable ? 'readonly' : '' }}>
+                                                            {{ !$isEditable ? 'readonly' : '' }}>
                                                     </td>
                                                 </tr>
 
@@ -63,7 +73,7 @@
                                                     <td>
                                                         <input type="text" class="form-control" name="description"
                                                             value="{{ $surveyProposal->description ?? '' }}"
-                                                                {{ !$isEditable ? 'readonly' : '' }}>
+                                                            {{ !$isEditable ? 'readonly' : '' }}>
                                                     </td>
                                                 </tr>
 
@@ -72,34 +82,35 @@
                                                     <td>
                                                         <input type="number" class="form-control" name="enrollment"
                                                             value="{{ $surveyProposal->enrollment ?? 0 }}"
-                                                                {{ !$isEditable ? 'readonly' : '' }}>
+                                                            {{ !$isEditable ? 'readonly' : '' }}>
                                                     </td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>WADA</th>
                                                     <td>
-                                                        <input type="number" step="0.01" class="form-control" name="wada"
-                                                            value="{{ $surveyProposal->wada ?? 0 }}"
-                                                                {{ !$isEditable ? 'readonly' : '' }}>
+                                                        <input type="number" step="0.01" class="form-control"
+                                                            name="wada" value="{{ $surveyProposal->wada ?? 0 }}"
+                                                            {{ !$isEditable ? 'readonly' : '' }}>
                                                     </td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>ABA</th>
                                                     <td>
-                                                        <input type="number" step="0.01" class="form-control" name="aba"
-                                                            value="{{ $surveyProposal->aba ?? 0 }}"
-                                                                {{ !$isEditable ? 'readonly' : '' }}>
+                                                        <input type="number" step="0.01" class="form-control"
+                                                            name="aba" value="{{ $surveyProposal->aba ?? 0 }}"
+                                                            {{ !$isEditable ? 'readonly' : '' }}>
                                                     </td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>Recommended Number of Service Technicians</th>
                                                     <td>
-                                                        <input type="number" class="form-control" name="service_technicians"
+                                                        <input type="number" class="form-control"
+                                                            name="service_technicians"
                                                             value="{{ $surveyProposal->service_technicians ?? 0 }}"
-                                                                {{ !$isEditable ? 'readonly' : '' }}>
+                                                            {{ !$isEditable ? 'readonly' : '' }}>
                                                     </td>
                                                 </tr>
 
@@ -108,7 +119,7 @@
                                                     <td>
                                                         <input type="number" class="form-control" name="distance"
                                                             value="{{ $surveyProposal->distance ?? 0 }}"
-                                                                {{ !$isEditable ? 'readonly' : '' }}>
+                                                            {{ !$isEditable ? 'readonly' : '' }}>
                                                     </td>
                                                 </tr>
 
@@ -117,7 +128,7 @@
                                                     <td>
                                                         <input type="number" class="form-control" name="man_hours"
                                                             value="{{ $surveyProposal->man_hours ?? 0 }}"
-                                                                {{ !$isEditable ? 'readonly' : '' }}>
+                                                            {{ !$isEditable ? 'readonly' : '' }}>
                                                     </td>
                                                 </tr>
 
@@ -148,8 +159,8 @@
                                             </div>
                                         </div>
 
-                                        <textarea class="form-control mb-2" name="specialist_narrative" rows="6"
-                                            placeholder="Enter narrative here..." {{ !$isEditable ? 'readonly' : '' }}>{{ $surveyProposal->specialist_narrative ?? '' }}</textarea>
+                                        <textarea class="form-control mb-2" name="specialist_narrative" rows="6" placeholder="Enter narrative here..."
+                                            {{ !$isEditable ? 'readonly' : '' }}>{{ $surveyProposal->specialist_narrative ?? '' }}</textarea>
 
                                         <p class="text-muted small">
                                             Last Updated By:
@@ -210,7 +221,8 @@
 
                                                     @if ($facilities->isEmpty())
                                                         <tr>
-                                                            <td colspan="6" class="text-center text-muted">No facilities
+                                                            <td colspan="6" class="text-center text-muted">No
+                                                                facilities
                                                                 added yet.</td>
                                                         </tr>
                                                     @else
@@ -522,17 +534,17 @@
                                                 <tr>
                                                     <th>Title</th>
                                                     <td>
-                                                        <input type="text" class="form-control" name="supplemental_title"
+                                                        <input type="text" class="form-control"
+                                                            name="supplemental_title"
                                                             value="{{ $surveyProposal->supplemental_title ?? '' }}"
-                                                                {{ !$isEditable ? 'readonly' : '' }}>
+                                                            {{ !$isEditable ? 'readonly' : '' }}>
                                                     </td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>Body</th>
                                                     <td>
-                                                        <textarea name="supplemental_body" class="form-control"
-                                                            rows="5" {{ !$isEditable ? 'readonly' : '' }}>{{ $surveyProposal->supplemental_body ?? '' }}</textarea>
+                                                        <textarea name="supplemental_body" class="form-control" rows="5" {{ !$isEditable ? 'readonly' : '' }}>{{ $surveyProposal->supplemental_body ?? '' }}</textarea>
                                                     </td>
                                                 </tr>
 
@@ -543,9 +555,171 @@
                                 </div>
                             </div>
 
-                        {{-- Locked Status Banner --}}
+                            {{-- Manager Actions / Suggestions Section --}}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="section-card">
+                                        <div class="section-header">
+                                            <h3 class="section-title">
+                                                @if (auth()->user()->isSalesManager())
+                                                    Manager Actions & Suggestions
+                                                @else
+                                                    Manager Suggestions
+                                                @endif
+                                            </h3>
+                                        </div>
+
+                                        {{-- Timeline of Actions --}}
+                                        {{-- <div id="actionsList">
+                                            @if ($proposalActions->isEmpty())
+                                                <div class="text-center py-5">
+                                                    <i class="ti ti-info-circle display-6 text-muted mb-3"></i>
+                                                    <p class="text-muted">No actions or suggestions yet</p>
+                                                </div>
+                                            @else
+                                                <div class="timeline timeline-one-side" data-timeline-content="axis">
+                                                    @foreach ($proposalActions as $action)
+                                                        <div class="timeline-block">
+                                                            <span class="timeline-step badge bg-{{ $action->action_color }}">
+                                                                @if ($action->status === 'approved')
+                                                                    <i class="ti ti-check"></i>
+                                                                @elseif ($action->status === 'rejected')
+                                                                    <i class="ti ti-x"></i>
+                                                                @else
+                                                                    <i class="ti ti-messagecircle"></i>
+                                                                @endif
+                                                            </span>
+                                                            <div class="timeline-content">
+                                                                <div class="card border-0 shadow-sm mb-0">
+                                                                    <div class="card-body">
+                                                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                                                            <div>
+                                                                                <h6 class="mb-0 fw-bold text-dark">
+                                                                                    {{ $action->user->name }}
+                                                                                    <span class="badge bg-{{ $action->action_color }} ms-2">
+                                                                                        {{ $action->action_label }}
+                                                                                    </span>
+                                                                                </h6>
+                                                                                <small class="text-muted d-block mt-1">
+                                                                                    <i class="ti ti-calendar me-1"></i>{{ $action->created_at->format('M d, Y H:i A') }}
+                                                                                </small>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        @if ($action->old_status !== null && $action->new_status !== null)
+                                                                            <div class="alert alert-light mb-2 border border-light">
+                                                                                <small class="text-muted">
+                                                                                    Status changed from <strong>{{ ucfirst(str_replace('_', ' ', $action->old_status)) }}</strong>
+                                                                                    to <strong>{{ ucfirst(str_replace('_', ' ', $action->new_status)) }}</strong>
+                                                                                </small>
+                                                                            </div>
+                                                                        @endif
+
+                                                                        @if ($action->comment)
+                                                                            <div class="mt-2">
+                                                                                <p class="mb-0 text-dark">{{ $action->comment }}</p>
+                                                                            </div>
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+    </div>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div> --}}
+
+                                        {{-- Timeline of Actions --}}
+                                        <div class="timeline-container">
+                                            <div class="timeline position-relative" id="proposalTimeline">
+
+                                                @if ($proposalActions->isEmpty())
+                                                    <div class="text-center py-5">
+                                                        <i class="ti ti-info-circle display-6 text-muted mb-3"></i>
+                                                        <p class="text-muted">No actions or suggestions yet</p>
+                                                    </div>
+                                                @else
+                                                    @foreach ($proposalActions as $action)
+                                                        <div class="timeline-item">
+
+                                                            {{-- ICON --}}
+                                                            <div class="timeline-icon">
+                                                                @if ($action->status === 'approved')
+                                                                    <i class="ti ti-check"></i>
+                                                                @elseif ($action->status === 'rejected')
+                                                                    <i class="ti ti-x"></i>
+                                                                @else
+                                                                    <i class="ti ti-messagecircle"></i>
+                                                                @endif
+                                                            </div>
+
+                                                            <div class="timeline-content">
+
+                                                                {{-- HEADER --}}
+                                                                <div class="timeline-header">
+                                                                    <div class="timestamp">
+                                                                        {{ $action->created_at->format('g:i A \o\n M j, Y') }}
+                                                                    </div>
+                                                                </div>
+
+                                                                {{-- BODY --}}
+                                                                <div class="timeline-body">
+
+                                                                    <div class="row align-items-start">
+                                                                        <div class="col-12">
+
+                                                                            {{-- USER + BADGE --}}
+                                                                            <p class="mb-1">
+                                                                                <span class="author-link">
+                                                                                    {{ $action->user->name }}
+                                                                                </span>
+                                                                                <span
+                                                                                    class="badge bg-{{ $action->action_color }} ms-2">
+                                                                                    {{ $action->action_label }}
+                                                                                </span>
+                                                                            </p>
+
+                                                                            {{-- STATUS CHANGE --}}
+                                                                            @if ($action->old_status !== null && $action->new_status !== null)
+                                                                                <div class="text-muted mb-2">
+                                                                                    Status changed from
+                                                                                    <strong>{{ ucfirst(str_replace('_', ' ', $action->old_status)) }}</strong>
+                                                                                    to
+                                                                                    <strong>{{ ucfirst(str_replace('_', ' ', $action->new_status)) }}</strong>
+                                                                                </div>
+                                                                            @endif
+
+                                                                            {{-- COMMENT --}}
+                                                                            @if ($action->comment)
+                                                                                <div class="comment-box d-flex flex-column">
+                                                                                    <div class="comment-text">
+                                                                                        {{ $action->comment }}
+                                                                                    </div>
+                                                                                </div>
+                                                                            @endif
+
+
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+
+                                                @endif
+
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
                             @if (!$isEditable)
-                                <div class="alert alert-warning border-warning d-flex align-items-center mb-3" role="alert">
+                                <div class="alert alert-warning border-warning d-flex align-items-center mb-3"
+                                    role="alert">
                                     <i class="ti ti-alert-triangle fs-4 me-3"></i>
                                     <div>
                                         <h5 class="alert-heading mb-1">
@@ -555,64 +729,14 @@
                                             <strong>Current Status:</strong>
                                             {{ ucfirst(str_replace('_', ' ', $surveyProposal->status ?? 'Unknown')) }}
                                             <br>
-                                            <small>Changes are not allowed until the status is changed to "Draft" or "Rejected"
+                                            <small>Changes are not allowed until the status is changed to "Draft" or
+                                                "Rejected"
                                                 by management.</small>
                                         </p>
                                     </div>
                                 </div>
                             @endif
 
-                            {{-- Manager Actions / Suggestions Section --}}
-                            @if (!$isEditable || $proposalComments->isNotEmpty())
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="section-card">
-                                            <div class="section-header d-flex justify-content-between align-items-center">
-                                                <h3 class="section-title">
-                                                    @if (auth()->user()->isSalesManager())
-                                                        Manager Actions
-                                                    @else
-                                                        Manager Suggestions
-                                                    @endif
-                                                </h3>
-                                                
-                                                @if (auth()->user()->isSalesManager() && !$isEditable)
-                                                    <div>
-                                                        <button type="button" class="btn btn-success btn-sm" id="approveProposalBtn">
-                                                            <i class="ti ti-check me-1"></i> Approve
-                                                        </button>
-                                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectModal">
-                                                            <i class="ti ti-x me-1"></i> Reject
-                                                        </button>
-                                                    </div>
-                                                @endif
-                                            </div>
-
-                                            {{-- Suggestions List --}}
-                                            <div id="suggestionsList">
-                                                @if ($proposalComments->isEmpty())
-                                                    <p class="text-muted text-center py-3">No suggestions yet.</p>
-                                                @else
-                                                    @foreach ($proposalComments as $comment)
-                                                        <div class="card mb-2">
-                                                            <div class="card-body">
-                                                                <div class="d-flex justify-content-between align-items-start">
-                                                                    <div>
-                                                                        <h6 class="mb-1">{{ $comment->user->name }}</h6>
-                                                                        <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
-                                                                    </div>
-                                                                </div>
-                                                                <p class="mb-0 mt-2">{{ $comment->comment }}</p>
-                                                            </div>
-                                                        </div>
-                                                    @endforeach
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-                       
                         </div>
                     </form>
                 </div>
@@ -621,55 +745,54 @@
             </div>
         </div>
     </div>
-    
+
     {{-- Reject Proposal Modal --}}
-<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen">
-        <div class="modal-content">
+    <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
 
-            {{-- HEADER --}}
-            <div class="modal-header">
-                <h1 class="modal-title" id="rejectModalLabel">Reject Proposal</h1>
-                <div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                {{-- HEADER --}}
+                <div class="modal-header">
+                    <h1 class="modal-title" id="rejectModalLabel">Reject Proposal</h1>
+                    <div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
                 </div>
-            </div>
 
-            {{-- BODY --}}
-            <div class="modal-body">
-                <form id="rejectForm">
+                {{-- BODY --}}
+                <div class="modal-body">
+                    <form id="rejectForm">
 
-                    <div class="row mx-0">
+                        <div class="row mx-0">
 
-                        <div class="col-lg-12">
-                            <div class="form-group">
-                                <label class="form-label">Reason</label><span class="text-danger">*</span>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Reason</label><span class="text-danger">*</span>
 
-                                <textarea class="form-control" id="rejectComment" name="comment" rows="5" required
-                                    placeholder="Please provide a reason for rejection..."
-                                ></textarea>
+                                    <textarea class="form-control" id="rejectComment" name="comment" rows="5" required
+                                        placeholder="Please provide a reason for rejection..."></textarea>
+                                </div>
                             </div>
+
                         </div>
 
-                    </div>
+                        {{-- FOOTER --}}
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                Close
+                            </button>
 
-                    {{-- FOOTER --}}
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Close
-                        </button>
+                            <button type="button" class="btn btn-danger" id="submitRejectBtn">
+                                Reject Proposal
+                            </button>
+                        </div>
 
-                        <button type="button" class="btn btn-danger" id="submitRejectBtn">
-                            Reject Proposal
-                        </button>
-                    </div>
+                    </form>
+                </div>
 
-                </form>
             </div>
-
         </div>
     </div>
-</div>
 
 
 
@@ -677,7 +800,7 @@
 
 @push('scripts')
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
 
             /* ---------------------------
                INITIALIZE SELECT2
@@ -738,10 +861,10 @@
                 messages: {},
                 errorElement: 'span',
                 errorClass: 'invalid-feedback d-block',
-                highlight: function (el) {
+                highlight: function(el) {
                     $(el).addClass('is-invalid');
                 },
-                unhighlight: function (el) {
+                unhighlight: function(el) {
                     $(el).removeClass('is-invalid');
                 }
             });
@@ -750,7 +873,7 @@
             /* ---------------------------
                SAVE SURVEY FORM AJAX
             ----------------------------*/
-            $('#add-survey-form').submit(function (e) {
+            $('#add-survey-form').submit(function(e) {
                 e.preventDefault();
 
                 // Check if proposal is editable
@@ -758,7 +881,7 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Proposal Locked',
-                        text: 'This survey proposal is locked and cannot be edited. Current status: {{ ucfirst(str_replace("_", " ", $surveyProposal->status ?? "Unknown")) }}',
+                        text: 'This survey proposal is locked and cannot be edited. Current status: {{ ucfirst(str_replace('_', ' ', $surveyProposal->status ?? 'Unknown')) }}',
                     });
                     return false;
                 @endif
@@ -769,7 +892,7 @@
                     url: "{{ route('admin.lead.survey.proposal.store', $lead->id) }}",
                     method: "POST",
                     data: $(this).serialize(),
-                    success: function (res) {
+                    success: function(res) {
                         Swal.fire({
                             icon: "success",
                             title: "Saved!",
@@ -779,12 +902,13 @@
                         });
                         setTimeout(() => location.reload(), 2000);
                     },
-                    error: function (xhr) {
+                    error: function(xhr) {
                         if (xhr.status === 403) {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Proposal Locked',
-                                text: xhr.responseJSON?.message || 'This proposal is locked and cannot be edited.',
+                                text: xhr.responseJSON?.message ||
+                                    'This proposal is locked and cannot be edited.',
                             });
                         } else {
                             toastr.error("Something went wrong while saving the proposal.");
@@ -795,7 +919,7 @@
             });
 
 
-            $("#proposalViewBtn").on("click", function (e) {
+            $("#proposalViewBtn").on("click", function(e) {
                 e.preventDefault();
 
                 let selected = $('#pricing_select').val();
@@ -810,7 +934,7 @@
                 window.open(url, "_blank");
             });
 
-            $("#proposalDownloadBtn").on("click", function (e) {
+            $("#proposalDownloadBtn").on("click", function(e) {
                 e.preventDefault();
 
                 let selected = $('#pricing_select').val();
@@ -858,10 +982,15 @@
                                     timer: 2000,
                                     showConfirmButton: false
                                 });
-                                setTimeout(() => location.reload(), 2000);
+                                // setTimeout(() => location.reload(), 2000);
+                                setTimeout(() => {
+                                    window.location.href = res.redirect;
+                                }, 1500);
+
                             },
                             error: function(xhr) {
-                                toastr.error(xhr.responseJSON?.message || 'Failed to approve proposal.');
+                                toastr.error(xhr.responseJSON?.message ||
+                                    'Failed to approve proposal.');
                             }
                         });
                     }
@@ -871,7 +1000,7 @@
             // Reject Proposal
             $('#submitRejectBtn').on('click', function() {
                 const comment = $('#rejectComment').val().trim();
-                
+
                 if (!comment) {
                     toastr.error('Please provide a rejection reason.');
                     return;
@@ -894,7 +1023,11 @@
                         });
                         $('#rejectModal').modal('hide');
                         $('#rejectComment').val('');
-                        setTimeout(() => location.reload(), 2000);
+                        // setTimeout(() => location.reload(), 2000);
+                        setTimeout(() => {
+                            window.location.href = res.redirect;
+                        }, 1500);
+
                     },
                     error: function(xhr) {
                         toastr.error(xhr.responseJSON?.message || 'Failed to reject proposal.');

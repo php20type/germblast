@@ -8,7 +8,7 @@ use App\Models\FacilityRoomType;
 use App\Models\Lead;
 use App\Models\PricingProposal;
 use App\Models\PricingService;
-use App\Models\ProposalComment;
+use App\Models\ProposalAction;
 use App\Models\SurveyEquipmentImage;
 use App\Models\SurveyFacility;
 use App\Models\SurveyFacilityAtp;
@@ -46,8 +46,8 @@ class SurveyProposalController extends Controller
         // Determine if the proposal is editable (only draft or rejected)
         $isEditable = in_array($surveyProposal->status, ['draft', 'rejected', null]);
 
-        // Get proposal comments/suggestions
-        $proposalComments = ProposalComment::with('user')
+        // Get proposal actions/comments/suggestions
+        $proposalActions = ProposalAction::with('user')
             ->where('survey_proposal_id', $surveyProposal->id)
             ->orderBy('created_at', 'desc')
             ->get();
@@ -66,7 +66,7 @@ class SurveyProposalController extends Controller
             'totalCleanCost',
             'pricingProposals',
             'isEditable',
-            'proposalComments'
+            'proposalActions'
         ));
     }
 
@@ -113,6 +113,16 @@ class SurveyProposalController extends Controller
         $validated['lead_id'] = $leadId;
         $validated['user_id'] = auth()->id();
         $validated['estimate'] = $estimate;
+
+        // If proposal was rejected and is being saved again, change status to pending_review
+        if ($existingProposal && $existingProposal->status === 'rejected') {
+            $validated['status'] = 'pending_review';
+
+            // Update lead stage to 2
+            $lead = Lead::findOrFail($leadId);
+            $lead->stage_id = 2;
+            $lead->save();
+        }
 
         // Store or update the proposal
         $proposal = SurveyProposal::updateOrCreate(
@@ -1042,10 +1052,6 @@ class SurveyProposalController extends Controller
         return $pdf->download("survey_proposal_{$survey->id}.pdf");
     }
 
-
-    /**
-     * Approve the proposal (change status to approved)
-     */
     public function approve(Request $request, $surveyProposalId)
     {
         $surveyProposal = SurveyProposal::findOrFail($surveyProposalId);
@@ -1058,19 +1064,34 @@ class SurveyProposalController extends Controller
             ], 403);
         }
 
+        $oldStatus = $surveyProposal->status;
+
         // Update proposal status to approved
         $surveyProposal->status = 'approved';
         $surveyProposal->save();
 
+        // Update Lead Stage to 4
+        if ($surveyProposal->lead) {
+            $surveyProposal->lead->stage_id = 4;
+            $surveyProposal->lead->save();
+        }
+
+        // Create action record
+        ProposalAction::create([
+            'survey_proposal_id' => $surveyProposalId,
+            'user_id' => auth()->id(),
+            'status' => 'approved',
+            'old_status' => $oldStatus,
+            'new_status' => 'approved'
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'Proposal approved successfully.',
+            'redirect' => route('admin.lead.show', $surveyProposal->lead_id)
         ]);
     }
 
-    /**
-     * Reject the proposal (change status to rejected)
-     */
     public function reject(Request $request, $surveyProposalId)
     {
         $request->validate([
@@ -1087,20 +1108,32 @@ class SurveyProposalController extends Controller
             ], 403);
         }
 
+        $oldStatus = $surveyProposal->status;
+
         // Update proposal status to rejected
         $surveyProposal->status = 'rejected';
         $surveyProposal->save();
 
-        // Store rejection comment (required)
-        ProposalComment::create([
+         // Update Lead Stage to 2
+        if ($surveyProposal->lead) {
+            $surveyProposal->lead->stage_id = 2;
+            $surveyProposal->lead->save();
+        }
+
+        // Store rejection action
+        ProposalAction::create([
             'survey_proposal_id' => $surveyProposalId,
             'user_id' => auth()->id(),
-            'comment' => $request->comment
+            'status' => 'rejected',
+            'comment' => $request->comment,
+            'old_status' => $oldStatus,
+            'new_status' => 'rejected'
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Proposal rejected. Sales rep can now make changes.',
+            'redirect' => route('admin.lead.show', $surveyProposal->lead_id)
         ]);
     }
 }

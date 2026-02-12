@@ -62,4 +62,9 @@ class SurveyProposal extends Model
         return $this->hasMany(ProposalComment::class,'survey_proposal_id');
     }
 
+    public function proposalActions()
+    {
+        return $this->hasMany(ProposalAction::class, 'survey_proposal_id');
+    }
+
 }

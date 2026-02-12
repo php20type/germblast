@@ -288,4 +288,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(ProposalComment::class,'user_id');
     }
+
+    public function proposalActions()
+    {
+        return $this->hasMany(ProposalAction::class, 'user_id');
+    }
 }
