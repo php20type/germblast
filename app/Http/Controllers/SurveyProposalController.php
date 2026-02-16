@@ -1114,7 +1114,7 @@ class SurveyProposalController extends Controller
         $surveyProposal->status = 'rejected';
         $surveyProposal->save();
 
-         // Update Lead Stage to 2
+        // Update Lead Stage to 2
         if ($surveyProposal->lead) {
             $surveyProposal->lead->stage_id = 2;
             $surveyProposal->lead->save();

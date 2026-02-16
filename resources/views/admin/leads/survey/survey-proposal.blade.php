@@ -26,7 +26,7 @@
                                         <button type="submit" class="btn btn-success">
                                             Save Survey Proposal
                                         </button>
-                                    @elseif (auth()->user()->isSalesManager() && !$isEditable)
+                                    @elseif (auth()->user()->isSalesManager() && !$isEditable && $surveyProposal->status !== 'approved')
                                         <div class="d-flex gap-2">
                                             <button type="button" class="btn btn-success" id="approveProposalBtn">
                                                 <i class="ti ti-check me-1"></i> Approve

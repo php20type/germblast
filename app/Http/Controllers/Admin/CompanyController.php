@@ -50,11 +50,11 @@ class CompanyController extends Controller
         $myCompaniesCount = $this->companyRepo->countByUser($currentUser->id);
 
         $formattedTotalCompanies = $totalCompanies >= 1000
-            ? number_format($totalCompanies / 1000, 1).'k'
+            ? number_format($totalCompanies / 1000, 1) . 'k'
             : $totalCompanies;
 
         $formattedMyCompanies = $myCompaniesCount >= 1000
-            ? number_format($myCompaniesCount / 1000, 1).'k'
+            ? number_format($myCompaniesCount / 1000, 1) . 'k'
             : $myCompaniesCount;
 
         return compact('formattedTotalCompanies', 'formattedMyCompanies');
@@ -71,31 +71,31 @@ class CompanyController extends Controller
         }
 
         if ($request->filled('assignee_id')) {
-            $query->whereHas('assignee', fn ($q) => $q->where('assignee_id', $request->assignee_id));
+            $query->whereHas('assignee', fn($q) => $q->where('assignee_id', $request->assignee_id));
         }
 
         if ($request->filled('people_id')) {
-            $query->whereHas('peoples', fn ($q) => $q->where('people_id', $request->people_id));
+            $query->whereHas('peoples', fn($q) => $q->where('people_id', $request->people_id));
         }
 
-        if (! empty($request->company_tags_filter_id)) {
-            $query->whereHas('tags', fn ($q) => $q->whereIn('tags.id', $request->company_tags_filter_id));
+        if (!empty($request->company_tags_filter_id)) {
+            $query->whereHas('tags', fn($q) => $q->whereIn('tags.id', $request->company_tags_filter_id));
         }
 
-        if (! empty($request->industry_filter_id)) {
+        if (!empty($request->industry_filter_id)) {
             $query->whereIn('industry_id', $request->industry_filter_id);
         }
 
-        if (! empty($request->territory_filter_id)) {
+        if (!empty($request->territory_filter_id)) {
             $query->whereIn('territory_id', $request->territory_filter_id);
         }
 
-        if (! empty($request->activity_type_filter_id)) {
-            $query->whereHas('activity', fn ($q) => $q->whereIn('activity_type_id', $request->activity_type_filter_id));
+        if (!empty($request->activity_type_filter_id)) {
+            $query->whereHas('activity', fn($q) => $q->whereIn('activity_type_id', $request->activity_type_filter_id));
         }
 
-        if (! empty($request->leads_status)) {
-            $query->whereHas('leads', fn ($q) => $q->whereIn('lead_status', $request->leads_status));
+        if (!empty($request->leads_status)) {
+            $query->whereHas('leads', fn($q) => $q->whereIn('lead_status', $request->leads_status));
         }
 
         return $query;
@@ -386,7 +386,8 @@ class CompanyController extends Controller
         }
 
         // $related_leads = $company->leads;
-        $related_leads = $company->leads()->with('products')->get();
+        // $related_leads = $company->leads()->with('products')->get();
+        $related_leads = $company->leadCompany()->with('products')->get();
         $relatedLeadsCount = Helper::calculateTotalValue($related_leads);
         $formattedLeadsCount = Helper::formatValue($relatedLeadsCount);
 
@@ -446,7 +447,7 @@ class CompanyController extends Controller
 
         if ($company->companyEmail) {
             foreach ($emailTypes as $field => $label) {
-                if (! empty($company->companyEmail->$field)) {
+                if (!empty($company->companyEmail->$field)) {
                     $emails[] = [
                         'selected' => $field,
                         'value' => $company->companyEmail->$field,
@@ -470,7 +471,7 @@ class CompanyController extends Controller
         $addressRecord = $company->companyAddress;
         if ($addressRecord) {
             foreach ($addressTypes as $field => $label) {
-                if (! empty($addressRecord->$field)) {
+                if (!empty($addressRecord->$field)) {
                     $addresses[] = [
                         'selected' => $field, // which option should be selected
                         'value' => $addressRecord->$field,
@@ -492,7 +493,7 @@ class CompanyController extends Controller
         $phoneRecord = $company->companyPhone;
         if ($phoneRecord) {
             foreach ($phoneTypes as $field => $label) {
-                if (! empty($phoneRecord->$field)) {
+                if (!empty($phoneRecord->$field)) {
                     $phones[] = [
                         'selected' => $field,   // which option should be selected
                         'value' => $phoneRecord->$field,
@@ -512,7 +513,7 @@ class CompanyController extends Controller
         $urlRecord = $company->companyUrl;
         if ($urlRecord) {
             foreach ($urlTypes as $field => $label) {
-                if (! empty($urlRecord->$field)) {
+                if (!empty($urlRecord->$field)) {
                     $urls[] = [
                         'selected' => $field, // which option should be selected
                         'value' => $urlRecord->$field,
@@ -648,7 +649,7 @@ class CompanyController extends Controller
             ->where('people_id', $request->people_id)
             ->first();
 
-        if (! $companyPeople) {
+        if (!$companyPeople) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'This person is not linked to the company.',
@@ -690,7 +691,7 @@ class CompanyController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => ucfirst($request->field).' updated successfully!',
+            'message' => ucfirst($request->field) . ' updated successfully!',
         ]);
     }
 
@@ -731,7 +732,7 @@ class CompanyController extends Controller
             ->where('tag_id', $tagId)
             ->first();
 
-        if (! $companyTag) {
+        if (!$companyTag) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Tag not found for this company.',
@@ -887,7 +888,7 @@ class CompanyController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => ucfirst(str_replace('_', ' ', $request->type)).' updated successfully',
+            'message' => ucfirst(str_replace('_', ' ', $request->type)) . ' updated successfully',
             'data' => $record,
         ]);
     }
@@ -909,16 +910,23 @@ class CompanyController extends Controller
 
             case 'address':
                 $allowed = [
-                    'address', 'main_address', 'work_address',
-                    'home_address', 'billing_address', 'mailing_address',
+                    'address',
+                    'main_address',
+                    'work_address',
+                    'home_address',
+                    'billing_address',
+                    'mailing_address',
                 ];
                 $model = CompanyAddress::where('company_id', $request->company_id)->first();
                 break;
 
             case 'phone':
                 $allowed = [
-                    'phone', 'home_phones', 'mobile_phones',
-                    'work_phones', 'fax_phones',
+                    'phone',
+                    'home_phones',
+                    'mobile_phones',
+                    'work_phones',
+                    'fax_phones',
                 ];
                 $model = CompanyPhone::where('company_id', $request->company_id)->first();
                 break;
@@ -935,17 +943,17 @@ class CompanyController extends Controller
                 ], 400);
         }
 
-        if (! in_array($request->type, $allowed)) {
+        if (!in_array($request->type, $allowed)) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Invalid field type',
             ], 422);
         }
 
-        if (! $model) {
+        if (!$model) {
             return response()->json([
                 'status' => 'error',
-                'message' => ucfirst($request->category).' record not found',
+                'message' => ucfirst($request->category) . ' record not found',
             ], 404);
         }
 
@@ -954,7 +962,7 @@ class CompanyController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => ucfirst(str_replace('_', ' ', $request->type)).' deleted successfully',
+            'message' => ucfirst(str_replace('_', ' ', $request->type)) . ' deleted successfully',
             'data' => $model,
         ]);
     }
@@ -970,7 +978,7 @@ class CompanyController extends Controller
             $originalName = $file->getClientOriginalName();
             $cleanName = Str::slug(pathinfo($originalName, PATHINFO_FILENAME));
             $extension = $file->getClientOriginalExtension();
-            $filename = Str::random(10).'_'.$cleanName.'.'.$extension;
+            $filename = Str::random(10) . '_' . $cleanName . '.' . $extension;
 
             $path = $file->storeAs('company_files', $filename, 'public');
 
@@ -988,7 +996,7 @@ class CompanyController extends Controller
                 'file' => $companyFile,
             ]);
         } catch (\Throwable $e) {
-            Log::error("Company file upload failed for company ID {$company->id}: ".$e->getMessage());
+            Log::error("Company file upload failed for company ID {$company->id}: " . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -1018,7 +1026,7 @@ class CompanyController extends Controller
             ]);
 
         } catch (\Throwable $e) {
-            Log::error("File delete failed for company {$request->company_id}: ".$e->getMessage());
+            Log::error("File delete failed for company {$request->company_id}: " . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -1050,7 +1058,7 @@ class CompanyController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to delete company(s): '.$e->getMessage(),
+                'message' => 'Failed to delete company(s): ' . $e->getMessage(),
             ], 500);
         }
     }

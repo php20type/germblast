@@ -15,6 +15,7 @@ use App\Models\LeadFile;
 use App\Models\LeadPeople;
 use App\Models\LeadProduct;
 use App\Models\LeadSource;
+use App\Models\ProposalAction;
 use App\Models\LeadStage;
 use App\Models\LeadStageProcess;
 use App\Models\LeadTag;
@@ -841,6 +842,18 @@ class LeadController extends Controller
                 $notify->proposalApprovalStage($lead, $surveyProposal);
             }
         }
+
+        // Handle reverting back to Site Survey stage (stage 2)
+        if ($request->stage_id == 2) {
+
+            $surveyProposal = SurveyProposal::where('lead_id', $lead->id)->first();
+
+            if ($surveyProposal) {
+                $surveyProposal->status = 'draft';
+                $surveyProposal->save();
+            }
+        }
+
 
         return response()->json(['message' => 'Lead stage updated successfully.']);
     }
