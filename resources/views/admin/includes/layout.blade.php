@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
     {{-- Tribute js --}}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tributejs/5.1.3/tribute.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tributejs/5.1.3/tribute.css" />
 
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     @stack('styles')
@@ -65,7 +65,7 @@
     {{-- Tagify --}}
     <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
 
-      <!-- Moments JavaScript -->
+    <!-- Moments JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
 
@@ -73,6 +73,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tributejs/5.1.3/tribute.min.js"></script>
 
     <script src="{{ asset('js/custom.js') }}"></script>
+
+    <script>
+        $('#menu-toggle').click(function() {
+            $('body').toggleClass('sidebar-open');
+        });
+    </script>
     @stack('scripts')
 </body>
 

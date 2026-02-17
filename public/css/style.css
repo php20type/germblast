@@ -3774,7 +3774,7 @@ title {
 
 /* === Responsive CSS Start === */
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width: 1200px) {
 
     .header-1 .header-content #menu-toggle,
     .app-sidebar #close {
@@ -3783,7 +3783,7 @@ title {
 }
 
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width: 1199px) {
     .app-sidebar.hidden #close {
         position: absolute;
         top: 10px;
@@ -3819,8 +3819,13 @@ title {
     .app-sidebar {
         width: 300px;
         margin-left: -320px;
+        transition: all 0.5s;
+        z-index: 999;
     }
 
+    .sidebar-open .app-sidebar{
+        margin-left: 0;
+    }
 }
 
 

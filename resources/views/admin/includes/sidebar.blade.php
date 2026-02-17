@@ -1,6 +1,6 @@
  <!-- Aside section start -->
  <aside class="app-sidebar">
-    <div id="close"><a href="javascript:void(0)"><i class="fa-regular fa-xmark"></i></a></div>
+    {{-- <div id="close"><a href="javascript:void(0)"><i class="fa-regular fa-xmark"></i></a></div> --}}
     <div class="logo-sec">
         <a href="{{ route('admin.dashboard') }}" class="d-block"><img src={{ asset("img/logo/logo.svg") }} alt="logo" /></a>
     </div>
