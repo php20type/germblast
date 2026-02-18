@@ -426,8 +426,10 @@ class CompanyController extends Controller
         $industries = Industry::all();
         $territories = Territory::all();
         $countries = Country::all();
-        $cities = City::all();
-        $states = State::all();
+        // $cities = City::all();
+        // $states = State::all();
+        $states = [];
+        $cities = [];
         $companyLocations = $company->locations;
         // Already coming from pivot relation, so no need for where('company_id', $id)
         $peoples = $company->peoples;
@@ -571,7 +573,7 @@ class CompanyController extends Controller
         $validated = $request->validate([
             'location_name' => 'required|string|max:255',
             'address_1' => 'required|string|max:255',
-            'address_2' => 'required|string|max:255',
+            'address_2' => 'nullable|string|max:255',
             'country_id' => 'required|integer',
             'state_id' => 'required|integer',
             'city_id' => 'required|integer',

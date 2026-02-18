@@ -77,8 +77,8 @@
                     </div>
                 </a>
             </li>
-            <hr class="d-none">
             <hr>
+            @if(auth()->user()->isSuperAdmin())
             <li class="{{ request()->routeIs('admin.roles.permissions') ? 'active' : '' }}">
                 <a href="{{ route('admin.roles.permissions') }}">
                     <div class="icon-round">
@@ -109,6 +109,7 @@
                     </div>
                 </a>
             </li>
+            @endif
         </ul>
     </nav>
 </aside>

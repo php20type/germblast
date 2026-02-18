@@ -27,7 +27,8 @@ class EmployeeController extends Controller
 
     public function create()
     {
-        $roles = Role::all();
+        // $roles = Role::all();
+        $roles = Role::whereNotIn('name', ['customer'])->get();
 
         return view('admin.employee.create', compact('roles'));
     }
@@ -64,7 +65,8 @@ class EmployeeController extends Controller
     public function edit($id)
     {
         $employee = User::findOrFail($id);
-        $roles = Role::all();
+        // $roles = Role::all();
+        $roles = Role::whereNotIn('name', ['customer'])->get();
 
         return view('admin.employee.edit', compact('employee', 'roles'));
     }
@@ -75,14 +77,21 @@ class EmployeeController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $id,
+            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'role' => 'required|exists:roles,name',
         ]);
 
         // Update basic fields
         $employee->update([
             'name' => $validated['name'],
+            'email' => $validated['email'],
             'role' => $validated['role'],
         ]);
+
+        if (!empty($validated['password'])) {
+            $employee->update(['password' => Hash::make($validated['password'])]);
+        }
 
         $employee->syncRoles([$validated['role']]);
 

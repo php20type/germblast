@@ -524,14 +524,14 @@
                                             <i class="fas fa-edit me-2"></i>WRITE A NOTE
                                         </button>
                                     </li>
-                                    <li class="nav-item ms-auto">
+                                    {{-- <li class="nav-item ms-auto">
                                         <button class="btn btn-outline-secondary btn-sm me-2">
                                             <i class="fas fa-arrow-up me-1"></i>SEND A TEXT
                                         </button>
                                         <button class="btn btn-dark btn-sm">
                                             <i class="fas fa-envelope me-1"></i>SEND AN EMAIL
                                         </button>
-                                    </li>
+                                    </li> --}}
                                 </ul>
 
                                 <!-- Tab Content -->

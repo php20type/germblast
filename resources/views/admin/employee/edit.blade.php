@@ -45,6 +45,37 @@
                                             </tr>
 
                                             <tr>
+                                                <th>Email</th>
+                                                <td>
+                                                    <input type="email" name="email" class="form-control" value="{{ $employee->email }}" required>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Password</th>
+                                                <td>
+                                                    <div class="input-group">
+                                                        <input type="password" name="password" id="password" class="form-control">
+                                                        <button type="button" class="btn btn-outline-secondary toggle-password" data-target="password">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Confirm Password</th>
+                                                <td>
+                                                    <div class="input-group">
+                                                        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control">
+                                                        <button type="button" class="btn btn-outline-secondary toggle-password" data-target="password_confirmation">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
                                                 <th>Role</th>
                                                 <td>
                                                     <select name="role" class="form-select" required>
@@ -102,11 +133,17 @@
 
         rules: {
             name: { required: true, minlength: 2 },
+            email: { required: true, email: true },
+            password: { minlength: 8 },
+            password_confirmation: { equalTo: "#password" },
             role: { required: true }
         },
 
         messages: {
             name: "Employee name is required.",
+            email: "Valid email address is required.",
+            password: { minlength: "Password must be at least 8 characters." },
+            password_confirmation: { equalTo: "Passwords do not match." },
             role: "Please select a role."
         },
 

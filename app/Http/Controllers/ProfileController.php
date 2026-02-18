@@ -22,6 +22,32 @@ class ProfileController extends Controller
     }
 
     /**
+     * Display the user's profile.
+     */
+    public function view(Request $request): View
+    {
+        return view('admin.profile.view', [
+            'user' => $request->user(),
+        ]);
+    }
+
+    /**
+     * Update the user's profile from admin view.
+     */
+    public function adminUpdate(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+        ]);
+
+        $user = $request->user();
+        $user->name = $request->name;
+        $user->save();
+
+        return Redirect::route('admin.profile.view')->with('status', 'profile-updated');
+    }
+
+    /**
      * Update the user's profile information.
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse

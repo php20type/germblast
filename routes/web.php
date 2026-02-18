@@ -48,6 +48,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     Route::get('dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
+    // Profile
+    Route::get('profile/view', [ProfileController::class, 'view'])->name('profile.view');
+    Route::post('profile/update', [ProfileController::class, 'adminUpdate'])->name('profile.admin.update');
+
     Route::post('/tasks/ajax', [TaskController::class, 'ajax_store'])->name('task.ajax.store');
 
     // Activities & Notes
@@ -82,10 +86,10 @@ Route::view('survey-proposal.pdf', 'survey-proposal.pdf')->name('survey.proposal
 | Modular Route Files (REQUIRES)
 |--------------------------------------------------------------------------
 */
-require __DIR__.'/auth.php';
-require __DIR__.'/company.php';
-require __DIR__.'/people.php';
-require __DIR__.'/lead.php';
-require __DIR__.'/sale.php';
-require __DIR__.'/survey.php';
-require __DIR__.'/settings.php';
+require __DIR__ . '/auth.php';
+require __DIR__ . '/company.php';
+require __DIR__ . '/people.php';
+require __DIR__ . '/lead.php';
+require __DIR__ . '/sale.php';
+require __DIR__ . '/survey.php';
+require __DIR__ . '/settings.php';
