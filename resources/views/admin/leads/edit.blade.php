@@ -384,11 +384,64 @@
                                         @endforeach
                                     </ul>
                                 </div>
+                                <div class="pipeline-section">
+                                    <div class="pipeline-header">
+                                        <div class="pipeline-title d-none">Stage Tasks</div>
+                                        <a href="#" class="d-none text-warning">Edit processes</a>
+                                    </div>
+
+                                    @if(auth()->user()->isSalesManager())
+                                        <div id="site-survey-stage" class="{{ $leads->stage_id == 3 ? '' : 'd-none' }}">
+                                            {{-- SURVEY & PROPOSAL --}}
+                                            <div class="task-section mt-2">
+                                                <div class="company-list mb-3 border rounded p-4 shadow-sm bg-white">
+                                                    <div class="row align-items-center">
+                                                        <div class="col-md-8">
+                                                            <h5 class="mb-1">Survey & Proposal</h5>
+                                                        </div>
+
+                                                        <div class="col-md-4 d-flex justify-content-end">
+                                                            <a class="text-warning fw-semibold"
+                                                            href="{{ route('admin.lead.survey.proposal', $leads->id) }}"
+                                                            target="_blank">
+                                                                View Proposal
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                </div>
 
                             @endcan
 
                         </div>
 
+
+                        {{-- SERVICE DETAILS --}}
+                        @if($leads->lead_status === 'won')
+                         <div class="section-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5>SERVICE DETAILS</h5>
+                                @can('lead.detail.edit')
+                                    <a class="text-warning" href="{{ route('admin.lead.service.details', $leads->id) }}" target="_blank">
+                                        Go to Service Details
+                                    </a>
+                                @endcan
+                            </div>
+                            <div class="d-flex align-items-start">
+                                <div class="task-icon me-3">
+                                    <i class="fas fa-list"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h6>DASHBOARD</h6>
+                                    <p class="text-muted mb-0">Overview of Service Details.</p>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
 
                         <!-- Tasks Section -->
                         <div class="section-card">

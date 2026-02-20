@@ -1298,4 +1298,21 @@ class LeadController extends Controller
             ], 500);
         }
     }
+
+    public function getServiceDetails(Request $request, $leadId)
+    {
+        $lead = Lead::with('products')->findOrFail($leadId);
+
+        $services = $lead->products->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'price' => Helper::formatValue($product->price),
+            ];
+        });
+
+        return view('admin.leads.service-details', compact('services'));
+    }
+
 }
