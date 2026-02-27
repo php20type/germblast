@@ -390,7 +390,7 @@
                                         <a href="#" class="d-none text-warning">Edit processes</a>
                                     </div>
 
-                                    @if(auth()->user()->isSalesManager())
+                                    @if(auth()->user()->isSalesManager() || auth()->user()->isSuperAdmin())
                                         <div id="site-survey-stage" class="{{ $leads->stage_id == 3 ? '' : 'd-none' }}">
                                             {{-- SURVEY & PROPOSAL --}}
                                             <div class="task-section mt-2">

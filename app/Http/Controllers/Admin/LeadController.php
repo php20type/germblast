@@ -763,6 +763,21 @@ class LeadController extends Controller
         $lead = Lead::findOrFail($leadId);
         $newStageId = $request->stage_id;
 
+        $surveyProposal = SurveyProposal::where('lead_id', $leadId)->first();
+
+         // 🚫 LOCK: If currently in stage 3 and proposal is pending_review, prevent ANY stage change
+        if (
+            $lead->stage_id == 3 &&
+            $surveyProposal &&
+            $surveyProposal->status === 'pending_review'
+        ) {
+            return response()->json([
+                'allowed' => false,
+                'message' => 'Stage is locked until manager approves or rejects the proposal.',
+                'current_stage_id' => $lead->stage_id,
+            ]);
+        }
+
         // Example stage-wise validation
         switch ($newStageId) {
             case 2: // Site Survey
@@ -1312,7 +1327,12 @@ class LeadController extends Controller
             ];
         });
 
-        return view('admin.leads.service-details', compact('services'));
+        return view('admin.leads.service-details', compact('services','lead'));
+    }
+
+    public function fulfillOrder(Request $request)
+    {
+        return view('admin.leads.fulfill-order');
     }
 
 }

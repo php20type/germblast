@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\LeadController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -80,6 +81,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 });
 
 Route::view('survey-proposal.pdf', 'survey-proposal.pdf')->name('survey.proposal');
+
+Route::get('admin/lead/fulfill-order', [LeadController::class, 'fulfillOrder'])->name('admin.lead.fulfill_order');
 
 /*
 |--------------------------------------------------------------------------
