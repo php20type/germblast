@@ -79,37 +79,51 @@
             </li>
             <hr>
             @if(auth()->user()->isSuperAdmin())
-            <li class="{{ request()->routeIs('admin.roles.permissions') ? 'active' : '' }}">
-                <a href="{{ route('admin.roles.permissions') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon4.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Role
-                    </div>
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('admin.employee.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.employee.index') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon4.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Employees
-                    </div>
-                </a>
-            </li>
-             <li class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.settings.index') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon16.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Settings
-                    </div>
-                </a>
-            </li>
+                <li class="{{ request()->routeIs('admin.roles.permissions') ? 'active' : '' }}">
+                    <a href="{{ route('admin.roles.permissions') }}">
+                        <div class="icon-round">
+                            <img src={{ asset("img/icons/menu-icon4.svg") }} alt="icon" />
+                        </div>
+                        <div class="nav-text ms-3">
+                            Role
+                        </div>
+                    </a>
+                </li>
+                <li class="{{ request()->routeIs('admin.employee.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.employee.index') }}">
+                        <div class="icon-round">
+                            <img src={{ asset("img/icons/menu-icon4.svg") }} alt="icon" />
+                        </div>
+                        <div class="nav-text ms-3">
+                            Employees
+                        </div>
+                    </a>
+                </li>
+                <li class="{{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.settings.index') }}">
+                        <div class="icon-round">
+                            <img src={{ asset("img/icons/menu-icon16.svg") }} alt="icon" />
+                        </div>
+                        <div class="nav-text ms-3">
+                            Settings
+                        </div>
+                    </a>
+                </li>
             @endif
+            <li>
+                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <div class="icon-round">
+                        <img src="{{ asset('img/icons/logout.svg') }}" alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Logout
+                    </div>
+                </a>
+
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                    @csrf
+                </form>
+            </li>
         </ul>
     </nav>
 </aside>
