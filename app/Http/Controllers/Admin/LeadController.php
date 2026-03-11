@@ -1256,6 +1256,52 @@ class LeadController extends Controller
         }
     }
 
+    public function storeSignedProposal(Request $request, Lead $lead)
+    {
+        $request->validate([
+            'signed_proposal' => 'required|file|max:10240',
+        ]);
+
+        try {
+            $file = $request->file('signed_proposal');
+            $originalName = $file->getClientOriginalName();
+            $cleanName = Str::slug(pathinfo($originalName, PATHINFO_FILENAME));
+            $extension = $file->getClientOriginalExtension();
+            $filename = Str::random(10) . '_' . $cleanName . '.' . $extension;
+
+            $path = $file->storeAs('lead_files', $filename, 'public');
+
+            $oldStage = $lead->stages->name ?? 'Unknown Stage';
+
+            $lead->received_signed_proposal = $path;
+            $lead->is_received_signed_proposal = true;
+            $lead->stage_id = 5;
+            $lead->save();
+
+            $newStage = LeadStage::find(5)->name ?? 'Rec. Signed Proposal';
+
+            Timeline::create([
+                'user_id'     => auth()->id(),
+                'owner_type'  => 'lead',
+                'owner_id'    => $lead->id,
+                'action_type' => 'updated_stage',
+                'description' => "uploaded signed proposal and changed stage of {$lead->name} from {$oldStage} to {$newStage}",
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Signed proposal uploaded and stage updated to ' . $newStage . ' successfully.',
+            ]);
+        } catch (\Throwable $e) {
+            Log::error("Signed proposal upload failed for lead ID {$lead->id}: " . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Upload failed. Please try again later.',
+            ], 500);
+        }
+    }
+
     public function fileDelete(Request $request)
     {
         $request->validate([

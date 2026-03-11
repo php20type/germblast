@@ -72,6 +72,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
             Route::post('{lead}/tags/add', [LeadController::class, 'addTag'])->name('tags.add');
             Route::post('{lead}/tags/{tag}/remove', [LeadController::class, 'removeTag'])->name('tags.remove');
             Route::post('{lead}/files/upload', [LeadController::class, 'fileUpload'])->name('files.upload');
+            Route::post('{lead}/signed-proposal/store', [LeadController::class, 'storeSignedProposal'])->name('signed.proposal.store');
             Route::post('files/delete', [LeadController::class, 'fileDelete'])->name('files.delete');
             Route::post('delete-field', [LeadController::class, 'deleteField'])->name('delete-field');
             Route::post('update-field', [LeadController::class, 'updateField'])->name('update-field');

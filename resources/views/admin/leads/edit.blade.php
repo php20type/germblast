@@ -369,28 +369,7 @@
 
                                     </div>
 
-                                </div>
-                            @else
-                                <div class="pipeline-section">
-                                    <div class="pipeline-header">
-                                        <div class="pipeline-title">Pipeline: Default Pipeline</div>
-                                    </div>
-
-                                    <ul class="step-menu list-inline">
-                                        @foreach ($leadStages as $leadStage)
-                                            <li class="{{ $leadStage->id <= $leads->stage_id ? 'current' : '' }}">
-                                                {{ $leadStage->name }}
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                                <div class="pipeline-section">
-                                    <div class="pipeline-header">
-                                        <div class="pipeline-title d-none">Stage Tasks</div>
-                                        <a href="#" class="d-none text-warning">Edit processes</a>
-                                    </div>
-
-                                    @if(auth()->user()->isSalesManager() || auth()->user()->isSuperAdmin())
+                                    @if(auth()->user()->isSuperAdmin())
                                         <div id="site-survey-stage" class="{{ $leads->stage_id == 3 ? '' : 'd-none' }}">
                                             {{-- SURVEY & PROPOSAL --}}
                                             <div class="task-section mt-2">
@@ -413,6 +392,97 @@
                                         </div>
                                     @endif
 
+                                    <div id="site-survey-stage" class="{{ $leads->stage_id == 5 ? '' : 'd-none' }}">
+                                        {{-- RECEIVED SIGNED PROPOSAL --}}
+                                        <div class="task-section mt-2">
+                                            <div class="company-list mb-3 border rounded p-4 shadow-sm bg-white">
+                                                <div class="row align-items-center">
+                                                    <div class="col-md-8">
+                                                        <h5 class="mb-1">Received Signed Proposal</h5>
+                                                    </div>
+
+                                                    <div class="col-md-4 d-flex justify-content-end gap-3">
+                                                        <a class="text-warning fw-semibold"
+                                                        href="{{ Storage::url($leads->received_signed_proposal) }}"
+                                                        target="_blank">
+                                                            View Proposal
+                                                        </a>
+                                                        <a class="text-warning fw-semibold"
+                                                        href="{{ Storage::url($leads->received_signed_proposal) }}"
+                                                        download="{{ basename($leads->received_signed_proposal) }}">
+                                                            Download
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            @else
+                                <div class="pipeline-section">
+                                    <div class="pipeline-header">
+                                        <div class="pipeline-title">Pipeline: Default Pipeline</div>
+                                    </div>
+
+                                    <ul class="step-menu list-inline">
+                                        @foreach ($leadStages as $leadStage)
+                                            <li class="{{ $leadStage->id <= $leads->stage_id ? 'current' : '' }}">
+                                                {{ $leadStage->name }}
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                                <div class="pipeline-section">
+                                    <div class="pipeline-header">
+                                        <div class="pipeline-title d-none">Stage Tasks</div>
+                                        <a href="#" class="d-none text-warning">Edit processes</a>
+                                    </div>
+
+                                    @if(auth()->user()->isSalesManager())
+                                        <div id="site-survey-stage" class="{{ $leads->stage_id == 3 ? '' : 'd-none' }}">
+                                            {{-- SURVEY & PROPOSAL --}}
+                                            <div class="task-section mt-2">
+                                                <div class="company-list mb-3 border rounded p-4 shadow-sm bg-white">
+                                                    <div class="row align-items-center">
+                                                        <div class="col-md-8">
+                                                            <h5 class="mb-1">Survey & Proposal</h5>
+                                                        </div>
+
+                                                        <div class="col-md-4 d-flex justify-content-end">
+                                                            <a class="text-warning fw-semibold"
+                                                            href="{{ route('admin.lead.survey.proposal', $leads->id) }}"
+                                                            target="_blank">
+                                                                View Proposal
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <div id="site-survey-stage" class="{{ $leads->stage_id == 5 ? '' : 'd-none' }}">
+                                        {{-- RECEIVED SIGNED PROPOSAL --}}
+                                        <div class="task-section mt-2">
+                                            <div class="company-list mb-3 border rounded p-4 shadow-sm bg-white">
+                                                <div class="row align-items-center">
+                                                    <div class="col-md-8">
+                                                        <h5 class="mb-1">Received Signed Proposal</h5>
+                                                    </div>
+
+                                                    <div class="col-md-4 d-flex justify-content-end">
+                                                        <a class="text-warning fw-semibold"
+                                                        href="{{ route('admin.lead.survey.proposal', $leads->id) }}"
+                                                        target="_blank">
+                                                            View Proposal
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
 
                             @endcan
@@ -421,7 +491,7 @@
 
 
                         {{-- SERVICE DETAILS --}}
-                        @if($leads->lead_status === 'won')
+                        {{-- @if($leads->lead_status === 'won')
                          <div class="section-card">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5>SERVICE DETAILS</h5>
@@ -441,7 +511,7 @@
                                 </div>
                             </div>
                         </div>
-                        @endif
+                        @endif --}}
 
                         <!-- Tasks Section -->
                         <div class="section-card">
@@ -2044,7 +2114,61 @@
                     </div>
                 </div>
             </div>
+        </div>
+        {{-- / Sales Forecasting modal --}}
 
+        {{-- Received Signed Proposal modal --}}
+        <div class="modal fade" id="upload-signed-proposal-modal" tabindex="-1" aria-labelledby="signedProposalModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-fullscreen">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="signedProposalModalLabel">
+                            Received Signed Proposal
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info d-flex align-items-start gap-2" role="alert">
+                            <i class="fas fa-info-circle mt-1"></i>
+                            <div>
+                                Please upload the signed proposal document received from the client.
+                                Once uploaded, the lead will automatically move to <strong>Stage 5 (Rec. Signed Proposal)</strong>.
+                            </div>
+                        </div>
+
+                        <form id="upload-signed-proposal-form" enctype="multipart/form-data">
+                            @csrf
+
+                            <input type="hidden" name="lead_id" id="signed_proposal_lead_id" value="{{ $leads->id }}">
+
+                            <div class="mb-3">
+                                <label for="signed_proposal_file" class="form-label fw-semibold">
+                                    Signed Proposal File <span class="text-danger">*</span>
+                                </label>
+                                <input type="file"
+                                    class="form-control"
+                                    name="signed_proposal"
+                                    id="signed_proposal_file"
+                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                <div class="form-text text-muted">
+                                    Accepted formats: PDF, DOC, DOCX, JPG, PNG (max 10MB)
+                                </div>
+                                <span id="signed_proposal_error" class="invalid-feedback d-block" style="display:none !important;"></span>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancelSignedProposalBtn">
+                            Cancel
+                        </button>
+                        <button type="button" class="btn btn-success" id="submitSignedProposalBtn">
+                            Upload
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{-- / Received Signed Proposal modal --}}
 
 @endsection
 
@@ -2399,6 +2523,41 @@
                                 `;
                             }
 
+                            // ── Stage 5: show the signed proposal upload modal ──
+                            if (newStageId == 5) {
+                                // First verify conditions are met
+                                $.ajax({
+                                    url: '/admin/lead/check-stage-condition/' + leadId,
+                                    method: 'POST',
+                                    data: {
+                                        _token: "{{ csrf_token() }}",
+                                        stage_id: newStageId
+                                    },
+                                    success: function(response) {
+                                        if (response.allowed) {
+                                            // Store the leadId on the modal so the submit handler can read it
+                                            $('#signed_proposal_lead_id').val(leadId);
+                                            // Reset the form & error state
+                                            $('#upload-signed-proposal-form')[0].reset();
+                                            $('#signed_proposal_file').removeClass('is-invalid');
+                                            $('#signed_proposal_error').hide().text('');
+                                            // Show the modal
+                                            $('#upload-signed-proposal-modal').modal('show');
+                                        } else {
+                                            Swal.fire({
+                                                icon: 'warning',
+                                                title: 'Cannot Change Stage',
+                                                text: response.message
+                                            });
+                                        }
+                                    },
+                                    error: function() {
+                                        Swal.fire('Error', 'Could not verify stage conditions. Please try again.', 'error');
+                                    }
+                                });
+                                return; // stop normal flow
+                            }
+
                             Swal.fire({
                                 title: swalTitle,
                                 text: swalHtml ? null : swalText,
@@ -2454,8 +2613,83 @@
                             });
                         });
 
+                        // ==============================
+                        // Signed Proposal Modal – Submit Handler
+                        // ==============================
+                        $('#submitSignedProposalBtn').on('click', function () {
+                            var fileInput = document.getElementById('signed_proposal_file');
 
+                            // Client-side validation
+                            if (!fileInput || !fileInput.files.length) {
+                                $('#signed_proposal_file').addClass('is-invalid');
+                                $('#signed_proposal_error')
+                                    .text('Please select a file to upload.')
+                                    .show();
+                                return;
+                            }
 
+                            $('#signed_proposal_file').removeClass('is-invalid');
+                            $('#signed_proposal_error').hide().text('');
+
+                            var leadId = $('#signed_proposal_lead_id').val();
+                            var formData = new FormData();
+                            formData.append('_token', '{{ csrf_token() }}');
+                            formData.append('signed_proposal', fileInput.files[0]);
+
+                            // Disable buttons while uploading
+                            var $btn = $(this);
+                            var $cancel = $('#cancelSignedProposalBtn');
+                            $btn.prop('disabled', true)
+                                .html('<i class="fas fa-spinner fa-spin me-1"></i>Uploading...');
+                            $cancel.prop('disabled', true);
+
+                            $.ajax({
+                                url: '/admin/lead/' + leadId + '/signed-proposal/store',
+                                type: 'POST',
+                                data: formData,
+                                processData: false,
+                                contentType: false,
+                                dataType: 'json',
+                                success: function(data) {
+                                    if (data.success) {
+                                        $('#upload-signed-proposal-modal').modal('hide');
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Success!',
+                                            text: data.message || 'Signed proposal uploaded and stage moved to 5 successfully.',
+                                            timer: 2000,
+                                            showConfirmButton: false
+                                        }).then(() => location.reload());
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Upload Failed',
+                                            text: data.message || 'Something went wrong. Please try again.'
+                                        });
+                                    }
+                                },
+                                error: function(xhr) {
+                                    console.error('Signed proposal upload error:', xhr);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Something went wrong while uploading. Please try again.'
+                                    });
+                                },
+                                complete: function() {
+                                    $btn.prop('disabled', false)
+                                        .html('<i class="fas fa-upload me-1"></i>Upload &amp; Move to Stage 5');
+                                    $cancel.prop('disabled', false);
+                                }
+                            });
+                        });
+
+                        // Reset modal form when dismissed
+                        $('#upload-signed-proposal-modal').on('hidden.bs.modal', function () {
+                            $('#upload-signed-proposal-form')[0].reset();
+                            $('#signed_proposal_file').removeClass('is-invalid');
+                            $('#signed_proposal_error').hide().text('');
+                        });
                         // ==============================
                         // Adding tags to the company
                         // ==============================

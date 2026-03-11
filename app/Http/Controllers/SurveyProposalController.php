@@ -1057,7 +1057,7 @@ class SurveyProposalController extends Controller
         $surveyProposal = SurveyProposal::findOrFail($surveyProposalId);
 
         // Only managers can approve
-        if (!auth()->user()->isSalesManager()) {
+        if (!auth()->user()->isSalesManager() && !auth()->user()->isSuperAdmin()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Only sales managers can approve proposals.',
@@ -1101,7 +1101,7 @@ class SurveyProposalController extends Controller
         $surveyProposal = SurveyProposal::findOrFail($surveyProposalId);
 
         // Only managers can reject
-        if (!auth()->user()->isSalesManager()) {
+        if (!auth()->user()->isSalesManager() && !auth()->user()->isSuperAdmin()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Only sales managers can reject proposals.',

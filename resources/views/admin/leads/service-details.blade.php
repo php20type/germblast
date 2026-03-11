@@ -40,7 +40,7 @@
                 <!-- Main Content -->
                 <div class="col-md-12 p-0">
 
-                    <form action="#" method="POST" class="" id="add-survey-form">
+                    <form action="#" method="POST" class="" id="add-service-details-form">
                         @csrf
                         <input type="hidden" name="lead_id" value="{{ $lead->id }}">
 
@@ -50,12 +50,6 @@
                                     <h1 class="display-6 mb-2 fw-bold">Service Details</h1>
                                     <p class="text-muted">Congrats! You won a lead! Now fill this info out</p>
                                 </div>
-
-                                {{-- <div>
-                                   <button type="submit" class="btn btn-success">
-                                            Save
-                                    </button>
-                                </div> --}}
                             </div>
 
                             {{-- District Numbers --}}

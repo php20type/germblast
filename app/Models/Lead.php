@@ -30,6 +30,8 @@ class Lead extends Model
         'last_modified',
         'market_id',
         'outcome_id',
+        'is_received_signed_proposal',
+        'received_signed_proposal',
         'created_at',
     ];
 

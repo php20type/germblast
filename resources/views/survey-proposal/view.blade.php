@@ -348,7 +348,7 @@
 
 
     <!-- ================= PAGE 5 ================= -->
-    <div class="page">
+    {{-- <div class="page">
 
         <div class="page-bg">
             <img src="{{ asset('img/survey-proposal/page5_img1.png') }}">
@@ -368,7 +368,7 @@
                         877.771.3558<br>
                         Fax: 806.771.3559
                     </td>
-                    {{-- Company Address  --}}
+                    <!-- Company Address  -->
                     <td style="width:50%; vertical-align:top;">
                         <strong>Borger ISD</strong><br>
                         200 East Ninth St<br>
@@ -478,7 +478,7 @@
             © 2025 GermBlast. All Rights Reserved.
         </div>
 
-    </div>
+    </div> --}}
 
     {{-- Page 5.2 --}}
     @foreach ($pricingDetails as $pricing)
