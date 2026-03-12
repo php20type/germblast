@@ -471,11 +471,16 @@
                                                         <h5 class="mb-1">Received Signed Proposal</h5>
                                                     </div>
 
-                                                    <div class="col-md-4 d-flex justify-content-end">
+                                                    <div class="col-md-4 d-flex justify-content-end gap-3">
                                                         <a class="text-warning fw-semibold"
-                                                        href="{{ route('admin.lead.survey.proposal', $leads->id) }}"
+                                                        href="{{ Storage::url($leads->received_signed_proposal) }}"
                                                         target="_blank">
                                                             View Proposal
+                                                        </a>
+                                                        <a class="text-warning fw-semibold"
+                                                        href="{{ Storage::url($leads->received_signed_proposal) }}"
+                                                        download="{{ basename($leads->received_signed_proposal) }}">
+                                                            Download
                                                         </a>
                                                     </div>
                                                 </div>
