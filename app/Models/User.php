@@ -293,4 +293,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(ProposalAction::class, 'user_id');
     }
+
+    public function service()
+    {
+        return $this->hasMany(Service::class, 'user_id');
+    }
+
+    public function serviceOrderUser()
+    {
+        return $this->hasMany(ServiceOrder::class, 'user_id');
+    }
+
+    public function serviceOrderClockedBy()
+    {
+        return $this->hasMany(ServiceOrder::class, 'clocked_by');
+    }
 }

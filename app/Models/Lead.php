@@ -181,4 +181,9 @@ class Lead extends Model
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
+
+    public function services()
+    {
+        return $this->hasMany(Service::class, 'lead_id');
+    }
 }

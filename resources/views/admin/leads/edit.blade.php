@@ -496,7 +496,7 @@
 
 
                         {{-- SERVICE DETAILS --}}
-                        {{-- @if($leads->lead_status === 'won')
+                        @if($leads->lead_status === 'won')
                          <div class="section-card">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5>SERVICE DETAILS</h5>
@@ -516,7 +516,7 @@
                                 </div>
                             </div>
                         </div>
-                        @endif --}}
+                        @endif
 
                         <!-- Tasks Section -->
                         <div class="section-card">

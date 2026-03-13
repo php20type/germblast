@@ -351,7 +351,7 @@
                                     </div>
 
                                     <p class="small text-muted">
-                                        Legend: <span class="text-primary">Open</span>,
+                                        Legend: <span class="text-primary">Pending</span>,
                                         <span class="text-success">Completed</span>,
                                         <span class="text-danger">Cancelled</span>
                                     </p>
@@ -364,11 +364,36 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td colspan="2" class="text-muted text-center">
-                                                    No services scheduled.
-                                                </td>
-                                            </tr>
+                                            @forelse ( $serviceOrders as $order)
+                                               @php
+                                                    $rowClass = match($order->status) {
+                                                        'pending'   => 'table-primary',
+                                                        'completed' => 'table-success',
+                                                        'cancelled' => 'table-danger',
+                                                        default     => ''
+                                                    };
+                                                @endphp
+                                                <tr class="{{ $rowClass }} small">
+                                                    <td>
+                                                        Order ID: {{ $order->order_no }} - <strong>{{ $order->service->service_name }}</strong> <br>
+                                                        Number Of Service: {{ $order->service->number_of_services }} <br>
+                                                        Price Per Service: ${{ number_format($order->service->price_per_service,2) }} <br>
+                                                        Total Price: ${{ number_format($order->service->total_price,2) }} <br>
+                                                        Estimated Man Hours: 12
+                                                    </td>
+                                                    <td>
+                                                        Intended Date: {{ $order->intended_date }} <br>
+                                                        Scheduled Date : <br>
+                                                                Sat 02/21/26 03:55:00 pm - Thu 02/19/26 03:55:00 pm
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="2" class="text-muted text-center">
+                                                        No services scheduled.
+                                                    </td>
+                                                </tr>
+                                            @endforelse
                                         </tbody>
                                     </table>
                                 </div>

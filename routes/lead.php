@@ -104,8 +104,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
             Route::post('{lead}/site-survey/reopen', [LeadStageController::class, 'reopenSiteSurvey'])->name('site_survey.reopen');
             Route::post('{lead}/site-survey/reset', [LeadStageController::class, 'resetSiteSurvey'])->name('site_survey.reset');
 
-            Route::get('service/details/{lead}', [LeadController::class, 'getServiceDetails'])->name('service.details');
-
         });
 
     });

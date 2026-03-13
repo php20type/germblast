@@ -82,8 +82,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
 Route::view('survey-proposal.pdf', 'survey-proposal.pdf')->name('survey.proposal');
 
-Route::get('admin/lead/fulfill-order', [LeadController::class, 'fulfillOrder'])->name('admin.lead.fulfill_order');
-
 /*
 |--------------------------------------------------------------------------
 | Modular Route Files (REQUIRES)
@@ -95,4 +93,5 @@ require __DIR__ . '/people.php';
 require __DIR__ . '/lead.php';
 require __DIR__ . '/sale.php';
 require __DIR__ . '/survey.php';
+require __DIR__ . '/service.php';
 require __DIR__ . '/settings.php';

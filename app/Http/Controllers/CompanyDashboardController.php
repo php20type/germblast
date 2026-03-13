@@ -10,6 +10,7 @@ use App\Models\Company;
 use App\Models\IAQDevice;
 use App\Models\IAQSurvey;
 use App\Models\IAQZone;
+use App\Models\ServiceOrder;
 use App\Models\WaterManagementPhase;
 use App\Models\WaterManagementTeam;
 use Illuminate\Http\Request;
@@ -42,6 +43,10 @@ class CompanyDashboardController extends Controller
 
         $waterManagement = $company->waterManagementPhase->sortByDesc('created_at');
 
+        $serviceOrders = ServiceOrder::whereHas('service.lead', function ($query) use ($company) {
+            $query->where('company_id', $company->id);
+        })->with(['service.lead'])->get();
+
         return view('admin.company.company-dashboard', [
             'company' => $company,
             'companyLocations' => $companyLocations,
@@ -51,6 +56,7 @@ class CompanyDashboardController extends Controller
             'biologicalReadiness' => $biologicalReadiness,
             'iaqSurveys' => $iaqSurveys,
             'waterManagement' => $waterManagement,
+            'serviceOrders'=> $serviceOrders
         ]);
     }
 
