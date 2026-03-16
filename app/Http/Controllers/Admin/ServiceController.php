@@ -147,8 +147,16 @@ class ServiceController extends Controller
         return redirect()->back()->with('success', 'Clocked out successfully.');
     }
 
-    public function fulfillOrder(Request $request)
+    public function fulfillOrder(Request $request, $orderId)
     {
-        return view('admin.leads.fulfill-order');
+        $order = ServiceOrder::findOrFail($orderId);
+
+        return view('admin.leads.fulfill-order', compact('order'));
+    }
+
+    public function fulfillOrder_book(Request $request, $orderId)
+    {
+        $order = ServiceOrder::findOrFail($orderId);
+        return "Order booked successfully!";
     }
 }

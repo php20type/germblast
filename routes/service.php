@@ -14,7 +14,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::post('service/clock-in',  [ServiceController::class, 'clockIn'])->name('service.clock_in');
         Route::post('service/clock-out', [ServiceController::class, 'clockOut'])->name('service.clock_out');
 
-        Route::get('fulfill-order', [ServiceController::class, 'fulfillOrder'])->name('fulfill_order');
+        Route::get('service/fulfill-order/{orderId}', [ServiceController::class, 'fulfillOrder'])->name('service.fulfill_order');
+        Route::post('service/fulfill-order/{orderId}/book', [ServiceController::class, 'fulfillOrder_book'])->name('service.fulfill_order.book');
 
     });
 });
