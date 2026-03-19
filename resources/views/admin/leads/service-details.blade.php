@@ -83,7 +83,7 @@
                     </form>
 
                     <!-- Services & Scheduling Section Start -->
-                    <div class="sales-dashboard mt-4">
+                    <div class="sales-dashboard">
                         <div class="row">
                             <div class="col-md-12">
 
@@ -154,7 +154,11 @@
 
                                         <ul class="list-group list-group-flush mb-3">
                                             <li class="list-group-item">
-                                                <i class="fa fa-circle me-2" style="font-size: 10px"></i><strong>Order: {{ $order->order_no }}</strong> - Intended Date: {{ $order->intended_date }}
+                                                <i class="fa fa-circle me-2" style="font-size: 10px"></i>
+                                                <a href="{{ route('admin.lead.service.fulfill_order', $order->id) }}">
+                                                    <strong>Order: {{ $order->order_no }}</strong>
+                                                </a>
+                                                - Intended Date: {{ $order->intended_date }}
                                             </li>
                                         </ul>
 
@@ -170,11 +174,7 @@
 
                             </div>
                         </div>
-                    </div>
-                    <!-- Services & Scheduling Section End -->
 
-
-                    <div class="sales-dashboard mt-4">
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="section-card">

@@ -10,29 +10,8 @@ class ServiceOrder extends Model
     protected $fillable = [
         'user_id',
         'service_id',
-
         'order_no',
-
-        // Intended
         'intended_date',
-
-        // Scheduled
-        'scheduled_date',
-        'scheduled_start_time',
-        'scheduled_end_time',
-        'scheduled_arrival_time',
-        'scheduled_office',
-        'scheduled_recurrence_count',
-        'scheduled_recurrence_rule',
-        'meet',
-        'overnight',
-
-        // Clock in/out
-        'clocked_by',
-        'clocked_in_at',
-        'clocked_out_at',
-        'job_notes',
-
         'status',
     ];
 
@@ -46,9 +25,9 @@ class ServiceOrder extends Model
         return $this->belongsTo(User::class,'user_id');
     }
 
-    public function clockedBy()
+     public function orderSlots()
     {
-        return $this->belongsTo(User::class,'clocked_by');
+        return $this->hasMany(ServiceOrderSlot::class, 'service_order_id');
     }
 
 }

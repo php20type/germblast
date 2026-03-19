@@ -56,4 +56,9 @@ class CompanyLocation extends Model
             'id'                   // PK on iaq_zones
         );
     }
+
+    public function slotFacilities()
+    {
+        return $this->hasMany(ServiceOrderSlotFacility::class, 'company_location_id');
+    }
 }

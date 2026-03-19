@@ -304,8 +304,13 @@ class User extends Authenticatable
         return $this->hasMany(ServiceOrder::class, 'user_id');
     }
 
-    public function serviceOrderClockedBy()
+    public function serviceOrderSlotClockedBy()
     {
-        return $this->hasMany(ServiceOrder::class, 'clocked_by');
+        return $this->hasMany(ServiceOrderSlotClock::class, 'clocked_by');
+    }
+
+    public function serviceOrderConfirmedBy()
+    {
+        return $this->hasMany(ServiceOrderSlot::class, 'confirmed_by');
     }
 }

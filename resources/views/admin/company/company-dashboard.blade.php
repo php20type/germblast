@@ -350,8 +350,16 @@
                                         </div>
                                     </div>
 
-                                    <p class="small text-muted">
+                                    {{-- <p class="small text-muted">
                                         Legend: <span class="text-primary">Pending</span>,
+                                        <span class="text-success">Completed</span>,
+                                        <span class="text-danger">Cancelled</span>
+                                    </p> --}}
+                                    <p class="small text-muted">
+                                        Legend:
+                                        <span class="text-primary">Pending</span>,
+                                        <span class="text-warning">Scheduled</span>,
+                                        <span class="text-info">In Progress</span>,
                                         <span class="text-success">Completed</span>,
                                         <span class="text-danger">Cancelled</span>
                                     </p>
@@ -365,26 +373,43 @@
                                         </thead>
                                         <tbody>
                                             @forelse ( $serviceOrders as $order)
-                                               @php
+                                                @php
                                                     $rowClass = match($order->status) {
-                                                        'pending'   => 'table-primary',
-                                                        'completed' => 'table-success',
-                                                        'cancelled' => 'table-danger',
-                                                        default     => ''
+                                                        'pending'     => 'table-primary',
+                                                        'scheduled'   => 'table-warning',
+                                                        'in_progress' => 'table-info',
+                                                        'completed'   => 'table-success',
+                                                        'cancelled'   => 'table-danger',
+                                                        default       => ''
                                                     };
                                                 @endphp
                                                 <tr class="{{ $rowClass }} small">
                                                     <td>
-                                                        Order ID: {{ $order->order_no }} - <strong>{{ $order->service->service_name }}</strong> <br>
+                                                        <a href="{{ route('admin.lead.service.fulfill_order', $order->id) }}">
+                                                            Order ID: {{ $order->order_no }}
+                                                        </a>
+                                                        -
+                                                        <strong>{{ $order->service->service_name }}</strong> <br>
+
                                                         Number Of Service: {{ $order->service->number_of_services }} <br>
                                                         Price Per Service: ${{ number_format($order->service->price_per_service,2) }} <br>
                                                         Total Price: ${{ number_format($order->service->total_price,2) }} <br>
                                                         Estimated Man Hours: 12
                                                     </td>
                                                     <td>
-                                                        Intended Date: {{ $order->intended_date }} <br>
-                                                        Scheduled Date : <br>
-                                                                Sat 02/21/26 03:55:00 pm - Thu 02/19/26 03:55:00 pm
+                                                        Intended Date: <br>
+                                                        <span class="text-muted small ms-4">{{ $order->intended_date }}</span>
+                                                         <br>
+                                                        @if($order->orderSlots->count())
+                                                            Scheduled Slots: <br>
+                                                            @foreach($order->orderSlots as $slot)
+                                                                <span class="text-muted small ms-4">
+                                                                    {{ $slot->scheduled_start_time }} — {{ $slot->scheduled_end_time }}
+                                                                </span><br>
+                                                            @endforeach
+                                                        @else
+                                                            <span class="text-muted small">No slots scheduled yet.</span>
+                                                        @endif
                                                     </td>
                                                 </tr>
                                             @empty

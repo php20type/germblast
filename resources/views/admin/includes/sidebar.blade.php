@@ -77,6 +77,16 @@
                     </div>
                 </a>
             </li>
+            <li class="{{ request()->routeIs('admin.calendar.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.calendar.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon5.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Calendar
+                    </div>
+                </a>
+            </li>
             <hr>
             @if(auth()->user()->isSuperAdmin())
                 <li class="{{ request()->routeIs('admin.roles.permissions') ? 'active' : '' }}">
