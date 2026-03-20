@@ -468,9 +468,9 @@
 
                         <!-- Notes Tab -->
                         <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
-                            {{-- Contract Details --}}
                             <div class="sales-dashboard mt-4">
 
+                                {{-- Contract Details --}}
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="section-card">
@@ -480,12 +480,52 @@
                                             </div>
 
                                             @forelse($order->service->outlines as $outline)
-                                                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                                                    <div>
-                                                        <p class="mb-1 fw-semibold">{{ ucwords($outline->outline_name) }}</p>
-                                                        <span class="badge bg-danger">CC</span>
+                                                <div class="border-bottom py-3">
+                                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                                        <div>
+                                                            <p class="mb-1 fw-semibold">{{ ucwords($outline->outline_name) }}</p>
+                                                        </div>
+                                                        <span class="text-muted small">{{ $outline->range }}% complete</span>
                                                     </div>
-                                                    <button type="button" class="btn btn-outline-secondary btn-sm">X</button>
+
+                                                    {{-- Progress Bar --}}
+                                                    <div class="progress mb-2" style="height: 6px;">
+                                                        <div class="progress-bar bg-success"
+                                                            role="progressbar"
+                                                            style="width: {{ $outline->range }}%"
+                                                            aria-valuenow="{{ $outline->range }}"
+                                                            aria-valuemin="0"
+                                                            aria-valuemax="100">
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- Edit Form --}}
+                                                    <form action="{{ route('admin.lead.service.outline.update', $outline->id) }}" method="POST" class="mt-2">
+                                                        @csrf
+                                                        <div class="row mt-2 g-2">
+                                                            <div class="col-md-12">
+                                                                <div class="input-group">
+                                                                    <input type="number"
+                                                                        class="form-control"
+                                                                        name="range"
+                                                                        value="{{ $outline->range ?? 0 }}"
+                                                                        min="0" max="100" step="1"
+                                                                        placeholder="0">
+                                                                    <span class="input-group-text">%</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 mt-2">
+                                                                <textarea name="description"
+                                                                    class="form-control"
+                                                                    placeholder="Add description...">{{ $outline->description ?? '' }}</textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mt-2">
+                                                            <div class="text-end">
+                                                                <button type="submit" class="btn btn-success">Save</button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             @empty
                                                 <p class="text-muted">No contract details found.</p>
@@ -495,39 +535,7 @@
                                     </div>
                                 </div>
 
-                            {{-- Add Additional Areas --}}
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="section-card">
-
-                                            <div class="section-header mb-3">
-                                                <h5 class="section-title">Add Additional Areas</h5>
-                                                <small class="text-muted">Note: these will only appear on this invoice</small>
-                                            </div>
-
-                                            <form action="#" method="POST">
-                                                @csrf
-                                                <input type="hidden" name="service_order_id" value="{{ $order->id }}">
-                                                <table class="table table-bordered align-middle">
-                                                    <tbody>
-                                                        <tr>
-                                                            <th>Departments</th>
-                                                            <td>
-                                                                <div class="d-flex gap-2">
-                                                                    <input type="text" class="form-control" name="department">
-                                                                    <button type="submit" class="btn btn-success">Add</button>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </form>
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                            {{-- Service Notes --}}
+                                {{-- Service Notes --}}
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="section-card">
@@ -537,9 +545,33 @@
                                                 <small class="text-muted">Enter new notes in the form below:</small>
                                             </div>
 
-                                            <form action="#" method="POST" enctype="multipart/form-data">
+                                            {{-- Existing Notes List --}}
+                                            @if($order->notes->count())
+                                                <div class="mb-4">
+                                                    @foreach($order->notes as $note)
+                                                        <div class="border rounded p-3 mb-2">
+                                                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                                                <small class="text-muted">
+                                                                    {{ $note->user->name ?? '-' }} &bull; {{ $note->created_at->format('d M Y, h:i A') }}
+                                                                </small>
+                                                                @if($note->notify_sales_team)
+                                                                    <span class="badge bg-warning text-dark">Sales Team Notified</span>
+                                                                @endif
+                                                            </div>
+                                                            <p class="mb-1">{{ $note->notes }}</p>
+                                                            @if($note->image_path)
+                                                                <img src="{{ asset('storage/' . $note->image_path) }}"
+                                                                    class="img-thumbnail mt-2"
+                                                                    style="max-height: 150px;">
+                                                            @endif
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+
+                                            {{-- Add Note Form --}}
+                                            <form action="{{ route('admin.lead.service.order.notes.add', $order->id) }}" method="POST" enctype="multipart/form-data">
                                                 @csrf
-                                                <input type="hidden" name="service_order_id" value="{{ $order->id }}">
                                                 <table class="table table-bordered align-middle">
                                                     <tbody>
                                                         <tr>
@@ -580,7 +612,7 @@
                                     </div>
                                 </div>
 
-                            {{-- Inventory Consumption --}}
+                                {{-- Inventory Consumption --}}
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="section-card">
@@ -589,21 +621,51 @@
                                                 <h5 class="section-title">Inventory Consumption</h5>
                                             </div>
 
-                                            <table class="table table-bordered align-middle">
-                                                <tbody>
-                                                    <tr><td>Microfiber</td></tr>
-                                                    <tr><td>Swabs</td></tr>
-                                                    <tr><td>Oxivir Concentrate Jars</td></tr>
-                                                    <tr><td>Opticide gallons</td></tr>
-                                                    <tr><td>Halomist</td></tr>
-                                                </tbody>
-                                            </table>
+                                            <form action="{{ route('admin.lead.service.order.inventory.update', $order->id) }}" method="POST">
+                                                @csrf
+                                                <table class="table table-bordered align-middle">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th>Item</th>
+                                                            <th>Quantity Used</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach([
+                                                            'microfiber'       => 'Microfiber',
+                                                            'swabs'            => 'Swabs',
+                                                            'oxivir_jars'      => 'Oxivir Concentrate Jars',
+                                                            'opticide_gallons' => 'Opticide Gallons',
+                                                            'halomist'         => 'Halomist',
+                                                            'water'            => 'Water',
+                                                        ] as $field => $label)
+                                                            <tr>
+                                                                <td>{{ $label }}</td>
+                                                                <td>
+                                                                    <input type="number"
+                                                                        class="form-control form-control-sm"
+                                                                        name="{{ $field }}"
+                                                                        value="{{ $order->$field ?? 0 }}"
+                                                                        min="0">
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <td colspan="2" class="text-end">
+                                                                <button type="submit" class="btn btn-success">Save Inventory</button>
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </form>
 
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
+                            </div>
                         </div>
 
                         <!-- Invoicing Tab -->
@@ -799,6 +861,7 @@
 
 @push('scripts')
 <script>
+
     // Live Clock — update all .live-clock and .live-date elements
     function updateClock() {
         const now = new Date();

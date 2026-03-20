@@ -66,10 +66,6 @@
                                                     <td colspan="2" class="text-end">
                                                         <button type="submit" class="btn btn-success">Add Service
                                                             Outline</button>
-                                                        {{-- <a href="{{ route('admin.lead.fulfill_order') }}"
-                                                            class="btn btn-primary ms-2">
-                                                            <i class="fas fa-check-circle"></i> Fulfill Order
-                                                        </a> --}}
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -152,7 +148,7 @@
 
                                     @forelse($service->orders as $order)
 
-                                        <ul class="list-group list-group-flush mb-3">
+                                        <ul class="list-group list-group-flush">
                                             <li class="list-group-item">
                                                 <i class="fa fa-circle me-2" style="font-size: 10px"></i>
                                                 <a href="{{ route('admin.lead.service.fulfill_order', $order->id) }}">

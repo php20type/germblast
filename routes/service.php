@@ -17,6 +17,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::post('service/slot/{slotId}/facility/add', [ServiceController::class, 'addFacility'])->name('service.slot.facility.add');
         Route::post('service/slot/facility/{facilityId}/remove', [ServiceController::class, 'removeFacility'])->name('service.slot.facility.remove');
 
+        Route::post('order/{orderId}/notes/add', [ServiceController::class, 'addServiceNote'])->name('service.order.notes.add');
+        Route::post('order/{orderId}/inventory/update', [ServiceController::class, 'updateInventory'])->name('service.order.inventory.update');
+        Route::post('outline/{outlineId}/update', [ServiceController::class, 'updateOutlineRange'])->name('service.outline.update');
+
         Route::post('service/clock-in',  [ServiceController::class, 'clockIn'])->name('service.clock_in');
         Route::post('service/clock-out', [ServiceController::class, 'clockOut'])->name('service.clock_out');
 

@@ -10,6 +10,8 @@ class ServiceOutline extends Model
     protected $fillable = [
         'service_id',
         'outline_name',
+        'description',
+        'range',
     ];
 
     public function service()

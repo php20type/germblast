@@ -7,6 +7,8 @@ use App\Models\Lead;
 use App\Models\Service;
 use App\Models\ServiceOrder;
 use App\Models\ServiceOrderSlot;
+use App\Models\ServiceOutline;
+use App\Models\ServiceNote;
 use App\Models\ServiceOrderSlotFacility;
 use App\Services\OrderService;
 use App\Models\CompanyLocation;
@@ -106,7 +108,8 @@ class ServiceController extends Controller
             'orderSlots.confirmedBy',
             'orderSlots.facilities.companyLocation',
             'service.outlines',
-            'service.lead.company.locations', // ← ADD THIS
+            'service.lead.company.locations',
+            'notes.user',// ← ADD THIS
         ])->findOrFail($orderId);
 
         $companyLocations = $order->service->lead->company->locations;
@@ -228,6 +231,70 @@ class ServiceController extends Controller
         ServiceOrderSlotFacility::findOrFail($facilityId)->delete();
 
         return redirect()->back()->with('success', 'Facility removed.');
+    }
+
+
+    public function addServiceNote(Request $request, $orderId)
+    {
+        $request->validate([
+            'notes' => 'required|string',
+            'photo' => 'nullable|image|max:2048',
+        ]);
+
+        $imagePath = null;
+        if ($request->hasFile('photo')) {
+            $imagePath = $request->file('photo')->store('service-notes', 'public');
+        }
+
+        ServiceNote::create([
+            'service_order_id'  => $orderId,
+            'user_id'           => auth()->id(),
+            'notes'             => $request->notes,
+            'image_path'        => $imagePath,
+            'notify_sales_team' => $request->boolean('notify_sales_team'),
+        ]);
+
+        return redirect()->back()->with('success', 'Note added successfully.');
+    }
+
+    public function updateInventory(Request $request, $orderId)
+    {
+        $request->validate([
+            'microfiber'        => 'nullable|integer|min:0',
+            'swabs'             => 'nullable|integer|min:0',
+            'oxivir_jars'       => 'nullable|integer|min:0',
+            'opticide_gallons'  => 'nullable|integer|min:0',
+            'halomist'          => 'nullable|integer|min:0',
+            'water'             => 'nullable|integer|min:0',
+        ]);
+
+        $order = ServiceOrder::findOrFail($orderId);
+
+        $order->update([
+            'microfiber'       => $request->microfiber ?? 0,
+            'swabs'            => $request->swabs ?? 0,
+            'oxivir_jars'      => $request->oxivir_jars ?? 0,
+            'opticide_gallons' => $request->opticide_gallons ?? 0,
+            'halomist'         => $request->halomist ?? 0,
+            'water'            => $request->water ?? 0,
+        ]);
+
+        return redirect()->back()->with('success', 'Inventory updated successfully.');
+    }
+
+    public function updateOutlineRange(Request $request, $outlineId)
+    {
+        $request->validate([
+            'range'       => 'required|integer|min:0|max:100',
+            'description' => 'nullable|string',
+        ]);
+
+        ServiceOutline::findOrFail($outlineId)->update([
+            'range'       => $request->range,
+            'description' => $request->description,
+        ]);
+
+        return redirect()->back()->with('success', 'Outline updated successfully.');
     }
 
     /**

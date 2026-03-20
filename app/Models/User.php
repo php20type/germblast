@@ -313,4 +313,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(ServiceOrderSlot::class, 'confirmed_by');
     }
+
+    public function serviceNoteUser()
+    {
+        return $this->hasMany(ServiceNote::class, 'user_id');
+    }
+
+    public function serviceNotePerson()
+    {
+        return $this->hasMany(ServiceNote::class, 'person_id');
+    }
 }

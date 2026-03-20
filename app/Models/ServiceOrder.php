@@ -13,6 +13,14 @@ class ServiceOrder extends Model
         'order_no',
         'intended_date',
         'status',
+
+        // Inventory consumptions
+        'microfiber',
+        'swabs',
+        'oxivir_jars',
+        'opticide_gallons',
+        'halomist',
+        'water',
     ];
 
     public function service()
@@ -30,4 +38,8 @@ class ServiceOrder extends Model
         return $this->hasMany(ServiceOrderSlot::class, 'service_order_id');
     }
 
+    public function notes()
+    {
+        return $this->hasMany(ServiceNote::class, 'service_order_id');
+    }
 }
