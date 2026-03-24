@@ -93,6 +93,32 @@
                                                     </td>
                                                 </tr>
 
+                                                <tr>
+                                                    <th>Staff Type</th>
+                                                    <td>
+                                                        <select name="staff_type" class="form-select">
+                                                            <option value="">Select Staff Type</option>
+                                                            <option value="leader">Leader</option>
+                                                            <option value="technician">Technician</option>
+                                                            <option value="corporate">Corporate</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <th>Territory</th>
+                                                    <td>
+                                                        <select name="territory_id" class="form-select">
+                                                            <option value="">Select Territory</option>
+                                                            @foreach ($territories as $territory)
+                                                                <option value="{{ $territory->id }}">
+                                                                    {{ $territory->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                </tr>
+
                                             </tbody>
                                         </table>
                                     </div>
@@ -149,6 +175,12 @@
                 },
                 role: {
                     required: true
+                },
+                staff_type: {
+                    required: true
+                },
+                territory_id: {
+                    required: true
                 }
             },
 
@@ -163,7 +195,9 @@
                     required: "Please confirm password.",
                     equalTo: "Passwords do not match."
                 },
-                role: "Please select a role."
+                role: "Please select a role.",
+                staff_type: "Please select a type.",
+                territory_id: "Please select a territory.",
             },
 
             errorElement: 'span',

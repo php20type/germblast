@@ -90,6 +90,32 @@
                                                 </td>
                                             </tr>
 
+                                            <tr>
+                                                <th>Staff Type</th>
+                                                <td>
+                                                    <select name="staff_type" class="form-select">
+                                                        <option value="">Select Staff Type</option>
+                                                        <option value="leader" {{ $employee->staff_type === 'leader' ? 'selected' : '' }}>Leader</option>
+                                                        <option value="technician" {{ $employee->staff_type === 'technician' ? 'selected' : '' }}>Technician</option>
+                                                        <option value="corporate" {{ $employee->staff_type === 'corporate' ? 'selected' : '' }}>Corporate</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Territory</th>
+                                                <td>
+                                                    <select name="territory_id" class="form-select">
+                                                        <option value="">Select Territory</option>
+                                                        @foreach ($territories as $territory)
+                                                            <option value="{{ $territory->id }}" {{ $employee->territory_id == $territory->id ? 'selected' : '' }}>
+                                                                {{ $territory->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                            </tr>
+
                                         </tbody>
                                     </table>
                                 </div>
@@ -136,7 +162,9 @@
             email: { required: true, email: true },
             password: { minlength: 8 },
             password_confirmation: { equalTo: "#password" },
-            role: { required: true }
+            role: { required: true },
+            staff_type: { required: true },
+            territory_id: { required: true }
         },
 
         messages: {
@@ -144,7 +172,9 @@
             email: "Valid email address is required.",
             password: { minlength: "Password must be at least 8 characters." },
             password_confirmation: { equalTo: "Passwords do not match." },
-            role: "Please select a role."
+            role: "Please select a role.",
+            staff_type: "Please select a type.",
+            territory_id: "Please select a territory.",
         },
 
         errorElement: 'span',

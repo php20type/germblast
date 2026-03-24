@@ -28,7 +28,7 @@
                                 <div class="col-md-6">
                                     <div class="d-flex align-items-center position-relative">
                                         <div class="search-form">
-                                            <input type="search" class="form-control" placeholder="" aria-label="Search"
+                                            <input type="search" class="form-control" placeholder="Search by name.." aria-label="Search"
                                                 id="employee-search">
                                         </div>
                                         <span class="company-count">{{ $employeesCount }} Employee Found</span>
@@ -49,40 +49,13 @@
                                             <th>Name</th>
                                             <th>Email</th>
                                             <th>Role</th>
+                                            <th>Staff Type</th>
+                                            <th>Territory</th>
                                             <th>Joined</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        @forelse ($employees as $employee)
-                                            <tr>
-                                                <td>
-                                                    <input type="checkbox" class="form-check-input row-checkbox"
-                                                        data-id="{{ $employee->id }}">
-                                                </td>
-                                                <td>
-                                                    <div class="company-name">
-                                                        <a href="{{ route('admin.employee.edit', $employee->id) }}"
-                                                            class="text-decoration-none text-dark">
-                                                            {{ $employee->name ?? 'N/A' }}
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    {{ $employee->email ?? 'N/A' }}
-                                                </td>
-                                                <td>
-                                                    <span class="badge-customer">
-                                                        {{ strtoupper(str_replace('_', ' ', $employee->role)) }}
-                                                    </span>
-                                                </td>
-                                                <td>{{ \Carbon\Carbon::parse($employee->created_at)->format('d F Y') }}</td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="9" class="text-center">No employees found</td>
-                                            </tr>
-                                        @endforelse
-
+                                    <tbody id="employee-table-body">
+                                        @include('admin.employee.partials.employee-table-rows')
                                     </tbody>
                                 </table>
                             </div>
@@ -107,4 +80,29 @@
     @endsection
 
     @push('scripts')
+        <script>
+            $(document).ready(function() {
+                function fetchEmployees() {
+                    let search = $('#employee-search').val();
+
+                    $.ajax({
+                        url: "{{ route('admin.employee.index') }}",
+                        method: "GET",
+                        data: {
+                            search: search,
+                        },
+                        success: function(response) {
+                            $('#employee-table-body').html(response.table);
+                            $('.company-count').text(response.count + ' Employee Found');
+                        },
+                        error: function() {
+                            console.error('Error fetching employee data');
+                        }
+                    });
+                }
+
+                // Trigger AJAX on typing
+                $('#employee-search').on('keyup', fetchEmployees);
+            });
+        </script>
     @endpush

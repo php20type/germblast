@@ -106,11 +106,9 @@
                                                             <th>Office</th>
                                                             <td>
                                                                 <select class="form-select" name="scheduled_office">
-                                                                    <option value="">Select Office</option>
-                                                                    <option>Lubbock, TX</option>
-                                                                    <option>Dallas, TX</option>
-                                                                    <option>Houston, TX</option>
-                                                                    <option>Austin, TX</option>
+                                                                    @foreach($territories as $territory)
+                                                                        <option value="{{ $territory->id }}">{{ $territory->name }}</option>
+                                                                    @endforeach
                                                                 </select>
                                                             </td>
                                                         </tr>
@@ -190,7 +188,8 @@
                                                             <td>{{ $slot->scheduled_start_time }}</td>
                                                             <td>{{ $slot->scheduled_end_time }}</td>
                                                             <td>{{ $slot->scheduled_arrival_time }}</td>
-                                                            <td>{{ $slot->scheduled_office }}</td>
+                                                            {{-- <td>{{ $slot->scheduled_office }}</td> --}}
+                                                            <td>{{ $slot->office->name ?? 'N/A' }}</td>
                                                             <td>{{ $slot->scheduled_hours }}</td>
                                                             <td>{{ ucfirst($slot->meet) }}</td>
                                                             <td>{{ $slot->overnight ? 'Yes' : 'No' }}</td>
@@ -246,7 +245,8 @@
                                                             <th>Arrival Time</th>
                                                             <td>{{ $slot->scheduled_arrival_time }}</td>
                                                             <th>Office</th>
-                                                            <td>{{ $slot->scheduled_office }}</td>
+                                                            {{-- <td>{{ $slot->scheduled_office }}</td> --}}
+                                                            <td>{{ $slot->office->name ?? 'N/A' }}</td>
                                                         </tr>
                                                         <tr>
                                                             <th>Hours</th>
@@ -316,8 +316,11 @@
                                                                     <td>
                                                                         <select class="form-select" name="scheduled_office">
                                                                             <option value="">Select Office</option>
-                                                                            @foreach(['Lubbock, TX', 'Dallas, TX', 'Houston, TX', 'Austin, TX'] as $office)
-                                                                                <option {{ $slot->scheduled_office == $office ? 'selected' : '' }}>{{ $office }}</option>
+                                                                            @foreach($territories as $territory)
+                                                                                <option value="{{ $territory->id }}"
+                                                                                    {{ $slot->scheduled_office == $territory->id ? 'selected' : '' }}>
+                                                                                    {{ $territory->name }}
+                                                                                </option>
                                                                             @endforeach
                                                                         </select>
                                                                     </td>
@@ -454,14 +457,241 @@
                         <!-- Staffing Tab -->
                         <div class="tab-pane fade" id="staffing" role="tabpanel" aria-labelledby="staffing-tab">
                             <div class="sales-dashboard">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="section-card">
 
+                                @php $confirmedSlots = $order->orderSlots->where('is_confirmed', true); @endphp
 
+                                @if($confirmedSlots->count())
+
+                                    <div class="section-card mt-3">
+                                        <nav class="nav nav-tabs mb-3" id="staffingSlotTabs" role="tablist">
+                                            @foreach($confirmedSlots as $slot)
+                                                <button class="nav-link {{ $loop->first ? 'active' : '' }}"
+                                                    id="staffing-slot-{{ $slot->id }}-tab"
+                                                    data-bs-toggle="tab"
+                                                    data-bs-target="#staffing-slot-{{ $slot->id }}"
+                                                    type="button" role="tab">
+                                                    Slot #{{ $loop->iteration }}
+                                                    <small class="text-muted ms-1">{{ \Carbon\Carbon::parse($slot->scheduled_start_time)->format('M d') }}</small>
+                                                </button>
+                                            @endforeach
+                                        </nav>
+
+                                        <div class="tab-content" id="staffingSlotTabContent">
+                                            @foreach($confirmedSlots as $slot)
+                                                <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
+                                                    id="staffing-slot-{{ $slot->id }}"
+                                                    role="tabpanel">
+
+                                                    {{-- Time & Facility Info --}}
+                                                    <div class="border rounded p-3 mb-3 bg-light">
+                                                        <p class="mb-1"><strong>Office:</strong> {{ $slot->office->name ?? 'N/A' }}</p>
+                                                        <p class="mb-1"><strong>Schedule:</strong> {{ $slot->scheduled_start_time }} — {{ $slot->scheduled_end_time }}</p>
+                                                        <p class="mb-0"><strong>Arrival Time:</strong> {{ $slot->scheduled_arrival_time }}</p>
+                                                    </div>
+
+                                                    {{-- Facilities --}}
+                                                    @if($slot->facilities->count())
+                                                        <div class="mb-3">
+                                                            <p class="fw-semibold mb-2">Facilities</p>
+                                                            <div class="d-flex flex-wrap gap-2">
+                                                                @foreach($slot->facilities as $facility)
+                                                                    <div class="border rounded p-2 text-center bg-white" style="min-width: 160px;">
+                                                                        <i class="fas fa-map-marker-alt text-danger mb-1"></i>
+                                                                        <p class="mb-0 small fw-semibold">{{ $facility->companyLocation->location_name ?? '-' }}</p>
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
+                                                    @endif
+
+                                                    {{-- Two Column Layout --}}
+                                                    <div class="row g-3">
+
+                                                        {{-- LEFT: Assigned Team --}}
+                                                        <div class="col-md-5">
+                                                            <div class="border rounded p-3 h-100">
+                                                                <h6 class="fw-bold mb-3">Team</h6>
+
+                                                                @forelse($slot->staff as $staffMember)
+                                                                    <div class="d-flex justify-content-between align-items-center border rounded p-2 mb-2 bg-success bg-opacity-25">
+                                                                        <div>
+                                                                            <span class="fw-semibold small">{{ $staffMember->user->name }}</span><br>
+                                                                            <small class="text-muted">{{ $staffMember->slot_hours }} hrs</small>
+                                                                            @php $roles = $staffMember->user->getRoleNames()->implode(' | '); @endphp
+                                                                            @if($roles)
+                                                                                <br><small class="text-muted">{{ $roles }}</small>
+                                                                            @endif
+                                                                        </div>
+                                                                        <form action="{{ route('admin.lead.service.slot.staff.remove', $staffMember->id) }}" method="POST" class="d-inline">
+                                                                            @csrf
+                                                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                                <i class="fas fa-times"></i>
+                                                                            </button>
+                                                                        </form>
+                                                                    </div>
+                                                                @empty
+                                                                    <p class="text-muted small">No team members assigned yet.</p>
+                                                                @endforelse
+
+                                                            </div>
+                                                        </div>
+
+                                                        {{-- RIGHT: Available Service Technicians --}}
+                                                        <div class="col-md-7">
+                                                            <div class="border rounded p-3 h-100">
+                                                                <h6 class="fw-bold mb-3">Service Technicians</h6>
+
+                                                                @php
+                                                                    $territoryId     = $slot->scheduled_office;
+                                                                    $staffForTerritory = $allStaff[$territoryId] ?? collect();
+                                                                    $assignedUserIds = $slot->staff->pluck('user_id')->toArray();
+                                                                @endphp
+
+                                                                @if($staffForTerritory->isEmpty())
+                                                                    <p class="text-muted small">No technicians found for this office.</p>
+                                                                @else
+                                                                    <form action="{{ route('admin.lead.service.slot.staff.assign', $slot->id) }}" method="POST">
+                                                                        @csrf
+
+                                                                        {{-- Leaders --}}
+                                                                        @if(isset($staffForTerritory['leader']) && $staffForTerritory['leader']->count())
+                                                                            <p class="text-muted small fw-semibold mb-2">Leaders</p>
+                                                                            @foreach($staffForTerritory['leader'] as $tech)
+                                                                                @if(!in_array($tech->id, $assignedUserIds))
+                                                                                    @php $roles = $tech->getRoleNames()->implode(' | '); @endphp
+                                                                                    <div class="d-flex justify-content-between align-items-center rounded p-2 mb-1"
+                                                                                        style="background-color: #4caf50;">
+                                                                                        <div class="d-flex align-items-center gap-2">
+                                                                                            <input type="checkbox"
+                                                                                                class="form-check-input mt-0"
+                                                                                                name="user_ids[]"
+                                                                                                value="{{ $tech->id }}"
+                                                                                                id="staff-{{ $slot->id }}-{{ $tech->id }}">
+                                                                                            <label for="staff-{{ $slot->id }}-{{ $tech->id }}"
+                                                                                                class="text-white small mb-0" style="cursor:pointer;">
+                                                                                                {{ $tech->name }}
+                                                                                                @if($roles) &nbsp;|&nbsp; {{ $roles }} @endif
+                                                                                            </label>
+                                                                                        </div>
+                                                                                        <button type="button"
+                                                                                            class="btn btn-sm btn-info rounded-circle p-1 view-user-slots"
+                                                                                            data-user="{{ $tech->id }}"
+                                                                                            data-date="{{ $slot->scheduled_start_time }}"
+                                                                                            style="width:28px;height:28px;">
+                                                                                            <i class="fas fa-question" style="font-size:11px;"></i>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                @endif
+                                                                            @endforeach
+                                                                        @endif
+
+                                                                        {{-- Technicians --}}
+                                                                        @if(isset($staffForTerritory['technician']) && $staffForTerritory['technician']->count())
+                                                                            <p class="text-muted small fw-semibold mt-3 mb-2">Technicians</p>
+                                                                            @foreach($staffForTerritory['technician'] as $tech)
+                                                                                @if(!in_array($tech->id, $assignedUserIds))
+                                                                                    @php $roles = $tech->getRoleNames()->implode(' | '); @endphp
+                                                                                    <div class="d-flex justify-content-between align-items-center rounded p-2 mb-1"
+                                                                                        style="background-color: #4caf50;">
+                                                                                        <div class="d-flex align-items-center gap-2">
+                                                                                            <input type="checkbox"
+                                                                                                class="form-check-input mt-0"
+                                                                                                name="user_ids[]"
+                                                                                                value="{{ $tech->id }}"
+                                                                                                id="staff-{{ $slot->id }}-{{ $tech->id }}">
+                                                                                            <label for="staff-{{ $slot->id }}-{{ $tech->id }}"
+                                                                                                class="text-white small mb-0" style="cursor:pointer;">
+                                                                                                {{ $tech->name }}
+                                                                                                @if($roles) &nbsp;|&nbsp; {{ $roles }} @endif
+                                                                                            </label>
+                                                                                        </div>
+                                                                                        <button type="button"
+                                                                                            class="btn btn-sm btn-info rounded-circle p-1 view-user-slots"
+                                                                                            data-user="{{ $tech->id }}"
+                                                                                            data-date="{{ $slot->scheduled_start_time }}"
+                                                                                            style="width:28px;height:28px;">
+                                                                                            <i class="fas fa-question" style="font-size:11px;"></i>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                @endif
+                                                                            @endforeach
+                                                                        @endif
+
+                                                                        {{-- Corporate --}}
+                                                                        @if(isset($staffForTerritory['corporate']) && $staffForTerritory['corporate']->count())
+                                                                            <p class="text-muted small fw-semibold mt-3 mb-2">Corporate</p>
+                                                                            @foreach($staffForTerritory['corporate'] as $tech)
+                                                                                @if(!in_array($tech->id, $assignedUserIds))
+                                                                                    @php $roles = $tech->getRoleNames()->implode(' | '); @endphp
+                                                                                    <div class="d-flex justify-content-between align-items-center rounded p-2 mb-1"
+                                                                                        style="background-color: #4caf50;">
+                                                                                        <div class="d-flex align-items-center gap-2">
+                                                                                            <input type="checkbox"
+                                                                                                class="form-check-input mt-0"
+                                                                                                name="user_ids[]"
+                                                                                                value="{{ $tech->id }}"
+                                                                                                id="staff-{{ $slot->id }}-{{ $tech->id }}">
+                                                                                            <label for="staff-{{ $slot->id }}-{{ $tech->id }}"
+                                                                                                class="text-white small mb-0" style="cursor:pointer;">
+                                                                                                {{ $tech->name }}
+                                                                                                @if($roles) &nbsp;|&nbsp; {{ $roles }} @endif
+                                                                                            </label>
+                                                                                        </div>
+                                                                                        <button type="button"
+                                                                                            class="btn btn-sm btn-info rounded-circle p-1 view-user-slots"
+                                                                                            data-user="{{ $tech->id }}"
+                                                                                            data-date="{{ $slot->scheduled_start_time }}"
+                                                                                            style="width:28px;height:28px;">
+                                                                                            <i class="fas fa-question" style="font-size:11px;"></i>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                @endif
+                                                                            @endforeach
+                                                                        @endif
+
+                                                                        {{-- Add Selected Button --}}
+                                                                        <div class="mt-3 text-end">
+                                                                            <button type="submit" class="btn btn-success px-4">
+                                                                                Add Selected
+                                                                            </button>
+                                                                        </div>
+
+                                                                    </form>
+                                                                @endif
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                    {{-- Summary Footer --}}
+                                                    @php
+                                                        $totalHours    = $slot->staff->sum('slot_hours');
+                                                        $totalCost     = $slot->staff->sum('cost');
+                                                        $invoiceAmount = $order->service->price_per_service ?? 0;
+                                                        $peoplePct     = $invoiceAmount > 0 ? round(($totalCost / $invoiceAmount) * 100) : 0;
+                                                    @endphp
+                                                    <div class="mt-3 pt-3 border-top d-flex gap-4">
+                                                        <small class="text-muted">People Percentage: <strong>{{ $peoplePct }}%</strong></small>
+                                                        <small class="text-muted">Invoice: <strong>${{ number_format($invoiceAmount, 2) }}</strong></small>
+                                                        <small class="text-muted">Hours: <strong>{{ $totalHours }}</strong></small>
+                                                        <small class="text-muted">Cost: <strong>${{ number_format($totalCost, 2) }}</strong></small>
+                                                    </div>
+
+                                                </div>
+                                            @endforeach
                                         </div>
                                     </div>
-                                </div>
+
+                                @else
+                                    <div class="row mt-3">
+                                        <div class="col-md-12">
+                                            <div class="section-card">
+                                                <p class="text-center text-muted mb-0">No confirmed slots found. Confirm slots in the Confirmations tab first.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
 
                             </div>
                         </div>
@@ -671,15 +901,112 @@
                         <!-- Invoicing Tab -->
                         <div class="tab-pane fade" id="invoicing" role="tabpanel" aria-labelledby="invoicing-tab">
                             <div class="sales-dashboard">
-                                <div class="row">
+                                <div class="row mt-3">
                                     <div class="col-md-12">
                                         <div class="section-card">
 
+                                            <h5 class="section-title mb-4">Invoices</h5>
+
+                                            {{-- Invoice Document --}}
+                                            <div class="border rounded p-4 mb-4">
+
+                                                {{-- Invoice Header --}}
+                                                <div class="row mb-4">
+                                                    <div class="col-md-6">
+                                                        {{-- Logo --}}
+                                                        <img src="{{ asset('img/logo/logo.png') }}"
+                                                            alt="GermBlast"
+                                                            style="max-height: 60px;">
+                                                    </div>
+                                                    <div class="col-md-6 text-end">
+                                                        <h4 class="fw-bold">Invoice</h4>
+                                                        <p class="mb-1 small">Invoice Number: <strong>49107</strong></p>
+                                                        <p class="mb-1 small">Invoice Date: <strong>March 02, 2026</strong></p>
+                                                        <p class="mb-1 small">Due Date: <strong class="text-danger">March 02, 2026</strong></p>
+                                                        <p class="mb-0 small">Amount Due: <strong>$419.58</strong></p>
+                                                    </div>
+                                                </div>
+
+                                                <hr>
+
+                                                {{-- Service Provider + Customer --}}
+                                                <div class="row mb-4">
+                                                    <div class="col-md-6">
+                                                        <p class="fw-bold mb-1">Service Provider</p>
+                                                        <p class="mb-0 small">Infection Controls, Inc.</p>
+                                                        <p class="mb-0 small">1414 Avenue J</p>
+                                                        <p class="mb-0 small">Lubbock, TX 79401</p>
+                                                        <p class="mb-0 small">877.771.3558</p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p class="fw-bold mb-1">Customer</p>
+                                                        <p class="mb-0 small">Faith Church Lubbock</p>
+                                                        <p class="mb-0 small">Faith Church Lubbock</p>
+                                                        <p class="mb-0 small">3616 58th Street</p>
+                                                        <p class="mb-0 small">Lubbock, TX 79413</p>
+                                                        <p class="mb-0 small">806.300.5184</p>
+                                                    </div>
+                                                </div>
+
+                                                <hr>
+
+                                                {{-- Line Items --}}
+                                                <h6 class="fw-bold mb-3">Line Items</h6>
+
+                                                {{-- Line Item Row --}}
+                                                <div class="row align-items-center mb-2 g-2">
+                                                    <div class="col-md-4">
+                                                        <select class="form-select form-select-sm">
+                                                            <option selected>GermBlast Flat Fee</option>
+                                                            <option>Travel Fee</option>
+                                                            <option>Supply Fee</option>
+                                                            <option>Additional Service</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <div class="input-group input-group-sm">
+                                                            <span class="input-group-text">Qty</span>
+                                                            <input type="number" class="form-control" value="1" min="1">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <div class="input-group input-group-sm">
+                                                            <span class="input-group-text">$</span>
+                                                            <input type="number" class="form-control" value="419.58" min="0" step="0.01">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <span class="small">Total = <strong>$419.58</strong></span>
+                                                    </div>
+                                                    <div class="col-md-2 d-flex gap-1">
+                                                        <button class="btn btn-sm btn-primary">Update</button>
+                                                        <button class="btn btn-sm btn-danger">Delete Line</button>
+                                                    </div>
+                                                </div>
+
+                                                {{-- Total --}}
+                                                <p class="small mt-2">Total of Line Items <strong>$419.58</strong></p>
+
+                                                {{-- Add Line Button --}}
+                                                <button class="btn btn-sm btn-outline-secondary mb-4">
+                                                    Add Another Line
+                                                </button>
+
+                                                {{-- Notes --}}
+                                                <div class="mb-3">
+                                                    <label class="form-label small fw-semibold">Notes:</label>
+                                                    <textarea class="form-control" rows="4"></textarea>
+                                                </div>
+                                                <button class="btn btn-sm btn-secondary mb-3">Update Notes</button>
+
+                                                {{-- Status --}}
+                                                <p class="small text-muted mb-0">Status: <strong>Complete</strong></p>
+
+                                            </div>
 
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
 
@@ -857,6 +1184,29 @@
         </div>
     </div>
 
+    <div class="modal fade" id="userSlotsModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>User Weekly Schedule</h5>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Office</th>
+                                <th>Start time</th>
+                                <th>End time</th>
+                                <th>Hours</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userSlotsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @push('scripts')
@@ -901,5 +1251,35 @@
 
     setInterval(updateTimeSinceClockIn, 1000);
     updateTimeSinceClockIn();
+
+    $(document).on('click', '.view-user-slots', function () {
+        let userId = $(this).data('user');
+        let date   = $(this).data('date');
+
+        $.get("{{ route('admin.lead.service.user.weekly_slots') }}", {
+            user_id: userId,
+            date: date
+        }, function (res) {
+            let html = '';
+
+            if (res.length === 0) {
+                html = `<tr><td colspan="4" class="text-center">No bookings</td></tr>`;
+            } else {
+                res.forEach(row => {
+                    html += `
+                        <tr>
+                            <td>${row.office}</td>
+                            <td>${row.start_time}</td>
+                            <td>${row.end_time}</td>
+                            <td>${row.hours}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            $('#userSlotsBody').html(html);
+            $('#userSlotsModal').modal('show');
+        });
+    });
 </script>
 @endpush

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Territory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
@@ -11,13 +12,25 @@ use Spatie\Permission\Models\Role;
 
 class EmployeeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $employees = User::where('role', '!=', 'client')
-            ->orderBy('name')
-            ->get();
+        $query = User::where('role', '!=', 'client');
 
+        // Apply search filter
+        if ($request->filled('search')) {
+            $query->where('name', 'like', "%{$request->search}%");
+        }
+
+        $employees = $query->orderBy('name')->get();
         $employeesCount = $employees->count();
+
+        // Handle AJAX requests
+        if ($request->ajax()) {
+            return response()->json([
+                'table' => view('admin.employee.partials.employee-table-rows', compact('employees'))->render(),
+                'count' => $employeesCount,
+            ]);
+        }
 
         return view('admin.employee.index', compact(
             'employees',
@@ -29,8 +42,9 @@ class EmployeeController extends Controller
     {
         // $roles = Role::all();
         $roles = Role::whereNotIn('name', ['customer'])->get();
+        $territories = Territory::all();
 
-        return view('admin.employee.create', compact('roles'));
+        return view('admin.employee.create', compact('roles', 'territories'));
     }
 
     public function store(Request $request)
@@ -40,6 +54,8 @@ class EmployeeController extends Controller
             'email' => 'required|email|max:255|unique:users,email',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => 'required|exists:roles,name',
+            'staff_type' => 'nullable|in:leader,technician,corporate',
+            'territory_id' => 'nullable|exists:territories,id',
         ]);
 
         // Create employee
@@ -47,6 +63,8 @@ class EmployeeController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'staff_type' => $validated['staff_type'] ?? null,
+            'territory_id' => $validated['territory_id'] ?? null,
 
             // Store role string for UI / legacy usage
             'role' => $validated['role'],
@@ -67,8 +85,9 @@ class EmployeeController extends Controller
         $employee = User::findOrFail($id);
         // $roles = Role::all();
         $roles = Role::whereNotIn('name', ['customer'])->get();
+        $territories = Territory::all();
 
-        return view('admin.employee.edit', compact('employee', 'roles'));
+        return view('admin.employee.edit', compact('employee', 'roles', 'territories'));
     }
 
     public function update(Request $request, $id)
@@ -80,6 +99,8 @@ class EmployeeController extends Controller
             'email' => 'required|email|max:255|unique:users,email,' . $id,
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'role' => 'required|exists:roles,name',
+            'staff_type' => 'nullable|in:leader,technician,corporate',
+            'territory_id' => 'nullable|exists:territories,id',
         ]);
 
         // Update basic fields
@@ -87,6 +108,8 @@ class EmployeeController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'role' => $validated['role'],
+            'staff_type' => $validated['staff_type'] ?? $employee->staff_type,
+            'territory_id' => $validated['territory_id'] ?? $employee->territory_id,
         ]);
 
         if (!empty($validated['password'])) {

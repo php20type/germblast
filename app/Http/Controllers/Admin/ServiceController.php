@@ -10,8 +10,11 @@ use App\Models\ServiceOrderSlot;
 use App\Models\ServiceOutline;
 use App\Models\ServiceNote;
 use App\Models\ServiceOrderSlotFacility;
+use App\Models\ServiceOrderSlotStaff;
 use App\Services\OrderService;
 use App\Models\CompanyLocation;
+use App\Models\Territory;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
@@ -107,14 +110,22 @@ class ServiceController extends Controller
             'orderSlots.clocks.clockedBy',
             'orderSlots.confirmedBy',
             'orderSlots.facilities.companyLocation',
+            'orderSlots.office',
+            'orderSlots.staff.user',
             'service.outlines',
             'service.lead.company.locations',
             'notes.user',// ← ADD THIS
         ])->findOrFail($orderId);
 
         $companyLocations = $order->service->lead->company->locations;
+        $territories = Territory::orderBy('name')->get(); // ← add this
 
-        return view('admin.leads.fulfill-order', compact('order','companyLocations'));
+        $allStaff = User::whereNotNull('territory_id')
+        ->whereNotNull('staff_type')
+        ->get()
+        ->groupBy(['territory_id', 'staff_type']);
+
+        return view('admin.leads.fulfill-order', compact('order','companyLocations','territories','allStaff'));
     }
 
     public function fulfillOrder_book(Request $request, $orderId)
@@ -123,7 +134,7 @@ class ServiceController extends Controller
             'scheduled_start_time'     => 'required',
             'scheduled_end_time'       => 'required',
             'scheduled_arrival_time'   => 'required',
-            'scheduled_office'         => 'required|string',
+            'scheduled_office' => 'required|exists:territories,id',
             'scheduled_recurrence_rule'=> 'required|string',
             'meet'                     => 'required|in:office,facility',
             'overnight'                => 'required|boolean',
@@ -171,7 +182,7 @@ class ServiceController extends Controller
             'scheduled_start_time'     => 'required',
             'scheduled_end_time'       => 'required',
             'scheduled_arrival_time'   => 'required',
-            'scheduled_office'         => 'required|string',
+            'scheduled_office' => 'required|exists:territories,id',
             'scheduled_recurrence_rule'=> 'required|string',
             'meet'                     => 'required|in:office,facility',
             'overnight'                => 'required|boolean',
@@ -233,6 +244,71 @@ class ServiceController extends Controller
         return redirect()->back()->with('success', 'Facility removed.');
     }
 
+    public function getUserWeeklySlots(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'date'    => 'required|date',
+        ]);
+
+        $date = \Carbon\Carbon::parse($request->date);
+
+        // Week range (Mon–Sun)
+        $startOfWeek = $date->copy()->startOfWeek();
+        $endOfWeek   = $date->copy()->endOfWeek();
+
+        $slots = ServiceOrderSlot::whereHas('staff', function ($q) use ($request) {
+                $q->where('user_id', $request->user_id);
+            })
+            ->whereBetween('scheduled_start_time', [$startOfWeek, $endOfWeek])
+            ->with('office')
+            ->orderBy('scheduled_start_time')
+            ->get()
+            ->map(function ($slot) {
+                return [
+                    'office'      => $slot->office->name ?? 'N/A',
+                    'start_time'  => \Carbon\Carbon::parse($slot->scheduled_start_time)->format('d M Y h:i A'),
+                    'end_time'    => \Carbon\Carbon::parse($slot->scheduled_end_time)->format('d M Y h:i A'),
+                    'hours'       => $slot->scheduled_hours,
+                ];
+            });
+
+        return response()->json($slots);
+    }
+
+    public function assignStaff(Request $request, $slotId)
+    {
+        $request->validate([
+            'user_ids'   => 'required|array|min:1',
+            'user_ids.*' => 'exists:users,id',
+        ]);
+
+        $slot = ServiceOrderSlot::findOrFail($slotId);
+        $slotHours = $slot->scheduled_hours ?? 0;
+
+        foreach ($request->user_ids as $userId) {
+            $alreadyAssigned = $slot->staff()->where('user_id', $userId)->exists();
+            if ($alreadyAssigned) continue;
+
+            $user = User::findOrFail($userId);
+            $cost = round($slotHours * ($user->hourly_rate ?? 0), 2);
+
+            $slot->staff()->create([
+                'user_id'    => $userId,
+                'slot_hours' => $slotHours,
+                'cost'       => $cost,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Staff assigned successfully.');
+    }
+
+    public function removeStaff(Request $request, $staffId)
+    {
+        ServiceOrderSlotStaff::findOrFail($staffId)->delete();
+
+        return redirect()->back()->with('success', 'Staff removed from slot.');
+    }
 
     public function addServiceNote(Request $request, $orderId)
     {

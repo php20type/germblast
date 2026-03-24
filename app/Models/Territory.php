@@ -10,6 +10,7 @@ class Territory extends Model
     protected $fillable = [
         'id',
         'name',
+        'franchise_name',
     ];
 
     // A territory has many locations
@@ -26,6 +27,16 @@ class Territory extends Model
     public function people()
     {
         return $this->hasMany(People::class, 'territory_id');
+    }
+
+    public function user()
+    {
+        return $this->hasMany(User::class, 'territory_id');
+    }
+
+    public function scheduledOffice()
+    {
+        return $this->hasMany(ServiceOrderSlot::class, 'scheduled_office');
     }
 
 

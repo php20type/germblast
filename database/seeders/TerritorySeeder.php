@@ -13,19 +13,22 @@ class TerritorySeeder extends Seeder
     public function run(): void
     {
         $territories = [
-            ['id' => 1, 'name' => 'Lubbock Office'],
-            ['id' => 2, 'name' => 'New Mexico'],
-            ['id' => 3, 'name' => 'Colorado Franchise'],
-            ['id' => 4, 'name' => 'Dallas Fort Worth - North/North East Texas'],
-            ['id' => 5, 'name' => 'Austin Office - Central Texas'],
-            ['id' => 6, 'name' => 'Houston Office'],
-            ['id' => 7, 'name' => 'El Paso Office'],
+            ['id' => 1, 'name' => 'Lubbock, TX',         'franchise_name' => 'Infection Controls, Inc.'],
+            ['id' => 2, 'name' => 'New Mexico',           'franchise_name' => 'GermBlast New Mexico'],
+            ['id' => 3, 'name' => 'Colorado',             'franchise_name' => 'GermBlast Colorado Franchise'],
+            ['id' => 4, 'name' => 'Dallas, TX',           'franchise_name' => 'Infection Controls, Inc.'],
+            ['id' => 5, 'name' => 'Austin, TX',           'franchise_name' => 'Infection Controls, Inc.'],
+            ['id' => 6, 'name' => 'Houston, TX',          'franchise_name' => 'Infection Controls, Inc.'],
+            ['id' => 7, 'name' => 'El Paso, TX',          'franchise_name' => 'Infection Controls, Inc.'],
         ];
 
         foreach ($territories as $territory) {
             Territory::updateOrCreate(
                 ['id' => $territory['id']],
-                ['name' => $territory['name']]
+                [
+                    'name'           => $territory['name'],
+                    'franchise_name' => $territory['franchise_name'],
+                ]
             );
         }
     }

@@ -22,6 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'territory_id',
+        'staff_type',
         'role',
         'zoom_access_token',
         'zoom_refresh_token',
@@ -322,5 +324,15 @@ class User extends Authenticatable
     public function serviceNotePerson()
     {
         return $this->hasMany(ServiceNote::class, 'person_id');
+    }
+
+    public function territory()
+    {
+        return $this->belongsTo(Territory::class,'territory_id');
+    }
+
+    public function staff()
+    {
+        return $this->hasMany(ServiceOrderSlotStaff::class, 'user_id');
     }
 }

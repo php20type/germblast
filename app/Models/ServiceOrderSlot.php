@@ -46,4 +46,14 @@ class ServiceOrderSlot extends Model
         return $this->hasMany(ServiceOrderSlotClock::class, 'service_order_slot_id');
     }
 
+    public function office()
+    {
+        return $this->belongsTo(Territory::class, 'scheduled_office');
+    }
+
+    public function staff()
+    {
+        return $this->hasMany(ServiceOrderSlotStaff::class, 'service_order_slot_id');
+    }
+
 }
