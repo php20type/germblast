@@ -788,7 +788,7 @@
                                                                     <span class="badge bg-warning text-dark">Sales Team Notified</span>
                                                                 @endif
                                                             </div>
-                                                            <p class="mb-1">{{ $note->notes }}</p>
+                                                            <p class="mb-1">{!! nl2br(e($note->notes)) !!}</p>
                                                             @if($note->image_path)
                                                                 <img src="{{ asset('storage/' . $note->image_path) }}"
                                                                     class="img-thumbnail mt-2"
@@ -1211,6 +1211,28 @@
 
 @push('scripts')
 <script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // On page load → check hash
+        let hash = window.location.hash;
+
+        if (hash) {
+            let triggerEl = document.querySelector(`[data-bs-target="${hash}"]`);
+            if (triggerEl) {
+                new bootstrap.Tab(triggerEl).show();
+            }
+        }
+
+        // On tab click → update URL hash
+        document.querySelectorAll('#fulfillOrderTabs button[data-bs-toggle="tab"]').forEach(tab => {
+            tab.addEventListener('shown.bs.tab', function (e) {
+                let target = e.target.getAttribute('data-bs-target');
+                history.replaceState(null, null, target);
+            });
+        });
+
+    });
 
     // Live Clock — update all .live-clock and .live-date elements
     function updateClock() {
