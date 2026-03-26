@@ -43,14 +43,13 @@
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
-                                            <th class="checkbox-cell">
-                                                <input type="checkbox" class="form-check-input" id="selectAll">
-                                            </th>
+                                            <th>Profile</th>
                                             <th>Name</th>
                                             <th>Email</th>
                                             <th>Role</th>
                                             <th>Staff Type</th>
                                             <th>Territory</th>
+                                            <th>Hourly Rate</th>
                                             <th>Joined</th>
                                         </tr>
                                     </thead>
@@ -102,7 +101,25 @@
                 }
 
                 // Trigger AJAX on typing
-                $('#employee-search').on('keyup', fetchEmployees);
+                $('#employee-search').on('input', function () {
+                    fetchEmployees();
+                });
+
+                $(document).on('click', '.toggle-rate', function () {
+                    let icon = $(this);
+                    let span = icon.closest('td').find('.hourly-rate');
+
+                    let value = span.data('value');
+
+                    if (icon.hasClass('fa-eye')) {
+                        span.text('$' + value);
+                        icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                    } else {
+                        span.text('****');
+                        icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                    }
+                });
+
             });
         </script>
     @endpush

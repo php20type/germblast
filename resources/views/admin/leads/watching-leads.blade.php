@@ -379,7 +379,9 @@
                 });
             }
 
-            $('#lead-search').on('keyup', fetchLeads);
+            $('#lead-search').on('input', function () {
+                fetchLeads();
+            });
             $('#checkDefault, select[name="status"], select[name="assignee_id"]').on('change', fetchLeads);
             // catch all checkbox changes
             // $('#filter-section input[type="checkbox"]').on('change', fetchLeads);

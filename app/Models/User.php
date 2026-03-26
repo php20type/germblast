@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class User extends Authenticatable
 {
@@ -18,6 +20,9 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+
+    use SoftDeletes;
+
     protected $fillable = [
         'name',
         'email',
@@ -28,6 +33,18 @@ class User extends Authenticatable
         'zoom_access_token',
         'zoom_refresh_token',
         'zoom_token_expiry',
+
+        'cell_phone',
+        'profile_image',
+        'hourly_rate',
+        'training_level',
+        'employee_type',
+        'active',
+        'schedulable',
+        'biological_response_team',
+        'healthcare_team',
+        'driver_trained',
+        'floor_certified',
     ];
 
     /**
@@ -140,6 +157,41 @@ class User extends Authenticatable
     {
         return $this->hasRole('super_admin');
     }
+
+    // =====================
+    // Specialties / Capabilities
+    // =====================
+    public function isBiologicalResponder(): bool
+    {
+        return (bool) $this->biological_response_team;
+    }
+
+    public function isHealthcareTechnician(): bool
+    {
+        return (bool) $this->healthcare_team;
+    }
+
+    public function isDriverTrained(): bool
+    {
+        return (bool) $this->driver_trained;
+    }
+
+    public function isFloorCertified(): bool
+    {
+        return (bool) $this->floor_certified;
+    }
+
+    public function getSpecialtiesAttribute(): array
+    {
+        $specialties = [];
+
+        if ($this->isDriverTrained())           $specialties[] = 'Trained Driver';
+        if ($this->isHealthcareTechnician())    $specialties[] = 'Healthcare Technician';
+        if ($this->isBiologicalResponder())     $specialties[] = 'Biological Responder';
+
+        return $specialties;
+    }
+    // =====================================
 
     public function task()
     {
@@ -335,4 +387,21 @@ class User extends Authenticatable
     {
         return $this->hasMany(ServiceOrderSlotStaff::class, 'user_id');
     }
+
+
+    public function maskTestRecord()
+    {
+        return $this->hasMany(MaskFitTestRecord::class, 'user_id');
+    }
+
+    public function driverLogs()
+    {
+        return $this->hasMany(DriverLog::class, 'user_id');
+    }
+
+    public function driverSuspensionRecords()
+    {
+        return $this->hasMany(DriverSuspensionRecord::class,'user_id');
+    }
+
 }

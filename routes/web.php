@@ -77,6 +77,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('employee/store', [EmployeeController::class, 'store'])->name('employee.store');
     Route::get('employee/edit/{id}', [EmployeeController::class, 'edit'])->name('employee.edit');
     Route::post('employee/update/{id}', [EmployeeController::class, 'update'])->name('employee.update');
+    Route::post('employee/{id}/mask-fit-test/store', [EmployeeController::class, 'storeMaskFitTest'])->name('employee.mask-fit-test.store');
+    Route::post('employee/{id}/driver-log/store',[EmployeeController::class, 'storeDriverLog'])->name('employee.driver-log.store');
+    Route::post('employee/{id}/driver-suspension/store',[EmployeeController::class, 'storeDriverSuspension'])->name('employee.driver-suspension.store');
 
 });
 

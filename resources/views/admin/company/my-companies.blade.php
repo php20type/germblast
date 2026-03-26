@@ -607,7 +607,9 @@
                     });
                 }
 
-                $('#company-search').on('keyup', fetchCompanies);
+                $('#company-search').on('input', function () {
+                    fetchCompanies();
+                });
                 $('select[name="company_type_id"], select[name="assignee_id"], select[name="people_id"]').on('change',
                     fetchCompanies);
                 // catch all checkbox changes

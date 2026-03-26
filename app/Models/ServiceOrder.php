@@ -11,6 +11,7 @@ class ServiceOrder extends Model
         'user_id',
         'service_id',
         'order_no',
+        'invoice_no',
         'intended_date',
         'status',
 

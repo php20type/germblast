@@ -31,6 +31,9 @@ class DatabaseSeeder extends Seeder
         $this->call(MarketSeeder::class);
         $this->call(FacilityRoomTypeSeeder::class);
         $this->call(EquipmentTypeSeeder::class);
+        $this->call(VehicleSeeder::class);
+        $this->call(MaskTypeSeeder::class);
+        $this->call(DriverLogItemSeeder::class);
         $this->call(UserSeeder::class);
 
         User::factory()->create([

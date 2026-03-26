@@ -457,6 +457,7 @@ class LeadController extends Controller
                 'close_date' => $request->close_date,
                 'confidence' => $request->confidence,
                 'creator_id' => auth()->id(),
+                'lead_status' => 'open',
             ]);
 
             LeadStageProcess::create([

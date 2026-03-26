@@ -583,7 +583,9 @@
                     });
                 }
 
-                $('#people-search').on('keyup', fetchPeoples);
+                $('#people-search').on('input', function () {
+                    fetchPeoples();
+                });
                 $('#checkDefault, select[name="assignee_id"], select[name="company_id"]').on('change',
                     fetchPeoples);
                 // catch all checkbox changes

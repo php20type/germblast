@@ -244,7 +244,7 @@ class ServiceController extends Controller
         return redirect()->back()->with('success', 'Facility removed.');
     }
 
-    public function getUserWeeklySlots(Request $request)
+    public function getUserMonthlySlots(Request $request)
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
@@ -253,14 +253,14 @@ class ServiceController extends Controller
 
         $date = \Carbon\Carbon::parse($request->date);
 
-        // Week range (Mon–Sun)
-        $startOfWeek = $date->copy()->startOfWeek();
-        $endOfWeek   = $date->copy()->endOfWeek();
+        // Month range
+        $startOfMonth = $date->copy()->startOfMonth();
+        $endOfMonth   = $date->copy()->endOfMonth();
 
         $slots = ServiceOrderSlot::whereHas('staff', function ($q) use ($request) {
                 $q->where('user_id', $request->user_id);
             })
-            ->whereBetween('scheduled_start_time', [$startOfWeek, $endOfWeek])
+            ->whereBetween('scheduled_start_time', [$startOfMonth, $endOfMonth])
             ->with('office')
             ->orderBy('scheduled_start_time')
             ->get()

@@ -1188,7 +1188,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5>User Weekly Schedule</h5>
+                    <h5>User Monthly Schedule</h5>
                 </div>
                 <div class="modal-body">
                     <table class="table table-bordered">
@@ -1278,7 +1278,7 @@
         let userId = $(this).data('user');
         let date   = $(this).data('date');
 
-        $.get("{{ route('admin.lead.service.user.weekly_slots') }}", {
+        $.get("{{ route('admin.lead.service.user.monthly_slots') }}", {
             user_id: userId,
             date: date
         }, function (res) {

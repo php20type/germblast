@@ -17,7 +17,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::post('service/slot/{slotId}/facility/add', [ServiceController::class, 'addFacility'])->name('service.slot.facility.add');
         Route::post('service/slot/facility/{facilityId}/remove', [ServiceController::class, 'removeFacility'])->name('service.slot.facility.remove');
 
-        Route::get('service/user-weekly-slots', [ServiceController::class, 'getUserWeeklySlots'])->name('service.user.weekly_slots');
+        Route::get('service/user-monthly-slots', [ServiceController::class, 'getUserMonthlySlots'])->name('service.user.monthly_slots');
         Route::post('service/slot/{slotId}/staff/assign', [ServiceController::class, 'assignStaff'])->name('service.slot.staff.assign');
         Route::post('service/slot/staff/{staffId}/remove', [ServiceController::class, 'removeStaff'])->name('service.slot.staff.remove');
 

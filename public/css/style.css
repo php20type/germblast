@@ -4049,3 +4049,28 @@ div[contenteditable="true"]:focus {
     object-fit: contain;
     /* keeps aspect ratio without stretching */
 }
+
+
+
+/* Employee Profile Styling */
+
+.profile-setting-section .profile-card {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #dcdcdc;
+    filter: drop-shadow(-2px 0px 10px rgba(0, 0, 0, 0.01));
+}
+
+.profile-card .preview {
+    display: flex;
+    align-items: center;
+}
+
+#img-preview-profile {
+    width: 120px;
+    height: 120px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
