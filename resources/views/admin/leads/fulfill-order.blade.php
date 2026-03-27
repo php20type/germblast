@@ -1212,27 +1212,27 @@
 @push('scripts')
 <script>
 
-    document.addEventListener("DOMContentLoaded", function () {
+    // document.addEventListener("DOMContentLoaded", function () {
 
-        // On page load → check hash
-        let hash = window.location.hash;
+    //     // On page load → check hash
+    //     let hash = window.location.hash;
 
-        if (hash) {
-            let triggerEl = document.querySelector(`[data-bs-target="${hash}"]`);
-            if (triggerEl) {
-                new bootstrap.Tab(triggerEl).show();
-            }
-        }
+    //     if (hash) {
+    //         let triggerEl = document.querySelector(`[data-bs-target="${hash}"]`);
+    //         if (triggerEl) {
+    //             new bootstrap.Tab(triggerEl).show();
+    //         }
+    //     }
 
-        // On tab click → update URL hash
-        document.querySelectorAll('#fulfillOrderTabs button[data-bs-toggle="tab"]').forEach(tab => {
-            tab.addEventListener('shown.bs.tab', function (e) {
-                let target = e.target.getAttribute('data-bs-target');
-                history.replaceState(null, null, target);
-            });
-        });
+    //     // On tab click → update URL hash
+    //     document.querySelectorAll('#fulfillOrderTabs button[data-bs-toggle="tab"]').forEach(tab => {
+    //         tab.addEventListener('shown.bs.tab', function (e) {
+    //             let target = e.target.getAttribute('data-bs-target');
+    //             history.replaceState(null, null, target);
+    //         });
+    //     });
 
-    });
+    // });
 
     // Live Clock — update all .live-clock and .live-date elements
     function updateClock() {

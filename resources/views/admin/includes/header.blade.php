@@ -46,8 +46,17 @@
                 <ul class="list-inline mb-0">
                     <li class="list-inline-item">
                         <a href="#" data-bs-toggle="dropdown" class="dropdown item-nav">
-                            <div class="icon-round" title="View Profile">
+                            {{-- <div class="icon-round" title="View Profile">
                                 <i class="fa-solid fa-user"></i>
+                            </div> --}}
+                            <div class="icon-round" title="View Profile" style="padding:0; overflow:hidden; background:transparent;">
+                                @if(Auth::user()->profile_image)
+                                    <img src="{{ asset('storage/' . Auth::user()->profile_image) }}"
+                                        alt="Profile"
+                                        style="width:50px; height:50px; object-fit:cover; border-radius:50%;">
+                                @else
+                                    <i class="fa-solid fa-user"></i>
+                                @endif
                             </div>
                         </a>
 
@@ -63,9 +72,20 @@
                                 <hr class="dropdown-divider">
                             </li>
                             <li>
-                                <a class="dropdown-item d-flex align-items-center py-2 px-3 rounded"
+                                {{-- <a class="dropdown-item d-flex align-items-center py-2 px-3 rounded"
                                     href="{{ route('admin.profile.view') }}">
                                     <i class="fas fa-user-circle me-3 text-primary"></i>
+                                    <span>View Profile</span>
+                                </a> --}}
+                                <a class="dropdown-item d-flex align-items-center py-2 px-3 rounded"
+                                    href="{{ route('admin.profile.view') }}">
+                                    @if(Auth::user()->profile_image)
+                                        <img src="{{ asset('storage/' . Auth::user()->profile_image) }}"
+                                            alt="Profile"
+                                            style="width:35px; height:35px; object-fit:cover; border-radius:50%; margin-right:12px;">
+                                    @else
+                                        <i class="fas fa-user-circle me-3 text-primary"></i>
+                                    @endif
                                     <span>View Profile</span>
                                 </a>
                             </li>

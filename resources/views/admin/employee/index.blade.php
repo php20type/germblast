@@ -115,7 +115,7 @@
                         span.text('$' + value);
                         icon.removeClass('fa-eye').addClass('fa-eye-slash');
                     } else {
-                        span.text('****');
+                        span.text('*****');
                         icon.removeClass('fa-eye-slash').addClass('fa-eye');
                     }
                 });

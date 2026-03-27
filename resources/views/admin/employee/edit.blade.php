@@ -44,7 +44,7 @@
                                                         <label class="form-label">Profile
                                                             <span class="text-danger">*</span>
                                                         </label>
-                                                        <div class="preview">
+                                                        {{-- <div class="preview">
                                                             <img id="img-preview-profile"
                                                                 src="{{ $employee->profile_image ? asset('storage/' . $employee->profile_image) : asset('img/home/default-profile.png') }}"
                                                                 alt="profile images" />
@@ -54,6 +54,26 @@
                                                                 <p>Allowed JPG, GIF or PNG.</p>
                                                                 <input accept="image/*" type="file" id="profile-input" name="profile_image"
                                                                     class="d-none" />
+                                                            </div>
+                                                        </div> --}}
+                                                        <div class="preview">
+                                                            <img id="img-preview-profile"
+                                                                src="{{ $employee->profile_image ? asset('storage/' . $employee->profile_image) : asset('img/home/default-profile.png') }}"
+                                                                alt="profile images" />
+
+                                                            <div class="text-upload ms-3">
+                                                                <label for="profile-input" class="btn btn-theme">Upload Photo</label>
+                                                                <p>Allowed JPG, GIF or PNG.</p>
+                                                                <input accept="image/*" type="file" id="profile-input" name="profile_image" class="d-none" />
+
+                                                                {{-- Hidden flag sent when user wants to remove photo --}}
+                                                                <input type="hidden" name="remove_profile_image" id="remove-profile-image" value="0">
+
+                                                                @if($employee->profile_image)
+                                                                    <button type="button" class="btn btn-danger btn-sm mt-1" id="remove-photo-btn">
+                                                                        <i class="fas fa-trash me-1"></i> Remove Photo
+                                                                    </button>
+                                                                @endif
                                                             </div>
                                                         </div>
                                                     </div>
@@ -829,6 +849,27 @@
                 );
             }
         });
+    });
+
+    // Remove photo button
+    $('#remove-photo-btn').on('click', function () {
+        // Reset preview to default
+        $('#img-preview-profile').attr('src', '{{ asset('img/home/default-profile.png') }}');
+        // Clear the file input
+        $('#profile-input').val('');
+        // Set the hidden flag
+        $('#remove-profile-image').val('1');
+        // Hide the remove button
+        $(this).hide();
+    });
+
+    // If user picks a new photo, cancel the remove flag
+    $('#profile-input').on('change', function () {
+        if (this.files && this.files[0]) {
+            $('#img-preview-profile').attr('src', URL.createObjectURL(this.files[0]));
+            $('#remove-profile-image').val('0');
+            $('#remove-photo-btn').show();
+        }
     });
 
 </script>

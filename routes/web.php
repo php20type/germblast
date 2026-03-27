@@ -20,7 +20,11 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $user = auth()->user();
+    if ($user->isCustomer()) {
+        return view('dashboard'); // customer dashboard
+    }
+    return redirect()->route('admin.dashboard'); // others
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {

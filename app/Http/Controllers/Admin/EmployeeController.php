@@ -155,11 +155,25 @@ class EmployeeController extends Controller
             'floor_certified' => $validated['floor_certified'],
         ];
 
+        // if ($request->hasFile('profile_image')) {
+        //     if ($employee->profile_image) {
+        //         Storage::disk('public')->delete($employee->profile_image);
+        //     }
+        //     $updateData['profile_image'] = $request->file('profile_image')->store('profiles', 'public');
+        // }
         if ($request->hasFile('profile_image')) {
+            // New photo uploaded — delete old one and store new
             if ($employee->profile_image) {
                 Storage::disk('public')->delete($employee->profile_image);
             }
             $updateData['profile_image'] = $request->file('profile_image')->store('profiles', 'public');
+
+        } elseif ($request->input('remove_profile_image') == '1') {
+            // User clicked Remove Photo — delete old and set null
+            if ($employee->profile_image) {
+                Storage::disk('public')->delete($employee->profile_image);
+            }
+            $updateData['profile_image'] = null;
         }
 
         $employee->update($updateData);

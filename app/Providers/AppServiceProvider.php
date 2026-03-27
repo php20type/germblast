@@ -18,6 +18,8 @@ use App\Repositories\StateRepository;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Opcodes\LogViewer\Facades\LogViewer;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -45,10 +47,14 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
 
          Relation::morphMap([
-        'Company' => \App\Models\Company::class,
-        'People'  => \App\Models\People::class,
-        'Lead'    => \App\Models\Lead::class,
-        // 'User'    => \App\Models\User::class,
-    ]);
+            'Company' => \App\Models\Company::class,
+            'People'  => \App\Models\People::class,
+            'Lead'    => \App\Models\Lead::class,
+            // 'User'    => \App\Models\User::class,
+        ]);
+
+        LogViewer::auth(function ($request) {
+            return auth()->check() && auth()->user()->isSuperAdmin();
+        });
     }
 }
