@@ -34,7 +34,11 @@ class DatabaseSeeder extends Seeder
         $this->call(VehicleSeeder::class);
         $this->call(MaskTypeSeeder::class);
         $this->call(DriverLogItemSeeder::class);
+        $this->call(DisciplinaryIssueSeeder::class);
         $this->call(UserSeeder::class);
+        $this->call(LeadSeeder::class);
+        $this->call(ExpenseTypeSeeder::class);
+        $this->call(ItemReasonSeeder::class);
 
         User::factory()->create([
             'name' => 'Test User',

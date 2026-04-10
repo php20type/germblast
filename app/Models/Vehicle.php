@@ -13,4 +13,10 @@ class Vehicle extends Model
         'number_available',
         'is_retired',
     ];
+
+    public function slots()
+    {
+        return $this->belongsToMany(ServiceOrderSlot::class, 'service_order_slot_vehicles')
+                    ->withTimestamps();
+    }
 }

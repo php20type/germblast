@@ -12,6 +12,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::get('/sales', [SaleController::class, 'index'])->name('sales.index');
+    Route::get('/sales/executive', [SaleController::class, 'executive'])->name('sales.executive');
     Route::get('/schedule/meeting', [SaleController::class, 'schedule_meeting'])->name('sales.schedule.meeting');
     Route::post('/store/meeting', [SaleController::class, 'store_meeting'])->name('sales.store.meeting');
     Route::get('meeting/{id}', [SaleController::class, 'show_meeting'])->name('sales.meetings.show');

@@ -32,6 +32,16 @@
                                 aria-selected="false">
                                 Confirmations
                             </button>
+                            <button class="nav-link" id="pre-checklist-tab" data-bs-toggle="tab"
+                                data-bs-target="#pre-checklist" type="button" role="tab" aria-controls="pre-checklist"
+                                aria-selected="false">
+                                Pre-Checklist
+                            </button>
+                            <button class="nav-link" id="post-checklist-tab" data-bs-toggle="tab"
+                                data-bs-target="#post-checklist" type="button" role="tab" aria-controls="post-checklist"
+                                aria-selected="false">
+                                Post Checklist
+                            </button>
                             <button class="nav-link" id="facilities-tab" data-bs-toggle="tab"
                                 data-bs-target="#facilities" type="button" role="tab" aria-controls="facilities"
                                 aria-selected="false">
@@ -55,6 +65,11 @@
                                 data-bs-target="#job-clocks" type="button" role="tab" aria-controls="job-clocks"
                                 aria-selected="false">
                                 Job Clocks
+                            </button>
+                            <button class="nav-link" id="employee-performance-tab" data-bs-toggle="tab"
+                                data-bs-target="#employee-performance" type="button" role="tab" aria-controls="employee-performance"
+                                aria-selected="false">
+                                Employee Performance
                             </button>
                             <button class="nav-link" id="reports-tab" data-bs-toggle="tab"
                                 data-bs-target="#reports" type="button" role="tab" aria-controls="reports"
@@ -377,6 +392,216 @@
                                         </div>
                                     </div>
                                 @endforelse
+
+                            </div>
+                        </div>
+
+                        <!-- Pre-Checklist Tab -->
+                        <div class="tab-pane fade" id="pre-checklist" role="tabpanel" aria-labelledby="pre-checklist-tab">
+                            <div class="sales-dashboard">
+
+                                <!-- Supervisor Items Section -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+                                            <div class="section-header mb-3">
+                                                <h5 class="section-title">Supervisor Items to Check</h5>
+                                            </div>
+                                            <ul style="line-height: 1.8;">
+                                                <li>ATF Meter</li>
+                                                <li>10 Swabs</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Service Plan Section -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+                                            <div class="section-header mb-3">
+                                                <h5 class="section-title">Service Plan (Plan Required: NO)</h5>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label text-muted" style="font-size: 13px;">Outline your plan here. This plan should include:</label>
+                                                <ul style="font-size: 13px; color: #555; line-height: 1.8; margin-left: 15px;">
+                                                    <li>Your plan for the outline in which you will address critical areas</li>
+                                                    <li>Who is responsible for each mobility during the job</li>
+                                                    <li>When you anticipate taking breaks during the service</li>
+                                                    <li>What time you expect to finish service</li>
+                                                    <li>Any client concerns or needs</li>
+                                                    <li>Any special requirements for the job (i.e. need/spare cash trailer)</li>
+                                                    <li>Simple plans are best. Don't complicate it with unnecessary job phase</li>
+                                                    <li>SAVE before you navigate to any other tabs</li>
+                                                </ul>
+                                            </div>
+                                            <form class="service-plan-form" id="servicePlanForm">
+                                                @csrf
+                                                <div class="mb-3">
+                                                    <label for="service_plan_narrative" class="form-label">Narrative:</label>
+                                                    <textarea class="form-control" id="service_plan_narrative" name="service_plan_narrative" rows="6" placeholder="Enter service plan narrative here...">{{ $order->service_plan_narrative ?? '' }}</textarea>
+                                                </div>
+                                                <div class="text-end">
+                                                    <button type="submit" class="btn btn-primary btn-sm save-service-plan-btn">
+                                                        <i class="fas fa-save me-1"></i> Update Narrative
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Plan Review Status Section -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <h6 class="mb-0">Plan Review Status:</h6>
+                                                </div>
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <span class="badge badge-plan-review-status {{ $order->plan_review_status == 'REVIEWED' ? 'bg-success' : 'bg-warning' }}" style="font-size: 12px; padding: 6px 12px;">
+                                                        {{ $order->plan_review_status ?? 'PENDING' }}
+                                                    </span>
+                                                    <button type="button" class="btn btn-sm btn-plan-review-toggle {{ $order->plan_review_status == 'REVIEWED' ? 'btn-success' : 'btn-outline-success' }}" data-order-id="{{ $order->id }}" style="transition: all 0.3s ease;">
+                                                        @if($order->plan_review_status == 'REVIEWED')
+                                                            <i class="bi bi-arrow-counterclockwise"></i> Undo Review
+                                                        @else
+                                                            <i class="bi bi-check-circle"></i> Review Done
+                                                        @endif
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Previous Plans Section -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+                                            <div class="section-header mb-3">
+                                                <h5 class="section-title">Service Plan Narrative</h5>
+                                            </div>
+                                            @if($order->service_plan_narrative)
+                                                <div class="border rounded p-3 bg-light" style="min-height: 120px;">
+                                                    <p class="mb-0" style="white-space: pre-wrap; word-break: break-word;">{{ $order->service_plan_narrative }}</p>
+                                                </div>
+                                            @else
+                                                <p class="text-muted" style="font-size: 13px;">No service plan narrative available.</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Reference Material Section -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+                                            <div class="section-header mb-3">
+                                                <h5 class="section-title">Reference Material (use this to make your plan)</h5>
+                                            </div>
+                                            <form class="sales-narrative-form" id="salesNarrativeForm">
+                                                @csrf
+                                                <label class="form-label">Sales Narrative</label>
+                                                <textarea class="form-control" id="sales_narrative" name="sales_narrative" rows="4" placeholder="Sales narrative reference...">{{ $order->sales_narrative ?? '' }}</textarea>
+                                                <div class="text-end mt-3">
+                                                    <button type="submit" class="btn btn-primary btn-sm save-sales-narrative-btn">
+                                                        <i class="fas fa-save me-1"></i> Update Narrative
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Select C.E. Notes Section -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+                                            <div class="section-header mb-3">
+                                                <h5 class="section-title">Staff</h5>
+                                            </div>
+                                            <label class="form-label">Certified Details</label>
+                                            <div class="mb-3">
+                                                <table class="table table-sm table-bordered">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Test C</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Test D</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Test A</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Facility Maps Section -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+                                            <div class="section-header mb-3">
+                                                <h5 class="section-title">Facility Maps (if available)</h5>
+                                            </div>
+                                            <p class="text-muted" style="font-size: 13px;">No facility maps available for this order.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Post Checklist Tab -->
+                        <div class="tab-pane fade" id="post-checklist" role="tabpanel" aria-labelledby="post-checklist-tab">
+                            <div class="sales-dashboard">
+
+                                <!-- Plan Debrief Section -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+                                            <div class="section-header mb-3">
+                                                <h5 class="section-title">Plan Debrief <span style="font-size: 14px; font-weight: 400;">(Debrief Required: NO(48 hours in advance))</span></h5>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label text-muted" style="font-size: 13px;">Debrief your plan here.</label>
+                                                <ul style="font-size: 13px; color: #555; line-height: 1.8; margin-left: 15px;">
+                                                    <li>Outline how your plan went. What worked, what didn't.</li>
+                                                    <li>Identify any extra areas you were asked to do.</li>
+                                                    <li>List any issues with equipment, vehicles, or other resources.</li>
+                                                    <li>Any thoughts that should be considered on future plans.</li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label text-muted" style="font-weight: 500;">Here was your plan:</label>
+                                                <div style="background-color: #f8f9fa; padding: 10px; border-radius: 4px; border: 1px solid #dee2e6; margin-bottom: 15px;">
+                                                    <p class="mb-0" style="font-size: 13px;">{{ $order->service_plan_narrative ?? 'No plan available yet.' }}</p>
+                                                </div>
+                                            </div>
+
+                                            <form class="plan-debrief-form" id="planDebriefForm">
+                                                @csrf
+                                                <div class="mb-3">
+                                                    <label for="plan_debrief" class="form-label">Debrief</label>
+                                                    <textarea class="form-control" id="plan_debrief" name="plan_debrief" rows="10" placeholder="Enter your debrief here...">{{ $order->plan_debrief ?? '' }}</textarea>
+                                                </div>
+
+                                                <div class="text-start">
+                                                    <button type="submit" class="btn btn-primary btn-sm save-debrief-btn">
+                                                        <i class="fas fa-save me-1"></i> Update Debrief
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
 
                             </div>
                         </div>
@@ -1159,6 +1384,133 @@
                             </div>
                         </div>
 
+                        <!-- Employee Performance Tab -->
+                        <div class="tab-pane fade" id="employee-performance" role="tabpanel" aria-labelledby="employee-performance-tab">
+                            <div class="sales-dashboard">
+                                <div class="row mt-3">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+
+                                            <div class="section-header mb-3">
+                                                <h5 class="section-title">Employee Performance Records</h5>
+                                            </div>
+
+                                            <!-- Existing Performance Records -->
+                                            @if($order->employeePerformances->count())
+                                                <div class="mb-4">
+                                                    <h6 class="mb-3">Recorded Performance Issues</h6>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm table-bordered align-middle">
+                                                            <thead class="table-light">
+                                                                <tr>
+                                                                    <th>Employee</th>
+                                                                    <th>Issue Type</th>
+                                                                    <th>Recorded By</th>
+                                                                    <th>Date Recorded</th>
+                                                                    <th>Notes</th>
+                                                                    <th>Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach($order->employeePerformances as $performance)
+                                                                    <tr>
+                                                                        <td>
+                                                                            <strong>{{ $performance->employee->name ?? 'N/A' }}</strong>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span class="badge bg-warning text-dark">
+                                                                                {{ $performance->issue->name ?? 'N/A' }}
+                                                                            </span>
+                                                                        </td>
+                                                                        <td>{{ $performance->user->name ?? 'N/A' }}</td>
+                                                                        <td>{{ $performance->created_at->format('M d, Y H:i') }}</td>
+                                                                        <td>
+                                                                            <small>{{ Str::limit($performance->notes, 50) }}</small>
+                                                                        </td>
+                                                                        <td>
+                                                                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#viewPerformanceModal{{ $performance->id }}">
+                                                                                View
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <!-- View Detail Modal -->
+                                                                    <div class="modal fade" id="viewPerformanceModal{{ $performance->id }}" tabindex="-1">
+                                                                        <div class="modal-dialog">
+                                                                            <div class="modal-content">
+                                                                                <div class="modal-header">
+                                                                                    <h5 class="modal-title">Performance Details</h5>
+                                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                                </div>
+                                                                                <div class="modal-body">
+                                                                                    <p><strong>Employee:</strong> {{ $performance->employee->name }}</p>
+                                                                                    <p><strong>Issue:</strong> {{ $performance->issue->name }}</p>
+                                                                                    <p><strong>Recorded By:</strong> {{ $performance->user->name }}</p>
+                                                                                    <p><strong>Date:</strong> {{ $performance->created_at->format('M d, Y H:i') }}</p>
+                                                                                    <p><strong>Notes:</strong></p>
+                                                                                    <p>{{ $performance->notes }}</p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                            @endif
+
+                                            <!-- Add New Performance Record Form -->
+                                            <div>
+                                                <h6 class="mb-3">Record New Performance Issue</h6>
+                                                <form id="employeePerformanceForm" class="employee-performance-form">
+                                                    @csrf
+                                                    <table class="table table-bordered align-middle">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th>Employee <span class="text-danger">*</span></th>
+                                                                <td>
+                                                                    <select class="form-select" name="employee_id" required>
+                                                                        <option value="">Select Employee</option>
+                                                                        @foreach($assignedEmployees as $employee)
+                                                                            <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Disciplinary Issue <span class="text-danger">*</span></th>
+                                                                <td>
+                                                                    <select class="form-select" name="disciplinary_issue_id" required>
+                                                                        <option value="">Select Issue</option>
+                                                                        @foreach($disciplinaryIssues as $issue)
+                                                                            <option value="{{ $issue->id }}">{{ $issue->name }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th style="vertical-align: top;">Notes</th>
+                                                                <td>
+                                                                    <textarea class="form-control" name="notes" rows="5" placeholder="Enter performance notes here..."></textarea>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="2" class="text-start">
+                                                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </form>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Reports Tab -->
                         <div class="tab-pane fade" id="reports" role="tabpanel" aria-labelledby="reports-tab">
                             <div class="sales-dashboard">
@@ -1211,29 +1563,6 @@
 
 @push('scripts')
 <script>
-
-    // document.addEventListener("DOMContentLoaded", function () {
-
-    //     // On page load → check hash
-    //     let hash = window.location.hash;
-
-    //     if (hash) {
-    //         let triggerEl = document.querySelector(`[data-bs-target="${hash}"]`);
-    //         if (triggerEl) {
-    //             new bootstrap.Tab(triggerEl).show();
-    //         }
-    //     }
-
-    //     // On tab click → update URL hash
-    //     document.querySelectorAll('#fulfillOrderTabs button[data-bs-toggle="tab"]').forEach(tab => {
-    //         tab.addEventListener('shown.bs.tab', function (e) {
-    //             let target = e.target.getAttribute('data-bs-target');
-    //             history.replaceState(null, null, target);
-    //         });
-    //     });
-
-    // });
-
     // Live Clock — update all .live-clock and .live-date elements
     function updateClock() {
         const now = new Date();
@@ -1301,6 +1630,201 @@
 
             $('#userSlotsBody').html(html);
             $('#userSlotsModal').modal('show');
+        });
+    });
+
+    // ==============================
+    // Save Service Plan Narrative
+    // ==============================
+    $(document).on('submit', '.service-plan-form', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const orderId = {{ $order->id }};
+        const narrative = $('textarea[name="service_plan_narrative"]').val();
+
+        $.ajax({
+            url: "{{ route('admin.lead.service.order.update_checklist', ['orderId' => ':orderId']) }}".replace(':orderId', orderId),
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                service_plan_narrative: narrative
+            },
+            success: function(response) {
+                if (response.success) {
+                    toastr.success('Service plan narrative saved successfully!');
+                } else {
+                    toastr.error(response.message || 'An error occurred');
+                }
+            },
+            error: function(xhr) {
+                toastr.error('Failed to save service plan narrative');
+            }
+        });
+    });
+
+    // ==============================
+    // Save Sales Narrative
+    // ==============================
+    $(document).on('submit', '.sales-narrative-form', function(e) {
+        e.preventDefault();
+        const orderId = {{ $order->id }};
+        const narrative = $('textarea[name="sales_narrative"]').val();
+
+        $.ajax({
+            url: "{{ route('admin.lead.service.order.update_checklist', ['orderId' => ':orderId']) }}".replace(':orderId', orderId),
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                sales_narrative: narrative
+            },
+            success: function(response) {
+                if (response.success) {
+                    toastr.success('Sales narrative saved successfully!');
+                } else {
+                    toastr.error(response.message || 'An error occurred');
+                }
+            },
+            error: function(xhr) {
+                toastr.error('Failed to save sales narrative');
+            }
+        });
+    });
+
+    // ==============================
+    // Save Plan Debrief
+    // ==============================
+    $(document).on('submit', '.plan-debrief-form', function(e) {
+        e.preventDefault();
+        const orderId = {{ $order->id }};
+        const debrief = $('textarea[name="plan_debrief"]').val();
+
+        $.ajax({
+            url: "{{ route('admin.lead.service.order.update_checklist', ['orderId' => ':orderId']) }}".replace(':orderId', orderId),
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                plan_debrief: debrief
+            },
+            success: function(response) {
+                if (response.success) {
+                    toastr.success('Plan debrief saved successfully!');
+                } else {
+                    toastr.error(response.message || 'An error occurred');
+                }
+            },
+            error: function(xhr) {
+                toastr.error('Failed to save plan debrief');
+            }
+        });
+    });
+
+    // ==============================
+    // Save Employee Performance
+    // ==============================
+    $(document).on('submit', '.employee-performance-form', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const orderId = {{ $order->id }};
+        const employeeId = form.find('select[name="employee_id"]').val();
+        const disciplinaryIssueId = form.find('select[name="disciplinary_issue_id"]').val();
+        const notes = form.find('textarea[name="notes"]').val();
+
+        console.log('Form submitted:', {
+            employeeId: employeeId,
+            disciplinaryIssueId: disciplinaryIssueId,
+            notes: notes,
+            orderId: orderId
+        });
+
+        if (!employeeId) {
+            toastr.error('Please select an employee');
+            return;
+        }
+
+        if (!disciplinaryIssueId) {
+            toastr.error('Please select a disciplinary issue');
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('admin.lead.service.order.employee_performance.store', ['orderId' => ':orderId']) }}".replace(':orderId', orderId),
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                employee_id: employeeId,
+                disciplinary_issue_id: disciplinaryIssueId,
+                notes: notes
+            },
+            success: function(response) {
+                console.log('Success response:', response);
+                if (response.success) {
+                    toastr.success('Employee performance recorded successfully!');
+                    form[0].reset();
+                    // Reload the page to show the new record
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    toastr.error(response.message || 'An error occurred');
+                }
+            },
+            error: function(xhr) {
+                console.log('Error response:', xhr.responseJSON);
+                const errors = xhr.responseJSON?.errors || {};
+                if (Object.keys(errors).length > 0) {
+                    $.each(errors, function(key, value) {
+                        toastr.error(value[0]);
+                    });
+                } else {
+                    toastr.error('Failed to record employee performance');
+                }
+            }
+        });
+    });
+
+    // ==============================
+    // Toggle Plan Review Status
+    // ==============================
+    $(document).on('click', '.btn-plan-review-toggle', function(e) {
+        e.preventDefault();
+        const btn = $(this);
+        const orderId = btn.data('order-id');
+        const currentStatus = $('.badge-plan-review-status').text().trim();
+        const newStatus = currentStatus === 'REVIEWED' ? 'PENDING' : 'REVIEWED';
+
+        $.ajax({
+            url: "{{ route('admin.lead.service.order.update_checklist', ['orderId' => ':orderId']) }}".replace(':orderId', orderId),
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                plan_review_status: newStatus
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Update badge
+                    const badgeClass = newStatus === 'REVIEWED' ? 'bg-success' : 'bg-warning';
+                    $('.badge-plan-review-status')
+                        .removeClass('bg-success bg-warning')
+                        .addClass(badgeClass)
+                        .text(newStatus);
+
+                    // Update button styling and text
+                    const btnHtml = newStatus === 'REVIEWED'
+                        ? '<i class="bi bi-arrow-counterclockwise"></i> Undo Review'
+                        : '<i class="bi bi-check-circle"></i> Review Done';
+
+                    btn.removeClass('btn-success btn-outline-success')
+                        .addClass(newStatus === 'REVIEWED' ? 'btn-success' : 'btn-outline-success')
+                        .html(btnHtml);
+
+                    toastr.success(newStatus === 'REVIEWED' ? 'Plan marked as reviewed!' : 'Review status reset!');
+                } else {
+                    toastr.error(response.message || 'An error occurred');
+                }
+            },
+            error: function(xhr) {
+                toastr.error('Failed to update plan review status');
+            }
         });
     });
 </script>

@@ -17,6 +17,21 @@
 
                 </a>
             </li>
+            <li>
+                <a class="nav-link d-inline-block w-100 {{ request()->routeIs('admin.sales.executive') ? 'active' : '' }}"
+                    href="{{ route('admin.sales.executive') }}">
+
+                    <svg width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M3.34311 15.6821C2.2243 14.5352 1.46239 13.0739 1.15371 11.4831C0.84504 9.89222 1.00347 8.24327 1.60898 6.74474C2.21448 5.2462 3.23986 3.96538 4.55545 3.06425C5.87104 2.16311 7.41775 1.68213 9 1.68213C10.5822 1.68213 12.129 2.16311 13.4445 3.06425C14.7601 3.96538 15.7855 5.2462 16.391 6.74474C16.9965 8.24327 17.155 9.89222 16.8463 11.4831C16.5376 13.0739 15.7757 14.5352 14.6569 15.6821"
+                            stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M12 7L9 10" stroke="white" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    Executive Dashboard
+
+                </a>
+            </li>
              <li>
                 <a class="nav-link d-inline-block w-100 {{ request()->routeIs('admin.sales.schedule.meeting') ? 'active' : '' }}"
                 href="{{ route('admin.sales.schedule.meeting') }}">

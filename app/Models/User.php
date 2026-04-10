@@ -404,4 +404,14 @@ class User extends Authenticatable
         return $this->hasMany(DriverSuspensionRecord::class,'user_id');
     }
 
+    public function performanceRecordAddedBy()
+    {
+        return $this->hasMany(ServiceOrderEmployeePerformance::class, 'user_id');
+    }
+
+    public function performanceRecords()
+    {
+        return $this->hasMany(ServiceOrderEmployeePerformance::class, 'employee_id');
+    }
+
 }

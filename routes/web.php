@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\NoteController;
 use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\Admin\EmployeeController;
+use App\Http\Controllers\Admin\ExpenseReportController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\LeadController;
@@ -85,6 +86,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('employee/{id}/driver-log/store',[EmployeeController::class, 'storeDriverLog'])->name('employee.driver-log.store');
     Route::post('employee/{id}/driver-suspension/store',[EmployeeController::class, 'storeDriverSuspension'])->name('employee.driver-suspension.store');
 
+    // Expense Reports
+    Route::get('expense-report/index', [ExpenseReportController::class, 'index'])->name('expense-report.index');
+    Route::get('expense-report/personal/create', [ExpenseReportController::class, 'personal_create'])->name('expense-report.personal.create');
+    Route::get('expense-report/corporate/create', [ExpenseReportController::class, 'corporate_create'])->name('expense-report.corporate.create');
+    Route::get('expense-report/edit/{id}', [ExpenseReportController::class, 'edit'])->name('expense-report.edit');
+    Route::post('expense-report/update/{id}', [ExpenseReportController::class, 'update'])->name('expense-report.update');
+    Route::post('expense-report/submit/{id}', [ExpenseReportController::class, 'submit'])->name('expense-report.submit');
 });
 
 Route::view('survey-proposal.pdf', 'survey-proposal.pdf')->name('survey.proposal');

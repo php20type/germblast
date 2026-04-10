@@ -11,9 +11,11 @@ use App\Models\ServiceOutline;
 use App\Models\ServiceNote;
 use App\Models\ServiceOrderSlotFacility;
 use App\Models\ServiceOrderSlotStaff;
+use App\Models\DisciplinaryIssue;
 use App\Services\OrderService;
 use App\Models\CompanyLocation;
 use App\Models\Territory;
+use App\Models\Vehicle;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -114,18 +116,33 @@ class ServiceController extends Controller
             'orderSlots.staff.user',
             'service.outlines',
             'service.lead.company.locations',
-            'notes.user',// ← ADD THIS
+            'notes.user',
+            'employeePerformances.employee',
+            'employeePerformances.issue',
+            'employeePerformances.user',
         ])->findOrFail($orderId);
 
         $companyLocations = $order->service->lead->company->locations;
-        $territories = Territory::orderBy('name')->get(); // ← add this
+        $territories = Territory::orderBy('name')->get();
 
         $allStaff = User::whereNotNull('territory_id')
         ->whereNotNull('staff_type')
         ->get()
         ->groupBy(['territory_id', 'staff_type']);
 
-        return view('admin.leads.fulfill-order', compact('order','companyLocations','territories','allStaff'));
+        // Fetch all disciplinary issues
+        $disciplinaryIssues = \App\Models\DisciplinaryIssue::orderBy('name')->get();
+
+        // Get employees assigned to this order (from slots staff)
+        $assignedEmployees = $order->orderSlots()
+            ->with('staff.user')
+            ->get()
+            ->flatMap(function ($slot) {
+                return $slot->staff->map(fn ($staff) => $staff->user);
+            })
+            ->unique('id');
+
+        return view('admin.leads.fulfill-order', compact('order','companyLocations','territories','allStaff','disciplinaryIssues','assignedEmployees'));
     }
 
     public function fulfillOrder_book(Request $request, $orderId)
@@ -310,6 +327,32 @@ class ServiceController extends Controller
         return redirect()->back()->with('success', 'Staff removed from slot.');
     }
 
+    public function assignVehicles(Request $request, $slotId)
+    {
+        $request->validate([
+            'vehicle_ids' => 'required|array|min:1',
+            'vehicle_ids.*' => 'exists:vehicles,id',
+        ]);
+
+        $slot = ServiceOrderSlot::findOrFail($slotId);
+
+        foreach ($request->vehicle_ids as $vehicleId) {
+            if (!$slot->vehicles()->where('vehicle_id', $vehicleId)->exists()) {
+                $slot->vehicles()->attach($vehicleId);
+            }
+        }
+
+        return back()->with('success', 'Vehicles assigned successfully.');
+    }
+
+    public function removeVehicle($slotId, $vehicleId)
+    {
+        $slot = ServiceOrderSlot::findOrFail($slotId);
+        $slot->vehicles()->detach($vehicleId);
+
+        return back()->with('success', 'Vehicle removed.');
+    }
+
     public function addServiceNote(Request $request, $orderId)
     {
         $request->validate([
@@ -483,5 +526,177 @@ class ServiceController extends Controller
         });
 
         return response()->json($events);
+    }
+
+    public function schedulingCalendar()
+    {
+        return view('admin.calendar.scheduling-calendar');
+    }
+
+    public function schedulingCalendarOrders()
+    {
+        $slots = ServiceOrderSlot::with([
+                'serviceOrder.service.lead.company',
+                'serviceOrder'
+            ])
+            ->where('is_confirmed', true)
+            ->get();
+
+        $events = $slots->map(function ($slot) {
+            $order = $slot->serviceOrder;
+
+            return [
+                'id'    => $slot->id,
+                'title' => $order->service->service_name ?? 'Service Order',
+                'start' => $slot->scheduled_start_time,
+                'end'   => $slot->scheduled_end_time,
+                'color' => match($order->status) {
+                    'scheduled'   => '#0d6efd',
+                    'in_progress' => '#ffc107',
+                    'completed'   => '#198754',
+                    'cancelled'   => '#dc3545',
+                    default       => '#6c757d',
+                },
+                'extendedProps' => [
+                    'order_no'     => $order->order_no,
+                    'service_name' => $order->service->service_name ?? '-',
+                    'lead_name'    => $order->service->lead->name ?? '-',
+                    'company_name' => $order->service->lead->company->name ?? '-',
+                    'po_number'    => $order->service->po_number ?? '-',
+                    'price'        => $order->service->price_per_service ?? '-',
+                    'status'       => $order->status,
+                    'scheduled_start_time' => $slot->scheduled_start_time,
+                    'fulfill_url'  => route('admin.lead.service.fulfill_order', $order->id),
+                ],
+            ];
+        });
+
+        return response()->json($events);
+    }
+
+
+    public function vehiclePlanning(Request $request)
+    {
+        $date = $request->date
+            ? \Carbon\Carbon::parse($request->date)
+            : now();
+
+        $start = $date->copy()->startOfWeek();
+        $end   = $date->copy()->endOfWeek();
+
+        $slots = ServiceOrderSlot::with([
+                'serviceOrder.service.lead.company',
+                'vehicles'
+            ])
+            ->where('is_confirmed', true)
+            ->whereBetween('scheduled_start_time', [$start, $end])
+            ->orderBy('scheduled_start_time')
+            ->get()
+            ->groupBy(function ($slot) {
+                return \Carbon\Carbon::parse($slot->scheduled_start_time)->format('Y-m-d');
+            });
+
+        $vehicles = Vehicle::where('is_retired', 0)->get();
+
+        return view('admin.vehicle-planning.index', compact('slots', 'vehicles', 'start', 'end', 'date'));
+    }
+
+    /**
+     * Update checklist fields (narratives, debrief, status)
+     */
+    public function updateChecklist(Request $request, $orderId)
+    {
+        $order = ServiceOrder::findOrFail($orderId);
+
+        $updateData = [];
+
+        // Update service_plan_narrative if provided
+        if ($request->has('service_plan_narrative')) {
+            $updateData['service_plan_narrative'] = $request->input('service_plan_narrative');
+        }
+
+        // Update sales_narrative if provided
+        if ($request->has('sales_narrative')) {
+            $updateData['sales_narrative'] = $request->input('sales_narrative');
+        }
+
+        // Update plan_review_status if provided
+        if ($request->has('plan_review_status')) {
+            $updateData['plan_review_status'] = $request->input('plan_review_status');
+        }
+
+        // Update plan_debrief if provided
+        if ($request->has('plan_debrief')) {
+            $updateData['plan_debrief'] = $request->input('plan_debrief');
+        }
+
+        // Update the order if there's data to update
+        if (!empty($updateData)) {
+            $order->update($updateData);
+        }
+
+        // Check if this is an AJAX request
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Checklist updated successfully',
+                'order' => $order
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Checklist updated successfully.');
+    }
+
+    /**
+     * Store employee performance record
+     */
+    public function storeEmployeePerformance(Request $request, $orderId)
+    {
+        try {
+            $request->validate([
+                'employee_id' => 'required|exists:users,id',
+                'disciplinary_issue_id' => 'required|exists:disciplinary_issues,id',
+                'notes' => 'nullable|string',
+            ]);
+
+            $order = ServiceOrder::findOrFail($orderId);
+
+            $performanceData = [
+                'user_id' => auth()->id(),
+                'employee_id' => $request->employee_id,
+                'disciplinary_issue_id' => $request->disciplinary_issue_id,
+                'notes' => $request->notes ?? null,
+            ];
+
+            \Log::info('Creating employee performance:', $performanceData);
+
+            $performance = $order->employeePerformances()->create($performanceData);
+
+            \Log::info('Employee performance created:', $performance->toArray());
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Employee performance recorded successfully',
+                    'performance' => $performance->load('employee', 'issue', 'user')
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Employee performance recorded successfully.');
+        } catch (\Exception $e) {
+            \Log::error('Error storing employee performance: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request_data' => $request->all()
+            ]);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error: ' . $e->getMessage()
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Failed to record employee performance: ' . $e->getMessage());
+        }
     }
 }

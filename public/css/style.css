@@ -899,6 +899,9 @@ title {
     min-height: 100vh;
     color: #ffffff;
     padding: 14px;
+
+    position: sticky;
+    top: 10px;
 }
 
 .companies-section .sidebar .counter-number .nav-link {

@@ -15,6 +15,12 @@ class ServiceOrder extends Model
         'intended_date',
         'status',
 
+        // NEW Checklist Fields
+        'service_plan_narrative',
+        'sales_narrative',
+        'plan_review_status',
+        'plan_debrief',
+
         // Inventory consumptions
         'microfiber',
         'swabs',
@@ -42,5 +48,10 @@ class ServiceOrder extends Model
     public function notes()
     {
         return $this->hasMany(ServiceNote::class, 'service_order_id');
+    }
+
+    public function employeePerformances()
+    {
+        return $this->hasMany(ServiceOrderEmployeePerformance::class,'service_order_id');
     }
 }

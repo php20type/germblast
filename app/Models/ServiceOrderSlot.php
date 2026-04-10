@@ -56,4 +56,10 @@ class ServiceOrderSlot extends Model
         return $this->hasMany(ServiceOrderSlotStaff::class, 'service_order_slot_id');
     }
 
+    public function vehicles()
+    {
+        return $this->belongsToMany(Vehicle::class, 'service_order_slot_vehicles')
+                    ->withTimestamps();
+    }
+
 }

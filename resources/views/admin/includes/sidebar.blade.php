@@ -80,10 +80,30 @@
             <li class="{{ request()->routeIs('admin.calendar.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.calendar.index') }}">
                     <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon5.svg") }} alt="icon" />
+                        <img src={{ asset("img/icons/menu-icon6.svg") }} alt="icon" />
                     </div>
                     <div class="nav-text ms-3">
                         Calendar
+                    </div>
+                </a>
+            </li>
+            <li class="{{ request()->routeIs('admin.scheduling_calendar.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.scheduling_calendar.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon6.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Scheduling Calendar
+                    </div>
+                </a>
+            </li>
+            <li class="{{ request()->routeIs('admin.vehicle.planning') ? 'active' : '' }}">
+                <a href="{{ route('admin.vehicle.planning') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon13.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Vehicle Planning
                     </div>
                 </a>
             </li>
@@ -106,6 +126,16 @@
                         </div>
                         <div class="nav-text ms-3">
                             Employees
+                        </div>
+                    </a>
+                </li>
+                <li class="{{ request()->routeIs('admin.expense-report.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.expense-report.index') }}">
+                        <div class="icon-round">
+                            <img src={{ asset("img/icons/menu-icon2.svg") }} alt="icon" />
+                        </div>
+                        <div class="nav-text ms-3">
+                            Expense Report
                         </div>
                     </a>
                 </li>
