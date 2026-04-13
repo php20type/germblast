@@ -15,38 +15,91 @@ use Illuminate\Support\Facades\DB;
 
 class ExpenseReportController extends Controller
 {
-    public function index(Request $request)
-    {
-        $baseQuery = ExpenseReport::with('user','items');
+    // public function index(Request $request)
+    // {
+    //     $baseQuery = ExpenseReport::with('user','items');
 
-        // Search
-        if ($request->filled('search')) {
-            $baseQuery->where(function ($query) use ($request) {
-                $query->whereHas('user', function ($q) use ($request) {
-                    $q->where('name', 'like', "%{$request->search}%");
-                })->orWhere('report_number', 'like', "%{$request->search}%");
-            });
-        }
+    //     // Search
+    //     if ($request->filled('search')) {
+    //         $baseQuery->where(function ($query) use ($request) {
+    //             $query->whereHas('user', function ($q) use ($request) {
+    //                 $q->where('name', 'like', "%{$request->search}%");
+    //             })->orWhere('report_number', 'like', "%{$request->search}%");
+    //         });
+    //     }
 
-        // Filters
-        if ($request->filled('report_type')) {
-            $baseQuery->where('report_type', $request->report_type);
-        }
+    //     // Filters
+    //     if ($request->filled('report_type')) {
+    //         $baseQuery->where('report_type', $request->report_type);
+    //     }
 
-        // Clone queries
-        $openReports = (clone $baseQuery)->where('status', 'Open')->latest()->get();
-        $submittedReports = (clone $baseQuery)->where('status', 'Submitted')->latest()->get();
-        $filledReports = (clone $baseQuery)->where('status', 'Filled')->latest()->get();
+    //     // Clone queries
+    //     $openReports = (clone $baseQuery)->where('status', 'Open')->latest()->get();
+    //     $submittedReports = (clone $baseQuery)->where('status', 'Submitted')->latest()->get();
+    //     $filledReports = (clone $baseQuery)->where('status', 'Filled')->latest()->get();
 
-        $count = $openReports->count() + $submittedReports->count() + $filledReports->count();
+    //     $count = $openReports->count() + $submittedReports->count() + $filledReports->count();
 
-        return view('admin.expense-report.index', compact(
-            'openReports',
-            'submittedReports',
-            'filledReports',
-            'count'
-        ));
+    //     return view('admin.expense-report.index', compact(
+    //         'openReports',
+    //         'submittedReports',
+    //         'filledReports',
+    //         'count'
+    //     ));
+    // }
+
+public function index(Request $request)
+{
+    $baseQuery = ExpenseReport::with('user', 'items');
+
+   if ($request->filled('search')) {
+        $baseQuery->whereHas('user', function ($q) use ($request) {
+            $q->where('name', 'like', "%{$request->search}%");
+        });
     }
+
+    if ($request->filled('report_type')) {
+        $baseQuery->where('report_type', $request->report_type);
+    }
+
+    // If a specific status is requested (individual section search),
+    // only fetch that section and return early
+    if ($request->ajax() && $request->filled('status')) {
+        $reports = (clone $baseQuery)->where('status', $request->status)->latest()->get();
+        $key     = strtolower($request->status); // Open→open, Submitted→submitted, Filled→filled
+
+        return response()->json([
+            $key . '_table' => view('admin.expense-report.partials.expense-report-table-rows', ['reports' => $reports])->render(),
+            $key . '_count' => $reports->count(),
+        ]);
+    }
+
+    // Global search — fetch all 3
+    $openReports      = (clone $baseQuery)->where('status', 'Open')->latest()->get();
+    $submittedReports = (clone $baseQuery)->where('status', 'Submitted')->latest()->get();
+    $filledReports    = (clone $baseQuery)->where('status', 'Filled')->latest()->get();
+
+    $count = $openReports->count() + $submittedReports->count() + $filledReports->count();
+
+    if ($request->ajax()) {
+        return response()->json([
+            'open_table'      => view('admin.expense-report.partials.expense-report-table-rows', ['reports' => $openReports])->render(),
+            'submitted_table' => view('admin.expense-report.partials.expense-report-table-rows', ['reports' => $submittedReports])->render(),
+            'filled_table'    => view('admin.expense-report.partials.expense-report-table-rows', ['reports' => $filledReports])->render(),
+            'open_count'      => $openReports->count(),
+            'submitted_count' => $submittedReports->count(),
+            'filled_count'    => $filledReports->count(),
+            'total_count'     => $count,
+        ]);
+    }
+
+    return view('admin.expense-report.index', compact(
+        'openReports',
+        'submittedReports',
+        'filledReports',
+        'count'
+    ));
+}
 
    private function createReport($type)
     {

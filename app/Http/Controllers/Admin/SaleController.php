@@ -136,76 +136,66 @@ class SaleController extends Controller
         );
     }
 
-    private function calculateServiceDashboardData()
+    private function calculateServiceDashboardData($date = null)
     {
-        $today = now();
+        $today = $date ? \Carbon\Carbon::parse($date) : now();
         $startOfMonth = $today->copy()->startOfMonth();
-        $endOfToday = $today->copy()->endOfDay();
+        $endOfMonth   = $today->copy()->endOfMonth();
 
         // =========================
         // 1. SERVICES THIS MONTH
         // =========================
         $servicesThisMonth = Service::with(['lead.company', 'lead.assignee'])
-            ->whereBetween('created_at', [$startOfMonth, $endOfToday])
+            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
             ->get();
 
         // =========================
-        // 2. SERVICE VALUE BY CUSTOMER TYPE (Industry)
+        // 2. SERVICE VALUE BY INDUSTRY
         // =========================
         $serviceValueByIndustry = Service::with('lead.company')
-            ->whereBetween('created_at', [$startOfMonth, $endOfToday])
+            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
             ->get()
             ->groupBy(fn ($s) => optional($s->lead->company->industry)->name ?? 'Unknown')
-            ->map(function ($group) {
-                return $group->sum('total_price');
-            });
+            ->map(fn ($group) => $group->sum('total_price'));
 
         // =========================
         // 3. SERVICE VALUE BY ASSIGNEE
         // =========================
         $serviceValueByAssignee = Service::with('lead.assignee')
-            ->whereBetween('created_at', [$startOfMonth, $endOfToday])
+            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
             ->get()
             ->groupBy(fn ($s) => $s->lead->assignee->name ?? 'Unassigned')
-            ->map(function ($group) {
-                return $group->sum('total_price');
-            });
+            ->map(fn ($group) => $group->sum('total_price'));
 
         // =========================
-        // 4. TOP 10 CLIENTS BY SERVICE VALUE
+        // 4. TOP 10 CLIENTS
         // =========================
         $topClients = Service::with('lead.company', 'lead.assignee')
-            ->whereBetween('created_at', [$startOfMonth, $endOfToday])
+            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
             ->get()
             ->groupBy(fn ($s) => $s->lead->company->id ?? 0)
-            ->map(function ($group) {
-                return [
-                    'company' => optional($group->first()->lead->company)->name ?? 'N/A',
-                    'services' => $group,
-                    'total_value' => $group->sum('total_price'),
-                ];
-            })
+            ->map(fn ($group) => [
+                'company'     => optional($group->first()->lead->company)->name ?? 'N/A',
+                'services'    => $group,
+                'total_value' => $group->sum('total_price'),
+            ])
             ->sortByDesc('total_value')
             ->take(10);
 
         // =========================
-        // 5. CONTRACTS WON THIS MONTH
+        // 5. CONTRACTS WON
         // =========================
         $contractsWon = Service::with('lead.company', 'lead.assignee')
-            ->whereHas('lead', function ($q) {
-                $q->where('lead_status', 'won');
-            })
-            ->whereBetween('created_at', [$startOfMonth, $endOfToday])
+            ->whereHas('lead', fn ($q) => $q->where('lead_status', 'won'))
+            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
             ->get()
             ->groupBy(fn ($s) => $s->lead->company->id ?? 0)
-            ->map(function ($group) {
-                return [
-                    'company' => optional($group->first()->lead->company)->name ?? 'N/A',
-                    'count' => $group->count(),
-                    'total_value' => $group->sum('total_price'),
-                    'assignee' => optional($group->first()->lead->assignee)->name ?? 'Unassigned',
-                ];
-            });
+            ->map(fn ($group) => [
+                'company'     => optional($group->first()->lead->company)->name ?? 'N/A',
+                'count'       => $group->count(),
+                'total_value' => $group->sum('total_price'),
+                'assignee'    => optional($group->first()->lead->assignee)->name ?? 'Unassigned',
+            ]);
 
         $newContractValue = $contractsWon->sum('total_value');
 
@@ -217,6 +207,17 @@ class SaleController extends Controller
             'contractsWon',
             'newContractValue'
         );
+    }
+
+    public function executive(Request $request)
+    {
+        $date  = $request->date ? \Carbon\Carbon::parse($request->date) : now();
+        $start = $date->copy()->startOfMonth();
+        $end   = $date->copy()->endOfMonth();
+
+        $serviceData = $this->calculateServiceDashboardData($date);
+
+        return view('admin.sales.executive', array_merge($serviceData, compact('start', 'end', 'date')));
     }
 
     public function index(Request $request)
@@ -391,18 +392,6 @@ class SaleController extends Controller
             'activities', 'logged_activities', 'allactivities',
             'notes', 'timeline', 'timelineEntries', 'alltasks', 'pendingTasks', 'completedTasks'
         ),  $data));
-    }
-
-    public function executive(Request $request)
-    {
-        $date = $request->date
-            ? Carbon::parse($request->date)
-            : now();
-        $start = $date->copy()->startOfMonth();
-        $end   = $date->copy()->endOfMonth();
-        $serviceData = $this->calculateServiceDashboardData();
-
-        return view('admin.sales.executive', $serviceData, compact('start', 'end','date'));
     }
 
     public function schedule_meeting(Request $request)

@@ -97,6 +97,16 @@
                     </div>
                 </a>
             </li>
+            <li class="{{ request()->routeIs('admin.all_schedules.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.all_schedules.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon6.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        All Schedules
+                    </div>
+                </a>
+            </li>
             <li class="{{ request()->routeIs('admin.vehicle.planning') ? 'active' : '' }}">
                 <a href="{{ route('admin.vehicle.planning') }}">
                     <div class="icon-round">

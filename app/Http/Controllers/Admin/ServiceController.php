@@ -699,4 +699,35 @@ class ServiceController extends Controller
             return redirect()->back()->with('error', 'Failed to record employee performance: ' . $e->getMessage());
         }
     }
+
+    public function all_schedules(Request $request)
+    {
+        $date = $request->date
+            ? \Carbon\Carbon::parse($request->date)
+            : now();
+
+        $start = $date->copy()->startOfWeek();
+        $end   = $date->copy()->endOfWeek();
+
+        $slots = ServiceOrderSlot::with([
+                'serviceOrder.service.lead.company',
+                'vehicles'
+            ])
+            ->where('is_confirmed', true)
+            ->whereBetween('scheduled_start_time', [$start, $end])
+            ->orderBy('scheduled_start_time')
+            ->get()
+            ->groupBy(function ($slot) {
+                return \Carbon\Carbon::parse($slot->scheduled_start_time)->format('Y-m-d');
+            });
+
+        $vehicles = Vehicle::where('is_retired', 0)->get();
+
+         $employees = User::whereNotNull('territory_id')
+        ->whereNotNull('staff_type')
+        ->orderBy('name')
+        ->get();
+
+        return view('admin.all-schedules', compact('slots', 'vehicles', 'start', 'end', 'date','employees'));
+    }
 }

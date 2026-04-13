@@ -26,6 +26,11 @@ class ServiceOrderSlot extends Model
         'confirmation_notes',
     ];
 
+    protected $casts = [
+        'scheduled_start_time' => 'datetime',
+        'scheduled_end_time'   => 'datetime',
+    ];
+
     public function serviceOrder()
     {
         return $this->belongsTo(ServiceOrder::class, 'service_order_id');
