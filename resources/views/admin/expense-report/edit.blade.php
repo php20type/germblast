@@ -99,12 +99,40 @@
                                                 </form>
                                             @elseif($report->status === 'Submitted')
                                                 <div>
+                                                    <form action="{{ route('admin.expense-report.approve-item', $report->id) }}" method="POST">
+                                                        @csrf
+
+                                                        <input type="hidden" name="item_id" value="{{ $item->id }}">
+
+                                                        <label class="form-label mb-1">Approved Value</label>
+                                                        <input type="number" step="0.01" class="form-control mb-2"
+                                                            name="approved_amount" value="{{ ($item->approved_amount == 0 || is_null($item->approved_amount)) ? $item->amount_requested : $item->approved_amount }}" required>
+
+                                                        <label class="form-label mb-1">Reason</label>
+                                                        <select class="form-select mb-2" name="reason_code" required>
+                                                            <option value="">Select reason</option>
+                                                            @foreach($itemReasons as $reason)
+                                                                <option value="{{ $reason->id }}"
+                                                                    {{ $item->reason_code == $reason->id ? 'selected' : '' }}>
+                                                                    {{ $reason->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+
+                                                        <button class="btn btn-light w-100 border">Update</button>
+                                                    </form>
+
+                                                </div>
+                                            @elseif($report->status === 'Filled')
+                                                <div>
                                                     <label class="form-label mb-1">Approved Value</label>
                                                     <input type="number" step="0.01" class="form-control mb-2"
-                                                        name="approved_amount" value="{{ $item->amount_requested ?? '' }}">
+                                                        value="{{ ($item->approved_amount == 0 || is_null($item->approved_amount)) ? $item->amount_requested : $item->approved_amount }}"
+                                                        disabled>
 
                                                     <label class="form-label mb-1">Reason</label>
-                                                    <select class="form-select mb-2" name="reason_code">
+                                                    <select class="form-select mb-2" disabled>
+                                                        <option value="">Select reason</option>
                                                         @foreach($itemReasons as $reason)
                                                             <option value="{{ $reason->id }}"
                                                                 {{ $item->reason_code == $reason->id ? 'selected' : '' }}>
@@ -112,10 +140,8 @@
                                                             </option>
                                                         @endforeach
                                                     </select>
-
-                                                    <button class="btn btn-light w-100 border">Update</button>
-
                                                 </div>
+
                                             @endif
                                         </td>
                                     </tr>
@@ -221,6 +247,46 @@
                                     Submit for Reimbursement
                                 </button>
                             </form>
+                        </div>
+                    @endif
+
+                    @if($report->status === 'Submitted')
+                        <div class="section-card">
+                            <div class="d-flex align-items-center gap-2">
+
+                                <form action="{{ route('admin.expense-report.unsubmit', $report->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-warning"
+                                        onclick="return confirm('Unsubmit this report and return it to Open?')">
+                                        Unsubmit this Report
+                                    </button>
+                                </form>
+
+                                <form action="{{ route('admin.expense-report.accept-and-fill', $report->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-success"
+                                        onclick="return confirm('Mark this report as accepted and filled?')">
+                                        Mark as Accepted and Filled
+                                    </button>
+                                </form>
+
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($report->status === 'Filled')
+                        <div class="section-card">
+                            <div class="alert alert-success mb-0 d-flex align-items-center gap-2">
+                                <i class="fas fa-check-circle fa-lg"></i>
+                                <div>
+                                    <strong>Report Accepted and Filled</strong>
+                                    @if($report->filled_at)
+                                        <div class="text-muted small">
+                                            Completed on {{ \Carbon\Carbon::parse($report->filled_at)->format('jS F Y, g:i A') }}
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                     @endif
 

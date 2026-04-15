@@ -17,6 +17,12 @@ class ExpenseReport extends Model
         'created_at',
     ];
 
+    protected $casts = [
+        'report_date' => 'date',
+        'submitted_at' => 'datetime',
+        'filled_at' => 'datetime',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

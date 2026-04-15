@@ -118,6 +118,16 @@
                 </a>
             </li>
             <hr>
+            <li class="{{ request()->routeIs('admin.expense-report.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.expense-report.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon2.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Expense Report
+                    </div>
+                </a>
+            </li>
             @if(auth()->user()->isSuperAdmin())
                 <li class="{{ request()->routeIs('admin.roles.permissions') ? 'active' : '' }}">
                     <a href="{{ route('admin.roles.permissions') }}">
@@ -136,16 +146,6 @@
                         </div>
                         <div class="nav-text ms-3">
                             Employees
-                        </div>
-                    </a>
-                </li>
-                <li class="{{ request()->routeIs('admin.expense-report.*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.expense-report.index') }}">
-                        <div class="icon-round">
-                            <img src={{ asset("img/icons/menu-icon2.svg") }} alt="icon" />
-                        </div>
-                        <div class="nav-text ms-3">
-                            Expense Report
                         </div>
                     </a>
                 </li>

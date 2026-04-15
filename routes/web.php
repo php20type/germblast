@@ -93,6 +93,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('expense-report/edit/{id}', [ExpenseReportController::class, 'edit'])->name('expense-report.edit');
     Route::post('expense-report/update/{id}', [ExpenseReportController::class, 'update'])->name('expense-report.update');
     Route::post('expense-report/submit/{id}', [ExpenseReportController::class, 'submit'])->name('expense-report.submit');
+    Route::post('expense-report/{id}/approve-item',[ExpenseReportController::class, 'approveItem'])->name('expense-report.approve-item');
+    Route::post('expense-report/{id}/unsubmit',       [ExpenseReportController::class, 'unsubmit'])->name('expense-report.unsubmit');
+    Route::post('expense-report/{id}/accept-and-fill', [ExpenseReportController::class, 'acceptAndFill'])->name('expense-report.accept-and-fill');
 });
 
 Route::view('survey-proposal.pdf', 'survey-proposal.pdf')->name('survey.proposal');

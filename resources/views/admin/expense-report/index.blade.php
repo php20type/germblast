@@ -12,7 +12,7 @@
         box-shadow: 0 1px 4px rgba(0,0,0,0.06);
     }
     .expense-section-header {
-        background: #ffb81c;
+        background: rgba(255, 184, 28, 0.4);
         padding: 10px 16px;
         display: flex;
         align-items: center;
@@ -80,14 +80,14 @@
                     <div class="filter-section">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2 position-relative">
                                     <div class="search-form">
                                         <input type="search" class="form-control" id="expense-search"
                                                placeholder="Search all reports..">
                                     </div>
                                     <span class="company-count" id="total-count">{{ $count }} Expense Reports Found</span>
                                 </div>
-                            </div>  
+                            </div>
                             <div class="col-md-6">
                                 <div class="d-flex align-items-center justify-content-end">
                                     <select class="form-select w-auto" id="type-filter">
@@ -110,7 +110,7 @@
                             <div class="section-search-wrap">
                                 <input type="search" class="form-control section-search"
                                        data-target="open"
-                                       placeholder="Search open reports..">
+                                       placeholder="Search by employee name">
                             </div>
                         </div>
                         <div class="table-responsive">
@@ -126,7 +126,11 @@
                                     </tr>
                                 </thead>
                                 <tbody id="open-table-body">
-                                    @include('admin.expense-report.partials.expense-report-table-rows', ['reports' => $openReports])
+                                    {{-- @include('admin.expense-report.partials.expense-report-table-rows', ['reports' => $openReports]) --}}
+                                    @include('admin.expense-report.partials.expense-report-table-rows', [
+                                        'reports' => $openReports,
+                                        'type' => 'open'
+                                    ])
                                 </tbody>
                             </table>
                         </div>
@@ -142,7 +146,7 @@
                             <div class="section-search-wrap">
                                 <input type="search" class="form-control section-search"
                                        data-target="submitted"
-                                       placeholder="Search submitted reports..">
+                                       placeholder="Search by employee name">
                             </div>
                         </div>
                         <div class="table-responsive">
@@ -150,6 +154,7 @@
                                 <thead>
                                     <tr>
                                         <th>Date</th>
+                                        <th>Submitted At</th>
                                         <th>Employee</th>
                                         <th>Report Type</th>
                                         <th>Status</th>
@@ -158,7 +163,11 @@
                                     </tr>
                                 </thead>
                                 <tbody id="submitted-table-body">
-                                    @include('admin.expense-report.partials.expense-report-table-rows', ['reports' => $submittedReports])
+                                    {{-- @include('admin.expense-report.partials.expense-report-table-rows', ['reports' => $submittedReports]) --}}
+                                    @include('admin.expense-report.partials.expense-report-table-rows', [
+                                        'reports' => $submittedReports,
+                                        'type' => 'submitted'
+                                    ])
                                 </tbody>
                             </table>
                         </div>
@@ -174,7 +183,7 @@
                             <div class="section-search-wrap">
                                 <input type="search" class="form-control section-search"
                                        data-target="filled"
-                                       placeholder="Search filled reports..">
+                                       placeholder="Search by employee name">
                             </div>
                         </div>
                         <div class="table-responsive">
@@ -182,6 +191,8 @@
                                 <thead>
                                     <tr>
                                         <th>Date</th>
+                                        <th>Submitted At</th>
+                                        <th>Filled At</th>
                                         <th>Employee</th>
                                         <th>Report Type</th>
                                         <th>Status</th>
@@ -190,7 +201,11 @@
                                     </tr>
                                 </thead>
                                 <tbody id="filled-table-body">
-                                    @include('admin.expense-report.partials.expense-report-table-rows', ['reports' => $filledReports])
+                                    {{-- @include('admin.expense-report.partials.expense-report-table-rows', ['reports' => $filledReports]) --}}
+                                    @include('admin.expense-report.partials.expense-report-table-rows', [
+                                        'reports' => $filledReports,
+                                        'type' => 'filled'
+                                    ])
                                 </tbody>
                             </table>
                         </div>

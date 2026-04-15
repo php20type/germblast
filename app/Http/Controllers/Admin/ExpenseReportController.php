@@ -15,91 +15,69 @@ use Illuminate\Support\Facades\DB;
 
 class ExpenseReportController extends Controller
 {
-    // public function index(Request $request)
-    // {
-    //     $baseQuery = ExpenseReport::with('user','items');
+    public function index(Request $request)
+    {
+        $baseQuery = ExpenseReport::with('user', 'items');
 
-    //     // Search
-    //     if ($request->filled('search')) {
-    //         $baseQuery->where(function ($query) use ($request) {
-    //             $query->whereHas('user', function ($q) use ($request) {
-    //                 $q->where('name', 'like', "%{$request->search}%");
-    //             })->orWhere('report_number', 'like', "%{$request->search}%");
-    //         });
-    //     }
+        if ($request->filled('search')) {
+            $baseQuery->whereHas('user', function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%");
+            });
+        }
 
-    //     // Filters
-    //     if ($request->filled('report_type')) {
-    //         $baseQuery->where('report_type', $request->report_type);
-    //     }
+        if ($request->filled('report_type')) {
+            $baseQuery->where('report_type', $request->report_type);
+        }
 
-    //     // Clone queries
-    //     $openReports = (clone $baseQuery)->where('status', 'Open')->latest()->get();
-    //     $submittedReports = (clone $baseQuery)->where('status', 'Submitted')->latest()->get();
-    //     $filledReports = (clone $baseQuery)->where('status', 'Filled')->latest()->get();
+        if ($request->ajax() && $request->filled('status')) {
+            $reports = (clone $baseQuery)->where('status', $request->status)->latest()->get();
+            $key     = strtolower($request->status);
 
-    //     $count = $openReports->count() + $submittedReports->count() + $filledReports->count();
+            return response()->json([
+                $key . '_table' => view('admin.expense-report.partials.expense-report-table-rows', [
+                    'reports' => $reports,
+                    'type' => $key
+                ])->render(),
+                $key . '_count' => $reports->count(),
+            ]);
+        }
 
-    //     return view('admin.expense-report.index', compact(
-    //         'openReports',
-    //         'submittedReports',
-    //         'filledReports',
-    //         'count'
-    //     ));
-    // }
+        $openReports      = (clone $baseQuery)->where('status', 'Open')->latest()->get();
+        $submittedReports = (clone $baseQuery)->where('status', 'Submitted')->latest()->get();
+        $filledReports    = (clone $baseQuery)->where('status', 'Filled')->latest()->get();
 
-public function index(Request $request)
-{
-    $baseQuery = ExpenseReport::with('user', 'items');
+        $count = $openReports->count() + $submittedReports->count() + $filledReports->count();
 
-   if ($request->filled('search')) {
-        $baseQuery->whereHas('user', function ($q) use ($request) {
-            $q->where('name', 'like', "%{$request->search}%");
-        });
+        if ($request->ajax()) {
+            return response()->json([
+                'open_table' => view('admin.expense-report.partials.expense-report-table-rows', [
+                    'reports' => $openReports,
+                    'type' => 'open'
+                ])->render(),
+
+                'submitted_table' => view('admin.expense-report.partials.expense-report-table-rows', [
+                    'reports' => $submittedReports,
+                    'type' => 'submitted'
+                ])->render(),
+
+                'filled_table' => view('admin.expense-report.partials.expense-report-table-rows', [
+                    'reports' => $filledReports,
+                    'type' => 'filled'
+                ])->render(),
+                'open_count'      => $openReports->count(),
+                'submitted_count' => $submittedReports->count(),
+                'filled_count'    => $filledReports->count(),
+                'total_count'     => $count,
+            ]);
+        }
+
+        return view('admin.expense-report.index', compact(
+            'openReports',
+            'submittedReports',
+            'filledReports',
+            'count'
+        ));
     }
-
-    if ($request->filled('report_type')) {
-        $baseQuery->where('report_type', $request->report_type);
-    }
-
-    // If a specific status is requested (individual section search),
-    // only fetch that section and return early
-    if ($request->ajax() && $request->filled('status')) {
-        $reports = (clone $baseQuery)->where('status', $request->status)->latest()->get();
-        $key     = strtolower($request->status); // Open→open, Submitted→submitted, Filled→filled
-
-        return response()->json([
-            $key . '_table' => view('admin.expense-report.partials.expense-report-table-rows', ['reports' => $reports])->render(),
-            $key . '_count' => $reports->count(),
-        ]);
-    }
-
-    // Global search — fetch all 3
-    $openReports      = (clone $baseQuery)->where('status', 'Open')->latest()->get();
-    $submittedReports = (clone $baseQuery)->where('status', 'Submitted')->latest()->get();
-    $filledReports    = (clone $baseQuery)->where('status', 'Filled')->latest()->get();
-
-    $count = $openReports->count() + $submittedReports->count() + $filledReports->count();
-
-    if ($request->ajax()) {
-        return response()->json([
-            'open_table'      => view('admin.expense-report.partials.expense-report-table-rows', ['reports' => $openReports])->render(),
-            'submitted_table' => view('admin.expense-report.partials.expense-report-table-rows', ['reports' => $submittedReports])->render(),
-            'filled_table'    => view('admin.expense-report.partials.expense-report-table-rows', ['reports' => $filledReports])->render(),
-            'open_count'      => $openReports->count(),
-            'submitted_count' => $submittedReports->count(),
-            'filled_count'    => $filledReports->count(),
-            'total_count'     => $count,
-        ]);
-    }
-
-    return view('admin.expense-report.index', compact(
-        'openReports',
-        'submittedReports',
-        'filledReports',
-        'count'
-    ));
-}
 
    private function createReport($type)
     {
@@ -201,6 +179,64 @@ public function index(Request $request)
         ]);
 
         return redirect()->back()->with('success', 'Report submitted successfully');
+    }
+
+    public function approveItem(Request $request, $id)
+    {
+        $report = ExpenseReport::findOrFail($id);
+
+        // Only allow when report is submitted
+        if ($report->status !== 'Submitted') {
+            return back()->with('error', 'Only submitted reports can be approved');
+        }
+
+        $request->validate([
+            'item_id' => 'required|exists:expense_report_items,id',
+            'approved_amount' => 'required|numeric|min:0',
+            'reason_code' => 'required|exists:expense_item_reasons,id',
+        ]);
+
+        $item = ExpenseReportItem::findOrFail($request->item_id);
+
+        $item->update([
+            'approved_amount' => $request->approved_amount,
+            'reason_code' => $request->reason_code,
+        ]);
+
+        return back()->with('success', 'Item approved successfully');
+    }
+
+
+    public function unsubmit($id)
+    {
+        $report = ExpenseReport::findOrFail($id);
+
+        if ($report->status !== 'Submitted') {
+            return back()->with('error', 'Only submitted reports can be unsubmitted.');
+        }
+
+        $report->update([
+            'status'       => 'Open',
+            'submitted_at' => null,
+        ]);
+
+        return back()->with('success', 'Report unsubmitted successfully.');
+    }
+
+    public function acceptAndFill($id)
+    {
+        $report = ExpenseReport::findOrFail($id);
+
+        if ($report->status !== 'Submitted') {
+            return back()->with('error', 'Only submitted reports can be accepted and filled.');
+        }
+
+        $report->update([
+            'status'    => 'Filled',
+            'filled_at' => now(),
+        ]);
+
+        return back()->with('success', 'Report marked as accepted and filled.');
     }
 
 }

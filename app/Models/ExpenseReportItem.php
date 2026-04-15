@@ -12,9 +12,8 @@ class ExpenseReportItem extends Model
         'description',
         'amount_requested',
         'receipt_picture',
-        'is_approved',
         'approved_amount',
-        'approved_by',
+        'reason_code',
     ];
     public function expenseReport()
     {
@@ -24,11 +23,6 @@ class ExpenseReportItem extends Model
     public function expenseType()
     {
         return $this->belongsTo(ExpenseType::class, 'expense_type_id');
-    }
-
-    public function approvedBy()
-    {
-        return $this->belongsTo(User::class, 'approved_by');
     }
 
     public function reason()
