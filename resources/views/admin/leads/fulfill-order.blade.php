@@ -61,6 +61,11 @@
                                 aria-selected="false">
                                 Invoicing
                             </button>
+                            <button class="nav-link" id="schedule-view-tab" data-bs-toggle="tab"
+                                data-bs-target="#schedule-view" type="button" role="tab" aria-controls="schedule-view"
+                                aria-selected="false">
+                                Schedule View
+                            </button>
                             <button class="nav-link" id="job-clocks-tab" data-bs-toggle="tab"
                                 data-bs-target="#job-clocks" type="button" role="tab" aria-controls="job-clocks"
                                 aria-selected="false">
@@ -742,7 +747,7 @@
                                                                         <div>
                                                                             <span class="fw-semibold small">{{ $staffMember->user->name }}</span><br>
                                                                             <small class="text-muted">{{ $staffMember->slot_hours }} hrs</small>
-                                                                            @php $roles = $staffMember->user->getRoleNames()->implode(' | '); @endphp
+                                                                            @php $roles = implode(' | ', $staffMember->user->specialties); @endphp
                                                                             @if($roles)
                                                                                 <br><small class="text-muted">{{ $roles }}</small>
                                                                             @endif
@@ -783,7 +788,7 @@
                                                                             <p class="text-muted small fw-semibold mb-2">Leaders</p>
                                                                             @foreach($staffForTerritory['leader'] as $tech)
                                                                                 @if(!in_array($tech->id, $assignedUserIds))
-                                                                                    @php $roles = $tech->getRoleNames()->implode(' | '); @endphp
+                                                                                    @php $roles = implode(' | ', $tech->specialties); @endphp
                                                                                     <div class="d-flex justify-content-between align-items-center rounded p-2 mb-1"
                                                                                         style="background-color: #4caf50;">
                                                                                         <div class="d-flex align-items-center gap-2">
@@ -815,7 +820,7 @@
                                                                             <p class="text-muted small fw-semibold mt-3 mb-2">Technicians</p>
                                                                             @foreach($staffForTerritory['technician'] as $tech)
                                                                                 @if(!in_array($tech->id, $assignedUserIds))
-                                                                                    @php $roles = $tech->getRoleNames()->implode(' | '); @endphp
+                                                                                    @php $roles = implode(' | ', $tech->specialties); @endphp
                                                                                     <div class="d-flex justify-content-between align-items-center rounded p-2 mb-1"
                                                                                         style="background-color: #4caf50;">
                                                                                         <div class="d-flex align-items-center gap-2">
@@ -847,7 +852,7 @@
                                                                             <p class="text-muted small fw-semibold mt-3 mb-2">Corporate</p>
                                                                             @foreach($staffForTerritory['corporate'] as $tech)
                                                                                 @if(!in_array($tech->id, $assignedUserIds))
-                                                                                    @php $roles = $tech->getRoleNames()->implode(' | '); @endphp
+                                                                                    @php $roles = implode(' | ', $tech->specialties); @endphp
                                                                                     <div class="d-flex justify-content-between align-items-center rounded p-2 mb-1"
                                                                                         style="background-color: #4caf50;">
                                                                                         <div class="d-flex align-items-center gap-2">
@@ -1234,6 +1239,151 @@
                                 </div>
                             </div>
                         </div>
+
+
+                        <div class="tab-pane fade" id="schedule-view" role="tabpanel" aria-labelledby="schedule-view-tab">
+                            <div class="sales-dashboard">
+
+                                <!-- HEADER -->
+                                <div class="section-card">
+                                    <div class="section-header mb-3">
+                                        <h5 class="section-title">Schedule - Pecos Barstow Toyah ISD</h5>
+                                    </div>
+
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <th>CalendarID</th>
+                                            <td>16272 - Pecos Barstow Toyah ISD</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Interval</th>
+                                            <td>2026-04-10 07:00AM - 06:00PM</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Time</th>
+                                            <td>11.00</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Arrival</th>
+                                            <td>10:00AM</td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                                <!-- VEHICLES -->
+                                <div class="section-card mb-3">
+                                    <div class="section-header mb-3">
+                                        <h5 class="section-title">Vehicles</h5>
+                                    </div>
+                                    <p>01 Transit VN 6725</p>
+                                </div>
+
+                                <!-- JOB CLOCKS -->
+                                <div class="section-card mb-3">
+                                    <div class="section-header mb-3">
+                                        <h5 class="section-title">Job Clocks</h5>
+                                    </div>
+
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Interval</th>
+                                                <th>Driver / Vehicle</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Travel</td>
+                                                <td>2026-04-10 07:00AM - 10:53AM</td>
+                                                <td>Blake Mitchell - 01 Transit VN6725</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Service</td>
+                                                <td>2026-04-10 10:53AM - 04:45PM</td>
+                                                <td>Blake Mitchell - 01 Transit VN6725</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Travel</td>
+                                                <td>2026-04-10 04:45PM - 06:00PM</td>
+                                                <td>Blake Mitchell - 01 Transit VN6725</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <button class="btn btn-primary btn-sm">Start the Clock</button>
+                                </div>
+
+                                <!-- SERVICE LOCATIONS -->
+                                <div class="section-card mb-3">
+                                    <div class="section-header mb-3">
+                                        <h5 class="section-title">Service Locations</h5>
+                                    </div>
+
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <td>Austin Elementary</td>
+                                            <td>1902 N Navarro<br>Pecos TX 79772</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Crockett Middle School</td>
+                                            <td>1901 Missouri St<br>Pecos TX 79772</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Crockett MS Athletics</td>
+                                            <td>1901 Missouri St<br>Pecos TX 79772</td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                                <!-- TECHNICIANS -->
+                                <div class="section-card mb-4">
+                                    <div class="section-header mb-3">
+                                        <h5 class="section-title">Technicians</h5>
+                                    </div>
+
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Technician</th>
+                                                <th>Clocked</th>
+                                                <th>Level</th>
+                                                <th>Driver</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Tammy Silva</td>
+                                                <td>X</td>
+                                                <td>T</td>
+                                                <td>🚗</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Garrison Rayher</td>
+                                                <td>X</td>
+                                                <td>N</td>
+                                                <td>🚗</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Blake Mitchell</td>
+                                                <td>X</td>
+                                                <td>N</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Brady He</td>
+                                                <td>X</td>
+                                                <td>N</td>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+
+                        </div>
+
 
                         {{-- Job Clocks Tab --}}
                         <div class="tab-pane fade" id="job-clocks" role="tabpanel" aria-labelledby="job-clocks-tab">
