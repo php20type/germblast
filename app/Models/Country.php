@@ -28,4 +28,10 @@ class Country extends Model
     {
         return $this->hasMany(People::class, 'country_id');
     }
+
+    public function surveyFacilities()
+    {
+        return $this->hasMany(SurveyFacility::class, 'country_id');
+    }
+    
 }

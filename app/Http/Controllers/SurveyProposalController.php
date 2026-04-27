@@ -14,6 +14,10 @@ use App\Models\SurveyFacility;
 use App\Models\SurveyFacilityAtp;
 use App\Models\SurveyFacilityMap;
 use App\Models\SurveyProposal;
+use App\Models\Country;
+use App\Models\State;
+use App\Models\City;
+use App\Models\CompanyLocation;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -146,10 +150,17 @@ class SurveyProposalController extends Controller
         $facilities = SurveyFacility::where('survey_proposal_id', $surveyProposalId)->get();
         $facilityRoomTypes = FacilityRoomType::all();
 
+        $countries = Country::all();
+        $states = [];
+        $cities = [];
+
         return view('admin.leads.survey.survey-facility', compact(
             'surveyProposal',
             'facilities',
-            'facilityRoomTypes'
+            'facilityRoomTypes',
+            'countries',
+            'states',
+            'cities'
         ));
     }
 
@@ -159,8 +170,9 @@ class SurveyProposalController extends Controller
         $request->validate([
             'facility_name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
+            'country_id' => 'required',
+            'state_id' => 'required',
+            'city_id' => 'required',
             'zip' => 'required|string|max:20',
             'facility_type' => 'required|string',
 
@@ -185,8 +197,9 @@ class SurveyProposalController extends Controller
 
                 'facility_name' => $request->facility_name,
                 'address' => $request->address,
-                'city' => $request->city,
-                'state' => $request->state,
+                'country_id' => $request->country_id,
+                'state_id' => $request->state_id,
+                'city_id' => $request->city_id,
                 'zip' => $request->zip,
                 'facility_type' => $request->facility_type,
             ];
@@ -306,12 +319,27 @@ class SurveyProposalController extends Controller
         $facilityMaps = SurveyFacilityMap::where('survey_facility_id', $facility->id)->get();
         $facilityAtps = SurveyFacilityAtp::where('survey_facility_id', $facility->id)->get();
 
+        $countries = Country::all();
+        $states = [];
+        $cities = [];
+
+        if ($facility->country_id) {
+        $states = State::where('country_id', $facility->country_id)->get();
+        }
+
+        if ($facility->state_id) {
+        $cities = City::where('state_id', $facility->state_id)->get();
+        }
+
         return view('admin.leads.survey.facility-edit', compact(
             'facility',
             'surveyProposalId',
             'facilityRoomTypes',
             'facilityMaps',
-            'facilityAtps'
+            'facilityAtps',
+            'countries',
+            'states',
+            'cities'
         ));
     }
 
@@ -321,8 +349,9 @@ class SurveyProposalController extends Controller
         $request->validate([
             'facility_name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
+            'country_id' => 'required',
+            'state_id' => 'required',
+            'city_id' => 'required',
             'zip' => 'required|string|max:20',
             'facility_type' => 'required|string',
 
@@ -344,8 +373,9 @@ class SurveyProposalController extends Controller
             $facilityData = [
                 'facility_name' => $request->facility_name,
                 'address' => $request->address,
-                'city' => $request->city,
-                'state' => $request->state,
+                'country_id' => $request->country_id,
+                'state_id' => $request->state_id,
+                'city_id' => $request->city_id,
                 'zip' => $request->zip,
                 'facility_type' => $request->facility_type,
             ];
@@ -1134,6 +1164,47 @@ class SurveyProposalController extends Controller
             'success' => true,
             'message' => 'Proposal rejected. Sales rep can now make changes.',
             'redirect' => route('admin.lead.show', $surveyProposal->lead_id)
+        ]);
+    }
+
+    public function addFacilityToCompany($facilityId)
+    {
+        $facility = SurveyFacility::with('surveyProposal.company')->findOrFail($facilityId);
+
+        if (!$facility->surveyProposal || !$facility->surveyProposal->company) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Company not found for this proposal.'
+            ], 404);
+        }
+
+        if ($facility->is_added_to_company) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Facility already added to company.'
+            ]);
+        }
+
+        $company = $facility->surveyProposal->company;
+
+        $location = CompanyLocation::create([
+            'company_id'    => $company->id,
+            'location_name' => $facility->facility_name,
+            'address_1'     => $facility->address,
+            'address_2'     => null,
+            'country_id'    => $facility->country_id ?? 1,
+            'state_id'      => $facility->state_id ?? 1, 
+            'city_id'       => $facility->city_id ?? 1, 
+            'zip'           => $facility->zip,
+        ]);
+
+        // mark as added
+        $facility->update(['is_added_to_company' => true]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Facility added to company location successfully.',
+            'data' => $location
         ]);
     }
 }

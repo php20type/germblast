@@ -43,4 +43,9 @@ class State extends Model
     {
         return $this->hasMany(People::class, 'state_id');
     }
+
+    public function surveyFacilities()
+    {
+        return $this->hasMany(SurveyFacility::class, 'state_id');
+    }
 }

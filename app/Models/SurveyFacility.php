@@ -12,8 +12,9 @@ class SurveyFacility extends Model
 
         'facility_name',
         'address',
-        'city',
-        'state',
+        'country_id',
+        'state_id',
+        'city_id',
         'zip',
         'facility_type',
 
@@ -37,8 +38,16 @@ class SurveyFacility extends Model
         'man_hours_cost',
 
         // Total cost
-        'total_cost'
+        'total_cost',
+        'is_added_to_company',
     ];
+
+    protected $casts = [
+        'is_added_to_company' => 'boolean',
+    ];
+
+    protected $with = ['country', 'state', 'city'];
+    
 
     public function surveyProposal()
     {
@@ -58,6 +67,21 @@ class SurveyFacility extends Model
     public function atp()
     {
         return $this->hasMany(SurveyFacilityAtp::class, 'survey_facility_id');
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class, 'country_id');
+    }
+
+    public function state()
+    {
+        return $this->belongsTo(State::class, 'state_id');
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class, 'city_id');
     }
 
 

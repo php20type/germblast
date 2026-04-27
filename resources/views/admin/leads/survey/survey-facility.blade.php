@@ -57,6 +57,36 @@
                                                 </tr>
 
                                                 <tr>
+                                                    <th>Country</th>
+                                                    <td>
+                                                        <select name="country_id" class="form-select select2" id="facility_country">
+                                                            <option value="">Select Country</option>
+                                                            @foreach ($countries as $country)
+                                                                <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <th>State</th>
+                                                    <td>
+                                                        <select name="state_id" class="form-select select2" id="facility_state" disabled>
+                                                            <option value="">Select State</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <th>City</th>
+                                                    <td>
+                                                        <select name="city_id" class="form-select select2" id="facility_city" disabled>
+                                                            <option value="">Select City</option>
+                                                        </select>
+                                                    </td>
+                                                </tr>
+
+                                                {{-- <tr>
                                                     <th>City</th>
                                                     <td>
                                                         <input type="text" class="form-control" name="city">
@@ -68,7 +98,7 @@
                                                     <td>
                                                         <input type="text" class="form-control" name="state">
                                                     </td>
-                                                </tr>
+                                                </tr> --}}
 
                                                 <tr>
                                                     <th>Zip</th>
@@ -290,10 +320,13 @@
                 address: {
                     required: true
                 },
-                city: {
+                country_id: {
                     required: true
                 },
-                state: {
+                state_id: {
+                    required: true
+                },
+                city_id: {
                     required: true
                 },
                 zip: {
@@ -429,5 +462,52 @@
             setupPreview('map_file', 'map-preview');
 
         });
+
+        // INIT SELECT2
+        $('#facility_country, #facility_state, #facility_city').select2({
+            placeholder: 'Select option',
+            allowClear: true,
+            width: '100%'
+        });
+
+
+          // Country → States
+            $('#facility_country').on('change', function() {
+                let countryId = $(this).val();
+                $('#facility_state').empty()
+                    .append('<option value="">Select State</option>').prop('disabled', true).trigger(
+                        'change');
+                $('#facility_city').empty()
+                    .append('<option value="">Select City</option>').prop('disabled', true).trigger(
+                        'change');
+
+                if (!countryId) return;
+                $.get(`/states/${countryId}`, function(states) {
+                    $('#facility_state').prop('disabled', false);
+                    $.each(states, function(i, state) {
+                        $('#facility_state').append(
+                            `<option value="${state.state_id}">${state.name}</option>`
+                        );
+                    });
+                });
+            });
+
+
+            // State → Cities
+            $('#facility_state').on('change', function() {
+                let stateId = $(this).val();
+                $('#facility_city').empty().append('<option value="">Select City</option>').prop('disabled',
+                    true).trigger('change');
+                if (!stateId) return;
+                $.get(`/cities/${stateId}`, function(cities) {
+                    $('#facility_city').prop('disabled', false);
+                    $.each(cities, function(i, city) {
+                        $('#facility_city').append(
+                            `<option value="${city.id}">${city.name}</option>`
+                        );
+                    });
+                });
+            });
+
     </script>
 @endpush

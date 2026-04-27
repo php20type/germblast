@@ -61,18 +61,47 @@
                                                 </tr>
 
                                                 <tr>
-                                                    <th>City</th>
+                                                    <th>Country</th>
                                                     <td>
-                                                        <input type="text" class="form-control" name="city"
-                                                            value="{{ $facility->city ?? ' ' }}">
+                                                        <select name="country_id" id="facility_country" class="form-control">
+                                                            <option value="">Select Country</option>
+                                                            @foreach ($countries as $country)
+                                                                <option value="{{ $country->id }}"
+                                                                    {{ $facility->country_id == $country->id ? 'selected' : '' }}>
+                                                                    {{ $country->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
                                                     </td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>State</th>
                                                     <td>
-                                                        <input type="text" class="form-control" name="state"
-                                                            value="{{ $facility->state ?? ' ' }}">
+                                                        <select name="state_id" id="facility_state" class="form-control" {{ $facility->state_id ? '' : 'disabled' }}>
+                                                            <option value="">Select State</option>
+                                                            @foreach ($states as $state)
+                                                                <option value="{{ $state->id }}"
+                                                                    {{ $facility->state_id == $state->id ? 'selected' : '' }}>
+                                                                    {{ $state->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <th>City</th>
+                                                    <td>
+                                                        <select name="city_id" id="facility_city" class="form-control" {{ $facility->city_id ? '' : 'disabled' }}>
+                                                            <option value="">Select City</option>
+                                                            @foreach ($cities as $city)
+                                                                <option value="{{ $city->id }}"
+                                                                    {{ $facility->city_id == $city->id ? 'selected' : '' }}>
+                                                                    {{ $city->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
                                                     </td>
                                                 </tr>
 
@@ -395,10 +424,13 @@
                 address: {
                     required: true
                 },
-                city: {
+                country_id: {
                     required: true
                 },
-                state: {
+                state_id: {
+                    required: true
+                },
+                city_id: {
                     required: true
                 },
                 zip: {
@@ -479,6 +511,89 @@
 
                         console.log(xhr.responseText);
                     }
+                });
+            });
+
+            let countryId = $('#facility_country').val();
+            let stateId = "{{ $facility->state_id }}";
+            let cityId = "{{ $facility->city_id }}";
+
+            if (countryId) {
+                $.get(`/states/${countryId}`, function(states) {
+                    $('#facility_state').prop('disabled', false).empty()
+                        .append('<option value="">Select State</option>');
+
+                    $.each(states, function(i, state) {
+                        let selected = state.state_id == stateId ? 'selected' : '';
+                        $('#facility_state').append(
+                            `<option value="${state.state_id}" ${selected}>${state.name}</option>`
+                        );
+                    });
+
+                    $('#facility_state').trigger('change');
+                });
+            }
+
+            if (stateId) {
+                $.get(`/cities/${stateId}`, function(cities) {
+                    $('#facility_city').prop('disabled', false).empty()
+                        .append('<option value="">Select City</option>');
+
+                    $.each(cities, function(i, city) {
+                        let selected = city.id == cityId ? 'selected' : '';
+                        $('#facility_city').append(
+                            `<option value="${city.id}" ${selected}>${city.name}</option>`
+                        );
+                    });
+
+                    $('#facility_city').trigger('change');
+                });
+            }
+
+
+              // INIT SELECT2
+        $('#facility_country, #facility_state, #facility_city').select2({
+            placeholder: 'Select option',
+            allowClear: true,
+            width: '100%'
+        });
+
+
+          // Country → States
+            $('#facility_country').on('change', function() {
+                let countryId = $(this).val();
+                $('#facility_state').empty()
+                    .append('<option value="">Select State</option>').prop('disabled', true).trigger(
+                        'change');
+                $('#facility_city').empty()
+                    .append('<option value="">Select City</option>').prop('disabled', true).trigger(
+                        'change');
+
+                if (!countryId) return;
+                $.get(`/states/${countryId}`, function(states) {
+                    $('#facility_state').prop('disabled', false);
+                    $.each(states, function(i, state) {
+                        $('#facility_state').append(
+                            `<option value="${state.state_id}">${state.name}</option>`
+                        );
+                    });
+                });
+            });
+
+
+            // State → Cities
+            $('#facility_state').on('change', function() {
+                let stateId = $(this).val();
+                $('#facility_city').empty().append('<option value="">Select City</option>').prop('disabled',
+                    true).trigger('change');
+                if (!stateId) return;
+                $.get(`/cities/${stateId}`, function(cities) {
+                    $('#facility_city').prop('disabled', false);
+                    $.each(cities, function(i, city) {
+                        $('#facility_city').append(
+                            `<option value="${city.id}">${city.name}</option>`
+                        );
+                    });
                 });
             });
 

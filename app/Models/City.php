@@ -41,4 +41,8 @@ class City extends Model
         return $this->hasMany(People::class, 'city_id');
     }
 
+    public function surveyFacilities()
+    {
+        return $this->hasMany(SurveyFacility::class, 'city_id');
+    }
 }

@@ -214,6 +214,7 @@
                                                         <th>Square Footage</th>
                                                         <th>Man Hours</th>
                                                         <th>Cost</th>
+                                                        <th>Action</th>
                                                     </tr>
                                                 </thead>
 
@@ -244,6 +245,28 @@
                                                                 <td>{{ $facility->square_footage }}</td>
                                                                 <td>{{ $facility->man_hours }}</td>
                                                                 <td>${{ number_format($facility->man_hours_cost, 2) }}</td>
+                                                                <td>
+                                                                    @if ($isEditable)
+                                                                        @if(!$facility->is_added_to_company)
+                                                                            <button
+                                                                                type="button"
+                                                                                class="btn btn-sm btn-primary add-to-company-btn"
+                                                                                data-id="{{ $facility->id }}">
+                                                                                Add to Company
+                                                                            </button>
+                                                                        @else
+                                                                            <button
+                                                                                type="button"
+                                                                                class="btn btn-sm btn-success" disabled>
+                                                                                Added
+                                                                            </button>
+                                                                        @endif
+                                                                    @else
+                                                                        <button class="btn btn-secondary btn-sm" disabled>
+                                                                            <i class="ti ti-lock me-1"></i> Add to Company
+                                                                        </button>
+                                                                    @endif
+                                                                </td>
                                                             </tr>
                                                         @endforeach
                                                     @endif
@@ -1031,6 +1054,29 @@
                     },
                     error: function(xhr) {
                         toastr.error(xhr.responseJSON?.message || 'Failed to reject proposal.');
+                    }
+                });
+            });
+
+
+            $(document).on('click', '.add-to-company-btn', function (e) {
+                e.preventDefault(); // extra safety
+                let btn = $(this);
+                let id = btn.data('id');
+
+                $.ajax({
+                    url: `/admin/survey/proposal/facility/${id}/add-to-company`,
+                    method: 'POST',
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (res) {
+                        toastr.success(res.message);
+                        btn.prop('disabled', true).addClass('btn-success').removeClass('btn-primary').text('Added');
+
+                    },
+                    error: function (xhr) {
+                        toastr.error(xhr.responseJSON?.message || 'Something went wrong');
                     }
                 });
             });

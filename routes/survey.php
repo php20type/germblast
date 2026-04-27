@@ -43,6 +43,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
             Route::post('{facility}/facility/update', [SurveyProposalController::class, 'survey_facility_update'])
                 ->name('facility.update');
 
+            Route::post('facility/{facility}/add-to-company', [SurveyProposalController::class, 'addFacilityToCompany'])
+                ->name('facility.add_to_company');
+
             Route::get('{survey_proposal}/equipment', [SurveyProposalController::class, 'survey_equipment'])
                 ->name('equipment');
 
@@ -68,7 +71,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
             ->middleware('permission:survey.proposal.view')
             ->name('download');
 
-        // Action buttons 
+        // Action buttons
         Route::post('{survey_proposal}/approve', [SurveyProposalController::class, 'approve'])
             ->name('approve');
 
