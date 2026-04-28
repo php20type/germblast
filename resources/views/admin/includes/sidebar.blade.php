@@ -128,6 +128,16 @@
                     </div>
                 </a>
             </li>
+            <li class="{{ request()->routeIs('admin.equipment-management.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.equipment-management.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon19.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Equipment Management
+                    </div>
+                </a>
+            </li>
             @if(auth()->user()->isSuperAdmin())
                 <li class="{{ request()->routeIs('admin.roles.permissions') ? 'active' : '' }}">
                     <a href="{{ route('admin.roles.permissions') }}">

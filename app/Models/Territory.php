@@ -39,6 +39,10 @@ class Territory extends Model
         return $this->hasMany(ServiceOrderSlot::class, 'scheduled_office');
     }
 
+    public function equipmentStatusLogs()
+    {
+        return $this->hasMany(EquipmentStatusLog::class, 'territory_id');
+    }
 
 
 }

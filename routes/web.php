@@ -8,7 +8,7 @@ use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\ExpenseReportController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\LeadController;
+use App\Http\Controllers\EquipmentManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -96,6 +96,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('expense-report/{id}/approve-item',[ExpenseReportController::class, 'approveItem'])->name('expense-report.approve-item');
     Route::post('expense-report/{id}/unsubmit',       [ExpenseReportController::class, 'unsubmit'])->name('expense-report.unsubmit');
     Route::post('expense-report/{id}/accept-and-fill', [ExpenseReportController::class, 'acceptAndFill'])->name('expense-report.accept-and-fill');
+
+    Route::get('equipment-management/index', [EquipmentManagementController::class, 'index'])->name('equipment-management.index');
+    Route::post('equipment-management/store', [EquipmentManagementController::class, 'store'])->name('equipment-management.store');
+    Route::post('equipment-management/update-status/{id}', [EquipmentManagementController::class, 'updateStatus'])->name('equipment-management.update-status');
 });
 
 Route::view('survey-proposal.pdf', 'survey-proposal.pdf')->name('survey.proposal');

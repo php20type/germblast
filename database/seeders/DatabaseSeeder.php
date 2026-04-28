@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
         $this->call(LeadSeeder::class);
         $this->call(ExpenseTypeSeeder::class);
         $this->call(ItemReasonSeeder::class);
+        $this->call(EquipmentManagementTypeSeeder::class);
 
         User::factory()->create([
             'name' => 'Test User',

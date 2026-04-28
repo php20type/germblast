@@ -414,4 +414,8 @@ class User extends Authenticatable
         return $this->hasMany(ServiceOrderEmployeePerformance::class, 'employee_id');
     }
 
+    public function equipmentStatusLogs()
+    {
+        return $this->hasMany(EquipmentStatusLog::class, 'changed_by');
+    }
 }
