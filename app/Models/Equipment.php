@@ -59,7 +59,7 @@ class Equipment extends Model
 
     public function type()
     {
-        return $this->belongsTo(EquipmentType::class, 'type_id');
+        return $this->belongsTo(EquipmentManagementType::class, 'type_id');
     }
 
     public function statusLogs()
@@ -109,49 +109,56 @@ class Equipment extends Model
     }
 
     public function getAvailableStatusOptions(): array
-{
-    switch ($this->status) {
+    {
+        switch ($this->status) {
 
-        case self::STATUS_NEW:
-            return [
-                self::STATUS_READY,
-            ];
+            case self::STATUS_NEW:
+                return [self::STATUS_READY];
 
-        case self::STATUS_READY:
-            return [
-                self::STATUS_DIRTY,
-                self::STATUS_BROKEN,
-            ];
+            case self::STATUS_READY:
+                return [
+                    self::STATUS_LOST,
+                    self::STATUS_BROKEN,
+                    self::STATUS_DIRTY,
+                ];
 
-        case self::STATUS_DIRTY:
-            return [
-                self::STATUS_READY,
-            ];
+            case self::STATUS_DIRTY:
+                return [self::STATUS_READY];
 
-        case self::STATUS_BROKEN:
-            return [
-                self::STATUS_BROKEN,
-                self::STATUS_LOST,
-                self::STATUS_DECOMMISSIONED,
-                self::STATUS_DIRTY,
-            ];
+            case self::STATUS_BROKEN:
+                return [
+                    self::STATUS_DIRTY,
+                    self::STATUS_BROKEN,
+                    self::STATUS_LOST,
+                    self::STATUS_DECOMMISSIONED,
+                ];
 
-        case self::STATUS_LOST:
-            return [
-                self::STATUS_LOST,
-                self::STATUS_DECOMMISSIONED,
-                self::STATUS_DIRTY,
-            ];
+            case self::STATUS_LOST:
+                return [
+                    self::STATUS_DIRTY,
+                    self::STATUS_BROKEN,
+                    self::STATUS_LOST,
+                    self::STATUS_DECOMMISSIONED,
+                ];
 
-        case self::STATUS_DECOMMISSIONED:
-            return [
-                self::STATUS_BROKEN,
-                self::STATUS_LOST,
-                self::STATUS_DIRTY,
-            ];
+            case self::STATUS_DECOMMISSIONED:
+                return [
+                    self::STATUS_DIRTY,
+                    self::STATUS_BROKEN,
+                    self::STATUS_LOST,
+                ];
 
-        default:
-            return [];
+            default:
+                return [];
+        }
     }
-}
+
+    /**
+     * Check whether a transition from the current status to $newStatus is allowed.
+     * Used by the controller to enforce server-side transition rules.
+     */
+    public function canTransitionTo(string $newStatus): bool
+    {
+        return in_array($newStatus, $this->getAvailableStatusOptions(), true);
+    }
 }

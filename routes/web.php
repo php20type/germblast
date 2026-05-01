@@ -100,6 +100,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('equipment-management/index', [EquipmentManagementController::class, 'index'])->name('equipment-management.index');
     Route::post('equipment-management/store', [EquipmentManagementController::class, 'store'])->name('equipment-management.store');
     Route::post('equipment-management/update-status/{id}', [EquipmentManagementController::class, 'updateStatus'])->name('equipment-management.update-status');
+    Route::get('equipment-management/{id}/history', [EquipmentManagementController::class, 'history'])->name('equipment-management.history');
 });
 
 Route::view('survey-proposal.pdf', 'survey-proposal.pdf')->name('survey.proposal');
