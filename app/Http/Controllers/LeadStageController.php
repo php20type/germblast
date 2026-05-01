@@ -129,6 +129,13 @@ class LeadStageController extends Controller
 
         $stage = LeadStageProcess::firstOrCreate(['lead_id' => $lead->id]);
 
+        // STRICT: Initial meeting must be completed before scheduling site survey
+        if (!$stage->initial_meeting_completed_at) {
+            return response()->json([
+                'message' => 'Please complete the Initial Meeting before scheduling a Site Survey.',
+            ], 422);
+        }
+
         if ($stage->site_survey_completed_at) {
             return response()->json([
                 'message' => 'Site survey is already completed. Cannot reschedule.',
@@ -150,6 +157,13 @@ class LeadStageController extends Controller
     public function completeSiteSurvey(Lead $lead, NotificationService $notify)
     {
         $stage = LeadStageProcess::firstOrCreate(['lead_id' => $lead->id]);
+
+        // STRICT: Initial meeting must be completed before completing site survey
+        if (!$stage->initial_meeting_completed_at) {
+            return response()->json([
+                'message' => 'Please complete the Initial Meeting before completing the Site Survey.',
+            ], 422);
+        }
 
         if (! $stage->site_survey_scheduled_at) {
             return response()->json([

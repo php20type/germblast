@@ -2503,6 +2503,43 @@
                         // Only allow changing to a different stage
                         if (newStageId == currentStageId) return;
 
+                        // STRICT: Only allow moving one stage forward at a time (no skipping)
+                        if (newStageId > currentStageId + 1) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Cannot Skip Stages',
+                                text: 'You must complete Stage ' + currentStageId + ' before proceeding to a later stage.'
+                            });
+                            return;
+                        }
+
+                        // STRICT: Stage 1 steps (Initial Meeting) must be completed before moving to Stage 2+
+                        @php
+                            $initialMeetingCompleted = $stage && $stage->initial_meeting_completed_at ? 'true' : 'false';
+                            $siteSurveyCompleted = $stage && $stage->site_survey_completed_at ? 'true' : 'false';
+                        @endphp
+                        var initialMeetingCompleted = {{ $initialMeetingCompleted }};
+                        var siteSurveyCompleted = {{ $siteSurveyCompleted }};
+
+                        if (newStageId >= 2 && !initialMeetingCompleted) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Stage Incomplete',
+                                text: 'Please schedule and complete the Initial Meeting before moving to the next stage.'
+                            });
+                            return;
+                        }
+
+                        // STRICT: Stage 2 steps (Site Survey) must be completed before moving to Stage 3+
+                        if (newStageId >= 3 && !siteSurveyCompleted) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Stage Incomplete',
+                                text: 'Please schedule and complete the Site Survey before moving to the next stage.'
+                            });
+                            return;
+                        }
+
                         // Special warning for Proposal Approval stage (stage 3)
                             var swalTitle = 'Are you sure?';
                             var swalText = "Do you want to move this lead to the selected stage?";

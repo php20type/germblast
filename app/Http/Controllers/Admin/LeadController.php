@@ -765,6 +765,7 @@ class LeadController extends Controller
         $newStageId = $request->stage_id;
 
         $surveyProposal = SurveyProposal::where('lead_id', $leadId)->first();
+        $stageProcess = LeadStageProcess::where('lead_id', $leadId)->first();
 
          // 🚫 LOCK: If currently in stage 3 and proposal is pending_review, prevent ANY stage change
         if (
@@ -779,7 +780,38 @@ class LeadController extends Controller
             ]);
         }
 
-        // Example stage-wise validation
+        // 🚫 STRICT: Only allow moving one stage forward at a time (no skipping)
+        if ($newStageId > $lead->stage_id + 1) {
+            return response()->json([
+                'allowed' => false,
+                'message' => 'You cannot skip stages. Please complete Stage ' . $lead->stage_id . ' first before proceeding.',
+                'current_stage_id' => $lead->stage_id,
+            ]);
+        }
+
+        // 🚫 STRICT: Stage 1 steps must be completed before moving to Stage 2+
+        if ($newStageId >= 2) {
+            if (!$stageProcess || !$stageProcess->initial_meeting_completed_at) {
+                return response()->json([
+                    'allowed' => false,
+                    'message' => 'Please schedule and complete the Initial Meeting before moving to the next stage.',
+                    'current_stage_id' => $lead->stage_id,
+                ]);
+            }
+        }
+
+        // 🚫 STRICT: Stage 2 steps must be completed before moving to Stage 3+
+        if ($newStageId >= 3) {
+            if (!$stageProcess || !$stageProcess->site_survey_completed_at) {
+                return response()->json([
+                    'allowed' => false,
+                    'message' => 'Please schedule and complete the Site Survey before moving to the next stage.',
+                    'current_stage_id' => $lead->stage_id,
+                ]);
+            }
+        }
+
+        // Stage-wise validation
         switch ($newStageId) {
             case 2: // Site Survey
                 if (!$lead->activity()->where('status', 'Logged')->exists()) {
