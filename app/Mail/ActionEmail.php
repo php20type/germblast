@@ -36,6 +36,7 @@ class ActionEmail extends Mailable
                 'meeting_scheduled' => 'New Meeting Scheduled',
                 'meeting_updated' => 'Meeting Updated',
                 'proposal_approval_stage' => 'Survey Proposal Ready for Review',
+                'staff_assigned_to_order' => 'You Have Been Assigned to a Service Order',
                 default => 'Lead Notification'
             }
         );

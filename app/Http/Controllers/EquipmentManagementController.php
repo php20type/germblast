@@ -11,16 +11,48 @@ use App\Models\EquipmentStatusLog;
 
 class EquipmentManagementController extends Controller
 {
-  public function index()
+    public function index(Request $request)
     {
+        $baseQuery = Equipment::with('type');
+
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $baseQuery->where(function($q) use ($searchTerm) {
+                $q->whereHas('type', function ($q2) use ($searchTerm) {
+                    $q2->where('name', 'like', "%{$searchTerm}%");
+                })
+                ->orWhere('barcode', 'like', "%{$searchTerm}%")
+                ->orWhere('serial_number', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        if ($request->ajax() && $request->filled('status')) {
+            $status = $request->status;
+            
+            if ($status === 'inuse') {
+                $equipments = (clone $baseQuery)->where('is_assigned', true)->get();
+            } elseif ($status === 'all') {
+                $equipments = (clone $baseQuery)->get();
+            } else {
+                $equipments = (clone $baseQuery)->where('status', $status)->get();
+            }
+
+            return response()->json([
+                $status . '_table' => view('admin.equipment-management.partials.equipment-table-rows', [
+                    'types' => $equipments
+                ])->render(),
+                $status . '_count' => $equipments->count(),
+            ]);
+        }
+
         // Status-wise data
-        $dirtyTypes = Equipment::with('type')->where('status', Equipment::STATUS_DIRTY)->get();
-        $readyTypes = Equipment::with('type')->where('status', Equipment::STATUS_READY)->get();
-        $brokenTypes = Equipment::with('type')->where('status', Equipment::STATUS_BROKEN)->get();
-        $lostTypes = Equipment::with('type')->where('status', Equipment::STATUS_LOST)->get();
-        $decommissionedTypes = Equipment::with('type')->where('status', Equipment::STATUS_DECOMMISSIONED)->get();
-        $inUseTypes = Equipment::with('type')->where('is_assigned', true)->get();
-        $allTypes = Equipment::with('type')->get();
+        $dirtyTypes = (clone $baseQuery)->where('status', Equipment::STATUS_DIRTY)->get();
+        $readyTypes = (clone $baseQuery)->where('status', Equipment::STATUS_READY)->get();
+        $brokenTypes = (clone $baseQuery)->where('status', Equipment::STATUS_BROKEN)->get();
+        $lostTypes = (clone $baseQuery)->where('status', Equipment::STATUS_LOST)->get();
+        $decommissionedTypes = (clone $baseQuery)->where('status', Equipment::STATUS_DECOMMISSIONED)->get();
+        $inUseTypes = (clone $baseQuery)->where('is_assigned', true)->get();
+        $allTypes = (clone $baseQuery)->get();
 
         // Counts
         $dirtyCount = $dirtyTypes->count();
@@ -30,6 +62,26 @@ class EquipmentManagementController extends Controller
         $decommissionedCount = $decommissionedTypes->count();
         $inUseCount = $inUseTypes->count();
         $allCount = $allTypes->count();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'dirty_table' => view('admin.equipment-management.partials.equipment-table-rows', ['types' => $dirtyTypes])->render(),
+                'ready_table' => view('admin.equipment-management.partials.equipment-table-rows', ['types' => $readyTypes])->render(),
+                'inuse_table' => view('admin.equipment-management.partials.equipment-table-rows', ['types' => $inUseTypes])->render(),
+                'broken_table' => view('admin.equipment-management.partials.equipment-table-rows', ['types' => $brokenTypes])->render(),
+                'lost_table' => view('admin.equipment-management.partials.equipment-table-rows', ['types' => $lostTypes])->render(),
+                'decommissioned_table' => view('admin.equipment-management.partials.equipment-table-rows', ['types' => $decommissionedTypes])->render(),
+                'all_table' => view('admin.equipment-management.partials.equipment-table-rows', ['types' => $allTypes])->render(),
+                
+                'dirty_count' => $dirtyCount,
+                'ready_count' => $readyCount,
+                'inuse_count' => $inUseCount,
+                'broken_count' => $brokenCount,
+                'lost_count' => $lostCount,
+                'decommissioned_count' => $decommissionedCount,
+                'all_count' => $allCount,
+            ]);
+        }
 
         // Equipment types (dropdown)
         $equipmentTypes = EquipmentManagementType::all();

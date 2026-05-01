@@ -253,6 +253,34 @@ class NotificationService
         }
     }
 
+    public function staffAssignedToOrder($user, $slot)
+    {
+        $order = $slot->serviceOrder;
+        $service = $order->service ?? null;
+
+        if ($this->sendEmail) {
+            SendEmailJob::dispatch(
+                $user->email,
+                'staff_assigned_to_order',
+                [
+                    'staff_name' => $user->name,
+                    'order_no' => $order->order_no ?? 'N/A',
+                    'service_name' => $service->service_name ?? 'N/A',
+                    'start_time' => $slot->scheduled_start_time,
+                    'end_time' => $slot->scheduled_end_time,
+                    'order_id' => $order->id,
+                ]
+            );
+        }
+
+        if ($this->sendSMS) {
+            SendSMSJob::dispatch(
+                $this->testPhone,
+                "You have been assigned to Order #{$order->order_no} — {$service->service_name}"
+            );
+        }
+    }
+
     public function proposalApprovalStage($lead, $surveyProposal)
     {
         // Generate the survey proposal link

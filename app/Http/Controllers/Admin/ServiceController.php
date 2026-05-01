@@ -12,6 +12,7 @@ use App\Models\ServiceNote;
 use App\Models\ServiceOrderSlotFacility;
 use App\Models\ServiceOrderSlotStaff;
 use App\Models\DisciplinaryIssue;
+use App\Services\NotificationService;
 use App\Services\OrderService;
 use App\Models\CompanyLocation;
 use App\Models\Territory;
@@ -22,10 +23,12 @@ use Illuminate\Http\Request;
 class ServiceController extends Controller
 {
     protected $orderService;
+    protected $notify;
 
-    public function __construct(OrderService $orderService)
+    public function __construct(OrderService $orderService, NotificationService $notify)
     {
         $this->orderService = $orderService;
+        $this->notify = $notify;
     }
 
     public function getServiceDetails(Request $request, $leadId)
@@ -300,7 +303,7 @@ class ServiceController extends Controller
             'user_ids.*' => 'exists:users,id',
         ]);
 
-        $slot = ServiceOrderSlot::findOrFail($slotId);
+        $slot = ServiceOrderSlot::with('serviceOrder.service')->findOrFail($slotId);
         $slotHours = $slot->scheduled_hours ?? 0;
 
         foreach ($request->user_ids as $userId) {
@@ -315,6 +318,8 @@ class ServiceController extends Controller
                 'slot_hours' => $slotHours,
                 'cost'       => $cost,
             ]);
+
+            $this->notify->staffAssignedToOrder($user, $slot);
         }
 
         return redirect()->back()->with('success', 'Staff assigned successfully.');
