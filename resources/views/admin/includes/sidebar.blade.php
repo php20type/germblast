@@ -138,6 +138,16 @@
                     </div>
                 </a>
             </li>
+            <li class="{{ request()->routeIs('admin.consumable-reports.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.consumable-reports.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon15.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Consumable Reports
+                    </div>
+                </a>
+            </li>
             @if(auth()->user()->isSuperAdmin())
                 <li class="{{ request()->routeIs('admin.roles.permissions') ? 'active' : '' }}">
                     <a href="{{ route('admin.roles.permissions') }}">

@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\ExpenseReportController;
 use App\Http\Controllers\Admin\RolePermissionController;
+use App\Http\Controllers\Admin\ConsumableReportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EquipmentManagementController;
 use Illuminate\Support\Facades\Route;
@@ -101,6 +102,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('equipment-management/store', [EquipmentManagementController::class, 'store'])->name('equipment-management.store');
     Route::post('equipment-management/update-status/{id}', [EquipmentManagementController::class, 'updateStatus'])->name('equipment-management.update-status');
     Route::get('equipment-management/{id}/history', [EquipmentManagementController::class, 'history'])->name('equipment-management.history');
+
+    // Consumable Reports
+    Route::get('consumable-reports/index', [ConsumableReportController::class, 'index'])->name('consumable-reports.index');
+    Route::post('consumable-reports/store', [ConsumableReportController::class, 'store'])->name('consumable-reports.store');
+    Route::put('consumable-reports/update/{id}', [ConsumableReportController::class, 'update'])->name('consumable-reports.update');
+    Route::post('consumable-reports/delete/{id}', [ConsumableReportController::class, 'destroy'])->name('consumable-reports.destroy');
 });
 
 Route::view('survey-proposal.pdf', 'survey-proposal.pdf')->name('survey.proposal');

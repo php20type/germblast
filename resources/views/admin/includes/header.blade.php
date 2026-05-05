@@ -17,13 +17,35 @@
                             </div>
                         </a>
                     </li>
-                    {{-- <li class="list-inline-item">
-                        <a href="#" class="item-nav">
-                            <div class="icon-round" title="Notifications">
+                    <li class="list-inline-item">
+                        <a href="#" class="dropdown item-nav" data-bs-toggle="dropdown">
+                            <div class="icon-round position-relative" title="Notifications">
                                 <i class="fa-solid fa-bell"></i>
+                                <span id="notificationBadge" class="badge bg-danger position-absolute top-0 start-100 translate-middle p-1"
+                                    style="font-size: 0.6rem; min-width: 20px; display: none;">0</span>
                             </div>
                         </a>
-                    </li> --}}
+
+                        <ul class="dropdown-menu shadow" style="width: 400px; border-radius: 10px;">
+
+                            {{-- Header --}}
+                            <li class="px-3 py-2 d-flex justify-content-between align-items-center">
+                                <strong>Notifications</strong>
+                                <button class="btn btn-sm btn-link p-0" style="font-size: 0.85rem;">Mark as Read</button>
+                            </li>
+
+                            <li><hr class="dropdown-divider"></li>
+
+                            {{-- Notifications List --}}
+                            <li id="notificationList" style="max-height:400px; overflow-y:auto;">
+                                <div class="px-3 py-3 text-center text-muted">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> Loading notifications...
+                                </div>
+                            </li>
+
+                        </ul>
+
+                    </li>
                 </ul>
             </div>
         </div>

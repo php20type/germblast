@@ -418,4 +418,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(EquipmentStatusLog::class, 'changed_by');
     }
+
+    public function consumableReports()
+    {
+        return $this->hasMany(ConsumableReport::class, 'user_id');
+    }
 }

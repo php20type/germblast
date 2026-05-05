@@ -208,5 +208,9 @@ class Company extends Model
         return $this->hasMany(SurveyProposal::class, 'company_id');
     }
 
+    public function consumableReports()
+    {
+        return $this->hasMany(ConsumableReport::class, 'company_id');
+    }
 
 }
