@@ -166,6 +166,13 @@
                             </div>
                         </div>
 
+                        <!-- Pagination -->
+                        <div class="row">
+                            <div id="company-pagination" class="col-12 mt-3">
+                                {{ $companies->links() }}
+                            </div>
+                        </div>
+
                         <!-- Action Bar -->
                         <div class="action-bar" id="actionBar">
                             <div class="d-flex align-items-center justify-content-center">
@@ -600,6 +607,7 @@
                         success: function(response) {
                             $('table tbody').html(response.table);
                             $('.company-count').text(response.count + ' Company Found');
+                            $('#company-pagination').html(response.pagination);
                         },
                         error: function(err) {
                             console.error('Error fetching company data', err);

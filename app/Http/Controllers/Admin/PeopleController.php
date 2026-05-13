@@ -114,14 +114,15 @@ class PeopleController extends Controller
         // Apply shared filters
         $this->applyPeopleFilters($query, $request);
 
-        $peoples = $query->get();
-        $peoplesCount = $peoples->count();
+        $peoples = $query->paginate(10)->appends($request->query());
+        $peoplesCount = $peoples->total();
 
         // AJAX response
         if ($request->ajax()) {
             return response()->json([
                 'table' => view('admin.peoples.partials.people-table-row', compact('peoples'))->render(),
                 'count' => $peoplesCount,
+                'pagination' => (string) $peoples->links(),
             ]);
         }
 
@@ -144,14 +145,15 @@ class PeopleController extends Controller
         // Apply shared filters
         $this->applyPeopleFilters($query, $request);
 
-        $peoples = $query->get();
-        $myPeoplesCount = $peoples->count();
+        $peoples = $query->paginate(10)->appends($request->query());
+        $myPeoplesCount = $peoples->total();
 
         // AJAX response
         if ($request->ajax()) {
             return response()->json([
                 'table' => view('admin.peoples.partials.people-table-row', compact('peoples'))->render(),
                 'count' => $myPeoplesCount,
+                'pagination' => (string) $peoples->links(),
             ]);
         }
 

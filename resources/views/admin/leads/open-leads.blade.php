@@ -167,6 +167,13 @@
                                 </div>
                             </div>
 
+                            <!-- Pagination -->
+                            <div class="row">
+                                <div id="lead-pagination" class="col-12 mt-3">
+                                    {{ $paginator->links() }}
+                                </div>
+                            </div>
+
                             <!-- Action Bar -->
                             <div class="action-bar" id="actionBar">
                                 <div class="d-flex align-items-center justify-content-center">
@@ -368,6 +375,7 @@
                         $('#total-value span').text('$' + response.total_value);
                         $('#avg-value span').text('$' + response.avg_value);
                         $('#confidence-value span').text(response.avg_confidence + '%');
+                        $('#lead-pagination').html(response.pagination);
                     },
                     error: function() {
                         console.error('Error fetching lead data');

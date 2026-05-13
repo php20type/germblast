@@ -125,13 +125,14 @@ class CompanyController extends Controller
             $request
         );
 
-        $companies = $query->get();
-        $companiesCount = $companies->count();
+        $companies = $query->paginate(10)->appends($request->query());
+        $companiesCount = $companies->total();
 
         if ($request->ajax()) {
             return response()->json([
                 'table' => view('admin.company.partials.company-table-rows', compact('companies'))->render(),
                 'count' => $companiesCount,
+                'pagination' => (string) $companies->links(),
             ]);
         }
 
@@ -149,13 +150,14 @@ class CompanyController extends Controller
             $request
         );
 
-        $companies = $query->get();
-        $totalMyCompanies = $companies->count();
+        $companies = $query->paginate(10)->appends($request->query());
+        $totalMyCompanies = $companies->total();
 
         if ($request->ajax()) {
             return response()->json([
                 'table' => view('admin.company.partials.company-table-rows', compact('companies'))->render(),
                 'count' => $totalMyCompanies,
+                'pagination' => (string) $companies->links(),
             ]);
         }
 

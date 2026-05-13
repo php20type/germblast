@@ -291,6 +291,14 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Pagination -->
+                                <div class="row">
+                                    <div id="people-pagination" class="col-12 mt-3">
+                                        {{ $peoples->links() }}
+                                    </div>
+                                </div>
+
                             </div>
                             <!-- Add New Product Button -->
                             <button type="button" id="addProductRow"
@@ -576,6 +584,7 @@
                         success: function(response) {
                             $('table tbody').html(response.table);
                             $('.company-count').text(response.count + ' People Found');
+                            $('#people-pagination').html(response.pagination);
                         },
                         error: function(err) {
                             console.error('Error fetching people data', err);

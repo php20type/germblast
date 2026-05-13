@@ -200,7 +200,8 @@ class LeadController extends Controller
     {
         $query = $this->applyFilters($this->baseLeadQuery(), $request);
 
-        $leads = $query->get();
+        $paginator = $query->paginate(10)->appends($request->query());
+        $leads = $paginator->getCollection();
         $groupedLeads = $this->groupLeads($leads);
         $stats = $this->calculateStats($leads);
 
@@ -211,13 +212,14 @@ class LeadController extends Controller
                 'total_value' => $stats['formattedTotalValue'],
                 'avg_value' => $stats['formattedAvgValue'],
                 'avg_confidence' => $stats['avgConfidence'],
+                'pagination' => (string) $paginator->links(),
             ]);
         }
 
         return view(
             'admin.leads.index',
             array_merge(
-                compact('groupedLeads'),
+                compact('groupedLeads', 'paginator'),
                 $stats,
                 $this->sharedViewData(),
                 $this->getSidebarStats()
@@ -232,7 +234,8 @@ class LeadController extends Controller
             $request
         );
 
-        $leads = $query->get();
+        $paginator = $query->paginate(10)->appends($request->query());
+        $leads = $paginator->getCollection();
         $groupedLeads = $this->groupLeads($leads);
         $stats = $this->calculateStats($leads);
 
@@ -243,13 +246,14 @@ class LeadController extends Controller
                 'total_value' => $stats['formattedTotalValue'],
                 'avg_value' => $stats['formattedAvgValue'],
                 'avg_confidence' => $stats['avgConfidence'],
+                'pagination' => (string) $paginator->links(),
             ]);
         }
 
         return view(
             'admin.leads.my-leads',
             array_merge(
-                compact('groupedLeads'),
+                compact('groupedLeads', 'paginator'),
                 $stats,
                 $this->sharedViewData(),
                 $this->getSidebarStats()
@@ -266,7 +270,8 @@ class LeadController extends Controller
             $request
         );
 
-        $leads = $query->get();
+        $paginator = $query->paginate(10)->appends($request->query());
+        $leads = $paginator->getCollection();
         $groupedLeads = $this->groupLeads($leads);
         $stats = $this->calculateStats($leads);
 
@@ -277,13 +282,14 @@ class LeadController extends Controller
                 'total_value' => $stats['formattedTotalValue'],
                 'avg_value' => $stats['formattedAvgValue'],
                 'avg_confidence' => $stats['avgConfidence'],
+                'pagination' => (string) $paginator->links(),
             ]);
         }
 
         return view(
             'admin.leads.open-leads',
             array_merge(
-                compact('groupedLeads'),
+                compact('groupedLeads', 'paginator'),
                 $stats,
                 $this->sharedViewData(),
                 $this->getSidebarStats()
@@ -298,7 +304,8 @@ class LeadController extends Controller
             $request
         );
 
-        $leads = $query->get();
+        $paginator = $query->paginate(10)->appends($request->query());
+        $leads = $paginator->getCollection();
         $groupedLeads = $this->groupLeads($leads);
         $stats = $this->calculateStats($leads);
 
@@ -309,11 +316,12 @@ class LeadController extends Controller
                 'total_value' => $stats['formattedTotalValue'],
                 'avg_value' => $stats['formattedAvgValue'],
                 'avg_confidence' => $stats['avgConfidence'],
+                'pagination' => (string) $paginator->links(),
             ]);
         }
 
         return view('admin.leads.hot-leads', array_merge(
-            compact('groupedLeads'),
+            compact('groupedLeads', 'paginator'),
             $stats,
             $this->sharedViewData(),
             $this->getSidebarStats()
@@ -329,7 +337,8 @@ class LeadController extends Controller
             $request
         );
 
-        $leads = $query->get();
+        $paginator = $query->paginate(10)->appends($request->query());
+        $leads = $paginator->getCollection();
         $groupedLeads = $this->groupLeads($leads);
         $stats = $this->calculateStats($leads);
 
@@ -340,11 +349,12 @@ class LeadController extends Controller
                 'total_value' => $stats['formattedTotalValue'],
                 'avg_value' => $stats['formattedAvgValue'],
                 'avg_confidence' => $stats['avgConfidence'],
+                'pagination' => (string) $paginator->links(),
             ]);
         }
 
         return view('admin.leads.watching-leads', array_merge(
-            compact('groupedLeads'),
+            compact('groupedLeads', 'paginator'),
             $stats,
             $this->sharedViewData(),
             $this->getSidebarStats()
@@ -362,7 +372,8 @@ class LeadController extends Controller
             $request
         );
 
-        $leads = $query->get();
+        $paginator = $query->paginate(10)->appends($request->query());
+        $leads = $paginator->getCollection();
         $groupedLeads = $this->groupLeads($leads);
         $stats = $this->calculateStats($leads);
 
@@ -373,11 +384,12 @@ class LeadController extends Controller
                 'total_value' => $stats['formattedTotalValue'],
                 'avg_value' => $stats['formattedAvgValue'],
                 'avg_confidence' => $stats['avgConfidence'],
+                'pagination' => (string) $paginator->links(),
             ]);
         }
 
         return view('admin.leads.added-this-week', array_merge(
-            compact('groupedLeads'),
+            compact('groupedLeads', 'paginator'),
             $stats,
             $this->sharedViewData(),
             $this->getSidebarStats()
@@ -395,7 +407,8 @@ class LeadController extends Controller
             $request
         );
 
-        $leads = $query->get();
+        $paginator = $query->paginate(10)->appends($request->query());
+        $leads = $paginator->getCollection();
         $groupedLeads = $this->groupLeads($leads);
         $stats = $this->calculateStats($leads);
 
@@ -406,11 +419,12 @@ class LeadController extends Controller
                 'total_value' => $stats['formattedTotalValue'],
                 'avg_value' => $stats['formattedAvgValue'],
                 'avg_confidence' => $stats['avgConfidence'],
+                'pagination' => (string) $paginator->links(),
             ]);
         }
 
         return view('admin.leads.closing-this-week', array_merge(
-            compact('groupedLeads'),
+            compact('groupedLeads', 'paginator'),
             $stats,
             $this->sharedViewData(),
             $this->getSidebarStats()
