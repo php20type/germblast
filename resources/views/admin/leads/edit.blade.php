@@ -2,6 +2,34 @@
 
 @section('title', 'Lead Details')
 
+@push('styles')
+<style>
+.custom-scrollbar::-webkit-scrollbar {
+    height: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #bdbdbd;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Firefox */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #bdbdbd #f1f1f1;
+}
+</style>
+@endpush
+
 @section('content')
 
     <!-- company details start -->
@@ -94,7 +122,7 @@
                                         <h6>Expected to close</h6>
                                         <p>{{ \Carbon\Carbon::parse($leads->close_date)->format('j F Y') }}</p>
                                     </div>
-                                    <div class="info-item">
+                                    <div class="info-item"> 
                                         <h6>Confidence</h6>
                                         <p>{{ $leads->confidence }}%</p>
                                     </div>
@@ -112,7 +140,7 @@
                                         <div class="pipeline-title">Pipeline: Default Pipeline</div>
                                     </div>
 
-                                    <ul class="step-menu list-inline">
+                                    <ul class="step-menu custom-scrollbar list-inline d-flex flex-nowrap overflow-auto pb-2" style="white-space: nowrap; -webkit-overflow-scrolling: touch;">
                                         @foreach ($leadStages as $leadStage)
                                             <li role="button"
                                                 class="stage-item {{ $leadStage->id <= $leads->stage_id ? 'current' : '' }}"
@@ -425,7 +453,8 @@
                                         <div class="pipeline-title">Pipeline: Default Pipeline</div>
                                     </div>
 
-                                    <ul class="step-menu list-inline">
+                                    <!-- <ul class="step-menu list-inline"> -->
+                                    <ul class="step-menu custom-scrollbar list-inline d-flex flex-nowrap overflow-auto pb-2" style="white-space: nowrap; -webkit-overflow-scrolling: touch;">
                                         @foreach ($leadStages as $leadStage)
                                             <li class="{{ $leadStage->id <= $leads->stage_id ? 'current' : '' }}">
                                                 {{ $leadStage->name }}
