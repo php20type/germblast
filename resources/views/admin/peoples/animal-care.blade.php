@@ -21,7 +21,7 @@
                             <!-- Header -->
                             <div class="heading-area-sec">
                                 <div class="left-part-sec">
-                                    <h3 class="mb-1">Pet/Animal Care <i class="fas fa-thumbtack pinned-icon"></i>
+                                    <h3 class="mb-1">Pet/Animal Care <span style="font-size: 24px;">📌</span>
                                     </h3>
                                     <p class="text-muted mb-0">Contacts (or the individuals) you do business with
                                     </p>

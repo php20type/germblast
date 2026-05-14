@@ -21,8 +21,7 @@
                             <!-- Header -->
                             <div class="heading-area-sec">
                                 <div class="left-part-sec">
-                                    <h3 class="mb-1">1st Drip Sequence Healthcare Texas <i
-                                            class="fas fa-thumbtack pinned-icon"></i></h3>
+                                    <h3 class="mb-1">1st Drip Sequence Healthcare Texas <span style="font-size: 24px;">📌</span></h3>
                                     <p class="text-muted mb-0">Created by Brennan Baxter on November 3rd, 2023</p>
                                 </div>
                                 <button class="btn btn-export">EXPORT</button>

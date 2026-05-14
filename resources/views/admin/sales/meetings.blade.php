@@ -15,7 +15,7 @@
                         <!-- Header -->
                         <div class="heading-area-sec">
                             <div class="left-part-sec">
-                                <h3 class="mb-1">Schedule New Meeting <i class="fas fa-thumbtack pinned-icon"></i></h3>
+                                <h3 class="mb-1">Schedule New Meeting <span style="font-size: 24px;">📌</span></h3>
                                 <p class="text-muted mb-0">Schedule and manage internal or client meetings</p>
                             </div>
                             <div class="right-part">

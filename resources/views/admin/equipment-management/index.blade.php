@@ -2,13 +2,317 @@
 
 @section('title', 'Equipment Report')
 
-@section('styles')
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <style>
         .cursor-pointer {
             cursor: pointer !important;
         }
+
+        /* Modern Soft Tabs Styling */
+        .navbar-tabs .nav-tabs {
+            border-bottom: none !important;
+        }
+
+        .navbar-tabs .nav-link {
+            border: none !important;
+            color: #6b7280 !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 13px;
+            padding: 12px 20px 20px 20px !important;
+            background: transparent !important;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .navbar-tabs .nav-link.active {
+            color: #111827 !important;
+            background-color: #fff8e8 !important;
+            /* Soft yellow background from image */
+            border-radius: 10px 10px 0 0;
+        }
+
+        .navbar-tabs .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: #ffb400;
+            /* Yellow indicator */
+        }
+
+        .navbar-tabs .badge {
+            background-color: #6b7280 !important;
+            font-weight: 500;
+            padding: 4px 8px;
+            font-size: 11px;
+            vertical-align: middle;
+        }
+
+        /* Equipment Report Table Boxed Styling */
+        .equipment-report-table {
+            border: 1px solid #e5e7eb !important;
+            border-radius: 12px !important;
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            overflow: hidden !important;
+            background: #fff !important;
+            width: 100% !important;
+            margin-top: 10px !important;
+        }
+
+        .equipment-report-table thead th {
+            background-color: rgba(255, 184, 28, 0.4) !important;
+            border-bottom: 1px solid #e5e7eb !important;
+            color: #374151 !important;
+            font-weight: 600 !important;
+            padding: 18px 20px !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+        }
+
+        .equipment-report-table thead th:first-child {
+            border-top-left-radius: 12px !important;
+        }
+
+        .equipment-report-table thead th:last-child {
+            border-top-right-radius: 12px !important;
+            border-right: none !important;
+        }
+
+        .equipment-report-table td {
+            padding: 15px 20px !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid #f3f4f6 !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+        }
+
+        .equipment-report-table td:last-child {
+            border-right: none !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td {
+            border-bottom: none !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 12px !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 12px !important;
+        }
+
+        /* Status Badge from Reference */
+        .status-pill {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+            display: inline-block;
+        }
+
+        .status-pill-dirty {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-pill-ready {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+        .status-pill-inuse {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-pill-broken {
+            background: #eff6ff;
+            color: #3b82f6;
+        }
+
+        .status-pill-lost {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .status-pill-decommissioned {
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        /* Timeline History Styles */
+        .history-timeline-container {
+            position: relative;
+            padding: 30px 40px;
+            background: #fff;
+        }
+
+        .history-timeline-line {
+            position: absolute;
+            left: 55px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #ffb400;
+            opacity: 0.3;
+        }
+
+        .timeline-item {
+            position: relative;
+            display: flex;
+            margin-bottom: 30px;
+            align-items: flex-start;
+        }
+
+        .timeline-icon {
+            width: 32px;
+            height: 32px;
+            background: #ffb400;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 14px;
+            z-index: 1;
+            flex-shrink: 0;
+            margin-right: 25px;
+            box-shadow: 0 0 0 5px #fff;
+            margin-top: 15px;
+        }
+
+        .history-card {
+            background: #fff;
+            border: 1px solid #f3f4f6;
+            border-radius: 16px;
+            padding: 20px 25px;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+        }
+
+        .history-card:hover {
+            border-color: #ffb400;
+            box-shadow: 0 5px 15px rgba(255, 180, 0, 0.05);
+        }
+
+        .history-date {
+            width: 90px;
+            flex-shrink: 0;
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .history-content {
+            flex-grow: 1;
+            padding: 0 25px;
+        }
+
+        .history-note {
+            font-size: 15px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .history-status-change {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        .history-office {
+            width: 140px;
+            text-align: center;
+            color: #4b5563;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .history-user {
+            width: 150px;
+            text-align: right;
+            font-weight: 600;
+            color: #111827;
+            font-size: 14px;
+        }
+
+        /* Modal Refinement */
+        #equipmentHistoryModal .modal-content {
+            border-radius: 24px;
+            border: none;
+            overflow: hidden;
+        }
+
+        #equipmentHistoryModal .modal-header {
+            padding: 35px 40px 25px 40px;
+            border-bottom: none !important;
+        }
+
+        #historyModalSubtitle {
+            font-size: 14px;
+            color: #9ca3af !important;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .btn-close-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #fff8e8;
+            border: none;
+            color: #ffb400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .btn-close-circle:hover {
+            background: #ffb400;
+            color: #fff;
+        }
+
+        .history-labels {
+            display: flex;
+            padding: 10px 40px;
+            color: #9ca3af;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-yellow-rounded {
+            background: #ffb400;
+            color: #fff;
+            border-radius: 12px;
+            padding: 10px 35px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-yellow-rounded:hover {
+            background: #e6a200;
+            color: #fff;
+        }
     </style>
-@endsection
+@endpush
 
 
 @section('content')
@@ -18,196 +322,207 @@
             <div class="row">
                 <div class="col-md-12 p-0">
 
-                    <div class="sales-dashboard">
-
-                        <!-- HEADER (same style usage) -->
-                        <div class="dashboard-header section-card d-flex justify-content-between align-items-center"
-                            style="background:#ffb400;">
-                            <div class="container-fluid px-0">
-                                <h1 class="display-6 mb-0 text-white">Equipment Report</h1>
+                    <div class="main-content">
+                        <!-- Header -->
+                        <div class="heading-area-sec border-bottom-0 pb-0">
+                            <div class="left-part-sec">
+                                <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">EQUIPMENT REPORT <span
+                                        style="font-size: 24px;">📌</span></h3>
+                                <p class="text-muted mb-0" style="font-size: 16px;">Track and analyze equipment status
+                                    across your organization.</p>
                             </div>
-                            {{-- <button class="btn text-white fs-4">+</button> --}}
-                            <button class="btn text-white fs-4" data-bs-toggle="modal"
-                                data-bs-target="#addEquipmentModal">+</button>
+                            <div class="right-part-sec d-none">
+                                <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#addEquipmentModal">
+                                    + CREATE EQUIPMENT
+                                </button>
+                            </div>
                         </div>
 
-                    </div>
+                        <hr class="mx-4 my-4" style="opacity: 0.1;">
 
-                    <!-- TABS (EXACT fulfill order structure) -->
-                    <nav class="nav nav-fill w-100 nav-tabs border-bottom mb-3" role="tablist">
+                        <!-- TABS -->
+                        <div class="navbar-tabs px-4">
+                            <nav class="nav nav-tabs mb-0 w-100 nav-fill" role="tablist">
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#dirty">Dirty <span
+                                        class="badge bg-secondary text-white rounded-pill ms-1"
+                                        id="dirty-count">{{ $dirtyCount }}</span></button>
 
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#dirty">Dirty <span
-                                class="badge bg-secondary" id="dirty-count">{{ $dirtyCount }}</span></button>
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#ready">Ready <span
+                                        class="badge bg-secondary text-white rounded-pill ms-1"
+                                        id="ready-count">{{ $readyCount }}</span></button>
 
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#ready">Ready <span
-                                class="badge bg-secondary" id="ready-count">{{ $readyCount }}</span></button>
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#inuse">In Use <span
+                                        class="badge bg-secondary text-white rounded-pill ms-1"
+                                        id="inuse-count">{{ $inUseCount }}</span></button>
 
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#inuse">In Use <span
-                                class="badge bg-secondary" id="inuse-count">{{ $inUseCount }}</span></button>
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#broken">Broken <span
+                                        class="badge bg-secondary text-white rounded-pill ms-1"
+                                        id="broken-count">{{ $brokenCount }}</span></button>
 
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#broken">Broken <span
-                                class="badge bg-secondary" id="broken-count">{{ $brokenCount }}</span></button>
+                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#lost">Lost <span
+                                        class="badge bg-secondary text-white rounded-pill ms-1"
+                                        id="lost-count">{{ $lostCount }}</span></button>
 
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#lost">Lost <span
-                                class="badge bg-secondary" id="lost-count">{{ $lostCount }}</span></button>
+                                <button class="nav-link" data-bs-toggle="tab"
+                                    data-bs-target="#decommissioned">Decommissioned
+                                    <span class="badge bg-secondary text-white rounded-pill ms-1"
+                                        id="decommissioned-count">{{ $decommissionedCount }}</span></button>
 
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#decommissioned">Decommissioned <span
-                                class="badge bg-secondary"
-                                id="decommissioned-count">{{ $decommissionedCount }}</span></button>
+                                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#all">All <span
+                                        class="badge bg-secondary text-white rounded-pill ms-1"
+                                        id="all-count">{{ $allCount }}</span></button>
+                            </nav>
+                        </div>
 
-                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#all">All <span
-                                class="badge bg-secondary" id="all-count">{{ $allCount }}</span></button>
+                        <hr class="mx-4 mb-4 mt-0" style="opacity: 0.1;">
 
-                    </nav>
+                        <!-- TAB CONTENT -->
+                        <div class="tab-content px-4">
 
-                    <!-- TAB CONTENT (same pattern as fulfill order) -->
-                    <div class="tab-content">
-
-                        <div class="tab-pane fade show" id="dirty">
-                            <div class="sales-dashboard">
-
-                                <div class="row mb-3">
-                                    <div class="col-md-4">
-                                        <input type="search" class="form-control section-search" data-target="dirty"
-                                            placeholder="Search dirty equipment...">
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="section-card" id="dirty-table-body">
+                            <div class="tab-pane fade show" id="dirty">
+                                <div class="table-responsive">
+                                    <table id="dirtyTable" class="table table-hover w-100 equipment-report-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Barcode</th>
+                                                <th>Serial #</th>
+                                                <th>Status</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                                             @include('admin.equipment-management.partials.equipment-table-rows', ['types' => $dirtyTypes])
-                                        </div>
-                                    </div>
+                                        </tbody>
+                                    </table>
                                 </div>
-
                             </div>
-                        </div>
 
-                        <div class="tab-pane fade show" id="ready">
-                            <div class="sales-dashboard">
-
-                                <div class="row mb-3">
-                                    <div class="col-md-4">
-                                        <input type="search" class="form-control section-search" data-target="ready"
-                                            placeholder="Search ready equipment...">
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="section-card" id="ready-table-body">
+                            <div class="tab-pane fade show" id="ready">
+                                <div class="table-responsive">
+                                    <table id="readyTable" class="table table-hover w-100 equipment-report-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Barcode</th>
+                                                <th>Serial #</th>
+                                                <th>Status</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                                             @include('admin.equipment-management.partials.equipment-table-rows', ['types' => $readyTypes])
-                                        </div>
-                                    </div>
+                                        </tbody>
+                                    </table>
                                 </div>
-
                             </div>
-                        </div>
 
-                        <div class="tab-pane fade show" id="inuse">
-                            <div class="sales-dashboard">
-
-                                <div class="row mb-3">
-                                    <div class="col-md-4">
-                                        <input type="search" class="form-control section-search" data-target="inuse"
-                                            placeholder="Search in use equipment...">
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="section-card" id="inuse-table-body">
+                            <div class="tab-pane fade show" id="inuse">
+                                <div class="table-responsive">
+                                    <table id="inuseTable" class="table table-hover w-100 equipment-report-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Barcode</th>
+                                                <th>Serial #</th>
+                                                <th>Status</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                                             @include('admin.equipment-management.partials.equipment-table-rows', ['types' => $inUseTypes])
-                                        </div>
-                                    </div>
+                                        </tbody>
+                                    </table>
                                 </div>
-
                             </div>
-                        </div>
 
-                        <div class="tab-pane fade show" id="broken">
-                            <div class="sales-dashboard">
-
-                                <div class="row mb-3">
-                                    <div class="col-md-4">
-                                        <input type="search" class="form-control section-search" data-target="broken"
-                                            placeholder="Search broken equipment...">
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="section-card" id="broken-table-body">
+                            <div class="tab-pane fade show" id="broken">
+                                <div class="table-responsive">
+                                    <table id="brokenTable" class="table table-hover w-100 equipment-report-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Barcode</th>
+                                                <th>Serial #</th>
+                                                <th>Status</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                                             @include('admin.equipment-management.partials.equipment-table-rows', ['types' => $brokenTypes])
-                                        </div>
-                                    </div>
+                                        </tbody>
+                                    </table>
                                 </div>
-
                             </div>
-                        </div>
 
-                        <div class="tab-pane fade show" id="lost">
-                            <div class="sales-dashboard">
-
-                                <div class="row mb-3">
-                                    <div class="col-md-4">
-                                        <input type="search" class="form-control section-search" data-target="lost"
-                                            placeholder="Search lost equipment...">
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="section-card" id="lost-table-body">
+                            <div class="tab-pane fade show" id="lost">
+                                <div class="table-responsive">
+                                    <table id="lostTable" class="table table-hover w-100 equipment-report-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Barcode</th>
+                                                <th>Serial #</th>
+                                                <th>Status</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                                             @include('admin.equipment-management.partials.equipment-table-rows', ['types' => $lostTypes])
-                                        </div>
-                                    </div>
+                                        </tbody>
+                                    </table>
                                 </div>
-
                             </div>
-                        </div>
 
-                        <div class="tab-pane fade show" id="decommissioned">
-                            <div class="sales-dashboard">
-
-                                <div class="row mb-3">
-                                    <div class="col-md-4">
-                                        <input type="search" class="form-control section-search"
-                                            data-target="decommissioned" placeholder="Search decommissioned equipment...">
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="section-card" id="decommissioned-table-body">
+                            <div class="tab-pane fade show" id="decommissioned">
+                                <div class="table-responsive">
+                                    <table id="decommissionedTable" class="table table-hover w-100 equipment-report-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Barcode</th>
+                                                <th>Serial #</th>
+                                                <th>Status</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                                             @include('admin.equipment-management.partials.equipment-table-rows', ['types' => $decommissionedTypes])
-                                        </div>
-                                    </div>
+                                        </tbody>
+                                    </table>
                                 </div>
-
                             </div>
-                        </div>
 
-                        <div class="tab-pane fade show active" id="all">
-                            <div class="sales-dashboard">
-
-                                <div class="row mb-3">
-                                    <div class="col-md-4">
-                                        <input type="search" class="form-control section-search" data-target="all"
-                                            placeholder="Search all equipment...">
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="section-card" id="all-table-body">
+                            <div class="tab-pane fade show active" id="all">
+                                <div class="table-responsive">
+                                    <table id="allTable" class="table table-hover w-100 equipment-report-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Barcode</th>
+                                                <th>Serial #</th>
+                                                <th>Status</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                                             @include('admin.equipment-management.partials.equipment-table-rows', ['types' => $allTypes])
-                                        </div>
-                                    </div>
+                                        </tbody>
+                                    </table>
                                 </div>
-
                             </div>
-                        </div>
 
+                        </div>
                     </div>
 
                 </div>
             </div>
         </div>
+    </div>
+
+    </div>
+    </div>
+    </div>
     </div>
 
     <div class="modal fade" id="addEquipmentModal" tabindex="-1" aria-labelledby="addEquipmentModalLabel"
@@ -314,34 +629,35 @@
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
 
-                <div class="modal-header border-bottom">
+                <div class="modal-header d-flex justify-content-between align-items-start">
                     <div>
-                        <h5 class="modal-title mb-0" id="historyModalTitle">Equipment Status History</h5>
-                        <small class="text-muted" id="historyModalSubtitle"></small>
+                        <h5 class="modal-title" id="historyModalTitle">Equipment Status History</h5>
+                        <div id="historyModalSubtitle"></div>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close-circle" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="history-labels d-flex">
+                    <div style="width: 55px; margin-right: 25px;"></div> <!-- Icon Spacer -->
+                    <div style="width: 90px;">Date</div>
+                    <div class="flex-grow-1" style="padding: 0 25px;">Note / Status Change</div>
+                    <div style="width: 140px;" class="text-center">Office</div>
+                    <div style="width: 150px;" class="text-end">Changed By</div>
                 </div>
 
                 <div class="modal-body p-0">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="ps-3 text-muted fw-normal small" style="width:150px;">Date</th>
-                                <th class="text-muted fw-normal small">Note / Status Change</th>
-                                <th class="text-muted fw-normal small" style="width:140px;">Office</th>
-                                <th class="text-muted fw-normal small text-end pe-3" style="width:150px;">Changed By</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyTableBody">
-                            <tr>
-                                <td colspan="4" class="text-center py-4 text-muted">Loading&hellip;</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="history-timeline-container">
+                        <div class="history-timeline-line"></div>
+                        <div id="historyTimelineBody">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
                 </div>
 
-                <div class="modal-footer border-top">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn-yellow-rounded" data-bs-dismiss="modal">Close</button>
                 </div>
 
             </div>
@@ -351,6 +667,8 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script>
         /**
          * Build the update-status URL for a given equipment ID.
@@ -523,10 +841,9 @@
             var historyModalEl = document.getElementById('equipmentHistoryModal');
             var historyModal = new bootstrap.Modal(historyModalEl);
 
-            document.getElementById('historyModalTitle').textContent = 'Equipment Status History';
-            document.getElementById('historyModalSubtitle').textContent = '';
-            document.getElementById('historyTableBody').innerHTML =
-                '<tr><td colspan="4" class="text-center py-4 text-muted">Loading&hellip;</td></tr>';
+            document.getElementById('historyModalSubtitle').innerHTML = 'Loading...';
+            document.getElementById('historyTimelineBody').innerHTML =
+                '<div class="text-center py-5 text-muted">Loading history details&hellip;</div>';
 
             historyModal.show();
 
@@ -537,117 +854,103 @@
                 .then(function (res) { return res.json(); })
                 .then(function (data) {
                     var eq = data.equipment;
-                    document.getElementById('historyModalTitle').textContent =
-                        'Equipment Status History';
-                    document.getElementById('historyModalSubtitle').textContent =
+
+                    // Subtitle
+                    document.getElementById('historyModalSubtitle').innerHTML =
                         eq.type + '  ·  Barcode: ' + eq.barcode + '  ·  Serial #: ' + (eq.serial_number || 'N/A') + '  ·  Current Status: ' + eq.status;
 
-                    var tbody = document.getElementById('historyTableBody');
+                    var container = document.getElementById('historyTimelineBody');
 
                     if (!data.logs || data.logs.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted">No history records found.</td></tr>';
+                        container.innerHTML = '<div class="text-center py-5 text-muted">No history records found.</div>';
                         return;
                     }
 
-                    tbody.innerHTML = data.logs.map(function (log) {
+                    container.innerHTML = data.logs.map(function (log) {
                         var note = log.note ? log.note : '<span class="text-muted fst-italic">No note</span>';
-                        var statusChange = '';
-                        if (log.from_status && log.to_status) {
-                            statusChange = '<span class="badge bg-secondary me-1">' + log.from_status + '</span>'
-                                + '<span class="text-muted me-1">→</span>'
-                                + '<span class="badge bg-primary">' + log.to_status + '</span>';
-                        }
-                        return '<tr>'
-                            + '<td class="text-muted small text-nowrap">' + log.date + '</td>'
-                            + '<td><span class="text-primary">' + note + '</span>'
-                            + (statusChange ? '<br><small class="mt-1 d-inline-block">' + statusChange + '</small>' : '')
-                            + '</td>'
-                            + '<td class="text-muted small">' + (log.territory || '') + '</td>'
-                            + '<td class="text-end small">' + log.changed_by + '</td>'
-                            + '</tr>';
+                        var icon = (log.to_status || '').toLowerCase() === 'ready' ? 'fa-calendar-check' : 'fa-sync-alt';
+
+                        return `
+                                    <div class="timeline-item">
+                                        <div class="timeline-icon">
+                                            <i class="fas ${icon}"></i>
+                                        </div>
+                                        <div class="history-card">
+                                            <div class="history-date">
+                                                <div class="text-dark">${log.date}</div>
+                                            </div>
+                                            <div class="history-content">
+                                                <div class="history-note">${note}</div>
+                                                <div class="history-status-change">
+                                                    <span class="status-pill status-pill-${(log.from_status || '').toLowerCase()}">${capitalize(log.from_status)}</span>
+                                                    <i class="fas fa-long-arrow-alt-right mx-1"></i>
+                                                    <span class="status-pill status-pill-${(log.to_status || '').toLowerCase()}">${capitalize(log.to_status)}</span>
+                                                </div>
+                                            </div>
+                                            <div class="history-office">
+                                                ${log.territory || '—'}
+                                            </div>
+                                            <div class="history-user">
+                                                ${log.changed_by || 'System'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
                     }).join('');
                 })
-                .catch(function () {
-                    document.getElementById('historyTableBody').innerHTML =
-                        '<tr><td colspan="4" class="text-center py-4 text-danger">Failed to load history. Please try again.</td></tr>';
+                .catch(function (err) {
+                    document.getElementById('historyTimelineBody').innerHTML =
+                        '<div class="text-center py-5 text-muted">Error loading history.</div>';
                 });
         }
+
         /* ------------------------------------------------------------------
-         * AJAX SEARCH AND FILTERING
+         * DATATABLE INITIALIZATION
          * ------------------------------------------------------------------ */
         $(document).ready(function () {
-            let globalTimer, sectionTimers = {};
-
-            // ── Global search (hits all tabs) ──────────────────────────
-            function fetchAll() {
-                const search = $('#equipment-search').val();
-
-                // Clear individual search boxes when global search runs
-                $('.section-search').val('');
-
-                $.ajax({
-                    url: "{{ route('admin.equipment-management.index') }}",
-                    method: "GET",
-                    data: { search },
-                    success: function (res) {
-                        $('#dirty-table-body').html(res.dirty_table);
-                        $('#ready-table-body').html(res.ready_table);
-                        $('#inuse-table-body').html(res.inuse_table);
-                        $('#broken-table-body').html(res.broken_table);
-                        $('#lost-table-body').html(res.lost_table);
-                        $('#decommissioned-table-body').html(res.decommissioned_table);
-                        $('#all-table-body').html(res.all_table);
-
-                        $('#dirty-count').text(res.dirty_count);
-                        $('#ready-count').text(res.ready_count);
-                        $('#inuse-count').text(res.inuse_count);
-                        $('#broken-count').text(res.broken_count);
-                        $('#lost-count').text(res.lost_count);
-                        $('#decommissioned-count').text(res.decommissioned_count);
-                        $('#all-count').text(res.all_count);
-
-                        $('#total-count').text(res.all_count + ' Equipment Found');
+            const tableConfig = {
+                // pageLength: 2,
+                // lengthMenu: [2, 4, 8, 16],
+                pageLength: 10,
+                lengthMenu: [10, 25, 50, 100],
+                ordering: false,
+                responsive: false,
+                columnDefs: [
+                    { orderable: false, targets: -1 }
+                ],
+                language: {
+                    search: 'Search:',
+                    lengthMenu: 'Show _MENU_ entries',
+                    info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+                    paginate: {
+                        previous: '< Previous',
+                        next: 'Next >'
                     }
-                });
+                },
+                dom: '<"d-flex justify-content-between align-items-center mb-3"l f>rtip',
+            };
+
+            function initDataTable(tableId) {
+                if (!$.fn.DataTable.isDataTable('#' + tableId)) {
+                    $('#' + tableId).DataTable(tableConfig);
+                }
             }
 
-            // ── Individual section search ───────────────────────────────────
-            function fetchSection(target) {
-                const search = $(`[data-target="${target}"]`).val();
-                const status = target; // 'dirty', 'ready', 'inuse', 'broken', 'lost', 'decommissioned', 'all'
-
-                $.ajax({
-                    url: "{{ route('admin.equipment-management.index') }}",
-                    method: "GET",
-                    data: { search, status },
-                    success: function (res) {
-                        const tableKey = target + '_table';
-                        const countKey = target + '_count';
-                        $(`#${target}-table-body`).html(res[tableKey]);
-                        $(`#${target}-count`).text(res[countKey]);
-
-                        // Note: Since 'all' tab shows everything, updating one specific status tab
-                        // doesn't immediately update 'all' unless we fetch all. This is normal
-                        // per-tab filtering behavior as requested.
-                    }
-                });
+            // Initialize active tab on load
+            const activeTabId = $('.tab-pane.active').find('table').attr('id');
+            if (activeTabId) {
+                initDataTable(activeTabId);
             }
 
-            // Global search — debounced
-            $('#equipment-search').on('keyup', function () {
-                clearTimeout(globalTimer);
-                globalTimer = setTimeout(fetchAll, 300);
-            });
-
-            // Individual tab search — debounced per section
-            $(document).on('keyup', '.section-search', function () {
-                const target = $(this).data('target');
-
-                // Clear global search when section search is used
-                $('#equipment-search').val('');
-
-                clearTimeout(sectionTimers[target]);
-                sectionTimers[target] = setTimeout(() => fetchSection(target), 300);
+            // Lazy initialization on tab switch
+            $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                const targetId = $(e.target).data('bs-target').replace('#', '');
+                const tableId = $('#' + targetId).find('table').attr('id');
+                if (tableId) {
+                    initDataTable(tableId);
+                    // Adjust columns for responsiveness/alignment
+                    $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+                }
             });
         });
 

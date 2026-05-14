@@ -14,7 +14,7 @@
                         <!-- Header -->
                         <div class="heading-area-sec">
                             <div class="left-part-sec">
-                                <h3 class="mb-1">All EMPLOYEES <i class="fas fa-thumbtack pinned-icon"></i></h3>
+                                <h3 class="mb-1">All EMPLOYEES <span style="font-size: 24px;">📌</span></h3>
                                 <p class="text-muted mb-0">Internal users excluding clients</p>
                             </div>
                             <div class="right-part">

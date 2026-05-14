@@ -1,35 +1,27 @@
 @forelse($types as $type)
-    <div class="row align-items-center border-bottom py-3">
-
-        <div class="col-3 fw-semibold">
-            {{ $type->type->name ?? '-' }}
-        </div>
-
-        <div class="col-2">
-            Barcode: {{ $type->barcode }}
-        </div>
-
-        <div class="col-2">
-            Serial #: {{ $type->serial_number ?? 'N/A' }}
-        </div>
-
-        <div class="col-3">
-            Status:
-            <span class="text-primary cursor-pointer" data-id="{{ $type->id }}"
+    <tr>
+        <td>
+            <span class="fw-semibold text-dark">{{ $type->type->name ?? '-' }}</span>
+        </td>
+        <td>{{ $type->barcode }}</td>
+        <td>{{ $type->serial_number ?? 'N/A' }}</td>
+        <td>
+            @php
+                $statusSlug = strtolower($type->status);
+                $pillClass = 'status-pill-' . $statusSlug;
+            @endphp
+            <span class="status-pill {{ $pillClass }} cursor-pointer" data-id="{{ $type->id }}"
                 data-status="{{ $type->status }}" onclick="openStatusModal(this)">
                 {{ ucfirst($type->status) }}
             </span>
-        </div>
-
-        <div class="col-2 text-end">
-            <button class="btn btn-sm btn-outline-dark" data-id="{{ $type->id }}" onclick="openHistoryModal(this)">
+        </td>
+        <td class="text-center">
+            <button class="btn btn-sm btn-outline-dark me-2" style="border-radius: 6px; padding: 6px 14px;"
+                data-id="{{ $type->id }}" onclick="openHistoryModal(this)">
                 View History
             </button>
-        </div>
-
-    </div>
+        </td>
+    </tr>
 @empty
-    <div class="row border-bottom py-3">
-        <div class="col-12 text-center text-muted">No equipment found.</div>
-    </div>
+    {{-- Empty state handled by DataTable --}}
 @endforelse
