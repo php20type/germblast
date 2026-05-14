@@ -160,10 +160,10 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>1</td>
-                                        <td class="val-bad">0</td>
-                                        <td>1</td>
-                                        <td>100%</td>
+                                        <td>{{ $goodReports }}</td>
+                                        <td class="{{ $badReports > 0 ? 'val-bad' : '' }}">{{ $badReports }}</td>
+                                        <td>{{ $totalReports }}</td>
+                                        <td>{{ $compliancePercentage }}%</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -327,10 +327,11 @@ $(document).ready(function () {
     $('#consumableTable').DataTable({
         pageLength: 10,
         lengthMenu: [10, 25, 50, 100],
-        ordering: true,
+        ordering: false,
         responsive: false,
         columnDefs: [
-            { orderable: false, targets: -1 }
+            { orderable: false, targets: -1 },
+            { searchable: false, targets: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17] }
         ],
         language: {
             search: 'Search:',
@@ -341,6 +342,67 @@ $(document).ready(function () {
                 next: 'Next' 
             }
         }
+    });
+
+    // jQuery Validate for the inventory form
+    $("#inventoryForm").validate({
+        ignore: [],
+        rules: {
+            company_id: { required: true }
+        },
+        messages: {
+            company_id: { required: "Please select a Company." }
+        },
+        errorElement: 'span',
+        errorClass: 'invalid-feedback d-block',
+        highlight: function(element) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('is-invalid');
+        },
+        errorPlacement: function(error, element) {
+            if (element.parent('.input-group').length) {
+                error.insertAfter(element.parent()); // Inserts after the .input-group
+            } else {
+                error.insertAfter(element); // Default
+            }
+        }
+    });
+
+    // AJAX Submission
+    $('#inventoryForm').submit(function(e) {
+        e.preventDefault();
+
+        const $form = $(this);
+        const $submitBtn = $form.find('button[type="submit"]');
+
+        if (!$form.valid()) return;
+
+        $.ajax({
+            url: $form.attr('action'),
+            method: 'POST',
+            data: $form.serialize(),
+
+            beforeSend: function() {
+                $submitBtn.prop('disabled', true).text('Saving...');
+            },
+
+            success: function(response) {
+                toastr.success(response.message || 'Report saved successfully!');
+                $form[0].reset();
+                $('#addInventoryModal').modal('hide');
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            },
+
+            error: function(xhr) {
+                toastr.error(xhr.responseJSON?.message || 'Something went wrong while saving the report.');
+                $submitBtn.prop('disabled', false).text('Save');
+            }
+        });
     });
     $('.edit-btn').on('click', function() {
         let btn = $(this);

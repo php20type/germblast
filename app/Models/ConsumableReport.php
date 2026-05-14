@@ -13,6 +13,7 @@ class ConsumableReport extends Model
         'company_id',
         'user_id',
         'reported_at',
+        'status',
         'micro_pre',
         'micro_post',
         'disp_micro_pre',
