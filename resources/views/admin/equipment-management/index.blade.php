@@ -331,7 +331,7 @@
                                 <p class="text-muted mb-0" style="font-size: 16px;">Track and analyze equipment status
                                     across your organization.</p>
                             </div>
-                            <div class="right-part-sec d-none">
+                            <div class="right-part-sec">
                                 <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#addEquipmentModal">
                                     + CREATE EQUIPMENT
                                 </button>
