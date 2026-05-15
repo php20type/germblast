@@ -2,7 +2,176 @@
 
 @section('title', 'Fulfill Order')
 
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <style>
+        .cursor-pointer {
+            cursor: pointer !important;
+        }
+
+        .navbar-tabs {
+            border-bottom: 1px solid #f3f4f6;
+            padding-bottom: 5px;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            scrollbar-width: thin;
+            scrollbar-color: transparent transparent;
+            transition: scrollbar-color 0.3s ease;
+        }
+
+        .navbar-tabs:hover {
+            scrollbar-color: #cbd5e1 transparent;
+        }
+
+        .navbar-tabs::-webkit-scrollbar {
+            height: 5px;
+        }
+
+        .navbar-tabs::-webkit-scrollbar-thumb {
+            background-color: transparent;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar-tabs:hover::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+        }
+
+        .navbar-tabs .nav-tabs {
+            border-bottom: none !important;
+        }
+
+        .navbar-tabs .nav-link {
+            border: none !important;
+            color: #6b7280 !important;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 13px;
+            padding: 12px 20px 20px 20px !important;
+            white-space: nowrap !important;
+            background: transparent !important;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .navbar-tabs .nav-link.active {
+            color: #111827 !important;
+            background-color: #fff8e8 !important;
+            /* Soft yellow background from image */
+            border-radius: 10px 10px 0 0;
+        }
+
+        .navbar-tabs .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: #ffb400;
+            /* Yellow indicator */
+        }
+
+        .navbar-tabs .badge {
+            background-color: #6b7280 !important;
+            font-weight: 500;
+            padding: 4px 8px;
+            font-size: 11px;
+            vertical-align: middle;
+        }
+
+        /* Equipment Report Table Boxed Styling */
+        .equipment-report-table {
+            border: 1px solid #e5e7eb !important;
+            border-radius: 12px !important;
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            overflow: hidden !important;
+            background: #fff !important;
+            width: 100% !important;
+            margin-top: 10px !important;
+        }
+
+        .equipment-report-table thead th {
+            background-color: rgba(255, 184, 28, 0.4) !important;
+            border-bottom: 1px solid #e5e7eb !important;
+            color: #374151 !important;
+            font-weight: 600 !important;
+            padding: 18px 20px !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+        }
+
+        .equipment-report-table thead th:first-child {
+            border-top-left-radius: 12px !important;
+        }
+
+        .equipment-report-table thead th:last-child {
+            border-top-right-radius: 12px !important;
+            border-right: none !important;
+        }
+
+        .equipment-report-table td {
+            padding: 15px 20px !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid #f3f4f6 !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+        }
+
+        .equipment-report-table td:last-child {
+            border-right: none !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td {
+            border-bottom: none !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 12px !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 12px !important;
+        }
+
+        /* Section Card Refinement */
+        .section-card {
+            background: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 16px !important;
+            padding: 25px !important;
+            margin-bottom: 25px !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .section-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        .section-title {
+            font-size: 18px !important;
+            font-weight: 600 !important;
+            color: #374151 !important;
+            margin-bottom: 0 !important;
+        }
+
+        .section-header {
+            border-bottom: 1px solid #f3f4f6 !important;
+            padding-bottom: 15px !important;
+            margin-bottom: 20px !important;
+        }
+
+        .main-content {
+            background-color: #ffffff;
+            border-radius: 10px;
+        }
+    </style>
+@endpush
+
 @section('content')
+
 
     <!-- All Companies Section start  -->
     <div class="companies-section my-4">
@@ -11,89 +180,96 @@
                 <!-- Main Content -->
                 <div class="col-md-12 p-0">
 
-                    <div class="sales-dashboard">
-                        <div class="dashboard-header section-card d-flex justify-content-between align-items-center">
-                            <div class="container-fluid px-0">
-                                <h1 class="display-6 mb-2 fw-bold">FulFill Order</h1>
-                                <p class="text-muted">Order ID: ORD001</p>
+                    <div class="main-content">
+                        <!-- Header -->
+                        <div class="heading-area-sec border-bottom-0 pb-0">
+                            <div class="left-part-sec">
+                                <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">FULFILL ORDER <span style="font-size: 24px;">📌</span></h3>
+                                <p class="text-muted mb-2" style="font-size: 16px;">Order ID: ORD001</p>
+                            </div>
+                            <div class="right-part-sec">
+                                <a class="btn btn-export"
+                                    href="{{ route('admin.company.show', $order->service->lead->company->id) }}">
+                                    TO CUSTOMER
+                                </a>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Tabs Navigation -->
-                        <nav class="nav nav-fill w-100 nav-tabs border-bottom mb-3" id="fulfillOrderTabs" role="tablist">
-                            <button class="nav-link active" id="scheduling-tab" data-bs-toggle="tab"
-                                data-bs-target="#scheduling" type="button" role="tab" aria-controls="scheduling"
-                                aria-selected="true">
-                                Scheduling
-                            </button>
-                            <button class="nav-link" id="confirmations-tab" data-bs-toggle="tab"
-                                data-bs-target="#confirmations" type="button" role="tab" aria-controls="confirmations"
-                                aria-selected="false">
-                                Confirmations
-                            </button>
-                            <button class="nav-link" id="pre-checklist-tab" data-bs-toggle="tab"
-                                data-bs-target="#pre-checklist" type="button" role="tab" aria-controls="pre-checklist"
-                                aria-selected="false">
-                                Pre-Checklist
-                            </button>
-                            <button class="nav-link" id="post-checklist-tab" data-bs-toggle="tab"
-                                data-bs-target="#post-checklist" type="button" role="tab" aria-controls="post-checklist"
-                                aria-selected="false">
-                                Post Checklist
-                            </button>
-                            <button class="nav-link" id="facilities-tab" data-bs-toggle="tab"
-                                data-bs-target="#facilities" type="button" role="tab" aria-controls="facilities"
-                                aria-selected="false">
-                                Facilities
-                            </button>
-                            <button class="nav-link" id="staffing-tab" data-bs-toggle="tab"
-                                data-bs-target="#staffing" type="button" role="tab" aria-controls="staffing"
-                                aria-selected="false">
-                                Staffing
-                            </button>
-                            <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes"
-                                type="button" role="tab" aria-controls="notes" aria-selected="false">
-                                Notes
-                            </button>
-                            <button class="nav-link" id="invoicing-tab" data-bs-toggle="tab"
-                                data-bs-target="#invoicing" type="button" role="tab" aria-controls="invoicing"
-                                aria-selected="false">
-                                Invoicing
-                            </button>
-                            <button class="nav-link" id="schedule-view-tab" data-bs-toggle="tab"
-                                data-bs-target="#schedule-view" type="button" role="tab" aria-controls="schedule-view"
-                                aria-selected="false">
-                                Schedule View
-                            </button>
-                            <button class="nav-link" id="job-clocks-tab" data-bs-toggle="tab"
-                                data-bs-target="#job-clocks" type="button" role="tab" aria-controls="job-clocks"
-                                aria-selected="false">
-                                Job Clocks
-                            </button>
-                            <button class="nav-link" id="employee-performance-tab" data-bs-toggle="tab"
-                                data-bs-target="#employee-performance" type="button" role="tab" aria-controls="employee-performance"
-                                aria-selected="false">
-                                Employee Performance
-                            </button>
-                            <button class="nav-link" id="reports-tab" data-bs-toggle="tab"
-                                data-bs-target="#reports" type="button" role="tab" aria-controls="reports"
-                                aria-selected="false">
-                                Reports
-                            </button>
-                            <a class="nav-link"
-                            href="{{ route('admin.company.show', $order->service->lead->company->id) }}"
-                            role="tab">
-                                To Customer
-                            </a>
-                        </nav>
+                        <hr class="mx-4 my-4" style="opacity: 0.1;">
 
-                    <!-- Tab Content Section -->
-                    <div class="tab-content" id="fulfillOrderTabContent">
 
-                        <!-- Scheduling Tab -->
-                        <div class="tab-pane fade show active" id="scheduling" role="tabpanel" aria-labelledby="scheduling-tab">
-                            <div class="sales-dashboard">
+                        <!-- TABS -->
+                        <div class="navbar-tabs px-4">
+                            <nav class="nav nav-tabs mb-0 flex-nowrap" id="fulfillOrderTabs" role="tablist">
+                                <button class="nav-link active" id="scheduling-tab" data-bs-toggle="tab"
+                                    data-bs-target="#scheduling" type="button" role="tab" aria-controls="scheduling"
+                                    aria-selected="true">
+                                    Scheduling
+                                </button>
+                                <button class="nav-link" id="confirmations-tab" data-bs-toggle="tab"
+                                    data-bs-target="#confirmations" type="button" role="tab"
+                                    aria-controls="confirmations" aria-selected="false">
+                                    Confirmations
+                                </button>
+                                <button class="nav-link" id="pre-checklist-tab" data-bs-toggle="tab"
+                                    data-bs-target="#pre-checklist" type="button" role="tab"
+                                    aria-controls="pre-checklist" aria-selected="false">
+                                    Pre-Checklist
+                                </button>
+                                <button class="nav-link" id="post-checklist-tab" data-bs-toggle="tab"
+                                    data-bs-target="#post-checklist" type="button" role="tab"
+                                    aria-controls="post-checklist" aria-selected="false">
+                                    Post Checklist
+                                </button>
+                                <button class="nav-link" id="facilities-tab" data-bs-toggle="tab"
+                                    data-bs-target="#facilities" type="button" role="tab" aria-controls="facilities"
+                                    aria-selected="false">
+                                    Facilities
+                                </button>
+                                <button class="nav-link" id="staffing-tab" data-bs-toggle="tab" data-bs-target="#staffing"
+                                    type="button" role="tab" aria-controls="staffing" aria-selected="false">
+                                    Staffing
+                                </button>
+                                <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes"
+                                    type="button" role="tab" aria-controls="notes" aria-selected="false">
+                                    Notes
+                                </button>
+                                <button class="nav-link" id="invoicing-tab" data-bs-toggle="tab" data-bs-target="#invoicing"
+                                    type="button" role="tab" aria-controls="invoicing" aria-selected="false">
+                                    Invoicing
+                                </button>
+                                <button class="nav-link" id="schedule-view-tab" data-bs-toggle="tab"
+                                    data-bs-target="#schedule-view" type="button" role="tab"
+                                    aria-controls="schedule-view" aria-selected="false">
+                                    Schedule View
+                                </button>
+                                <button class="nav-link" id="job-clocks-tab" data-bs-toggle="tab"
+                                    data-bs-target="#job-clocks" type="button" role="tab" aria-controls="job-clocks"
+                                    aria-selected="false">
+                                    Job Clocks
+                                </button>
+                                <button class="nav-link" id="employee-performance-tab" data-bs-toggle="tab"
+                                    data-bs-target="#employee-performance" type="button" role="tab"
+                                    aria-controls="employee-performance" aria-selected="false">
+                                    Employee Performance
+                                </button>
+                                {{-- <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports"
+                                    type="button" role="tab" aria-controls="reports" aria-selected="false">
+                                    Reports
+                                </button> --}}
+                            </nav>
+                        </div>
+
+                        <hr class="mx-4 mb-4 mt-0" style="opacity: 0.1;">
+
+
+                        <!-- Tab Content Section -->
+                        <div class="tab-content px-4" id="fulfillOrderTabContent">
+
+
+                            <!-- Scheduling Tab -->
+                            <div class="tab-pane fade show active" id="scheduling" role="tabpanel"
+                                aria-labelledby="scheduling-tab">
 
                                 <!-- Scheduling Slots -->
                                 <div class="row">
@@ -108,7 +284,7 @@
                                                 @csrf
                                                 <input type="hidden" name="service_order_id" value="{{ $order->id }}">
 
-                                                <table class="table table-bordered align-middle">
+                                                <table class="table table-hover equipment-report-table">
                                                     <tbody>
                                                         <tr>
                                                             <th>Start Time</th>
@@ -185,7 +361,7 @@
                                                 <h5 class="section-title">Scheduled Slots</h5>
                                             </div>
 
-                                            <table class="table table-bordered align-middle">
+                                            <table class="table table-hover equipment-report-table">
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
@@ -232,9 +408,9 @@
                             </div>
                         </div>
 
-                        <!-- Confirmations Tab -->
-                        <div class="tab-pane fade" id="confirmations" role="tabpanel" aria-labelledby="confirmations-tab">
-                            <div class="sales-dashboard">
+                            <!-- Confirmations Tab -->
+                            <div class="tab-pane fade" id="confirmations" role="tabpanel"
+                                aria-labelledby="confirmations-tab">
 
                                 @forelse($order->orderSlots as $slot)
                                     <div class="row mt-3">
@@ -253,7 +429,7 @@
                                                 </div>
 
                                                 {{-- Slot Details --}}
-                                                <table class="table table-bordered align-middle mb-3">
+                                                <table class="table table-hover equipment-report-table mb-3">
                                                     <tbody>
                                                         <tr>
                                                             <th>Start Time</th>
@@ -317,7 +493,7 @@
                                                 <div class="collapse mt-3" id="editSlot{{ $slot->id }}">
                                                     <form action="{{ route('admin.lead.service.slot.update', $slot->id) }}" method="POST">
                                                         @csrf
-                                                        <table class="table table-bordered align-middle">
+                                                        <table class="table table-hover equipment-report-table">
                                                             <tbody>
                                                                 <tr>
                                                                     <th>Start Time</th>
@@ -399,11 +575,10 @@
                                 @endforelse
 
                             </div>
-                        </div>
 
-                        <!-- Pre-Checklist Tab -->
-                        <div class="tab-pane fade" id="pre-checklist" role="tabpanel" aria-labelledby="pre-checklist-tab">
-                            <div class="sales-dashboard">
+                            <!-- Pre-Checklist Tab -->
+                            <div class="tab-pane fade" id="pre-checklist" role="tabpanel"
+                                aria-labelledby="pre-checklist-tab">
 
                                 <!-- Supervisor Items Section -->
                                 <div class="row">
@@ -529,7 +704,7 @@
                                             </div>
                                             <label class="form-label">Certified Details</label>
                                             <div class="mb-3">
-                                                <table class="table table-sm table-bordered">
+                                                <table class="table table-sm table-hover equipment-report-table">
                                                     <tbody>
                                                         <tr>
                                                             <td>Test C</td>
@@ -560,11 +735,11 @@
                                 </div>
 
                             </div>
-                        </div>
 
-                        <!-- Post Checklist Tab -->
-                        <div class="tab-pane fade" id="post-checklist" role="tabpanel" aria-labelledby="post-checklist-tab">
-                            <div class="sales-dashboard">
+
+                            <!-- Post Checklist Tab -->
+                            <div class="tab-pane fade" id="post-checklist" role="tabpanel"
+                                aria-labelledby="post-checklist-tab">
 
                                 <!-- Plan Debrief Section -->
                                 <div class="row">
@@ -609,11 +784,10 @@
                                 </div>
 
                             </div>
-                        </div>
 
-                        <!-- Facilities Tab -->
-                        <div class="tab-pane fade" id="facilities" role="tabpanel" aria-labelledby="facilities-tab">
-                            <div class="sales-dashboard">
+
+                            <!-- Facilities Tab -->
+                            <div class="tab-pane fade" id="facilities" role="tabpanel" aria-labelledby="facilities-tab">
 
                                 @forelse($order->orderSlots->where('is_confirmed', true) as $slot)
                                     <div class="row mt-3">
@@ -680,31 +854,33 @@
                                         </div>
                                     </div>
                                 @endforelse
-
                             </div>
-                        </div>
 
-                        <!-- Staffing Tab -->
-                        <div class="tab-pane fade" id="staffing" role="tabpanel" aria-labelledby="staffing-tab">
-                            <div class="sales-dashboard">
+
+                            <!-- Staffing Tab -->
+                            <div class="tab-pane fade" id="staffing" role="tabpanel" aria-labelledby="staffing-tab">
 
                                 @php $confirmedSlots = $order->orderSlots->where('is_confirmed', true); @endphp
 
                                 @if($confirmedSlots->count())
 
                                     <div class="section-card mt-3">
-                                        <nav class="nav nav-tabs mb-3" id="staffingSlotTabs" role="tablist">
-                                            @foreach($confirmedSlots as $slot)
-                                                <button class="nav-link {{ $loop->first ? 'active' : '' }}"
-                                                    id="staffing-slot-{{ $slot->id }}-tab"
-                                                    data-bs-toggle="tab"
-                                                    data-bs-target="#staffing-slot-{{ $slot->id }}"
-                                                    type="button" role="tab">
-                                                    Slot #{{ $loop->iteration }}
-                                                    <small class="text-muted ms-1">{{ \Carbon\Carbon::parse($slot->scheduled_start_time)->format('M d') }}</small>
-                                                </button>
-                                            @endforeach
-                                        </nav>
+                                        <div class="navbar-tabs overflow-auto">
+                                            <nav class="nav nav-tabs mb-3 flex-nowrap" id="staffingSlotTabs" role="tablist">
+                                                @foreach ($confirmedSlots as $slot)
+                                                    <button class="nav-link {{ $loop->first ? 'active' : '' }}"
+                                                        id="staffing-slot-{{ $slot->id }}-tab" data-bs-toggle="tab"
+                                                        data-bs-target="#staffing-slot-{{ $slot->id }}"
+                                                        type="button" role="tab">
+                                                        Slot #{{ $loop->iteration }}
+                                                        <small
+                                                            class="text-muted ms-1">{{ \Carbon\Carbon::parse($slot->scheduled_start_time)->format('M d') }}</small>
+                                                    </button>
+                                                @endforeach
+                                            </nav>
+                                        </div>
+
+
 
                                         <div class="tab-content" id="staffingSlotTabContent">
                                             @foreach($confirmedSlots as $slot)
@@ -924,11 +1100,9 @@
                                 @endif
 
                             </div>
-                        </div>
 
                         <!-- Notes Tab -->
                         <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
-                            <div class="sales-dashboard mt-4">
 
                                 {{-- Contract Details --}}
                                 <div class="row">
@@ -1029,44 +1203,51 @@
                                                 </div>
                                             @endif
 
-                                            {{-- Add Note Form --}}
-                                            <form action="{{ route('admin.lead.service.order.notes.add', $order->id) }}" method="POST" enctype="multipart/form-data">
-                                                @csrf
-                                                <table class="table table-bordered align-middle">
-                                                    <tbody>
-                                                        <tr>
-                                                            <th>Notes</th>
-                                                            <td>
-                                                                <textarea class="form-control" name="notes" rows="5"></textarea>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <th>Upload Photo <small class="text-muted">(optional)</small></th>
-                                                            <td>
-                                                                <input type="file" class="form-control" name="photo">
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td colspan="2">
-                                                                <small class="text-muted">Note: Use the Contracts section to document service that was performed. Discrepancies, damage, or other issues that the sales team should be notified about should be documented and the checkbox checked.</small>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td colspan="2">
-                                                                <div class="form-check">
-                                                                    <input type="checkbox" class="form-check-input" name="notify_sales_team" id="notify_sales_team">
-                                                                    <label class="form-check-label" for="notify_sales_team">Notify Sales Team</label>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td colspan="2" class="text-end">
-                                                                <button type="submit" class="btn btn-success">Add Notes</button>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </form>
+                                        {{-- Add Note Form --}}
+                                        <form action="{{ route('admin.lead.service.order.notes.add', $order->id) }}"
+                                            method="POST" enctype="multipart/form-data">
+                                            @csrf
+                                            <table class="table table-hover equipment-report-table">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Notes</th>
+                                                        <td>
+                                                            <textarea class="form-control" name="notes" rows="5"></textarea>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Upload Photo <small class="text-muted">(optional)</small></th>
+                                                        <td>
+                                                            <input type="file" class="form-control" name="photo">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2">
+                                                            <small class="text-muted">Note: Use the Contracts section to
+                                                                document service that was performed. Discrepancies, damage,
+                                                                or other issues that the sales team should be notified about
+                                                                should be documented and the checkbox checked.</small>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2">
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input"
+                                                                    name="notify_sales_team" id="notify_sales_team">
+                                                                <label class="form-check-label"
+                                                                    for="notify_sales_team">Notify Sales Team</label>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2" class="text-end">
+                                                            <button type="submit" class="btn btn-success">Add
+                                                                Notes</button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </form>
 
                                         </div>
                                     </div>
@@ -1081,20 +1262,22 @@
                                                 <h5 class="section-title">Inventory Consumption</h5>
                                             </div>
 
-                                            <form action="{{ route('admin.lead.service.order.inventory.update', $order->id) }}" method="POST">
-                                                @csrf
-                                                <table class="table table-bordered align-middle">
-                                                    <thead class="table-light">
-                                                        <tr>
-                                                            <th>Item</th>
-                                                            <th>Quantity Used</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach([
-                                                            'microfiber'       => 'Microfiber',
-                                                            'swabs'            => 'Swabs',
-                                                            'oxivir_jars'      => 'Oxivir Concentrate Jars',
+                                        <form
+                                            action="{{ route('admin.lead.service.order.inventory.update', $order->id) }}"
+                                            method="POST">
+                                            @csrf
+                                            <table class="table table-hover equipment-report-table">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Item</th>
+                                                        <th>Quantity Used</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ([
+                                                            'microfiber' => 'Microfiber',
+                                                            'swabs' => 'Swabs',
+                                                            'oxivir_jars' => 'Oxivir Concentrate Jars',
                                                             'opticide_gallons' => 'Opticide Gallons',
                                                             'halomist'         => 'Halomist',
                                                             'water'            => 'Water',
@@ -1125,15 +1308,13 @@
                                     </div>
                                 </div>
 
-                            </div>
                         </div>
 
                         <!-- Invoicing Tab -->
                         <div class="tab-pane fade" id="invoicing" role="tabpanel" aria-labelledby="invoicing-tab">
-                            <div class="sales-dashboard">
-                                <div class="row mt-3">
-                                    <div class="col-md-12">
-                                        <div class="section-card">
+                            <div class="row mt-3">
+                                <div class="col-md-12">
+                                    <div class="section-card">
 
                                             <h5 class="section-title mb-4">Invoices</h5>
 
@@ -1232,17 +1413,18 @@
                                                 {{-- Status --}}
                                                 <p class="small text-muted mb-0">Status: <strong>Complete</strong></p>
 
-                                            </div>
-
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
                         </div>
 
 
-                        <div class="tab-pane fade" id="schedule-view" role="tabpanel" aria-labelledby="schedule-view-tab">
-                            <div class="sales-dashboard">
+
+                            <!-- Schedule View Tab -->
+                            <div class="tab-pane fade" id="schedule-view" role="tabpanel"
+                                aria-labelledby="schedule-view-tab">
 
                                 <!-- HEADER -->
                                 <div class="section-card">
@@ -1250,7 +1432,7 @@
                                         <h5 class="section-title">Schedule - Pecos Barstow Toyah ISD</h5>
                                     </div>
 
-                                    <table class="table table-bordered">
+                                    <table class="table table-hover equipment-report-table">
                                         <tr>
                                             <th>CalendarID</th>
                                             <td>16272 - Pecos Barstow Toyah ISD</td>
@@ -1284,7 +1466,7 @@
                                         <h5 class="section-title">Job Clocks</h5>
                                     </div>
 
-                                    <table class="table table-bordered">
+                                    <table class="table table-hover equipment-report-table">
                                         <thead>
                                             <tr>
                                                 <th>Type</th>
@@ -1320,7 +1502,7 @@
                                         <h5 class="section-title">Service Locations</h5>
                                     </div>
 
-                                    <table class="table table-bordered">
+                                    <table class="table table-hover equipment-report-table">
                                         <tr>
                                             <td>Austin Elementary</td>
                                             <td>1902 N Navarro<br>Pecos TX 79772</td>
@@ -1342,7 +1524,7 @@
                                         <h5 class="section-title">Technicians</h5>
                                     </div>
 
-                                    <table class="table table-bordered">
+                                    <table class="table table-hover equipment-report-table">
                                         <thead>
                                             <tr>
                                                 <th>Technician</th>
@@ -1382,12 +1564,9 @@
 
                             </div>
 
-                        </div>
 
-
-                        {{-- Job Clocks Tab --}}
-                        <div class="tab-pane fade" id="job-clocks" role="tabpanel" aria-labelledby="job-clocks-tab">
-                            <div class="sales-dashboard">
+                            {{-- Job Clocks Tab --}}
+                            <div class="tab-pane fade" id="job-clocks" role="tabpanel" aria-labelledby="job-clocks-tab">
 
                                 @forelse($order->orderSlots->where('is_confirmed', true) as $slot)
                                     <div class="row mt-3">
@@ -1402,8 +1581,8 @@
                                                 </div>
 
                                                 {{-- Clock History Table --}}
-                                                @if($slot->clocks->count())
-                                                    <table class="table table-bordered table-sm align-middle mb-3">
+                                                @if ($slot->clocks->count())
+                                                    <table class="table table-hover equipment-report-table">
                                                         <thead class="table-light">
                                                             <tr>
                                                                 <th>Type</th>
@@ -1532,11 +1711,11 @@
                                 @endforelse
 
                             </div>
-                        </div>
 
-                        <!-- Employee Performance Tab -->
-                        <div class="tab-pane fade" id="employee-performance" role="tabpanel" aria-labelledby="employee-performance-tab">
-                            <div class="sales-dashboard">
+
+                            <!-- Employee Performance Tab -->
+                            <div class="tab-pane fade" id="employee-performance" role="tabpanel"
+                                aria-labelledby="employee-performance-tab">
                                 <div class="row mt-3">
                                     <div class="col-md-12">
                                         <div class="section-card">
@@ -1550,7 +1729,7 @@
                                                 <div class="mb-4">
                                                     <h6 class="mb-3">Recorded Performance Issues</h6>
                                                     <div class="table-responsive">
-                                                        <table class="table table-sm table-bordered align-middle">
+                                                        <table class="table table-hover equipment-report-table">
                                                             <thead class="table-light">
                                                                 <tr>
                                                                     <th>Employee</th>
@@ -1615,7 +1794,7 @@
                                                 <h6 class="mb-3">Record New Performance Issue</h6>
                                                 <form id="employeePerformanceForm" class="employee-performance-form">
                                                     @csrf
-                                                    <table class="table table-bordered align-middle">
+                                                    <table class="table table-hover equipment-report-table">
                                                         <tbody>
                                                             <tr>
                                                                 <th>Employee <span class="text-danger">*</span></th>
@@ -1658,26 +1837,8 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        <!-- Reports Tab -->
-                        <div class="tab-pane fade" id="reports" role="tabpanel" aria-labelledby="reports-tab">
-                            <div class="sales-dashboard">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="section-card">
-
-
-                                        </div>
-                                    </div>
-                                </div>
 
                             </div>
-                        </div>
-                </div>
-
-
 
                 </div>
                 <!-- Main Content Ends -->
@@ -1686,28 +1847,28 @@
         </div>
     </div>
 
-    <div class="modal fade" id="userSlotsModal">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5>User Monthly Schedule</h5>
-                </div>
-                <div class="modal-body">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Office</th>
-                                <th>Start time</th>
-                                <th>End time</th>
-                                <th>Hours</th>
-                            </tr>
-                        </thead>
-                        <tbody id="userSlotsBody"></tbody>
-                    </table>
+            <div class="modal fade" id="userSlotsModal">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5>User Monthly Schedule</h5>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table table-hover equipment-report-table">
+                                <thead>
+                                    <tr>
+                                        <th>Office</th>
+                                        <th>Start time</th>
+                                        <th>End time</th>
+                                        <th>Hours</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="userSlotsBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
 @endsection
 
