@@ -406,7 +406,6 @@
                                 </div>
 
                             </div>
-                        </div>
 
                             <!-- Confirmations Tab -->
                             <div class="tab-pane fade" id="confirmations" role="tabpanel"
@@ -1839,6 +1838,9 @@
                                 </div>
 
                             </div>
+
+                        </div>
+                        <!-- /tab-content -->
 
                 </div>
                 <!-- Main Content Ends -->
