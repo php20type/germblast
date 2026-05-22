@@ -112,11 +112,17 @@ class ServiceController extends Controller
     public function fulfillOrder(Request $request, $orderId)
     {
         $order = ServiceOrder::with([
+            // 'orderSlots.clocks.clockedBy',
+            // 'orderSlots.confirmedBy',
+            // 'orderSlots.facilities.companyLocation',
+            // 'orderSlots.office',
+            // 'orderSlots.staff.user',
             'orderSlots.clocks.clockedBy',
             'orderSlots.confirmedBy',
             'orderSlots.facilities.companyLocation',
             'orderSlots.office',
             'orderSlots.staff.user',
+            'orderSlots.vehicles',
             'service.outlines',
             'service.lead.company.locations',
             'notes.user',
@@ -145,7 +151,9 @@ class ServiceController extends Controller
             })
             ->unique('id');
 
-        return view('admin.leads.fulfill-order', compact('order','companyLocations','territories','allStaff','disciplinaryIssues','assignedEmployees'));
+        $allVehicles = Vehicle::where('is_retired', 0)->orderBy('name')->get();
+
+        return view('admin.leads.fulfill-order', compact('order','companyLocations','territories','allStaff','disciplinaryIssues','assignedEmployees','allVehicles'));
     }
 
     public function fulfillOrder_book(Request $request, $orderId)
@@ -427,29 +435,39 @@ class ServiceController extends Controller
     public function clockIn(Request $request)
     {
         $request->validate([
-            'slot_id' => 'required|exists:service_order_slots,id',
-            'type'    => 'required|in:service,travel,break',
+            'slot_id'        => 'required|exists:service_order_slots,id',
+            'type'           => 'required|in:service,travel,break,office work,warehouse,training,service prep,umc',
+            'vehicle_id'     => 'required_if:type,travel|nullable|exists:vehicles,id',
+            'driver_user_id' => 'required_if:type,travel|nullable|exists:users,id',
         ]);
 
         $slot = ServiceOrderSlot::findOrFail($request->slot_id);
 
-        // Prevent overlapping active clock of same type
+        // Prevent the same user from having two active clocks of the same type simultaneously
         $activeClock = $slot->clocks()
             ->where('type', $request->type)
+            ->where('clocked_by', auth()->id())
             ->whereNull('clocked_out_at')
             ->first();
 
         if ($activeClock) {
             return redirect()->back()->with('error',
-                ucfirst($request->type) . ' clock is already running.'
+                ucfirst($request->type) . ' clock is already running for your account.'
             );
         }
 
-        $slot->clocks()->create([
+        $clockData = [
             'type'          => $request->type,
             'clocked_by'    => auth()->id(),
             'clocked_in_at' => now(),
-        ]);
+        ];
+
+        if ($request->type === 'travel') {
+            $clockData['vehicle_id']    = $request->vehicle_id;
+            $clockData['driver_user_id'] = $request->driver_user_id;
+        }
+
+        $slot->clocks()->create($clockData);
 
         $slot->serviceOrder->update(['status' => 'in_progress']);
 
@@ -472,6 +490,7 @@ class ServiceController extends Controller
 
         $activeClock = $slot->clocks()
             ->where('type', $request->type)
+            ->where('clocked_by', auth()->id())
             ->whereNull('clocked_out_at')
             ->latest('clocked_in_at')
             ->first();

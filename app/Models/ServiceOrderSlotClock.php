@@ -39,4 +39,14 @@ class ServiceOrderSlotClock extends Model
         return 0;
     }
 
+    public function vehicle()
+    {
+        return $this->belongsTo(Vehicle::class, 'vehicle_id');
+    }
+
+    public function driver()
+    {
+        return $this->belongsTo(User::class, 'driver_user_id');
+    }
+
 }
