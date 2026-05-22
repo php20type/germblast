@@ -61,6 +61,11 @@
                     <div class="form-group mb-5 mt-5">
                         <button type="submit" class="btn btn-primary rounded-pill w-100">REGISTER</button>
                     </div>
+
+                    {{-- Sign In --}}
+                    <div class="forget-password">
+                        <p><span> Already have an account? <a href="{{ route('login') }}" class="theme-color"> Sign in</a></span></p>
+                    </div>
                 </form>
             </div>
         </div>

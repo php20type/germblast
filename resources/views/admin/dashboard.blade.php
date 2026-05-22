@@ -22,7 +22,7 @@
             <div class="row">
                 <!-- Top Row -->
                 @can('company.create')
-                <div class="col-lg-3 col-md-6 col-module">
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-module">
                     <div class="card-module" data-bs-toggle="modal" data-bs-target="#AddCompany">
                         <div class="icon-wrapper icon-company">
                             <img src={{ asset('img/icons/dashboard-app1.png') }} alt="app icon" />
@@ -34,7 +34,7 @@
                 @endcan
 
                 @can('people.create')
-                <div class="col-lg-3 col-md-6 col-module">
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-module">
                     <div class="card-module" data-bs-toggle="modal" data-bs-target="#AddPerson">
                         <div class="icon-wrapper icon-person">
                             <img src={{ asset('img/icons/dashboard-app2.png') }} alt="app icon" />
@@ -46,7 +46,7 @@
                 @endcan
 
                 @can('lead.create')
-                <div class="col-lg-3 col-md-6 col-module">
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-module">
                     <div class="card-module" data-bs-toggle="modal" data-bs-target="#AddLead">
                         <div class="icon-wrapper icon-lead">
                             <img src={{ asset('img/icons/dashboard-app3.png') }} alt="app icon" />
@@ -57,7 +57,7 @@
                 </div>
                 @endcan
 
-                <div class="col-lg-3 col-md-6 col-module">
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-module">
                     <div class="card-module" data-bs-toggle="modal" data-bs-target="#AddActivity">
                         <div class="icon-wrapper icon-activity">
                             <img src={{ asset('img/icons/dashboard-app4.png') }} alt="app icon" />
@@ -67,7 +67,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-6 col-module">
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-module">
                     <div class="card-module" data-bs-toggle="modal" data-bs-target="#AddTask">
                         <div class="icon-wrapper icon-task">
                             <img src={{ asset('img/icons/dashboard-app5.png') }} alt="app icon" />
@@ -77,7 +77,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-6 col-module">
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-module">
                     <div class="card-module">
                         <div class="icon-wrapper icon-form">
                             <img src={{ asset('img/icons/dashboard-app6.png') }} alt="app icon" />
@@ -87,7 +87,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-6 col-module">
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-module">
                     <div class="card-module">
                         <div class="icon-wrapper icon-import">
                             <img src={{ asset('img/icons/dashboard-app7.png') }} alt="app icon" />
