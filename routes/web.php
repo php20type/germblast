@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Admin\ConsumableReportController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EquipmentManagementController;
+use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -108,6 +109,18 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('consumable-reports/store', [ConsumableReportController::class, 'store'])->name('consumable-reports.store');
     Route::put('consumable-reports/update/{id}', [ConsumableReportController::class, 'update'])->name('consumable-reports.update');
     Route::post('consumable-reports/delete/{id}', [ConsumableReportController::class, 'destroy'])->name('consumable-reports.destroy');
+
+    // Warehouse 
+    Route::get('/warehouse/maintenance-dashboard', [WarehouseController::class, 'maintenance'])->name('warehouse.maintenance');
+    Route::post('/warehouse/tasks/store', [WarehouseController::class, 'store'])->name('warehouse.tasks.store');
+    Route::post('/warehouse/tasks/update/{id}', [WarehouseController::class, 'update'])->name('warehouse.tasks.update');
+    Route::post('/warehouse/tasks/complete/{id}', [WarehouseController::class, 'complete'])->name('warehouse.tasks.complete');
+    Route::post('/warehouse/tasks/reset/{id}', [WarehouseController::class, 'reset'])->name('warehouse.tasks.reset');
+    Route::post('/warehouse/tasks/delete/{id}', [WarehouseController::class, 'destroy'])->name('warehouse.tasks.destroy');
+
+    Route::get('/warehouse/calendar', [WarehouseController::class, 'calendar'])->name('warehouse.calendar');
+    Route::post('/warehouse/calendar/store', [WarehouseController::class, 'storeSchedule'])->name('warehouse.calendar.store');
+    Route::post('/warehouse/calendar/delete/{id}', [WarehouseController::class, 'destroySchedule'])->name('warehouse.calendar.destroy');
 });
 
 Route::view('survey-proposal.pdf', 'survey-proposal.pdf')->name('survey.proposal');

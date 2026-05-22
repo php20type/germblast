@@ -1,12 +1,13 @@
- <!-- Aside section start -->
- <aside class="app-sidebar">
+<!-- Aside section start -->
+<aside class="app-sidebar">
     {{-- <div id="close"><a href="javascript:void(0)"><i class="fa-regular fa-xmark"></i></a></div> --}}
     <div class="logo-sec">
-        <a href="{{ route('admin.dashboard') }}" class="d-block"><img src={{ asset("img/logo/logo.svg") }} alt="logo" /></a>
+        <a href="{{ route('admin.dashboard') }}" class="d-block"><img src={{ asset("img/logo/logo.svg") }}
+                alt="logo" /></a>
     </div>
     <nav class="sidebar-nav">
         <ul class="list-inline">
-             <li class="{{ request()->routeIs('admin.sales.*') ? 'active' : '' }}">
+            <li class="{{ request()->routeIs('admin.sales.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.sales.index') }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon18.svg") }} alt="icon" />
@@ -145,6 +146,26 @@
                     </div>
                     <div class="nav-text ms-3">
                         Consumable Reports
+                    </div>
+                </a>
+            </li>
+            <li class="{{ request()->routeIs('admin.warehouse.maintenance') ? 'active' : '' }}">
+                <a href="{{ route('admin.warehouse.maintenance') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon13.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Warehouse Maintenance
+                    </div>
+                </a>
+            </li>
+            <li class="{{ request()->routeIs('admin.warehouse.calendar') ? 'active' : '' }}">
+                <a href="{{ route('admin.warehouse.calendar') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon8.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Warehouse Calendar
                     </div>
                 </a>
             </li>

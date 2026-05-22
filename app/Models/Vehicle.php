@@ -19,4 +19,9 @@ class Vehicle extends Model
         return $this->belongsToMany(ServiceOrderSlot::class, 'service_order_slot_vehicles')
                     ->withTimestamps();
     }
+
+    public function warehouseTasks()
+    {
+        return $this->hasMany(WarehouseTask::class, 'vehicle_id');
+    }
 }
