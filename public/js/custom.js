@@ -18,6 +18,17 @@
         });
     }
 
+    // Scroll active sidebar menu item into view
+    const activeSidebarItem = document.querySelector(".app-sidebar li.active");
+    if (activeSidebarItem) {
+        // Run immediately to capture early rendering
+        activeSidebarItem.scrollIntoView({ behavior: "auto", block: "center" });
+        // Also run after layout stabilization to guarantee visibility on heavy layout shifts
+        setTimeout(() => {
+            activeSidebarItem.scrollIntoView({ behavior: "auto", block: "center" });
+        }, 100);
+    }
+
     // Handle checkbox selection
     const selectAllCheckbox = document.getElementById('selectAll');
     const tableBody = document.querySelector('table tbody');
