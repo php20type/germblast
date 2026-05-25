@@ -106,6 +106,15 @@
                                     </span>
                                 @endforeach
                             </div>
+                            <div class="mt-2" id="contact-types-badges-container">
+                                @if(!empty($peoples->contact_types))
+                                    @foreach ($peoples->contact_types as $type)
+                                        <span class="badge bg-warning text-dark mx-1 px-2 py-1" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; border-radius: 4px; display: inline-block;">
+                                            <i class="fas fa-address-card me-1"></i>{{ $type }}
+                                        </span>
+                                    @endforeach
+                                @endif
+                            </div>
 
                             @can('people.detail.edit')
                                 <div class="mt-4" id="addCompanyTag">
@@ -1055,6 +1064,35 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label"><b>CONTACT TYPE</b></label>
+                                    <div class="d-flex flex-column gap-2 mt-1">
+                                        @php
+                                            $selectedTypes = $peoples->contact_types ?? [];
+                                        @endphp
+                                        <div class="form-check">
+                                            <input class="form-check-input contact-type-checkbox" type="checkbox" value="service" id="edit_contact_type_service"
+                                                {{ in_array('service', $selectedTypes) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="edit_contact_type_service">
+                                                Service
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input contact-type-checkbox" type="checkbox" value="scheduling" id="edit_contact_type_scheduling"
+                                                {{ in_array('scheduling', $selectedTypes) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="edit_contact_type_scheduling">
+                                                Scheduling
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input contact-type-checkbox" type="checkbox" value="billing" id="edit_contact_type_billing"
+                                                {{ in_array('billing', $selectedTypes) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="edit_contact_type_billing">
+                                                Billing
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
                             @else
                                 <div class="form-group mb-3">
                                     <label class="form-label"><b>ASSIGNEE</b> </label>
@@ -1079,6 +1117,26 @@
                                             </option>
                                         @endforeach
                                     </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label"><b>CONTACT TYPE</b></label>
+                                    <div class="d-flex flex-column gap-2 mt-1">
+                                        @php
+                                            $selectedTypes = $peoples->contact_types ?? [];
+                                        @endphp
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" disabled {{ in_array('service', $selectedTypes) ? 'checked' : '' }}>
+                                            <label class="form-check-label">Service</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" disabled {{ in_array('scheduling', $selectedTypes) ? 'checked' : '' }}>
+                                            <label class="form-check-label">Scheduling</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" disabled {{ in_array('billing', $selectedTypes) ? 'checked' : '' }}>
+                                            <label class="form-check-label">Billing</label>
+                                        </div>
+                                    </div>
                                 </div>
 
                             @endcan
@@ -3011,6 +3069,47 @@
                     }
                 });
             }
+
+
+            // ==============================
+            // Handle contact type checkbox change
+            // ==============================
+            $(document).on('change', '.contact-type-checkbox', function() {
+                let selectedTypes = [];
+                $('.contact-type-checkbox:checked').each(function() {
+                    selectedTypes.push($(this).val());
+                });
+
+                let peopleId = $('#people-details-container').data('people-id');
+
+                $.ajax({
+                    url: `/admin/people/${peopleId}/update-field`,
+                    type: 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content') || "{{ csrf_token() }}",
+                        field: 'contact_types',
+                        value: selectedTypes
+                    },
+                    success: function(response) {
+                        toastr.success('Contact types updated successfully!');
+
+                        // Dynamically update badges at the top
+                        let badgesContainer = $('#contact-types-badges-container');
+                        badgesContainer.empty();
+                        selectedTypes.forEach(function(type) {
+                            badgesContainer.append(`
+                                <span class="badge bg-warning text-dark mx-1 px-2 py-1" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; border-radius: 4px; display: inline-block;">
+                                    <i class="fas fa-address-card me-1"></i>${type}
+                                </span>
+                            `);
+                        });
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        toastr.error('Failed to update contact types.');
+                    }
+                });
+            });
 
 
             // ==============================

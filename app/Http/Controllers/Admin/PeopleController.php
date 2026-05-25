@@ -770,6 +770,7 @@ class PeopleController extends Controller
                 'name' => $request->name,
                 'bio' => $request->bio,
                 'territory_id' => $request->territory_id,
+                'contact_types' => $request->contact_types,
             ]);
 
             // Step 2: Store emails
@@ -902,12 +903,35 @@ class PeopleController extends Controller
     {
         $request->validate([
             'field' => 'required|string',
-            'value' => 'nullable|string',
+            'value' => 'nullable',
         ]);
 
         $peopleName = $people->name ?? 'Unknown Person';
 
         switch ($request->field) {
+
+            case 'contact_types':
+                $value = $request->value;
+                if (is_string($value)) {
+                    $decoded = json_decode($value, true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $value = $decoded;
+                    } else {
+                        $value = array_filter(explode(',', $value));
+                    }
+                }
+                $people->update([
+                    'contact_types' => $value,
+                ]);
+
+                Timeline::create([
+                    'user_id' => auth()->id(),
+                    'owner_type' => 'people',
+                    'owner_id' => $people->id,
+                    'action_type' => 'updated_contact_types',
+                    'description' => "updated contact types for {$peopleName}",
+                ]);
+                break;
 
             case 'territory_id':
                 $people->update([

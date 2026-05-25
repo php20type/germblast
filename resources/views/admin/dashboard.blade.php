@@ -354,6 +354,31 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-lg-12">
+                                <div class="form-group mb-3">
+                                    <label class="form-label"><b>Contact Type</b></label>
+                                    <div class="d-flex gap-4 mt-1">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="contact_types[]" value="service" id="contact_type_service">
+                                            <label class="form-check-label" for="contact_type_service">
+                                                Service
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="contact_types[]" value="scheduling" id="contact_type_scheduling">
+                                            <label class="form-check-label" for="contact_type_scheduling">
+                                                Scheduling
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="contact_types[]" value="billing" id="contact_type_billing">
+                                            <label class="form-check-label" for="contact_type_billing">
+                                                Billing
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

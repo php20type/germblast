@@ -25,6 +25,11 @@ class People extends Model
         'city_id',
         'marketing_status',
         'territory_id',
+        'contact_types',
+    ];
+
+    protected $casts = [
+        'contact_types' => 'array',
     ];
 
     protected $morphClass = 'People';

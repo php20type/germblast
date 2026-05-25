@@ -129,6 +129,15 @@
                                                                 <div class="company-name">
                                                                     {{ $people->companiesAlt->first()?->name ?? 'N/A' }}
                                                                 </div>
+                                                                @if(!empty($people->contact_types))
+                                                                    <div class="contact-types-list mt-1 d-flex flex-wrap gap-1">
+                                                                        @foreach($people->contact_types as $type)
+                                                                            <span class="badge bg-light text-dark border px-1 py-0.5" style="font-size: 0.65rem; font-weight: 500; text-transform: uppercase; border-radius: 3px;">
+                                                                                {{ $type }}
+                                                                            </span>
+                                                                        @endforeach
+                                                                    </div>
+                                                                @endif
                                                             </td>
                                                             <td>
                                                                 {{ \Carbon\Carbon::parse($people->created_at)->format('j F Y') }}
