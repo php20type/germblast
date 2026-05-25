@@ -234,11 +234,41 @@ title {
     padding-left: 5px;
 }
 
-.login-section .login-image img {
+/* .login-section .login-image img {
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+} */
+
+.login-section .login-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    overflow: hidden;
+    padding: 20px;
+}
+
+.login-section .login-image img {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    width: 100%;
+    max-width: 650px;
+    height: auto;
+    object-fit: contain;
+}
+
+@media (max-width: 991px) {
+    .login-section .login-image {
+        min-height: 400px;
+    }
+
+    .login-section .login-form {
+        height: auto;
+    }
 }
 
 .login-section .login-form .btn-primary {
