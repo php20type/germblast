@@ -199,6 +199,17 @@
                             </div>
                             <div class="col-lg-12">
                                 <div class="form-group">
+                                    <label class="form-label">Tax Rate</label>
+                                    <select name="tax_rate" class="form-select">
+                                        <option value="">Please Select</option>
+                                        @foreach(config('mapping.tax_rates') as $value => $label)
+                                            <option value="{{ $value }}">{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
                                     <label class="form-label">Assignee</label>
                                     <span class="text-danger">*</span>
                                     <select name="assignee_id" class="form-select">

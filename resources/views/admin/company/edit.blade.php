@@ -1209,7 +1209,7 @@
                                 @endcan
                             </div>
 
-                            <div class="form-group mb-3">
+                             <div class="form-group mb-3">
                                 <label class="form-label"><b>TERRITORY</b></label>
                                 @can('company.detail.edit')
                                     <select class="form-select company-update" data-field-name="Territory"
@@ -1227,6 +1227,30 @@
                                             <option value="{{ $territory->id }}"
                                                 {{ $company->territory_id == $territory->id ? 'selected' : '' }}>
                                                 {{ $territory->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @endcan
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label"><b>TAX RATE</b></label>
+                                @can('company.detail.edit')
+                                    <select class="form-select company-update" data-field-name="Tax Rate"
+                                        data-field="tax_rate">
+                                        <option value="">Please Select</option>
+                                        @foreach(config('mapping.tax_rates') as $value => $label)
+                                            <option value="{{ $value }}" {{ $company->tax_rate == $value ? 'selected' : '' }}>
+                                                {{ $label }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @else
+                                    <select class="form-select" disabled>
+                                        <option value="">Please Select</option>
+                                        @foreach(config('mapping.tax_rates') as $value => $label)
+                                            <option value="{{ $value }}" {{ $company->tax_rate == $value ? 'selected' : '' }}>
+                                                {{ $label }}
                                             </option>
                                         @endforeach
                                     </select>

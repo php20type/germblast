@@ -24,6 +24,7 @@ class Company extends Model
         'territory_id',
         'annual_revenue',
         'employees_count',
+        'tax_rate',
     ];
 
     protected $morphClass = 'Company';

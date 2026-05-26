@@ -170,6 +170,10 @@ class CompanyController extends Controller
 
     public function store(Request $request, NotificationService $notify)
     {
+        if ($request->filled('tax_rate') && !array_key_exists($request->tax_rate, config('mapping.tax_rates'))) {
+            return redirect()->back()->with('error', 'Invalid tax rate selected.');
+        }
+
         try {
             // Step 1: Create company
             $company = Company::create([
@@ -180,6 +184,7 @@ class CompanyController extends Controller
                 'company_type_id' => $request->company_type_id,
                 'industry_id' => $request->industry_id,
                 'territory_id' => $request->territory_id,
+                'tax_rate' => $request->tax_rate,
             ]);
 
             // Step 2: Store emails
@@ -815,6 +820,17 @@ class CompanyController extends Controller
             case 'employees_count':
                 $company->update([
                     'employees_count' => $request->value,
+                ]);
+                break;
+
+            case 'tax_rate':
+                if ($request->filled('value') && !array_key_exists($request->value, config('mapping.tax_rates'))) {
+                    return response()->json([
+                        'error' => 'Invalid tax rate value',
+                    ], 422);
+                }
+                $company->update([
+                    'tax_rate' => $request->value,
                 ]);
                 break;
 
