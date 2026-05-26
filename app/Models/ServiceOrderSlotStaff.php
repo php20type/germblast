@@ -11,6 +11,10 @@ class ServiceOrderSlotStaff extends Model
         'service_order_slot_id',
         'user_id',
         'slot_hours',
+        'is_leader',
+    ];
+    protected $casts = [
+        'is_leader' => 'boolean',
     ];
     public function slot()
     {

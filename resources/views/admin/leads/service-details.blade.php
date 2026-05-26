@@ -145,6 +145,108 @@
                                         </table>
                                     </div>
 
+                                    <!-- Recurrence Schedule Table -->
+                                    <div class="table-responsive mb-2 mt-4">
+                                        <h6 class="fw-bold mb-3 text-secondary"><i class="fas fa-redo me-1"></i> Configure Recurring Service Schedule</h6>
+                                        <table class="table table-bordered align-middle">
+                                            <tbody>
+                                                <form action="{{ route('admin.lead.service.add_recurrence') }}" method="POST">
+                                                    @csrf
+
+                                                    <input type="hidden" name="service_id" value="{{ $service->id }}">
+
+
+
+                                                     <tr>
+                                                         <th>Start Time</th>
+                                                         <td>
+                                                             <input type="time" class="form-control" name="scheduled_start_time">
+                                                         </td>
+                                                     </tr>
+
+                                                     <tr>
+                                                         <th>End Time</th>
+                                                         <td>
+                                                             <input type="time" class="form-control" name="scheduled_end_time">
+                                                         </td>
+                                                     </tr>
+
+                                                    <tr>
+                                                        <th>Arrival Time</th>
+                                                        <td>
+                                                            <input type="time" class="form-control" name="scheduled_arrival_time">
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <th>Office</th>
+                                                        <td>
+                                                            <select class="form-control form-select" name="scheduled_office">
+                                                                @foreach($offices as $office)
+                                                                    <option value="{{ $office->name }}" {{ $office->name === 'Lubbock, TX' ? 'selected' : '' }}>{{ $office->name }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <th>Recurrence Count</th>
+                                                        <td>
+                                                            <input type="number" class="form-control" name="scheduled_recurrence_count" min="1" required placeholder="Number of recurring orders to generate">
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <th>Recurrence Rules</th>
+                                                        <td>
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <select class="form-control form-select" name="recurrence_rule_1" style="width: auto;">
+                                                                    <option value="N/A">N/A</option>
+                                                                    <option value="First">First</option>
+                                                                    <option value="Second">Second</option>
+                                                                    <option value="Third">Third</option>
+                                                                    <option value="Fourth">Fourth</option>
+                                                                    <option value="Last">Last</option>
+                                                                </select>
+
+                                                                <select class="form-control form-select" name="recurrence_rule_2" style="width: auto;">
+                                                                    <option value="N/A">N/A</option>
+                                                                    <option value="Sunday">Sunday</option>
+                                                                    <option value="Monday">Monday</option>
+                                                                    <option value="Tuesday">Tuesday</option>
+                                                                    <option value="Wednesday">Wednesday</option>
+                                                                    <option value="Thursday">Thursday</option>
+                                                                    <option value="Friday">Friday</option>
+                                                                    <option value="Saturday">Saturday</option>
+                                                                </select>
+
+                                                                <span class="text-muted">of a</span>
+
+                                                                <select class="form-control form-select" name="recurrence_rule_3" style="width: auto;">
+                                                                    <option value="N/A">N/A</option>
+                                                                    <option value="Week">Week</option>
+                                                                    <option value="Month">Month</option>
+                                                                    <option value="Quarter">Quarter</option>
+                                                                    <option value="Half-Year">Half-Year</option>
+                                                                </select>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td colspan="2" class="text-end">
+                                                            <button type="submit" class="btn btn-primary">
+                                                                Submit
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+
+                                                </form>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+
 
                                     @forelse($service->orders as $order)
 

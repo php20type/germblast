@@ -10,6 +10,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
         Route::post('service/store/{lead}', [ServiceController::class, 'storeService'])->name('service.store');
         Route::post('service/add-date', [ServiceController::class, 'addIntendedDate'])->name('service.add_date');
+        Route::post('service/add-recurrence', [ServiceController::class, 'addRecurrenceSchedule'])->name('service.add_recurrence');
 
         Route::post('service/slot/{slotId}/confirm', [ServiceController::class, 'confirmSlot'])->name('service.slot.confirm');
         Route::post('service/slot/{slotId}/update', [ServiceController::class, 'updateSlot'])->name('service.slot.update');
@@ -20,6 +21,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::get('service/user-monthly-slots', [ServiceController::class, 'getUserMonthlySlots'])->name('service.user.monthly_slots');
         Route::post('service/slot/{slotId}/staff/assign', [ServiceController::class, 'assignStaff'])->name('service.slot.staff.assign');
         Route::post('service/slot/staff/{staffId}/remove', [ServiceController::class, 'removeStaff'])->name('service.slot.staff.remove');
+        Route::post('service/slot/staff/{staffId}/toggle-leader', [ServiceController::class, 'toggleLeader'])->name('service.slot.staff.toggle_leader');
 
         Route::post('/slot/{slot}/vehicles', [ServiceController::class, 'assignVehicles'])->name('slot.vehicle.assign');
         Route::post('/slot/{slot}/vehicles/{vehicle}', [ServiceController::class, 'removeVehicle'])->name('slot.vehicle.remove');

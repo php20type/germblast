@@ -37,8 +37,9 @@ class ServiceController extends Controller
 
         $services = $lead->services;
         $totalRevenue = $services->sum('total_price');
+        $offices = \App\Models\OfficeLocation::where('is_active', 1)->get();
 
-        return view('admin.leads.service-details', compact('services', 'lead', 'totalRevenue'));
+        return view('admin.leads.service-details', compact('services', 'lead', 'totalRevenue', 'offices'));
     }
 
     /**
@@ -84,7 +85,7 @@ class ServiceController extends Controller
     }
 
     /**
-     * Step 2: Add intended date → creates a ServiceOrder record
+     * Step 2: Add intended date → creates a ServiceOrder record (manual creation)
      */
     public function addIntendedDate(Request $request)
     {
@@ -107,6 +108,175 @@ class ServiceController extends Controller
 
         return redirect()->route('admin.lead.service.details', $service->lead_id)
             ->with('success', 'Intended date added.');
+    }
+
+    public function addRecurrenceSchedule(Request $request)
+    {
+        $request->validate([
+            'service_id' => 'required|exists:services,id',
+            'scheduled_start_time' => 'nullable|string',
+            'scheduled_end_time' => 'nullable|string',
+            'scheduled_arrival_time' => 'nullable|string',
+            'scheduled_office' => 'nullable|string',
+            'scheduled_recurrence_count' => 'required|integer|min:1',
+            'recurrence_rule_1' => 'nullable|string',
+            'recurrence_rule_2' => 'nullable|string',
+            'recurrence_rule_3' => 'nullable|string',
+        ]);
+
+        $service = Service::findOrFail($request->service_id);
+        $recurrenceCount = $request->input('scheduled_recurrence_count');
+
+        $rule1 = $request->input('recurrence_rule_1', 'N/A');
+        $rule2 = $request->input('recurrence_rule_2', 'N/A');
+        $rule3 = $request->input('recurrence_rule_3', 'N/A');
+
+        $ruleStr = "{$rule1} {$rule2} of a {$rule3}";
+        if ($rule1 === 'N/A' && $rule2 === 'N/A' && $rule3 === 'N/A') {
+            $ruleStr = 'N/A';
+        }
+
+        // Generate recurrence dates starting dynamically from the current date
+        $dates = $this->generateRecurrenceDates($recurrenceCount, $rule1, $rule2, $rule3);
+
+        foreach ($dates as $date) {
+            $order = ServiceOrder::create([
+                'user_id' => auth()->id(),
+                'service_id' => $service->id,
+                'intended_date' => $date,
+                'status' => 'scheduled',
+            ]);
+
+            $order->update([
+                'order_no' => $this->orderService->generateOrderNo($order->id),
+            ]);
+
+            // Calculate start and end datetimes
+            $scheduledStart = null;
+            $scheduledEnd = null;
+            $scheduledHours = null;
+
+            if ($request->filled('scheduled_start_time')) {
+                $scheduledStart = \Carbon\Carbon::parse("$date " . $request->scheduled_start_time);
+            }
+            if ($request->filled('scheduled_end_time')) {
+                $scheduledEnd = \Carbon\Carbon::parse("$date " . $request->scheduled_end_time);
+            }
+            if ($scheduledStart && $scheduledEnd) {
+                $scheduledHours = abs(round($scheduledStart->diffInMinutes($scheduledEnd) / 60, 2));
+            }
+
+            // Find matching territory ID for the scheduled office string
+            $officeId = null;
+            if ($request->filled('scheduled_office')) {
+                $cleanOfficeName = explode(',', $request->scheduled_office)[0];
+                $territory = Territory::where('name', $request->scheduled_office)
+                    ->orWhere('name', 'like', '%' . $cleanOfficeName . '%')
+                    ->first();
+                if ($territory) {
+                    $officeId = $territory->id;
+                }
+            }
+
+            // Create slot record for the order
+            $order->orderSlots()->create([
+                'scheduled_start_time' => $scheduledStart,
+                'scheduled_end_time' => $scheduledEnd,
+                'scheduled_arrival_time' => $request->scheduled_arrival_time,
+                'scheduled_office' => $officeId,
+                'scheduled_recurrence_count' => $recurrenceCount,
+                'scheduled_recurrence_rule' => $ruleStr,
+                'scheduled_hours' => $scheduledHours,
+                'meet' => 'office',
+                'overnight' => 0,
+            ]);
+        }
+
+        return redirect()->route('admin.lead.service.details', $service->lead_id)
+            ->with('success', 'Recurring service orders generated successfully.');
+    }
+
+    private function generateRecurrenceDates($count, $rule1, $rule2, $rule3)
+    {
+        $dates = [];
+        $today = new \DateTime('today');
+        $pointer = clone $today;
+
+        if ($rule1 !== 'N/A' && $rule2 !== 'N/A') {
+            while (count($dates) < $count) {
+                $year = $pointer->format('Y');
+                $month = $pointer->format('m');
+                $calculated = $this->getNthWeekdayOfMonth($year, $month, $rule1, $rule2);
+
+                if ($calculated && $calculated >= $today) {
+                    $dates[] = $calculated->format('Y-m-d');
+                }
+
+                // Increment pointer
+                if ($rule3 === 'Week') {
+                    $pointer->modify('+1 week');
+                } elseif ($rule3 === 'Month') {
+                    $pointer->modify('+1 month');
+                } elseif ($rule3 === 'Quarter') {
+                    $pointer->modify('+3 month');
+                } elseif ($rule3 === 'Half-Year') {
+                    $pointer->modify('+6 month');
+                } else {
+                    $pointer->modify('+1 day');
+                }
+            }
+        } else {
+            while (count($dates) < $count) {
+                $dates[] = $pointer->format('Y-m-d');
+
+                // Increment pointer
+                if ($rule3 === 'Week') {
+                    $pointer->modify('+1 week');
+                } elseif ($rule3 === 'Month') {
+                    $pointer->modify('+1 month');
+                } elseif ($rule3 === 'Quarter') {
+                    $pointer->modify('+3 month');
+                } elseif ($rule3 === 'Half-Year') {
+                    $pointer->modify('+6 month');
+                } else {
+                    $pointer->modify('+1 day');
+                }
+            }
+        }
+
+        return $dates;
+    }
+
+    private function getNthWeekdayOfMonth($year, $month, $nth, $weekday)
+    {
+        $firstDay = new \DateTime("$year-$month-01");
+        $lastDay = new \DateTime("last day of $year-$month");
+
+        $dates = [];
+        for ($d = clone $firstDay; $d <= $lastDay; $d->modify('+1 day')) {
+            if ($d->format('l') === $weekday) {
+                $dates[] = clone $d;
+            }
+        }
+
+        if (empty($dates)) {
+            return null;
+        }
+
+        switch ($nth) {
+            case 'First':
+                return $dates[0];
+            case 'Second':
+                return isset($dates[1]) ? $dates[1] : end($dates);
+            case 'Third':
+                return isset($dates[2]) ? $dates[2] : end($dates);
+            case 'Fourth':
+                return isset($dates[3]) ? $dates[3] : end($dates);
+            case 'Last':
+                return end($dates);
+            default:
+                return $dates[0];
+        }
     }
 
     public function fulfillOrder(Request $request, $orderId)
@@ -338,6 +508,15 @@ class ServiceController extends Controller
         ServiceOrderSlotStaff::findOrFail($staffId)->delete();
 
         return redirect()->back()->with('success', 'Staff removed from slot.');
+    }
+
+    public function toggleLeader(Request $request, $staffId)
+    {
+        $staff = ServiceOrderSlotStaff::findOrFail($staffId);
+        $staff->is_leader = !$staff->is_leader;
+        $staff->save();
+
+        return redirect()->back()->with('success', 'Staff leadership status updated.');
     }
 
     public function assignVehicles(Request $request, $slotId)
@@ -652,6 +831,24 @@ class ServiceController extends Controller
         // Update plan_debrief if provided
         if ($request->has('plan_debrief')) {
             $updateData['plan_debrief'] = $request->input('plan_debrief');
+        }
+
+        // Update pre_checklist_consumables if provided
+        if ($request->has('pre_checklist_consumables')) {
+            $request->validate([
+                'pre_checklist_consumables' => 'nullable|array',
+                'pre_checklist_consumables.*' => 'nullable|numeric|min:0',
+            ]);
+            $updateData['pre_checklist_consumables'] = $request->input('pre_checklist_consumables');
+        }
+
+        // Update post_checklist_consumables if provided
+        if ($request->has('post_checklist_consumables')) {
+            $request->validate([
+                'post_checklist_consumables' => 'nullable|array',
+                'post_checklist_consumables.*' => 'nullable|numeric|min:0',
+            ]);
+            $updateData['post_checklist_consumables'] = $request->input('post_checklist_consumables');
         }
 
         // Update the order if there's data to update

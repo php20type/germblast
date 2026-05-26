@@ -216,11 +216,6 @@
                                     aria-controls="pre-checklist" aria-selected="false">
                                     Pre-Checklist
                                 </button>
-                                <button class="nav-link" id="post-checklist-tab" data-bs-toggle="tab"
-                                    data-bs-target="#post-checklist" type="button" role="tab"
-                                    aria-controls="post-checklist" aria-selected="false">
-                                    Post Checklist
-                                </button>
                                 <button class="nav-link" id="facilities-tab" data-bs-toggle="tab"
                                     data-bs-target="#facilities" type="button" role="tab" aria-controls="facilities"
                                     aria-selected="false">
@@ -252,6 +247,11 @@
                                     data-bs-target="#employee-performance" type="button" role="tab"
                                     aria-controls="employee-performance" aria-selected="false">
                                     Employee Performance
+                                </button>
+                                <button class="nav-link" id="post-checklist-tab" data-bs-toggle="tab"
+                                    data-bs-target="#post-checklist" type="button" role="tab"
+                                    aria-controls="post-checklist" aria-selected="false">
+                                    Post Checklist
                                 </button>
                                 {{-- <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports"
                                     type="button" role="tab" aria-controls="reports" aria-selected="false">
@@ -594,6 +594,61 @@
                                     </div>
                                 </div>
 
+                                <!-- Consumables Section -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+                                            <div class="section-header d-flex justify-content-between align-items-center mb-3">
+                                                <h5 class="section-title">Consumables (Pre-Service Initial Counts)</h5>
+                                            </div>
+                                            <form class="pre-checklist-consumables-form" id="preChecklistConsumablesForm">
+                                                @csrf
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover equipment-report-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Item</th>
+                                                                <th>Pre-Service Quantity</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ([
+                                                                'microfiber_bins' => 'Microfiber Bins',
+                                                                'disposable_microfiber' => 'Disposable Microfiber (Count Packs, Not Cloths)',
+                                                                'atp_swabs' => 'ATP Swabs',
+                                                                'gallons_water' => 'Gallons of Water',
+                                                                'gallons_d2' => 'Gallons of D2',
+                                                                'bottles_oxivir' => 'Bottles of Oxivir Concentrate',
+                                                                'bottles_shield' => 'Bottles of Shield Concentrate',
+                                                                'gallons_opticide' => 'Gallons of Opticide',
+                                                                'gallons_halomist' => 'Gallons of Halomist (Gallons in Halomist Units)',
+                                                                'gallons_sterifab' => 'Gallons of Sterifab',
+                                                                'boxes_gloves' => 'Boxes of Gloves',
+                                                                'monster_mop_fibers' => 'Monster Mop Fibers'
+                                                            ] as $key => $label)
+                                                                <tr>
+                                                                    <td class="align-middle fw-semibold" style="width: 60%;">{{ $label }}</td>
+                                                                    <td>
+                                                                        <input type="number" step="any" min="0" 
+                                                                            name="pre_checklist_consumables[{{ $key }}]" 
+                                                                            class="form-control form-control-sm text-center" 
+                                                                            value="{{ $order->pre_checklist_consumables[$key] ?? 0 }}">
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="text-end mt-3">
+                                                    <button type="submit" class="btn btn-primary btn-sm save-pre-consumables-btn">
+                                                        <i class="fas fa-save me-1"></i> Save Pre-Service Consumables
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Service Plan Section -->
                                 <div class="row">
                                     <div class="col-md-12">
@@ -736,53 +791,6 @@
                             </div>
 
 
-                            <!-- Post Checklist Tab -->
-                            <div class="tab-pane fade" id="post-checklist" role="tabpanel"
-                                aria-labelledby="post-checklist-tab">
-
-                                <!-- Plan Debrief Section -->
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="section-card">
-                                            <div class="section-header mb-3">
-                                                <h5 class="section-title">Plan Debrief <span style="font-size: 14px; font-weight: 400;">(Debrief Required: NO(48 hours in advance))</span></h5>
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label class="form-label text-muted" style="font-size: 13px;">Debrief your plan here.</label>
-                                                <ul style="font-size: 13px; color: #555; line-height: 1.8; margin-left: 15px;">
-                                                    <li>Outline how your plan went. What worked, what didn't.</li>
-                                                    <li>Identify any extra areas you were asked to do.</li>
-                                                    <li>List any issues with equipment, vehicles, or other resources.</li>
-                                                    <li>Any thoughts that should be considered on future plans.</li>
-                                                </ul>
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label class="form-label text-muted" style="font-weight: 500;">Here was your plan:</label>
-                                                <div style="background-color: #f8f9fa; padding: 10px; border-radius: 4px; border: 1px solid #dee2e6; margin-bottom: 15px;">
-                                                    <p class="mb-0" style="font-size: 13px;">{{ $order->service_plan_narrative ?? 'No plan available yet.' }}</p>
-                                                </div>
-                                            </div>
-
-                                            <form class="plan-debrief-form" id="planDebriefForm">
-                                                @csrf
-                                                <div class="mb-3">
-                                                    <label for="plan_debrief" class="form-label">Debrief</label>
-                                                    <textarea class="form-control" id="plan_debrief" name="plan_debrief" rows="10" placeholder="Enter your debrief here...">{{ $order->plan_debrief ?? '' }}</textarea>
-                                                </div>
-
-                                                <div class="text-start">
-                                                    <button type="submit" class="btn btn-primary btn-sm save-debrief-btn">
-                                                        <i class="fas fa-save me-1"></i> Update Debrief
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
 
 
                             <!-- Facilities Tab -->
@@ -918,21 +926,71 @@
                                                                 <h6 class="fw-bold mb-3">Team</h6>
 
                                                                 @forelse($slot->staff as $staffMember)
-                                                                    <div class="d-flex justify-content-between align-items-center border rounded p-2 mb-2 bg-success bg-opacity-25">
+                                                                    @php
+                                                                        $isLeader = $staffMember->is_leader ?? false;
+                                                                        $cardClass = $isLeader ? 'border-warning bg-warning bg-opacity-10' : 'bg-success bg-opacity-25';
+                                                                    @endphp
+                                                                    <div class="d-flex justify-content-between align-items-center border rounded p-2 mb-2 {{ $cardClass }}">
                                                                         <div>
-                                                                            <span class="fw-semibold small">{{ $staffMember->user->name }}</span><br>
+                                                                            <span class="fw-semibold small">
+                                                                                {{ $staffMember->user->name }}
+                                                                                @if($isLeader)
+                                                                                    <span class="badge bg-warning text-dark ms-1" style="font-size: 10px; font-weight: 700;">
+                                                                                        <i class="fas fa-crown me-1"></i> LEADER
+                                                                                    </span>
+                                                                                @endif
+                                                                            </span><br>
                                                                             <small class="text-muted">{{ $staffMember->slot_hours }} hrs</small>
                                                                             @php $roles = implode(' | ', $staffMember->user->specialties); @endphp
                                                                             @if($roles)
                                                                                 <br><small class="text-muted">{{ $roles }}</small>
                                                                             @endif
                                                                         </div>
-                                                                        <form action="{{ route('admin.lead.service.slot.staff.remove', $staffMember->id) }}" method="POST" class="d-inline">
-                                                                            @csrf
-                                                                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                                                <i class="fas fa-times"></i>
+                                                                        <div class="d-flex align-items-center gap-2">
+                                                                            <button type="button"
+                                                                                class="btn btn-sm btn-info rounded-circle p-0 view-user-slots d-flex align-items-center justify-content-center"
+                                                                                data-user="{{ $staffMember->user_id }}"
+                                                                                data-date="{{ $slot->scheduled_start_time }}"
+                                                                                style="width:22px;height:22px;"
+                                                                                title="View Monthly Schedule">
+                                                                                <i class="fas fa-question" style="font-size:9px;"></i>
                                                                             </button>
-                                                                        </form>
+                                                                            {{-- Toggle Leader Button --}}
+                                                                            <form action="{{ route('admin.lead.service.slot.staff.toggle_leader', $staffMember->id) }}" method="POST" class="d-inline">
+                                                                                @csrf
+                                                                                <button type="submit" class="btn btn-sm {{ $isLeader ? 'btn-warning text-dark' : 'btn-outline-warning border-0' }}" title="{{ $isLeader ? 'Remove Leader Designation' : 'Designate as Leader' }}" style="padding: 4px 6px; line-height: 1;">
+                                                                                    <svg viewBox="0 0 100 100" style="width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; display: inline-block;">
+                                                                                        <!-- Head -->
+                                                                                        <circle cx="33" cy="28" r="9" />
+                                                                                        <!-- Body/Spine -->
+                                                                                        <path d="M33 37 v24" />
+                                                                                        <!-- Left arm (hand on hip) -->
+                                                                                        <path d="M33 41 H23 L19 50 L25 56" />
+                                                                                        <!-- Right arm (pointing up) -->
+                                                                                        <path d="M33 41 L47 29" />
+                                                                                        <!-- Left leg (straight down) -->
+                                                                                        <path d="M33 61 H28 V81" />
+                                                                                        <!-- Right leg (stepped up) -->
+                                                                                        <path d="M33 61 H44 V68 H38" />
+                                                                                        <!-- Podium/Box -->
+                                                                                        <rect x="36" y="68" width="18" height="13" />
+                                                                                        <!-- Dotted ray -->
+                                                                                        <path d="M51 26 L56 22" stroke-dasharray="2,3" />
+                                                                                        <path d="M60 19 L65 15" stroke-dasharray="2,3" />
+                                                                                        <!-- Star -->
+                                                                                        <path d="M74 8 L77 15 L84 18 L77 21 L74 28 L71 21 L64 18 L71 15 Z" fill="currentColor" stroke="none" />
+                                                                                    </svg>
+                                                                                </button>
+                                                                            </form>
+
+                                                                            {{-- Remove Staff Button --}}
+                                                                            <form action="{{ route('admin.lead.service.slot.staff.remove', $staffMember->id) }}" method="POST" class="d-inline">
+                                                                                @csrf
+                                                                                <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Remove Staff Member">
+                                                                                    <i class="fas fa-times"></i>
+                                                                                </button>
+                                                                            </form>
+                                                                        </div>
                                                                     </div>
                                                                 @empty
                                                                     <p class="text-muted small">No team members assigned yet.</p>
@@ -1252,60 +1310,7 @@
                                     </div>
                                 </div>
 
-                                {{-- Inventory Consumption --}}
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="section-card">
 
-                                            <div class="section-header mb-3">
-                                                <h5 class="section-title">Inventory Consumption</h5>
-                                            </div>
-
-                                        <form
-                                            action="{{ route('admin.lead.service.order.inventory.update', $order->id) }}"
-                                            method="POST">
-                                            @csrf
-                                            <table class="table table-hover equipment-report-table">
-                                                <thead class="table-light">
-                                                    <tr>
-                                                        <th>Item</th>
-                                                        <th>Quantity Used</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach ([
-                                                            'microfiber' => 'Microfiber',
-                                                            'swabs' => 'Swabs',
-                                                            'oxivir_jars' => 'Oxivir Concentrate Jars',
-                                                            'opticide_gallons' => 'Opticide Gallons',
-                                                            'halomist'         => 'Halomist',
-                                                            'water'            => 'Water',
-                                                        ] as $field => $label)
-                                                            <tr>
-                                                                <td>{{ $label }}</td>
-                                                                <td>
-                                                                    <input type="number"
-                                                                        class="form-control form-control-sm"
-                                                                        name="{{ $field }}"
-                                                                        value="{{ $order->$field ?? 0 }}"
-                                                                        min="0">
-                                                                </td>
-                                                            </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                    <tfoot>
-                                                        <tr>
-                                                            <td colspan="2" class="text-end">
-                                                                <button type="submit" class="btn btn-success">Save Inventory</button>
-                                                            </td>
-                                                        </tr>
-                                                    </tfoot>
-                                                </table>
-                                            </form>
-
-                                        </div>
-                                    </div>
-                                </div>
 
                         </div>
 
@@ -1849,6 +1854,113 @@
 
                             </div>
 
+                            <!-- Post Checklist Tab -->
+                            <div class="tab-pane fade" id="post-checklist" role="tabpanel"
+                                aria-labelledby="post-checklist-tab">
+
+                                <!-- Consumables Section -->
+                                <div class="row mt-3">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+                                            <div class="section-header d-flex justify-content-between align-items-center mb-3">
+                                                <h5 class="section-title">Consumables (Post-Service Remaining Counts)</h5>
+                                            </div>
+                                            <form class="post-checklist-consumables-form" id="postChecklistConsumablesForm">
+                                                @csrf
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover equipment-report-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Item</th>
+                                                                <th class="text-center" style="width: 20%;">Pre-Service Qty</th>
+                                                                <th class="text-center" style="width: 20%;">Post-Service Qty</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ([
+                                                                'microfiber_bins' => 'Microfiber Bins',
+                                                                'disposable_microfiber' => 'Disposable Microfiber (Count Packs, Not Cloths)',
+                                                                'atp_swabs' => 'ATP Swabs',
+                                                                'gallons_water' => 'Gallons of Water',
+                                                                'gallons_d2' => 'Gallons of D2',
+                                                                'bottles_oxivir' => 'Bottles of Oxivir Concentrate',
+                                                                'bottles_shield' => 'Bottles of Shield Concentrate',
+                                                                'gallons_opticide' => 'Gallons of Opticide',
+                                                                'gallons_halomist' => 'Gallons of Halomist (Gallons in Halomist Units)',
+                                                                'gallons_sterifab' => 'Gallons of Sterifab',
+                                                                'boxes_gloves' => 'Boxes of Gloves',
+                                                                'monster_mop_fibers' => 'Monster Mop Fibers'
+                                                            ] as $key => $label)
+                                                                <tr>
+                                                                    <td class="align-middle fw-semibold" style="width: 60%;">{{ $label }}</td>
+                                                                    <td class="align-middle text-center font-monospace" style="font-size: 14px; background-color: #fdfaf2; color: #b58900; font-weight: bold;">
+                                                                        {{ floatval($order->pre_checklist_consumables[$key] ?? 0) }}
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="number" step="any" min="0" 
+                                                                            name="post_checklist_consumables[{{ $key }}]" 
+                                                                            class="form-control form-control-sm text-center" 
+                                                                            value="{{ $order->post_checklist_consumables[$key] ?? 0 }}">
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="text-end mt-3">
+                                                    <button type="submit" class="btn btn-primary btn-sm save-post-consumables-btn">
+                                                        <i class="fas fa-save me-1"></i> Save Post-Service Consumables
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Plan Debrief Section -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+                                            <div class="section-header mb-3">
+                                                <h5 class="section-title">Plan Debrief <span style="font-size: 14px; font-weight: 400;">(Debrief Required: NO(48 hours in advance))</span></h5>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label text-muted" style="font-size: 13px;">Debrief your plan here.</label>
+                                                <ul style="font-size: 13px; color: #555; line-height: 1.8; margin-left: 15px;">
+                                                    <li>Outline how your plan went. What worked, what didn't.</li>
+                                                    <li>Identify any extra areas you were asked to do.</li>
+                                                    <li>List any issues with equipment, vehicles, or other resources.</li>
+                                                    <li>Any thoughts that should be considered on future plans.</li>
+                                                    </ul>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label text-muted" style="font-weight: 500;">Here was your plan:</label>
+                                                <div style="background-color: #f8f9fa; padding: 10px; border-radius: 4px; border: 1px solid #dee2e6; margin-bottom: 15px;">
+                                                    <p class="mb-0" style="font-size: 13px;">{{ $order->service_plan_narrative ?? 'No plan available yet.' }}</p>
+                                                </div>
+                                            </div>
+
+                                            <form class="plan-debrief-form" id="planDebriefForm">
+                                                @csrf
+                                                <div class="mb-3">
+                                                    <label for="plan_debrief" class="form-label">Debrief</label>
+                                                    <textarea class="form-control" id="plan_debrief" name="plan_debrief" rows="10" placeholder="Enter your debrief here...">{{ $order->plan_debrief ?? '' }}</textarea>
+                                                </div>
+
+                                                <div class="text-start">
+                                                    <button type="submit" class="btn btn-primary btn-sm save-debrief-btn">
+                                                        <i class="fas fa-save me-1"></i> Update Debrief
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
                         </div>
                         <!-- /tab-content -->
 
@@ -2194,6 +2306,56 @@
             },
             error: function(xhr) {
                 toastr.error('Failed to update plan review status');
+            }
+        });
+    });
+
+    // ==============================
+    // Save Pre-Service Consumables
+    // ==============================
+    $(document).on('submit', '#preChecklistConsumablesForm', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const orderId = {{ $order->id }};
+
+        $.ajax({
+            url: "{{ route('admin.lead.service.order.update_checklist', ['orderId' => ':orderId']) }}".replace(':orderId', orderId),
+            type: 'POST',
+            data: form.serialize(),
+            success: function(response) {
+                if (response.success) {
+                    toastr.success('Pre-service consumables saved successfully!');
+                } else {
+                    toastr.error(response.message || 'An error occurred');
+                }
+            },
+            error: function(xhr) {
+                toastr.error('Failed to save pre-service consumables');
+            }
+        });
+    });
+
+    // ==============================
+    // Save Post-Service Consumables
+    // ==============================
+    $(document).on('submit', '#postChecklistConsumablesForm', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const orderId = {{ $order->id }};
+
+        $.ajax({
+            url: "{{ route('admin.lead.service.order.update_checklist', ['orderId' => ':orderId']) }}".replace(':orderId', orderId),
+            type: 'POST',
+            data: form.serialize(),
+            success: function(response) {
+                if (response.success) {
+                    toastr.success('Post-service consumables saved successfully!');
+                } else {
+                    toastr.error(response.message || 'An error occurred');
+                }
+            },
+            error: function(xhr) {
+                toastr.error('Failed to save post-service consumables');
             }
         });
     });

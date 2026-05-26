@@ -21,13 +21,14 @@ class ServiceOrder extends Model
         'plan_review_status',
         'plan_debrief',
 
-        // Inventory consumptions
-        'microfiber',
-        'swabs',
-        'oxivir_jars',
-        'opticide_gallons',
-        'halomist',
-        'water',
+        // Checklist consumables
+        'pre_checklist_consumables',
+        'post_checklist_consumables',
+    ];
+
+    protected $casts = [
+        'pre_checklist_consumables' => 'array',
+        'post_checklist_consumables' => 'array',
     ];
 
     public function service()
