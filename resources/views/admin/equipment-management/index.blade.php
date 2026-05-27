@@ -131,6 +131,11 @@
             color: #92400e;
         }
 
+        .status-pill-assigned {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
         .status-pill-broken {
             background: #eff6ff;
             color: #3b82f6;
@@ -698,6 +703,7 @@
             'broken': ['dirty', 'broken', 'lost', 'decommissioned'],
             'lost': ['dirty', 'broken', 'lost', 'decommissioned'],
             'decommissioned': ['dirty', 'broken', 'lost'],
+            'assigned': ['dirty', 'broken', 'lost'],
         };
 
         var modalConfig = {
@@ -715,6 +721,9 @@
                 title: 'Change Status'
             },
             'decommissioned': {
+                title: 'Change Status'
+            },
+            'assigned': {
                 title: 'Change Status'
             }
         };

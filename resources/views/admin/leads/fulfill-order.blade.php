@@ -185,13 +185,20 @@
                         <div class="heading-area-sec border-bottom-0 pb-0">
                             <div class="left-part-sec">
                                 <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">FULFILL ORDER <span style="font-size: 24px;">📌</span></h3>
-                                <p class="text-muted mb-2" style="font-size: 16px;">Order ID: ORD001</p>
+                                <p class="text-muted mb-2" style="font-size: 16px;">Order ID: {{ $order->order_no ?? '' }}</p>
                             </div>
                             <div class="right-part-sec">
-                                <a class="btn btn-export"
-                                    href="{{ route('admin.company.show', $order->service->lead->company->id) }}">
-                                    TO CUSTOMER
-                                </a>
+                                <div>
+                                    <a class="btn btn-export"
+                                        href="{{ route('admin.lead.service.service_dashboard', $order->id) }}">
+                                        SERVICE VIEW 
+                                    </a>
+
+                                    <a class="btn btn-export"
+                                        href="{{ route('admin.company.show', $order->service->lead->company->id) }}">
+                                        TO CUSTOMER
+                                    </a>
+                                </div>
                             </div>
                         </div>
 

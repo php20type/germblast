@@ -18,6 +18,8 @@ use App\Models\CompanyLocation;
 use App\Models\Territory;
 use App\Models\Vehicle;
 use App\Models\User;
+use App\Models\Equipment;
+use App\Models\EquipmentStatusLog;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
@@ -29,6 +31,14 @@ class ServiceController extends Controller
     {
         $this->orderService = $orderService;
         $this->notify = $notify;
+
+        if (!\Illuminate\Support\Facades\Schema::hasTable('service_order_slot_equipments')) {
+            \Illuminate\Support\Facades\Schema::create('service_order_slot_equipments', function ($table) {
+                $table->unsignedBigInteger('service_order_slot_id')->index();
+                $table->unsignedBigInteger('equipment_id')->index();
+                $table->timestamps();
+            });
+        }
     }
 
     public function getServiceDetails(Request $request, $leadId)
@@ -310,7 +320,7 @@ class ServiceController extends Controller
         ->groupBy(['territory_id', 'staff_type']);
 
         // Fetch all disciplinary issues
-        $disciplinaryIssues = \App\Models\DisciplinaryIssue::orderBy('name')->get();
+        $disciplinaryIssues = DisciplinaryIssue::orderBy('name')->get();
 
         // Get employees assigned to this order (from slots staff)
         $assignedEmployees = $order->orderSlots()
@@ -323,7 +333,119 @@ class ServiceController extends Controller
 
         $allVehicles = Vehicle::where('is_retired', 0)->orderBy('name')->get();
 
-        return view('admin.leads.fulfill-order', compact('order','companyLocations','territories','allStaff','disciplinaryIssues','assignedEmployees','allVehicles'));
+        return view('admin.leads.fulfill-order', compact('order', 'companyLocations', 'territories', 'allStaff', 'disciplinaryIssues', 'assignedEmployees', 'allVehicles'));
+    }
+
+    public function service_dashboard(Request $request, $orderId)
+    {
+        $order = ServiceOrder::with([
+            'orderSlots.clocks.clockedBy',
+            'orderSlots.confirmedBy',
+            'orderSlots.facilities.companyLocation',
+            'orderSlots.office',
+            'orderSlots.staff.user',
+            'orderSlots.vehicles',
+            'orderSlots.equipments.type',
+            'service.outlines',
+            'service.lead.company.locations',
+            'notes.user',
+            'employeePerformances.employee',
+            'employeePerformances.issue',
+            'employeePerformances.user',
+        ])->findOrFail($orderId);
+
+        $companyLocations = $order->service->lead->company->locations;
+        $territories = Territory::orderBy('name')->get();
+
+        $allStaff = User::whereNotNull('territory_id')
+            ->whereNotNull('staff_type')
+            ->get()
+            ->groupBy(['territory_id', 'staff_type']);
+
+        // Fetch all disciplinary issues
+        $disciplinaryIssues = DisciplinaryIssue::orderBy('name')->get();
+
+        // Get employees assigned to this order (from slots staff)
+        $assignedEmployees = $order->orderSlots()
+            ->with('staff.user')
+            ->get()
+            ->flatMap(function ($slot) {
+                return $slot->staff->map(fn($staff) => $staff->user);
+            })
+            ->unique('id');
+
+        $allVehicles = Vehicle::where('is_retired', 0)->orderBy('name')->get();
+
+        return view('admin.leads.service-dashboard', compact('order', 'companyLocations', 'territories', 'allStaff', 'disciplinaryIssues', 'assignedEmployees', 'allVehicles'));
+    }
+
+    public function assignEquipment(Request $request, $slotId)
+    {
+        $request->validate([
+            'barcode' => 'required|string',
+        ]);
+
+        $slot = ServiceOrderSlot::with('serviceOrder')->findOrFail($slotId);
+
+        // Find the equipment by barcode
+        $equipment = Equipment::where('barcode', $request->barcode)->first();
+
+        if (!$equipment) {
+            return redirect()->back()->with('error', 'Equipment barcode not found.');
+        }
+
+        // Check if already assigned to this slot
+        $alreadyAssignedToSlot = $slot->equipments()->where('equipment_id', $equipment->id)->exists();
+        if ($alreadyAssignedToSlot) {
+            return redirect()->back()->with('error', 'This equipment is already assigned to this slot.');
+        }
+
+        // Check if already assigned to any other slot
+        if ($equipment->isAssigned()) {
+            return redirect()->back()->with('error', 'This equipment is already assigned to another active order/slot.');
+        }
+
+        // Create status log
+        EquipmentStatusLog::create([
+            'equipment_id' => $equipment->id,
+            'from_status' => config("mapping.equipment_status.{$equipment->status}", $equipment->status),
+            'to_status' => 'assigned',
+            'note' => 'Equipment assigned to job ' . ($slot->serviceOrder->order_no ?? $slot->serviceOrder->id) . ' by ' . (auth()->user()->name ?? 'System'),
+            'territory_id' => $slot->scheduled_office ?: null,
+            'changed_by' => auth()->id(),
+        ]);
+
+        // Attach equipment
+        $slot->equipments()->attach($equipment->id);
+
+        // Update equipment status to assigned
+        $equipment->update(['status' => Equipment::STATUS_ASSIGNED]);
+
+        return redirect()->back()->with('success', 'Equipment assigned successfully.');
+    }
+
+    public function removeEquipment(Request $request, $slotId, $equipmentId)
+    {
+        $slot = ServiceOrderSlot::with('serviceOrder')->findOrFail($slotId);
+        $equipment = Equipment::findOrFail($equipmentId);
+
+        // Create status log
+        EquipmentStatusLog::create([
+            'equipment_id' => $equipment->id,
+            'from_status' => config("mapping.equipment_status.{$equipment->status}", $equipment->status),
+            'to_status' => 'dirty',
+            'note' => 'Equipment unassigned from job ' . ($slot->serviceOrder->order_no ?? $slot->serviceOrder->id) . ' by ' . (auth()->user()->name ?? 'System'),
+            'territory_id' => $slot->scheduled_office ?: null,
+            'changed_by' => auth()->id(),
+        ]);
+
+        // Detach
+        $slot->equipments()->detach($equipment->id);
+
+        // Update equipment status
+        $equipment->update(['status' => Equipment::STATUS_DIRTY]);
+
+        return redirect()->back()->with('success', 'Equipment removed successfully.');
     }
 
     public function fulfillOrder_book(Request $request, $orderId)

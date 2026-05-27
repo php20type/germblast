@@ -21,7 +21,10 @@ class EquipmentManagementController extends Controller
         $brokenTypes = (clone $baseQuery)->where('status', Equipment::STATUS_BROKEN)->get();
         $lostTypes = (clone $baseQuery)->where('status', Equipment::STATUS_LOST)->get();
         $decommissionedTypes = (clone $baseQuery)->where('status', Equipment::STATUS_DECOMMISSIONED)->get();
-        $inUseTypes = (clone $baseQuery)->where('is_assigned', true)->get();
+        $inUseTypes = (clone $baseQuery)->where(function ($q) {
+            $q->where('status', Equipment::STATUS_ASSIGNED)
+              ->orWhereHas('slots');
+        })->get();
         $allTypes = (clone $baseQuery)->get();
 
         // Counts
@@ -72,7 +75,6 @@ class EquipmentManagementController extends Controller
             'serial_number' => $request->serial_number,
             'type_id' => $request->type_id,
             'status' => Equipment::STATUS_DIRTY,
-            'is_assigned' => false,
         ]);
 
         return redirect()->back()->with('success', 'Equipment created successfully');
@@ -93,50 +95,26 @@ class EquipmentManagementController extends Controller
             'office'       => 'nullable|exists:territories,id',
         ]);
 
-        // ------------------------------------------------------------------
-        // HANDLE IN USE  (assign)
-        // ------------------------------------------------------------------
-        if ($newStatus === 'in_use') {
-
-            if ($equipment->status !== Equipment::STATUS_READY) {
-                return back()->with('error', 'Only equipment with status "Ready" can be assigned.');
-            }
-
-            EquipmentStatusLog::create([
-                'equipment_id' => $equipment->id,
-                'from_status'  => $equipment->status,
-                'to_status'    => 'in_use',
-                'note'         => $request->note,
-                'territory_id' => $request->office ?: null,
-                'changed_by'   => auth()->id(),
-            ]);
-
-            $equipment->is_assigned = true;
-            $equipment->save();
-
-            return back()->with('success', 'Equipment marked as In Use.');
-        }
 
         // ------------------------------------------------------------------
         // HANDLE UNASSIGN  (In Use tab modal)
         // ------------------------------------------------------------------
         if ($newStatus === 'unassign') {
 
-            if (!$equipment->is_assigned) {
+            if (!$equipment->isAssigned()) {
                 return back()->with('error', 'This equipment is not currently assigned.');
             }
 
             EquipmentStatusLog::create([
                 'equipment_id' => $equipment->id,
-                'from_status'  => 'in_use',
-                'to_status'    => $equipment->status,
+                'from_status'  => config("mapping.equipment_status.{$equipment->status}", $equipment->status),
+                'to_status'    => 'dirty',
                 'note'         => $request->note ?? 'Unassigned',
                 'territory_id' => $request->office ?: null,
                 'changed_by'   => auth()->id(),
             ]);
 
-            $equipment->is_assigned = false;
-            $equipment->save();
+            $equipment->update(['status' => Equipment::STATUS_DIRTY]);
 
             return back()->with('success', 'Equipment has been unassigned successfully.');
         }
@@ -144,16 +122,26 @@ class EquipmentManagementController extends Controller
         // ------------------------------------------------------------------
         // VALIDATE STATUS IS A KNOWN VALUE
         // ------------------------------------------------------------------
-        if (!in_array($newStatus, Equipment::statuses(), true)) {
+        $integerStatus = $newStatus;
+        if (is_string($newStatus) && !is_numeric($newStatus)) {
+            $mapped = array_search($newStatus, config('mapping.equipment_status', []));
+            if ($mapped !== false) {
+                $integerStatus = $mapped;
+            }
+        }
+
+        if (!in_array((int)$integerStatus, Equipment::statuses(), true)) {
             return back()->with('error', 'Unknown status value provided.');
         }
 
         // ------------------------------------------------------------------
         // VALIDATE TRANSITION IS ALLOWED
         // ------------------------------------------------------------------
-        if (!$equipment->canTransitionTo($newStatus)) {
+        if (!$equipment->canTransitionTo($integerStatus)) {
+            $currentStatusText = config("mapping.equipment_status.{$equipment->status}", $equipment->status);
+            $newStatusText = config("mapping.equipment_status.{$integerStatus}", $newStatus);
             return back()->with('error',
-                'Cannot transition from "' . ucfirst($equipment->status) . '" to "' . ucfirst($newStatus) . '".'
+                'Cannot transition from "' . ucfirst($currentStatusText) . '" to "' . ucfirst($newStatusText) . '".'
             );
         }
 
@@ -162,8 +150,8 @@ class EquipmentManagementController extends Controller
         // ------------------------------------------------------------------
         EquipmentStatusLog::create([
             'equipment_id' => $equipment->id,
-            'from_status'  => $equipment->status,
-            'to_status'    => $newStatus,
+            'from_status'  => config("mapping.equipment_status.{$equipment->status}", $equipment->status),
+            'to_status'    => config("mapping.equipment_status.{$integerStatus}", $integerStatus),
             'note'         => $request->note,
             'territory_id' => $request->office ?: null,
             'changed_by'   => auth()->id(),
@@ -172,11 +160,11 @@ class EquipmentManagementController extends Controller
         // ------------------------------------------------------------------
         // APPLY STATUS CHANGE
         // ------------------------------------------------------------------
-        $equipment->status      = $newStatus;
-        $equipment->is_assigned = false;   // any manual status change clears assignment
+        $equipment->status      = $integerStatus;
         $equipment->save();
 
-        return back()->with('success', 'Equipment status updated to "' . ucfirst($newStatus) . '" successfully.');
+        $newStatusText = config("mapping.equipment_status.{$integerStatus}", $newStatus);
+        return back()->with('success', 'Equipment status updated to "' . ucfirst($newStatusText) . '" successfully.');
     }
 
     // ------------------------------------------------------------------
@@ -191,15 +179,25 @@ class EquipmentManagementController extends Controller
             ->orderByDesc('created_at')
             ->get()
             ->map(function ($log) {
+                $fromText = is_numeric($log->from_status) 
+                    ? config("mapping.equipment_status.{$log->from_status}", $log->from_status) 
+                    : $log->from_status;
+                
+                $toText = is_numeric($log->to_status) 
+                    ? config("mapping.equipment_status.{$log->to_status}", $log->to_status) 
+                    : $log->to_status;
+
                 return [
                     'date'        => $log->created_at->format('m/d/y g:i a'),
-                    'from_status' => ucfirst($log->from_status),
-                    'to_status'   => ucfirst($log->to_status),
+                    'from_status' => ucfirst($fromText),
+                    'to_status'   => ucfirst($toText),
                     'note'        => $log->note,
                     'territory'   => $log->territory ? $log->territory->name : null,
                     'changed_by'  => $log->changedBy ? $log->changedBy->name : 'System',
                 ];
             });
+
+        $equipmentStatusText = config("mapping.equipment_status.{$equipment->status}", $equipment->status);
 
         return response()->json([
             'equipment' => [
@@ -207,7 +205,7 @@ class EquipmentManagementController extends Controller
                 'barcode'       => $equipment->barcode,
                 'serial_number' => $equipment->serial_number,
                 'type'          => $equipment->type ? $equipment->type->name : '-',
-                'status'        => ucfirst($equipment->status),
+                'status'        => ucfirst($equipmentStatusText),
             ],
             'logs' => $logs,
         ]);

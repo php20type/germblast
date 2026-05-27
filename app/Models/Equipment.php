@@ -16,13 +16,12 @@ class Equipment extends Model
         'serial_number',
         'type_id',
         'status',
-        'is_assigned',
     ];
 
     protected function casts(): array
     {
         return [
-            'is_assigned' => 'boolean',
+            'status' => 'integer',
         ];
     }
 
@@ -32,12 +31,13 @@ class Equipment extends Model
     |--------------------------------------------------------------------------
     */
 
-    public const STATUS_NEW = 'new';
-    public const STATUS_READY = 'ready';
-    public const STATUS_DIRTY = 'dirty';
-    public const STATUS_BROKEN = 'broken';
-    public const STATUS_LOST = 'lost';
-    public const STATUS_DECOMMISSIONED = 'decommissioned';
+    public const STATUS_NEW = 1;
+    public const STATUS_READY = 2;
+    public const STATUS_DIRTY = 3;
+    public const STATUS_BROKEN = 4;
+    public const STATUS_LOST = 5;
+    public const STATUS_DECOMMISSIONED = 6;
+    public const STATUS_ASSIGNED = 7;
 
     public static function statuses(): array
     {
@@ -48,6 +48,7 @@ class Equipment extends Model
             self::STATUS_BROKEN,
             self::STATUS_LOST,
             self::STATUS_DECOMMISSIONED,
+            self::STATUS_ASSIGNED,
         ];
     }
 
@@ -67,6 +68,12 @@ class Equipment extends Model
         return $this->hasMany(EquipmentStatusLog::class, 'equipment_id');
     }
 
+    public function slots()
+    {
+        return $this->belongsToMany(ServiceOrderSlot::class, 'service_order_slot_equipments', 'equipment_id', 'service_order_slot_id')
+                    ->withTimestamps();
+    }
+
     /*
     |--------------------------------------------------------------------------
     | STATUS HELPERS
@@ -75,42 +82,42 @@ class Equipment extends Model
 
     public function isNew(): bool
     {
-        return $this->status === self::STATUS_NEW;
+        return (int) $this->status === self::STATUS_NEW;
     }
 
     public function isReady(): bool
     {
-        return $this->status === self::STATUS_READY;
+        return (int) $this->status === self::STATUS_READY;
     }
 
     public function isDirtyStatus(): bool
     {
-        return $this->status === self::STATUS_DIRTY;
+        return (int) $this->status === self::STATUS_DIRTY;
     }
 
     public function isBroken(): bool
     {
-        return $this->status === self::STATUS_BROKEN;
+        return (int) $this->status === self::STATUS_BROKEN;
     }
 
     public function isLost(): bool
     {
-        return $this->status === self::STATUS_LOST;
+        return (int) $this->status === self::STATUS_LOST;
     }
 
     public function isDecommissioned(): bool
     {
-        return $this->status === self::STATUS_DECOMMISSIONED;
+        return (int) $this->status === self::STATUS_DECOMMISSIONED;
     }
 
-    public function isInUse(): bool
+    public function isAssigned(): bool
     {
-        return (bool) $this->is_assigned;
+        return (int) $this->status === self::STATUS_ASSIGNED || $this->slots()->exists();
     }
 
     public function getAvailableStatusOptions(): array
     {
-        switch ($this->status) {
+        switch ((int) $this->status) {
 
             case self::STATUS_NEW:
                 return [self::STATUS_READY];
@@ -148,6 +155,13 @@ class Equipment extends Model
                     self::STATUS_LOST,
                 ];
 
+            case self::STATUS_ASSIGNED:
+                return [
+                    self::STATUS_DIRTY,
+                    self::STATUS_BROKEN,
+                    self::STATUS_LOST,
+                ];
+
             default:
                 return [];
         }
@@ -157,8 +171,14 @@ class Equipment extends Model
      * Check whether a transition from the current status to $newStatus is allowed.
      * Used by the controller to enforce server-side transition rules.
      */
-    public function canTransitionTo(string $newStatus): bool
+    public function canTransitionTo($newStatus): bool
     {
-        return in_array($newStatus, $this->getAvailableStatusOptions(), true);
+        if (is_string($newStatus) && !is_numeric($newStatus)) {
+            $mapped = array_search($newStatus, config('mapping.equipment_status', []));
+            if ($mapped !== false) {
+                $newStatus = $mapped;
+            }
+        }
+        return in_array((int) $newStatus, $this->getAvailableStatusOptions(), true);
     }
 }

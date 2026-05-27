@@ -7,12 +7,13 @@
         <td>{{ $type->serial_number ?? 'N/A' }}</td>
         <td>
             @php
-                $statusSlug = strtolower($type->status);
+                $mappedStatus = config("mapping.equipment_status.{$type->status}", 'unknown');
+                $statusSlug = strtolower($mappedStatus);
                 $pillClass = 'status-pill-' . $statusSlug;
             @endphp
             <span class="status-pill {{ $pillClass }} cursor-pointer" data-id="{{ $type->id }}"
-                data-status="{{ $type->status }}" onclick="openStatusModal(this)">
-                {{ ucfirst($type->status) }}
+                data-status="{{ $mappedStatus }}" onclick="openStatusModal(this)">
+                {{ ucfirst($mappedStatus) }}
             </span>
         </td>
         <td class="text-center">

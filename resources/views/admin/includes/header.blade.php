@@ -17,7 +17,7 @@
                             </div>
                         </a>
                     </li>
-                    <li class="list-inline-item">
+                    <!-- <li class="list-inline-item">
                         <a href="#" class="dropdown item-nav" data-bs-toggle="dropdown">
                             <div class="icon-round position-relative" title="Notifications">
                                 <i class="fa-solid fa-bell"></i>
@@ -28,7 +28,6 @@
 
                         <ul class="dropdown-menu shadow" style="width: 400px; border-radius: 10px;">
 
-                            {{-- Header --}}
                             <li class="px-3 py-2 d-flex justify-content-between align-items-center">
                                 <strong>Notifications</strong>
                                 <button class="btn btn-sm btn-link p-0" style="font-size: 0.85rem;">Mark as Read</button>
@@ -36,7 +35,6 @@
 
                             <li><hr class="dropdown-divider"></li>
 
-                            {{-- Notifications List --}}
                             <li id="notificationList" style="max-height:400px; overflow-y:auto;">
                                 <div class="px-3 py-3 text-center text-muted">
                                     <i class="fa-solid fa-spinner fa-spin"></i> Loading notifications...
@@ -45,7 +43,7 @@
 
                         </ul>
 
-                    </li>
+                    </li> -->
                 </ul>
             </div>
         </div>

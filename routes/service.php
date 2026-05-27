@@ -38,6 +38,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::post('order/{orderId}/update-checklist', [ServiceController::class, 'updateChecklist'])->name('service.order.update_checklist');
         Route::post('order/{orderId}/employee-performance/store', [ServiceController::class, 'storeEmployeePerformance'])->name('service.order.employee_performance.store');
 
+        Route::get('service/service-dashboard/{orderId}', [ServiceController::class, 'service_dashboard'])->name('service.service_dashboard');
+        Route::post('service/slot/{slotId}/equipment/assign', [ServiceController::class, 'assignEquipment'])->name('service.slot.assign_equipment');
+        Route::post('service/slot/{slotId}/equipment/{equipmentId}/remove', [ServiceController::class, 'removeEquipment'])->name('service.slot.remove_equipment');
+
     });
 
     Route::get('calendar', [ServiceController::class, 'calendar'])->name('calendar.index');

@@ -67,4 +67,10 @@ class ServiceOrderSlot extends Model
                     ->withTimestamps();
     }
 
+    public function equipments()
+    {
+        return $this->belongsToMany(Equipment::class, 'service_order_slot_equipments', 'service_order_slot_id', 'equipment_id')
+                    ->withTimestamps();
+    }
+
 }
