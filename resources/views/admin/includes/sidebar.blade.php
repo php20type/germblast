@@ -17,7 +17,7 @@
                     </div>
                 </a>
             </li>
-            <li class="">
+            <!-- <li class="">
                 <a href="#">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon1.svg") }} alt="icon" />
@@ -36,9 +36,10 @@
                         Engagement
                     </div>
                 </a>
-            </li>
+            </li> -->
             <hr>
-            <li class="{{ request()->routeIs('admin.company.*') || request()->routeIs('admin.company.*') ? 'active' : '' }}">
+            <li
+                class="{{ request()->routeIs('admin.company.*') || request()->routeIs('admin.company.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.company.index') }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon3.svg") }} alt="icon" />
@@ -58,7 +59,8 @@
                     </div>
                 </a>
             </li>
-            <li class="{{ request()->routeIs('admin.lead.*') || request()->routeIs('admin.survey.proposal.*') ? 'active' : '' }}">
+            <li
+                class="{{ request()->routeIs('admin.lead.*') || request()->routeIs('admin.survey.proposal.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.lead.index') }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon5.svg") }} alt="icon" />
@@ -68,7 +70,7 @@
                     </div>
                 </a>
             </li>
-            <li class="">
+            <!-- <li class="">
                 <a href="#">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon19.svg") }} alt="icon" />
@@ -77,7 +79,7 @@
                         Reports
                     </div>
                 </a>
-            </li>
+            </li> -->
             <li class="{{ request()->routeIs('admin.calendar.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.calendar.index') }}">
                     <div class="icon-round">
