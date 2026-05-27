@@ -605,21 +605,128 @@
                                         </div>
                                     </div>
 
-                                </div>
+                                </div>                                 
+                                
+                                {{-- Summary Tab --}}
+                                 <div class="tab-pane fade" id="summary" role="tabpanel" aria-labelledby="summary-tab">
+                                     <div class="row">
+                                         <!-- Left Card: Lead Summary Details & Form -->
+                                         <div class="col-md-6">
+                                             <div class="section-card mb-4">
+                                                 <div class="section-header mb-3">
+                                                     <h5 class="section-title">Client Details</h5>
+                                                 </div>
 
-                                <!-- Summary Tab -->
-                                <div class="tab-pane fade" id="summary" role="tabpanel" aria-labelledby="summary-tab">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="section-card">
-                                                <div class="section-header mb-3">
-                                                    <h5 class="section-title">Summary</h5>
-                                                </div>
-                                                <p class="text-muted">Coming in Phase 2</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                                 <table class="table table-hover equipment-report-table mb-4">
+                                                     <tbody>
+                                                         <tr>
+                                                             <th>Company</th>
+                                                             <td>{{ $order->service->lead->company->name ?? $order->service->lead->name ?? 'N/A' }}</td>
+                                                             <th>Client ID</th>
+                                                             <td>{{ $order->service->lead->company->id ?? 'N/A' }}</td>
+                                                         </tr>
+                                                         <tr>
+                                                             <th>Status</th>
+                                                             <td>{{ ucfirst($order->status ?? 'N/A') }} {{ $order->order_no ?? '' }}</td>
+                                                             <th>Notes</th>
+                                                             <td>{{ $order->service_plan_narrative ?? ($order->sales_narrative ?? 'No service notes documented.') }}</td>
+                                                         </tr>
+                                                     </tbody>
+                                                 </table>
+
+                                                 <div class="section-header mb-3">
+                                                     <h5 class="section-title">Add Hotel Details</h5>
+                                                 </div>
+                                                 <form id="hotel-details-form" action="{{ route('admin.lead.service.order.hotel.save', $order->id) }}" method="POST" class="mb-0">
+                                                     @csrf
+                                                     <div class="mb-3">
+                                                         <label class="form-label fw-semibold">Hotel Name</label>
+                                                         <input type="text" name="hotel_name" class="form-control bg-light" placeholder="Hotel Name" required>
+                                                     </div>
+                                                     <div class="mb-3">
+                                                         <label class="form-label fw-semibold">Full Address</label>
+                                                         <input type="text" name="full_address" class="form-control bg-light" placeholder="Full Address">
+                                                     </div>
+                                                     <div class="mb-3">
+                                                         <label class="form-label fw-semibold">Confirmation Number</label>
+                                                         <input type="text" name="confirmation_no" class="form-control bg-light" placeholder="Confirmation Number">
+                                                     </div>
+                                                     <div class="row">
+                                                         <div class="col-md-6 mb-3">
+                                                             <label class="form-label fw-semibold">Check In</label>
+                                                             <input type="date" name="check_in" class="form-control bg-light">
+                                                         </div>
+                                                         <div class="col-md-6 mb-3">
+                                                             <label class="form-label fw-semibold">Check Out</label>
+                                                             <input type="date" name="check_out" class="form-control bg-light">
+                                                         </div>
+                                                     </div>
+                                                     <button type="submit" class="btn btn-export mt-2">
+                                                         <i class="fa-solid fa-circle-check me-1"></i> Save
+                                                     </button>
+                                                 </form>
+                                             </div>
+                                         </div>
+
+                                         <!-- Right Card: Hotel Information List -->
+                                         <div class="col-md-6">
+                                             <div class="section-card mb-4">
+                                                 <div class="section-header mb-3">
+                                                     <h5 class="section-title">Hotel Information</h5>
+                                                 </div>
+
+                                                 <div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
+                                                     <table class="table equipment-report-table mb-0">
+                                                         <thead>
+                                                             <tr>
+                                                                 <th>Dates</th>
+                                                                 <th>Hotel Name</th>
+                                                                 <th>Address</th>
+                                                                 <th>Confirmation #</th>
+                                                                 <th class="text-end">Actions</th>
+                                                             </tr>
+                                                         </thead>
+                                                         <tbody id="hotel-list-container">
+                                                             @php $hotels = $order->hotel_details ?? []; @endphp
+                                                             @forelse($hotels as $hotel)
+                                                                 @php
+                                                                     $checkIn = !empty($hotel['check_in']) ? \Carbon\Carbon::parse($hotel['check_in'])->format('m-d') : '';
+                                                                     $checkOut = !empty($hotel['check_out']) ? \Carbon\Carbon::parse($hotel['check_out'])->format('m-d') : '';
+                                                                 @endphp
+                                                                 <tr class="align-middle">
+                                                                     <td class="fw-semibold text-secondary" style="font-size: 13px;">
+                                                                         {{ $checkIn && $checkOut ? "$checkIn - $checkOut" : 'No Dates' }}
+                                                                     </td>
+                                                                     <td class="fw-bold text-dark" style="font-size: 14px;">
+                                                                         {{ $hotel['hotel_name'] ?? 'N/A' }}
+                                                                     </td>
+                                                                     <td style="font-size: 13px;">
+                                                                         {{ $hotel['full_address'] ?? 'N/A' }}
+                                                                     </td>
+                                                                     <td style="font-size: 13px;">
+                                                                         {{ $hotel['confirmation_no'] ?? 'N/A' }}
+                                                                     </td>
+                                                                     <td class="text-end">
+                                                                         <button type="button" class="btn-delete-hotel btn btn-sm btn-link text-danger p-0" data-id="{{ $hotel['id'] ?? '' }}">
+                                                                             <i class="fa-solid fa-trash fs-5"></i>
+                                                                         </button>
+                                                                     </td>
+                                                                 </tr>
+                                                             @empty
+                                                                 <tr>
+                                                                     <td colspan="5" class="text-center py-5 text-secondary">
+                                                                         <i class="fa-solid fa-hotel fs-1 mb-2 d-block text-muted" style="font-size: 40px;"></i>
+                                                                         No hotel details have been documented yet.
+                                                                     </td>
+                                                                 </tr>
+                                                             @endforelse
+                                                         </tbody>
+                                                     </table>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
 
                                 <!-- Schedule Tab -->
                                 <div class="tab-pane fade" id="schedule" role="tabpanel" aria-labelledby="schedule-tab">
@@ -922,19 +1029,152 @@
 
                                 </div>
 
-                                <!-- ATP Tab -->
                                 <div class="tab-pane fade" id="atp" role="tabpanel" aria-labelledby="atp-tab">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="section-card">
-                                                <div class="section-header mb-3">
-                                                    <h5 class="section-title">Summary</h5>
-                                                </div>
-                                                <p class="text-muted">Coming in Phase 2</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                     <div class="row">
+                                         <!-- Left Column: ATP Instructions & Form -->
+                                         <div class="col-md-6">
+                                             <div class="section-card mb-4">
+                                                 <div class="section-header mb-3">
+                                                     <h5 class="section-title">ATP Information</h5>
+                                                 </div>
+                                                 <p class="text-muted mb-4" style="font-size: 13px; line-height: 1.5;">
+                                                     ATP Notes: Take 8 pre-service samples and 2 post-service samples total. Divide this number appropriately across facilities, departments, services (if applicable), etc
+                                                 </p>
+
+                                                 <div class="section-header mb-3">
+                                                     <h5 class="section-title">Add ATP Details</h5>
+                                                 </div>
+                                                 <form id="atp-details-form" action="{{ route('admin.lead.service.order.atp.save', $order->id) }}" method="POST" class="mb-0">
+                                                     @csrf
+                                                     <div class="mb-3">
+                                                         <label class="form-label fw-semibold">Description</label>
+                                                         <input type="text" name="description" class="form-control bg-light" placeholder="Description" required>
+                                                     </div>
+                                                     <div class="mb-3">
+                                                         <label class="form-label fw-semibold">Result</label>
+                                                         <input type="text" name="result" class="form-control bg-light" placeholder="Result" required>
+                                                     </div>
+                                                     <div class="mb-3">
+                                                         <label class="form-label fw-semibold">ATP Type</label>
+                                                         <select name="atp_type" class="form-select bg-light" required>
+                                                             <option value="pre">Pre</option>
+                                                             <option value="post">Post</option>
+                                                         </select>
+                                                     </div>
+                                                     <div class="mb-3">
+                                                         <label class="form-label fw-semibold">Service Location (Facility)</label>
+                                                         @php
+                                                             $uniqueLocations = collect();
+                                                             foreach($order->orderSlots as $slot) {
+                                                                 foreach($slot->facilities as $fac) {
+                                                                     if ($fac->companyLocation) {
+                                                                         $uniqueLocations->put($fac->companyLocation->id, $fac->companyLocation->location_name);
+                                                                     }
+                                                                 }
+                                                             }
+                                                         @endphp
+                                                         <select name="facility_id" class="form-select bg-light" required>
+                                                             <option value="N/A">N/A</option>
+                                                             @foreach($uniqueLocations as $locId => $locName)
+                                                                 <option value="{{ $locId }}">{{ $locName }}</option>
+                                                             @endforeach
+                                                         </select>
+                                                     </div>
+                                                     <button type="submit" class="btn btn-export mt-2">
+                                                         Add ATP
+                                                     </button>
+                                                 </form>
+                                             </div>
+                                         </div>
+
+                                         <!-- Right Column: ATP Results List -->
+                                         <div class="col-md-6">
+                                             <div class="section-card mb-4">
+                                                 <div class="section-header mb-3">
+                                                     <h5 class="section-title">ATP Results</h5>
+                                                 </div>
+                                                 @php 
+                                                     $atpDetails = $order->atp_details ?? []; 
+                                                     $totalSamples = count($atpDetails);
+                                                     $preSamples = collect($atpDetails)->where('atp_type', 'pre')->count();
+                                                     $postSamples = collect($atpDetails)->where('atp_type', 'post')->count();
+                                                 @endphp
+                                                 <p class="text-muted mb-3" style="font-size: 13px;">
+                                                     You have taken {{ $totalSamples }} samples so far ({{ $preSamples }} pre-samples & {{ $postSamples }} post-samples)
+                                                 </p>
+
+                                                 <div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
+                                                     <table class="table table-hover equipment-report-table mb-0">
+                                                         <thead>
+                                                             <tr>
+                                                                 <th>Date/Time</th>
+                                                                 <th>Type: Result</th>
+                                                                 <th>Description & Facility</th>
+                                                                 <th class="text-end">Actions</th>
+                                                             </tr>
+                                                         </thead>
+                                                         <tbody>
+                                                             @forelse($atpDetails as $atp)
+                                                                 @php
+                                                                     $facilityName = '';
+                                                                     if (!empty($atp['facility_id']) && $atp['facility_id'] !== 'N/A') {
+                                                                         $location = \App\Models\CompanyLocation::find($atp['facility_id']);
+                                                                         if ($location) {
+                                                                             $facilityName = $location->location_name;
+                                                                         }
+                                                                     }
+                                                                     
+                                                                     $displayTime = '';
+                                                                     if (!empty($atp['created_at'])) {
+                                                                         $displayTime = \Carbon\Carbon::parse($atp['created_at'])->format('m/d/y h:i A');
+                                                                     } else {
+                                                                         $displayTime = now()->format('m/d/y h:i A');
+                                                                     }
+                                                                 @endphp
+                                                                 <tr class="align-middle">
+                                                                     <td class="text-muted" style="font-size: 11px;">
+                                                                         {{ $displayTime }}
+                                                                     </td>
+                                                                     <td>
+                                                                         <span class="badge {{ ($atp['atp_type'] ?? '') === 'pre' ? 'bg-warning text-dark' : 'bg-success text-white' }} fw-semibold px-2 py-1" style="border-radius: 4px; font-size: 11px;">
+                                                                             {{ strtoupper($atp['atp_type'] ?? '') }}
+                                                                         </span>
+                                                                         <span class="fw-bold text-dark ms-1" style="font-size: 14px;">
+                                                                             {{ $atp['result'] ?? '' }}
+                                                                         </span>
+                                                                     </td>
+                                                                     <td style="font-size: 13px;">
+                                                                         <span class="fw-bold text-dark">{{ $atp['description'] ?? '' }}</span>
+                                                                         @if($facilityName)
+                                                                             <br>
+                                                                             <small class="text-muted">{{ $facilityName }}</small>
+                                                                         @else
+                                                                             <br>
+                                                                             <small class="text-muted">N/A</small>
+                                                                         @endif
+                                                                     </td>
+                                                                     <td class="text-end">
+                                                                         <button type="button" class="btn-delete-atp btn btn-sm btn-link text-danger p-0" data-id="{{ $atp['id'] ?? '' }}">
+                                                                             <i class="fa-solid fa-trash fs-5"></i>
+                                                                         </button>
+                                                                     </td>
+                                                                 </tr>
+                                                             @empty
+                                                                 <tr>
+                                                                     <td colspan="4" class="text-center py-5 text-secondary">
+                                                                         <i class="fa-solid fa-vial fs-1 mb-2 d-block text-muted" style="font-size: 40px;"></i>
+                                                                         No ATP details have been documented yet.
+                                                                     </td>
+                                                                 </tr>
+                                                             @endforelse
+                                                         </tbody>
+                                                     </table>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+
 
                                 <!-- Room Record Tab -->
                                 <div class="tab-pane fade" id="room-record" role="tabpanel" aria-labelledby="room-record-tab">
@@ -1011,10 +1251,10 @@
                                                         </div>
 
                                                         {{-- Edit Form --}}
-                                                        <form action="{{ route('admin.lead.service.outline.update', $outline->id) }}" method="POST" class="mt-2">
-                                                            @csrf
+                                                        <!-- <form action="{{ route('admin.lead.service.outline.update', $outline->id) }}" method="POST" class="mt-2">
+                                                            @csrf -->
                                                             <div class="row mt-2 g-2">
-                                                                <div class="col-md-12">
+                                                                <!-- <div class="col-md-12">
                                                                     <div class="input-group">
                                                                         <input type="number"
                                                                             class="form-control"
@@ -1024,19 +1264,19 @@
                                                                             placeholder="0">
                                                                         <span class="input-group-text">%</span>
                                                                     </div>
-                                                                </div>
+                                                                </div> -->
                                                                 <div class="col-md-12 mt-2">
                                                                     <textarea name="description"
                                                                         class="form-control"
-                                                                        placeholder="Add description...">{{ $outline->description ?? '' }}</textarea>
+                                                                        placeholder="Add description..." readonly>{{ $outline->description ?? '' }}</textarea>
                                                                 </div>
                                                             </div>
-                                                            <div class="row mt-2">
+                                                            <!-- <div class="row mt-2">
                                                                 <div class="text-end">
                                                                     <button type="submit" class="btn btn-success">Save</button>
                                                                 </div>
                                                             </div>
-                                                        </form>
+                                                        </form> -->
                                                     </div>
                                                 @empty
                                                     <p class="text-muted">No contract details found.</p>
@@ -1782,6 +2022,122 @@
                     $('#travelClockInModal').modal('show');
                 }
                 // All other types submit normally
+            });
+
+            // ==============================
+            // Hotel Details Form Submission
+            // ==============================
+            $(document).on('submit', '#hotel-details-form', function (e) {
+                e.preventDefault();
+                const form = $(this);
+                const orderId = {{ $order->id }};
+
+                $.ajax({
+                    url: "{{ route('admin.lead.service.order.hotel.save', ['orderId' => ':orderId']) }}".replace(':orderId', orderId),
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success('Hotel details saved successfully!');
+                            location.reload();
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                        }
+                    },
+                    error: function (xhr) {
+                        toastr.error('Failed to save hotel details');
+                    }
+                });
+            });
+
+            // ==============================
+            // Hotel Details Deletion
+            // ==============================
+            $(document).on('click', '.btn-delete-hotel', function (e) {
+                e.preventDefault();
+                if (!confirm('Are you sure you want to remove this hotel entry?')) return;
+                
+                const btn = $(this);
+                const hotelEntryId = btn.data('id');
+                const orderId = {{ $order->id }};
+
+                $.ajax({
+                    url: "{{ route('admin.lead.service.order.hotel.delete', ['orderId' => ':orderId']) }}".replace(':orderId', orderId),
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        hotel_entry_id: hotelEntryId
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success('Hotel detail removed successfully!');
+                            location.reload();
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                        }
+                    },
+                    error: function (xhr) {
+                        toastr.error('Failed to delete hotel entry');
+                    }
+                });
+            });
+
+            // ==============================
+            // ATP Details Form Submission
+            // ==============================
+            $(document).on('submit', '#atp-details-form', function (e) {
+                e.preventDefault();
+                const form = $(this);
+                const orderId = {{ $order->id }};
+
+                $.ajax({
+                    url: "{{ route('admin.lead.service.order.atp.save', ['orderId' => ':orderId']) }}".replace(':orderId', orderId),
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success('ATP details saved successfully!');
+                            location.reload();
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                        }
+                    },
+                    error: function (xhr) {
+                        toastr.error('Failed to save ATP details');
+                    }
+                });
+            });
+
+            // ==============================
+            // ATP Details Deletion
+            // ==============================
+            $(document).on('click', '.btn-delete-atp', function (e) {
+                e.preventDefault();
+                if (!confirm('Are you sure you want to remove this ATP entry?')) return;
+                
+                const btn = $(this);
+                const atpEntryId = btn.data('id');
+                const orderId = {{ $order->id }};
+
+                $.ajax({
+                    url: "{{ route('admin.lead.service.order.atp.delete', ['orderId' => ':orderId']) }}".replace(':orderId', orderId),
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        atp_entry_id: atpEntryId
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success('ATP detail removed successfully!');
+                            location.reload();
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                        }
+                    },
+                    error: function (xhr) {
+                        toastr.error('Failed to delete ATP entry');
+                    }
+                });
             });
         </script>
     @endpush

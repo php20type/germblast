@@ -1233,6 +1233,40 @@
                                     </div>
                                 </div>
 
+                                {{-- Departmental --}}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+
+                                            <div class="section-header mb-3">
+                                                <h5 class="section-title">Departmental</h5>
+                                                <small class="text-muted">Enter new departments in the form below:</small>
+                                            </div>
+
+                                            {{-- Add Department Form --}}
+                                            <form action="{{ route('admin.lead.service.outline.add', $order->service->id) }}" method="POST">
+                                                @csrf
+                                                <table class="table table-hover equipment-report-table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th style="width: 25%;">Department Name</th>
+                                                            <td>
+                                                                <input type="text" class="form-control" name="outline_name" placeholder="Enter department name" required>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="2" class="text-end">
+                                                                <button type="submit" class="btn btn-success">Add Department</button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </form>
+
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {{-- Service Notes --}}
                                 <div class="row">
                                     <div class="col-md-12">

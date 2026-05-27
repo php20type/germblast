@@ -29,6 +29,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::post('order/{orderId}/notes/add', [ServiceController::class, 'addServiceNote'])->name('service.order.notes.add');
         Route::post('order/{orderId}/inventory/update', [ServiceController::class, 'updateInventory'])->name('service.order.inventory.update');
         Route::post('outline/{outlineId}/update', [ServiceController::class, 'updateOutlineRange'])->name('service.outline.update');
+        Route::post('service/{serviceId}/outline/add', [ServiceController::class, 'addServiceOutline'])->name('service.outline.add');
 
         Route::post('service/clock-in',  [ServiceController::class, 'clockIn'])->name('service.clock_in');
         Route::post('service/clock-out', [ServiceController::class, 'clockOut'])->name('service.clock_out');
@@ -41,6 +42,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::get('service/service-dashboard/{orderId}', [ServiceController::class, 'service_dashboard'])->name('service.service_dashboard');
         Route::post('service/slot/{slotId}/equipment/assign', [ServiceController::class, 'assignEquipment'])->name('service.slot.assign_equipment');
         Route::post('service/slot/{slotId}/equipment/{equipmentId}/remove', [ServiceController::class, 'removeEquipment'])->name('service.slot.remove_equipment');
+        Route::post('order/{orderId}/hotel/save', [ServiceController::class, 'saveHotelDetails'])->name('service.order.hotel.save');
+        Route::post('order/{orderId}/hotel/delete', [ServiceController::class, 'deleteHotelDetail'])->name('service.order.hotel.delete');
+        Route::post('order/{orderId}/atp/save', [ServiceController::class, 'saveAtpDetails'])->name('service.order.atp.save');
+        Route::post('order/{orderId}/atp/delete', [ServiceController::class, 'deleteAtpDetail'])->name('service.order.atp.delete');
 
     });
 

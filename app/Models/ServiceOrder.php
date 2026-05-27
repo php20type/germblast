@@ -24,11 +24,15 @@ class ServiceOrder extends Model
         // Checklist consumables
         'pre_checklist_consumables',
         'post_checklist_consumables',
+        'hotel_details',
+        'atp_details',
     ];
 
     protected $casts = [
         'pre_checklist_consumables' => 'array',
         'post_checklist_consumables' => 'array',
+        'hotel_details' => 'array',
+        'atp_details' => 'array',
     ];
 
     public function service()

@@ -730,6 +730,21 @@ class ServiceController extends Controller
         return redirect()->back()->with('success', 'Outline updated successfully.');
     }
 
+    public function addServiceOutline(Request $request, $serviceId)
+    {
+        $request->validate([
+            'outline_name' => 'required|string|max:255',
+        ]);
+
+        ServiceOutline::create([
+            'service_id'   => $serviceId,
+            'outline_name' => $request->outline_name,
+            'range'        => 0,
+        ]);
+
+        return redirect()->back()->with('success', 'Department added successfully.');
+    }
+
     /**
      * Clock in - per slot
      */
@@ -1073,4 +1088,162 @@ class ServiceController extends Controller
 
         return view('admin.all-schedules', compact('slots', 'vehicles', 'start', 'end', 'date','employees'));
     }
+
+    /**
+     * Save/Append hotel details to the service order
+     */
+    public function saveHotelDetails(Request $request, $orderId)
+    {
+        $request->validate([
+            'hotel_name'         => 'required|string|max:255',
+            'full_address'       => 'nullable|string|max:500',
+            'confirmation_no'    => 'nullable|string|max:255',
+            'check_in'           => 'nullable|date',
+            'check_out'          => 'nullable|date',
+        ]);
+
+        $order = ServiceOrder::findOrFail($orderId);
+
+        // Retrieve existing hotel details array
+        $hotels = $order->hotel_details ?? [];
+
+        // Generate a unique ID for the new hotel entry
+        $newHotel = [
+            'id'              => uniqid(),
+            'hotel_name'      => $request->input('hotel_name'),
+            'full_address'    => $request->input('full_address'),
+            'confirmation_no' => $request->input('confirmation_no'),
+            'check_in'        => $request->input('check_in'),
+            'check_out'       => $request->input('check_out'),
+        ];
+
+        $hotels[] = $newHotel;
+
+        $order->update([
+            'hotel_details' => $hotels
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Hotel details added successfully',
+                'hotels'  => $hotels
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Hotel details added successfully.');
+    }
+
+    /**
+     * Delete a specific hotel detail entry from the array list
+     */
+    public function deleteHotelDetail(Request $request, $orderId)
+    {
+        $request->validate([
+            'hotel_entry_id' => 'required|string',
+        ]);
+
+        $order = ServiceOrder::findOrFail($orderId);
+        $hotels = $order->hotel_details ?? [];
+
+        // Filter out the requested hotel ID
+        $updatedHotels = array_filter($hotels, function ($hotel) use ($request) {
+            return ($hotel['id'] ?? '') !== $request->input('hotel_entry_id');
+        });
+
+        // Reindex array keys
+        $updatedHotels = array_values($updatedHotels);
+
+        $order->update([
+            'hotel_details' => $updatedHotels
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Hotel detail removed successfully',
+                'hotels'  => $updatedHotels
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Hotel detail removed successfully.');
+    }
+
+    /**
+     * Save/Append ATP details to the service order
+     */
+    public function saveAtpDetails(Request $request, $orderId)
+    {
+        $request->validate([
+            'atp_type'    => 'required|in:pre,post',
+            'facility_id' => 'required|string',
+            'result'      => 'required|string|max:255',
+            'description' => 'nullable|string|max:500',
+        ]);
+
+        $order = ServiceOrder::findOrFail($orderId);
+        $atpRecords = $order->atp_details ?? [];
+
+        $newRecord = [
+            'id'          => uniqid(),
+            'atp_type'    => $request->input('atp_type'),
+            'facility_id' => $request->input('facility_id'),
+            'result'      => $request->input('result'),
+            'description' => $request->input('description'),
+            'created_at'  => now()->toDateTimeString(),
+        ];
+
+        $atpRecords[] = $newRecord;
+
+        $order->update([
+            'atp_details' => $atpRecords
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'ATP details added successfully',
+                'atp_details' => $atpRecords
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'ATP details added successfully.');
+    }
+
+    /**
+     * Delete a specific ATP detail entry from the array list
+     */
+    public function deleteAtpDetail(Request $request, $orderId)
+    {
+        $request->validate([
+            'atp_entry_id' => 'required|string',
+        ]);
+
+        $order = ServiceOrder::findOrFail($orderId);
+        $atpRecords = $order->atp_details ?? [];
+
+        // Filter out the requested ATP ID
+        $updatedRecords = array_filter($atpRecords, function ($record) use ($request) {
+            return ($record['id'] ?? '') !== $request->input('atp_entry_id');
+        });
+
+        // Reindex array keys
+        $updatedRecords = array_values($updatedRecords);
+
+        $order->update([
+            'atp_details' => $updatedRecords
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'ATP detail removed successfully',
+                'atp_details' => $updatedRecords
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'ATP detail removed successfully.');
+    }
 }
+
+
