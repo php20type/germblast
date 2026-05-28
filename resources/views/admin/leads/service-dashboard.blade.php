@@ -763,9 +763,6 @@
                                                             <p class="mb-1"><strong>Interval:</strong> {{ $slot->scheduled_start_time }} — {{ $slot->scheduled_end_time }}</p>
                                                             <p class="mb-1"><strong>Hours:</strong> {{ $slot->scheduled_hours }}</p>
                                                             <p class="mb-1"><strong>Arrival Time:</strong> {{ $slot->scheduled_arrival_time }}</p>
-                                                            <p class="mb-1"><strong>Meet:</strong> {{ ucfirst($slot->meet) }}</p>
-                                                            <p class="mb-1"><strong>Overnight:</strong> {{ $slot->overnight ? 'Yes' : 'No' }}</p>
-                                                            <p class="mb-0"><strong>Recurrence:</strong> {{ $slot->scheduled_recurrence_rule }}</p>
                                                         </div>
                                                         
                                                         {{-- Vehicles and Service Locations Side-by-Side --}}
@@ -775,9 +772,9 @@
                                                                     <div class="section-header mb-3">
                                                                         <h5 class="section-title">Vehicles</h5>
                                                                     </div>
-                                                                    @if($allVehicles->count())
+                                                                    @if($slot->vehicles->count())
                                                                         <div class="d-flex flex-wrap gap-2">
-                                                                            @foreach($allVehicles as $vehicle)
+                                                                            @foreach($slot->vehicles as $vehicle)
                                                                                 <div class="border rounded p-2 text-center bg-white" style="min-width: 160px;">
                                                                                     <i class="fas fa-car text-danger mb-1"></i>
                                                                                     <p class="mb-0 small fw-semibold">{{ $vehicle->name ?? $vehicle->plate_number ?? 'Vehicle #' . $vehicle->id }}</p>
@@ -907,7 +904,7 @@
                                                                     </div>
                                                                 </div>
                                                             @else
-                                                                <form action="{{ route('admin.lead.service.clock_in') }}" method="POST" class="clock-in-form">
+                                                                <form action="{{ route('admin.lead.service.clock_in') }}" method="POST" class="clock-in-form" data-vehicles="{{ json_encode($slot->vehicles->map(fn($v) => ['id' => $v->id, 'name' => $v->name ?? $v->plate_number ?? 'Vehicle #'.$v->id])) }}">
                                                                     @csrf
                                                                     <input type="hidden" name="slot_id" value="{{ $slot->id }}" class="clock-in-slot-id">
                                                                     <div class="d-flex gap-2 align-items-center">
@@ -950,7 +947,7 @@
                                                                         @foreach($slot->staff as $staffMember)
                                                                             <tr>
                                                                                 <td>{{ $staffMember->user->name ?? '-' }}</td>
-                                                                                <td>{{ implode(' | ', $staffMember->user->specialties ?? []) ?: '-' }}</td>
+                                                                                <td>{{ $staffMember->user->training_level ?? '-' }}</td>
                                                                                 <td>{{ $staffMember->slot_hours }}</td>
                                                                                 <td>{{ $slot->clocked_in_at ?? '-' }}</td>
                                                                                 <td>{{ $slot->clocked_out_at ?? '-' }}</td>
@@ -1159,27 +1156,110 @@
                                         <div class="col-md-12">
                                             <div class="section-card">
                                                 <div class="section-header mb-3">
-                                                    <h5 class="section-title">Summary</h5>
+                                                    <h5 class="section-title">Barcoded Rooms</h5>
                                                 </div>
-                                                <p class="text-muted">Coming in Phase 2</p>
+                                                <form class="mb-0">
+                                                    <p class="text-muted mb-2" style="font-size: 14px;">For an existing barcode:</p>
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-semibold text-dark">Barcode</label>
+                                                        <input type="text" class="form-control bg-light" placeholder="Barcode">
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary px-4" style="background-color: #3b82f6; border-color: #3b82f6;">
+                                                        Submit
+                                                    </button>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Equipment Tab -->
-                                <div class="tab-pane fade" id="equipment" role="tabpanel" aria-labelledby="equipment-tab">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="section-card">
-                                                <div class="section-header mb-3">
-                                                    <h5 class="section-title">Summary</h5>
-                                                </div>
-                                                <p class="text-muted">Coming in Phase 2</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                 <!-- Equipment Tab -->
+                                 <div class="tab-pane fade" id="equipment" role="tabpanel" aria-labelledby="equipment-tab">
+                                     <div class="row">
+                                         <div class="col-md-12">
+                                             {{-- Card 1: Equipment Barcode Record --}}
+                                             <div class="section-card mb-4">
+                                                 <div class="section-header mb-3">
+                                                     <h5 class="section-title">Equipment Barcode Record</h5>
+                                                 </div>
+                                                 <form class="mb-0">
+                                                     <div class="d-flex flex-wrap gap-2 align-items-center">
+                                                         <div style="flex: 1; min-width: 140px;">
+                                                             <input type="text" class="form-control bg-light" placeholder="Barcode">
+                                                         </div>
+                                                         <div style="flex: 1; min-width: 140px;">
+                                                             <input type="text" class="form-control bg-light" placeholder="Location">
+                                                         </div>
+                                                         <div style="flex: 1; min-width: 140px;">
+                                                             <input type="text" class="form-control bg-light" placeholder="Comment">
+                                                         </div>
+                                                         <div style="width: 140px;">
+                                                             <select class="form-select bg-light">
+                                                                 <option value="service">Service</option>
+                                                                 <option value="washed">Washed</option>
+                                                                 <option value="germblasted">GermBlasted</option>
+                                                             </select>
+                                                         </div>
+                                                         <div>
+                                                             <button type="button" class="btn btn-success px-3" style="background-color: #2ec15d; border-color: #2ec15d; height: 38px;">
+                                                                 <i class="fas fa-check-circle"></i>
+                                                             </button>
+                                                         </div>
+                                                     </div>
+                                                 </form>
+                                             </div>
+
+                                             {{-- Card 2: Newly Barcoded Equipment --}}
+                                             <div class="section-card mb-4">
+                                                 <div class="section-header mb-3">
+                                                     <h5 class="section-title">Newly Barcoded Equipment</h5>
+                                                 </div>
+                                                 <form class="mb-0">
+                                                     <div class="d-flex flex-wrap gap-2 align-items-center">
+                                                         <div style="flex: 1; min-width: 120px;">
+                                                             <input type="text" class="form-control bg-light" placeholder="Barcode">
+                                                         </div>
+                                                         <div style="flex: 1; min-width: 120px;">
+                                                             <input type="text" class="form-control bg-light" placeholder="Serial Number">
+                                                         </div>
+                                                         <div style="flex: 1; min-width: 120px;">
+                                                             <input type="text" class="form-control bg-light" placeholder="Description">
+                                                         </div>
+                                                         <div style="flex: 1; min-width: 120px;">
+                                                             <input type="text" class="form-control bg-light" placeholder="Location">
+                                                         </div>
+                                                         <div style="flex: 1; min-width: 120px;">
+                                                             <input type="text" class="form-control bg-light" placeholder="Comment">
+                                                         </div>
+                                                         <div style="width: 130px;">
+                                                             <select class="form-select bg-light">
+                                                                 <option value="service">Service</option>
+                                                                 <option value="washed">Washed</option>
+                                                                 <option value="germblasted">GermBlasted</option>
+                                                             </select>
+                                                         </div>
+                                                         <div>
+                                                             <button type="button" class="btn btn-success px-3" style="background-color: #2ec15d; border-color: #2ec15d; height: 38px;">
+                                                                 <i class="fas fa-check-circle"></i>
+                                                             </button>
+                                                         </div>
+                                                     </div>
+                                                 </form>
+                                             </div>
+
+                                             {{-- Card 3: Equipment Summary --}}
+                                             <div class="section-card">
+                                                 <div class="section-header mb-3">
+                                                     <h5 class="section-title">Equipment Summary</h5>
+                                                 </div>
+                                                 <div class="bg-light p-3 rounded">
+                                                     <p class="mb-2 fw-semibold text-dark">Total Number of Pieces Washed: <span class="badge bg-primary fs-6 px-2 py-1 ms-1">0</span></p>
+                                                     <p class="mb-0 fw-semibold text-dark">Total Number of Pieces GermBlasted: <span class="badge bg-success fs-6 px-2 py-1 ms-1">0</span></p>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
 
                                 <!-- Clean Patch Tab -->
                                 <div class="tab-pane fade" id="clean-patch" role="tabpanel" aria-labelledby="clean-patch-tab">
@@ -1187,9 +1267,30 @@
                                         <div class="col-md-12">
                                             <div class="section-card">
                                                 <div class="section-header mb-3">
-                                                    <h5 class="section-title">Summary</h5>
+                                                    <h5 class="section-title">Clean Patch Record</h5>
                                                 </div>
-                                                <p class="text-muted">Coming in Phase 2</p>
+                                                <form class="mb-0">
+                                                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                                                        <div style="flex: 1; max-width: 300px; min-width: 140px;">
+                                                            <input type="text" class="form-control bg-light" placeholder="Barcode">
+                                                        </div>
+                                                        <div style="flex: 1; max-width: 300px; min-width: 160px;">
+                                                            <select class="form-select bg-light">
+                                                                <option value="large_rectangle">Large (Rectangle)</option>
+                                                                <option value="medium_rectangle">Medium (Rectangle)</option>
+                                                                <option value="small_rectangle">Small (Rectangle)</option>
+                                                                <option value="large_square">Large (Square)</option>
+                                                                <option value="medium_square">Medium (Square)</option>
+                                                                <option value="small_square">Small (Square)</option>
+                                                            </select>
+                                                        </div>
+                                                        <div>
+                                                            <button type="button" class="btn btn-success px-3" style="background-color: #2ec15d; border-color: #2ec15d; height: 38px;">
+                                                                <i class="fas fa-check-circle"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
@@ -1994,7 +2095,17 @@
                     e.preventDefault();
                     const slotId = $(this).find('.clock-in-slot-id').val();
                     $('#travel_slot_id').val(slotId);
-                    $('#travel_vehicle_id').val('');
+                    
+                    // Rebuild the vehicle select dynamically with only this slot's assigned vehicles
+                    const vehicles = $(this).data('vehicles') || [];
+                    const vehicleSelect = $('#travel_vehicle_id');
+                    vehicleSelect.empty();
+                    vehicleSelect.append('<option value="">-- Select Vehicle --</option>');
+                    
+                    vehicles.forEach(function (v) {
+                        vehicleSelect.append(`<option value="${v.id}">${v.name}</option>`);
+                    });
+
                     $('#travel_driver_id').val('');
                     $('#travelClockInModal').modal('show');
                 }

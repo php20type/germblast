@@ -218,11 +218,11 @@
                                     aria-controls="confirmations" aria-selected="false">
                                     Confirmations
                                 </button>
-                                <button class="nav-link" id="pre-checklist-tab" data-bs-toggle="tab"
+                                <!-- <button class="nav-link" id="pre-checklist-tab" data-bs-toggle="tab"
                                     data-bs-target="#pre-checklist" type="button" role="tab"
                                     aria-controls="pre-checklist" aria-selected="false">
                                     Pre-Checklist
-                                </button>
+                                </button> -->
                                 <button class="nav-link" id="facilities-tab" data-bs-toggle="tab"
                                     data-bs-target="#facilities" type="button" role="tab" aria-controls="facilities"
                                     aria-selected="false">
@@ -250,7 +250,7 @@
                                     aria-selected="false">
                                     Job Clocks
                                 </button> --}}
-                                <button class="nav-link" id="employee-performance-tab" data-bs-toggle="tab"
+                                <!-- <button class="nav-link" id="employee-performance-tab" data-bs-toggle="tab"
                                     data-bs-target="#employee-performance" type="button" role="tab"
                                     aria-controls="employee-performance" aria-selected="false">
                                     Employee Performance
@@ -259,7 +259,7 @@
                                     data-bs-target="#post-checklist" type="button" role="tab"
                                     aria-controls="post-checklist" aria-selected="false">
                                     Post Checklist
-                                </button>
+                                </button> -->
                                 {{-- <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports"
                                     type="button" role="tab" aria-controls="reports" aria-selected="false">
                                     Reports
@@ -1502,9 +1502,6 @@
                                                     <p class="mb-1"><strong>Interval:</strong> {{ $slot->scheduled_start_time }} — {{ $slot->scheduled_end_time }}</p>
                                                     <p class="mb-1"><strong>Hours:</strong> {{ $slot->scheduled_hours }}</p>
                                                     <p class="mb-1"><strong>Arrival Time:</strong> {{ $slot->scheduled_arrival_time }}</p>
-                                                    <p class="mb-1"><strong>Meet:</strong> {{ ucfirst($slot->meet) }}</p>
-                                                    <p class="mb-1"><strong>Overnight:</strong> {{ $slot->overnight ? 'Yes' : 'No' }}</p>
-                                                    <p class="mb-0"><strong>Recurrence:</strong> {{ $slot->scheduled_recurrence_rule }}</p>
                                                 </div>
 
                                                 {{-- Vehicles and Service Locations Side-by-Side --}}
@@ -1514,9 +1511,9 @@
                                                             <div class="section-header mb-3">
                                                                 <h5 class="section-title">Vehicles</h5>
                                                             </div>
-                                                            @if($allVehicles->count())
+                                                            @if($slot->vehicles->count())
                                                                 <div class="d-flex flex-wrap gap-2">
-                                                                    @foreach($allVehicles as $vehicle)
+                                                                    @foreach($slot->vehicles as $vehicle)
                                                                         <div class="border rounded p-2 text-center bg-white" style="min-width: 160px;">
                                                                             <i class="fas fa-car text-danger mb-1"></i>
                                                                             <p class="mb-0 small fw-semibold">{{ $vehicle->name ?? $vehicle->plate_number ?? 'Vehicle #'.$vehicle->id }}</p>
@@ -1646,7 +1643,7 @@
                                                             </div>
                                                         </div>
                                                     @else
-                                                        <form action="{{ route('admin.lead.service.clock_in') }}" method="POST" class="clock-in-form">
+                                                        <form action="{{ route('admin.lead.service.clock_in') }}" method="POST" class="clock-in-form" data-vehicles="{{ json_encode($slot->vehicles->map(fn($v) => ['id' => $v->id, 'name' => $v->name ?? $v->plate_number ?? 'Vehicle #'.$v->id])) }}">
                                                             @csrf
                                                             <input type="hidden" name="slot_id" value="{{ $slot->id }}" class="clock-in-slot-id">
                                                             <div class="d-flex gap-2 align-items-center">
@@ -1689,7 +1686,7 @@
                                                                 @foreach($slot->staff as $staffMember)
                                                                     <tr>
                                                                         <td>{{ $staffMember->user->name ?? '-' }}</td>
-                                                                        <td>{{ implode(' | ', $staffMember->user->specialties ?? []) ?: '-' }}</td>
+                                                                        <td>{{ $staffMember->user->training_level ?? '-' }}</td>
                                                                         <td>{{ $staffMember->slot_hours }}</td>
                                                                         <td>{{ $slot->clocked_in_at ?? '-' }}</td>
                                                                         <td>{{ $slot->clocked_out_at ?? '-' }}</td>
@@ -2388,7 +2385,17 @@
             e.preventDefault();
             const slotId = $(this).find('.clock-in-slot-id').val();
             $('#travel_slot_id').val(slotId);
-            $('#travel_vehicle_id').val('');
+            
+            // Rebuild the vehicle select dynamically with only this slot's assigned vehicles
+            const vehicles = $(this).data('vehicles') || [];
+            const vehicleSelect = $('#travel_vehicle_id');
+            vehicleSelect.empty();
+            vehicleSelect.append('<option value="">-- Select Vehicle --</option>');
+            
+            vehicles.forEach(function (v) {
+                vehicleSelect.append(`<option value="${v.id}">${v.name}</option>`);
+            });
+
             $('#travel_driver_id').val('');
             $('#travelClockInModal').modal('show');
         }

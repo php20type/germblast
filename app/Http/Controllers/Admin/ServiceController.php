@@ -670,6 +670,50 @@ class ServiceController extends Controller
 
         $slot = ServiceOrderSlot::findOrFail($slotId);
 
+        $start = $slot->scheduled_start_time;
+        $end   = $slot->scheduled_end_time;
+
+        if ($start && $end) {
+            $occupiedStart = $start->copy()->subHour();
+            $occupiedEnd   = $end->copy()->addHour();
+            $targetDate    = $start->toDateString();
+
+            foreach ($request->vehicle_ids as $vehicleId) {
+                // Find conflicting slots on the same day for this vehicle
+                $existingSlots = ServiceOrderSlot::where('id', '!=', $slot->id)
+                    ->whereHas('vehicles', function ($q) use ($vehicleId) {
+                        $q->where('vehicles.id', $vehicleId);
+                    })
+                    ->get()
+                    ->filter(function ($s) use ($targetDate) {
+                        return $s->scheduled_start_time && $s->scheduled_start_time->toDateString() === $targetDate;
+                    });
+
+                foreach ($existingSlots as $existingSlot) {
+                    $existingStart = $existingSlot->scheduled_start_time;
+                    $existingEnd   = $existingSlot->scheduled_end_time;
+
+                    if ($existingStart && $existingEnd) {
+                        $existingOccupiedStart = $existingStart->copy()->subHour();
+                        $existingOccupiedEnd   = $existingEnd->copy()->addHour();
+
+                        // Overlap check on occupied durations (inclusive of 1 hour buffer)
+                        if ($occupiedStart < $existingOccupiedEnd && $occupiedEnd > $existingOccupiedStart) {
+                            $vehicle = Vehicle::find($vehicleId);
+                            $vehicleName = $vehicle ? ($vehicle->name ?? $vehicle->plate_number) : 'Vehicle';
+                            
+                            $formattedStart = $existingStart->format('h:i A');
+                            $formattedEnd = $existingEnd->format('h:i A');
+                            $bufferStart = $existingOccupiedStart->format('h:i A');
+                            $bufferEnd = $existingOccupiedEnd->format('h:i A');
+                            
+                            return back()->with('error', "Vehicle '{$vehicleName}' is already booked on this day from {$formattedStart} to {$formattedEnd} (Occupied buffer: {$bufferStart} to {$bufferEnd}).");
+                        }
+                    }
+                }
+            }
+        }
+
         foreach ($request->vehicle_ids as $vehicleId) {
             if (!$slot->vehicles()->where('vehicle_id', $vehicleId)->exists()) {
                 $slot->vehicles()->attach($vehicleId);

@@ -7,144 +7,288 @@
         .company-link {
             color: #1a5fb4;
             text-decoration: none;
+            transition: all 0.2s ease;
         }
+
         .company-link:hover {
             text-decoration: underline;
+            color: #0d47a1;
+        }
+
+        .bg-today-light {
+            background-color: rgba(255, 180, 0, 0.02) !important;
+        }
+
+        .border-today-accent {
+            border-top: 3px solid #ffb400 !important;
+        }
+
+        /* Calendar column borders */
+        .calendar-week-grid {
+            border: 1px solid #e5e7eb !important;
+            border-radius: 8px !important;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        .calendar-day-col {
+            flex: 1 1 0%;
+            min-width: 150px;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .calendar-day-col:last-child {
+            border-right: none;
+        }
+
+        .calendar-day-header {
+            background-color: #fafafa;
+            border-bottom: 1px solid #e5e7eb !important;
+        }
+
+        .calendar-nav-btn {
+            color: #4b5563 !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 16px !important;
+            border-radius: 6px !important;
+            transition: all 0.15s ease;
+            text-decoration: none !important;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .calendar-nav-btn:hover {
+            background-color: #f3f4f6 !important;
+            color: #1f2937 !important;
+        }
+
+        .calendar-nav-btn.btn-today {
+            background-color: #ffb400 !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 4px rgba(255, 180, 0, 0.15) !important;
+        }
+
+        .calendar-nav-btn.btn-today:hover {
+            background-color: #e6a200 !important;
+            color: #ffffff !important;
         }
     </style>
 @endpush
 
 @section('content')
 
-<div class="container-fluid my-3">
+    <div class="companies-section my-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12 p-0">
 
-    {{-- HEADER BAR --}}
-    <div style="background:#ffb81c; padding:8px 10px; border-radius:4px 4px 0 0;">
-        <div class="d-flex justify-content-between align-items-center">
+                    <div class="main-content">
+                        <!-- Header (matching GermBlast standard index layout) -->
+                        <div class="heading-area-sec mb-0 border-bottom-0">
+                            <div class="left-part-sec">
+                                <h3 class="mb-1">VEHICLE PLANNING
+                                    <span style="font-size: 24px;">📌</span>
+                                </h3>
+                                <p class="text-muted mb-0">Manage week-by-week service slot planning and vehicle assignments
+                                </p>
+                            </div>
+                        </div>
 
-            <a href="{{ route('admin.vehicle.planning', ['date' => $start->copy()->subWeek()->toDateString()]) }}"
-               class="btn btn-light btn-sm">
-                << Previous Week
-            </a>
+                        <!-- Restyled Header Filter Control Bar -->
+                        <div class="filter-section py-3 px-4 mx-4 my-3 rounded-3 border bg-white"
+                            style="border-color: #e5e7eb !important;">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
 
-            <div>
-                Week of: {{ $start->format('l d/m/y') }}
-                <a href="{{ route('admin.vehicle.planning', ['date' => now()->toDateString()]) }}" class="btn btn-light btn-sm ms-2">
-                    Current Week
-                </a>
-            </div>
+                                <!-- Left Side: Current Range Header -->
 
-            <a href="{{ route('admin.vehicle.planning', ['date' => $start->copy()->addWeek()->toDateString()]) }}"
-               class="btn btn-light btn-sm">
-                Next Week >>
-            </a>
+                                <div>
+                                    <span class="text-secondary text-uppercase fw-bold d-block"
+                                        style="font-size: 9px; letter-spacing: 0.5px;">Active Schedule Period</span>
+                                    <h4 class="mb-0 fw-bold text-dark" style="font-size: 18px;">
+                                        Week of: {{ $start->format('M d, Y') }}
+                                    </h4>
+                                </div>
 
-        </div>
-    </div>
+                                <!-- Right Side: Unified Navigation Segment Control -->
+                                <div class="d-flex align-items-center gap-1 bg-light p-1 rounded-3 border"
+                                    style="border-color: #e5e7eb !important;">
+                                    <a href="{{ route('admin.vehicle.planning', ['date' => $start->copy()->subWeek()->toDateString()]) }}"
+                                        class="calendar-nav-btn" title="Previous Week">
+                                        <i class="fas fa-chevron-left me-1" style="font-size: 10px;"></i> Prev Week
+                                    </a>
 
-    {{-- MAIN GRID --}}
-    <div style="background:#e5e5e5; padding:10px; border:1px solid #999;">
+                                    <span class="text-muted opacity-25 px-1">|</span>
 
-        <div class="d-flex flex-wrap gap-2">
+                                    <a href="{{ route('admin.vehicle.planning', ['date' => now()->toDateString()]) }}"
+                                        class="calendar-nav-btn btn-today">
+                                        Current Week
+                                    </a>
 
-            @for($i = 0; $i < 7; $i++)
-                @php
-                    $dateItem = $start->copy()->addDays($i);
-                    $dayKey = $dateItem->format('Y-m-d');
-                    $daySlots = $slots[$dayKey] ?? collect();
-                @endphp
+                                    <span class="text-muted opacity-25 px-1">|</span>
 
-                {{-- DAY COLUMN --}}
-                <div style="flex:1; background:#f9f9f9; border:1px solid #999; border-radius:6px;">
-
-                    {{-- DAY HEADER --}}
-                    <div style="padding:8px; border-bottom:1px solid #ccc;">
-                        {{ $dateItem->format('l d/m/y') }}
-                    </div>
-
-                    {{-- SLOTS --}}
-                    <div style="padding:8px;">
-
-                        @forelse($daySlots as $slot)
-
-                            <div style="background:#cfe3f1; padding:8px; margin-bottom:10px; border-radius:4px;">
-
-                                {{-- COMPANY --}}
-                                <div style="font-weight:600;">
-                                    <a href="{{ route('admin.lead.service.fulfill_order', $slot->serviceOrder->id) }}"
-                                        class="company-link">
-                                        {{ $slot->serviceOrder->service->lead->company->name ?? '-' }}
+                                    <a href="{{ route('admin.vehicle.planning', ['date' => $start->copy()->addWeek()->toDateString()]) }}"
+                                        class="calendar-nav-btn" title="Next Week">
+                                        Next Week <i class="fas fa-chevron-right ms-1" style="font-size: 10px;"></i>
                                     </a>
                                 </div>
 
-                                {{-- TIME --}}
-                                <div style="font-size:12px; color:#1a5fb4; margin-bottom:6px;">
-                                    {{ \Carbon\Carbon::parse($slot->scheduled_start_time)->format('h:i A') }}
-                                    -
-                                    {{ \Carbon\Carbon::parse($slot->scheduled_end_time)->format('h:i A') }}
-                                </div>
+                            </div>
+                        </div>
 
-                                {{-- CURRENT VEHICLES --}}
-                                <div style="font-size:12px; margin-bottom:4px;">
-                                    Current Vehicles (+ last 4 VIN)
-                                </div>
+                        <!-- Calendar Weekly Matrix Grid -->
+                        <div class="px-4 pb-4 mt-3">
+                            <div class="calendar-week-grid d-flex flex-nowrap overflow-auto">
+                                @foreach([4, 5, 6, 0, 1] as $dayOffset)
+                                    @php
+                                        $dateItem = $start->copy()->addDays($dayOffset);
+                                        $dayKey = $dateItem->format('Y-m-d');
+                                        $daySlots = $slots[$dayKey] ?? collect();
+                                        $isToday = $dateItem->isToday();
+                                    @endphp
 
-                                @foreach($slot->vehicles as $vehicle)
-                                    <div style="display:flex; justify-content:space-between; align-items:center; background:#d9edf7; padding:4px 6px; margin-bottom:4px; border:1px solid #bcdff1;
-                                        border-radius:3px;">
-                                        <span style="font-size:12px;">
-                                            {{ $vehicle->name }}
-                                        </span>
+                                    {{-- DAY COLUMN --}}
+                                    <div class="calendar-day-col {{ $isToday ? 'bg-today-light' : '' }}">
 
-                                        <form action="{{ route('admin.lead.slot.vehicle.remove', [$slot->id, $vehicle->id]) }}" method="POST">
-                                            @csrf
-                                            <button style="background:#d9534f; color:#fff; border:none; padding:2px 6px; border-radius:2px;">
-                                                X
-                                            </button>
-                                        </form>
+                                        {{-- DAY HEADER --}}
+                                        <div
+                                            class="calendar-day-header py-3 px-2 text-center {{ $isToday ? 'border-today-accent' : '' }}">
+                                            <span class="d-block fw-bold text-secondary text-uppercase mb-1"
+                                                style="font-size: 10px; letter-spacing: 0.5px;">
+                                                {{ $dateItem->format('l') }}
+                                            </span>
+                                            <span class="d-block fw-bold text-dark" style="font-size: 13px;">
+                                                {{ $dateItem->format('M d, Y') }}
+                                            </span>
+                                            @if($isToday)
+                                                <span class="badge bg-warning text-dark mt-1"
+                                                    style="font-size: 9px; font-weight: 600;">TODAY</span>
+                                            @endif
+                                        </div>
+
+                                        {{-- DAY BODY / SLOTS --}}
+                                        <div class="p-2 flex-grow-1 d-flex flex-column gap-2" style="min-height: 450px;">
+                                            @forelse($daySlots as $slot)
+                                                {{-- SLOT CONTAINER --}}
+                                                <div class="p-3 rounded-3 position-relative"
+                                                    style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #3b82f6;">
+
+                                                    {{-- COMPANY LINK --}}
+                                                    <div class="fw-bold text-dark mb-1" style="font-size: 12px; line-height: 1.3;">
+                                                        <a href="{{ route('admin.lead.service.fulfill_order', $slot->serviceOrder->id) }}"
+                                                            class="company-link text-primary hover-underline">
+                                                            {{ $slot->serviceOrder->service->lead->company->name ?? '-' }}
+                                                        </a>
+                                                    </div>
+
+                                                    {{-- SLOT TIME --}}
+                                                    <div class="text-muted fw-semibold mb-2" style="font-size: 10px;">
+                                                        <i class="far fa-clock me-1 text-primary"
+                                                            style="opacity: 0.7; font-size: 9px;"></i>
+                                                        {{ \Carbon\Carbon::parse($slot->scheduled_start_time)->format('h:i A') }}
+                                                        -
+                                                        {{ \Carbon\Carbon::parse($slot->scheduled_end_time)->format('h:i A') }}
+                                                    </div>
+
+                                                    {{-- ASSIGNED VEHICLES --}}
+                                                    <div class="assigned-vehicles-list mb-1">
+                                                        @foreach($slot->vehicles as $vehicle)
+                                                            <div class="d-flex justify-content-between align-items-center mb-1 p-1 px-2 rounded bg-white border"
+                                                                style="font-size: 11px; border-color: #e5e7eb !important;">
+                                                                <span class="text-dark fw-medium">
+                                                                    <i class="fas fa-truck text-primary me-1"
+                                                                        style="font-size: 9px; opacity: 0.8;"></i>
+                                                                    {{ $vehicle->name }}
+                                                                </span>
+                                                                <form
+                                                                    action="{{ route('admin.lead.slot.vehicle.remove', [$slot->id, $vehicle->id]) }}"
+                                                                    method="POST" class="m-0">
+                                                                    @csrf
+                                                                    <button type="submit"
+                                                                        class="btn btn-sm btn-link text-danger p-0 border-0 ms-1"
+                                                                        style="font-size: 11px; line-height: 1;">
+                                                                        <i class="fas fa-times-circle"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+
+                                                    {{-- ADD VEHICLE FORM --}}
+                                                    <div class="mt-2 pt-2 border-top"
+                                                        style="border-top: 1px dashed #bfdbfe !important;">
+                                                        <form action="{{ route('admin.lead.slot.vehicle.assign', $slot->id) }}"
+                                                            method="POST" class="m-0">
+                                                            @csrf
+                                                            <div class="mb-1">
+                                                                <select name="vehicle_ids[]"
+                                                                    class="form-select form-select-sm bg-white"
+                                                                    style="font-size: 11px; border-radius: 4px; padding: 0.2rem 0.4rem !important;"
+                                                                    required>
+                                                                    <option value="">Add vehicle...</option>
+                                                                    @foreach($vehicles as $vehicle)
+                                                                        @if(!$slot->vehicles->pluck('id')->contains($vehicle->id))
+                                                                            <option value="{{ $vehicle->id }}">{{ $vehicle->name }}</option>
+                                                                        @endif
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                            <button type="submit"
+                                                                class="btn btn-export btn-sm py-1 w-100 text-center text-uppercase fw-bold"
+                                                                style="font-size: 10px; border-radius: 4px !important;">
+                                                                Add
+                                                            </button>
+                                                        </form>
+                                                    </div>
+
+                                                </div>
+                                            @empty
+                                                {{-- NO SLOTS TEMPLATE --}}
+                                                <div class="py-4 text-center text-muted"
+                                                    style="font-size: 11px; margin-top: auto; margin-bottom: auto;">
+                                                    <i class="far fa-calendar-minus d-block mb-1 text-muted"
+                                                        style="font-size: 14px; opacity: 0.5;"></i>
+                                                    No slots
+                                                </div>
+                                            @endforelse
+                                        </div>
 
                                     </div>
                                 @endforeach
-
-                                {{-- ADD VEHICLE --}}
-                                <div style="margin-top:6px; font-size:12px;">
-                                    Add Vehicle:
-                                </div>
-
-                                <form action="{{ route('admin.lead.slot.vehicle.assign', $slot->id) }}" method="POST">
-                                    @csrf
-
-                                    <select name="vehicle_ids[]" style="width:100%; margin-bottom:4px;" class="form-select">
-                                        <option value="">Select a vehicle/VIN</option>
-
-                                        @foreach($vehicles as $vehicle)
-                                            @if(!$slot->vehicles->pluck('id')->contains($vehicle->id))
-                                                <option value="{{ $vehicle->id }}">{{ $vehicle->name }}</option>
-                                            @endif
-                                        @endforeach
-                                    </select>
-
-                                    <button class="btn btn-sm bg-primary text-white" style="width:100%;">
-                                        Add
-                                    </button>
-                                </form>
-
                             </div>
-
-                        @empty
-                            <div style="font-size:12px; color:#777;">
-                                No slots
-                            </div>
-                        @endforelse
+                        </div>
 
                     </div>
+
                 </div>
-
-            @endfor
-
+            </div>
         </div>
     </div>
 
-</div>
-
 @endsection
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            @if(session('success'))
+                toastr.success("{{ session('success') }}");
+            @endif
+
+            @if(session('error'))
+                toastr.error("{{ session('error') }}");
+            @endif
+
+            @if(session('warning'))
+                toastr.warning("{{ session('warning') }}");
+            @endif
+
+            @if(session('info'))
+                toastr.info("{{ session('info') }}");
+            @endif
+                });
+    </script>
+@endpush
