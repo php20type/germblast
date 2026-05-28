@@ -943,7 +943,7 @@
                                                                                 {{ $staffMember->user->name }}
                                                                                 @if($isLeader)
                                                                                     <span class="badge bg-warning text-dark ms-1" style="font-size: 10px; font-weight: 700;">
-                                                                                        <i class="fas fa-crown me-1"></i> LEADER
+                                                                                        LEADER
                                                                                     </span>
                                                                                 @endif
                                                                             </span><br>

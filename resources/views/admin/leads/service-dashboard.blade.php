@@ -779,7 +779,7 @@
                                                                         <div class="d-flex flex-wrap gap-2">
                                                                             @foreach($allVehicles as $vehicle)
                                                                                 <div class="border rounded p-2 text-center bg-white" style="min-width: 160px;">
-                                                                                    <i class="fas fa-car text-danger mb-1"></span>
+                                                                                    <i class="fas fa-car text-danger mb-1"></i>
                                                                                     <p class="mb-0 small fw-semibold">{{ $vehicle->name ?? $vehicle->plate_number ?? 'Vehicle #' . $vehicle->id }}</p>
                                                                                 </div>
                                                                             @endforeach
