@@ -12,6 +12,8 @@ class ServiceOrderSlotClock extends Model
         'service_order_slot_id',
         'type',
         'clocked_by',
+        'vehicle_id',
+        'driver_user_id',
         'clocked_in_at',
         'clocked_out_at',
         'clocked_hours',

@@ -31,6 +31,22 @@ class ServiceOrderSlot extends Model
         'scheduled_end_time'   => 'datetime',
     ];
 
+    public function getClockedInAtAttribute()
+    {
+        $firstClock = $this->clocks()->orderBy('clocked_in_at', 'asc')->first();
+        return $firstClock ? $firstClock->clocked_in_at : null;
+    }
+
+    public function getClockedOutAtAttribute()
+    {
+        $hasActive = $this->clocks()->whereNull('clocked_out_at')->exists();
+        if ($hasActive) {
+            return null;
+        }
+        $latestClock = $this->clocks()->whereNotNull('clocked_out_at')->orderBy('clocked_out_at', 'desc')->first();
+        return $latestClock ? $latestClock->clocked_out_at : null;
+    }
+
     public function serviceOrder()
     {
         return $this->belongsTo(ServiceOrder::class, 'service_order_id');

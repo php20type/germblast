@@ -780,10 +780,10 @@
                                                 <div class="section-header mb-3">
                                                     <h5 class="section-title">Vehicles</h5>
                                                 </div>
-                                                @if($slot->vehicles->count())
+                                                @if($allVehicles->count())
                                                     <table class="table table-hover equipment-report-table mb-0">
                                                         <tbody>
-                                                            @foreach($slot->vehicles as $vehicle)
+                                                            @foreach($allVehicles as $vehicle)
                                                                 <tr>
                                                                     <td>{{ $vehicle->name ?? $vehicle->plate_number ?? 'Vehicle #' . $vehicle->id }}</td>
                                                                 </tr>
@@ -843,7 +843,7 @@
                                                                             @endif
                                                                         @endif
                                                                     </td>
-                                                                    <td>{{ $clock->clockedBy->name ?? '-' }}</td>
+                                                                    <!-- <td>{{ $clock->clockedBy->name ?? '-' }}</td> -->
                                                                     <td>{{ $clock->clocked_hours ? $clock->clocked_hours . ' hrs' : '-' }}</td>
                                                                     <td>
                                                                         @if($clock->clocked_out_at)
@@ -861,7 +861,7 @@
                                                 @endif
 
                                                 {{-- Active / Clock-In Form --}}
-                                                @php $runningClock = $slot->clocks->where('clocked_by', auth()->id())->whereNull('clocked_out_at')->first(); @endphp
+                                                @php $runningClock = $slot->clocks->whereNull('clocked_out_at')->first(); @endphp
 
                                                 @if($runningClock)
                                                     <div class="border rounded p-3 bg-light mb-3">
@@ -951,18 +951,12 @@
                                                         </thead>
                                                         <tbody>
                                                             @foreach($slot->staff as $staffMember)
-                                                                @php
-                                                                    $techClock = $slot->clocks
-                                                                        ->where('clocked_by', $staffMember->user_id)
-                                                                        ->sortByDesc('clocked_in_at')
-                                                                        ->first();
-                                                                @endphp
                                                                 <tr>
                                                                     <td>{{ $staffMember->user->name ?? '-' }}</td>
                                                                     <td>{{ implode(' | ', $staffMember->user->specialties ?? []) ?: '-' }}</td>
                                                                     <td>{{ $staffMember->slot_hours }}</td>
-                                                                    <td>{{ $techClock->clocked_in_at ?? '-' }}</td>
-                                                                    <td>{{ $techClock->clocked_out_at ?? '-' }}</td>
+                                                                    <td>{{ $slot->clocked_in_at ?? '-' }}</td>
+                                                                    <td>{{ $slot->clocked_out_at ?? '-' }}</td>
                                                                 </tr>
                                                             @endforeach
                                                         </tbody>
@@ -1669,7 +1663,7 @@
                                     <label class="form-label fw-semibold">Driver <span class="text-danger">*</span></label>
                                     <select class="form-select" name="driver_user_id" id="travel_driver_id" required>
                                         <option value="">-- Select Driver --</option>
-                                        @foreach($assignedEmployees as $employee)
+                                        @foreach($assignedDrivers as $employee)
                                             <option value="{{ $employee->id }}">{{ $employee->name }}</option>
                                         @endforeach
                                     </select>

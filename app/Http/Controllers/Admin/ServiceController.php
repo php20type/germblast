@@ -331,9 +331,19 @@ class ServiceController extends Controller
             })
             ->unique('id');
 
-        $allVehicles = Vehicle::where('is_retired', 0)->orderBy('name')->get();
+        $assignedDrivers = $assignedEmployees->filter(function ($user) {
+            return $user && $user->isDriverTrained();
+        })->values();
 
-        return view('admin.leads.fulfill-order', compact('order', 'companyLocations', 'territories', 'allStaff', 'disciplinaryIssues', 'assignedEmployees', 'allVehicles'));
+        $allVehicles = $order->orderSlots()
+            ->with('vehicles')
+            ->get()
+            ->flatMap(function ($slot) {
+                return $slot->vehicles;
+            })
+            ->unique('id');
+
+        return view('admin.leads.fulfill-order', compact('order', 'companyLocations', 'territories', 'allStaff', 'disciplinaryIssues', 'assignedEmployees', 'assignedDrivers', 'allVehicles'));
     }
 
     public function service_dashboard(Request $request, $orderId)
@@ -374,9 +384,19 @@ class ServiceController extends Controller
             })
             ->unique('id');
 
-        $allVehicles = Vehicle::where('is_retired', 0)->orderBy('name')->get();
+        $assignedDrivers = $assignedEmployees->filter(function ($user) {
+            return $user && $user->isDriverTrained();
+        })->values();
 
-        return view('admin.leads.service-dashboard', compact('order', 'companyLocations', 'territories', 'allStaff', 'disciplinaryIssues', 'assignedEmployees', 'allVehicles'));
+        $allVehicles = $order->orderSlots()
+            ->with('vehicles')
+            ->get()
+            ->flatMap(function ($slot) {
+                return $slot->vehicles;
+            })
+            ->unique('id');
+
+        return view('admin.leads.service-dashboard', compact('order', 'companyLocations', 'territories', 'allStaff', 'disciplinaryIssues', 'assignedEmployees', 'assignedDrivers', 'allVehicles'));
     }
 
     public function assignEquipment(Request $request, $slotId)
@@ -759,16 +779,15 @@ class ServiceController extends Controller
 
         $slot = ServiceOrderSlot::findOrFail($request->slot_id);
 
-        // Prevent the same user from having two active clocks of the same type simultaneously
+        // Prevent the slot from having two active clocks of the same type simultaneously
         $activeClock = $slot->clocks()
             ->where('type', $request->type)
-            ->where('clocked_by', auth()->id())
             ->whereNull('clocked_out_at')
             ->first();
 
         if ($activeClock) {
             return redirect()->back()->with('error',
-                ucfirst($request->type) . ' clock is already running for your account.'
+                ucfirst($request->type) . ' clock is already running for this slot.'
             );
         }
 
@@ -806,14 +825,13 @@ class ServiceController extends Controller
 
         $activeClock = $slot->clocks()
             ->where('type', $request->type)
-            ->where('clocked_by', auth()->id())
             ->whereNull('clocked_out_at')
             ->latest('clocked_in_at')
             ->first();
 
         if (!$activeClock) {
             return redirect()->back()->with('error',
-                'No active ' . $request->type . ' clock found.'
+                'No active ' . $request->type . ' clock found for this slot.'
             );
         }
 
