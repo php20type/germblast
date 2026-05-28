@@ -1470,287 +1470,270 @@
                         <div class="tab-pane fade" id="schedule-view" role="tabpanel"
                             aria-labelledby="schedule-view-tab">
 
-                            @forelse($order->orderSlots->where('is_confirmed', true) as $slot)
-                                <div class="mb-4">
+                            @php $confirmedSlots = $order->orderSlots->where('is_confirmed', true); @endphp
 
-                                    {{-- Section Header --}}
-                                    <div class="section-card">
-                                        <div class="section-header mb-3">
-                                            <h5 class="section-title">Slot #{{ $loop->iteration }} — Schedule View</h5>
-                                        </div>
+                            @if($confirmedSlots->count())
 
-                                        {{-- 1. Basic Details --}}
-                                        <table class="table table-hover equipment-report-table mb-0">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Office</th>
-                                                    <td>{{ $slot->office->name ?? 'N/A' }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Interval</th>
-                                                    <td>{{ $slot->scheduled_start_time }} — {{ $slot->scheduled_end_time }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Hours</th>
-                                                    <td>{{ $slot->scheduled_hours }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Arrival</th>
-                                                    <td>{{ $slot->scheduled_arrival_time }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Meet</th>
-                                                    <td>{{ ucfirst($slot->meet) }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Overnight</th>
-                                                    <td>{{ $slot->overnight ? 'Yes' : 'No' }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Recurrence</th>
-                                                    <td>{{ $slot->scheduled_recurrence_rule }}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                <div class="section-card mt-3">
+                                    <div class="navbar-tabs overflow-auto">
+                                        <nav class="nav nav-tabs mb-3 flex-nowrap" id="scheduleViewSlotTabs" role="tablist">
+                                            @foreach ($confirmedSlots as $slot)
+                                                <button class="nav-link {{ $loop->first ? 'active' : '' }}"
+                                                    id="schedule-view-slot-{{ $slot->id }}-tab" data-bs-toggle="tab"
+                                                    data-bs-target="#schedule-view-slot-{{ $slot->id }}"
+                                                    type="button" role="tab">
+                                                    Slot #{{ $loop->iteration }}
+                                                    <small
+                                                        class="text-muted ms-1">{{ \Carbon\Carbon::parse($slot->scheduled_start_time)->format('M d') }}</small>
+                                                </button>
+                                            @endforeach
+                                        </nav>
                                     </div>
 
-                                    {{-- 2. Vehicles --}}
-                                    <div class="section-card">
-                                        <div class="section-header mb-3">
-                                            <h5 class="section-title">Vehicles</h5>
-                                        </div>
-                                        @if($allVehicles->count())
-                                            <table class="table table-hover equipment-report-table mb-0">
-                                                <tbody>
-                                                    @foreach($allVehicles as $vehicle)
-                                                        <tr>
-                                                            <td>{{ $vehicle->name ?? $vehicle->plate_number ?? 'Vehicle #'.$vehicle->id }}</td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        @else
-                                            <p class="text-muted mb-0">No vehicles assigned.</p>
-                                        @endif
-                                    </div>
+                                    <div class="tab-content" id="scheduleViewSlotTabContent">
+                                        @foreach($confirmedSlots as $slot)
+                                            <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
+                                                id="schedule-view-slot-{{ $slot->id }}"
+                                                role="tabpanel">
 
-                                    {{-- 3. Job Clocks --}}
-                                    <div class="section-card">
-                                        <div class="section-header mb-3">
-                                            <h5 class="section-title">Job Clocks</h5>
-                                        </div>
+                                                {{-- Basic Details --}}
+                                                <div class="border rounded p-3 mb-3 bg-light">
+                                                    <p class="mb-1"><strong>Office:</strong> {{ $slot->office->name ?? 'N/A' }}</p>
+                                                    <p class="mb-1"><strong>Interval:</strong> {{ $slot->scheduled_start_time }} — {{ $slot->scheduled_end_time }}</p>
+                                                    <p class="mb-1"><strong>Hours:</strong> {{ $slot->scheduled_hours }}</p>
+                                                    <p class="mb-1"><strong>Arrival Time:</strong> {{ $slot->scheduled_arrival_time }}</p>
+                                                    <p class="mb-1"><strong>Meet:</strong> {{ ucfirst($slot->meet) }}</p>
+                                                    <p class="mb-1"><strong>Overnight:</strong> {{ $slot->overnight ? 'Yes' : 'No' }}</p>
+                                                    <p class="mb-0"><strong>Recurrence:</strong> {{ $slot->scheduled_recurrence_rule }}</p>
+                                                </div>
 
-                                        @if($slot->clocks->count())
-                                            <table class="table table-hover equipment-report-table mb-3">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Type</th>
-                                                        <th>Interval</th>
-                                                        <th>By</th>
-                                                        <th>Hours</th>
-                                                        <th>Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach($slot->clocks as $clock)
-                                                        <tr>
-                                                            <td>
-                                                                @php
-                                                                    $badgeMap = [
-                                                                        'service'      => 'bg-primary',
-                                                                        'travel'       => 'bg-info text-dark',
-                                                                        'break'        => 'bg-warning text-dark',
-                                                                        'office work'  => 'bg-secondary',
-                                                                        'warehouse'    => 'bg-dark',
-                                                                        'training'     => 'bg-success',
-                                                                        'service prep' => 'bg-danger',
-                                                                        'umc'          => 'bg-purple text-white',
-                                                                    ];
-                                                                    $badge = $badgeMap[$clock->type] ?? 'bg-secondary';
-                                                                @endphp
-                                                                <span class="badge {{ $badge }}">{{ ucwords($clock->type) }}</span>
-                                                            </td>
-                                                            <td>{{ $clock->clocked_in_at ?? '-' }} — {{ $clock->clocked_out_at ?? 'Running' }}</td>
-                                                            <td>
-                                                                {{ $clock->clockedBy->name ?? '-' }}
-                                                                @if($clock->type === 'travel')
-                                                                    @if($clock->vehicle)
-                                                                        <br><small class="text-muted"><i class="fas fa-car me-1"></i>{{ $clock->vehicle->name ?? $clock->vehicle->plate_number }}</small>
-                                                                    @endif
-                                                                    @if($clock->driver)
-                                                                        <br><small class="text-muted"><i class="fas fa-user me-1"></i>{{ $clock->driver->name }}</small>
-                                                                    @endif
-                                                                @endif
-                                                            </td>
-                                                            <!-- <td>{{ $clock->clockedBy->name ?? '-' }}</td> -->
-                                                            <td>{{ $clock->clocked_hours ? $clock->clocked_hours . ' hrs' : '-' }}</td>
-                                                            <td>
-                                                                @if($clock->clocked_out_at)
-                                                                    <span class="badge bg-success">Done</span>
-                                                                @else
-                                                                    <span class="badge bg-warning text-dark">Running</span>
-                                                                @endif
-                                                            </td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        @else
-                                            <p class="text-muted mb-3">No clock entries yet.</p>
-                                        @endif
-
-                                        {{-- Active / Clock-In Form --}}
-                                        @php $runningClock = $slot->clocks->whereNull('clocked_out_at')->first(); @endphp
-
-                                        @if($runningClock)
-                                            <div class="border rounded p-3 bg-light mb-3">
-                                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                                    <div>
-                                                        @php $badge = $badgeMap[$runningClock->type] ?? 'bg-secondary'; @endphp
-                                                        <span class="badge {{ $badge }} fs-6 px-3 py-2">{{ ucwords($runningClock->type) }}</span>
-                                                        <span class="ms-2 text-muted small">Started: {{ $runningClock->clocked_in_at }}</span>
+                                                {{-- Vehicles and Service Locations Side-by-Side --}}
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="section-card h-100 mb-0">
+                                                            <div class="section-header mb-3">
+                                                                <h5 class="section-title">Vehicles</h5>
+                                                            </div>
+                                                            @if($allVehicles->count())
+                                                                <div class="d-flex flex-wrap gap-2">
+                                                                    @foreach($allVehicles as $vehicle)
+                                                                        <div class="border rounded p-2 text-center bg-white" style="min-width: 160px;">
+                                                                            <i class="fas fa-car text-danger mb-1"></i>
+                                                                            <p class="mb-0 small fw-semibold">{{ $vehicle->name ?? $vehicle->plate_number ?? 'Vehicle #'.$vehicle->id }}</p>
+                                                                        </div>
+                                                                    @endforeach
+                                                                </div>
+                                                            @else
+                                                                <p class="text-muted mb-0 small">No vehicles assigned.</p>
+                                                            @endif
+                                                        </div>
                                                     </div>
-                                                    <small class="text-muted">
-                                                        ⏱ Since Clock In:
-                                                        <strong><span data-clockin-time="{{ $runningClock->clocked_in_at }}"></span></strong>
-                                                    </small>
+                                                    <div class="col-md-6 mb-3">
+                                                        <div class="section-card h-100 mb-0">
+                                                            <div class="section-header mb-3">
+                                                                <h5 class="section-title">Service Locations</h5>
+                                                            </div>
+                                                            @if($slot->facilities->count())
+                                                                <div class="d-flex flex-wrap gap-2">
+                                                                    @foreach($slot->facilities as $facility)
+                                                                        <div class="border rounded p-2 text-center bg-white" style="min-width: 160px;">
+                                                                            <i class="fas fa-map-marker-alt text-danger mb-1"></i>
+                                                                            <p class="mb-0 small fw-semibold">{{ $facility->companyLocation->location_name ?? '-' }}</p>
+                                                                            @if(!empty($facility->companyLocation->address))
+                                                                                <small class="text-muted d-block mt-1" style="font-size: 11px;">{{ $facility->companyLocation->address }}</small>
+                                                                            @endif
+                                                                        </div>
+                                                                    @endforeach
+                                                                </div>
+                                                            @else
+                                                                <p class="text-muted mb-0 small">No service locations assigned.</p>
+                                                            @endif
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div class="d-flex justify-content-end">
-                                                    <form action="{{ route('admin.lead.service.clock_out') }}" method="POST">
-                                                        @csrf
-                                                        <input type="hidden" name="slot_id" value="{{ $slot->id }}">
-                                                        <input type="hidden" name="type" value="{{ $runningClock->type }}">
-                                                        <button type="submit" class="btn btn-danger">
-                                                            <i class="fas fa-stop-circle me-1"></i>
-                                                            Clock Out — {{ ucwords($runningClock->type) }}
-                                                        </button>
-                                                    </form>
+
+                                                {{-- Job Clocks --}}
+                                                <div class="section-card">
+                                                    <div class="section-header mb-3">
+                                                        <h5 class="section-title">Job Clocks</h5>
+                                                    </div>
+
+                                                    @if($slot->clocks->count())
+                                                        <table class="table table-hover equipment-report-table mb-3">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Type</th>
+                                                                    <th>Interval</th>
+                                                                    <th>By</th>
+                                                                    <th>Hours</th>
+                                                                    <th>Status</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach($slot->clocks as $clock)
+                                                                    <tr>
+                                                                        <td>
+                                                                            @php
+                                                                                $badgeMap = [
+                                                                                    'service'      => 'bg-primary',
+                                                                                    'travel'       => 'bg-info text-dark',
+                                                                                    'break'        => 'bg-warning text-dark',
+                                                                                    'office work'  => 'bg-secondary',
+                                                                                    'warehouse'    => 'bg-dark',
+                                                                                    'training'     => 'bg-success',
+                                                                                    'service prep' => 'bg-danger',
+                                                                                    'umc'          => 'bg-purple text-white',
+                                                                                ];
+                                                                                $badge = $badgeMap[$clock->type] ?? 'bg-secondary';
+                                                                            @endphp
+                                                                            <span class="badge {{ $badge }}">{{ ucwords($clock->type) }}</span>
+                                                                        </td>
+                                                                        <td>{{ $clock->clocked_in_at ?? '-' }} — {{ $clock->clocked_out_at ?? 'Running' }}</td>
+                                                                        <td>
+                                                                            {{ $clock->clockedBy->name ?? '-' }}
+                                                                            @if($clock->type === 'travel')
+                                                                                @if($clock->vehicle)
+                                                                                    <br><small class="text-muted"><i class="fas fa-car me-1"></i>{{ $clock->vehicle->name ?? $clock->vehicle->plate_number }}</small>
+                                                                                @endif
+                                                                                @if($clock->driver)
+                                                                                    <br><small class="text-muted"><i class="fas fa-user me-1"></i>{{ $clock->driver->name }}</small>
+                                                                                @endif
+                                                                            @endif
+                                                                        </td>
+                                                                        <!-- <td>{{ $clock->clockedBy->name ?? '-' }}</td> -->
+                                                                        <td>{{ $clock->clocked_hours ? $clock->clocked_hours . ' hrs' : '-' }}</td>
+                                                                        <td>
+                                                                            @if($clock->clocked_out_at)
+                                                                                <span class="badge bg-success">Done</span>
+                                                                            @else
+                                                                                <span class="badge bg-warning text-dark">Running</span>
+                                                                            @endif
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    @else
+                                                        <p class="text-muted mb-3">No clock entries yet.</p>
+                                                    @endif
+
+                                                    {{-- Active / Clock-In Form --}}
+                                                    @php $runningClock = $slot->clocks->whereNull('clocked_out_at')->first(); @endphp
+
+                                                    @if($runningClock)
+                                                        <div class="border rounded p-3 bg-light mb-3">
+                                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                <div>
+                                                                    @php $badge = $badgeMap[$runningClock->type] ?? 'bg-secondary'; @endphp
+                                                                    <span class="badge {{ $badge }} fs-6 px-3 py-2">{{ ucwords($runningClock->type) }}</span>
+                                                                    <span class="ms-2 text-muted small">Started: {{ $runningClock->clocked_in_at }}</span>
+                                                                </div>
+                                                                <small class="text-muted">
+                                                                    ⏱ Since Clock In:
+                                                                    <strong><span data-clockin-time="{{ $runningClock->clocked_in_at }}"></span></strong>
+                                                                </small>
+                                                            </div>
+                                                            <div class="d-flex justify-content-end">
+                                                                <form action="{{ route('admin.lead.service.clock_out') }}" method="POST">
+                                                                    @csrf
+                                                                    <input type="hidden" name="slot_id" value="{{ $slot->id }}">
+                                                                    <input type="hidden" name="type" value="{{ $runningClock->type }}">
+                                                                    <button type="submit" class="btn btn-danger">
+                                                                        <i class="fas fa-stop-circle me-1"></i>
+                                                                        Clock Out — {{ ucwords($runningClock->type) }}
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    @else
+                                                        <form action="{{ route('admin.lead.service.clock_in') }}" method="POST" class="clock-in-form">
+                                                            @csrf
+                                                            <input type="hidden" name="slot_id" value="{{ $slot->id }}" class="clock-in-slot-id">
+                                                            <div class="d-flex gap-2 align-items-center">
+                                                                <select class="form-select clock-type-select" name="type" required>
+                                                                    <option value="">-- Select Type --</option>
+                                                                    <option value="service">Service</option>
+                                                                    <option value="travel">Travel</option>
+                                                                    <option value="break">Break</option>
+                                                                    <option value="office work">Office Work</option>
+                                                                    <option value="warehouse">Warehouse</option>
+                                                                    <option value="training">Training</option>
+                                                                    <option value="service prep">Service Prep</option>
+                                                                    <option value="umc">UMC</option>
+                                                                </select>
+                                                                <button type="submit" class="btn btn-success px-4 text-nowrap">
+                                                                    <i class="fas fa-play-circle me-1"></i> Clock In
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    @endif
                                                 </div>
+
+                                                {{-- Technicians --}}
+                                                <div class="section-card">
+                                                    <div class="section-header mb-3">
+                                                        <h5 class="section-title">Technicians</h5>
+                                                    </div>
+                                                    @if($slot->staff->count())
+                                                        <table class="table table-hover equipment-report-table mb-0">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Technician</th>
+                                                                    <th>Level / Role</th>
+                                                                    <th>Hours</th>
+                                                                    <th>Clocked In</th>
+                                                                    <th>Clocked Out</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach($slot->staff as $staffMember)
+                                                                    <tr>
+                                                                        <td>{{ $staffMember->user->name ?? '-' }}</td>
+                                                                        <td>{{ implode(' | ', $staffMember->user->specialties ?? []) ?: '-' }}</td>
+                                                                        <td>{{ $staffMember->slot_hours }}</td>
+                                                                        <td>{{ $slot->clocked_in_at ?? '-' }}</td>
+                                                                        <td>{{ $slot->clocked_out_at ?? '-' }}</td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    @else
+                                                        <p class="text-muted mb-0">No technicians assigned.</p>
+                                                    @endif
+                                                </div>
+
+                                                {{-- Stats --}}
+                                                @php
+                                                    $totalClocked  = $slot->clocks->sum('clocked_hours');
+                                                    $serviceHours  = $slot->clocks->where('type', 'service')->sum('clocked_hours');
+                                                    $travelHours   = $slot->clocks->where('type', 'travel')->sum('clocked_hours');
+                                                    $breakHours    = $slot->clocks->where('type', 'break')->sum('clocked_hours');
+                                                    $invoiceAmt    = $order->service->price_per_service ?? 0;
+                                                    $totalCost     = $slot->staff->sum('cost');
+                                                    $peoplePct     = $invoiceAmt > 0 ? round(($totalCost / $invoiceAmt) * 100) : 0;
+                                                @endphp
+                                                <div class="section-card">
+                                                    <div class="section-header mb-3">
+                                                        <h5 class="section-title">Stats</h5>
+                                                    </div>
+                                                    <div class="mt-3 pt-3 d-flex gap-4 flex-wrap">
+                                                        <small class="text-muted">People Percentage: <strong>{{ $peoplePct }}%</strong></small>
+                                                        <small class="text-muted">Invoice: <strong>${{ number_format($invoiceAmt, 2) }}</strong></small>
+                                                        <small class="text-muted">Scheduled Hours: <strong>{{ $slot->scheduled_hours }}</strong></small>
+                                                        <small class="text-muted">Total Clocked Hours: <strong>{{ $totalClocked }}</strong></small>
+                                                        <small class="text-muted">Service Hours: <strong>{{ $serviceHours }}</strong></small>
+                                                        <small class="text-muted">Travel Hours: <strong>{{ $travelHours }}</strong></small>
+                                                        <small class="text-muted">Break Hours: <strong>{{ $breakHours }}</strong></small>
+                                                        <small class="text-muted">Cost: <strong>${{ number_format($totalCost, 2) }}</strong></small>
+                                                    </div>
+                                                </div>
+
                                             </div>
-                                        @else
-                                            <form action="{{ route('admin.lead.service.clock_in') }}" method="POST" class="clock-in-form">
-                                                @csrf
-                                                <input type="hidden" name="slot_id" value="{{ $slot->id }}" class="clock-in-slot-id">
-                                                <div class="d-flex gap-2 align-items-center">
-                                                    <select class="form-select clock-type-select" name="type" required>
-                                                        <option value="">-- Select Type --</option>
-                                                        <option value="service">Service</option>
-                                                        <option value="travel">Travel</option>
-                                                        <option value="break">Break</option>
-                                                        <option value="office work">Office Work</option>
-                                                        <option value="warehouse">Warehouse</option>
-                                                        <option value="training">Training</option>
-                                                        <option value="service prep">Service Prep</option>
-                                                        <option value="umc">UMC</option>
-                                                    </select>
-                                                    <button type="submit" class="btn btn-success px-4 text-nowrap">
-                                                        <i class="fas fa-play-circle me-1"></i> Clock In
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        @endif
+                                        @endforeach
                                     </div>
-
-                                    {{-- 4. Service Locations --}}
-                                    <div class="section-card">
-                                        <div class="section-header mb-3">
-                                            <h5 class="section-title">Service Locations</h5>
-                                        </div>
-                                        @if($slot->facilities->count())
-                                            <table class="table table-hover equipment-report-table mb-0">
-                                                <tbody>
-                                                    @foreach($slot->facilities as $facility)
-                                                        <tr>
-                                                            <td>{{ $facility->companyLocation->location_name ?? '-' }}</td>
-                                                            <td>{{ $facility->companyLocation->address ?? '' }}</td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        @else
-                                            <p class="text-muted mb-0">No service locations assigned.</p>
-                                        @endif
-                                    </div>
-
-                                    {{-- 5. Clock Details (Technicians) --}}
-                                    <div class="section-card">
-                                        <div class="section-header mb-3">
-                                            <h5 class="section-title">Technicians</h5>
-                                        </div>
-                                        @if($slot->staff->count())
-                                            <table class="table table-hover equipment-report-table mb-0">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Technician</th>
-                                                        <th>Level / Role</th>
-                                                        <th>Hours</th>
-                                                        <th>Clocked In</th>
-                                                        <th>Clocked Out</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach($slot->staff as $staffMember)
-                                                        <tr>
-                                                            <td>{{ $staffMember->user->name ?? '-' }}</td>
-                                                            <td>{{ implode(' | ', $staffMember->user->specialties ?? []) ?: '-' }}</td>
-                                                            <td>{{ $staffMember->slot_hours }}</td>
-                                                            <td>{{ $slot->clocked_in_at ?? '-' }}</td>
-                                                            <td>{{ $slot->clocked_out_at ?? '-' }}</td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        @else
-                                            <p class="text-muted mb-0">No technicians assigned.</p>
-                                        @endif
-                                    </div>
-
-                                    {{-- 6. Stats --}}
-                                    @php
-                                        $totalClocked  = $slot->clocks->sum('clocked_hours');
-                                        $serviceHours  = $slot->clocks->where('type', 'service')->sum('clocked_hours');
-                                        $travelHours   = $slot->clocks->where('type', 'travel')->sum('clocked_hours');
-                                        $breakHours    = $slot->clocks->where('type', 'break')->sum('clocked_hours');
-                                        $invoiceAmt    = $order->service->price_per_service ?? 0;
-                                        $totalCost     = $slot->staff->sum('cost');
-                                        $peoplePct     = $invoiceAmt > 0 ? round(($totalCost / $invoiceAmt) * 100) : 0;
-                                    @endphp
-                                    <div class="section-card">
-                                        <div class="section-header mb-3">
-                                            <h5 class="section-title">Stats</h5>
-                                        </div>
-                                        <table class="table table-hover equipment-report-table mb-0">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Scheduled Hours</th>
-                                                    <td>{{ $slot->scheduled_hours }}</td>
-                                                    <th>Total Clocked Hours</th>
-                                                    <td>{{ $totalClocked }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Service Hours</th>
-                                                    <td>{{ $serviceHours }}</td>
-                                                    <th>Travel Hours</th>
-                                                    <td>{{ $travelHours }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Break Hours</th>
-                                                    <td>{{ $breakHours }}</td>
-                                                    <th>People %</th>
-                                                    <td>{{ $peoplePct }}%</td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Invoice Amount</th>
-                                                    <td>${{ number_format($invoiceAmt, 2) }}</td>
-                                                    <th>Staff Cost</th>
-                                                    <td>${{ number_format($totalCost, 2) }}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-
                                 </div>
-                            @empty
+
+                            @else
                                 <div class="row mt-3">
                                     <div class="col-md-12">
                                         <div class="section-card">
@@ -1758,7 +1741,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            @endforelse
+                            @endif
 
                         </div>
 
