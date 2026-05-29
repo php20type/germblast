@@ -47,6 +47,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::post('order/{orderId}/atp/save', [ServiceController::class, 'saveAtpDetails'])->name('service.order.atp.save');
         Route::post('order/{orderId}/atp/delete', [ServiceController::class, 'deleteAtpDetail'])->name('service.order.atp.delete');
 
+        Route::post('order/{orderId}/status', [ServiceController::class, 'updateOrderStatus'])->name('service.order.update_status');
+        Route::post('service/slot/{slotId}/status', [ServiceController::class, 'updateSlotStatus'])->name('service.slot.update_status');
     });
 
     Route::get('calendar', [ServiceController::class, 'calendar'])->name('calendar.index');

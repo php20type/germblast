@@ -167,6 +167,57 @@
             background-color: #ffffff;
             border-radius: 10px;
         }
+
+        /* Custom Premium Status Badges */
+        .status-pill {
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            padding: 6px 14px !important;
+            border-radius: 30px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            border: 1px solid transparent !important;
+        }
+
+        .status-pill-pending {
+            background-color: rgba(134, 134, 134, 0.12) !important;
+            color: #636363 !important;
+            border-color: rgba(134, 134, 134, 0.2) !important;
+        }
+
+        .status-pill-scheduled {
+            background-color: rgba(255, 184, 28, 0.12) !important;
+            color: #d39100 !important;
+            border-color: rgba(255, 184, 28, 0.25) !important;
+        }
+
+        .status-pill-confirmed {
+            background-color: rgba(13, 110, 253, 0.12) !important;
+            color: #0d6efd !important;
+            border-color: rgba(13, 110, 253, 0.2) !important;
+        }
+
+        .status-pill-in_progress {
+            background-color: rgba(255, 193, 7, 0.15) !important;
+            color: #926d00 !important;
+            border-color: rgba(255, 193, 7, 0.3) !important;
+        }
+
+        .status-pill-completed {
+            background-color: rgba(6, 150, 151, 0.12) !important;
+            color: #069697 !important;
+            border-color: rgba(6, 150, 151, 0.25) !important;
+        }
+
+        .status-pill-cancelled {
+            background-color: rgba(234, 61, 47, 0.12) !important;
+            color: #ea3d2f !important;
+            border-color: rgba(234, 61, 47, 0.2) !important;
+        }
     </style>
 @endpush
 
@@ -189,6 +240,13 @@
                                 <p class="text-muted mb-2" style="font-size: 16px;">Order ID:
                                     {{ $order->order_no ?? 'N/A' }}
                                 </p>
+                                
+                                <div class="d-flex align-items-center gap-2 mt-2 mb-3">
+                                    <span class="text-muted fw-semibold" style="font-size: 14px;">Order Status:</span>
+                                    <span class="status-pill status-pill-{{ $order->status ?? 'pending' }}">
+                                        {{ ucfirst(str_replace('_', ' ', $order->status ?? 'pending')) }}
+                                    </span>
+                                </div>
                             </div>
                             <div class="right-part-sec">
                                 <div>
@@ -616,23 +674,24 @@
                                                  <div class="section-header mb-3">
                                                      <h5 class="section-title">Client Details</h5>
                                                  </div>
-
-                                                 <table class="table table-hover equipment-report-table mb-4">
-                                                     <tbody>
-                                                         <tr>
-                                                             <th>Company</th>
-                                                             <td>{{ $order->service->lead->company->name ?? $order->service->lead->name ?? 'N/A' }}</td>
-                                                             <th>Client ID</th>
-                                                             <td>{{ $order->service->lead->company->id ?? 'N/A' }}</td>
-                                                         </tr>
-                                                         <tr>
-                                                             <th>Status</th>
-                                                             <td>{{ ucfirst($order->status ?? 'N/A') }} {{ $order->order_no ?? '' }}</td>
-                                                             <th>Notes</th>
-                                                             <td>{{ $order->service_plan_narrative ?? ($order->sales_narrative ?? 'No service notes documented.') }}</td>
-                                                         </tr>
-                                                     </tbody>
-                                                 </table>
+                                                 <div class="table-responsive">
+                                                     <table class="table table-hover equipment-report-table mb-4">
+                                                         <tbody>
+                                                             <tr>
+                                                                 <th>Company</th>
+                                                                 <td>{{ $order->service->lead->company->name ?? $order->service->lead->name ?? 'N/A' }}</td>
+                                                                 <th>Client ID</th>
+                                                                 <td>{{ $order->service->lead->company->id ?? 'N/A' }}</td>
+                                                             </tr>
+                                                             <tr>
+                                                                 <th>Status</th>
+                                                                 <td>{{ ucfirst($order->status ?? 'N/A') }} {{ $order->order_no ?? '' }}</td>
+                                                                 <th>Notes</th>
+                                                                 <td>{{ $order->service_plan_narrative ?? ($order->sales_narrative ?? 'No service notes documented.') }}</td>
+                                                             </tr>
+                                                         </tbody>
+                                                     </table>
+                                                 </div>
 
                                                  <div class="section-header mb-3">
                                                      <h5 class="section-title">Add Hotel Details</h5>
@@ -759,10 +818,20 @@
 
                                                         {{-- Basic Details --}}
                                                         <div class="border rounded p-3 mb-3 bg-light">
-                                                            <p class="mb-1"><strong>Office:</strong> {{ $slot->office->name ?? 'N/A' }}</p>
-                                                            <p class="mb-1"><strong>Interval:</strong> {{ $slot->scheduled_start_time }} — {{ $slot->scheduled_end_time }}</p>
-                                                            <p class="mb-1"><strong>Hours:</strong> {{ $slot->scheduled_hours }}</p>
-                                                            <p class="mb-1"><strong>Arrival Time:</strong> {{ $slot->scheduled_arrival_time }}</p>
+                                                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                                                <div>
+                                                                    <p class="mb-1"><strong>Office:</strong> {{ $slot->office->name ?? 'N/A' }}</p>
+                                                                    <p class="mb-1"><strong>Interval:</strong> {{ $slot->scheduled_start_time }} — {{ $slot->scheduled_end_time }}</p>
+                                                                    <p class="mb-1"><strong>Hours:</strong> {{ $slot->scheduled_hours }}</p>
+                                                                    <p class="mb-1"><strong>Arrival Time:</strong> {{ $slot->scheduled_arrival_time }}</p>
+                                                                </div>
+                                                                <div class="border rounded p-2 bg-white d-flex align-items-center gap-2">
+                                                                    <span class="text-muted fw-semibold" style="font-size: 13px;">Slot Status:</span>
+                                                                    <span class="status-pill status-pill-{{ $slot->status ?? 'pending' }}" style="font-size: 11px !important; padding: 4px 10px !important;">
+                                                                        {{ ucfirst(str_replace('_', ' ', $slot->status ?? 'pending')) }}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                         
                                                         {{-- Vehicles and Service Locations Side-by-Side --}}
@@ -949,8 +1018,12 @@
                                                                                 <td>{{ $staffMember->user->name ?? '-' }}</td>
                                                                                 <td>{{ $staffMember->user->training_level ?? '-' }}</td>
                                                                                 <td>{{ $staffMember->slot_hours }}</td>
-                                                                                <td>{{ $slot->clocked_in_at ?? '-' }}</td>
-                                                                                <td>{{ $slot->clocked_out_at ?? '-' }}</td>
+                                                                                <td>
+                                                                                    <span class="{{ $slot->clocked_in_at ? 'text-success fw-bold' : 'text-danger fw-bold' }}" style="font-size: 15px;">{{ $slot->clocked_in_at ? '✓' : '✗' }}</span>
+                                                                                </td>
+                                                                                <td>
+                                                                                    <span class="{{ $slot->clocked_out_at ? 'text-success fw-bold' : 'text-danger fw-bold' }}" style="font-size: 15px;">{{ $slot->clocked_out_at ? '✓' : '✗' }}</span>
+                                                                                </td>
                                                                             </tr>
                                                                         @endforeach
                                                                     </tbody>
@@ -1770,6 +1843,25 @@
 
     @push('scripts')
         <script>
+            // Toastr Notifications from Session
+            @if(session('success'))
+                toastr.success("{{ session('success') }}");
+            @endif
+            @if(session('error'))
+                toastr.error("{{ session('error') }}");
+            @endif
+            @if(session('warning'))
+                toastr.warning("{{ session('warning') }}");
+            @endif
+            @if(session('info'))
+                toastr.info("{{ session('info') }}");
+            @endif
+            @if($errors->any())
+                @foreach($errors->all() as $error)
+                    toastr.error("{{ $error }}");
+                @endforeach
+            @endif
+
             // Live Clock — update all .live-clock and .live-date elements
             function updateClock() {
                 const now = new Date();

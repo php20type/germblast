@@ -29,18 +29,33 @@
             border-radius: 8px !important;
             overflow: hidden;
             background: #ffffff;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
         }
 
         .calendar-day-col {
-            flex: 1 1 0%;
-            min-width: 150px;
             border-right: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e5e7eb;
             display: flex;
             flex-direction: column;
         }
 
-        .calendar-day-col:last-child {
-            border-right: none;
+        @media (max-width: 1200px) {
+            .calendar-week-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .calendar-week-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendar-week-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .calendar-day-header {
@@ -142,8 +157,8 @@
 
                         <!-- Calendar Weekly Matrix Grid -->
                         <div class="px-4 pb-4 mt-3">
-                            <div class="calendar-week-grid d-flex flex-nowrap overflow-auto">
-                                @foreach([4, 5, 6, 0, 1] as $dayOffset)
+                            <div class="calendar-week-grid">
+                                @foreach(range(0, 6) as $dayOffset)
                                     @php
                                         $dateItem = $start->copy()->addDays($dayOffset);
                                         $dayKey = $dateItem->format('Y-m-d');

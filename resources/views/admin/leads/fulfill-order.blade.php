@@ -167,6 +167,73 @@
             background-color: #ffffff;
             border-radius: 10px;
         }
+
+        /* Custom Premium Status Badges & Selectors */
+        .status-pill {
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            padding: 6px 14px !important;
+            border-radius: 30px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            border: 1px solid transparent !important;
+        }
+
+        .status-pill-pending {
+            background-color: rgba(134, 134, 134, 0.12) !important;
+            color: #636363 !important;
+            border-color: rgba(134, 134, 134, 0.2) !important;
+        }
+
+        .status-pill-scheduled {
+            background-color: rgba(255, 184, 28, 0.12) !important;
+            color: #d39100 !important;
+            border-color: rgba(255, 184, 28, 0.25) !important;
+        }
+
+        .status-pill-confirmed {
+            background-color: rgba(13, 110, 253, 0.12) !important;
+            color: #0d6efd !important;
+            border-color: rgba(13, 110, 253, 0.2) !important;
+        }
+
+        .status-pill-in_progress {
+            background-color: rgba(255, 193, 7, 0.15) !important;
+            color: #926d00 !important;
+            border-color: rgba(255, 193, 7, 0.3) !important;
+        }
+
+        .status-pill-completed {
+            background-color: rgba(6, 150, 151, 0.12) !important;
+            color: #069697 !important;
+            border-color: rgba(6, 150, 151, 0.25) !important;
+        }
+
+        .status-pill-cancelled {
+            background-color: rgba(234, 61, 47, 0.12) !important;
+            color: #ea3d2f !important;
+            border-color: rgba(234, 61, 47, 0.2) !important;
+        }
+
+        .status-select {
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            border-radius: 8px !important;
+            padding: 4px 10px !important;
+            cursor: pointer !important;
+            border: 1px solid #ced4da !important;
+            background-color: #ffffff !important;
+            transition: all 0.2s ease !important;
+            outline: none !important;
+        }
+        .status-select:focus {
+            border-color: #FFB81C !important;
+            box-shadow: 0 0 0 0.2rem rgba(255, 184, 28, 0.25) !important;
+        }
     </style>
 @endpush
 
@@ -186,6 +253,23 @@
                             <div class="left-part-sec">
                                 <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">FULFILL ORDER <span style="font-size: 24px;">📌</span></h3>
                                 <p class="text-muted mb-2" style="font-size: 16px;">Order ID: {{ $order->order_no ?? '' }}</p>
+                                
+                                <div class="d-flex align-items-center gap-3 flex-wrap mt-2 mb-3">
+                                    <form action="{{ route('admin.lead.service.order.update_status', $order->id) }}" method="POST" class="d-flex align-items-center gap-2 mb-0">
+                                        @csrf
+                                        <label class="text-muted mb-0 fw-semibold" style="font-size: 14px;">Order Status:</label>
+                                        <select name="status" class="status-select" onchange="this.form.submit()" style="width: auto; min-width: 140px;">
+                                            <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending</option>
+                                            <option value="scheduled" {{ $order->status === 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                                            <option value="in_progress" {{ $order->status === 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                                            <option value="completed" {{ $order->status === 'completed' ? 'selected' : '' }}>Completed</option>
+                                            <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                        </select>
+                                    </form>
+                                    <span class="status-pill status-pill-{{ $order->status ?? 'pending' }}">
+                                        {{ ucfirst(str_replace('_', ' ', $order->status ?? 'pending')) }}
+                                    </span>
+                                </div>
                             </div>
                             <div class="right-part-sec">
                                 <div>
@@ -382,6 +466,8 @@
                                                         <th>Recurrence</th>
                                                         <th>Clock In</th>
                                                         <th>Clock Out</th>
+                                                        <th>Status</th>
+                                                        <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -399,10 +485,28 @@
                                                             <td>{{ $slot->scheduled_recurrence_rule }}</td>
                                                             <td>{{ $slot->clocked_in_at ?? '-' }}</td>
                                                             <td>{{ $slot->clocked_out_at ?? '-' }}</td>
+                                                            <td>
+                                                                <span class="status-pill status-pill-{{ $slot->status ?? 'pending' }}">
+                                                                    {{ ucfirst(str_replace('_', ' ', $slot->status ?? 'pending')) }}
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <form action="{{ route('admin.lead.service.slot.update_status', $slot->id) }}" method="POST" class="d-flex align-items-center gap-1 mb-0">
+                                                                    @csrf
+                                                                    <select name="status" class="status-select" onchange="this.form.submit()" style="width: auto; min-width: 120px;">
+                                                                        <option value="pending" {{ $slot->status === 'pending' ? 'selected' : '' }}>Pending</option>
+                                                                        <option value="scheduled" {{ $slot->status === 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                                                                        <option value="confirmed" {{ $slot->status === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
+                                                                        <option value="in_progress" {{ $slot->status === 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                                                                        <option value="completed" {{ $slot->status === 'completed' ? 'selected' : '' }}>Completed</option>
+                                                                        <option value="cancelled" {{ $slot->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                                                    </select>
+                                                                </form>
+                                                            </td>
                                                         </tr>
                                                     @empty
                                                         <tr>
-                                                            <td colspan="11" class="text-center text-muted">No slots booked yet.</td>
+                                                            <td colspan="13" class="text-center text-muted">No slots booked yet.</td>
                                                         </tr>
                                                     @endforelse
                                                 </tbody>
@@ -424,7 +528,12 @@
                                             <div class="section-card">
 
                                                 <div class="section-header d-flex justify-content-between align-items-center mb-3">
-                                                    <h5 class="section-title mb-0">Slot #{{ $loop->iteration }}</h5>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <h5 class="section-title mb-0">Slot #{{ $loop->iteration }}</h5>
+                                                        <span class="status-pill status-pill-{{ $slot->status ?? 'pending' }}" style="font-size: 11px !important; padding: 4px 10px !important;">
+                                                            {{ ucfirst(str_replace('_', ' ', $slot->status ?? 'pending')) }}
+                                                        </span>
+                                                    </div>
                                                     @if($slot->is_confirmed)
                                                         <span class="badge bg-success fs-6 px-3 py-2">
                                                             <i class="fas fa-check-circle me-1"></i> Confirmed
@@ -1688,8 +1797,12 @@
                                                                         <td>{{ $staffMember->user->name ?? '-' }}</td>
                                                                         <td>{{ $staffMember->user->training_level ?? '-' }}</td>
                                                                         <td>{{ $staffMember->slot_hours }}</td>
-                                                                        <td>{{ $slot->clocked_in_at ?? '-' }}</td>
-                                                                        <td>{{ $slot->clocked_out_at ?? '-' }}</td>
+                                                                        <td>
+                                                                            <span class="{{ $slot->clocked_in_at ? 'text-success fw-bold' : 'text-danger fw-bold' }}" style="font-size: 15px;">{{ $slot->clocked_in_at ? '✓' : '✗' }}</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span class="{{ $slot->clocked_out_at ? 'text-success fw-bold' : 'text-danger fw-bold' }}" style="font-size: 15px;">{{ $slot->clocked_out_at ? '✓' : '✗' }}</span>
+                                                                        </td>
                                                                     </tr>
                                                                 @endforeach
                                                             </tbody>
@@ -2060,6 +2173,25 @@
 
 @push('scripts')
 <script>
+    // Toastr Notifications from Session
+    @if(session('success'))
+        toastr.success("{{ session('success') }}");
+    @endif
+    @if(session('error'))
+        toastr.error("{{ session('error') }}");
+    @endif
+    @if(session('warning'))
+        toastr.warning("{{ session('warning') }}");
+    @endif
+    @if(session('info'))
+        toastr.info("{{ session('info') }}");
+    @endif
+    @if($errors->any())
+        @foreach($errors->all() as $error)
+            toastr.error("{{ $error }}");
+        @endforeach
+    @endif
+
     // Live Clock — update all .live-clock and .live-date elements
     function updateClock() {
         const now = new Date();

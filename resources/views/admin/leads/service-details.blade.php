@@ -2,6 +2,61 @@
 
 @section('title', 'Service Details')
 
+@push('styles')
+    <style>
+        /* Custom Premium Status Badges */
+        .status-pill {
+            font-size: 11px !important;
+            font-weight: 600 !important;
+            padding: 4px 10px !important;
+            border-radius: 30px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 4px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            border: 1px solid transparent !important;
+        }
+
+        .status-pill-pending {
+            background-color: rgba(134, 134, 134, 0.12) !important;
+            color: #636363 !important;
+            border-color: rgba(134, 134, 134, 0.2) !important;
+        }
+
+        .status-pill-scheduled {
+            background-color: rgba(255, 184, 28, 0.12) !important;
+            color: #d39100 !important;
+            border-color: rgba(255, 184, 28, 0.25) !important;
+        }
+
+        .status-pill-confirmed {
+            background-color: rgba(13, 110, 253, 0.12) !important;
+            color: #0d6efd !important;
+            border-color: rgba(13, 110, 253, 0.2) !important;
+        }
+
+        .status-pill-in_progress {
+            background-color: rgba(255, 193, 7, 0.15) !important;
+            color: #926d00 !important;
+            border-color: rgba(255, 193, 7, 0.3) !important;
+        }
+
+        .status-pill-completed {
+            background-color: rgba(6, 150, 151, 0.12) !important;
+            color: #069697 !important;
+            border-color: rgba(6, 150, 151, 0.25) !important;
+        }
+
+        .status-pill-cancelled {
+            background-color: rgba(234, 61, 47, 0.12) !important;
+            color: #ea3d2f !important;
+            border-color: rgba(234, 61, 47, 0.2) !important;
+        }
+    </style>
+@endpush
+
 @section('content')
     <!-- All Companies Section start  -->
     <div class="companies-section my-4">
@@ -256,6 +311,9 @@
                                                 <a href="{{ route('admin.lead.service.fulfill_order', $order->id) }}">
                                                     <strong>Order: {{ $order->order_no }}</strong>
                                                 </a>
+                                                <span class="status-pill status-pill-{{ $order->status ?? 'pending' }} ms-2" style="font-size: 10px !important; padding: 4px 10px !important;">
+                                                    {{ ucfirst(str_replace('_', ' ', $order->status ?? 'pending')) }}
+                                                </span>
                                                 - Intended Date: {{ $order->intended_date }}
                                             </li>
                                         </ul>

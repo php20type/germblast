@@ -26,8 +26,11 @@
                                 <span style="background-color:#6c757d; color:#fff; padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600;">
                                     ● Pending
                                 </span>
-                                <span style="background-color:#0d6efd; color:#fff; padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600;">
+                                <span style="background-color:#ffb81c; color:#fff; padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600;">
                                     ● Scheduled
+                                </span>
+                                <span style="background-color:#0d6efd; color:#fff; padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600;">
+                                    ● Confirmed
                                 </span>
                                 <span style="background-color:#198754; color:#fff; padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600;">
                                     ● Completed
@@ -89,7 +92,8 @@
 
                     const statusColors = {
                         'pending':     'secondary',
-                        'scheduled':   'primary',
+                        'scheduled':   'warning',
+                        'confirmed':   'primary',
                         'in_progress': 'warning',
                         'completed':   'success',
                         'cancelled':   'danger',

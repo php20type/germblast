@@ -199,6 +199,7 @@ class ServiceController extends Controller
                 'scheduled_hours' => $scheduledHours,
                 'meet' => 'office',
                 'overnight' => 0,
+                'status' => 'scheduled',
             ]);
         }
 
@@ -495,6 +496,7 @@ class ServiceController extends Controller
             'meet'                     => $request->meet,
             'overnight'                => $request->overnight,
             'scheduled_hours'          => $scheduledHours,
+            'status'                   => 'scheduled',
         ]);
 
         $order->update(['status' => 'scheduled']);
@@ -511,6 +513,7 @@ class ServiceController extends Controller
             'is_confirmed' => true,
             'confirmed_at' => now(),
             'confirmed_by' => auth()->id(),
+            'status' => 'confirmed',
         ]);
 
         return redirect()->back()->with('success', 'Slot confirmed successfully.');
@@ -952,8 +955,9 @@ class ServiceController extends Controller
                 'title' => $order->service->service_name ?? 'Service Order',
                 'start' => $slot->scheduled_start_time,
                 'end'   => $slot->scheduled_end_time,
-                'color' => match($order->status) {
-                    'scheduled'   => '#0d6efd',
+                'color' => match($slot->status) {
+                    'scheduled'   => '#ffb81c',
+                    'confirmed'   => '#0d6efd',
                     'in_progress' => '#ffc107',
                     'completed'   => '#198754',
                     'cancelled'   => '#dc3545',
@@ -966,7 +970,7 @@ class ServiceController extends Controller
                     'company_name' => $order->service->lead->company->name ?? '-',
                     'po_number'    => $order->service->po_number ?? '-',
                     'price'        => $order->service->price_per_service ?? '-',
-                    'status'       => $order->status,
+                    'status'       => $slot->status ?? 'pending',
                     'scheduled_start_time' => $slot->scheduled_start_time,
                     'fulfill_url'  => route('admin.lead.service.fulfill_order', $order->id),
                 ],
@@ -1305,6 +1309,77 @@ class ServiceController extends Controller
         }
 
         return redirect()->back()->with('success', 'ATP detail removed successfully.');
+    }
+
+    /**
+     * Update Service Order status manually.
+     */
+    public function updateOrderStatus(Request $request, $orderId)
+    {
+        $request->validate([
+            'status' => 'required|string|in:pending,scheduled,in_progress,completed,cancelled',
+        ]);
+
+        $order = ServiceOrder::findOrFail($orderId);
+        $newStatus = $request->input('status');
+
+        if ($newStatus === 'completed') {
+            // Verify that all associated Scheduled Slots are already marked as Completed.
+            $nonCompletedSlots = $order->orderSlots->filter(function ($slot) {
+                return $slot->status !== 'completed';
+            });
+
+            if ($nonCompletedSlots->isNotEmpty()) {
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Cannot mark Service Order as Completed because there are ' . $nonCompletedSlots->count() . ' slot(s) not yet marked as Completed.'
+                    ], 422);
+                }
+                return redirect()->back()->with('error', 'Cannot mark Service Order as Completed because there are ' . $nonCompletedSlots->count() . ' slot(s) not yet marked as Completed.');
+            }
+        }
+
+        $order->update([
+            'status' => $newStatus
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Service Order status updated to ' . ucfirst($newStatus) . ' successfully.',
+                'status' => $newStatus
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Service Order status updated to ' . ucfirst($newStatus) . ' successfully.');
+    }
+
+    /**
+     * Update Scheduled Slot status manually.
+     */
+    public function updateSlotStatus(Request $request, $slotId)
+    {
+        $request->validate([
+            'status' => 'required|string|in:pending,scheduled,confirmed,in_progress,completed,cancelled',
+        ]);
+
+        $slot = ServiceOrderSlot::findOrFail($slotId);
+        $newStatus = $request->input('status');
+
+        $slot->update([
+            'status' => $newStatus
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Slot status updated to ' . ucfirst($newStatus) . ' successfully.',
+                'status' => $newStatus
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Slot status updated to ' . ucfirst($newStatus) . ' successfully.');
     }
 }
 

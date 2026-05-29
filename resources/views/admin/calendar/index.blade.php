@@ -89,7 +89,8 @@
 
                     const statusColors = {
                         'pending':     'secondary',
-                        'scheduled':   'primary',
+                        'scheduled':   'warning',
+                        'confirmed':   'primary',
                         'in_progress': 'warning',
                         'completed':   'success',
                         'cancelled':   'danger',
