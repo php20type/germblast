@@ -312,6 +312,212 @@ class NotificationService
         }
     }
 
+    public function staffUnassignedFromOrder($user, $slot)
+    {
+        $order = $slot->serviceOrder;
+        $service = $order->service ?? null;
+
+        if ($this->sendEmail) {
+            SendEmailJob::dispatch(
+                $user->email,
+                'staff_unassigned_from_order',
+                [
+                    'staff_name' => $user->name,
+                    'order_no' => $order->order_no ?? 'N/A',
+                    'service_name' => $service->service_name ?? 'N/A',
+                    'start_time' => $slot->scheduled_start_time,
+                    'end_time' => $slot->scheduled_end_time,
+                    'order_id' => $order->id,
+                ]
+            );
+        }
+
+        if ($this->sendSMS) {
+            SendSMSJob::dispatch(
+                $user->cell_phone ?: $this->testPhone,
+                "You have been unassigned from Order #{$order->order_no} — {$service->service_name}"
+            );
+        }
+    }
+
+    public function staffMarkedAsLeader($user, $slot)
+    {
+        $order = $slot->serviceOrder;
+        $service = $order->service ?? null;
+
+        if ($this->sendEmail) {
+            SendEmailJob::dispatch(
+                $user->email,
+                'staff_marked_as_leader',
+                [
+                    'staff_name' => $user->name,
+                    'order_no' => $order->order_no ?? 'N/A',
+                    'service_name' => $service->service_name ?? 'N/A',
+                    'start_time' => $slot->scheduled_start_time,
+                    'end_time' => $slot->scheduled_end_time,
+                    'order_id' => $order->id,
+                ]
+            );
+        }
+
+        if ($this->sendSMS) {
+            SendSMSJob::dispatch(
+                $user->cell_phone ?: $this->testPhone,
+                "You have been marked as Leader for Order #{$order->order_no} — {$service->service_name}"
+            );
+        }
+    }
+
+    public function staffUnmarkedAsLeader($user, $slot)
+    {
+        $order = $slot->serviceOrder;
+        $service = $order->service ?? null;
+
+        if ($this->sendEmail) {
+            SendEmailJob::dispatch(
+                $user->email,
+                'staff_unmarked_as_leader',
+                [
+                    'staff_name' => $user->name,
+                    'order_no' => $order->order_no ?? 'N/A',
+                    'service_name' => $service->service_name ?? 'N/A',
+                    'start_time' => $slot->scheduled_start_time,
+                    'end_time' => $slot->scheduled_end_time,
+                    'order_id' => $order->id,
+                ]
+            );
+        }
+
+        if ($this->sendSMS) {
+            SendSMSJob::dispatch(
+                $user->cell_phone ?: $this->testPhone,
+                "You have been unmarked as Leader for Order #{$order->order_no} — {$service->service_name}"
+            );
+        }
+    }
+
+    public function serviceNoteAdded($note)
+    {
+        $order = $note->serviceOrder;
+        if (!$order) return;
+        $service = $order->service ?? null;
+
+        // Fetch sales team users
+        $salesTeam = \App\Models\User::where('role', 'sales_team')
+            ->orWhereHas('roles', function($q) {
+                $q->where('name', 'sales_team');
+            })
+            ->get();
+
+        foreach ($salesTeam as $member) {
+            if ($this->sendEmail) {
+                SendEmailJob::dispatch(
+                    $member->email,
+                    'service_note_added',
+                    [
+                        'sales_name' => $member->name,
+                        'order_no' => $order->order_no ?? 'N/A',
+                        'service_name' => $service->service_name ?? 'N/A',
+                        'added_by' => $note->user->name ?? 'System',
+                        'notes' => $note->notes,
+                        'order_id' => $order->id,
+                    ]
+                );
+            }
+
+            if ($this->sendSMS) {
+                SendSMSJob::dispatch(
+                    $member->cell_phone ?: $this->testPhone,
+                    "New service note added to Order #{$order->order_no} by {$note->user->name}: {$note->notes}"
+                );
+            }
+        }
+    }
+
+    public function dayOfService($slot)
+    {
+        $order = $slot->serviceOrder;
+        if (!$order) return;
+        $service = $order->service;
+        $lead = $service ? $service->lead : null;
+
+        // 1. Notify Assigned Staff
+        if ($slot->staff) {
+            foreach ($slot->staff as $staffPivot) {
+                $staff = $staffPivot->user;
+                if ($staff) {
+                    $this->dayOfServiceStaffNotification($staff, $slot);
+                }
+            }
+        }
+
+        // 2. Notify Sales Reps
+        $salesReps = collect();
+        if ($lead && $lead->assignee) {
+            $salesReps->push($lead->assignee);
+        }
+        if ($lead && $lead->company && $lead->company->salesRep) {
+            $salesReps->push($lead->company->salesRep);
+        }
+        $salesReps = $salesReps->unique('id');
+
+        foreach ($salesReps as $rep) {
+            $this->dayOfServiceSalesRepNotification($rep, $slot);
+        }
+    }
+
+    public function dayOfServiceStaffNotification($user, $slot)
+    {
+        $order = $slot->serviceOrder;
+        $service = $order->service ?? null;
+
+        // Forced Email
+        SendEmailJob::dispatch(
+            $user->email,
+            'day_of_service_staff',
+            [
+                'staff_name' => $user->name,
+                'order_no' => $order->order_no ?? 'N/A',
+                'service_name' => $service->service_name ?? 'N/A',
+                'start_time' => $slot->scheduled_start_time->format('h:i A'),
+                'end_time' => $slot->scheduled_end_time->format('h:i A'),
+                'order_id' => $order->id,
+            ]
+        );
+
+        // Forced SMS
+        SendSMSJob::dispatch(
+            $user->cell_phone ?: $this->testPhone,
+            "Reminder: You have a GermBlast Service Order scheduled today! Order #{$order->order_no} ({$service->service_name}) from " . $slot->scheduled_start_time->format('h:i A') . " to " . $slot->scheduled_end_time->format('h:i A') . "."
+        );
+    }
+
+    public function dayOfServiceSalesRepNotification($user, $slot)
+    {
+        $order = $slot->serviceOrder;
+        $service = $order->service ?? null;
+
+        // Forced Email
+        SendEmailJob::dispatch(
+            $user->email,
+            'day_of_service_sales_rep',
+            [
+                'rep_name' => $user->name,
+                'order_no' => $order->order_no ?? 'N/A',
+                'service_name' => $service->service_name ?? 'N/A',
+                'start_time' => $slot->scheduled_start_time->format('h:i A'),
+                'end_time' => $slot->scheduled_end_time->format('h:i A'),
+                'order_id' => $order->id,
+            ]
+        );
+
+        // Forced SMS
+        SendSMSJob::dispatch(
+            $user->cell_phone ?: $this->testPhone,
+            "Reminder: GermBlast Service Order #{$order->order_no} ({$service->service_name}) is scheduled today from " . $slot->scheduled_start_time->format('h:i A') . " to " . $slot->scheduled_end_time->format('h:i A') . "."
+        );
+    }
+
     // =======================
     // THIS IS FOR SENDING TO USER ROLE (e.g., all Sales Managers)
     // =======================

@@ -47,6 +47,7 @@
             font-size: 12px !important;
             cursor: pointer !important;
             transition: transform 0.15s ease !important;
+            color: #ffffff !important;
         }
 
         .fc-event:hover {
@@ -172,6 +173,7 @@
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
                 events: '{{ route('admin.scheduling_calendar.orders') }}',
+                eventDisplay: 'block',
 
                 eventClick: function (info) {
                     const props = info.event.extendedProps;

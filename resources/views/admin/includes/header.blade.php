@@ -110,6 +110,13 @@
                                 </a>
                             </li>
                             <li>
+                                <a class="dropdown-item d-flex align-items-center py-2 px-3 rounded"
+                                    href="{{ route('admin.my-jobs.index') }}">
+                                    <i class="fas fa-briefcase text-warning" style="font-size: 22px; width: 35px; text-align: center; margin-right: 12px;"></i>
+                                    <span>My Jobs</span>
+                                </a>
+                            </li>
+                            <li>
                                 <hr class="dropdown-divider">
                             </li>
                             <li>

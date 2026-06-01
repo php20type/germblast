@@ -516,6 +516,8 @@ class ServiceController extends Controller
             'status' => 'confirmed',
         ]);
 
+        $this->notify->dayOfService($slot);
+
         return redirect()->back()->with('success', 'Slot confirmed successfully.');
     }
 
@@ -650,16 +652,35 @@ class ServiceController extends Controller
 
     public function removeStaff(Request $request, $staffId)
     {
-        ServiceOrderSlotStaff::findOrFail($staffId)->delete();
+        $staff = ServiceOrderSlotStaff::with(['user', 'slot.serviceOrder.service'])->findOrFail($staffId);
+        $user = $staff->user;
+        $slot = $staff->slot;
+
+        $staff->delete();
+
+        if ($user && $slot) {
+            $this->notify->staffUnassignedFromOrder($user, $slot);
+        }
 
         return redirect()->back()->with('success', 'Staff removed from slot.');
     }
 
     public function toggleLeader(Request $request, $staffId)
     {
-        $staff = ServiceOrderSlotStaff::findOrFail($staffId);
+        $staff = ServiceOrderSlotStaff::with(['user', 'slot.serviceOrder.service'])->findOrFail($staffId);
         $staff->is_leader = !$staff->is_leader;
         $staff->save();
+
+        $user = $staff->user;
+        $slot = $staff->slot;
+
+        if ($user && $slot) {
+            if ($staff->is_leader) {
+                $this->notify->staffMarkedAsLeader($user, $slot);
+            } else {
+                $this->notify->staffUnmarkedAsLeader($user, $slot);
+            }
+        }
 
         return redirect()->back()->with('success', 'Staff leadership status updated.');
     }
@@ -746,13 +767,17 @@ class ServiceController extends Controller
             $imagePath = $request->file('photo')->store('service-notes', 'public');
         }
 
-        ServiceNote::create([
+        $note = ServiceNote::create([
             'service_order_id'  => $orderId,
             'user_id'           => auth()->id(),
             'notes'             => $request->notes,
             'image_path'        => $imagePath,
             'notify_sales_team' => $request->boolean('notify_sales_team'),
         ]);
+
+        if ($note->notify_sales_team) {
+            $this->notify->serviceNoteAdded($note);
+        }
 
         return redirect()->back()->with('success', 'Note added successfully.');
     }
@@ -1155,6 +1180,40 @@ class ServiceController extends Controller
         return view('admin.all-schedules', compact('slots', 'vehicles', 'start', 'end', 'date','employees'));
     }
 
+    public function myJobs(Request $request)
+    {
+        $userId = auth()->id();
+
+        // Parse date from request, default to today
+        $date = $request->date
+            ? \Carbon\Carbon::parse($request->date)
+            : \Carbon\Carbon::today();
+
+        // Retrieve slots assigned to this user on the selected date
+        $slots = ServiceOrderSlot::with([
+                'serviceOrder.service.lead.company',
+                'vehicles',
+                'staff.user'
+            ])
+            ->whereDate('scheduled_start_time', $date)
+            ->where('is_confirmed', true)
+            ->whereHas('staff', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->orderBy('scheduled_start_time')
+            ->get();
+
+        // Calculate total hours scheduled for this user today
+        $totalHours = 0;
+        foreach ($slots as $slot) {
+            $userPivot = $slot->staff->firstWhere('user_id', $userId);
+            // If specific slot hours are set on pivot, use that; otherwise fallback to scheduled_hours
+            $totalHours += $userPivot && $userPivot->slot_hours ? $userPivot->slot_hours : ($slot->scheduled_hours ?? 0);
+        }
+
+        return view('admin.jobs.my-jobs', compact('slots', 'date', 'totalHours'));
+    }
+
     /**
      * Save/Append hotel details to the service order
      */
@@ -1370,6 +1429,10 @@ class ServiceController extends Controller
         $slot->update([
             'status' => $newStatus
         ]);
+
+        if (in_array($newStatus, ['confirmed', 'in_progress'])) {
+            $this->notify->dayOfService($slot);
+        }
 
         if ($request->ajax()) {
             return response()->json([

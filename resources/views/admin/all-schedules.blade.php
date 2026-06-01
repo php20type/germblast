@@ -162,8 +162,6 @@
 
                             <!-- Left Side: Current Range Header -->
                             <div>
-                                <span class="text-secondary text-uppercase fw-bold d-block"
-                                    style="font-size: 9px; letter-spacing: 0.5px;">Active Schedule Period</span>
                                 <h4 class="mb-0 fw-bold text-dark" style="font-size: 18px;">
                                     Week of: {{ $start->format('M d, Y') }}
                                 </h4>
@@ -180,9 +178,9 @@
                                 <span class="text-muted opacity-25 px-1">|</span>
 
                                 <a href="{{ route('admin.all_schedules.index', ['date' => now()->toDateString()]) }}"
-                                    class="calendar-nav-btn btn-today">
-                                    Current Week
-                                </a>
+                                     class="calendar-nav-btn {{ $start->toDateString() === now()->startOfWeek()->toDateString() ? 'btn-today' : '' }}">
+                                     Current Week
+                                 </a>
 
                                 <span class="text-muted opacity-25 px-1">|</span>
 

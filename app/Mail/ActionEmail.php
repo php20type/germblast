@@ -37,6 +37,12 @@ class ActionEmail extends Mailable
                 'meeting_updated' => 'Meeting Updated',
                 'proposal_approval_stage' => 'Survey Proposal Ready for Review',
                 'staff_assigned_to_order' => 'You Have Been Assigned to a Service Order',
+                'staff_unassigned_from_order' => 'You Have Been Unassigned from a Service Order',
+                'staff_marked_as_leader' => 'You Have Been Marked as Leader',
+                'staff_unmarked_as_leader' => 'You Have Been Unmarked as Leader',
+                'service_note_added' => 'New Service Note Added',
+                'day_of_service_staff' => 'Service Order Scheduled Today',
+                'day_of_service_sales_rep' => 'Service Scheduled Today',
                 default => 'Lead Notification'
             }
         );
