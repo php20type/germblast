@@ -2,7 +2,9 @@
 <tr>
 
     <!-- DATE -->
-    <td>{{ $report->report_date ? \Carbon\Carbon::parse($report->report_date)->format('jS F Y') : 'N/A' }}</td>
+    <td>
+        <span class="fw-semibold text-dark">{{ $report->report_date ? \Carbon\Carbon::parse($report->report_date)->format('jS F Y') : 'N/A' }}</span>
+    </td>
 
     <!-- SUBMITTED AT -->
     @if(isset($type) && ($type === 'submitted' || $type === 'filled'))
@@ -20,31 +22,35 @@
 
     <!-- EMPLOYEE -->
     <td>
-        <a href="{{ route('admin.expense-report.edit', $report->id) }}">
+        <a href="{{ route('admin.expense-report.edit', $report->id) }}" class="fw-bold text-decoration-none" style="color: #ffb400;">
             {{ $report->user->name ?? 'N/A' }}
         </a>
     </td>
 
     <!-- TYPE -->
     <td>
-        <span class="badge bg-info">{{ $report->report_type ?? 'N/A' }}</span>
+        <span class="fw-semibold text-secondary">{{ $report->report_type ?? 'N/A' }}</span>
     </td>
 
     <!-- STATUS -->
     <td>
-        <span class="badge bg-{{ $report->status === 'Approved' ? 'success' : ($report->status === 'Rejected' ? 'danger' : ($report->status === 'Filled' ? 'warning' : 'secondary')) }}">
+        @php
+            $statusSlug = strtolower($report->status ?? 'open');
+            $pillClass = 'status-pill-' . $statusSlug;
+        @endphp
+        <span class="status-pill {{ $pillClass }}">
             {{ $report->status ?? 'N/A' }}
         </span>
     </td>
 
     <!-- ITEMS -->
     <td>
-        <span class="badge bg-secondary">{{ $report->items->count() }} items</span>
+        <span class="badge bg-secondary text-white rounded-pill px-2 py-1">{{ $report->items->count() }} items</span>
     </td>
 
     <!-- AMOUNT -->
     <td>
-        <strong>${{ number_format($report->total_amount, 2) }}</strong>
+        <strong class="text-dark">${{ number_format($report->total_amount, 2) }}</strong>
     </td>
 
 </tr>
