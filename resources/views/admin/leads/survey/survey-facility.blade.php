@@ -2,6 +2,112 @@
 
 @section('title', 'Survey Facility')
 
+@push('styles')
+    <style>
+        /* Equipment Report Table Boxed Styling */
+        .equipment-report-table {
+            border: 1px solid #e5e7eb !important;
+            border-radius: 12px !important;
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            overflow: hidden !important;
+            background: #fff !important;
+            width: 100% !important;
+            margin-top: 10px !important;
+        }
+
+        .equipment-report-table thead th {
+            background-color: rgba(255, 184, 28, 0.4) !important;
+            border-bottom: 1px solid #e5e7eb !important;
+            color: #374151 !important;
+            font-weight: 600 !important;
+            padding: 18px 20px !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+        }
+
+        .equipment-report-table thead th:first-child {
+            border-top-left-radius: 12px !important;
+        }
+
+        .equipment-report-table thead th:last-child {
+            border-top-right-radius: 12px !important;
+            border-right: none !important;
+        }
+
+        .equipment-report-table tbody th {
+            background-color: #fff !important;
+            border-bottom: 1px solid #f3f4f6 !important;
+            color: #374151 !important;
+            font-weight: 600 !important;
+            padding: 15px 20px !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+            text-align: left !important;
+        }
+
+        .equipment-report-table td {
+            padding: 15px 20px !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid #f3f4f6 !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+        }
+
+        .equipment-report-table td:last-child {
+            border-right: none !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td,
+        .equipment-report-table tbody tr:last-child th {
+            border-bottom: none !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td:first-child,
+        .equipment-report-table tbody tr:last-child th:first-child {
+            border-bottom-left-radius: 12px !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td:last-child,
+        .equipment-report-table tbody tr:last-child th:last-child {
+            border-bottom-right-radius: 12px !important;
+        }
+
+        /* Section Card Refinement */
+        .section-card {
+            background: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 16px !important;
+            padding: 25px !important;
+            margin-bottom: 25px !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .section-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        .section-title {
+            font-size: 18px !important;
+            font-weight: 600 !important;
+            color: #374151 !important;
+            margin-bottom: 0 !important;
+        }
+
+        .section-header {
+            border-bottom: 1px solid #f3f4f6 !important;
+            padding-bottom: 15px !important;
+            margin-bottom: 20px !important;
+        }
+
+        .main-content {
+            background-color: #ffffff;
+            border-radius: 10px;
+        }
+    </style>
+@endpush
+
 @section('content')
     <!-- All Companies Section start  -->
     <div class="companies-section my-4">
@@ -14,32 +120,39 @@
                         @csrf
                         <input type="hidden" name="survey_proposal_id" value="{{ $surveyProposal->id }}">
 
-
-                        <div class="sales-dashboard">
-                            <div class="dashboard-header section-card d-flex justify-content-between align-items-center">
-                                <div class="container-fluid px-0">
-                                    <h1 class="display-6 mb-2 fw-bold">Add Facility</h1>
-                                    <p class="text-muted">Record survey results on this page</p>
+                        <div class="main-content">
+                            {{-- HEADER --}}
+                            <div class="heading-area-sec border-bottom-0 pb-0 px-4 pt-4 d-flex justify-content-between align-items-center">
+                                <div class="left-part-sec">
+                                    <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">
+                                        Add Facility <span style="font-size: 24px;">🏢</span>
+                                    </h3>
+                                    <p class="text-muted mb-2" style="font-size: 16px;">
+                                        Record survey results on this page
+                                    </p>
                                 </div>
-
-                                <div>
-                                    <button type="submit" class="btn btn-success">
+                                <div class="right-part d-flex align-items-center gap-2">
+                                    <button type="submit" class="btn btn-success fw-semibold">
                                         Save Facility
                                     </button>
                                 </div>
                             </div>
 
-                            {{-- Create Facility --}}
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="section-card">
-                                        <div class="section-header">
-                                            <h3 class="section-title">Create Facility</h3>
-                                            <div class="text-end">
-                                            </div>
-                                        </div>
+                            <div class="my-4"></div>
 
-                                        <table class="table table-bordered align-middle">
+                            <div class="dashboard-body px-4 pb-4">
+
+                                {{-- Create Facility --}}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+                                            <div class="section-header">
+                                                <h3 class="section-title">Create Facility</h3>
+                                                <div class="text-end">
+                                                </div>
+                                            </div>
+
+                                            <table class="equipment-report-table align-middle">
                                             <tbody>
 
                                                 <tr>
@@ -150,7 +263,7 @@
                                             </div>
                                         </div>
 
-                                        <table class="table table-bordered align-middle">
+                                        <table class="equipment-report-table align-middle">
                                             <tbody>
                                                 <tr>
                                                     <th>Map Name</th>
@@ -203,7 +316,7 @@
                                         </div>
 
 
-                                        <table class="table table-bordered align-middle">
+                                        <table class="equipment-report-table align-middle">
                                             <tbody>
                                                 <tr>
                                                     <th>Location</th>
@@ -263,7 +376,7 @@
                                             </div>
                                         </div>
 
-                                        <table class="table table-bordered align-middle">
+                                        <table class="equipment-report-table align-middle">
                                             <tbody>
                                                 <tr>
                                                     <th>
@@ -297,7 +410,7 @@
                                     </div>
                                 </div>
                             </div>
-
+                            </div>
                         </div>
                     </form>
                 </div>
