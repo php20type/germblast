@@ -2,6 +2,43 @@
 
 @section('title', 'Biological Readiness')
 
+@push('styles')
+    <style>
+        /* Section Card Refinement */
+        .section-card {
+            background: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 16px !important;
+            padding: 25px !important;
+            margin-bottom: 25px !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .section-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        .section-title {
+            font-size: 18px !important;
+            font-weight: 600 !important;
+            color: #374151 !important;
+            margin-bottom: 0 !important;
+        }
+
+        .section-header {
+            border-bottom: 1px solid #f3f4f6 !important;
+            padding-bottom: 15px !important;
+            margin-bottom: 20px !important;
+        }
+
+        .main-content {
+            background-color: #ffffff;
+            border-radius: 10px;
+        }
+    </style>
+@endpush
+
 @section('content')
     <div class="companies-section my-4">
         <div class="container-fluid">
@@ -12,118 +49,132 @@
                         id="biological-readiness-form">
                         @csrf
 
-                        <div class="sales-dashboard">
+                        <div class="main-content">
 
                             {{-- HEADER --}}
-                            <div class="dashboard-header section-card d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h1 class="display-6 mb-2 fw-bold">Biological Readiness</h1>
-                                    <p class="text-muted">Create readiness agreement details</p>
+                            <div class="heading-area-sec border-bottom-0 pb-0">
+                                <div class="left-part-sec">
+                                    <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">
+                                        BIOLOGICAL READINESS <span style="font-size: 24px;">🛡️</span>
+                                    </h3>
+                                    <p class="text-muted mb-2" style="font-size: 16px;">
+                                        Create readiness agreement details
+                                    </p>
                                 </div>
-
-                                <button type="submit" class="btn btn-success">
-                                    Submit
-                                </button>
+                                <div class="right-part-sec">
+                                    <button type="submit" class="btn btn-export fw-semibold">
+                                        Submit
+                                    </button>
+                                </div>
                             </div>
 
-                            {{-- BASIC INFORMATION --}}
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="section-card">
-                                        <div class="section-header">
-                                            <h3 class="section-title">Basic Information</h3>
+                            <div class="my-4"></div>
+
+                            <div class="dashboard-body px-4 pb-4">
+
+                                {{-- BASIC INFORMATION --}}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+                                            <div class="section-header">
+                                                <h3 class="section-title">Basic Information</h3>
+                                            </div>
+
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered align-middle">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>Project Name</th>
+                                                            <td>
+                                                                <input type="text" name="project_name" class="form-control">
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <th>Price per Hour Reduction Amount</th>
+                                                            <td>
+                                                                <input type="number" step="0.01" name="per_hour_reduction_amount"
+                                                                    class="form-control">
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <th>Length of Contract (months)</th>
+                                                            <td>
+                                                                <input type="number" name="length"
+                                                                    class="form-control">
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <th>Monthly Rate</th>
+                                                            <td>
+                                                                <input type="number" step="0.01" name="monthly_rate"
+                                                                    class="form-control">
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Status</th>
+                                                            <td>
+                                                                <select name="status" class="form-control">
+                                                                    <option value="Open">Open</option>
+                                                                    <option value="Won">Won</option>
+                                                                    <option value="Lost">Lost</option>
+                                                                    <option value="Pending">Pending</option>
+                                                                    <option value="Closed">Closed</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
-
-                                        <table class="table table-bordered align-middle">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Project Name</th>
-                                                    <td>
-                                                        <input type="text" name="project_name" class="form-control">
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Price per Hour Reduction Amount</th>
-                                                    <td>
-                                                        <input type="number" step="0.01" name="per_hour_reduction_amount"
-                                                            class="form-control">
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Length of Contract (months)</th>
-                                                    <td>
-                                                        <input type="number" name="length"
-                                                            class="form-control">
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Monthly Rate</th>
-                                                    <td>
-                                                        <input type="number" step="0.01" name="monthly_rate"
-                                                            class="form-control">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Status</th>
-                                                    <td>
-                                                        <select name="status" class="form-control">
-                                                            <option value="Open">Open</option>
-                                                            <option value="Won">Won</option>
-                                                            <option value="Lost">Lost</option>
-                                                            <option value="Pending">Pending</option>
-                                                            <option value="Closed">Closed</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
                                     </div>
                                 </div>
-                            </div>
 
-                            {{-- READINESS DETAILS --}}
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="section-card">
-                                        <div class="section-header">
-                                            <h3 class="section-title">Readiness Details</h3>
-                                        </div>
+                                {{-- READINESS DETAILS --}}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+                                            <div class="section-header">
+                                                <h3 class="section-title">Readiness Details</h3>
+                                            </div>
 
-                                        <table class="table table-bordered align-middle">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Default Readiness Includes</th>
-                                                    <td>
-                                                        <textarea name="default_readiness_includes_1" rows="3" class="form-control">
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered align-middle">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>Default Readiness Includes</th>
+                                                            <td>
+                                                                <textarea name="default_readiness_includes_1" rows="3" class="form-control">
 Reserved chemical, personal protective equipment, and other needed supplies to ensure availability for GermBlast to respond to your outbreak
-                                                    </textarea>
-                                                    </td>
-                                                </tr>
+                                                            </textarea>
+                                                            </td>
+                                                        </tr>
 
-                                                <tr>
-                                                    <th>Default Readiness Includes</th>
-                                                    <td>
-                                                        <textarea name="default_readiness_includes_2" rows="3" class="form-control">
+                                                        <tr>
+                                                            <th>Default Readiness Includes</th>
+                                                            <td>
+                                                                <textarea name="default_readiness_includes_2" rows="3" class="form-control">
 Required biological response supplies and chemical included with each service
-                                                    </textarea>
-                                                    </td>
-                                                </tr>
+                                                            </textarea>
+                                                            </td>
+                                                        </tr>
 
-                                                <tr>
-                                                    <th>In addition Include</th>
-                                                    <td>
-                                                        <textarea name="additional_includes" rows="4" class="form-control" placeholder="Type a addition and press Enter"></textarea>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                                        <tr>
+                                                            <th>In addition Include</th>
+                                                            <td>
+                                                                <textarea name="additional_includes" rows="4" class="form-control" placeholder="Type a addition and press Enter"></textarea>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
+                            </div>
                         </div>
                     </form>
 

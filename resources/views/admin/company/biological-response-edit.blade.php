@@ -2,6 +2,43 @@
 
 @section('title', 'Edit Biological Response Intake')
 
+@push('styles')
+    <style>
+        /* Section Card Refinement */
+        .section-card {
+            background: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 16px !important;
+            padding: 25px !important;
+            margin-bottom: 25px !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .section-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        .section-title {
+            font-size: 18px !important;
+            font-weight: 600 !important;
+            color: #374151 !important;
+            margin-bottom: 0 !important;
+        }
+
+        .section-header {
+            border-bottom: 1px solid #f3f4f6 !important;
+            padding-bottom: 15px !important;
+            margin-bottom: 20px !important;
+        }
+
+        .main-content {
+            background-color: #ffffff;
+            border-radius: 10px;
+        }
+    </style>
+@endpush
+
 @section('content')
     <div class="companies-section my-4">
         <div class="container-fluid">
@@ -12,80 +49,91 @@
                         method="POST" id="biological-response-intake-form">
                         @csrf
 
-                        <div class="sales-dashboard">
+                        <div class="main-content">
 
                             {{-- HEADER --}}
-                            <div class="dashboard-header section-card d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h1 class="display-6 mb-2 fw-bold">Edit Biological Response Intake</h1>
-                                    <p class="text-muted">Update project and insurance details</p>
+                            <div class="heading-area-sec border-bottom-0 pb-0">
+                                <div class="left-part-sec">
+                                    <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">
+                                        EDIT BIOLOGICAL RESPONSE INTAKE <span style="font-size: 24px;">🧬</span>
+                                    </h3>
+                                    <p class="text-muted mb-2" style="font-size: 16px;">
+                                        Update project and insurance details
+                                    </p>
                                 </div>
-
-                                <button type="submit" class="btn btn-primary">
-                                    Update Intake
-                                </button>
+                                <div class="right-part-sec">
+                                    <button type="submit" class="btn btn-export fw-semibold">
+                                        Update Intake
+                                    </button>
+                                </div>
                             </div>
 
-                            {{-- BASIC INFORMATION --}}
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="section-card">
+                            <div class="my-4"></div>
+
+                            <div class="dashboard-body px-4 pb-4">
+
+                                {{-- BASIC INFORMATION --}}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
                                         <div class="section-header">
                                             <h3 class="section-title">Basic Information</h3>
                                         </div>
 
-                                        <table class="table table-bordered align-middle">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Project Name</th>
-                                                    <td>
-                                                        <input type="text" name="project_name" class="form-control"
-                                                            value="{{ old('project_name', $intake->project_name) }}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Project Address</th>
-                                                    <td>
-                                                        <input type="text" name="project_address" class="form-control"
-                                                            value="{{ old('project_address', $intake->project_address) }}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>City</th>
-                                                    <td>
-                                                        <input type="text" name="project_city" class="form-control"
-                                                            value="{{ old('project_city', $intake->project_city) }}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>State</th>
-                                                    <td>
-                                                        <input type="text" name="project_state" class="form-control"
-                                                            value="{{ old('project_state', $intake->project_state) }}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Zip</th>
-                                                    <td>
-                                                        <input type="text" name="project_zip" class="form-control"
-                                                            value="{{ old('project_zip', $intake->project_zip) }}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Project Leader</th>
-                                                    <td>
-                                                        <input type="text" name="project_leader" class="form-control"
-                                                            value="{{ old('project_leader', $intake->project_leader) }}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Comments</th>
-                                                    <td>
-                                                        <textarea name="comments" class="form-control" rows="3">{{ old('comments', $intake->comments) }}</textarea>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered align-middle">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Project Name</th>
+                                                        <td>
+                                                            <input type="text" name="project_name" class="form-control"
+                                                                value="{{ old('project_name', $intake->project_name) }}">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Project Address</th>
+                                                        <td>
+                                                            <input type="text" name="project_address" class="form-control"
+                                                                value="{{ old('project_address', $intake->project_address) }}">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>City</th>
+                                                        <td>
+                                                            <input type="text" name="project_city" class="form-control"
+                                                                value="{{ old('project_city', $intake->project_city) }}">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>State</th>
+                                                        <td>
+                                                            <input type="text" name="project_state" class="form-control"
+                                                                value="{{ old('project_state', $intake->project_state) }}">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Zip</th>
+                                                        <td>
+                                                            <input type="text" name="project_zip" class="form-control"
+                                                                value="{{ old('project_zip', $intake->project_zip) }}">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Project Leader</th>
+                                                        <td>
+                                                            <input type="text" name="project_leader" class="form-control"
+                                                                value="{{ old('project_leader', $intake->project_leader) }}">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Comments</th>
+                                                        <td>
+                                                            <textarea name="comments" class="form-control" rows="3">{{ old('comments', $intake->comments) }}</textarea>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -98,121 +146,123 @@
                                             <h3 class="section-title">Frontend Management Information</h3>
                                         </div>
 
-                                        <table class="table table-bordered align-middle">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Facility Type</th>
-                                                    <td>
-                                                        <select name="facility_type" class="form-select">
-                                                            <option value="">Select One</option>
-                                                            <option value="Residential"
-                                                                {{ old('facility_type', $intake->facility_type) === 'Residential' ? 'selected' : '' }}>
-                                                                Residential
-                                                            </option>
-                                                            <option value="Institutional"
-                                                                {{ old('facility_type', $intake->facility_type) === 'Institutional' ? 'selected' : '' }}>
-                                                                Institutional
-                                                            </option>
-                                                            <option value="Municipal"
-                                                                {{ old('facility_type', $intake->facility_type) === 'Municipal' ? 'selected' : '' }}>
-                                                                Municipal
-                                                            </option>
-                                                            <option value="Health"
-                                                                {{ old('facility_type', $intake->facility_type) === 'Health' ? 'selected' : '' }}>
-                                                                Health
-                                                            </option>
-                                                            <option value="Commercial"
-                                                                {{ old('facility_type', $intake->facility_type) === 'Commercial' ? 'selected' : '' }}>
-                                                                Commercial
-                                                            </option>
-                                                            <option value="Industrial"
-                                                                {{ old('facility_type', $intake->facility_type) === 'Industrial' ? 'selected' : '' }}>
-                                                                Industrial
-                                                            </option>
-                                                        </select>
-
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Casualties / Illnesses</th>
-                                                    <td>
-                                                        <select name="casualties_or_illnesses" class="form-select">
-                                                            <option value="">Select One</option>
-                                                            <option value="Death"
-                                                                {{ old('casualties_or_illnesses', $intake->casualties_or_illnesses) === 'Death' ? 'selected' : '' }}>
-                                                                Death
-                                                            </option>
-                                                            <option value="Illness"
-                                                                {{ old('casualties_or_illnesses', $intake->casualties_or_illnesses) === 'Illness' ? 'selected' : '' }}>
-                                                                Illness
-                                                            </option>
-                                                            <option value="None"
-                                                                {{ old('casualties_or_illnesses', $intake->casualties_or_illnesses) === 'None' ? 'selected' : '' }}>
-                                                                None
-                                                            </option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Estimated Man Hours</th>
-                                                    <td>
-                                                        <input type="number" name="estimated_man_hours"
-                                                            class="form-control"
-                                                            value="{{ old('estimated_man_hours', $intake->estimated_man_hours) }}">
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Estimated People</th>
-                                                    <td>
-                                                        <input type="number" name="estimated_people" class="form-control"
-                                                            value="{{ old('estimated_people', $intake->estimated_people) }}">
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Type of Loss</th>
-                                                    <td>
-                                                        <select name="type_of_loss" class="form-select">
-                                                            <option value="">Select One</option>
-                                                            <option value="Drug"
-                                                                {{ old('type_of_loss', $intake->type_of_loss) === 'Drug' ? 'selected' : '' }}>
-                                                                Drug
-                                                            </option>
-                                                            <option value="Trauma"
-                                                                {{ old('type_of_loss', $intake->type_of_loss) === 'Trauma' ? 'selected' : '' }}>
-                                                                Trauma
-                                                            </option>
-                                                            <option value="Zoonotic"
-                                                                {{ old('type_of_loss', $intake->type_of_loss) === 'Zoonotic' ? 'selected' : '' }}>
-                                                                Zoonotic
-                                                            </option>
-                                                            <option value="Infectious Disease"
-                                                                {{ old('type_of_loss', $intake->type_of_loss) === 'Infectious Disease' ? 'selected' : '' }}>
-                                                                Infectious Disease
-                                                            </option>
-                                                            <option value="Food Borne"
-                                                                {{ old('type_of_loss', $intake->type_of_loss) === 'Food Borne' ? 'selected' : '' }}>
-                                                                Food Borne
-                                                            </option>
-                                                            <option value="Terrorism"
-                                                                {{ old('type_of_loss', $intake->type_of_loss) === 'Terrorism' ? 'selected' : '' }}>
-                                                                Terrorism
-                                                            </option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Areas to be treated</th>
-                                                    <td>
-                                                        <input type="text" name="treated_areas" class="form-control">
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered align-middle">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Facility Type</th>
+                                                        <td>
+                                                            <select name="facility_type" class="form-select">
+                                                                <option value="">Select One</option>
+                                                                <option value="Residential"
+                                                                    {{ old('facility_type', $intake->facility_type) === 'Residential' ? 'selected' : '' }}>
+                                                                    Residential
+                                                                </option>
+                                                                <option value="Institutional"
+                                                                    {{ old('facility_type', $intake->facility_type) === 'Institutional' ? 'selected' : '' }}>
+                                                                    Institutional
+                                                                </option>
+                                                                <option value="Municipal"
+                                                                    {{ old('facility_type', $intake->facility_type) === 'Municipal' ? 'selected' : '' }}>
+                                                                    Municipal
+                                                                </option>
+                                                                <option value="Health"
+                                                                    {{ old('facility_type', $intake->facility_type) === 'Health' ? 'selected' : '' }}>
+                                                                    Health
+                                                                </option>
+                                                                <option value="Commercial"
+                                                                    {{ old('facility_type', $intake->facility_type) === 'Commercial' ? 'selected' : '' }}>
+                                                                    Commercial
+                                                                </option>
+                                                                <option value="Industrial"
+                                                                    {{ old('facility_type', $intake->facility_type) === 'Industrial' ? 'selected' : '' }}>
+                                                                    Industrial
+                                                                </option>
+                                                            </select>
+    
+                                                        </td>
+                                                    </tr>
+    
+                                                    <tr>
+                                                        <th>Casualties / Illnesses</th>
+                                                        <td>
+                                                            <select name="casualties_or_illnesses" class="form-select">
+                                                                <option value="">Select One</option>
+                                                                <option value="Death"
+                                                                    {{ old('casualties_or_illnesses', $intake->casualties_or_illnesses) === 'Death' ? 'selected' : '' }}>
+                                                                    Death
+                                                                </option>
+                                                                <option value="Illness"
+                                                                    {{ old('casualties_or_illnesses', $intake->casualties_or_illnesses) === 'Illness' ? 'selected' : '' }}>
+                                                                    Illness
+                                                                </option>
+                                                                <option value="None"
+                                                                    {{ old('casualties_or_illnesses', $intake->casualties_or_illnesses) === 'None' ? 'selected' : '' }}>
+                                                                    None
+                                                                </option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+    
+                                                    <tr>
+                                                        <th>Estimated Man Hours</th>
+                                                        <td>
+                                                            <input type="number" name="estimated_man_hours"
+                                                                class="form-control"
+                                                                value="{{ old('estimated_man_hours', $intake->estimated_man_hours) }}">
+                                                        </td>
+                                                    </tr>
+    
+                                                    <tr>
+                                                        <th>Estimated People</th>
+                                                        <td>
+                                                            <input type="number" name="estimated_people" class="form-control"
+                                                                value="{{ old('estimated_people', $intake->estimated_people) }}">
+                                                        </td>
+                                                    </tr>
+    
+                                                    <tr>
+                                                        <th>Type of Loss</th>
+                                                        <td>
+                                                            <select name="type_of_loss" class="form-select">
+                                                                <option value="">Select One</option>
+                                                                <option value="Drug"
+                                                                    {{ old('type_of_loss', $intake->type_of_loss) === 'Drug' ? 'selected' : '' }}>
+                                                                    Drug
+                                                                </option>
+                                                                <option value="Trauma"
+                                                                    {{ old('type_of_loss', $intake->type_of_loss) === 'Trauma' ? 'selected' : '' }}>
+                                                                    Trauma
+                                                                </option>
+                                                                <option value="Zoonotic"
+                                                                    {{ old('type_of_loss', $intake->type_of_loss) === 'Zoonotic' ? 'selected' : '' }}>
+                                                                    Zoonotic
+                                                                </option>
+                                                                <option value="Infectious Disease"
+                                                                    {{ old('type_of_loss', $intake->type_of_loss) === 'Infectious Disease' ? 'selected' : '' }}>
+                                                                    Infectious Disease
+                                                                </option>
+                                                                <option value="Food Borne"
+                                                                    {{ old('type_of_loss', $intake->type_of_loss) === 'Food Borne' ? 'selected' : '' }}>
+                                                                    Food Borne
+                                                                </option>
+                                                                <option value="Terrorism"
+                                                                    {{ old('type_of_loss', $intake->type_of_loss) === 'Terrorism' ? 'selected' : '' }}>
+                                                                    Terrorism
+                                                                </option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+    
+                                                    <tr>
+                                                        <th>Areas to be treated</th>
+                                                        <td>
+                                                            <input type="text" name="treated_areas" class="form-control">
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -225,111 +275,113 @@
                                             <h3 class="section-title">Insurance Information</h3>
                                         </div>
 
-                                        <table class="table table-bordered align-middle">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Insurance Notified</th>
-                                                    <td>
-                                                        <select name="insurance_notified" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0"
-                                                                {{ old('insurance_notified', $intake->insurance_notified) == 0 ? 'selected' : '' }}>
-                                                                No
-                                                            </option>
-                                                            <option value="1"
-                                                                {{ old('insurance_notified', $intake->insurance_notified) == 1 ? 'selected' : '' }}>
-                                                                Yes
-                                                            </option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Insurance Company</th>
-                                                    <td>
-                                                        <input type="text" name="insurance_company_name"
-                                                            class="form-control"
-                                                            value="{{ old('insurance_company_name', $intake->insurance_company_name) }}">
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Insurance Phone</th>
-                                                    <td>
-                                                        <input type="text" name="insurance_phone" class="form-control"
-                                                            value="{{ old('insurance_phone', $intake->insurance_phone) }}">
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Coverage Determination</th>
-                                                    <td>
-                                                        <select name="coverage_determination" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0"
-                                                                {{ old('coverage_determination', $intake->coverage_determination) == 0 ? 'selected' : '' }}>
-                                                                No
-                                                            </option>
-                                                            <option value="1"
-                                                                {{ old('coverage_determination', $intake->coverage_determination) == 1 ? 'selected' : '' }}>
-                                                                Yes
-                                                            </option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Coverage Amount</th>
-                                                    <td>
-                                                        <input type="number" step="0.01" name="coverage_amount"
-                                                            class="form-control"
-                                                            value="{{ old('coverage_amount', $intake->coverage_amount) }}">
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Deductible</th>
-                                                    <td>
-                                                        <input type="number" step="0.01" name="deductible"
-                                                            class="form-control"
-                                                            value="{{ old('deductible', $intake->deductible) }}">
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Claim Number</th>
-                                                    <td>
-                                                        <input type="text" name="claim_number" class="form-control"
-                                                            value="{{ old('claim_number', $intake->claim_number) }}">
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Adjuster Phone</th>
-                                                    <td>
-                                                        <input type="text" name="adjuster_phone" class="form-control"
-                                                            value="{{ old('adjuster_phone', $intake->adjuster_phone) }}">
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Insurance Email</th>
-                                                    <td>
-                                                        <input type="email" name="insurance_email" class="form-control"
-                                                            value="{{ old('insurance_email', $intake->insurance_email) }}">
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Limit / Cap</th>
-                                                    <td>
-                                                        <input type="number" step="0.01" name="limit_or_cap"
-                                                            class="form-control"
-                                                            value="{{ old('limit_or_cap', $intake->limit_or_cap) }}">
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered align-middle">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Insurance Notified</th>
+                                                        <td>
+                                                            <select name="insurance_notified" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0"
+                                                                    {{ old('insurance_notified', $intake->insurance_notified) == 0 ? 'selected' : '' }}>
+                                                                    No
+                                                                </option>
+                                                                <option value="1"
+                                                                    {{ old('insurance_notified', $intake->insurance_notified) == 1 ? 'selected' : '' }}>
+                                                                    Yes
+                                                                </option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+    
+                                                    <tr>
+                                                        <th>Insurance Company</th>
+                                                        <td>
+                                                            <input type="text" name="insurance_company_name"
+                                                                class="form-control"
+                                                                value="{{ old('insurance_company_name', $intake->insurance_company_name) }}">
+                                                        </td>
+                                                    </tr>
+    
+                                                    <tr>
+                                                        <th>Insurance Phone</th>
+                                                        <td>
+                                                            <input type="text" name="insurance_phone" class="form-control"
+                                                                value="{{ old('insurance_phone', $intake->insurance_phone) }}">
+                                                        </td>
+                                                    </tr>
+    
+                                                    <tr>
+                                                        <th>Coverage Determination</th>
+                                                        <td>
+                                                            <select name="coverage_determination" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0"
+                                                                    {{ old('coverage_determination', $intake->coverage_determination) == 0 ? 'selected' : '' }}>
+                                                                    No
+                                                                </option>
+                                                                <option value="1"
+                                                                    {{ old('coverage_determination', $intake->coverage_determination) == 1 ? 'selected' : '' }}>
+                                                                    Yes
+                                                                </option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+    
+                                                    <tr>
+                                                        <th>Coverage Amount</th>
+                                                        <td>
+                                                            <input type="number" step="0.01" name="coverage_amount"
+                                                                class="form-control"
+                                                                value="{{ old('coverage_amount', $intake->coverage_amount) }}">
+                                                        </td>
+                                                    </tr>
+    
+                                                    <tr>
+                                                        <th>Deductible</th>
+                                                        <td>
+                                                            <input type="number" step="0.01" name="deductible"
+                                                                class="form-control"
+                                                                value="{{ old('deductible', $intake->deductible) }}">
+                                                        </td>
+                                                    </tr>
+    
+                                                    <tr>
+                                                        <th>Claim Number</th>
+                                                        <td>
+                                                            <input type="text" name="claim_number" class="form-control"
+                                                                value="{{ old('claim_number', $intake->claim_number) }}">
+                                                        </td>
+                                                    </tr>
+    
+                                                    <tr>
+                                                        <th>Adjuster Phone</th>
+                                                        <td>
+                                                            <input type="text" name="adjuster_phone" class="form-control"
+                                                                value="{{ old('adjuster_phone', $intake->adjuster_phone) }}">
+                                                        </td>
+                                                    </tr>
+    
+                                                    <tr>
+                                                        <th>Insurance Email</th>
+                                                        <td>
+                                                            <input type="email" name="insurance_email" class="form-control"
+                                                                value="{{ old('insurance_email', $intake->insurance_email) }}">
+                                                        </td>
+                                                    </tr>
+    
+                                                    <tr>
+                                                        <th>Limit / Cap</th>
+                                                        <td>
+                                                            <input type="number" step="0.01" name="limit_or_cap"
+                                                                class="form-control"
+                                                                value="{{ old('limit_or_cap', $intake->limit_or_cap) }}">
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -343,71 +395,73 @@
                                             <h3 class="section-title">Death Information</h3>
                                         </div>
 
-                                        <table class="table table-bordered align-middle">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Cause of Death</th>
-                                                    <td>
-                                                        <input type="text" name="cause_of_death" class="form-control"
-                                                            value="{{ old('cause_of_death', $intake->cause_of_death) }}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>How Many</th>
-                                                    <td>
-                                                        <input type="number" name="number_of_deaths"
-                                                            class="form-control"
-                                                            value="{{ old('number_of_deaths', $intake->number_of_deaths) }}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Bodies Unattended</th>
-                                                    <td>
-                                                        <select name="body_unattended" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0"
-                                                                {{ old('body_unattended', $intake->body_unattended) == 0 ? 'selected' : '' }}>
-                                                                No</option>
-                                                            <option value="1"
-                                                                {{ old('body_unattended', $intake->body_unattended) == 1 ? 'selected' : '' }}>
-                                                                Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Unattended Days</th>
-                                                    <td>
-                                                        <input type="number" name="unattended_days" class="form-control"
-                                                            value="{{ old('unattended_days', $intake->unattended_days) }}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>More than 2 rooms</th>
-                                                    <td>
-                                                        <select name="death_more_than_2_rooms" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0"
-                                                            {{ old('death_more_than_2_rooms', $intake->more_than_2_rooms) == 0 ? 'selected' : '' }}>No</option>
-                                                            <option value="1"
-                                                            {{ old('death_more_than_2_rooms', $intake->more_than_2_rooms) == 1 ? 'selected' : '' }}>Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>High consequence infectious disease</th>
-                                                    <td>
-                                                        <select name="death_high_consequence_infectious_disease"
-                                                            class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0"
-                                                            {{ old('death_high_consequence_infectious_disease', $intake->high_consequence_infectious_disease) == 0 ? 'selected' : '' }}>No</option>
-                                                            <option value="1"
-                                                            {{ old('death_high_consequence_infectious_disease', $intake->high_consequence_infectious_disease) == 1 ? 'selected' : '' }}>Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered align-middle">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Cause of Death</th>
+                                                        <td>
+                                                            <input type="text" name="cause_of_death" class="form-control"
+                                                                value="{{ old('cause_of_death', $intake->cause_of_death) }}">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>How Many</th>
+                                                        <td>
+                                                            <input type="number" name="number_of_deaths"
+                                                                class="form-control"
+                                                                value="{{ old('number_of_deaths', $intake->number_of_deaths) }}">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Bodies Unattended</th>
+                                                        <td>
+                                                            <select name="body_unattended" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0"
+                                                                    {{ old('body_unattended', $intake->body_unattended) == 0 ? 'selected' : '' }}>
+                                                                    No</option>
+                                                                <option value="1"
+                                                                    {{ old('body_unattended', $intake->body_unattended) == 1 ? 'selected' : '' }}>
+                                                                    Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Unattended Days</th>
+                                                        <td>
+                                                            <input type="number" name="unattended_days" class="form-control"
+                                                                value="{{ old('unattended_days', $intake->unattended_days) }}">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>More than 2 rooms</th>
+                                                        <td>
+                                                            <select name="death_more_than_2_rooms" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0"
+                                                                {{ old('death_more_than_2_rooms', $intake->more_than_2_rooms) == 0 ? 'selected' : '' }}>No</option>
+                                                                <option value="1"
+                                                                {{ old('death_more_than_2_rooms', $intake->more_than_2_rooms) == 1 ? 'selected' : '' }}>Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>High consequence infectious disease</th>
+                                                        <td>
+                                                            <select name="death_high_consequence_infectious_disease"
+                                                                class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0"
+                                                                {{ old('death_high_consequence_infectious_disease', $intake->high_consequence_infectious_disease) == 0 ? 'selected' : '' }}>No</option>
+                                                                <option value="1"
+                                                                {{ old('death_high_consequence_infectious_disease', $intake->high_consequence_infectious_disease) == 1 ? 'selected' : '' }}>Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -421,71 +475,73 @@
                                             <h3 class="section-title">Illness Information</h3>
                                         </div>
 
-                                        <table class="table table-bordered align-middle">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Has person travelled outside the country within past 3 weeks?</th>
-                                                    <td>
-                                                        <select name="person_travelled_outside" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0"
-                                                                {{ old('person_travelled_outside', $intake->person_travelled_outside) == 0 ? 'selected' : '' }}>
-                                                                No</option>
-                                                            <option value="1"
-                                                                {{ old('person_travelled_outside', $intake->person_travelled_outside) == 1 ? 'selected' : '' }}>
-                                                                Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Is there a diagnosis?</th>
-                                                    <td>
-                                                        <select name="diagnosis" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0"
-                                                                {{ old('diagnosis', $intake->diagnosis) == 0 ? 'selected' : '' }}>
-                                                                No</option>
-                                                            <option value="1"
-                                                                {{ old('diagnosis', $intake->diagnosis) == 1 ? 'selected' : '' }}>
-                                                                Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>How many diagnosis?</th>
-                                                    <td>
-                                                        <input type="number" name="number_of_diagnosis"
-                                                            class="form-control"
-                                                            value="{{ old('number_of_diagnosis', $intake->number_of_diagnosis) }}">
-                                                    </td>
-                                                </tr>
-                                                 <tr>
-                                                    <th>More than 2 rooms ?</th>
-                                                    <td>
-                                                        <select name="illness_more_than_2_rooms" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0"
-                                                            {{ old('illness_more_than_2_rooms', $intake->more_than_2_rooms) == 0 ? 'selected' : '' }}>No</option>
-                                                            <option value="1"
-                                                            {{ old('illness_more_than_2_rooms', $intake->more_than_2_rooms) == 1 ? 'selected' : '' }}>Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>High consequence infectious disease</th>
-                                                    <td>
-                                                        <select name="illness_high_consequence_infectious_disease"
-                                                            class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0"
-                                                            {{ old('illness_high_consequence_infectious_disease', $intake->high_consequence_infectious_disease) == 0 ? 'selected' : '' }}>No</option>
-                                                            <option value="1"
-                                                            {{ old('illness_high_consequence_infectious_disease', $intake->high_consequence_infectious_disease) == 1 ? 'selected' : '' }}>Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered align-middle">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Has person travelled outside the country within past 3 weeks?</th>
+                                                        <td>
+                                                            <select name="person_travelled_outside" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0"
+                                                                    {{ old('person_travelled_outside', $intake->person_travelled_outside) == 0 ? 'selected' : '' }}>
+                                                                    No</option>
+                                                                <option value="1"
+                                                                    {{ old('person_travelled_outside', $intake->person_travelled_outside) == 1 ? 'selected' : '' }}>
+                                                                    Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Is there a diagnosis?</th>
+                                                        <td>
+                                                            <select name="diagnosis" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0"
+                                                                    {{ old('diagnosis', $intake->diagnosis) == 0 ? 'selected' : '' }}>
+                                                                    No</option>
+                                                                <option value="1"
+                                                                    {{ old('diagnosis', $intake->diagnosis) == 1 ? 'selected' : '' }}>
+                                                                    Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>How many diagnosis?</th>
+                                                        <td>
+                                                            <input type="number" name="number_of_diagnosis"
+                                                                class="form-control"
+                                                                value="{{ old('number_of_diagnosis', $intake->number_of_diagnosis) }}">
+                                                        </td>
+                                                    </tr>
+                                                     <tr>
+                                                        <th>More than 2 rooms ?</th>
+                                                        <td>
+                                                            <select name="illness_more_than_2_rooms" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0"
+                                                                {{ old('illness_more_than_2_rooms', $intake->more_than_2_rooms) == 0 ? 'selected' : '' }}>No</option>
+                                                                <option value="1"
+                                                                {{ old('illness_more_than_2_rooms', $intake->more_than_2_rooms) == 1 ? 'selected' : '' }}>Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>High consequence infectious disease</th>
+                                                        <td>
+                                                            <select name="illness_high_consequence_infectious_disease"
+                                                                class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0"
+                                                                {{ old('illness_high_consequence_infectious_disease', $intake->high_consequence_infectious_disease) == 0 ? 'selected' : '' }}>No</option>
+                                                                <option value="1"
+                                                                {{ old('illness_high_consequence_infectious_disease', $intake->high_consequence_infectious_disease) == 1 ? 'selected' : '' }}>Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -498,59 +554,61 @@
                                             <h3 class="section-title">Additional Information</h3>
                                         </div>
 
-                                        <table class="table table-bordered align-middle">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Police Cleared the scene?</th>
-                                                    <td>
-                                                        <select name="police_cleanup" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0"
-                                                                {{ old('police_cleanup', $intake->police_cleanup) == 0 ? 'selected' : '' }}>
-                                                                No</option>
-                                                            <option value="1"
-                                                                {{ old('police_cleanup', $intake->police_cleanup) == 1 ? 'selected' : '' }}>
-                                                                Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Phone Number</th>
-                                                    <td>
-                                                        <input type="text" name="police_number" class="form-control"
-                                                            value="{{ old('police_number', $intake->police_number) }}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Overdose?</th>
-                                                    <td>
-                                                        <select name="overdose" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0"
-                                                                {{ old('overdose', $intake->overdose) == 0 ? 'selected' : '' }}>
-                                                                No</option>
-                                                            <option value="1"
-                                                                {{ old('overdose', $intake->overdose) == 1 ? 'selected' : '' }}>
-                                                                Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Gunshot Wound?</th>
-                                                    <td>
-                                                        <select name="gunshot" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0"
-                                                                {{ old('gunshot', $intake->gunshot) == 0 ? 'selected' : '' }}>
-                                                                No</option>
-                                                            <option value="1"
-                                                                {{ old('gunshot', $intake->gunshot) == 1 ? 'selected' : '' }}>
-                                                                Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered align-middle">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Police Cleared the scene?</th>
+                                                        <td>
+                                                            <select name="police_cleanup" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0"
+                                                                    {{ old('police_cleanup', $intake->police_cleanup) == 0 ? 'selected' : '' }}>
+                                                                    No</option>
+                                                                <option value="1"
+                                                                    {{ old('police_cleanup', $intake->police_cleanup) == 1 ? 'selected' : '' }}>
+                                                                    Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Phone Number</th>
+                                                        <td>
+                                                            <input type="text" name="police_number" class="form-control"
+                                                                value="{{ old('police_number', $intake->police_number) }}">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Overdose?</th>
+                                                        <td>
+                                                            <select name="overdose" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0"
+                                                                    {{ old('overdose', $intake->overdose) == 0 ? 'selected' : '' }}>
+                                                                    No</option>
+                                                                <option value="1"
+                                                                    {{ old('overdose', $intake->overdose) == 1 ? 'selected' : '' }}>
+                                                                    Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Gunshot Wound?</th>
+                                                        <td>
+                                                            <select name="gunshot" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0"
+                                                                    {{ old('gunshot', $intake->gunshot) == 0 ? 'selected' : '' }}>
+                                                                    No</option>
+                                                                <option value="1"
+                                                                    {{ old('gunshot', $intake->gunshot) == 1 ? 'selected' : '' }}>
+                                                                    Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -563,36 +621,39 @@
                                             <h3 class="section-title">Additional Contact Information</h3>
                                         </div>
 
-                                        <table class="table table-bordered align-middle">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Contact Name</th>
-                                                    <td>
-                                                        <input type="text" name="contact_name" class="form-control"
-                                                            value="{{ old('contact_name', $intake->contact_name) }}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Contact Title</th>
-                                                    <td>
-                                                        <input type="text" name="contact_title" class="form-control"
-                                                            value="{{ old('contact_title', $intake->contact_title) }}">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Contact Phone</th>
-                                                    <td>
-                                                        <input type="text" name="contact_phone" class="form-control"
-                                                            value="{{ old('contact_phone', $intake->contact_phone) }}">
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered align-middle">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Contact Name</th>
+                                                        <td>
+                                                            <input type="text" name="contact_name" class="form-control"
+                                                                value="{{ old('contact_name', $intake->contact_name) }}">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Contact Title</th>
+                                                        <td>
+                                                            <input type="text" name="contact_title" class="form-control"
+                                                                value="{{ old('contact_title', $intake->contact_title) }}">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Contact Phone</th>
+                                                        <td>
+                                                            <input type="text" name="contact_phone" class="form-control"
+                                                                value="{{ old('contact_phone', $intake->contact_phone) }}">
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
 
+                            </div>
                         </div>
                     </form>
 

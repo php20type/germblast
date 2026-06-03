@@ -2,6 +2,43 @@
 
 @section('title', 'Biological Response Intake')
 
+@push('styles')
+    <style>
+        /* Section Card Refinement */
+        .section-card {
+            background: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 16px !important;
+            padding: 25px !important;
+            margin-bottom: 25px !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .section-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        .section-title {
+            font-size: 18px !important;
+            font-weight: 600 !important;
+            color: #374151 !important;
+            margin-bottom: 0 !important;
+        }
+
+        .section-header {
+            border-bottom: 1px solid #f3f4f6 !important;
+            padding-bottom: 15px !important;
+            margin-bottom: 20px !important;
+        }
+
+        .main-content {
+            background-color: #ffffff;
+            border-radius: 10px;
+        }
+    </style>
+@endpush
+
 @section('content')
     <div class="companies-section my-4">
         <div class="container-fluid">
@@ -12,65 +49,76 @@
                         id="biological-response-intake-form">
                         @csrf
 
-                        <div class="sales-dashboard">
+                        <div class="main-content">
 
                             {{-- HEADER --}}
-                            <div class="dashboard-header section-card d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h1 class="display-6 mb-2 fw-bold">Biological Response Intake</h1>
-                                    <p class="text-muted">Capture project and insurance details</p>
+                            <div class="heading-area-sec border-bottom-0 pb-0">
+                                <div class="left-part-sec">
+                                    <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">
+                                        BIOLOGICAL RESPONSE INTAKE <span style="font-size: 24px;">🧬</span>
+                                    </h3>
+                                    <p class="text-muted mb-2" style="font-size: 16px;">
+                                        Capture project and insurance details
+                                    </p>
                                 </div>
-
-                                <button type="submit" class="btn btn-success">
-                                    Save Intake
-                                </button>
+                                <div class="right-part-sec">
+                                    <button type="submit" class="btn btn-export fw-semibold">
+                                        Save Intake
+                                    </button>
+                                </div>
                             </div>
 
-                            {{-- BASIC INFORMATION --}}
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="section-card">
+                            <div class="my-4"></div>
+
+                            <div class="dashboard-body px-4 pb-4">
+
+                                {{-- BASIC INFORMATION --}}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
                                         <div class="section-header">
                                             <h3 class="section-title">Basic Information</h3>
                                         </div>
 
-                                        <table class="table table-bordered align-middle">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Project Name</th>
-                                                    <td><input type="text" name="project_name" class="form-control"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Project Address</th>
-                                                    <td><input type="text" name="project_address" class="form-control">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>City</th>
-                                                    <td><input type="text" name="project_city" class="form-control"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>State</th>
-                                                    <td><input type="text" name="project_state" class="form-control">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Zip</th>
-                                                    <td><input type="text" name="project_zip" class="form-control"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Project Leader</th>
-                                                    <td><input type="text" name="project_leader" class="form-control">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Comments</th>
-                                                    <td>
-                                                        <textarea name="comments" class="form-control" rows="3"></textarea>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered align-middle">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Project Name</th>
+                                                        <td><input type="text" name="project_name" class="form-control"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Project Address</th>
+                                                        <td><input type="text" name="project_address" class="form-control">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>City</th>
+                                                        <td><input type="text" name="project_city" class="form-control"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>State</th>
+                                                        <td><input type="text" name="project_state" class="form-control">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Zip</th>
+                                                        <td><input type="text" name="project_zip" class="form-control"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Project Leader</th>
+                                                        <td><input type="text" name="project_leader" class="form-control">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Comments</th>
+                                                        <td>
+                                                            <textarea name="comments" class="form-control" rows="3"></textarea>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -83,66 +131,68 @@
                                             <h3 class="section-title">Frontend Management Information</h3>
                                         </div>
 
-                                        <table class="table table-bordered align-middle">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Facility Type</th>
-                                                    <td>
-                                                        <select name="facility_type" class="form-select">
-                                                            <option value="">Select One</option>
-                                                            <option value="Residential">Residential</option>
-                                                            <option value="Institutional">Institutional</option>
-                                                            <option value="Municipal">Municipal</option>
-                                                            <option value="Health">Health</option>
-                                                            <option value="Commercial">Commercial</option>
-                                                            <option value="Industrial">Industrial</option>
-                                                        </select>
-                                                    </td>
-
-                                                </tr>
-                                                <tr>
-                                                    <th>Casualties / Illnesses</th>
-                                                    <td>
-                                                        <select name="casualties_or_illnesses" class="form-select">
-                                                            <option value="">Select One</option>
-                                                            <option value="Death">Death</option>
-                                                            <option value="Illness">Illness</option>
-                                                            <option value="None">None</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Estimated Man Hours</th>
-                                                    <td><input type="number" name="estimated_man_hours"
-                                                            class="form-control"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Estimated People</th>
-                                                    <td><input type="number" name="estimated_people" class="form-control">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Type of Loss</th>
-                                                    <td>
-                                                        <select name="type_of_loss" class="form-select">
-                                                            <option value="">Select One</option>
-                                                            <option value="Drug">Drug</option>
-                                                            <option value="Trauma">Trauma</option>
-                                                            <option value="Zoonotic">Zoonotic</option>
-                                                            <option value="Infectious Disease">Infectious Disease</option>
-                                                            <option value="Food Borne">Food Borne</option>
-                                                            <option value="Terrorism">Terrorism</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Areas to be treated</th>
-                                                    <td><input type="text" name="treated_areas" class="form-control"
-                                                            placeholder="Type a area and press Enter">
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered align-middle">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Facility Type</th>
+                                                        <td>
+                                                            <select name="facility_type" class="form-select">
+                                                                <option value="">Select One</option>
+                                                                <option value="Residential">Residential</option>
+                                                                <option value="Institutional">Institutional</option>
+                                                                <option value="Municipal">Municipal</option>
+                                                                <option value="Health">Health</option>
+                                                                <option value="Commercial">Commercial</option>
+                                                                <option value="Industrial">Industrial</option>
+                                                            </select>
+                                                        </td>
+    
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Casualties / Illnesses</th>
+                                                        <td>
+                                                            <select name="casualties_or_illnesses" class="form-select">
+                                                                <option value="">Select One</option>
+                                                                <option value="Death">Death</option>
+                                                                <option value="Illness">Illness</option>
+                                                                <option value="None">None</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Estimated Man Hours</th>
+                                                        <td><input type="number" name="estimated_man_hours"
+                                                                class="form-control"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Estimated People</th>
+                                                        <td><input type="number" name="estimated_people" class="form-control">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Type of Loss</th>
+                                                        <td>
+                                                            <select name="type_of_loss" class="form-select">
+                                                                <option value="">Select One</option>
+                                                                <option value="Drug">Drug</option>
+                                                                <option value="Trauma">Trauma</option>
+                                                                <option value="Zoonotic">Zoonotic</option>
+                                                                <option value="Infectious Disease">Infectious Disease</option>
+                                                                <option value="Food Borne">Food Borne</option>
+                                                                <option value="Terrorism">Terrorism</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Areas to be treated</th>
+                                                        <td><input type="text" name="treated_areas" class="form-control"
+                                                                placeholder="Type a area and press Enter">
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -155,70 +205,72 @@
                                             <h3 class="section-title">Insurance Information</h3>
                                         </div>
 
-                                        <table class="table table-bordered align-middle">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Insurance Notified</th>
-                                                    <td>
-                                                        <select name="insurance_notified" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0">No</option>
-                                                            <option value="1">Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Insurance Company</th>
-                                                    <td><input type="text" name="insurance_company_name"
-                                                            class="form-control"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Insurance Phone</th>
-                                                    <td><input type="text" name="insurance_phone" class="form-control">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Coverage Determination</th>
-                                                    <td>
-                                                        <select name="coverage_determination" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0">No</option>
-                                                            <option value="1">Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Coverage Amount</th>
-                                                    <td><input type="number" step="0.01" name="coverage_amount"
-                                                            class="form-control"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Deductible</th>
-                                                    <td><input type="number" step="0.01" name="deductible"
-                                                            class="form-control"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Claim Number</th>
-                                                    <td><input type="text" name="claim_number" class="form-control">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Adjuster Phone</th>
-                                                    <td><input type="text" name="adjuster_phone" class="form-control">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Insurance Email</th>
-                                                    <td><input type="email" name="insurance_email"
-                                                            class="form-control"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Limit / Cap</th>
-                                                    <td><input type="number" step="0.01" name="limit_or_cap"
-                                                            class="form-control"></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered align-middle">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Insurance Notified</th>
+                                                        <td>
+                                                            <select name="insurance_notified" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0">No</option>
+                                                                <option value="1">Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Insurance Company</th>
+                                                        <td><input type="text" name="insurance_company_name"
+                                                                class="form-control"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Insurance Phone</th>
+                                                        <td><input type="text" name="insurance_phone" class="form-control">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Coverage Determination</th>
+                                                        <td>
+                                                            <select name="coverage_determination" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0">No</option>
+                                                                <option value="1">Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Coverage Amount</th>
+                                                        <td><input type="number" step="0.01" name="coverage_amount"
+                                                                class="form-control"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Deductible</th>
+                                                        <td><input type="number" step="0.01" name="deductible"
+                                                                class="form-control"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Claim Number</th>
+                                                        <td><input type="text" name="claim_number" class="form-control">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Adjuster Phone</th>
+                                                        <td><input type="text" name="adjuster_phone" class="form-control">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Insurance Email</th>
+                                                        <td><input type="email" name="insurance_email"
+                                                                class="form-control"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Limit / Cap</th>
+                                                        <td><input type="number" step="0.01" name="limit_or_cap"
+                                                                class="form-control"></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -232,57 +284,59 @@
                                             <h3 class="section-title">Death Information</h3>
                                         </div>
 
-                                        <table class="table table-bordered align-middle">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Cause of Death</th>
-                                                    <td><input type="text" name="cause_of_death" class="form-control">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>How Many</th>
-                                                    <td><input type="number" name="number_of_deaths"
-                                                            class="form-control">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Bodies Unattended</th>
-                                                    <td>
-                                                        <select name="body_unattended" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0">No</option>
-                                                            <option value="1">Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Unattended Days</th>
-                                                    <td><input type="number" name="unattended_days"
-                                                            class="form-control">
-                                                </tr>
-                                                <tr>
-                                                    <th>More than 2 rooms</th>
-                                                    <td>
-                                                        <select name="death_more_than_2_rooms" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0">No</option>
-                                                            <option value="1">Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>High consequence infectious disease</th>
-                                                    <td>
-                                                        <select name="death_high_consequence_infectious_disease"
-                                                            class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0">No</option>
-                                                            <option value="1">Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered align-middle">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Cause of Death</th>
+                                                        <td><input type="text" name="cause_of_death" class="form-control">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>How Many</th>
+                                                        <td><input type="number" name="number_of_deaths"
+                                                                class="form-control">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Bodies Unattended</th>
+                                                        <td>
+                                                            <select name="body_unattended" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0">No</option>
+                                                                <option value="1">Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Unattended Days</th>
+                                                        <td><input type="number" name="unattended_days"
+                                                                class="form-control">
+                                                    </tr>
+                                                    <tr>
+                                                        <th>More than 2 rooms</th>
+                                                        <td>
+                                                            <select name="death_more_than_2_rooms" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0">No</option>
+                                                                <option value="1">Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>High consequence infectious disease</th>
+                                                        <td>
+                                                            <select name="death_high_consequence_infectious_disease"
+                                                                class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0">No</option>
+                                                                <option value="1">Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -295,59 +349,61 @@
                                             <h3 class="section-title">Illness Information</h3>
                                         </div>
 
-                                        <table class="table table-bordered align-middle">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Has person travelled outside the <br> country within past 3 weeks ?
-                                                    </th>
-                                                    <td>
-                                                        <select name="person_travelled_outside" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0">No</option>
-                                                            <option value="1">Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Is there a diagnosis ?</th>
-                                                    <td>
-                                                        <select name="diagnosis" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0">No</option>
-                                                            <option value="1">Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>How many diagnosis ?</th>
-                                                    <td>
-                                                        <input type="number" name="number_of_diagnosis"
-                                                            class="form-control">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>More than 2 rooms ?</th>
-                                                    <td>
-                                                        <select name="illness_more_than_2_rooms" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0">No</option>
-                                                            <option value="1">Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>High consequence infectious disease</th>
-                                                    <td>
-                                                        <select name="illness_high_consequence_infectious_disease"
-                                                            class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0">No</option>
-                                                            <option value="1">Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered align-middle">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Has person travelled outside the <br> country within past 3 weeks ?
+                                                        </th>
+                                                        <td>
+                                                            <select name="person_travelled_outside" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0">No</option>
+                                                                <option value="1">Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Is there a diagnosis ?</th>
+                                                        <td>
+                                                            <select name="diagnosis" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0">No</option>
+                                                                <option value="1">Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>How many diagnosis ?</th>
+                                                        <td>
+                                                            <input type="number" name="number_of_diagnosis"
+                                                                class="form-control">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>More than 2 rooms ?</th>
+                                                        <td>
+                                                            <select name="illness_more_than_2_rooms" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0">No</option>
+                                                                <option value="1">Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>High consequence infectious disease</th>
+                                                        <td>
+                                                            <select name="illness_high_consequence_infectious_disease"
+                                                                class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0">No</option>
+                                                                <option value="1">Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -360,46 +416,48 @@
                                             <h3 class="section-title">Additional Information</h3>
                                         </div>
 
-                                        <table class="table table-bordered align-middle">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Police Cleared the scene ?</th>
-                                                    <td>
-                                                        <select name="police_cleanup" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0">No</option>
-                                                            <option value="1">Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Phone Number</th>
-                                                    <td>
-                                                        <input type="text" name="police_number" class="form-control">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Overdose ?</th>
-                                                    <td>
-                                                        <select name="overdose" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0">No</option>
-                                                            <option value="1">Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Gunshot Wound ?</th>
-                                                    <td>
-                                                        <select name="gunshot" class="form-control">
-                                                            <option value="">Select One</option>
-                                                            <option value="0">No</option>
-                                                            <option value="1">Yes</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered align-middle">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Police Cleared the scene ?</th>
+                                                        <td>
+                                                            <select name="police_cleanup" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0">No</option>
+                                                                <option value="1">Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Phone Number</th>
+                                                        <td>
+                                                            <input type="text" name="police_number" class="form-control">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Overdose ?</th>
+                                                        <td>
+                                                            <select name="overdose" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0">No</option>
+                                                                <option value="1">Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Gunshot Wound ?</th>
+                                                        <td>
+                                                            <select name="gunshot" class="form-control">
+                                                                <option value="">Select One</option>
+                                                                <option value="0">No</option>
+                                                                <option value="1">Yes</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -412,29 +470,32 @@
                                             <h3 class="section-title">Additional Contact Information</h3>
                                         </div>
 
-                                        <table class="table table-bordered align-middle">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Contact Name</th>
-                                                    <td><input type="text" name="contact_name" class="form-control">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Contact Title</th>
-                                                    <td><input type="text" name="contact_title" class="form-control">
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Contact Phone</th>
-                                                    <td><input type="text" name="contact_phone" class="form-control">
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered align-middle">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Contact Name</th>
+                                                        <td><input type="text" name="contact_name" class="form-control">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Contact Title</th>
+                                                        <td><input type="text" name="contact_title" class="form-control">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Contact Phone</th>
+                                                        <td><input type="text" name="contact_phone" class="form-control">
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
+                            </div>
                         </div>
                     </form>
 

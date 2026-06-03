@@ -2,6 +2,43 @@
 
 @section('title', 'Water Management')
 
+@push('styles')
+    <style>
+        /* Section Card Refinement */
+        .section-card {
+            background: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 16px !important;
+            padding: 25px !important;
+            margin-bottom: 25px !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .section-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        .section-title {
+            font-size: 18px !important;
+            font-weight: 600 !important;
+            color: #374151 !important;
+            margin-bottom: 0 !important;
+        }
+
+        .section-header {
+            border-bottom: 1px solid #f3f4f6 !important;
+            padding-bottom: 15px !important;
+            margin-bottom: 20px !important;
+        }
+
+        .main-content {
+            background-color: #ffffff;
+            border-radius: 10px;
+        }
+    </style>
+@endpush
+
 @section('content')
     <div class="companies-section my-4">
         <div class="container-fluid">
@@ -12,108 +49,109 @@
                         id="water-management-form">
                         @csrf
 
-                        <div class="sales-dashboard">
+                        <div class="main-content">
 
                             {{-- HEADER --}}
-                            <div class="dashboard-header section-card d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h1 class="display-6 mb-2 fw-bold">Water Management</h1>
-                                    <p class="text-muted">Create Water Management Phase</p>
+                            <div class="heading-area-sec border-bottom-0 pb-0">
+                                <div class="left-part-sec">
+                                    <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">
+                                        WATER MANAGEMENT <span style="font-size: 24px;">💧</span>
+                                    </h3>
+                                    <p class="text-muted mb-2" style="font-size: 16px;">
+                                        Create Water Management Phase
+                                    </p>
                                 </div>
-                                <button type="submit" class="btn btn-success">Save Survey</button>
-                            </div>
-
-                            {{-- BASIC DETAILS --}}
-                            <div class="section-card">
-                                <div class="section-header">
-                                    <h3 class="section-title">Basic Details</h3>
-                                </div>
-
-                                <table class="table table-bordered align-middle">
-                                    <tbody>
-                                        <tr>
-                                            <th>Survey Name</th>
-                                            <td>
-                                                <input type="text" name="survey_name" class="form-control">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>Municipal Water Supplier</th>
-                                            <td>
-                                                <input type="text" name="municipal_water_supplier" class="form-control">
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            {{-- WMP TEAM --}}
-                            {{-- <div class="section-card">
-                            <div class="section-header">
-                                <h3 class="section-title">WMP Team & Role</h3>
-                            </div>
-
-                            <table class="table table-bordered align-middle">
-                                <tbody>
-                                    <tr>
-                                        <th>Name</th>
-                                        <td><input type="text" name="wmp_team_name" class="form-control"></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Role</th>
-                                        <td><input type="text" name="wmp_team_role" class="form-control"></td>
-                                    </tr>
-                                    <tr>
-                                        <th>Email</th>
-                                        <td><input type="email" name="wmp_team_email" class="form-control"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div> --}}
-                            {{-- WMP TEAM --}}
-                            <div class="section-card">
-                                <div class="section-header d-flex justify-content-between align-items-center">
-                                    <h3 class="section-title mb-0">WMP Team & Role</h3>
-                                    <button type="button" class="btn btn-sm btn-primary" id="add-wmp-team">
-                                        + Add
+                                <div class="right-part-sec">
+                                    <button type="submit" class="btn btn-export fw-semibold">
+                                        Save Survey
                                     </button>
                                 </div>
-
-                                <div id="wmp-team-wrapper">
-
-                                    {{-- TEAM BLOCK --}}
-                                    <table class="table table-bordered align-middle wmp-team-block">
-                                        <tbody>
-                                            <tr>
-                                                <th colspan="2" class="text-end">
-                                                    <button type="button" class="btn btn-sm btn-danger remove-wmp-team">
-                                                        ✕
-                                                    </button>
-                                                </th>
-                                            </tr>
-                                            <tr>
-                                                <th>Name</th>
-                                                <td>
-                                                    <input type="text" name="wmp_team_name[]" class="form-control">
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Role</th>
-                                                <td>
-                                                    <input type="text" name="wmp_team_role[]" class="form-control">
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>Email</th>
-                                                <td>
-                                                    <input type="email" name="wmp_team_email[]" class="form-control">
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-
-                                </div>
                             </div>
+
+                            <div class="my-4"></div>
+
+                            <div class="dashboard-body px-4 pb-4">
+
+                                {{-- BASIC DETAILS --}}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+                                            <div class="section-header">
+                                                <h3 class="section-title">Basic Details</h3>
+                                            </div>
+
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered align-middle">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>Survey Name</th>
+                                                            <td>
+                                                                <input type="text" name="survey_name" class="form-control">
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Municipal Water Supplier</th>
+                                                            <td>
+                                                                <input type="text" name="municipal_water_supplier" class="form-control">
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- WMP TEAM --}}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+                                            <div class="section-header d-flex justify-content-between align-items-center">
+                                                <h3 class="section-title mb-0">WMP Team & Role</h3>
+                                                <button type="button" class="btn btn-sm btn-export fw-semibold" id="add-wmp-team">
+                                                    + Add
+                                                </button>
+                                            </div>
+
+                                            <div id="wmp-team-wrapper">
+
+                                                {{-- TEAM BLOCK --}}
+                                                <div class="table-responsive wmp-team-block mb-3">
+                                                    <table class="table table-bordered align-middle">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th colspan="2" class="text-end">
+                                                                    <button type="button" class="btn btn-sm btn-danger remove-wmp-team">
+                                                                        ✕
+                                                                    </button>
+                                                                </th>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Name</th>
+                                                                <td>
+                                                                    <input type="text" name="wmp_team_name[]" class="form-control">
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Role</th>
+                                                                <td>
+                                                                    <input type="text" name="wmp_team_role[]" class="form-control">
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Email</th>
+                                                                <td>
+                                                                    <input type="email" name="wmp_team_email[]" class="form-control">
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
 
                             {{-- FACILITY RISK FACTORS --}}
@@ -122,120 +160,122 @@
                                     <h3 class="section-title">Facility Risk Factors</h3>
                                 </div>
 
-                                <table class="table table-bordered align-middle">
-                                    <tbody>
-                                        <tr>
-                                            <th>Healthcare Facility</th>
-                                            <td>
-                                                <select name="is_healthcare_facility" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1">Yes</option>
-                                                    <option value="0">No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered align-middle">
+                                        <tbody>
+                                            <tr>
+                                                <th>Healthcare Facility</th>
+                                                <td>
+                                                    <select name="is_healthcare_facility" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1">Yes</option>
+                                                        <option value="0">No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <th>Houses Elderly Patients</th>
-                                            <td>
-                                                <select name="houses_elderly_patients" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1">Yes</option>
-                                                    <option value="0">No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <th>Houses Elderly Patients</th>
+                                                <td>
+                                                    <select name="houses_elderly_patients" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1">Yes</option>
+                                                        <option value="0">No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <th>Multiple Housing Units</th>
-                                            <td>
-                                                <select name="has_multiple_housing_units" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1">Yes</option>
-                                                    <option value="0">No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <th>Multiple Housing Units</th>
+                                                <td>
+                                                    <select name="has_multiple_housing_units" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1">Yes</option>
+                                                        <option value="0">No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <th>More Than Two Floors</th>
-                                            <td>
-                                                <select name="has_more_than_two_floors" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1">Yes</option>
-                                                    <option value="0">No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <th>More Than Two Floors</th>
+                                                <td>
+                                                    <select name="has_more_than_two_floors" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1">Yes</option>
+                                                        <option value="0">No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <th>Cooling Tower</th>
-                                            <td>
-                                                <select name="has_cooling_tower" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1">Yes</option>
-                                                    <option value="0">No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <th>Cooling Tower</th>
+                                                <td>
+                                                    <select name="has_cooling_tower" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1">Yes</option>
+                                                        <option value="0">No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <th>Hot Tub or Spa</th>
-                                            <td>
-                                                <select name="has_hot_tub_or_spa" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1">Yes</option>
-                                                    <option value="0">No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <th>Hot Tub or Spa</th>
+                                                <td>
+                                                    <select name="has_hot_tub_or_spa" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1">Yes</option>
+                                                        <option value="0">No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <th>Indoor Fountain</th>
-                                            <td>
-                                                <select name="has_indoor_fountain" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1">Yes</option>
-                                                    <option value="0">No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <th>Indoor Fountain</th>
+                                                <td>
+                                                    <select name="has_indoor_fountain" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1">Yes</option>
+                                                        <option value="0">No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <th>Central Mister / Humidifier</th>
-                                            <td>
-                                                <select name="has_central_mister_or_humidifier" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1">Yes</option>
-                                                    <option value="0">No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <th>Central Mister / Humidifier</th>
+                                                <td>
+                                                    <select name="has_central_mister_or_humidifier" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1">Yes</option>
+                                                        <option value="0">No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <th>Organ Transplant Conducted</th>
-                                            <td>
-                                                <select name="conducts_organ_transplant" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1">Yes</option>
-                                                    <option value="0">No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <th>Organ Transplant Conducted</th>
+                                                <td>
+                                                    <select name="conducts_organ_transplant" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1">Yes</option>
+                                                        <option value="0">No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <th>History of Legionella</th>
-                                            <td>
-                                                <select name="history_of_legionella" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1">Yes</option>
-                                                    <option value="0">No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
-                                    </tbody>
+                                            <tr>
+                                                <th>History of Legionella</th>
+                                                <td>
+                                                    <select name="history_of_legionella" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1">Yes</option>
+                                                        <option value="0">No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </tbody>
 
-                                </table>
+                                    </table>
+                                </div>
                             </div>
 
                             {{-- MONITORING --}}

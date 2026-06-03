@@ -2,6 +2,98 @@
 
 @section('title', 'People Details')
 
+@push('styles')
+<style>
+/* Responsive Activity/Note Log Form Styling */
+.activity-form {
+    background-color: #fdfdfd !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    padding: 24px !important;
+}
+
+.activity-form textarea.form-textarea {
+    border: 1px solid #d1d5db !important;
+    border-radius: 8px !important;
+    padding: 14px !important;
+    font-size: 14px !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+    background-color: #ffffff !important;
+}
+
+.activity-form textarea.form-textarea:focus {
+    border-color: #ffb81c !important;
+    box-shadow: 0 0 0 3px rgba(255, 184, 28, 0.15) !important;
+    outline: none !important;
+}
+
+.activity-form .form-label {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    color: #4b5563 !important;
+    margin-bottom: 6px !important;
+    text-transform: uppercase !important;
+    display: block !important;
+}
+
+.activity-form .form-select-custom,
+.activity-form .activity-date,
+.activity-form input[type="text"] {
+    width: 100% !important;
+    height: 42px !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    padding: 8px 14px !important;
+    font-size: 14px !important;
+    background-color: #ffffff !important;
+    color: #374151 !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+
+.activity-form .form-select-custom:focus,
+.activity-form .activity-date:focus,
+.activity-form input[type="text"]:focus {
+    border-color: #ffb81c !important;
+    box-shadow: 0 0 0 3px rgba(255, 184, 28, 0.15) !important;
+    outline: none !important;
+}
+
+.activity-form .btn-login {
+    background-color: #28a745 !important;
+    border: none !important;
+    color: white !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    padding: 12px 24px !important;
+    border-radius: 6px !important;
+    transition: background-color 0.2s, transform 0.1s !important;
+    cursor: pointer !important;
+    display: inline-block !important;
+    width: auto !important;
+}
+
+.activity-form .btn-login:hover {
+    background-color: #218838 !important;
+}
+
+/* Specific styling for select2 or custom participant selects inside activity form */
+.activity-form select[multiple].form-select-custom,
+.activity-form .select2-container {
+    width: 100% !important;
+}
+
+.activity-form .select2-container--default .select2-selection--multiple {
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    min-height: 42px !important;
+    padding: 4px 8px !important;
+}
+</style>
+@endpush
+
 @section('content')
 
     <!-- company details start -->
@@ -547,12 +639,11 @@
                                                 value="">
                                             <input type="hidden" name="note_value" id="note_value" value="">
 
-
-                                            <div class="form-row">
-                                                <div class="activity-form-group mt-2">
+                                             <div class="row g-3 mb-3">
+                                                <div class="col-md-6 col-12">
                                                     <label class="form-label">PARTICIPANTS</label>
                                                     <select id="activity_participant_select" name="participant_id[]"
-                                                        class="form-select-custom" multiple>
+                                                        class="form-select-custom form-select" multiple>
                                                         {{-- Companies --}}
                                                         <optgroup label="Companies">
                                                             @foreach ($companies as $company)
@@ -585,19 +676,19 @@
                                                     </select>
                                                 </div>
 
-                                                <div class="activity-form-group mt-2">
+                                                <div class="col-md-6 col-12">
                                                     <label class="form-label">DESCRIPTION</label>
-                                                    <input type="text" style="width: 380px;"
+                                                    <input type="text"
                                                         placeholder="Add an agenda to share with your attendees..."
-                                                        class="form-select-custom" name="description" />
+                                                        class="form-select-custom form-control" name="description" />
                                                 </div>
 
                                             </div>
 
-                                            <div class="form-row">
-                                                <div class="activity-form-group mt-2">
+                                            <div class="row g-3">
+                                                <div class="col-md-3 col-sm-6 col-12">
                                                     <label class="form-label">ACTIVITY</label>
-                                                    <select class="form-select-custom" name="activity_type">
+                                                    <select class="form-select-custom form-select" name="activity_type">
                                                         <option value="">-- Select --</option>
                                                         @foreach ($activity_types as $activity_type)
                                                             <option value="{{ $activity_type->id }}">
@@ -606,12 +697,12 @@
                                                     </select>
                                                 </div>
 
-                                                <div class="activity-form-group mt-2">
+                                                <div class="col-md-3 col-sm-6 col-12">
                                                     <label class="form-label">DURATION</label>
                                                     <input type="hidden" name="start_time" id="start_time">
                                                     <input type="hidden" name="end_time" id="end_time">
 
-                                                    <select class="form-select-custom" name="duration" id="duration">
+                                                    <select class="form-select-custom form-select" name="duration" id="duration">
                                                         <option value="">-- Select --</option>
                                                         <option value="15">15 Min</option>
                                                         <option value="30">30 Min</option>
@@ -620,16 +711,16 @@
                                                     </select>
                                                 </div>
 
-                                                <div class="activity-form-group mt-2">
+                                                <div class="col-md-3 col-sm-6 col-12">
                                                     <label class="form-label">DATE</label>
                                                     <input type="date" name="date" id="date"
-                                                        class="activity-date">
+                                                        class="activity-date form-control">
                                                 </div>
 
-                                                <div class="activity-form-group mt-2">
+                                                <div class="col-md-3 col-sm-6 col-12">
                                                     <label class="form-label">LOCATION</label>
                                                     <input type="text" placeholder="Add a Location"
-                                                        class="form-select-custom" name="location" />
+                                                        class="form-select-custom form-control" name="location" />
                                                 </div>
 
                                             </div>
@@ -664,7 +755,7 @@
                                             <!-- Hidden field to store processed note content -->
                                             <input type="hidden" name="note_value" id="note_value" value="">
 
-                                            <div class="form-row mt-4">
+                                            <div class="mt-4">
                                                 <button type="submit" class="btn-login">SAVE NOTE</button>
                                             </div>
                                         </form>
