@@ -176,6 +176,7 @@ class SaleController extends Controller
             ->groupBy(fn ($s) => $s->lead->company->id ?? 0)
             ->map(fn ($group) => [
                 'company'     => optional($group->first()->lead->company)->name ?? 'N/A',
+                'company_obj' => $group->first()->lead?->company,
                 'services'    => $group,
                 'total_value' => $group->sum('total_price'),
             ])
@@ -192,6 +193,7 @@ class SaleController extends Controller
             ->groupBy(fn ($s) => $s->lead->company->id ?? 0)
             ->map(fn ($group) => [
                 'company'     => optional($group->first()->lead->company)->name ?? 'N/A',
+                'company_obj' => $group->first()->lead?->company,
                 'count'       => $group->count(),
                 'total_value' => $group->sum('total_price'),
                 'assignee'    => optional($group->first()->lead->assignee)->name ?? 'Unassigned',

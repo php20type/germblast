@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Lead;
 use App\Models\Service;
 use App\Models\ServiceOrder;
+use App\Models\ServiceOrderInvoice;
 use App\Models\ServiceOrderSlot;
 use App\Models\ServiceOutline;
 use App\Models\ServiceNote;
@@ -32,13 +33,7 @@ class ServiceController extends Controller
         $this->orderService = $orderService;
         $this->notify = $notify;
 
-        if (!\Illuminate\Support\Facades\Schema::hasTable('service_order_slot_equipments')) {
-            \Illuminate\Support\Facades\Schema::create('service_order_slot_equipments', function ($table) {
-                $table->unsignedBigInteger('service_order_slot_id')->index();
-                $table->unsignedBigInteger('equipment_id')->index();
-                $table->timestamps();
-            });
-        }
+
     }
 
     public function getServiceDetails(Request $request, $leadId)
@@ -293,11 +288,10 @@ class ServiceController extends Controller
     public function fulfillOrder(Request $request, $orderId)
     {
         $order = ServiceOrder::with([
-            // 'orderSlots.clocks.clockedBy',
-            // 'orderSlots.confirmedBy',
-            // 'orderSlots.facilities.companyLocation',
-            // 'orderSlots.office',
-            // 'orderSlots.staff.user',
+            'invoice',
+            'invoices.creator',
+            'invoices.updater',
+            'invoices.sender',
             'orderSlots.clocks.clockedBy',
             'orderSlots.confirmedBy',
             'orderSlots.facilities.companyLocation',
@@ -350,6 +344,7 @@ class ServiceController extends Controller
     public function service_dashboard(Request $request, $orderId)
     {
         $order = ServiceOrder::with([
+            'invoice',
             'orderSlots.clocks.clockedBy',
             'orderSlots.confirmedBy',
             'orderSlots.facilities.companyLocation',
@@ -1443,6 +1438,270 @@ class ServiceController extends Controller
         }
 
         return redirect()->back()->with('success', 'Slot status updated to ' . ucfirst($newStatus) . ' successfully.');
+    }
+
+    public function saveInvoice(Request $request, $orderId, $invoiceId = null)
+    {
+        $order = ServiceOrder::findOrFail($orderId);
+
+        $request->validate([
+            'invoice_no' => 'required|string',
+            'invoice_type' => 'required|string|in:Deposit,Progress,Final,Adjustment',
+            'invoice_date' => 'required|date',
+            'due_date' => 'required|date',
+            'notes' => 'nullable|string',
+            'items' => 'required|array',
+            'items.*.type' => 'required|string',
+            'items.*.qty' => 'required|integer|min:1',
+            'items.*.price' => 'required|numeric|min:0',
+        ]);
+
+        $totalAmount = 0;
+        $items = [];
+        foreach ($request->items as $item) {
+            $subtotal = round($item['qty'] * $item['price'], 2);
+            $totalAmount += $subtotal;
+            $items[] = [
+                'type' => $item['type'],
+                'qty' => (int) $item['qty'],
+                'price' => (float) $item['price'],
+                'total' => $subtotal,
+            ];
+        }
+
+        if ($invoiceId) {
+            $invoice = ServiceOrderInvoice::findOrFail($invoiceId);
+            if (in_array($invoice->status, ['Paid', 'Cancelled'])) {
+                return redirect()->back()->with('error', 'Cannot modify Paid or Cancelled invoices.');
+            }
+            $invoice->update([
+                'invoice_no' => $request->invoice_no,
+                'invoice_type' => $request->invoice_type,
+                'invoice_date' => $request->invoice_date,
+                'due_date' => $request->due_date,
+                'notes' => $request->notes,
+                'line_items' => $items,
+                'total_amount' => $totalAmount,
+                'updated_by' => auth()->id(),
+            ]);
+        } else {
+            ServiceOrderInvoice::create([
+                'service_order_id' => $order->id,
+                'invoice_no' => $request->invoice_no,
+                'invoice_type' => $request->invoice_type,
+                'invoice_date' => $request->invoice_date,
+                'due_date' => $request->due_date,
+                'status' => 'Draft',
+                'notes' => $request->notes,
+                'line_items' => $items,
+                'total_amount' => $totalAmount,
+                'created_by' => auth()->id(),
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Invoice details updated successfully.');
+    }
+
+    public function shareInvoice(Request $request, $invoiceId)
+    {
+        $invoice = ServiceOrderInvoice::findOrFail($invoiceId);
+        $order = ServiceOrder::with('service.lead.company.companyEmail', 'service.lead.company.locations')->findOrFail($invoice->service_order_id);
+
+        $recipientEmail = $request->input('recipient_email') ?: ($order->service->lead->company->companyEmail->email ?? $order->service->lead->email ?? null);
+        if (!$recipientEmail) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Customer does not have a valid email address.']);
+            }
+            return redirect()->back()->with('error', 'Customer does not have a valid email address.');
+        }
+
+        if ($invoice->status === 'Cancelled') {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Cannot share cancelled invoices.']);
+            }
+            return redirect()->back()->with('error', 'Cannot share cancelled invoices.');
+        }
+
+        $invoiceDetails = [
+            'invoice_no' => $invoice->invoice_no,
+            'invoice_type' => $invoice->invoice_type,
+            'invoice_date' => $invoice->invoice_date ? ($invoice->invoice_date instanceof \Carbon\Carbon ? $invoice->invoice_date->format('Y-m-d') : $invoice->invoice_date) : date('Y-m-d'),
+            'due_date' => $invoice->due_date ? ($invoice->due_date instanceof \Carbon\Carbon ? $invoice->due_date->format('Y-m-d') : $invoice->due_date) : date('Y-m-d'),
+            'status' => $invoice->status,
+            'notes' => $invoice->notes,
+            'items' => $invoice->line_items,
+            'total_amount' => $invoice->total_amount,
+        ];
+        $invoiceDetails['company_name'] = $order->service->lead->company->name ?? 'N/A';
+        $invoiceDetails['email_message'] = $request->email_message ?? 'Please find details of your invoice below.';
+
+        // Generate PDF
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.invoice', compact('order', 'invoiceDetails'));
+        $pdfContent = base64_encode($pdf->output());
+
+        $attachment = [
+            'base64_data' => $pdfContent,
+            'name' => 'invoice-' . ($invoice->invoice_no ?? $order->id) . '.pdf',
+            'mime' => 'application/pdf',
+        ];
+
+        // Dispatch SendEmailJob using NotificationService
+        $this->notify->shareInvoice($recipientEmail, $order, $invoiceDetails, $attachment);
+
+        // Update status and sent info
+        $invoice->update([
+            'status' => 'Sent',
+            'sent_by' => auth()->id(),
+            'sent_date' => now(),
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Invoice shared with customer successfully.'
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Invoice shared with customer successfully.');
+    }
+
+    public function downloadInvoicePdf($invoiceId)
+    {
+        $invoice = ServiceOrderInvoice::findOrFail($invoiceId);
+        $order = ServiceOrder::with('service.lead.company')->findOrFail($invoice->service_order_id);
+
+        $invoiceDetails = [
+            'invoice_no' => $invoice->invoice_no,
+            'invoice_type' => $invoice->invoice_type,
+            'invoice_date' => $invoice->invoice_date ? ($invoice->invoice_date instanceof \Carbon\Carbon ? $invoice->invoice_date->format('Y-m-d') : $invoice->invoice_date) : date('Y-m-d'),
+            'due_date' => $invoice->due_date ? ($invoice->due_date instanceof \Carbon\Carbon ? $invoice->due_date->format('Y-m-d') : $invoice->due_date) : date('Y-m-d'),
+            'status' => $invoice->status,
+            'notes' => $invoice->notes,
+            'items' => $invoice->line_items,
+            'total_amount' => $invoice->total_amount,
+        ];
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.invoice', compact('order', 'invoiceDetails'));
+        return $pdf->download('invoice-' . ($invoice->invoice_no ?? $order->id) . '.pdf');
+    }
+
+    public function downloadInvoiceCsv($invoiceId)
+    {
+        $invoice = ServiceOrderInvoice::findOrFail($invoiceId);
+        $order = ServiceOrder::with('service.lead.company')->findOrFail($invoice->service_order_id);
+
+        $invoiceDetails = [
+            'invoice_no' => $invoice->invoice_no,
+            'invoice_type' => $invoice->invoice_type,
+            'invoice_date' => $invoice->invoice_date ? ($invoice->invoice_date instanceof \Carbon\Carbon ? $invoice->invoice_date->format('Y-m-d') : $invoice->invoice_date) : date('Y-m-d'),
+            'due_date' => $invoice->due_date ? ($invoice->due_date instanceof \Carbon\Carbon ? $invoice->due_date->format('Y-m-d') : $invoice->due_date) : date('Y-m-d'),
+            'status' => $invoice->status,
+            'notes' => $invoice->notes,
+            'items' => $invoice->line_items,
+            'total_amount' => $invoice->total_amount,
+        ];
+        $items = $invoiceDetails['items'] ?? [];
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="invoice-' . ($invoice->invoice_no ?? $order->id) . '.csv"',
+        ];
+
+        $callback = function () use ($order, $invoiceDetails, $items) {
+            $file = fopen('php://output', 'w');
+
+            // Metadata / Header info
+            fputcsv($file, ['Invoice Number', $invoiceDetails['invoice_no']]);
+            fputcsv($file, ['Invoice Type', $invoiceDetails['invoice_type'] ?? 'Final']);
+            fputcsv($file, ['Order Number', $order->order_no ?? 'N/A']);
+            fputcsv($file, ['Invoice Date', $invoiceDetails['invoice_date'] ?? '']);
+            fputcsv($file, ['Due Date', $invoiceDetails['due_date'] ?? '']);
+
+            fputcsv($file, ['Customer Name', $order->service->lead->company->name ?? 'N/A']);
+            fputcsv($file, []); // Empty row
+
+            // Line Items header
+            fputcsv($file, ['Item Description', 'Quantity', 'Price', 'Total']);
+
+            // Line Items data
+            foreach ($items as $item) {
+                fputcsv($file, [
+                    $item['type'] ?? '',
+                    $item['qty'] ?? 1,
+                    $item['price'] ?? 0.00,
+                    $item['total'] ?? 0.00,
+                ]);
+            }
+
+            fputcsv($file, []); // Empty row
+            fputcsv($file, ['', '', 'Amount Due', $invoiceDetails['total_amount'] ?? 0.00]);
+            
+            if (!empty($invoiceDetails['notes'])) {
+                fputcsv($file, []);
+                fputcsv($file, ['Notes', $invoiceDetails['notes']]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function markPaid(Request $request, $invoiceId)
+    {
+        $invoice = ServiceOrderInvoice::findOrFail($invoiceId);
+
+        if ($invoice->status === 'Cancelled') {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Cannot mark a cancelled invoice as Paid.']);
+            }
+            return redirect()->back()->with('error', 'Cannot mark a cancelled invoice as Paid.');
+        }
+
+        $invoice->update([
+            'status' => 'Paid',
+            'updated_by' => auth()->id()
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Invoice marked as Paid successfully.'
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Invoice marked as Paid successfully.');
+    }
+
+    public function cancelInvoice(Request $request, $invoiceId)
+    {
+        $invoice = ServiceOrderInvoice::findOrFail($invoiceId);
+
+        $request->validate([
+            'cancellation_reason' => 'required|string|max:1000'
+        ]);
+
+        if ($invoice->status === 'Paid') {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Cannot cancel a paid invoice.']);
+            }
+            return redirect()->back()->with('error', 'Cannot cancel a paid invoice.');
+        }
+
+        $invoice->update([
+            'status' => 'Cancelled',
+            'cancellation_reason' => $request->cancellation_reason,
+            'updated_by' => auth()->id()
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Invoice cancelled successfully.'
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Invoice cancelled successfully.');
     }
 }
 

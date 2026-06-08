@@ -43,6 +43,7 @@ class ActionEmail extends Mailable
                 'service_note_added' => 'New Service Note Added',
                 'day_of_service_staff' => 'Service Order Scheduled Today',
                 'day_of_service_sales_rep' => 'Service Scheduled Today',
+                'share_invoice' => 'Invoice Details for Your Service Order',
                 default => 'Lead Notification'
             }
         );
@@ -59,6 +60,15 @@ class ActionEmail extends Mailable
 
     public function attachments(): array
     {
+        if (isset($this->data['attachment'])) {
+            $att = $this->data['attachment'];
+            return [
+                \Illuminate\Mail\Mailables\Attachment::fromData(
+                    fn () => base64_decode($att['base64_data']),
+                    $att['name']
+                )->withMime($att['mime'])
+            ];
+        }
         return [];
     }
 }

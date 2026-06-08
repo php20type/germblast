@@ -549,4 +549,27 @@ class NotificationService
     //     }
     // }
 
+    public function shareInvoice($email, $order, $invoiceDetails, $attachment = null)
+    {
+        if ($this->sendEmail) {
+            $data = [
+                'order_no' => $order->order_no ?? 'N/A',
+                'invoice_no' => $invoiceDetails['invoice_no'],
+                'invoice_date' => $invoiceDetails['invoice_date'],
+                'due_date' => $invoiceDetails['due_date'],
+                'items' => $invoiceDetails['items'],
+                'total_amount' => $invoiceDetails['total_amount'],
+                'notes' => $invoiceDetails['notes'] ?? '',
+                'email_message' => $invoiceDetails['email_message'],
+                'company_name' => $invoiceDetails['company_name'],
+            ];
+
+            if ($attachment) {
+                $data['attachment'] = $attachment;
+            }
+
+            SendEmailJob::dispatch($email, 'share_invoice', $data);
+        }
+    }
+
 }

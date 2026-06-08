@@ -11,7 +11,6 @@ class ServiceOrder extends Model
         'user_id',
         'service_id',
         'order_no',
-        'invoice_no',
         'intended_date',
         'status',
 
@@ -58,5 +57,15 @@ class ServiceOrder extends Model
     public function employeePerformances()
     {
         return $this->hasMany(ServiceOrderEmployeePerformance::class,'service_order_id');
+    }
+
+    public function invoice()
+    {
+        return $this->hasOne(ServiceOrderInvoice::class, 'service_order_id');
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(ServiceOrderInvoice::class, 'service_order_id');
     }
 }

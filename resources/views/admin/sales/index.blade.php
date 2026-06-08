@@ -265,7 +265,7 @@
                             </div>
                         </div>
                         <!-- Activities Section -->
-                        <div class="row">
+                        <div class="row company-details-section">
                             <div class="col-12">
                                 <div class="section-card">
                                     <!-- Bootstrap Nav Tabs -->

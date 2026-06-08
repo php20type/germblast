@@ -1381,57 +1381,57 @@
                                                     <h5 class="section-title">Contract Details</h5>
                                                 </div>
 
-                                                @forelse($order->service->outlines as $outline)
-                                                    <div class="border-bottom py-3">
-                                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                                            <div>
-                                                                <p class="mb-1 fw-semibold">{{ ucwords($outline->outline_name) }}</p>
-                                                            </div>
-                                                            <span class="text-muted small">{{ $outline->range }}% complete</span>
+                                            @forelse($order->service->outlines as $outline)
+                                                <div class="border-bottom py-3">
+                                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                                        <div>
+                                                            <p class="mb-1 fw-semibold">{{ ucwords($outline->outline_name) }}</p>
                                                         </div>
-
-                                                        {{-- Progress Bar --}}
-                                                        <div class="progress mb-2" style="height: 6px;">
-                                                            <div class="progress-bar bg-success"
-                                                                role="progressbar"
-                                                                style="width: {{ $outline->range }}%"
-                                                                aria-valuenow="{{ $outline->range }}"
-                                                                aria-valuemin="0"
-                                                                aria-valuemax="100">
-                                                            </div>
-                                                        </div>
-
-                                                        {{-- Edit Form --}}
-                                                        <!-- <form action="{{ route('admin.lead.service.outline.update', $outline->id) }}" method="POST" class="mt-2">
-                                                            @csrf -->
-                                                            <div class="row mt-2 g-2">
-                                                                <!-- <div class="col-md-12">
-                                                                    <div class="input-group">
-                                                                        <input type="number"
-                                                                            class="form-control"
-                                                                            name="range"
-                                                                            value="{{ $outline->range ?? 0 }}"
-                                                                            min="0" max="100" step="1"
-                                                                            placeholder="0">
-                                                                        <span class="input-group-text">%</span>
-                                                                    </div>
-                                                                </div> -->
-                                                                <div class="col-md-12 mt-2">
-                                                                    <textarea name="description"
-                                                                        class="form-control"
-                                                                        placeholder="Add description..." readonly>{{ $outline->description ?? '' }}</textarea>
-                                                                </div>
-                                                            </div>
-                                                            <!-- <div class="row mt-2">
-                                                                <div class="text-end">
-                                                                    <button type="submit" class="btn btn-success">Save</button>
-                                                                </div>
-                                                            </div>
-                                                        </form> -->
+                                                        <span class="text-muted small">{{ $outline->range }}% complete</span>
                                                     </div>
-                                                @empty
-                                                    <p class="text-muted">No contract details found.</p>
-                                                @endforelse
+
+                                                    {{-- Progress Bar --}}
+                                                    <div class="progress mb-2" style="height: 6px;">
+                                                        <div class="progress-bar bg-success"
+                                                            role="progressbar"
+                                                            style="width: {{ $outline->range }}%"
+                                                            aria-valuenow="{{ $outline->range }}"
+                                                            aria-valuemin="0"
+                                                            aria-valuemax="100">
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- Edit Form --}}
+                                                    <form action="{{ route('admin.lead.service.outline.update', $outline->id) }}" method="POST" class="mt-2">
+                                                        @csrf
+                                                        <div class="row mt-2 g-2">
+                                                            <div class="col-md-12">
+                                                                <div class="input-group">
+                                                                    <input type="number"
+                                                                        class="form-control"
+                                                                        name="range"
+                                                                        value="{{ $outline->range ?? 0 }}"
+                                                                        min="0" max="100" step="1"
+                                                                        placeholder="0">
+                                                                    <span class="input-group-text">%</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 mt-2">
+                                                                <textarea name="description"
+                                                                    class="form-control"
+                                                                    placeholder="Add description...">{{ $outline->description ?? '' }}</textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row mt-2">
+                                                            <div class="text-end">
+                                                                <button type="submit" class="btn btn-success">Save</button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            @empty
+                                                <p class="text-muted">No contract details found.</p>
+                                            @endforelse
 
                                             </div>
                                         </div>
