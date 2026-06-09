@@ -1478,25 +1478,12 @@
                                             $remainingUninvoiced = max(0, $orderTotal - $totalInvoiced);
                                             $invoiceCount = $order->invoices->count();
 
-                                            // Determine selected invoice
-                                            $invoiceId = request('invoice_id');
-                                            if ($invoiceId === 'new') {
-                                                $selectedInvoice = null;
-                                            } elseif ($invoiceId) {
-                                                $selectedInvoice = $order->invoices->find($invoiceId);
-                                            } else {
-                                                $selectedInvoice = $order->invoices->first();
-                                            }
-
-                                            $invoiceNo = $selectedInvoice->invoice_no ?? 'INV-' . ($order->order_no ?? $order->id) . '-' . ($invoiceCount + 1);
-                                            $invoiceDate = $selectedInvoice && $selectedInvoice->invoice_date ? ($selectedInvoice->invoice_date instanceof \Carbon\Carbon ? $selectedInvoice->invoice_date->format('Y-m-d') : $selectedInvoice->invoice_date) : ($order->intended_date ? \Carbon\Carbon::parse($order->intended_date)->format('Y-m-d') : date('Y-m-d'));
-                                            $invoiceDueDate = $selectedInvoice && $selectedInvoice->due_date ? ($selectedInvoice->due_date instanceof \Carbon\Carbon ? $selectedInvoice->due_date->format('Y-m-d') : $selectedInvoice->due_date) : ($order->intended_date ? \Carbon\Carbon::parse($order->intended_date)->format('Y-m-d') : date('Y-m-d'));
-                                            $invoiceStatus = $selectedInvoice->status ?? 'Draft';
-                                            $invoiceNotes = $selectedInvoice->notes ?? 'Thank you for your business!';
-                                            $invoiceType = $selectedInvoice->invoice_type ?? 'Final';
+                                            // Default new invoice details
+                                            $invoiceNo = 'INV-' . ($order->order_no ?? $order->id) . '-' . ($invoiceCount + 1);
+                                            $invoiceDueDate = $order->intended_date ? \Carbon\Carbon::parse($order->intended_date)->format('Y-m-d') : date('Y-m-d');
+                                            $invoiceNotes = 'Thank you for your business!';
                                             
-                                            // Default single item if no items exist yet
-                                            $invoiceItems = $selectedInvoice->line_items ?? [
+                                            $invoiceItems = [
                                                 [
                                                     'type' => 'GermBlast Flat Fee',
                                                     'qty' => 1,
@@ -1504,46 +1491,12 @@
                                                     'total' => $order->service->price_per_service ?? 0.00
                                                 ]
                                             ];
-                                            $invoiceTotal = $selectedInvoice->total_amount ?? ($order->service->price_per_service ?? 0.00);
-                                            $isReadOnly = $selectedInvoice && in_array($selectedInvoice->status, ['Paid', 'Cancelled']);
+                                            $invoiceTotal = $order->service->price_per_service ?? 0.00;
+                                            $isReadOnly = false;
+                                            $selectedInvoice = null;
                                         @endphp
 
-                                        {{-- Invoices selector top-bar & financial summary --}}
-                                        <div class="border rounded p-3 mb-3 bg-light">
-                                            <div class="row align-items-center">
-                                                <div class="col-md-5">
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <label for="invoice_select" class="small fw-bold text-secondary mb-0 text-nowrap">Select Invoice:</label>
-                                                        <select id="invoice_select" class="form-select form-select-sm" onchange="window.location.href = '?invoice_id=' + this.value">
-                                                            @foreach($order->invoices as $inv)
-                                                                <option value="{{ $inv->id }}" {{ $selectedInvoice && $selectedInvoice->id == $inv->id ? 'selected' : '' }}>
-                                                                    {{ $inv->invoice_no }} ({{ $inv->invoice_type }} - {{ $inv->status }})
-                                                                </option>
-                                                            @endforeach
-                                                            <option value="new" {{ request('invoice_id') == 'new' || !$order->invoices->count() ? 'selected' : '' }}>+ Create New Invoice</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-7">
-                                                    <div class="d-flex justify-content-end gap-3 text-end">
-                                                        <div class="small">
-                                                            <span class="text-muted">Order Total:</span> <strong>${{ number_format($orderTotal, 2) }}</strong>
-                                                        </div>
-                                                        <div class="small border-start ps-3">
-                                                            <span class="text-muted">Total Invoiced:</span> <strong>${{ number_format($totalInvoiced, 2) }}</strong>
-                                                        </div>
-                                                        <div class="small border-start ps-3">
-                                                            <span class="text-muted">Remaining:</span> <strong>${{ number_format($remainingUninvoiced, 2) }}</strong>
-                                                        </div>
-                                                        <div class="small border-start ps-3">
-                                                            <span class="text-muted">Invoices:</span> <strong>{{ $invoiceCount }}</strong>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <form action="{{ $selectedInvoice ? route('admin.lead.service.order.invoice.save', [$order->id, $selectedInvoice->id]) : route('admin.lead.service.order.invoice.save', $order->id) }}" method="POST" id="invoiceForm">
+                                        <form action="{{ route('admin.lead.service.order.invoice.save', $order->id) }}" method="POST" id="invoiceForm">
                                             @csrf
 
                                             <div class="border rounded p-4 mb-4">
@@ -1554,38 +1507,18 @@
                                                         <img src="{{ asset('img/logo/logo.png') }}" alt="GermBlast" style="max-height: 60px;">
                                                     </div>
                                                     <div class="col-md-6 text-end">
-                                                        <h4 class="fw-bold text-primary">Invoice</h4>
-                                                        
                                                         <div class="d-flex flex-column align-items-end gap-2 mt-2">
                                                             <div class="d-flex align-items-center gap-2">
                                                                 <span class="small fw-semibold">Invoice Number:</span>
-                                                                <input type="text" name="invoice_no" class="form-control form-control-sm" style="width: 150px;" value="{{ $invoiceNo }}" required {{ $isReadOnly ? 'disabled' : '' }}>
-                                                            </div>
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                <span class="small fw-semibold">Invoice Type:</span>
-                                                                <select name="invoice_type" class="form-select form-select-sm" style="width: 150px;" required {{ $isReadOnly ? 'disabled' : '' }}>
-                                                                    <option value="Deposit" {{ $invoiceType == 'Deposit' ? 'selected' : '' }}>Deposit</option>
-                                                                    <option value="Progress" {{ $invoiceType == 'Progress' ? 'selected' : '' }}>Progress</option>
-                                                                    <option value="Final" {{ $invoiceType == 'Final' ? 'selected' : '' }}>Final</option>
-                                                                    <option value="Adjustment" {{ $invoiceType == 'Adjustment' ? 'selected' : '' }}>Adjustment</option>
-                                                                </select>
+                                                                <input type="text" name="invoice_no" class="form-control form-control-sm" style="width: 150px;" value="{{ $invoiceNo }}" required>
                                                             </div>
                                                             <div class="d-flex align-items-center gap-2">
                                                                 <span class="small fw-semibold">Invoice Date:</span>
-                                                                <input type="date" name="invoice_date" class="form-control form-control-sm" style="width: 150px;" value="{{ $invoiceDate }}" required {{ $isReadOnly ? 'disabled' : '' }}>
+                                                                <input type="text" class="form-control form-control-sm" style="width: 150px;" value="{{ date('m/d/Y') }}" readonly>
                                                             </div>
                                                             <div class="d-flex align-items-center gap-2">
                                                                 <span class="small fw-semibold">Due Date:</span>
-                                                                <input type="date" name="due_date" class="form-control form-control-sm" style="width: 150px;" value="{{ $invoiceDueDate }}" required {{ $isReadOnly ? 'disabled' : '' }}>
-                                                            </div>
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                <span class="small fw-semibold">Status:</span>
-                                                                <select name="status" class="form-select form-select-sm" style="width: 150px;" disabled>
-                                                                    <option value="Draft" {{ $invoiceStatus == 'Draft' ? 'selected' : '' }}>Draft</option>
-                                                                    <option value="Sent" {{ $invoiceStatus == 'Sent' ? 'selected' : '' }}>Sent</option>
-                                                                    <option value="Paid" {{ $invoiceStatus == 'Paid' ? 'selected' : '' }}>Paid</option>
-                                                                    <option value="Cancelled" {{ $invoiceStatus == 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
-                                                                </select>
+                                                                <input type="date" name="due_date" class="form-control form-control-sm" style="width: 150px;" value="{{ $invoiceDueDate }}" required>
                                                             </div>
                                                             <div class="mt-1">
                                                                 <span class="small fw-bold">Amount Due: </span>
@@ -1633,42 +1566,40 @@
                                                     @foreach($invoiceItems as $index => $item)
                                                         <div class="row align-items-center mb-2 g-2 invoice-item-row" data-index="{{ $index }}">
                                                             <div class="col-md-4">
-                                                                <select name="items[{{ $index }}][type]" class="form-select form-select-sm item-type" {{ $isReadOnly ? 'disabled' : '' }}>
-                                                                    <option value="New Line" {{ ($item['type'] ?? '') == 'New Line' ? 'selected' : '' }}>New Line</option>
-                                                                    <option value="GermBlast Disinfection Services" {{ ($item['type'] ?? '') == 'GermBlast Disinfection Services' ? 'selected' : '' }}>GermBlast Disinfection Services</option>
-                                                                    <option value="GermBlast Response Service" {{ ($item['type'] ?? '') == 'GermBlast Response Service' ? 'selected' : '' }}>GermBlast Response Service</option>
-                                                                    <option value="GermBlast Response Service under contract" {{ ($item['type'] ?? '') == 'GermBlast Response Service under contract' ? 'selected' : '' }}>GermBlast Response Service under contract</option>
-                                                                    <option value="Service Supplies" {{ ($item['type'] ?? '') == 'Service Supplies' ? 'selected' : '' }}>Service Supplies</option>
-                                                                    <option value="COVID Travel Manhours" {{ ($item['type'] ?? '') == 'COVID Travel Manhours' ? 'selected' : '' }}>COVID Travel Manhours</option>
-                                                                    <option value="COVID Service Manhours" {{ ($item['type'] ?? '') == 'COVID Service Manhours' ? 'selected' : '' }}>COVID Service Manhours</option>
-                                                                    <option value="modified GermBlast Response Service" {{ ($item['type'] ?? '') == 'modified GermBlast Response Service' ? 'selected' : '' }}>modified GermBlast Response Service</option>
-                                                                    <option value="GermBlast Biological Response Service COVID-19" {{ ($item['type'] ?? '') == 'GermBlast Biological Response Service COVID-19' ? 'selected' : '' }}>GermBlast Biological Response Service COVID-19</option>
-                                                                    <option value="GermBlast Flat Fee" {{ ($item['type'] ?? '') == 'GermBlast Flat Fee' ? 'selected' : '' }}>GermBlast Flat Fee</option>
-                                                                    <option value="GBS - Flooring" {{ ($item['type'] ?? '') == 'GBS - Flooring' ? 'selected' : '' }}>GBS - Flooring</option>
-                                                                    <option value="GBS-BONA Flooring Service" {{ ($item['type'] ?? '') == 'GBS-BONA Flooring Service' ? 'selected' : '' }}>GBS-BONA Flooring Service</option>
-                                                                    <option value="Discount" {{ ($item['type'] ?? '') == 'Discount' ? 'selected' : '' }}>Discount</option>
-                                                                    <option value="Sales Tax" {{ ($item['type'] ?? '') == 'Sales Tax' ? 'selected' : '' }}>Sales Tax</option>
+                                                                <select name="items[{{ $index }}][type]" class="form-select form-select-sm item-type">
+                                                                    <option value="New Line">New Line</option>
+                                                                    <option value="GermBlast Disinfection Services">GermBlast Disinfection Services</option>
+                                                                    <option value="GermBlast Response Service">GermBlast Response Service</option>
+                                                                    <option value="GermBlast Response Service under contract">GermBlast Response Service under contract</option>
+                                                                    <option value="Service Supplies">Service Supplies</option>
+                                                                    <option value="COVID Travel Manhours">COVID Travel Manhours</option>
+                                                                    <option value="COVID Service Manhours">COVID Service Manhours</option>
+                                                                    <option value="modified GermBlast Response Service">modified GermBlast Response Service</option>
+                                                                    <option value="GermBlast Biological Response Service COVID-19">GermBlast Biological Response Service COVID-19</option>
+                                                                    <option value="GermBlast Flat Fee" selected>GermBlast Flat Fee</option>
+                                                                    <option value="GBS - Flooring">GBS - Flooring</option>
+                                                                    <option value="GBS-BONA Flooring Service">GBS-BONA Flooring Service</option>
+                                                                    <option value="Discount">Discount</option>
+                                                                    <option value="Sales Tax">Sales Tax</option>
                                                                 </select>
                                                             </div>
                                                             <div class="col-md-2">
                                                                 <div class="input-group input-group-sm">
                                                                     <span class="input-group-text">Qty</span>
-                                                                    <input type="number" name="items[{{ $index }}][qty]" class="form-control item-qty" value="{{ $item['qty'] ?? 1 }}" min="1" {{ $isReadOnly ? 'disabled' : '' }}>
+                                                                    <input type="number" name="items[{{ $index }}][qty]" class="form-control item-qty" value="{{ $item['qty'] ?? 1 }}" min="1">
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-2">
                                                                 <div class="input-group input-group-sm">
                                                                     <span class="input-group-text">$</span>
-                                                                    <input type="number" name="items[{{ $index }}][price]" class="form-control item-price" value="{{ $item['price'] ?? 0 }}" min="0" step="0.01" {{ $isReadOnly ? 'disabled' : '' }}>
+                                                                    <input type="number" name="items[{{ $index }}][price]" class="form-control item-price" value="{{ $item['price'] ?? 0 }}" min="0" step="0.01">
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-2">
                                                                 <span class="small">Total = $<strong><span class="item-total">{{ number_format($item['total'] ?? 0, 2) }}</span></strong></span>
                                                             </div>
                                                             <div class="col-md-2 d-flex gap-1">
-                                                                @if(!$isReadOnly)
-                                                                    <button type="button" class="btn btn-sm btn-danger delete-item-btn">Delete Line</button>
-                                                                @endif
+                                                                <button type="button" class="btn btn-sm btn-danger delete-item-btn">Delete Line</button>
                                                             </div>
                                                         </div>
                                                     @endforeach
@@ -1677,86 +1608,98 @@
                                                 {{-- Total --}}
                                                 <p class="small mt-2 fw-semibold">Total of Line Items: <strong>$<span id="invoice-grand-total">{{ number_format($invoiceTotal, 2) }}</span></strong></p>
 
-                                                @if(!$isReadOnly)
-                                                    {{-- Add Line Button --}}
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary mb-4" id="add-invoice-item-btn">
-                                                        <i class="bi bi-plus-circle"></i> Add Another Line
-                                                    </button>
-                                                @endif
+                                                {{-- Add Line Button --}}
+                                                <button type="button" class="btn btn-sm btn-outline-secondary mb-4" id="add-invoice-item-btn">
+                                                    <i class="bi bi-plus-circle"></i> Add Another Line
+                                                </button>
 
                                                 {{-- Notes --}}
                                                 <div class="mb-3">
                                                     <label class="form-label small fw-semibold">Notes:</label>
-                                                    <textarea name="notes" class="form-control" rows="3" {{ $isReadOnly ? 'disabled' : '' }}>{{ $invoiceNotes }}</textarea>
+                                                    <textarea name="notes" class="form-control" rows="3">{{ $invoiceNotes }}</textarea>
                                                 </div>
-
-                                                {{-- Audit Trail & History --}}
-                                                @if($selectedInvoice)
-                                                    <div class="mt-4 p-3 bg-light rounded border text-start">
-                                                        <h6 class="fw-bold text-secondary mb-2 small" style="font-size: 0.8rem;"><i class="bi bi-clock-history"></i> Audit Trail & Invoice History</h6>
-                                                        <div class="row g-3 small">
-                                                            <div class="col-md-4 col-sm-6">
-                                                                <span class="text-muted">Created By:</span> {{ $selectedInvoice->creator->name ?? 'System' }}<br>
-                                                                <span class="text-muted">Created At:</span> {{ $selectedInvoice->created_at->format('M d, Y H:i') }}
-                                                            </div>
-                                                            @if($selectedInvoice->updater)
-                                                            <div class="col-md-4 col-sm-6">
-                                                                <span class="text-muted">Last Updated By:</span> {{ $selectedInvoice->updater->name ?? 'System' }}<br>
-                                                                <span class="text-muted">Updated At:</span> {{ $selectedInvoice->updated_at->format('M d, Y H:i') }}
-                                                            </div>
-                                                            @endif
-                                                            @if($selectedInvoice->sent_date)
-                                                            <div class="col-md-4 col-sm-6">
-                                                                <span class="text-muted">Sent By:</span> {{ $selectedInvoice->sender->name ?? 'System' }}<br>
-                                                                <span class="text-muted">Sent At:</span> {{ $selectedInvoice->sent_date->format('M d, Y H:i') }}
-                                                            </div>
-                                                            @endif
-                                                            @if($selectedInvoice->status === 'Cancelled' && $selectedInvoice->cancellation_reason)
-                                                            <div class="col-md-12 text-danger fw-semibold">
-                                                                Cancellation Reason: {{ $selectedInvoice->cancellation_reason }}
-                                                            </div>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                @endif
 
                                                 <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
                                                     <div>
-                                                        @if(!$isReadOnly)
-                                                            <button type="submit" class="btn btn-sm btn-success px-3">
-                                                                <i class="bi bi-save"></i> Save Invoice
-                                                            </button>
-                                                        @else
-                                                            <span class="badge bg-secondary p-2"><i class="bi bi-lock-fill"></i> Read-Only ({{ $invoiceStatus }})</span>
-                                                        @endif
+                                                        <button type="submit" class="btn btn-sm btn-success px-3">
+                                                            <i class="bi bi-save"></i> Save Invoice
+                                                        </button>
                                                     </div>
-
-                                                    @if($selectedInvoice)
-                                                    <div class="d-flex gap-2">
-                                                        <a href="{{ route('admin.lead.service.order.invoice.download.pdf', $selectedInvoice->id) }}" class="btn btn-sm btn-outline-danger px-3">
-                                                            <i class="bi bi-file-pdf"></i> Download PDF
-                                                        </a>
-                                                        <a href="{{ route('admin.lead.service.order.invoice.download.csv', $selectedInvoice->id) }}" class="btn btn-sm btn-outline-info px-3">
-                                                            <i class="bi bi-file-earmark-spreadsheet"></i> Download CSV
-                                                        </a>
-                                                        @if($selectedInvoice->status !== 'Cancelled')
-                                                            <button type="button" class="btn btn-sm btn-primary px-3 share-invoice-btn" data-url="{{ route('admin.lead.service.order.invoice.share', $selectedInvoice->id) }}">
-                                                                <i class="bi bi-envelope"></i> Share with Customer
-                                                            </button>
-                                                        @endif
-                                                        @if(!in_array($selectedInvoice->status, ['Paid', 'Cancelled']))
-                                                            <button type="button" class="btn btn-sm btn-success px-3 mark-paid-btn" data-url="{{ route('admin.lead.service.order.invoice.mark_paid', $selectedInvoice->id) }}">
-                                                                <i class="bi bi-check-lg"></i> Mark as Paid
-                                                            </button>
-                                                            <button type="button" class="btn btn-sm btn-danger px-3 cancel-invoice-btn" data-url="{{ route('admin.lead.service.order.invoice.cancel', $selectedInvoice->id) }}">
-                                                                <i class="bi bi-x-circle"></i> Cancel Invoice
-                                                            </button>
-                                                        @endif
-                                                    </div>
-                                                    @endif
                                                 </div>
                                             </div>
                                         </form>
+
+                                        {{-- Invoices Table in Equipment Loan Format --}}
+                                        @if($order->invoices->count() > 0)
+                                            <div class="mt-4 pt-4 border-top">
+                                                <h5 class="fw-bold mb-3 text-secondary">Generated Invoices</h5>
+                                                <table class="table w-100 equipment-report-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Invoice #</th>
+                                                            <th>Date</th>
+                                                            <th>Due Date</th>
+                                                            <th>Amount</th>
+                                                            <th>Status</th>
+                                                            <th class="text-center" style="width: 240px;">Actions</th>
+                                                            <th class="text-center" style="width: 180px;">Payment Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach($order->invoices as $inv)
+                                                            <tr>
+                                                                <td class="fw-bold text-dark">{{ $inv->invoice_no }}</td>
+                                                                <td class="text-secondary">{{ $inv->invoice_date ? \Carbon\Carbon::parse($inv->invoice_date)->format('m/d/Y') : '—' }}</td>
+                                                                <td class="text-secondary">{{ $inv->due_date ? \Carbon\Carbon::parse($inv->due_date)->format('m/d/Y') : '—' }}</td>
+                                                                <td class="fw-bold text-dark">${{ number_format($inv->total_amount, 2) }}</td>
+                                                                <td>
+                                                                    @if($inv->status == 'Draft')
+                                                                        <span class="badge bg-warning text-dark">Draft</span>
+                                                                    @elseif($inv->status == 'Sent')
+                                                                        <span class="badge bg-info text-white">Sent</span>
+                                                                    @elseif($inv->status == 'Paid')
+                                                                        <span class="badge bg-success text-white">Paid</span>
+                                                                    @elseif($inv->status == 'Cancelled')
+                                                                        <span class="badge bg-danger text-white">Cancelled</span>
+                                                                    @endif
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="d-flex justify-content-center gap-2">
+                                                                        <a href="{{ route('admin.lead.service.order.invoice.download.pdf', $inv->id) }}" class="btn btn-sm btn-outline-danger py-1 px-2" title="Download PDF">
+                                                                            <i class="bi bi-file-pdf"></i> PDF
+                                                                        </a>
+                                                                        <a href="{{ route('admin.lead.service.order.invoice.download.csv', $inv->id) }}" class="btn btn-sm btn-outline-info py-1 px-2" title="Download CSV">
+                                                                            <i class="bi bi-file-earmark-spreadsheet"></i> CSV
+                                                                        </a>
+                                                                        @if($inv->status !== 'Cancelled')
+                                                                            <button type="button" class="btn btn-sm btn-primary py-1 px-2 share-invoice-btn" data-url="{{ route('admin.lead.service.order.invoice.share', $inv->id) }}" title="Share with Customer">
+                                                                                <i class="bi bi-envelope"></i> Share
+                                                                            </button>
+                                                                        @endif
+                                                                    </div>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    @if($inv->status == 'Paid')
+                                                                        <span class="text-success small fw-semibold"><i class="bi bi-check-circle-fill"></i> Paid</span>
+                                                                    @elseif($inv->status == 'Cancelled')
+                                                                        <span class="text-danger small fw-semibold"><i class="bi bi-x-circle-fill"></i> Cancelled</span>
+                                                                    @else
+                                                                        <div class="d-flex justify-content-center gap-2">
+                                                                            <button type="button" class="btn btn-sm btn-success py-1 px-2 mark-paid-btn" data-url="{{ route('admin.lead.service.order.invoice.mark_paid', $inv->id) }}">
+                                                                                Mark Paid
+                                                                            </button>
+                                                                            <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2 cancel-invoice-btn" data-url="{{ route('admin.lead.service.order.invoice.cancel', $inv->id) }}">
+                                                                                Cancel
+                                                                            </button>
+                                                                        </div>
+                                                                    @endif
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        @endif
 
                                     </div>
                                 </div>

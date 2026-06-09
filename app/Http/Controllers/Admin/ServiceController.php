@@ -1449,14 +1449,12 @@ class ServiceController extends Controller
         return redirect()->back()->with('success', 'Slot status updated to ' . ucfirst($newStatus) . ' successfully.');
     }
 
-    public function saveInvoice(Request $request, $orderId, $invoiceId = null)
+    public function saveInvoice(Request $request, $orderId)
     {
         $order = ServiceOrder::findOrFail($orderId);
 
         $request->validate([
             'invoice_no' => 'required|string',
-            'invoice_type' => 'required|string|in:Deposit,Progress,Final,Adjustment',
-            'invoice_date' => 'required|date',
             'due_date' => 'required|date',
             'notes' => 'nullable|string',
             'items' => 'required|array',
@@ -1478,37 +1476,19 @@ class ServiceController extends Controller
             ];
         }
 
-        if ($invoiceId) {
-            $invoice = ServiceOrderInvoice::findOrFail($invoiceId);
-            if (in_array($invoice->status, ['Paid', 'Cancelled'])) {
-                return redirect()->back()->with('error', 'Cannot modify Paid or Cancelled invoices.');
-            }
-            $invoice->update([
-                'invoice_no' => $request->invoice_no,
-                'invoice_type' => $request->invoice_type,
-                'invoice_date' => $request->invoice_date,
-                'due_date' => $request->due_date,
-                'notes' => $request->notes,
-                'line_items' => $items,
-                'total_amount' => $totalAmount,
-                'updated_by' => auth()->id(),
-            ]);
-        } else {
-            ServiceOrderInvoice::create([
-                'service_order_id' => $order->id,
-                'invoice_no' => $request->invoice_no,
-                'invoice_type' => $request->invoice_type,
-                'invoice_date' => $request->invoice_date,
-                'due_date' => $request->due_date,
-                'status' => 'Draft',
-                'notes' => $request->notes,
-                'line_items' => $items,
-                'total_amount' => $totalAmount,
-                'created_by' => auth()->id(),
-            ]);
-        }
+        $invoice = ServiceOrderInvoice::create([
+            'service_order_id' => $order->id,
+            'invoice_no' => $request->invoice_no,
+            'invoice_date' => today(),
+            'due_date' => $request->due_date,
+            'status' => 'Draft',
+            'notes' => $request->notes,
+            'line_items' => $items,
+            'total_amount' => $totalAmount,
+            'created_by' => auth()->id(),
+        ]);
 
-        return redirect()->back()->with('success', 'Invoice details updated successfully.');
+        return redirect()->route('admin.lead.service.fulfill_order', $order->id)->with('success', 'Invoice generated successfully.');
     }
 
     public function shareInvoice(Request $request, $invoiceId)
@@ -1533,7 +1513,6 @@ class ServiceController extends Controller
 
         $invoiceDetails = [
             'invoice_no' => $invoice->invoice_no,
-            'invoice_type' => $invoice->invoice_type,
             'invoice_date' => $invoice->invoice_date ? ($invoice->invoice_date instanceof \Carbon\Carbon ? $invoice->invoice_date->format('Y-m-d') : $invoice->invoice_date) : date('Y-m-d'),
             'due_date' => $invoice->due_date ? ($invoice->due_date instanceof \Carbon\Carbon ? $invoice->due_date->format('Y-m-d') : $invoice->due_date) : date('Y-m-d'),
             'status' => $invoice->status,
@@ -1581,7 +1560,6 @@ class ServiceController extends Controller
 
         $invoiceDetails = [
             'invoice_no' => $invoice->invoice_no,
-            'invoice_type' => $invoice->invoice_type,
             'invoice_date' => $invoice->invoice_date ? ($invoice->invoice_date instanceof \Carbon\Carbon ? $invoice->invoice_date->format('Y-m-d') : $invoice->invoice_date) : date('Y-m-d'),
             'due_date' => $invoice->due_date ? ($invoice->due_date instanceof \Carbon\Carbon ? $invoice->due_date->format('Y-m-d') : $invoice->due_date) : date('Y-m-d'),
             'status' => $invoice->status,
@@ -1601,7 +1579,6 @@ class ServiceController extends Controller
 
         $invoiceDetails = [
             'invoice_no' => $invoice->invoice_no,
-            'invoice_type' => $invoice->invoice_type,
             'invoice_date' => $invoice->invoice_date ? ($invoice->invoice_date instanceof \Carbon\Carbon ? $invoice->invoice_date->format('Y-m-d') : $invoice->invoice_date) : date('Y-m-d'),
             'due_date' => $invoice->due_date ? ($invoice->due_date instanceof \Carbon\Carbon ? $invoice->due_date->format('Y-m-d') : $invoice->due_date) : date('Y-m-d'),
             'status' => $invoice->status,
@@ -1621,7 +1598,6 @@ class ServiceController extends Controller
 
             // Metadata / Header info
             fputcsv($file, ['Invoice Number', $invoiceDetails['invoice_no']]);
-            fputcsv($file, ['Invoice Type', $invoiceDetails['invoice_type'] ?? 'Final']);
             fputcsv($file, ['Order Number', $order->order_no ?? 'N/A']);
             fputcsv($file, ['Invoice Date', $invoiceDetails['invoice_date'] ?? '']);
             fputcsv($file, ['Due Date', $invoiceDetails['due_date'] ?? '']);

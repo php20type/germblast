@@ -122,9 +122,6 @@
         <div style="float: right;" class="invoice-details">
             <h2 class="invoice-title" style="color: #0d6efd; margin-bottom: 5px;">INVOICE</h2>
             <div><strong>Invoice Number:</strong> {{ $invoiceDetails['invoice_no'] ?? '' }}</div>
-            @if(!empty($invoiceDetails['invoice_type']))
-            <div><strong>Invoice Type:</strong> {{ $invoiceDetails['invoice_type'] }}</div>
-            @endif
             <div><strong>Order Number:</strong> {{ $order->order_no ?? 'N/A' }}</div>
             <div><strong>Invoice Date:</strong> {{ \Carbon\Carbon::parse($invoiceDetails['invoice_date'] ?? date('Y-m-d'))->format('M d, Y') }}</div>
             <div><strong>Due Date:</strong> {{ \Carbon\Carbon::parse($invoiceDetails['due_date'] ?? date('Y-m-d'))->format('M d, Y') }}</div>
