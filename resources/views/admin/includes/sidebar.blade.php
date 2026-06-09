@@ -151,6 +151,16 @@
                     </div>
                 </a>
             </li>
+            <li class="{{ request()->routeIs('admin.equipment-loan.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.equipment-loan.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon19.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Equipment Loan
+                    </div>
+                </a>
+            </li>
             <li class="{{ request()->routeIs('admin.consumable-reports.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.consumable-reports.index') }}">
                     <div class="icon-round">

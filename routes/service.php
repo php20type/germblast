@@ -53,6 +53,15 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::post('order/{orderId}/atp/save', [ServiceController::class, 'saveAtpDetails'])->name('service.order.atp.save');
         Route::post('order/{orderId}/atp/delete', [ServiceController::class, 'deleteAtpDetail'])->name('service.order.atp.delete');
 
+        Route::post('order/{orderId}/room-record/save', [ServiceController::class, 'saveRoomRecord'])->name('service.order.room_record.save');
+        Route::post('room-record/{recordId}/delete', [ServiceController::class, 'deleteRoomRecord'])->name('service.order.room_record.delete');
+
+        Route::post('order/{orderId}/equipment-record/save', [ServiceController::class, 'saveEquipmentRecord'])->name('service.order.equipment_record.save');
+        Route::post('equipment-record/{recordId}/delete', [ServiceController::class, 'deleteEquipmentRecord'])->name('service.order.equipment_record.delete');
+
+        Route::post('order/{orderId}/clean-patch/save', [ServiceController::class, 'saveCleanPatch'])->name('service.order.clean_patch.save');
+        Route::post('clean-patch/{patchId}/delete', [ServiceController::class, 'deleteCleanPatch'])->name('service.order.clean_patch.delete');
+
         Route::post('order/{orderId}/status', [ServiceController::class, 'updateOrderStatus'])->name('service.order.update_status');
         Route::post('service/slot/{slotId}/status', [ServiceController::class, 'updateSlotStatus'])->name('service.slot.update_status');
     });

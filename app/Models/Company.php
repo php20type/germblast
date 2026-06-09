@@ -214,4 +214,9 @@ class Company extends Model
         return $this->hasMany(ConsumableReport::class, 'company_id');
     }
 
+    public function loanEquipments()
+    {
+        return $this->hasMany(LoanEquipment::class, 'company_id');
+    }
+
 }

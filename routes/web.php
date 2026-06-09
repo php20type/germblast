@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\ExpenseReportController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Admin\ConsumableReportController;
+use App\Http\Controllers\Admin\LoanEquipmentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EquipmentManagementController;
 use App\Http\Controllers\WarehouseController;
@@ -109,6 +110,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('consumable-reports/store', [ConsumableReportController::class, 'store'])->name('consumable-reports.store');
     Route::put('consumable-reports/update/{id}', [ConsumableReportController::class, 'update'])->name('consumable-reports.update');
     Route::post('consumable-reports/delete/{id}', [ConsumableReportController::class, 'destroy'])->name('consumable-reports.destroy');
+
+    // Equipment Loan System
+    Route::get('equipment-loan/index', [LoanEquipmentController::class, 'index'])->name('equipment-loan.index');
+    Route::post('equipment-loan/store', [LoanEquipmentController::class, 'store'])->name('equipment-loan.store');
+    Route::post('equipment-loan/{id}/checkout', [LoanEquipmentController::class, 'checkout'])->name('equipment-loan.checkout');
+    Route::post('equipment-loan/{id}/disposition', [LoanEquipmentController::class, 'disposition'])->name('equipment-loan.disposition');
 
     // Warehouse 
     Route::get('/warehouse/maintenance-dashboard', [WarehouseController::class, 'maintenance'])->name('warehouse.maintenance');

@@ -1223,151 +1223,301 @@
                                  </div>
 
 
-                                <!-- Room Record Tab -->
-                                <div class="tab-pane fade" id="room-record" role="tabpanel" aria-labelledby="room-record-tab">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="section-card">
-                                                <div class="section-header mb-3">
-                                                    <h5 class="section-title">Barcoded Rooms</h5>
-                                                </div>
-                                                <form class="mb-0">
-                                                    <p class="text-muted mb-2" style="font-size: 14px;">For an existing barcode:</p>
-                                                    <div class="mb-3">
-                                                        <label class="form-label fw-semibold text-dark">Barcode</label>
-                                                        <input type="text" class="form-control bg-light" placeholder="Barcode">
-                                                    </div>
-                                                    <button type="submit" class="btn btn-primary px-4" style="background-color: #3b82f6; border-color: #3b82f6;">
-                                                        Submit
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                 <!-- Equipment Tab -->
-                                 <div class="tab-pane fade" id="equipment" role="tabpanel" aria-labelledby="equipment-tab">
+                                 <!-- Room Record Tab -->
+                                 <div class="tab-pane fade" id="room-record" role="tabpanel" aria-labelledby="room-record-tab">
                                      <div class="row">
-                                         <div class="col-md-12">
-                                             {{-- Card 1: Equipment Barcode Record --}}
+                                         <!-- Left Column: Add Barcode Form -->
+                                         <div class="col-md-5">
                                              <div class="section-card mb-4">
                                                  <div class="section-header mb-3">
-                                                     <h5 class="section-title">Equipment Barcode Record</h5>
+                                                     <h5 class="section-title">Add Barcoded Room</h5>
                                                  </div>
-                                                 <form class="mb-0">
+                                                 <form id="room-record-form" action="{{ route('admin.lead.service.order.room_record.save', $order->id) }}" method="POST" class="mb-0">
+                                                     @csrf
+                                                     <p class="text-muted mb-2" style="font-size: 14px;">For an existing barcode:</p>
+                                                     <div class="mb-3">
+                                                         <label class="form-label fw-semibold text-dark">Barcode</label>
+                                                         <input type="text" name="barcode" class="form-control bg-light" placeholder="Barcode" required>
+                                                     </div>
+                                                     <button type="submit" class="btn btn-primary px-4" style="background-color: #3b82f6; border-color: #3b82f6;">
+                                                         Submit
+                                                     </button>
+                                                 </form>
+                                             </div>
+                                         </div>
+
+                                         <!-- Right Column: Barcoded Rooms List -->
+                                         <div class="col-md-7">
+                                             <div class="section-card mb-4">
+                                                 <div class="section-header mb-3">
+                                                     <h5 class="section-title">Barcoded Rooms</h5>
+                                                 </div>
+                                                 <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                                                     <table class="table table-hover equipment-report-table mb-0">
+                                                         <thead>
+                                                             <tr>
+                                                                 <th>Barcode</th>
+                                                                 <th>Recorded By</th>
+                                                                 <th>Date/Time</th>
+                                                                 <th class="text-end">Actions</th>
+                                                             </tr>
+                                                         </thead>
+                                                         <tbody>
+                                                             @forelse($order->roomRecords as $record)
+                                                                 <tr class="align-middle">
+                                                                     <td class="fw-semibold text-dark">{{ $record->barcode }}</td>
+                                                                     <td>{{ $record->creator->name ?? 'System' }}</td>
+                                                                     <td class="text-muted" style="font-size: 12px;">
+                                                                         {{ $record->created_at->format('m/d/y h:i A') }}
+                                                                     </td>
+                                                                     <td class="text-end">
+                                                                         <form action="{{ route('admin.lead.service.order.room_record.delete', $record->id) }}" method="POST" class="d-inline room-delete-form">
+                                                                             @csrf
+                                                                             <button type="submit" class="btn btn-sm btn-link text-danger p-0">
+                                                                                 <i class="fa-solid fa-trash fs-5"></i>
+                                                                             </button>
+                                                                         </form>
+                                                                     </td>
+                                                                 </tr>
+                                                             @empty
+                                                                 <tr>
+                                                                     <td colspan="4" class="text-center py-5 text-secondary">
+                                                                         <i class="fa-solid fa-door-open fs-1 mb-2 d-block text-muted" style="font-size: 40px;"></i>
+                                                                         No room barcodes have been recorded yet.
+                                                                     </td>
+                                                                 </tr>
+                                                             @endforelse
+                                                         </tbody>
+                                                     </table>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                </div>
+                                                        <!-- Equipment Tab -->
+                                  <div class="tab-pane fade" id="equipment" role="tabpanel" aria-labelledby="equipment-tab">
+                                      <div class="row">
+                                          <div class="col-md-12">
+                                              {{-- Card 1: Equipment Barcode Record --}}
+                                              <div class="section-card mb-4">
+                                                  <div class="section-header mb-3">
+                                                      <h5 class="section-title">Equipment Barcode Record</h5>
+                                                  </div>
+                                                  <form action="{{ route('admin.lead.service.order.equipment_record.save', $order->id) }}" method="POST" class="mb-0">
+                                                      @csrf
+                                                      <div class="d-flex flex-wrap gap-2 align-items-center">
+                                                          <div style="flex: 2; min-width: 200px;">
+                                                              <input type="text" name="barcode" list="existing-barcodes" class="form-control bg-light" placeholder="Select or Scan Existing Barcode..." required value="{{ old('barcode') }}">
+                                                              <datalist id="existing-barcodes">
+                                                                  @foreach($equipments as $eq)
+                                                                      <option value="{{ $eq->barcode }}">{{ $eq->barcode }} {{ $eq->serial_number ? '('.$eq->serial_number.')' : '' }}</option>
+                                                                  @endforeach
+                                                              </datalist>
+                                                          </div>
+                                                          <div style="width: 140px;">
+                                                              <select name="status" class="form-select bg-light" required>
+                                                                  <option value="service" {{ old('status') == 'service' ? 'selected' : '' }}>Service</option>
+                                                                  <option value="washed" {{ old('status') == 'washed' ? 'selected' : '' }}>Wash</option>
+                                                              </select>
+                                                          </div>
+                                                          <div>
+                                                              <button type="submit" class="btn btn-success px-3" style="background-color: #2ec15d; border-color: #2ec15d; height: 38px;">
+                                                                  <i class="fas fa-check-circle"></i>
+                                                              </button>
+                                                          </div>
+                                                      </div>
+                                                  </form>
+                                              </div>
+ 
+                                              {{-- Card 2: Newly Barcoded Equipment --}}
+                                              <div class="section-card mb-4">
+                                                  <div class="section-header mb-3">
+                                                      <h5 class="section-title">Newly Barcoded Equipment</h5>
+                                                  </div>
+                                                  <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded border border-dashed flex-wrap gap-2">
+                                                      <div class="text-secondary" style="font-size: 13px;">
+                                                          <i class="fa-solid fa-circle-info me-1 text-primary"></i> Need to register new equipment? Go to Equipment Management to create new barcodes.
+                                                      </div>
+                                                      <div>
+                                                          <a href="{{ route('admin.equipment-management.index') }}" class="btn btn-sm btn-primary px-3 fw-semibold">
+                                                              <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> Equipment Management
+                                                          </a>
+                                                      </div>
+                                                  </div>
+                                              </div>
+ 
+                                              {{-- Card 3: Equipment Summary --}}
+                                              <div class="section-card mb-4">
+                                                  <div class="section-header mb-3">
+                                                      <h5 class="section-title">Equipment Summary</h5>
+                                                  </div>
+                                                  <div class="bg-light p-3 rounded">
+                                                      <p class="mb-2 fw-semibold text-dark">Total Number of Pieces Serviced: <span class="badge bg-warning text-dark fs-6 px-2 py-1 ms-1">{{ $order->equipmentRecords->where('status', 'service')->count() }}</span></p>
+                                                      <p class="mb-0 fw-semibold text-dark">Total Number of Pieces Washed: <span class="badge bg-primary fs-6 px-2 py-1 ms-1">{{ $order->equipmentRecords->where('status', 'washed')->count() }}</span></p>
+                                                  </div>
+                                              </div>
+ 
+                                              {{-- Card 4: Equipment Records List --}}
+                                              <div class="section-card">
+                                                  <div class="section-header mb-3">
+                                                      <h5 class="section-title">Equipment Records List</h5>
+                                                  </div>
+                                                  <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                                                      <table class="table table-hover equipment-report-table mb-0">
+                                                          <thead>
+                                                              <tr>
+                                                                  <th>Barcode</th>
+                                                                  <th>Type</th>
+                                                                  <th>Serial Number</th>
+                                                                  <th>Status</th>
+                                                                  <th>Recorded By</th>
+                                                                  <th>Date/Time</th>
+                                                                  <th class="text-end">Actions</th>
+                                                              </tr>
+                                                          </thead>
+                                                          <tbody>
+                                                              @forelse($order->equipmentRecords as $record)
+                                                                  <tr class="align-middle">
+                                                                      <td class="fw-semibold text-dark">{{ $record->barcode }}</td>
+                                                                      <td>{{ $record->equipment->type->name ?? '—' }}</td>
+                                                                      <td>{{ $record->equipment->serial_number ?? '—' }}</td>
+                                                                      <td>
+                                                                          @php
+                                                                              $statusBadges = [
+                                                                                  'service' => 'bg-warning text-dark',
+                                                                                  'washed' => 'bg-primary',
+                                                                              ];
+                                                                              $badgeClass = $statusBadges[$record->status] ?? 'bg-secondary';
+                                                                              $statusLabel = $record->status == 'washed' ? 'Wash' : 'Service';
+                                                                          @endphp
+                                                                          <span class="badge {{ $badgeClass }}" style="font-size: 11px;">{{ $statusLabel }}</span>
+                                                                      </td>
+                                                                      <td>{{ $record->creator->name ?? 'System' }}</td>
+                                                                      <td class="text-muted" style="font-size: 12px;">
+                                                                          {{ $record->created_at->format('m/d/y h:i A') }}
+                                                                      </td>
+                                                                      <td class="text-end">
+                                                                          <form action="{{ route('admin.lead.service.order.equipment_record.delete', $record->id) }}" method="POST" class="d-inline equipment-delete-form">
+                                                                              @csrf
+                                                                              <button type="submit" class="btn btn-sm btn-link text-danger p-0">
+                                                                                  <i class="fa-solid fa-trash fs-5"></i>
+                                                                              </button>
+                                                                          </form>
+                                                                      </td>
+                                                                  </tr>
+                                                              @empty
+                                                                  <tr>
+                                                                      <td colspan="7" class="text-center py-5 text-secondary">
+                                                                          <i class="fa-solid fa-laptop-medical fs-1 mb-2 d-block text-muted" style="font-size: 40px;"></i>
+                                                                          No equipment records have been submitted yet.
+                                                                      </td>
+                                                                  </tr>
+                                                              @endforelse
+                                                          </tbody>
+                                                      </table>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+
+                                 <!-- Clean Patch Tab -->
+                                 <div class="tab-pane fade" id="clean-patch" role="tabpanel" aria-labelledby="clean-patch-tab">
+                                     <div class="row">
+                                         <!-- Left Column: Add Clean Patch Form -->
+                                         <div class="col-md-5">
+                                             <div class="section-card mb-4">
+                                                 <div class="section-header mb-3">
+                                                     <h5 class="section-title">Clean Patch Record</h5>
+                                                 </div>
+                                                 <form id="clean-patch-form" action="{{ route('admin.lead.service.order.clean_patch.save', $order->id) }}" method="POST" class="mb-0">
+                                                     @csrf
                                                      <div class="d-flex flex-wrap gap-2 align-items-center">
                                                          <div style="flex: 1; min-width: 140px;">
-                                                             <input type="text" class="form-control bg-light" placeholder="Barcode">
+                                                             <input type="text" name="barcode" class="form-control bg-light" placeholder="Barcode" required>
                                                          </div>
-                                                         <div style="flex: 1; min-width: 140px;">
-                                                             <input type="text" class="form-control bg-light" placeholder="Location">
-                                                         </div>
-                                                         <div style="flex: 1; min-width: 140px;">
-                                                             <input type="text" class="form-control bg-light" placeholder="Comment">
-                                                         </div>
-                                                         <div style="width: 140px;">
-                                                             <select class="form-select bg-light">
-                                                                 <option value="service">Service</option>
-                                                                 <option value="washed">Washed</option>
-                                                                 <option value="germblasted">GermBlasted</option>
+                                                         <div style="flex: 1; min-width: 160px;">
+                                                             <select name="patch_size" class="form-select bg-light" required>
+                                                                 <option value="large_rectangle">Large (Rectangle)</option>
+                                                                 <option value="medium_rectangle">Medium (Rectangle)</option>
+                                                                 <option value="small_rectangle">Small (Rectangle)</option>
+                                                                 <option value="large_square">Large (Square)</option>
+                                                                 <option value="medium_square">Medium (Square)</option>
+                                                                 <option value="small_square">Small (Square)</option>
                                                              </select>
                                                          </div>
                                                          <div>
-                                                             <button type="button" class="btn btn-success px-3" style="background-color: #2ec15d; border-color: #2ec15d; height: 38px;">
+                                                             <button type="submit" class="btn btn-success px-3" style="background-color: #2ec15d; border-color: #2ec15d; height: 38px;">
                                                                  <i class="fas fa-check-circle"></i>
                                                              </button>
                                                          </div>
                                                      </div>
                                                  </form>
                                              </div>
+                                         </div>
 
-                                             {{-- Card 2: Newly Barcoded Equipment --}}
+                                         <!-- Right Column: Clean Patch List -->
+                                         <div class="col-md-7">
                                              <div class="section-card mb-4">
                                                  <div class="section-header mb-3">
-                                                     <h5 class="section-title">Newly Barcoded Equipment</h5>
+                                                     <h5 class="section-title">Clean Patch Records List</h5>
                                                  </div>
-                                                 <form class="mb-0">
-                                                     <div class="d-flex flex-wrap gap-2 align-items-center">
-                                                         <div style="flex: 1; min-width: 120px;">
-                                                             <input type="text" class="form-control bg-light" placeholder="Barcode">
-                                                         </div>
-                                                         <div style="flex: 1; min-width: 120px;">
-                                                             <input type="text" class="form-control bg-light" placeholder="Serial Number">
-                                                         </div>
-                                                         <div style="flex: 1; min-width: 120px;">
-                                                             <input type="text" class="form-control bg-light" placeholder="Description">
-                                                         </div>
-                                                         <div style="flex: 1; min-width: 120px;">
-                                                             <input type="text" class="form-control bg-light" placeholder="Location">
-                                                         </div>
-                                                         <div style="flex: 1; min-width: 120px;">
-                                                             <input type="text" class="form-control bg-light" placeholder="Comment">
-                                                         </div>
-                                                         <div style="width: 130px;">
-                                                             <select class="form-select bg-light">
-                                                                 <option value="service">Service</option>
-                                                                 <option value="washed">Washed</option>
-                                                                 <option value="germblasted">GermBlasted</option>
-                                                             </select>
-                                                         </div>
-                                                         <div>
-                                                             <button type="button" class="btn btn-success px-3" style="background-color: #2ec15d; border-color: #2ec15d; height: 38px;">
-                                                                 <i class="fas fa-check-circle"></i>
-                                                             </button>
-                                                         </div>
-                                                     </div>
-                                                 </form>
-                                             </div>
-
-                                             {{-- Card 3: Equipment Summary --}}
-                                             <div class="section-card">
-                                                 <div class="section-header mb-3">
-                                                     <h5 class="section-title">Equipment Summary</h5>
-                                                 </div>
-                                                 <div class="bg-light p-3 rounded">
-                                                     <p class="mb-2 fw-semibold text-dark">Total Number of Pieces Washed: <span class="badge bg-primary fs-6 px-2 py-1 ms-1">0</span></p>
-                                                     <p class="mb-0 fw-semibold text-dark">Total Number of Pieces GermBlasted: <span class="badge bg-success fs-6 px-2 py-1 ms-1">0</span></p>
+                                                 <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                                                     <table class="table table-hover equipment-report-table mb-0">
+                                                         <thead>
+                                                             <tr>
+                                                                 <th>Barcode</th>
+                                                                 <th>Size / Type</th>
+                                                                 <th>Recorded By</th>
+                                                                 <th>Date/Time</th>
+                                                                 <th class="text-end">Actions</th>
+                                                             </tr>
+                                                         </thead>
+                                                         <tbody>
+                                                             @forelse($order->cleanPatches as $patch)
+                                                                 <tr class="align-middle">
+                                                                     <td class="fw-semibold text-dark">{{ $patch->barcode }}</td>
+                                                                     <td>
+                                                                         @php
+                                                                             $patchSizes = [
+                                                                                 'large_rectangle' => 'Large (Rectangle)',
+                                                                                 'medium_rectangle' => 'Medium (Rectangle)',
+                                                                                 'small_rectangle' => 'Small (Rectangle)',
+                                                                                 'large_square' => 'Large (Square)',
+                                                                                 'medium_square' => 'Medium (Square)',
+                                                                                 'small_square' => 'Small (Square)',
+                                                                             ];
+                                                                             echo $patchSizes[$patch->patch_size] ?? $patch->patch_size;
+                                                                         @endphp
+                                                                     </td>
+                                                                     <td>{{ $patch->creator->name ?? 'System' }}</td>
+                                                                     <td class="text-muted" style="font-size: 12px;">
+                                                                         {{ $patch->created_at->format('m/d/y h:i A') }}
+                                                                     </td>
+                                                                     <td class="text-end">
+                                                                         <form action="{{ route('admin.lead.service.order.clean_patch.delete', $patch->id) }}" method="POST" class="d-inline patch-delete-form">
+                                                                             @csrf
+                                                                             <button type="submit" class="btn btn-sm btn-link text-danger p-0">
+                                                                                 <i class="fa-solid fa-trash fs-5"></i>
+                                                                             </button>
+                                                                         </form>
+                                                                     </td>
+                                                                 </tr>
+                                                             @empty
+                                                                 <tr>
+                                                                     <td colspan="5" class="text-center py-5 text-secondary">
+                                                                         <i class="fa-solid fa-shield-halved fs-1 mb-2 d-block text-muted" style="font-size: 40px;"></i>
+                                                                         No clean patch records have been saved yet.
+                                                                     </td>
+                                                                 </tr>
+                                                             @endforelse
+                                                         </tbody>
+                                                     </table>
                                                  </div>
                                              </div>
                                          </div>
                                      </div>
                                  </div>
-
-                                <!-- Clean Patch Tab -->
-                                <div class="tab-pane fade" id="clean-patch" role="tabpanel" aria-labelledby="clean-patch-tab">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="section-card">
-                                                <div class="section-header mb-3">
-                                                    <h5 class="section-title">Clean Patch Record</h5>
-                                                </div>
-                                                <form class="mb-0">
-                                                    <div class="d-flex flex-wrap gap-2 align-items-center">
-                                                        <div style="flex: 1; max-width: 300px; min-width: 140px;">
-                                                            <input type="text" class="form-control bg-light" placeholder="Barcode">
-                                                        </div>
-                                                        <div style="flex: 1; max-width: 300px; min-width: 160px;">
-                                                            <select class="form-select bg-light">
-                                                                <option value="large_rectangle">Large (Rectangle)</option>
-                                                                <option value="medium_rectangle">Medium (Rectangle)</option>
-                                                                <option value="small_rectangle">Small (Rectangle)</option>
-                                                                <option value="large_square">Large (Square)</option>
-                                                                <option value="medium_square">Medium (Square)</option>
-                                                                <option value="small_square">Small (Square)</option>
-                                                            </select>
-                                                        </div>
-                                                        <div>
-                                                            <button type="button" class="btn btn-success px-3" style="background-color: #2ec15d; border-color: #2ec15d; height: 38px;">
-                                                                <i class="fas fa-check-circle"></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
 
                                 <!-- Notes Tab -->
                                 <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">

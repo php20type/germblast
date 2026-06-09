@@ -68,4 +68,19 @@ class ServiceOrder extends Model
     {
         return $this->hasMany(ServiceOrderInvoice::class, 'service_order_id');
     }
+
+    public function roomRecords()
+    {
+        return $this->hasMany(ServiceOrderRoomRecord::class, 'service_order_id');
+    }
+
+    public function equipmentRecords()
+    {
+        return $this->hasMany(ServiceOrderEquipmentRecord::class, 'service_order_id');
+    }
+
+    public function cleanPatches()
+    {
+        return $this->hasMany(ServiceOrderCleanPatch::class, 'service_order_id');
+    }
 }

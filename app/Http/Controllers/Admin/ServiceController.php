@@ -21,6 +21,9 @@ use App\Models\Vehicle;
 use App\Models\User;
 use App\Models\Equipment;
 use App\Models\EquipmentStatusLog;
+use App\Models\ServiceOrderRoomRecord;
+use App\Models\ServiceOrderEquipmentRecord;
+use App\Models\ServiceOrderCleanPatch;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
@@ -358,6 +361,10 @@ class ServiceController extends Controller
             'employeePerformances.employee',
             'employeePerformances.issue',
             'employeePerformances.user',
+            'roomRecords.creator',
+            'equipmentRecords.creator',
+            'equipmentRecords.equipment.type',
+            'cleanPatches.creator',
         ])->findOrFail($orderId);
 
         $companyLocations = $order->service->lead->company->locations;
@@ -392,7 +399,9 @@ class ServiceController extends Controller
             })
             ->unique('id');
 
-        return view('admin.leads.service-dashboard', compact('order', 'companyLocations', 'territories', 'allStaff', 'disciplinaryIssues', 'assignedEmployees', 'assignedDrivers', 'allVehicles'));
+        $equipments = Equipment::select('id', 'barcode', 'serial_number')->orderBy('barcode')->get();
+
+        return view('admin.leads.service-dashboard', compact('order', 'companyLocations', 'territories', 'allStaff', 'disciplinaryIssues', 'assignedEmployees', 'assignedDrivers', 'allVehicles', 'equipments'));
     }
 
     public function assignEquipment(Request $request, $slotId)
@@ -1702,6 +1711,87 @@ class ServiceController extends Controller
         }
 
         return redirect()->back()->with('success', 'Invoice cancelled successfully.');
+    }
+
+    public function saveRoomRecord(Request $request, $orderId)
+    {
+        $request->validate([
+            'barcode' => 'required|string',
+        ]);
+
+        $order = ServiceOrder::findOrFail($orderId);
+
+        $order->roomRecords()->create([
+            'barcode' => $request->barcode,
+            'created_by' => auth()->id(),
+        ]);
+
+        return redirect()->back()->with('success', 'Room barcode recorded successfully.');
+    }
+
+    public function deleteRoomRecord($recordId)
+    {
+        $record = ServiceOrderRoomRecord::findOrFail($recordId);
+        $record->delete();
+
+        return redirect()->back()->with('success', 'Room barcode record deleted successfully.');
+    }
+
+    public function saveEquipmentRecord(Request $request, $orderId)
+    {
+        $request->validate([
+            'barcode' => 'required|string',
+            'status' => 'required|string|in:service,washed',
+        ]);
+
+        $exists = Equipment::where('barcode', $request->barcode)->exists();
+        if (!$exists) {
+            return redirect()->back()->with('error', 'Warning: The entered barcode is not registered in the system.')->withInput();
+        }
+
+        $order = ServiceOrder::findOrFail($orderId);
+
+        $order->equipmentRecords()->create([
+            'barcode' => $request->barcode,
+            'status' => $request->status,
+            'created_by' => auth()->id(),
+        ]);
+
+        return redirect()->back()->with('success', 'Equipment barcode record saved successfully.');
+    }
+
+    public function deleteEquipmentRecord($recordId)
+    {
+        $record = ServiceOrderEquipmentRecord::findOrFail($recordId);
+        $record->delete();
+
+        return redirect()->back()->with('success', 'Equipment barcode record deleted successfully.');
+    }
+
+    public function saveCleanPatch(Request $request, $orderId)
+    {
+        $request->validate([
+            'barcode' => 'required|string',
+            'patch_size' => 'required|string',
+        ]);
+
+        $order = ServiceOrder::findOrFail($orderId);
+
+        $order->cleanPatches()->create([
+            'barcode' => $request->barcode,
+            'patch_size' => $request->patch_size,
+            'created_by' => auth()->id(),
+        ]);
+
+        return redirect()->back()->with('success', 'Clean patch record saved successfully.');
+    }
+
+    public function deleteCleanPatch($patchId)
+    {
+        $patch = ServiceOrderCleanPatch::findOrFail($patchId);
+        $patch->delete();
+
+        return redirect()->back()->with('success', 'Clean patch record deleted successfully.');
     }
 }
 
