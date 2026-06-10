@@ -9,6 +9,9 @@ use App\Http\Controllers\Admin\ExpenseReportController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Admin\ConsumableReportController;
 use App\Http\Controllers\Admin\LoanEquipmentController;
+use App\Http\Controllers\Admin\AnonymousFeedbackController;
+use App\Http\Controllers\Admin\TimeOffRequestController;
+use App\Http\Controllers\Admin\CoreValuePraiseController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EquipmentManagementController;
 use App\Http\Controllers\WarehouseController;
@@ -128,6 +131,22 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/warehouse/calendar', [WarehouseController::class, 'calendar'])->name('warehouse.calendar');
     Route::post('/warehouse/calendar/store', [WarehouseController::class, 'storeSchedule'])->name('warehouse.calendar.store');
     Route::post('/warehouse/calendar/delete/{id}', [WarehouseController::class, 'destroySchedule'])->name('warehouse.calendar.destroy');
+    // Anonymous Feedback
+    Route::get('hr/feedback', [AnonymousFeedbackController::class, 'index'])->name('hr.feedback.index');
+    Route::get('hr/feedback/create', [AnonymousFeedbackController::class, 'create'])->name('hr.feedback.create');
+    Route::post('hr/feedback/store', [AnonymousFeedbackController::class, 'store'])->name('hr.feedback.store');
+    Route::delete('hr/feedback/{id}/destroy', [AnonymousFeedbackController::class, 'destroy'])->name('hr.feedback.destroy');
+
+    // Time Off Requests
+    Route::get('hr/time-off', [TimeOffRequestController::class, 'index'])->name('hr.time-off.index');
+    Route::post('hr/time-off/store', [TimeOffRequestController::class, 'store'])->name('hr.time-off.store');
+    Route::post('hr/time-off/{id}/approve', [TimeOffRequestController::class, 'approve'])->name('hr.time-off.approve');
+    Route::post('hr/time-off/{id}/deny', [TimeOffRequestController::class, 'deny'])->name('hr.time-off.deny');
+
+    // Core Value Praise
+    Route::get('hr/praise', [CoreValuePraiseController::class, 'index'])->name('hr.praise.index');
+    Route::get('hr/praise/create', [CoreValuePraiseController::class, 'create'])->name('hr.praise.create');
+    Route::post('hr/praise/store', [CoreValuePraiseController::class, 'store'])->name('hr.praise.store');
 });
 
 Route::view('survey-proposal.pdf', 'survey-proposal.pdf')->name('survey.proposal');

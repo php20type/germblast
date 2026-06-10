@@ -423,4 +423,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(ConsumableReport::class, 'user_id');
     }
+
+    public function timeOffRequests()
+    {
+        return $this->hasMany(TimeOffRequest::class, 'user_id');
+    }
 }

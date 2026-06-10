@@ -191,6 +191,36 @@
                     </div>
                 </a>
             </li>
+            <li class="{{ request()->routeIs('admin.hr.feedback.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.hr.feedback.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon2.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Anonymous Feedback
+                    </div>
+                </a>
+            </li>
+            <li class="{{ request()->routeIs('admin.hr.time-off.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.hr.time-off.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon15.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Time Off Requests
+                    </div>
+                </a>
+            </li>
+            <li class="{{ request()->routeIs('admin.hr.praise.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.hr.praise.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon2.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Core Value Praise
+                    </div>
+                </a>
+            </li>
             @if(auth()->user()->isSuperAdmin())
                 <li class="{{ request()->routeIs('admin.roles.permissions') ? 'active' : '' }}">
                     <a href="{{ route('admin.roles.permissions') }}">
