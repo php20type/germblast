@@ -18,14 +18,10 @@ return new class extends Migration
             $table->date('end_date');
             $table->text('reason')->nullable();
             $table->string('status')->default('submitted'); // submitted, approved, denied
-            $table->unsignedBigInteger('actioned_by')->nullable();
+            $table->unsignedBigInteger('actioned_by')->nullable()->index();
             $table->dateTime('actioned_at')->nullable();
             $table->text('admin_notes')->nullable();
             $table->timestamps();
-
-            // Foreign keys
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('actioned_by')->references('id')->on('users')->onDelete('set null');
         });
     }
 
