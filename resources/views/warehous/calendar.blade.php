@@ -144,7 +144,7 @@
                         <hr class="mx-4 my-4" style="opacity: 0.1;">
 
                         <!-- Controls and Calendar in PX-4 wrapper matching Warehouse Maintenance layout -->
-                        <div class="px-4">
+                        <div class="px-4 py-2">
 
                             <!-- Controls Card -->
                             <div class="calendar-card">

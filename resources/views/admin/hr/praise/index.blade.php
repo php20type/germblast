@@ -8,7 +8,7 @@
             <div class="row company-details-section">
                 <div class="col-md-12 p-0">
                     <div class="main-content">
-                        <div class="sales-dashboard rounded-4 shadow-sm overflow-hidden">
+                        <div class="sales-dashboard">
 
                             {{-- Header --}}
                             <div class="heading-area-sec border-bottom-0 pb-0">
