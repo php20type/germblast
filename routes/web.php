@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\LoanEquipmentController;
 use App\Http\Controllers\Admin\AnonymousFeedbackController;
 use App\Http\Controllers\Admin\TimeOffRequestController;
 use App\Http\Controllers\Admin\CoreValuePraiseController;
+use App\Http\Controllers\Admin\EmployeeRewardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EquipmentManagementController;
 use App\Http\Controllers\WarehouseController;
@@ -146,6 +147,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('hr/praise', [CoreValuePraiseController::class, 'index'])->name('hr.praise.index');
     Route::get('hr/praise/create', [CoreValuePraiseController::class, 'create'])->name('hr.praise.create');
     Route::post('hr/praise/store', [CoreValuePraiseController::class, 'store'])->name('hr.praise.store');
+
+    // GB Rewards
+    Route::get('hr/rewards', [EmployeeRewardController::class, 'index'])->name('hr.rewards.index');
+    Route::post('hr/rewards/store', [EmployeeRewardController::class, 'store'])->name('hr.rewards.store');
+    Route::delete('hr/rewards/{id}/destroy', [EmployeeRewardController::class, 'destroy'])->name('hr.rewards.destroy');
 
     // Driver Reports
     Route::get('hr/driver-report', [EmployeeController::class, 'driverReport'])->name('hr.driver-report.index');

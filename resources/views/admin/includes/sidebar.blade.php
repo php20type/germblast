@@ -221,6 +221,16 @@
                     </div>
                 </a>
             </li>
+            <li class="{{ request()->routeIs('admin.hr.rewards.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.hr.rewards.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon15.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        GB Rewards
+                    </div>
+                </a>
+            </li>
             <li class="{{ request()->routeIs('admin.hr.driver-report.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.hr.driver-report.index') }}">
                     <div class="icon-round">

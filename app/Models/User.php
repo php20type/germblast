@@ -430,4 +430,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(TimeOffRequest::class, 'user_id');
     }
+
+    public function rewards()
+    {
+        return $this->hasMany(EmployeeReward::class, 'user_id');
+    }
 }
