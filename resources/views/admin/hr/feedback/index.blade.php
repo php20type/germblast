@@ -5,7 +5,7 @@
 @section('content')
     <div class="companies-section my-4">
         <div class="container-fluid">
-            <div class="row">
+            <div class="row  company-details-section">
                 <div class="col-md-12 p-0">
                     <div class="main-content">
                         <div class="sales-dashboard rounded-4 shadow-sm overflow-hidden">
@@ -26,15 +26,6 @@
 
                             <hr class="mx-4 my-4" style="opacity: .1;">
 
-                            @if(session('success'))
-                                <div class="px-4">
-                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                        {{ session('success') }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                    </div>
-                                </div>
-                            @endif
-
                             {{-- Timeline --}}
                             <div class="px-4 pb-4">
                                 <div class="section-card">
@@ -44,6 +35,9 @@
 
                                             @forelse($feedbacks as $fb)
                                                 <div class="timeline-item">
+                                                    <div class="timeline-icon">
+                                                        <i class="fas fa-angle-double-right"></i>
+                                                    </div>
                                                     <div class="timeline-content">
                                                         <div class="timeline-header">
                                                             <div class="timestamp">

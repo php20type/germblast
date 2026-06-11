@@ -5,12 +5,16 @@
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <style>
-        /* Modern Boxed Table System matching Equipment Management / Consumable Reports */
+        .cursor-pointer {
+            cursor: pointer !important;
+        }
+
+        /* Equipment Report Table Boxed Styling from EQ */
         .equipment-report-table {
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
             border: 1px solid #e5e7eb !important;
             border-radius: 12px !important;
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
             overflow: hidden !important;
             background: #fff !important;
             width: 100% !important;
@@ -19,33 +23,48 @@
 
         .equipment-report-table thead th {
             background-color: rgba(255, 184, 28, 0.4) !important;
+            border-bottom: 1px solid #e5e7eb !important;
             color: #374151 !important;
             font-weight: 600 !important;
             padding: 18px 20px !important;
             border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
             font-size: 14px !important;
-            text-align: left;
         }
 
-        .equipment-report-table tbody td {
+        .equipment-report-table thead th:first-child {
+            border-top-left-radius: 12px !important;
+        }
+
+        .equipment-report-table thead th:last-child {
+            border-top-right-radius: 12px !important;
+            border-right: none !important;
+        }
+
+        .equipment-report-table td {
             padding: 15px 20px !important;
             vertical-align: middle !important;
             border-bottom: 1px solid #f3f4f6 !important;
             border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
             font-size: 14px !important;
-            text-align: left;
         }
 
-        .equipment-report-table thead th:last-child,
-        .equipment-report-table tbody td:last-child {
+        .equipment-report-table td:last-child {
             border-right: none !important;
         }
 
-        .equipment-report-table tr:last-child td {
+        .equipment-report-table tbody tr:last-child td {
             border-bottom: none !important;
         }
 
-        /* Status badges */
+        .equipment-report-table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 12px !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 12px !important;
+        }
+
+        /* Status Badge from Reference */
         .status-pill {
             padding: 6px 14px;
             border-radius: 6px;
@@ -73,10 +92,6 @@
             background: #eef0f2;
             color: #4b5563;
         }
-
-        .text-yellow-brand {
-            color: #ffb400;
-        }
     </style>
 @endpush
 
@@ -84,55 +99,29 @@
     <div class="companies-section my-4">
         <div class="container-fluid">
             <div class="row">
-                <!-- Main Content (Full Width, No inner sidebar) -->
                 <div class="col-md-12 p-0">
                     <div class="main-content">
                         
-                        <div class="sales-dashboard rounded-4 shadow-sm overflow-hidden bg-white p-4">
-                            
-                            <!-- Notifications -->
-                            @if (session('success'))
-                                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                    <i class="fa-solid fa-circle-check me-2"></i> {{ session('success') }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
-                            @endif
 
-                            @if (session('error'))
-                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                    <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ session('error') }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
-                            @endif
 
-                            @if ($errors->any())
-                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                    <ul class="mb-0">
-                                        @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
-                            @endif
-
-                            <!-- Header Area -->
-                            <div class="heading-area-sec border-bottom-0 pb-0 d-flex justify-content-between align-items-center mb-4">
-                                <div class="left-part-sec">
-                                    <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">EQUIPMENT LOAN/RENTAL <span style="font-size: 24px;">📌</span></h3>
-                                    <p class="text-muted mb-0" style="font-size: 16px;">Track and manage equipment checkout, returns, and sales.</p>
-                                </div>
-                                <div class="right-part-sec">
-                                    <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#AddEquipmentModal">
-                                        + CREATE EQUIPMENT
-                                    </button>
-                                </div>
+                        <!-- Header Area -->
+                        <div class="heading-area-sec border-bottom-0 pb-0">
+                            <div class="left-part-sec">
+                                <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">EQUIPMENT LOAN/RENTAL <span style="font-size: 24px;">📌</span></h3>
+                                <p class="text-muted mb-0" style="font-size: 16px;">Track and manage equipment checkout, returns, and sales.</p>
                             </div>
+                            <div class="right-part-sec">
+                                <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#AddEquipmentModal">
+                                    + CREATE EQUIPMENT
+                                </button>
+                            </div>
+                        </div>
 
-                            <hr class="my-4" style="opacity: 0.1;">
+                        <hr class="mx-4 my-4" style="opacity: 0.1;">
 
-                            <!-- Table Card -->
-                            <div class="pb-4">
+                        <!-- Table Card -->
+                        <div class="px-4 pb-4">
+                            <div class="table-responsive">
                                 <table id="equipmentLoanTable" class="table table-hover w-100 equipment-report-table">
                                     <thead>
                                         <tr>
@@ -140,7 +129,7 @@
                                             <th>Serial Number</th>
                                             <th>Status</th>
                                             <th>Location / Rental Info</th>
-                                            <th class="text-center" style="width: 120px;">Actions</th>
+                                            <th class="text-center" style="width: 150px;">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -176,14 +165,16 @@
                                                 </td>
                                                 <td class="text-center">
                                                     @if ($eq->status === 'available')
-                                                        <button class="btn btn-sm btn-outline-success btn-process-checkout fw-semibold" 
+                                                        <button class="btn btn-sm btn-outline-dark me-2 btn-process-checkout" 
+                                                                style="border-radius: 6px; padding: 6px 14px;"
                                                                 data-id="{{ $eq->id }}" 
                                                                 data-name="{{ $eq->name }}" 
                                                                 data-serial="{{ $eq->serial_number }}">
                                                             Process
                                                         </button>
                                                     @elseif ($eq->status === 'processed')
-                                                        <button class="btn btn-sm btn-outline-danger btn-process-disposition fw-semibold"
+                                                        <button class="btn btn-sm btn-outline-dark me-2 btn-process-disposition"
+                                                                style="border-radius: 6px; padding: 6px 14px;"
                                                                 data-id="{{ $eq->id }}"
                                                                 data-name="{{ $eq->name }}"
                                                                 data-serial="{{ $eq->serial_number }}"
@@ -201,11 +192,10 @@
                                     </tbody>
                                 </table>
                             </div>
-
                         </div>
+
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -222,23 +212,25 @@
                     @csrf
                     <div class="modal-body">
                         <div class="row mx-0">
-                            <div class="col-lg-12 mb-3">
+                            <div class="col-lg-12">
                                 <div class="form-group">
-                                    <label class="form-label fw-semibold">Equipment Name <span class="text-danger">*</span></label>
-                                    <input type="text" name="name" class="form-control bg-light" placeholder="e.g. 5000Pro, Air Oasis" required>
+                                    <label class="form-label">Equipment Name</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="text" name="name" class="form-control" placeholder="e.g. 5000Pro, Air Oasis" required>
                                 </div>
                             </div>
-                            <div class="col-lg-12 mb-3">
+                            <div class="col-lg-12">
                                 <div class="form-group">
-                                    <label class="form-label fw-semibold">Serial Number <span class="text-danger">*</span></label>
-                                    <input type="text" name="serial_number" class="form-control bg-light" placeholder="e.g. 21918004" required>
+                                    <label class="form-label">Serial Number</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="text" name="serial_number" class="form-control" placeholder="e.g. 21918004" required>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Create</button>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -257,16 +249,17 @@
                     @csrf
                     <div class="modal-body">
                         <div class="row mx-0">
-                            <div class="col-lg-12 mb-3">
-                                <div class="p-3 bg-light rounded border">
+                            <div class="col-lg-12">
+                                <div class="p-3 bg-light rounded border mb-3">
                                     <div class="mb-1"><span class="fw-semibold text-muted">Equipment:</span> <span class="eq-name fw-bold text-dark"></span></div>
                                     <div><span class="fw-semibold text-muted">Serial:</span> <span class="eq-serial fw-bold text-dark"></span></div>
                                 </div>
                             </div>
-                            <div class="col-lg-12 mb-3">
+                            <div class="col-lg-12">
                                 <div class="form-group">
-                                    <label class="form-label fw-semibold">Select Company <span class="text-danger">*</span></label>
-                                    <select id="checkout-company" name="company_id" class="form-control bg-light" required>
+                                    <label class="form-label">Select Company</label>
+                                    <span class="text-danger">*</span>
+                                    <select id="checkout-company" name="company_id" class="form-select" required>
                                         <option value="">-- Select Company --</option>
                                         @foreach ($companies as $company)
                                             <option value="{{ $company->id }}">{{ $company->name }}</option>
@@ -275,10 +268,10 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Complete Checkout</button>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Complete Checkout</button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -297,8 +290,8 @@
                     @csrf
                     <div class="modal-body">
                         <div class="row mx-0">
-                            <div class="col-lg-12 mb-3">
-                                <div class="p-3 bg-light rounded border" style="font-size: 13px;">
+                            <div class="col-lg-12">
+                                <div class="p-3 bg-light rounded border mb-3" style="font-size: 13px;">
                                     <div class="mb-1"><span class="fw-semibold text-muted">Equipment:</span> <span class="eq-name fw-bold text-dark"></span></div>
                                     <div class="mb-1"><span class="fw-semibold text-muted">Serial:</span> <span class="eq-serial fw-bold text-dark"></span></div>
                                     <div class="mb-1"><span class="fw-semibold text-muted">Company:</span> <span class="eq-company fw-bold text-dark"></span></div>
@@ -306,10 +299,11 @@
                                     <div><span class="fw-semibold text-muted">Due Back Date:</span> <span class="eq-due fw-bold text-danger"></span></div>
                                 </div>
                             </div>
-                            <div class="col-lg-12 mb-3">
+                            <div class="col-lg-12">
                                 <div class="form-group">
-                                    <label class="form-label fw-semibold">Select Disposition Action <span class="text-danger">*</span></label>
-                                    <select name="action" class="form-control bg-light" required>
+                                    <label class="form-label">Select Disposition Action</label>
+                                    <span class="text-danger">*</span>
+                                    <select name="action" class="form-select" required>
                                         <option value="">-- Select Disposition Action --</option>
                                         <option value="check_in">Check In (Returns to Available)</option>
                                         <option value="sell">Sell to Client (Updates to Sold)</option>
@@ -318,10 +312,10 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Submit Disposition</button>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Submit Disposition</button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -334,6 +328,19 @@
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script>
         $(document).ready(function() {
+            @if(session('success'))
+                toastr.success("{{ session('success') }}");
+            @endif
+
+            @if(session('error'))
+                toastr.error("{{ session('error') }}");
+            @endif
+
+            @if($errors->any())
+                @foreach($errors->all() as $error)
+                    toastr.error("{{ $error }}");
+                @endforeach
+            @endif
             // Initialize DataTable
             $('#equipmentLoanTable').DataTable({
                 pageLength: 10,
@@ -345,7 +352,8 @@
                 ],
                 dom: '<"d-flex justify-content-between align-items-center mb-3"l f>r<"table-responsive"t><"d-flex justify-content-between align-items-center mt-3"i p>',
                 language: {
-                    search: 'Search:',
+                    search: '',
+                    searchPlaceholder: 'Search...',
                     lengthMenu: 'Show _MENU_ entries',
                     info: 'Showing _START_ to _END_ of _TOTAL_ entries',
                     paginate: {

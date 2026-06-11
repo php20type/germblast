@@ -333,9 +333,9 @@
                                                 <div class="timeline position-relative" id="allActivitiesContainer">
                                                     @foreach ($allactivities as $item)
                                                         <div class="timeline-item">
-                                                            {{-- <div class="timeline-icon">
-                                                                    <i class="{{ $item->activityType->icon }}"></i>
-                                                                </div> --}}
+                                                            <div class="timeline-icon">
+                                                                <i class="fas fa-angle-double-right"></i>
+                                                            </div>
                                                             <div class="timeline-content">
                                                                 <div class="timeline-header">
                                                                     <div class="timestamp">
@@ -720,9 +720,9 @@
                                                     @foreach ($timeline as $item)
                                                         @if ($item->type === 'activity')
                                                             <div class="timeline-item">
-                                                                {{-- <div class="timeline-icon">
-                                                                    <i class="{{ $item->activityType->icon }}"></i>
-                                                                </div> --}}
+                                                                <div class="timeline-icon">
+                                                                    <i class="fas fa-angle-double-right"></i>
+                                                                </div>
                                                                 <div class="timeline-content">
                                                                     <div class="timeline-header">
                                                                         <div class="timestamp">
@@ -844,9 +844,9 @@
                                                             </div>
                                                         @elseif ($item->type === 'note')
                                                             <div class="timeline-item">
-                                                                {{-- <div class="timeline-icon">
+                                                                <div class="timeline-icon">
                                                                     <i class="fas fa-sticky-note"></i>
-                                                                </div> --}}
+                                                                </div> 
                                                                 <div class="timeline-content">
                                                                     <div class="timeline-header">
                                                                         <div class="timestamp">
@@ -955,9 +955,9 @@
                                                             </div>
                                                         @elseif ($item->type === 'timeline')
                                                             <div class="timeline-item">
-                                                                {{-- <div class="timeline-icon">
+                                                                <div class="timeline-icon">
                                                                     <i class="fas fa-angle-double-right"></i>
-                                                                </div> --}}
+                                                                </div>
                                                                 <div class="timeline-content">
                                                                     <div class="timeline-header">
                                                                         <div class="timestamp">
@@ -982,9 +982,9 @@
                                                             </div>
                                                         @elseif ($item->type === 'milestone')
                                                             <div class="timeline-item milestone">
-                                                                {{-- <div class="timeline-icon">
+                                                                <div class="timeline-icon">
                                                                     <i class="fa-brands fa-web-awesome"></i>
-                                                                </div> --}}
+                                                                </div> 
                                                                 <strong>🎉 {{ $item->title }}</strong>
                                                                 <span
                                                                     class="text-muted">{{ $item->timestamp->format('M d, Y') }}</span>

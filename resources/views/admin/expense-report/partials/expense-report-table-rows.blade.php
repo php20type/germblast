@@ -22,7 +22,7 @@
 
     <!-- EMPLOYEE -->
     <td>
-        <a href="{{ route('admin.expense-report.edit', $report->id) }}" class="fw-bold text-decoration-none" style="color: #ffb400;">
+        <a href="{{ route('admin.expense-report.edit', $report->id) }}" class="text-decoration-none">
             {{ $report->user->name ?? 'N/A' }}
         </a>
     </td>

@@ -928,7 +928,8 @@
                     { orderable: false, targets: -1 }
                 ],
                 language: {
-                    search: 'Search:',
+                    search: '',
+                    searchPlaceholder: 'Search...',
                     lengthMenu: 'Show _MENU_ entries',
                     info: 'Showing _START_ to _END_ of _TOTAL_ entries',
                     paginate: {
@@ -936,7 +937,7 @@
                         next: 'Next >'
                     }
                 },
-                dom: '<"d-flex justify-content-between align-items-center mb-3"l f>rtip',
+                dom: '<"d-flex justify-content-between align-items-center mb-3"l f>r<"table-responsive"t><"d-flex justify-content-between align-items-center mt-3"i p>',
             };
 
             function initDataTable(tableId) {

@@ -201,7 +201,7 @@
                             <div class="col-md-6">
                                 <div class="d-flex align-items-center gap-2 position-relative">
                                     <div class="search-form">
-                                        <input type="search" class="form-control bg-light" id="expense-search"
+                                        <input type="search" class="form-control" id="expense-search"
                                                placeholder="Search all reports..">
                                     </div>
                                     <span class="company-count" id="total-count">{{ $count }} Expense Reports Found</span>
@@ -209,7 +209,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="d-flex align-items-center justify-content-end">
-                                    <select class="form-select w-auto bg-light" id="type-filter">
+                                    <select class="form-select w-auto" id="type-filter">
                                         <option value="">All Types</option>
                                         <option value="Personal">Personal</option>
                                         <option value="Corporate">Corporate</option>
@@ -219,7 +219,7 @@
                         </div>
                     </div>
 
-                    <div class="sales-dashboard rounded-4 shadow-sm overflow-hidden mx-4 mb-4" style="background: #fff; border: 1px solid #e5e7eb;">
+                    <div class="sales-dashboard">
                         <!-- TABS -->
                         <div class="navbar-tabs px-4 pt-3">
                             <nav class="nav nav-tabs mb-0 w-100 nav-fill" role="tablist">

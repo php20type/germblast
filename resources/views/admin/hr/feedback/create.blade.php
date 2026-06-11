@@ -63,9 +63,11 @@
                                     Your identity is completely protected. Share your honest thoughts.
                                 </p>
                             </div>
+                            @if (auth()->user()->isSuperAdmin())
                             <div class="right-part-sec">
                                 <a href="{{ route('admin.hr.feedback.index') }}" class="btn btn-export">View Submissions</a>
                             </div>
+                            @endif
                         </div>
 
                         <hr class="mx-4 my-4" style="opacity: .1;">

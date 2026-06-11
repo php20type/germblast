@@ -45,6 +45,8 @@ class User extends Authenticatable
         'healthcare_team',
         'driver_trained',
         'floor_certified',
+        'driver_status',
+        'driver_points',
     ];
 
     /**

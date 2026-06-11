@@ -48,19 +48,17 @@
         border-color: #3b82f6;
     }
     .btn-submit-praise {
-        background: #4e83f2;
+        background: #ffb81c;
         color: #fff;
-        font-weight: 500;
+        font-weight: 700;
         font-size: 14px;
-        padding: 10px 36px;
+        padding: 10px 32px;
         border: none;
-        border-radius: 20px;
+        border-radius: 8px;
         cursor: pointer;
         transition: background .15s;
     }
-    .btn-submit-praise:hover {
-        background: #3b71df;
-    }
+    .btn-submit-praise:hover { background: #e5a500; }
 </style>
 @endpush
 
@@ -80,9 +78,11 @@
                                     Please answer the following questions and submit your feedback.
                                 </p>
                             </div>
+                            @if (auth()->user()->isSuperAdmin())
                             <div class="right-part-sec">
                                 <a href="{{ route('admin.hr.praise.index') }}" class="btn btn-export">View Submissions</a>
                             </div>
+                            @endif
                         </div>
 
                         <hr class="mx-4 my-4" style="opacity: .1;">
@@ -154,7 +154,7 @@
 
                                 </div>
 
-                                <div class="text-center">
+                                <div>
                                     <button type="submit" class="btn-submit-praise" id="submitBtn">Submit Praise</button>
                                 </div>
                             </form>

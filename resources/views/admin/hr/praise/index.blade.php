@@ -5,7 +5,7 @@
 @section('content')
     <div class="companies-section my-4">
         <div class="container-fluid">
-            <div class="row">
+            <div class="row company-details-section">
                 <div class="col-md-12 p-0">
                     <div class="main-content">
                         <div class="sales-dashboard rounded-4 shadow-sm overflow-hidden">
@@ -42,7 +42,10 @@
                                         <div class="timeline position-relative">
 
                                             @forelse($praises as $praise)
-                                                <div class="timeline-item pb-4 mb-4 border-bottom">
+                                                <div class="timeline-item">
+                                                    <div class="timeline-icon">
+                                                        <i class="fas fa-angle-double-right"></i>
+                                                    </div>
                                                     <div class="timeline-content">
                                                         <div class="timeline-header d-flex justify-content-between align-items-center">
                                                             <div class="timestamp text-muted small">

@@ -254,4 +254,52 @@ class EmployeeController extends Controller
             'message' => 'Driver suspension record added successfully.',
         ]);
     }
+
+    /**
+     * Display a listing of driver reports.
+     */
+    public function driverReport()
+    {
+        $users = User::orderBy('name')->get();
+        
+        $drivers = $users->filter(function ($user) {
+            return $user->isDriverTrained();
+        });
+
+        return view('admin.hr.driver-report.index', compact('drivers'));
+    }
+
+    /**
+     * Update the driver report fields for the specified user.
+     */
+    public function updateDriverReport(Request $request, $userId)
+    {
+        $request->validate([
+            'status' => 'nullable|string|max:255',
+            'points' => 'nullable|string|max:255',
+        ]);
+
+        $user = User::findOrFail($userId);
+
+        if (!$user->isDriverTrained()) {
+            if ($request->ajax()) {
+                return response()->json(['error' => 'Selected user is not a driver.'], 422);
+            }
+            return redirect()->back()->with('error', 'Selected user is not a driver.');
+        }
+
+        $user->update([
+            'driver_status' => $request->status,
+            'driver_points' => $request->points,
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'message' => 'Driver report updated successfully!',
+                'user' => $user
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Driver report updated successfully!');
+    }
 }

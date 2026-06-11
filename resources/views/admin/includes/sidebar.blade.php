@@ -192,7 +192,7 @@
                 </a>
             </li>
             <li class="{{ request()->routeIs('admin.hr.feedback.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.hr.feedback.index') }}">
+                <a href="{{ route('admin.hr.feedback.create') }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon2.svg") }} alt="icon" />
                     </div>
@@ -212,12 +212,22 @@
                 </a>
             </li>
             <li class="{{ request()->routeIs('admin.hr.praise.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.hr.praise.index') }}">
+                <a href="{{ route('admin.hr.praise.create') }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon2.svg") }} alt="icon" />
                     </div>
                     <div class="nav-text ms-3">
                         Core Value Praise
+                    </div>
+                </a>
+            </li>
+            <li class="{{ request()->routeIs('admin.hr.driver-report.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.hr.driver-report.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon15.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Driver Report
                     </div>
                 </a>
             </li>

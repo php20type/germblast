@@ -14,6 +14,9 @@ class CoreValuePraiseController extends Controller
      */
     public function index()
     {
+        if (!auth()->user()->isSuperAdmin()) {
+            abort(403, 'Unauthorized action.');
+        }
         $praises = CoreValuePraise::with(['sender', 'recipient'])->latest()->get();
         return view('admin.hr.praise.index', compact('praises'));
     }

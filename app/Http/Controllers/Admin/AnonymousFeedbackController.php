@@ -10,6 +10,9 @@ class AnonymousFeedbackController extends Controller
 {
     public function index()
     {
+        if (!auth()->user()->isSuperAdmin()) {
+            abort(403, 'Unauthorized action.');
+        }
         $feedbacks = AnonymousFeedback::latest()->get();
         return view('admin.hr.feedback.index', compact('feedbacks'));
     }
@@ -37,10 +40,4 @@ class AnonymousFeedbackController extends Controller
             ->with('success', 'Feedback submitted successfully.');
     }
 
-    public function destroy($id)
-    {
-        AnonymousFeedback::findOrFail($id)->delete();
-
-        return redirect()->back()->with('success', 'Feedback deleted.');
-    }
 }

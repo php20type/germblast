@@ -432,9 +432,10 @@ $(document).ready(function () {
     $('#myRequestsTable').DataTable({
         pageLength: 10,
         ordering: false,
-        dom: '<"d-flex justify-content-between align-items-center mb-3"lf>r<"table-responsive"t><"d-flex justify-content-between align-items-center mt-3"ip>',
+        dom: '<"d-flex justify-content-between align-items-center mb-3"l f>r<"table-responsive"t><"d-flex justify-content-between align-items-center mt-3"i p>',
         language: {
-            search: 'Search:',
+            search: '',
+            searchPlaceholder: 'Search...',
             lengthMenu: 'Show _MENU_ entries',
             info: 'Showing _START_ to _END_ of _TOTAL_ entries',
             paginate: { previous: 'Previous', next: 'Next' }
@@ -447,7 +448,8 @@ $(document).ready(function () {
             ordering: false,
             dom: '<"d-flex justify-content-between align-items-center mb-3"lf>r<"table-responsive"t><"d-flex justify-content-between align-items-center mt-3"ip>',
             language: {
-                search: 'Search:',
+                search: '',
+                searchPlaceholder: 'Search...',
                 lengthMenu: 'Show _MENU_ entries',
                 info: 'Showing _START_ to _END_ of _TOTAL_ entries',
                 paginate: { previous: 'Previous', next: 'Next' }

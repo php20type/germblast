@@ -135,7 +135,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('hr/feedback', [AnonymousFeedbackController::class, 'index'])->name('hr.feedback.index');
     Route::get('hr/feedback/create', [AnonymousFeedbackController::class, 'create'])->name('hr.feedback.create');
     Route::post('hr/feedback/store', [AnonymousFeedbackController::class, 'store'])->name('hr.feedback.store');
-    Route::delete('hr/feedback/{id}/destroy', [AnonymousFeedbackController::class, 'destroy'])->name('hr.feedback.destroy');
 
     // Time Off Requests
     Route::get('hr/time-off', [TimeOffRequestController::class, 'index'])->name('hr.time-off.index');
@@ -147,6 +146,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('hr/praise', [CoreValuePraiseController::class, 'index'])->name('hr.praise.index');
     Route::get('hr/praise/create', [CoreValuePraiseController::class, 'create'])->name('hr.praise.create');
     Route::post('hr/praise/store', [CoreValuePraiseController::class, 'store'])->name('hr.praise.store');
+
+    // Driver Reports
+    Route::get('hr/driver-report', [EmployeeController::class, 'driverReport'])->name('hr.driver-report.index');
+    Route::post('hr/driver-report/{userId}', [EmployeeController::class, 'updateDriverReport'])->name('hr.driver-report.update');
 });
 
 Route::view('survey-proposal.pdf', 'survey-proposal.pdf')->name('survey.proposal');
