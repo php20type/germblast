@@ -20,4 +20,5 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('meetings/delete', [SaleController::class, 'delete_meetings'])->name('sales.meetings.delete');
     Route::post('meeting/{id}/complete', [SaleController::class, 'complete_meeting'])->name('sales.meeting.complete');
 
+    Route::get('/sales/invoices', [SaleController::class, 'invoices'])->name('sales.invoices');
 });

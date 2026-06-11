@@ -685,4 +685,16 @@ class SaleController extends Controller
                 : 'Meeting deleted successfully.',
         ]);
     }
+
+    public function invoices(Request $request)
+    {
+        $invoices = \App\Models\ServiceOrderInvoice::with(['serviceOrder.service.lead.company'])
+                          ->orderBy('invoice_date', 'desc')
+                          ->orderBy('id', 'desc')
+                          ->get();
+
+        $invoicesCount = $invoices->count();
+
+        return view('admin.sales.invoices', compact('invoices', 'invoicesCount'));
+    }
 }
