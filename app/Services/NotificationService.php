@@ -572,4 +572,67 @@ class NotificationService
         }
     }
 
+    public function timeOffSubmitted($timeOffRequest)
+    {
+        $employee = $timeOffRequest->user;
+        $superAdmins = \App\Models\User::where('role', 'super_admin')
+            ->orWhereHas('roles', function($q) {
+                $q->where('name', 'super_admin');
+            })
+            ->get();
+
+        foreach ($superAdmins as $admin) {
+            if ($this->sendEmail) {
+                SendEmailJob::dispatch(
+                    $admin->email,
+                    'time_off_submitted',
+                    [
+                        'admin_name' => $admin->name,
+                        'employee_name' => $employee->name ?? 'Unknown Employee',
+                        'start_date' => $timeOffRequest->start_date->format('M d, Y'),
+                        'end_date' => $timeOffRequest->end_date->format('M d, Y'),
+                        'duration_days' => $timeOffRequest->duration_days,
+                        'reason' => $timeOffRequest->reason ?? 'No reason provided',
+                        'request_id' => $timeOffRequest->id,
+                    ]
+                );
+            }
+
+            if ($this->sendSMS) {
+                SendSMSJob::dispatch(
+                    $admin->cell_phone ?: $this->testPhone,
+                    "New Time Off Request submitted by {$employee->name} from " . $timeOffRequest->start_date->format('M d, Y') . " to " . $timeOffRequest->end_date->format('M d, Y') . "."
+                );
+            }
+        }
+    }
+
+    public function timeOffActioned($timeOffRequest)
+    {
+        $employee = $timeOffRequest->user;
+        if (!$employee) return;
+
+        if ($this->sendEmail) {
+            SendEmailJob::dispatch(
+                $employee->email,
+                'time_off_actioned',
+                [
+                    'employee_name' => $employee->name,
+                    'status' => $timeOffRequest->status,
+                    'start_date' => $timeOffRequest->start_date->format('M d, Y'),
+                    'end_date' => $timeOffRequest->end_date->format('M d, Y'),
+                    'duration_days' => $timeOffRequest->duration_days,
+                    'admin_notes' => $timeOffRequest->admin_notes ?? 'No comments.',
+                ]
+            );
+        }
+
+        if ($this->sendSMS) {
+            SendSMSJob::dispatch(
+                $employee->cell_phone ?: $this->testPhone,
+                "Your Time Off Request for " . $timeOffRequest->start_date->format('M d, Y') . " to " . $timeOffRequest->end_date->format('M d, Y') . " has been {$timeOffRequest->status}."
+            );
+        }
+    }
+
 }

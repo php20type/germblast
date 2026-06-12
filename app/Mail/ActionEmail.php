@@ -44,6 +44,8 @@ class ActionEmail extends Mailable
                 'day_of_service_staff' => 'Service Order Scheduled Today',
                 'day_of_service_sales_rep' => 'Service Scheduled Today',
                 'share_invoice' => 'Invoice Details for Your Service Order',
+                'time_off_submitted' => 'New Time Off Request Submitted',
+                'time_off_actioned' => 'Time Off Request Update',
                 default => 'Lead Notification'
             }
         );

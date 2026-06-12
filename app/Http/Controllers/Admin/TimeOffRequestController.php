@@ -16,59 +16,59 @@ class TimeOffRequestController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
+        
+        $currentYear = Carbon::now()->year;
+        $selectedYear = $request->input('year', $currentYear); // default to current year
 
         // 1. Current user's requests
         $myRequests = TimeOffRequest::where('user_id', $user->id)
+            ->whereYear('start_date', $selectedYear)
             ->latest()
             ->get();
 
-        // Calculate current user's approved days (e.g. for the current year)
-        $currentYear = Carbon::now()->year;
-        $myApprovedRequestsThisYear = TimeOffRequest::where('user_id', $user->id)
-            ->where('status', 'approved')
-            ->whereYear('start_date', $currentYear)
-            ->get();
-
-        $myApprovedDays = $myApprovedRequestsThisYear->sum(function ($req) {
-            return $req->duration_days;
-        });
-
         // 2. Company-wide requests (for admins, managers, supervisors)
-        $isAdminOrManager = $user->isSuperAdmin() || 
-                            $user->isSupervisor() || 
-                            $user->isOperationsManager() || 
-                            $user->isAssistantOperationsManager() || 
-                            $user->isRegionalOperationsManager();
+        $isAdminOrManager = $user->isSuperAdmin();
 
         $companyRequests = collect();
-        $submittedCount = 0;
-        $approvedCount = 0;
-        $totalApprovedDaysCompany = 0;
+
+        // Stats queries base
+        $adminQuery = TimeOffRequest::query();
+        $employeeQuery = TimeOffRequest::where('user_id', $user->id);
+
+        // Apply year filter
+        $adminQuery->whereYear('start_date', $selectedYear);
+        $employeeQuery->whereYear('start_date', $selectedYear);
 
         if ($isAdminOrManager) {
             $companyRequests = TimeOffRequest::with(['user', 'manager'])
+                ->whereYear('start_date', $selectedYear)
                 ->latest()
                 ->get();
 
-            $submittedCount = TimeOffRequest::where('status', 'submitted')->count();
-            $approvedCount = TimeOffRequest::where('status', 'approved')->count();
-            
-            $approvedRequestsThisYear = TimeOffRequest::where('status', 'approved')
-                ->whereYear('start_date', $currentYear)
-                ->get();
-            $totalApprovedDaysCompany = $approvedRequestsThisYear->sum(function ($req) {
-                return $req->duration_days;
-            });
+            // Stats for Admin (Company-wide)
+            $approvedCount = $adminQuery->clone()->where('status', 'approved')->count();
+            $pendingCount = $adminQuery->clone()->where('status', 'submitted')->count();
+            $rejectedCount = $adminQuery->clone()->where('status', 'rejected')->count();
+        } else {
+            // Stats for regular employee (personal requests)
+            $approvedCount = $employeeQuery->clone()->where('status', 'approved')->count();
+            $pendingCount = $employeeQuery->clone()->where('status', 'submitted')->count();
+            $rejectedCount = $employeeQuery->clone()->where('status', 'rejected')->count();
         }
+
+        // Generate dynamic years for the toggle starting from 2026 up to the current year
+        $years = range($currentYear, 2026);
 
         return view('admin.hr.time-off.index', compact(
             'myRequests',
-            'myApprovedDays',
             'isAdminOrManager',
             'companyRequests',
-            'submittedCount',
             'approvedCount',
-            'totalApprovedDaysCompany'
+            'pendingCount',
+            'rejectedCount',
+            'selectedYear',
+            'currentYear',
+            'years'
         ));
     }
 
@@ -84,13 +84,16 @@ class TimeOffRequestController extends Controller
         ]);
 
         try {
-            TimeOffRequest::create([
+            $timeOffRequest = TimeOffRequest::create([
                 'user_id'    => auth()->id(),
                 'start_date' => $request->start_date,
                 'end_date'   => $request->end_date,
                 'reason'     => $request->reason,
                 'status'     => 'submitted',
             ]);
+
+            $timeOffRequest->load('user');
+            (new \App\Services\NotificationService())->timeOffSubmitted($timeOffRequest);
 
             if ($request->ajax()) {
                 return response()->json(['message' => 'Time off request submitted successfully.']);
@@ -110,11 +113,7 @@ class TimeOffRequestController extends Controller
     public function approve(Request $request, $id)
     {
         $user = auth()->user();
-        $isAdminOrManager = $user->isSuperAdmin() || 
-                            $user->isSupervisor() || 
-                            $user->isOperationsManager() || 
-                            $user->isAssistantOperationsManager() || 
-                            $user->isRegionalOperationsManager();
+        $isAdminOrManager = $user->isSuperAdmin();
 
         if (!$isAdminOrManager) {
             if ($request->ajax()) {
@@ -132,6 +131,9 @@ class TimeOffRequestController extends Controller
                 'admin_notes' => $request->admin_notes,
             ]);
 
+            $timeOffRequest->load('user');
+            (new \App\Services\NotificationService())->timeOffActioned($timeOffRequest);
+
             if ($request->ajax()) {
                 return response()->json(['message' => 'Request approved successfully.']);
             }
@@ -145,16 +147,12 @@ class TimeOffRequestController extends Controller
     }
 
     /**
-     * Deny a time off request.
+     * Reject a time off request.
      */
-    public function deny(Request $request, $id)
+    public function reject(Request $request, $id)
     {
         $user = auth()->user();
-        $isAdminOrManager = $user->isSuperAdmin() || 
-                            $user->isSupervisor() || 
-                            $user->isOperationsManager() || 
-                            $user->isAssistantOperationsManager() || 
-                            $user->isRegionalOperationsManager();
+        $isAdminOrManager = $user->isSuperAdmin();
 
         if (!$isAdminOrManager) {
             if ($request->ajax()) {
@@ -166,16 +164,19 @@ class TimeOffRequestController extends Controller
         try {
             $timeOffRequest = TimeOffRequest::findOrFail($id);
             $timeOffRequest->update([
-                'status'      => 'denied',
+                'status'      => 'rejected',
                 'actioned_by' => $user->id,
                 'actioned_at' => now(),
                 'admin_notes' => $request->admin_notes,
             ]);
 
+            $timeOffRequest->load('user');
+            (new \App\Services\NotificationService())->timeOffActioned($timeOffRequest);
+
             if ($request->ajax()) {
-                return response()->json(['message' => 'Request denied successfully.']);
+                return response()->json(['message' => 'Request rejected successfully.']);
             }
-            return redirect()->back()->with('success', 'Request denied successfully.');
+            return redirect()->back()->with('success', 'Request rejected successfully.');
         } catch (\Exception $e) {
             if ($request->ajax()) {
                 return response()->json(['message' => 'Something went wrong: ' . $e->getMessage()], 500);

@@ -141,7 +141,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('hr/time-off', [TimeOffRequestController::class, 'index'])->name('hr.time-off.index');
     Route::post('hr/time-off/store', [TimeOffRequestController::class, 'store'])->name('hr.time-off.store');
     Route::post('hr/time-off/{id}/approve', [TimeOffRequestController::class, 'approve'])->name('hr.time-off.approve');
-    Route::post('hr/time-off/{id}/deny', [TimeOffRequestController::class, 'deny'])->name('hr.time-off.deny');
+    Route::post('hr/time-off/{id}/reject', [TimeOffRequestController::class, 'reject'])->name('hr.time-off.reject');
 
     // Core Value Praise
     Route::get('hr/praise', [CoreValuePraiseController::class, 'index'])->name('hr.praise.index');

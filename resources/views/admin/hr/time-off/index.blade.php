@@ -73,7 +73,7 @@
         color: #065f46;
     }
 
-    .status-pill-denied {
+    .status-pill-rejected {
         background: #fee2e2;
         color: #b91c1c;
     }
@@ -166,6 +166,37 @@
         background: #e5a200;
         color: #fff;
     }
+
+    /* Calendar Navigation Button from Vehicle Planning / All Schedules */
+    .calendar-nav-btn {
+        color: #4b5563 !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 8px 16px !important;
+        border-radius: 6px !important;
+        transition: all 0.15s ease;
+        text-decoration: none !important;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .calendar-nav-btn:hover {
+        background-color: #f3f4f6 !important;
+        color: #1f2937 !important;
+    }
+
+    .calendar-nav-btn.btn-today {
+        background-color: #ffb400 !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 4px rgba(255, 180, 0, 0.15) !important;
+    }
+
+    .calendar-nav-btn.btn-today:hover {
+        background-color: #e6a200 !important;
+        color: #ffffff !important;
+    }
 </style>
 @endpush
 
@@ -212,47 +243,82 @@
                             </div>
                         @endif
 
+                        <!-- Year-wise Toggle Navigation Bar (Matching All Schedules Page Layout) -->
+                        <div class="filter-section py-3 px-4 mx-4 my-3 rounded-3 border bg-white"
+                            style="border-color: #e5e7eb !important;">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                                <div>
+                                    <h4 class="mb-0 fw-bold text-dark" style="font-size: 16px;">
+                                        Year: {{ $selectedYear }}
+                                    </h4>
+                                </div>
+                                <div class="d-flex align-items-center gap-1 bg-light p-1 rounded-3 border"
+                                    style="border-color: #e5e7eb !important;">
+                                    @if($selectedYear > 2026)
+                                        <a href="{{ route('admin.hr.time-off.index', ['year' => $selectedYear - 1]) }}"
+                                            class="calendar-nav-btn" title="Previous Year">
+                                            <i class="fas fa-chevron-left me-1" style="font-size: 10px;"></i> Prev Year
+                                        </a>
+                                    @else
+                                        <span class="calendar-nav-btn text-muted opacity-50" style="cursor: not-allowed;" title="Previous Year">
+                                            <i class="fas fa-chevron-left me-1" style="font-size: 10px;"></i> Prev Year
+                                        </span>
+                                    @endif
+
+                                    <span class="text-muted opacity-25 px-1">|</span>
+
+                                    <a href="{{ route('admin.hr.time-off.index', ['year' => $currentYear]) }}"
+                                         class="calendar-nav-btn {{ $selectedYear == $currentYear ? 'btn-today' : '' }}">
+                                         Current Year
+                                     </a>
+
+                                    <span class="text-muted opacity-25 px-1">|</span>
+
+                                    @if($selectedYear < $currentYear)
+                                        <a href="{{ route('admin.hr.time-off.index', ['year' => $selectedYear + 1]) }}"
+                                            class="calendar-nav-btn" title="Next Year">
+                                            Next Year <i class="fas fa-chevron-right ms-1" style="font-size: 10px;"></i>
+                                        </a>
+                                    @else
+                                        <span class="calendar-nav-btn text-muted opacity-50" style="cursor: not-allowed;" title="Next Year">
+                                            Next Year <i class="fas fa-chevron-right ms-1" style="font-size: 10px;"></i>
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
                         {{-- Summary Cards --}}
                         <div class="px-4 pb-2">
                             <div class="section-card">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <div>
-                                        <h2 class="section-title" style="margin-bottom: 0px; padding-bottom: 0px;">TIME OFF METRICS</h2>
-                                        <p class="section-subtitle text-muted mb-0" style="font-size: 13px;">Metrics - Year - to - date</p>
+                                        <p class="section-subtitle text-muted mb-0" style="font-size: 13px;">Metrics - Year {{ $selectedYear }}</p>
                                     </div>
                                 </div>
 
                                 <div class="row">
-                                    <div class="{{ $isAdminOrManager ? 'col-md-3' : 'col-md-12' }}">
-                                        <div class="metric-card open-leads mb-0">
-                                            <h3>MY APPROVED DAYS</h3>
-                                            <div class="metric-value blue">{{ $myApprovedDays }}</div>
-                                            <div class="metric-change text-muted">Days approved this calendar year</div>
+                                    <div class="col-md-4">
+                                        <div class="metric-card new-lead mb-0">
+                                            <h3>APPROVED LEAVES</h3>
+                                            <div class="metric-value green">{{ $approvedCount }}</div>
+                                            <div class="metric-change text-muted">Total approved leave requests</div>
                                         </div>
                                     </div>
-                                    @if($isAdminOrManager)
-                                        <div class="col-md-3">
-                                            <div class="metric-card sales mb-0">
-                                                <h3>SUBMITTED COMPANY REQUESTS</h3>
-                                                <div class="metric-value red">{{ $submittedCount }}</div>
-                                                <div class="metric-change text-muted">Awaiting manager review</div>
-                                            </div>
+                                    <div class="col-md-4">
+                                        <div class="metric-card open-leads mb-0">
+                                            <h3>PENDING LEAVES</h3>
+                                            <div class="metric-value blue">{{ $pendingCount }}</div>
+                                            <div class="metric-change text-muted">Leave requests awaiting review</div>
                                         </div>
-                                        <div class="col-md-3">
-                                            <div class="metric-card new-lead mb-0">
-                                                <h3>APPROVED COMPANY REQUESTS</h3>
-                                                <div class="metric-value green">{{ $approvedCount }}</div>
-                                                <div class="metric-change text-muted">Approved company-wide requests</div>
-                                            </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="metric-card sales mb-0">
+                                            <h3>REJECTED LEAVES</h3>
+                                            <div class="metric-value red">{{ $rejectedCount }}</div>
+                                            <div class="metric-change text-muted">Rejected or cancelled requests</div>
                                         </div>
-                                        <div class="col-md-3">
-                                            <div class="metric-card open-leads mb-0">
-                                                <h3>TOTAL CO. APPROVED DAYS</h3>
-                                                <div class="metric-value blue">{{ $totalApprovedDaysCompany }}</div>
-                                                <div class="metric-change text-muted">Total days approved company-wide</div>
-                                            </div>
-                                        </div>
-                                    @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -260,7 +326,7 @@
                         {{-- Section 1: My Requests --}}
                         <div class="px-4 pb-2">
                             <div class="section-card">
-                                <div class="section-title">My Time Off Requests</div>
+                                <div class="section-title">My Requests</div>
                                 <table id="myRequestsTable" class="table w-100 equipment-report-table">
                                     <thead>
                                         <tr>
@@ -302,7 +368,7 @@
                         @if($isAdminOrManager)
                             <div class="px-4 pb-4">
                                 <div class="section-card">
-                                    <div class="section-title">Company-Wide Requests (Admin Control)</div>
+                                    <div class="section-title">All Requests</div>
                                     <table id="companyRequestsTable" class="table w-100 equipment-report-table">
                                         <thead>
                                             <tr>
@@ -336,7 +402,7 @@
                                                          </span>
                                                      </td>
                                                      <td>
-                                                         @if($request->status === 'approved' || $request->status === 'denied')
+                                                         @if($request->status === 'approved' || $request->status === 'rejected')
                                                              <small class="text-secondary">{{ ucfirst($request->status) }} by {{ $request->manager->name ?? 'System' }}</small>
                                                          @else
                                                              <span class="text-muted">—</span>
@@ -352,8 +418,8 @@
                                                                      <button type="button" class="btn btn-sm btn-outline-success inline-approve-btn flex-fill" data-id="{{ $request->id }}">
                                                                          Approve
                                                                      </button>
-                                                                     <button type="button" class="btn btn-sm btn-outline-danger inline-deny-btn flex-fill" data-id="{{ $request->id }}">
-                                                                         Deny
+                                                                     <button type="button" class="btn btn-sm btn-outline-danger inline-reject-btn flex-fill" data-id="{{ $request->id }}">
+                                                                         Reject
                                                                      </button>
                                                                  </div>
                                                              </div>
@@ -478,14 +544,14 @@ $(document).ready(function () {
         form.submit();
     });
 
-    // Inline Deny Button Click Action
-    $(document).on('click', '.inline-deny-btn', function () {
+    // Inline Reject Button Click Action
+    $(document).on('click', '.inline-reject-btn', function () {
         var id = $(this).data('id');
         var notes = $('#notes-input-' + id).val();
         
         var form = $('<form>', {
             method: 'POST',
-            action: '/admin/hr/time-off/' + id + '/deny'
+            action: '/admin/hr/time-off/' + id + '/reject'
         });
         form.append($('<input>', { type: 'hidden', name: '_token', value: '{{ csrf_token() }}' }));
         form.append($('<input>', { type: 'hidden', name: 'admin_notes', value: notes }));
