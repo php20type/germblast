@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ConsumableReportController;
 use App\Http\Controllers\Admin\OfficeDutyController;
 use App\Http\Controllers\Admin\InventoryReportController;
 use App\Http\Controllers\Admin\JobProfitabilityController;
+use App\Http\Controllers\Admin\ChangeControlController;
 use App\Http\Controllers\Admin\LoanEquipmentController;
 use App\Http\Controllers\Admin\AnonymousFeedbackController;
 use App\Http\Controllers\Admin\TimeOffRequestController;
@@ -171,6 +172,16 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     // Job Profitability
     Route::get('job-profitability', [JobProfitabilityController::class, 'index'])->name('job-profitability.index');
+
+    // Change Control
+    Route::get('change-control', [ChangeControlController::class, 'index'])->name('change-control.index');
+    Route::post('change-control', [ChangeControlController::class, 'store'])->name('change-control.store');
+    Route::get('change-control/{id}', [ChangeControlController::class, 'show'])->name('change-control.show');
+    Route::post('change-control/{id}/update', [ChangeControlController::class, 'update'])->name('change-control.update');
+    Route::post('change-control/{id}/status', [ChangeControlController::class, 'updateStatus'])->name('change-control.status.update');
+    Route::post('change-control/{id}/task', [ChangeControlController::class, 'storeTask'])->name('change-control.task.store');
+    Route::post('change-control/{id}/task/{taskId}/status', [ChangeControlController::class, 'updateTaskStatus'])->name('change-control.task.status.update');
+    Route::post('change-control/{id}/documentation', [ChangeControlController::class, 'storeDocumentation'])->name('change-control.documentation.store');
 });
 
 Route::view('survey-proposal.pdf', 'survey-proposal.pdf')->name('survey.proposal');

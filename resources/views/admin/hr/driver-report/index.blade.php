@@ -42,8 +42,8 @@
 
         .equipment-report-table td {
             padding: 15px 20px !important;
-            vertical-align: middle !important;
-            border-bottom: 1px solid #f3f4f6 !important;
+                vertical-align: middle !important;
+                border-bottom: 1px solid #f3f4f6 !important;
             border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
             font-size: 14px !important;
         }

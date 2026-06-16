@@ -191,6 +191,16 @@
                     </div>
                 </a>
             </li>
+            <li class="{{ request()->routeIs('admin.change-control.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.change-control.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon15.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Change Control
+                    </div>
+                </a>
+            </li>
             <li class="{{ request()->routeIs('admin.office-duties.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.office-duties.index') }}">
                     <div class="icon-round">
