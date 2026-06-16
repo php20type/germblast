@@ -141,6 +141,16 @@
                     </div>
                 </a>
             </li>
+            <li class="{{ request()->routeIs('admin.job-profitability.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.job-profitability.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon18.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Job Profitability
+                    </div>
+                </a>
+            </li>
             <li class="{{ request()->routeIs('admin.equipment-management.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.equipment-management.index') }}">
                     <div class="icon-round">
@@ -168,6 +178,26 @@
                     </div>
                     <div class="nav-text ms-3">
                         Consumable Reports
+                    </div>
+                </a>
+            </li>
+            <li class="{{ request()->routeIs('admin.inventory-report.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.inventory-report.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon15.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Inventory Report
+                    </div>
+                </a>
+            </li>
+            <li class="{{ request()->routeIs('admin.office-duties.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.office-duties.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon15.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Office Duties
                     </div>
                 </a>
             </li>

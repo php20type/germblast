@@ -8,6 +8,9 @@ use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\ExpenseReportController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Admin\ConsumableReportController;
+use App\Http\Controllers\Admin\OfficeDutyController;
+use App\Http\Controllers\Admin\InventoryReportController;
+use App\Http\Controllers\Admin\JobProfitabilityController;
 use App\Http\Controllers\Admin\LoanEquipmentController;
 use App\Http\Controllers\Admin\AnonymousFeedbackController;
 use App\Http\Controllers\Admin\TimeOffRequestController;
@@ -115,6 +118,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::put('consumable-reports/update/{id}', [ConsumableReportController::class, 'update'])->name('consumable-reports.update');
     Route::post('consumable-reports/delete/{id}', [ConsumableReportController::class, 'destroy'])->name('consumable-reports.destroy');
 
+    // Office Duties
+    Route::get('office-duties', [OfficeDutyController::class, 'index'])->name('office-duties.index');
+    Route::post('office-duties/store', [OfficeDutyController::class, 'store'])->name('office-duties.store');
+    Route::put('office-duties/update/{id}', [OfficeDutyController::class, 'update'])->name('office-duties.update');
+    Route::post('office-duties/complete/{id}', [OfficeDutyController::class, 'complete'])->name('office-duties.complete');
+
     // Equipment Loan System
     Route::get('equipment-loan/index', [LoanEquipmentController::class, 'index'])->name('equipment-loan.index');
     Route::post('equipment-loan/store', [LoanEquipmentController::class, 'store'])->name('equipment-loan.store');
@@ -156,6 +165,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Driver Reports
     Route::get('hr/driver-report', [EmployeeController::class, 'driverReport'])->name('hr.driver-report.index');
     Route::post('hr/driver-report/{userId}', [EmployeeController::class, 'updateDriverReport'])->name('hr.driver-report.update');
+
+    // Inventory Report
+    Route::get('inventory-report', [InventoryReportController::class, 'index'])->name('inventory-report.index');
+
+    // Job Profitability
+    Route::get('job-profitability', [JobProfitabilityController::class, 'index'])->name('job-profitability.index');
 });
 
 Route::view('survey-proposal.pdf', 'survey-proposal.pdf')->name('survey.proposal');
