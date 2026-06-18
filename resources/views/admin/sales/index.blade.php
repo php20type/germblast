@@ -278,7 +278,7 @@
                                         <li class="nav-item" role="presentation">
                                             <button class="nav-link" id="todo-tab" data-bs-toggle="tab"
                                                 data-bs-target="#todo" type="button" role="tab"
-                                                aria-controls="todo" aria-selected="false">TO DO</button>
+                                                aria-controls="todo" aria-selected="false">T  O DO</button>
                                         </li>
                                         <li class="nav-item" role="presentation">
                                             <button class="nav-link" id="timeline-tab" data-bs-toggle="tab"

@@ -4,248 +4,108 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\InventoryItem;
+use Carbon\Carbon;
 
 class InventoryReportController extends Controller
 {
     public function index()
     {
-        $items = [
-            [
-                'name' => 'Coolers',
-                'report_date' => '07/25/24',
-                'inventory_val' => '7.00',
-                'reorder_point_val' => '',
-                'unit' => 'Eaches',
-                'actions' => '',
-                'warning' => false,
-                'office' => 'Lubbock, TX',
-                'supplier' => '',
-                'details' => '',
-                'notes' => 'Write notes here'
-            ],
-            [
-                'name' => 'Microfibers Black',
-                'report_date' => '10/04/23',
-                'inventory_val' => '999.99',
-                'reorder_point_val' => '',
-                'unit' => 'Eaches',
-                'actions' => '',
-                'warning' => false,
-                'office' => 'Lubbock, TX',
-                'supplier' => '',
-                'details' => '',
-                'notes' => 'Write notes here'
-            ],
-            [
-                'name' => 'Trough',
-                'report_date' => '09/03/24',
-                'inventory_val' => '7.00',
-                'reorder_point_val' => '',
-                'unit' => 'Eaches',
-                'actions' => '',
-                'warning' => false,
-                'office' => 'Lubbock, TX',
-                'supplier' => '',
-                'details' => '',
-                'notes' => 'Write notes here'
-            ],
-            [
-                'name' => 'Day Duties - Testing',
-                'report_date' => '05/21/26',
-                'inventory_val' => '',
-                'reorder_point_val' => '0.00',
-                'unit' => '',
-                'actions' => 'Please be sure you have an additional 0 on order',
-                'warning' => true,
-                'office' => 'Lubbock, TX',
-                'supplier' => '',
-                'details' => '',
-                'notes' => 'Write notes here'
-            ],
-            [
-                'name' => 'Def',
-                'report_date' => '11/13/24',
-                'inventory_val' => '1.00',
-                'reorder_point_val' => '0.00',
-                'unit' => 'Jugs',
-                'actions' => '',
-                'warning' => false,
-                'office' => 'Lubbock, TX',
-                'supplier' => '',
-                'details' => '',
-                'notes' => 'Write notes here'
-            ],
-            [
-                'name' => 'Gray Dust Heads',
-                'report_date' => '06/22/22',
-                'inventory_val' => '1.00',
-                'reorder_point_val' => '0.00',
-                'unit' => 'Eaches',
-                'actions' => '',
-                'warning' => false,
-                'office' => 'Lubbock, TX',
-                'supplier' => '',
-                'details' => '',
-                'notes' => 'Write notes here'
-            ],
-            [
-                'name' => 'Gray Mop Heads',
-                'report_date' => '08/22/22',
-                'inventory_val' => '5.00',
-                'reorder_point_val' => '0.00',
-                'unit' => 'Eaches',
-                'actions' => '',
-                'warning' => false,
-                'office' => 'Lubbock, TX',
-                'supplier' => '',
-                'details' => '',
-                'notes' => 'Write notes here'
-            ],
-            [
-                'name' => 'Mop Buckets',
-                'report_date' => '08/22/22',
-                'inventory_val' => '4.00',
-                'reorder_point_val' => '0.00',
-                'unit' => 'Eaches',
-                'actions' => '',
-                'warning' => false,
-                'office' => 'Lubbock, TX',
-                'supplier' => '',
-                'details' => '',
-                'notes' => 'Write notes here'
-            ],
-            [
-                'name' => 'Shoe covers',
-                'report_date' => '09/11/24',
-                'inventory_val' => '1.00',
-                'reorder_point_val' => '1.00',
-                'unit' => 'Cases',
-                'actions' => '',
-                'warning' => false,
-                'office' => 'Lubbock, TX',
-                'supplier' => '',
-                'details' => '',
-                'notes' => 'Write notes here'
-            ],
-            [
-                'name' => 'Uniform Shirts - 2XL',
-                'report_date' => '11/13/24',
-                'inventory_val' => '2.00',
-                'reorder_point_val' => '2.00',
-                'unit' => '',
-                'actions' => '',
-                'warning' => false,
-                'office' => 'Lubbock, TX',
-                'supplier' => '',
-                'details' => '',
-                'notes' => 'Write notes here'
-            ],
-            [
-                'name' => 'Uniform Shirts - 3XL',
-                'report_date' => '11/13/24',
-                'inventory_val' => '0.00',
-                'reorder_point_val' => '2.00',
-                'unit' => 'Shirts',
-                'actions' => 'Please be sure you have an additional 2 Shirts on order',
-                'warning' => true,
-                'office' => 'Lubbock, TX',
-                'supplier' => '',
-                'details' => '',
-                'notes' => 'Write notes here'
-            ],
-            [
-                'name' => 'Uniform Shirts - 4XL',
-                'report_date' => '11/13/24',
-                'inventory_val' => '1.00',
-                'reorder_point_val' => '2.00',
-                'unit' => 'Shirts',
-                'actions' => 'Please be sure you have an additional 2 Shirts on order',
-                'warning' => true,
-                'office' => 'Lubbock, TX',
-                'supplier' => '',
-                'details' => '',
-                'notes' => 'Write notes here'
-            ],
-            [
-                'name' => 'Uniform Shirts - Large',
-                'report_date' => '11/13/24',
-                'inventory_val' => '2.00',
-                'reorder_point_val' => '2.00',
-                'unit' => 'Shirts',
-                'actions' => '',
-                'warning' => false,
-                'office' => 'Lubbock, TX',
-                'supplier' => '',
-                'details' => '',
-                'notes' => 'Write notes here'
-            ],
-            [
-                'name' => 'Uniform Shirts - Medium',
-                'report_date' => '11/13/24',
-                'inventory_val' => '2.00',
-                'reorder_point_val' => '2.00',
-                'unit' => 'Shirts',
-                'actions' => '',
-                'warning' => false,
-                'office' => 'Lubbock, TX',
-                'supplier' => '',
-                'details' => '',
-                'notes' => 'Write notes here'
-            ],
-            [
-                'name' => 'Uniform Shirts - Small',
-                'report_date' => '11/13/24',
-                'inventory_val' => '5.00',
-                'reorder_point_val' => '2.00',
-                'unit' => 'Shirts',
-                'actions' => '',
-                'warning' => false,
-                'office' => 'Lubbock, TX',
-                'supplier' => '',
-                'details' => '',
-                'notes' => 'Write notes here'
-            ],
-            [
-                'name' => 'Uniform Shirts - XL',
-                'report_date' => '11/13/24',
-                'inventory_val' => '2.00',
-                'reorder_point_val' => '2.00',
-                'unit' => 'Shirts',
-                'actions' => '',
-                'warning' => false,
-                'office' => 'Lubbock, TX',
-                'supplier' => '',
-                'details' => '',
-                'notes' => 'Write notes here'
-            ],
-            [
-                'name' => 'Uniform Shirts - XS',
-                'report_date' => '11/13/24',
-                'inventory_val' => '9.00',
-                'reorder_point_val' => '2.00',
-                'unit' => 'Shirts',
-                'actions' => '',
-                'warning' => false,
-                'office' => 'Lubbock, TX',
-                'supplier' => '',
-                'details' => '',
-                'notes' => 'Write notes here'
-            ],
-            [
-                'name' => '3M Particulate Filters',
-                'report_date' => '11/13/24',
-                'inventory_val' => '3.00',
-                'reorder_point_val' => '10.00',
-                'unit' => 'Boxes',
-                'actions' => 'Please be sure you have an additional 20 Boxes on order',
-                'warning' => true,
-                'office' => 'Lubbock, TX',
-                'supplier' => '',
-                'details' => '',
-                'notes' => 'Write notes here'
-            ],
-        ];
-
+        $items = InventoryItem::orderBy('name', 'asc')->get();
         return view('admin.reports.inventory', compact('items'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'office' => 'required|string|max:255',
+            'report_date' => 'required|date',
+            'inventory_val' => 'nullable|numeric|min:0',
+            'reorder_point_val' => 'nullable|numeric|min:0',
+            'unit' => 'nullable|string|max:255',
+            'supplier' => 'nullable|string|max:255',
+            'actions' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
+        ]);
+
+        $data = $request->all();
+
+        // Auto-determine warning status
+        $inv = $request->filled('inventory_val') ? (float)$request->inventory_val : null;
+        $reorder = $request->filled('reorder_point_val') ? (float)$request->reorder_point_val : null;
+        
+        $warning = false;
+        if ($inv !== null && $reorder !== null && $inv < $reorder) {
+            $warning = true;
+        } elseif ($inv === null && $reorder !== null) {
+            $warning = true;
+        }
+        
+        $data['warning'] = $warning;
+
+        // Auto-fill action if empty and it is a warning
+        if ($warning && empty($data['actions'])) {
+            $qty = $reorder !== null ? floatval($reorder) : 0;
+            $unitStr = $request->unit ? ' ' . $request->unit : '';
+            $data['actions'] = "Please be sure you have an additional {$qty}{$unitStr} on order";
+        }
+
+        InventoryItem::create($data);
+
+        return redirect()->route('admin.inventory-report.index')->with('success', 'Inventory item created successfully.');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $item = InventoryItem::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'office' => 'required|string|max:255',
+            'report_date' => 'required|date',
+            'inventory_val' => 'nullable|numeric|min:0',
+            'reorder_point_val' => 'nullable|numeric|min:0',
+            'unit' => 'nullable|string|max:255',
+            'supplier' => 'nullable|string|max:255',
+            'actions' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
+        ]);
+
+        $data = $request->all();
+
+        // Auto-determine warning status
+        $inv = $request->filled('inventory_val') ? (float)$request->inventory_val : null;
+        $reorder = $request->filled('reorder_point_val') ? (float)$request->reorder_point_val : null;
+        
+        $warning = false;
+        if ($inv !== null && $reorder !== null && $inv < $reorder) {
+            $warning = true;
+        } elseif ($inv === null && $reorder !== null) {
+            $warning = true;
+        }
+        
+        $data['warning'] = $warning;
+
+        // Auto-fill action if warning and empty
+        if ($warning && empty($data['actions'])) {
+            $qty = $reorder !== null ? floatval($reorder) : 0;
+            $unitStr = $request->unit ? ' ' . $request->unit : '';
+            $data['actions'] = "Please be sure you have an additional {$qty}{$unitStr} on order";
+        } elseif (!$warning) {
+            $data['actions'] = null;
+        }
+
+        $item->update($data);
+
+        return redirect()->route('admin.inventory-report.index')->with('success', 'Inventory item updated successfully.');
+    }
+
+    public function destroy($id)
+    {
+        $item = InventoryItem::findOrFail($id);
+        $item->delete();
+
+        return redirect()->route('admin.inventory-report.index')->with('success', 'Inventory item deleted successfully.');
     }
 }

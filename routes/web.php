@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\OfficeDutyController;
 use App\Http\Controllers\Admin\InventoryReportController;
 use App\Http\Controllers\Admin\JobProfitabilityController;
 use App\Http\Controllers\Admin\ChangeControlController;
+use App\Http\Controllers\Admin\BusinessFailureController;
 use App\Http\Controllers\Admin\LoanEquipmentController;
 use App\Http\Controllers\Admin\AnonymousFeedbackController;
 use App\Http\Controllers\Admin\TimeOffRequestController;
@@ -169,9 +170,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     // Inventory Report
     Route::get('inventory-report', [InventoryReportController::class, 'index'])->name('inventory-report.index');
+    Route::post('inventory-report', [InventoryReportController::class, 'store'])->name('inventory-report.store');
+    Route::post('inventory-report/{id}/update', [InventoryReportController::class, 'update'])->name('inventory-report.update');
+    Route::post('inventory-report/{id}/delete', [InventoryReportController::class, 'destroy'])->name('inventory-report.destroy');
 
     // Job Profitability
     Route::get('job-profitability', [JobProfitabilityController::class, 'index'])->name('job-profitability.index');
+    Route::get('job-profitability/pdf', [JobProfitabilityController::class, 'downloadPdf'])->name('job-profitability.pdf');
+    Route::get('job-profitability/csv', [JobProfitabilityController::class, 'downloadCsv'])->name('job-profitability.csv');
 
     // Change Control
     Route::get('change-control', [ChangeControlController::class, 'index'])->name('change-control.index');
@@ -182,6 +188,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('change-control/{id}/task', [ChangeControlController::class, 'storeTask'])->name('change-control.task.store');
     Route::post('change-control/{id}/task/{taskId}/status', [ChangeControlController::class, 'updateTaskStatus'])->name('change-control.task.status.update');
     Route::post('change-control/{id}/documentation', [ChangeControlController::class, 'storeDocumentation'])->name('change-control.documentation.store');
+
+    // Business Failures
+    Route::get('business-failures', [BusinessFailureController::class, 'index'])->name('failures.index');
+    Route::post('business-failures', [BusinessFailureController::class, 'store'])->name('failures.store');
+    Route::post('business-failures/{id}/documentation', [BusinessFailureController::class, 'storeDocumentation'])->name('failures.documentation.store');
 });
 
 Route::view('survey-proposal.pdf', 'survey-proposal.pdf')->name('survey.proposal');

@@ -4,218 +4,300 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\ServiceOrder;
+use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class JobProfitabilityController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $records = [
-            [
-                'client' => 'Faith Church Lubbock',
-                'date' => '06/01/26',
-                'price' => '419.58',
-                'hours' => '6.29',
-                'ot' => '-',
-                'budget_hours' => '4.86',
-                'ratio_hours' => '1.29',
-                'actual_labor' => '117.10',
-                'budget_labor' => '117.36',
-                'ratio_labor' => '1.00',
-                'delta' => '-0.26',
-                'row_class' => '',
-                'text_color' => '',
-                'price_color' => '',
-                'delta_color' => ''
-            ],
-            [
-                'client' => 'Grace Surgical Hospital',
-                'date' => '06/06/26',
-                'price' => '1,932.00',
-                'hours' => '11.04',
-                'ot' => '-',
-                'budget_hours' => '22.40',
-                'ratio_hours' => '0.49',
-                'actual_labor' => '205.34',
-                'budget_labor' => '540.96',
-                'ratio_labor' => '0.38',
-                'delta' => '-335.62',
-                'row_class' => 'row-green',
-                'text_color' => 'text-success',
-                'price_color' => 'text-success',
-                'delta_color' => 'text-success'
-            ],
-            [
-                'client' => 'Hobbs Municipal Schools',
-                'date' => '06/05/26',
-                'price' => '36,453.53',
-                'hours' => '326.36',
-                'ot' => '23.27',
-                'budget_hours' => '422.60',
-                'ratio_hours' => '0.83',
-                'actual_labor' => '7,130.87',
-                'budget_labor' => '10,205.80',
-                'ratio_labor' => '0.70',
-                'delta' => '-3,074.93',
-                'row_class' => 'row-green',
-                'text_color' => 'text-success',
-                'price_color' => 'text-success',
-                'delta_color' => 'text-success'
-            ],
-            [
-                'client' => 'Hobbs Municipal Schools',
-                'date' => '06/08/26',
-                'price' => '1,200.00',
-                'hours' => '-',
-                'ot' => '-',
-                'budget_hours' => '-',
-                'ratio_hours' => '-',
-                'actual_labor' => '-',
-                'budget_labor' => '-',
-                'ratio_labor' => '-',
-                'delta' => '-',
-                'row_class' => 'row-yellow',
-                'text_color' => '',
-                'price_color' => '',
-                'delta_color' => ''
-            ],
-            [
-                'client' => 'McLane High Plains',
-                'date' => '06/06/26',
-                'price' => '1,045.91',
-                'hours' => '6.68',
-                'ot' => '-',
-                'budget_hours' => '12.12',
-                'ratio_hours' => '0.55',
-                'actual_labor' => '124.25',
-                'budget_labor' => '292.68',
-                'ratio_labor' => '0.42',
-                'delta' => '-168.43',
-                'row_class' => 'row-green',
-                'text_color' => 'text-success',
-                'price_color' => 'text-success',
-                'delta_color' => 'text-success'
-            ],
-            [
-                'client' => 'Milestones Development & Play Park',
-                'date' => '06/07/26',
-                'price' => '609.31',
-                'hours' => '5.62',
-                'ot' => '-',
-                'budget_hours' => '7.06',
-                'ratio_hours' => '0.80',
-                'actual_labor' => '101.16',
-                'budget_labor' => '170.50',
-                'ratio_labor' => '0.59',
-                'delta' => '-69.34',
-                'row_class' => 'row-green',
-                'text_color' => 'text-success',
-                'price_color' => 'text-success',
-                'delta_color' => 'text-success'
-            ],
-            [
-                'client' => 'Northwest Texas Healthcare System',
-                'date' => '06/11/26',
-                'price' => '6,696.01',
-                'hours' => '360.72',
-                'ot' => '14.83',
-                'budget_hours' => '77.64',
-                'ratio_hours' => '4.88',
-                'actual_labor' => '6,413.51',
-                'budget_labor' => '1,875.00',
-                'ratio_labor' => '3.42',
-                'delta' => '4,538.51',
-                'row_class' => 'row-pink',
-                'text_color' => 'text-danger',
-                'price_color' => 'text-danger',
-                'delta_color' => 'text-danger'
-            ],
-            [
-                'client' => 'NWTHS - Cardiovascular Center',
-                'date' => '06/07/26',
-                'price' => '1,700.00',
-                'hours' => '11.09',
-                'ot' => '-',
-                'budget_hours' => '19.72',
-                'ratio_hours' => '0.56',
-                'actual_labor' => '173.00',
-                'budget_labor' => '476.24',
-                'ratio_labor' => '0.36',
-                'delta' => '-303.24',
-                'row_class' => 'row-green',
-                'text_color' => 'text-success',
-                'price_color' => 'text-success',
-                'delta_color' => 'text-success'
-            ],
-            [
-                'client' => 'NWTHS - Georgia Balance Center',
-                'date' => '06/07/26',
-                'price' => '1,623.32',
-                'hours' => '15.67',
-                'ot' => '-',
-                'budget_hours' => '18.81',
-                'ratio_hours' => '0.83',
-                'actual_labor' => '255.76',
-                'budget_labor' => '454.26',
-                'ratio_labor' => '0.56',
-                'delta' => '-198.50',
-                'row_class' => 'row-green',
-                'text_color' => 'text-success',
-                'price_color' => 'text-success',
-                'delta_color' => 'text-success'
-            ],
-            [
-                'client' => 'NWTHS - JO Wyatt Clinic',
-                'date' => '06/05/26',
-                'price' => '5,043.32',
-                'hours' => '193.95',
-                'ot' => '226.33',
-                'budget_hours' => '58.45',
-                'ratio_hours' => '7.19',
-                'actual_labor' => '8,837.66',
-                'budget_labor' => '1,411.55',
-                'ratio_labor' => '6.26',
-                'delta' => '7,426.11',
-                'row_class' => 'row-pink',
-                'text_color' => 'text-danger',
-                'price_color' => 'text-danger',
-                'delta_color' => 'text-danger'
-            ],
-            [
-                'client' => 'NWTHS - Sports & Ortho',
-                'date' => '06/07/26',
-                'price' => '1,053.30',
-                'hours' => '20.51',
-                'ot' => '-',
-                'budget_hours' => '12.21',
-                'ratio_hours' => '1.68',
-                'actual_labor' => '319.96',
-                'budget_labor' => '294.87',
-                'ratio_labor' => '1.09',
-                'delta' => '25.09',
-                'row_class' => '',
-                'text_color' => '',
-                'price_color' => '',
-                'delta_color' => ''
-            ],
-            [
-                'client' => 'NWTHS - Wound Care & Hyperbaric Oxygen Therapy',
-                'date' => '06/05/26',
-                'price' => '1,243.30',
-                'hours' => '26.01',
-                'ot' => '-',
-                'budget_hours' => '14.42',
-                'ratio_hours' => '1.80',
-                'actual_labor' => '405.76',
-                'budget_labor' => '348.24',
-                'ratio_labor' => '1.17',
-                'delta' => '57.52',
-                'row_class' => '',
-                'text_color' => '',
-                'price_color' => '',
-                'delta_color' => ''
-            ]
+        $date = $request->date
+            ? Carbon::parse($request->date)
+            : Carbon::now();
+
+        $data = $this->getProfitabilityData($date);
+
+        return view('admin.reports.profitability', [
+            'records' => $data['records'],
+            'date' => $data['date']
+        ]);
+    }
+
+    public function downloadPdf(Request $request)
+    {
+        $date = $request->date
+            ? Carbon::parse($request->date)
+            : Carbon::now();
+
+        $data = $this->getProfitabilityData($date);
+
+        $pdf = Pdf::loadView('pdf.profitability', [
+            'records' => $data['records'],
+            'date' => $data['date']
+        ]);
+
+        return $pdf->download('job-profitability-' . $date->format('Y-m') . '.pdf');
+    }
+
+    public function downloadCsv(Request $request)
+    {
+        $date = $request->date
+            ? Carbon::parse($request->date)
+            : Carbon::now();
+
+        $data = $this->getProfitabilityData($date);
+        $records = $data['records'];
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="job-profitability-' . $date->format('Y-m') . '.csv"',
         ];
 
-        return view('admin.reports.profitability', compact('records'));
+        $callback = function () use ($records, $date) {
+            $file = fopen('php://output', 'w');
+
+            // Metadata / Header
+            fputcsv($file, ['Job Profitability Report']);
+            fputcsv($file, ['Month', $date->format('F Y')]);
+            fputcsv($file, ['Generated At', now()->format('Y-m-d H:i:s')]);
+            fputcsv($file, []); // Empty row
+
+            // Table Headers
+            fputcsv($file, [
+                'Client',
+                'Date',
+                'Price ($)',
+                'Hours',
+                'OT',
+                'Budget Hours',
+                'Ratio Hours',
+                'Actual Labor ($)',
+                'Budget Labor ($)',
+                'Ratio Labor',
+                'Delta ($)'
+            ]);
+
+            // Data Rows
+            foreach ($records as $record) {
+                fputcsv($file, [
+                    $record['client'],
+                    $record['date'],
+                    $record['price'],
+                    $record['hours'],
+                    $record['ot'],
+                    $record['budget_hours'],
+                    $record['ratio_hours'],
+                    $record['actual_labor'],
+                    $record['budget_labor'],
+                    $record['ratio_labor'],
+                    $record['delta']
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Shared profitability data fetcher
+     */
+    private function getProfitabilityData(Carbon $date): array
+    {
+        $start = $date->copy()->startOfMonth();
+        $end   = $date->copy()->endOfMonth();
+
+        $orders = ServiceOrder::where(function($q) use ($start, $end) {
+            $q->whereBetween('intended_date', [$start->toDateString(), $end->toDateString()])
+              ->orWhereHas('orderSlots', function($slotQ) use ($start, $end) {
+                  $slotQ->whereBetween('scheduled_start_time', [$start, $end]);
+              });
+        })
+        ->with([
+            'service.lead.company',
+            'invoice',
+            'orderSlots.clocks.clockedBy',
+            'orderSlots.staff.user'
+        ])
+        ->get();
+
+        $records = [];
+
+        foreach ($orders as $order) {
+            $clientName = $order->service->lead->company->name ?? 'System';
+            
+            // Get first slot scheduled date or fallback to intended_date
+            $firstSlot = $order->orderSlots->first();
+            $dateObj = $firstSlot && $firstSlot->scheduled_start_time
+                ? $firstSlot->scheduled_start_time
+                : ($order->intended_date ? Carbon::parse($order->intended_date) : null);
+            $formattedDate = $dateObj ? $dateObj->format('m/d/y') : '-';
+
+            // Price calculation
+            $price = 0;
+            if ($order->invoice) {
+                $price = $order->invoice->total_amount;
+            } elseif ($order->service) {
+                $price = $order->service->price_per_service ?? $order->service->total_price ?? 0;
+            }
+
+            // Budget hours & Budget labor
+            $budgetHours = 0;
+            $budgetLabor = 0;
+            $hasStaff = false;
+
+            foreach ($order->orderSlots as $slot) {
+                if ($slot->staff->isNotEmpty()) {
+                    $hasStaff = true;
+                    $budgetHours += $slot->staff->sum('slot_hours');
+                    $budgetLabor += $slot->staff->sum('cost');
+                }
+            }
+
+            if (!$hasStaff) {
+                $budgetHours = $order->orderSlots->sum('scheduled_hours');
+                // fallback budget labor estimate ($25/hr default)
+                $budgetLabor = $budgetHours * 25;
+            }
+
+            // Actual hours, Overtime hours & Actual labor cost from Clocks
+            $actualHours = 0;
+            $otHours = 0;
+            $actualLabor = 0;
+            $hasClocks = false;
+
+            foreach ($order->orderSlots as $slot) {
+                if ($slot->clocks->isNotEmpty()) {
+                    $hasClocks = true;
+                    // Group clocks by technician clocked_by
+                    $userClocks = $slot->clocks->groupBy('clocked_by');
+
+                    foreach ($userClocks as $userId => $clocks) {
+                        if (!$userId) continue;
+
+                        $totalClocksHours = 0;
+                        foreach ($clocks as $clock) {
+                            if (in_array(strtolower($clock->type), ['service', 'travel'])) {
+                                $totalClocksHours += $clock->clocked_hours ?? $clock->calculateHours();
+                            }
+                        }
+
+                        if ($totalClocksHours > 0) {
+                            $user = $clocks->first()->clockedBy ?? \App\Models\User::find($userId);
+                            $rate = $user ? ($user->hourly_rate ?? 0) : 0;
+                            if ($rate == 0) {
+                                $rate = 20; // fallback rate
+                            }
+
+                            // 8-hour overtime threshold per slot/day
+                            $reg = min(8, $totalClocksHours);
+                            $ot = max(0, $totalClocksHours - 8);
+
+                            $actualHours += $reg;
+                            $otHours += $ot;
+                            $actualLabor += ($reg * $rate) + ($ot * $rate * 1.5);
+                        }
+                    }
+                }
+            }
+
+            // If there are no slots scheduled, we treat all metrics as '-'
+            $hasSlots = $order->orderSlots->isNotEmpty();
+
+            // Calculate Ratios and Delta
+            if ($hasSlots) {
+                $ratioHours = $budgetHours > 0 ? ($actualHours + $otHours) / $budgetHours : 0;
+                $ratioLabor = $budgetLabor > 0 ? $actualLabor / $budgetLabor : 0;
+                $delta = $actualLabor - $budgetLabor;
+
+                // Format values
+                $displayHours = $actualHours > 0 ? number_format($actualHours, 2) : '0.00';
+                $displayOt = $otHours > 0 ? number_format($otHours, 2) : '-';
+                $displayBudgetHours = number_format($budgetHours, 2);
+                $displayRatioHours = number_format($ratioHours, 2);
+
+                $displayActualLabor = number_format($actualLabor, 2);
+                $displayBudgetLabor = number_format($budgetLabor, 2);
+                $displayRatioLabor = number_format($ratioLabor, 2);
+                
+                $formattedDelta = ($delta >= 0 ? '' : '-') . number_format(abs($delta), 2);
+
+                // Row highlights matching business logic
+                if (!$hasClocks) {
+                    $rowClass = 'row-yellow';
+                    $textColor = '';
+                    $priceColor = '';
+                    $deltaColor = '';
+                } else {
+                    $ratio = $budgetLabor > 0 ? $actualLabor / $budgetLabor : 1;
+                    if ($actualLabor < $budgetLabor) {
+                        $diff = $budgetLabor - $actualLabor;
+                        if ($diff >= 50 || $ratio <= 0.90) {
+                            $rowClass = 'row-green';
+                            $textColor = 'text-success';
+                            $priceColor = 'text-success';
+                            $deltaColor = 'text-success';
+                        } else {
+                            $rowClass = '';
+                            $textColor = '';
+                            $priceColor = '';
+                            $deltaColor = '';
+                        }
+                    } else {
+                        $diff = $actualLabor - $budgetLabor;
+                        if ($diff >= 100 || $ratio >= 1.10) {
+                            $rowClass = 'row-pink';
+                            $textColor = 'text-danger';
+                            $priceColor = 'text-danger';
+                            $deltaColor = 'text-danger';
+                        } else {
+                            $rowClass = '';
+                            $textColor = '';
+                            $priceColor = '';
+                            $deltaColor = '';
+                        }
+                    }
+                }
+            } else {
+                $displayHours = '-';
+                $displayOt = '-';
+                $displayBudgetHours = '-';
+                $displayRatioHours = '-';
+                $displayActualLabor = '-';
+                $displayBudgetLabor = '-';
+                $displayRatioLabor = '-';
+                $formattedDelta = '-';
+                $rowClass = 'row-yellow';
+                $textColor = '';
+                $priceColor = '';
+                $deltaColor = '';
+            }
+
+            $records[] = [
+                'id' => $order->id,
+                'client' => $clientName,
+                'date' => $formattedDate,
+                'price' => number_format($price, 2),
+                'hours' => $displayHours,
+                'ot' => $displayOt,
+                'budget_hours' => $displayBudgetHours,
+                'ratio_hours' => $displayRatioHours,
+                'actual_labor' => $displayActualLabor,
+                'budget_labor' => $displayBudgetLabor,
+                'ratio_labor' => $displayRatioLabor,
+                'delta' => $formattedDelta,
+                'row_class' => $rowClass,
+                'text_color' => $textColor,
+                'price_color' => $priceColor,
+                'delta_color' => $deltaColor
+            ];
+        }
+
+        return [
+            'records' => $records,
+            'date' => $date
+        ];
     }
 }

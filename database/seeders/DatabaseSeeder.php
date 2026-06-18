@@ -40,6 +40,8 @@ class DatabaseSeeder extends Seeder
         $this->call(ExpenseTypeSeeder::class);
         $this->call(ItemReasonSeeder::class);
         $this->call(EquipmentManagementTypeSeeder::class);
+        $this->call(InventoryItemSeeder::class);
+        $this->call(BusinessFailureSeeder::class);
 
         User::factory()->create([
             'name' => 'Test User',
