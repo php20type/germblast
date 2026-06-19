@@ -130,6 +130,16 @@
                     </div>
                 </a>
             </li>
+            <li class="{{ request()->routeIs('admin.team.availability') ? 'active' : '' }}">
+                <a href="{{ route('admin.team.availability') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon4.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Team Availability
+                    </div>
+                </a>
+            </li>
             <hr>
             <li class="{{ request()->routeIs('admin.expense-report.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.expense-report.index') }}">

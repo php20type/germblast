@@ -123,7 +123,7 @@
 
                                 <div>
                                     <span class="text-secondary text-uppercase fw-bold d-block"
-                                        style="font-size: 9px; letter-spacing: 0.5px;">Active Schedule Period</span>
+                                        style="font-size: 11px; letter-spacing: 0.5px;">Active Schedule Period</span>
                                     <h4 class="mb-0 fw-bold text-dark" style="font-size: 18px;">
                                         Week of: {{ $start->format('M d, Y') }}
                                     </h4>
@@ -134,7 +134,7 @@
                                     style="border-color: #e5e7eb !important;">
                                     <a href="{{ route('admin.vehicle.planning', ['date' => $start->copy()->subWeek()->toDateString()]) }}"
                                         class="calendar-nav-btn" title="Previous Week">
-                                        <i class="fas fa-chevron-left me-1" style="font-size: 10px;"></i> Prev Week
+                                        <i class="fas fa-chevron-left me-1" style="font-size: 12px;"></i> Prev Week
                                     </a>
 
                                     <span class="text-muted opacity-25 px-1">|</span>
@@ -148,7 +148,7 @@
 
                                     <a href="{{ route('admin.vehicle.planning', ['date' => $start->copy()->addWeek()->toDateString()]) }}"
                                         class="calendar-nav-btn" title="Next Week">
-                                        Next Week <i class="fas fa-chevron-right ms-1" style="font-size: 10px;"></i>
+                                        Next Week <i class="fas fa-chevron-right ms-1" style="font-size: 12px;"></i>
                                     </a>
                                 </div>
 
@@ -173,15 +173,15 @@
                                         <div
                                             class="calendar-day-header py-3 px-2 text-center {{ $isToday ? 'border-today-accent' : '' }}">
                                             <span class="d-block fw-bold text-secondary text-uppercase mb-1"
-                                                style="font-size: 10px; letter-spacing: 0.5px;">
+                                                style="font-size: 12px; letter-spacing: 0.5px;">
                                                 {{ $dateItem->format('l') }}
                                             </span>
-                                            <span class="d-block fw-bold text-dark" style="font-size: 13px;">
+                                            <span class="d-block fw-bold text-dark" style="font-size: 14px;">
                                                 {{ $dateItem->format('M d, Y') }}
                                             </span>
                                             @if($isToday)
                                                 <span class="badge bg-warning text-dark mt-1"
-                                                    style="font-size: 9px; font-weight: 600;">TODAY</span>
+                                                    style="font-size: 10px; font-weight: 600;">TODAY</span>
                                             @endif
                                         </div>
 
@@ -193,7 +193,7 @@
                                                     style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #3b82f6;">
 
                                                     {{-- COMPANY LINK --}}
-                                                    <div class="fw-bold text-dark mb-1" style="font-size: 12px; line-height: 1.3;">
+                                                    <div class="fw-bold text-dark mb-1" style="font-size: 14px; line-height: 1.3;">
                                                         <a href="{{ route('admin.lead.service.fulfill_order', $slot->serviceOrder->id) }}"
                                                             class="company-link text-primary hover-underline">
                                                             {{ $slot->serviceOrder->service->lead->company->name ?? '-' }}
@@ -201,9 +201,9 @@
                                                     </div>
 
                                                     {{-- SLOT TIME --}}
-                                                    <div class="text-muted fw-semibold mb-2" style="font-size: 10px;">
+                                                    <div class="text-muted fw-semibold mb-2" style="font-size: 12px;">
                                                         <i class="far fa-clock me-1 text-primary"
-                                                            style="opacity: 0.7; font-size: 9px;"></i>
+                                                            style="opacity: 0.7; font-size: 11px;"></i>
                                                         {{ \Carbon\Carbon::parse($slot->scheduled_start_time)->format('h:i A') }}
                                                         -
                                                         {{ \Carbon\Carbon::parse($slot->scheduled_end_time)->format('h:i A') }}
@@ -213,10 +213,10 @@
                                                     <div class="assigned-vehicles-list mb-1">
                                                         @foreach($slot->vehicles as $vehicle)
                                                             <div class="d-flex justify-content-between align-items-center mb-1 p-1 px-2 rounded bg-white border"
-                                                                style="font-size: 11px; border-color: #e5e7eb !important;">
+                                                                style="font-size: 13px; border-color: #e5e7eb !important;">
                                                                 <span class="text-dark fw-medium">
                                                                     <i class="fas fa-truck text-primary me-1"
-                                                                        style="font-size: 9px; opacity: 0.8;"></i>
+                                                                        style="font-size: 11px; opacity: 0.8;"></i>
                                                                     {{ $vehicle->name }}
                                                                 </span>
                                                                 <form
@@ -225,7 +225,7 @@
                                                                     @csrf
                                                                     <button type="submit"
                                                                         class="btn btn-sm btn-link text-danger p-0 border-0 ms-1"
-                                                                        style="font-size: 11px; line-height: 1;">
+                                                                        style="font-size: 13px; line-height: 1;">
                                                                         <i class="fas fa-times-circle"></i>
                                                                     </button>
                                                                 </form>
@@ -242,7 +242,7 @@
                                                             <div class="mb-1">
                                                                 <select name="vehicle_ids[]"
                                                                     class="form-select form-select-sm bg-white"
-                                                                    style="font-size: 11px; border-radius: 4px; padding: 0.2rem 0.4rem !important;"
+                                                                    style="font-size: 13px; border-radius: 4px; padding: 0.2rem 0.4rem !important;"
                                                                     required>
                                                                     <option value="">Add vehicle...</option>
                                                                     @foreach($vehicles as $vehicle)
@@ -254,7 +254,7 @@
                                                             </div>
                                                             <button type="submit"
                                                                 class="btn btn-export btn-sm py-1 w-100 text-center text-uppercase fw-bold"
-                                                                style="font-size: 10px; border-radius: 4px !important;">
+                                                                style="font-size: 12px; border-radius: 4px !important;">
                                                                 Add
                                                             </button>
                                                         </form>
@@ -264,9 +264,9 @@
                                             @empty
                                                 {{-- NO SLOTS TEMPLATE --}}
                                                 <div class="py-4 text-center text-muted"
-                                                    style="font-size: 11px; margin-top: auto; margin-bottom: auto;">
+                                                    style="font-size: 13px; margin-top: auto; margin-bottom: auto;">
                                                     <i class="far fa-calendar-minus d-block mb-1 text-muted"
-                                                        style="font-size: 14px; opacity: 0.5;"></i>
+                                                        style="font-size: 16px; opacity: 0.5;"></i>
                                                     No slots
                                                 </div>
                                             @endforelse

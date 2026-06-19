@@ -75,6 +75,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('/scheduling-calendar/orders', [ServiceController::class, 'schedulingCalendarOrders'])->name('scheduling_calendar.orders');
 
     Route::get('/vehicle-planning', [ServiceController::class, 'vehiclePlanning'])->name('vehicle.planning');
+    Route::get('/team-availability', [ServiceController::class, 'teamAvailability'])->name('team.availability');
 
     Route::get('/all-schedules', [ServiceController::class, 'all_schedules'])->name('all_schedules.index');
     Route::get('/my-jobs', [ServiceController::class, 'myJobs'])->name('my-jobs.index');

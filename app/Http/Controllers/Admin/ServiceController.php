@@ -19,6 +19,8 @@ use App\Models\CompanyLocation;
 use App\Models\Territory;
 use App\Models\Vehicle;
 use App\Models\User;
+use App\Models\TimeOffRequest;
+use App\Models\ServiceOrderSlotClock;
 use App\Models\Equipment;
 use App\Models\EquipmentStatusLog;
 use App\Models\ServiceOrderRoomRecord;
@@ -1034,6 +1036,289 @@ class ServiceController extends Controller
         $vehicles = Vehicle::where('is_retired', 0)->get();
 
         return view('admin.vehicle-planning.index', compact('slots', 'vehicles', 'start', 'end', 'date'));
+    }
+
+    public function teamAvailability(Request $request)
+    {
+        $date = $request->date
+            ? \Carbon\Carbon::parse($request->date)
+            : now();
+
+        $start = $date->copy()->startOfWeek();
+        $end   = $date->copy()->endOfWeek();
+
+        // 1. Fetch all confirmed slots in the range
+        $slots = ServiceOrderSlot::with([
+                'serviceOrder.service.lead.company',
+                'staff.user'
+            ])
+            ->where('is_confirmed', true)
+            ->whereBetween('scheduled_start_time', [$start, $end])
+            ->orderBy('scheduled_start_time')
+            ->get();
+
+        // 2. Fetch all potential employees
+        $employees = User::whereNotNull('territory_id')
+            ->whereNotNull('staff_type')
+            ->orderBy('name')
+            ->get();
+
+        $startOfWeek = $start->copy()->startOfDay();
+        $endOfWeek = $end->copy()->endOfDay();
+
+        // 3. Fetch all slot staff assignments for the week
+        $allWeeklyAssignments = ServiceOrderSlotStaff::whereHas('slot', function ($query) use ($startOfWeek, $endOfWeek) {
+                $query->where('is_confirmed', true)
+                      ->whereBetween('scheduled_start_time', [$startOfWeek, $endOfWeek]);
+            })
+            ->with('slot')
+            ->get()
+            ->groupBy('user_id');
+
+        // 4. Fetch all approved time-off requests for the week
+        $allWeeklyTimeOffs = TimeOffRequest::where('status', 'approved')
+            ->where(function ($query) use ($startOfWeek, $endOfWeek) {
+                $query->where(function ($q) use ($startOfWeek, $endOfWeek) {
+                    $q->whereBetween('start_date', [$startOfWeek, $endOfWeek])
+                      ->orWhereBetween('end_date', [$startOfWeek, $endOfWeek])
+                      ->orWhere(function ($q2) use ($startOfWeek, $endOfWeek) {
+                          $q2->where('start_date', '<=', $startOfWeek)
+                            ->where('end_date', '>=', $endOfWeek);
+                      });
+                });
+            })
+            ->get();
+
+        // 5. For each slot, calculate available staff
+        foreach ($slots as $slot) {
+            $slotStart = $slot->scheduled_start_time;
+            $slotEnd = $slot->scheduled_end_time;
+            $slotDayKey = $slotStart->format('Y-m-d');
+
+            $assignedUserIds = $slot->staff->pluck('user_id')->toArray();
+            $availableStaff = [];
+
+            foreach ($employees as $employee) {
+                // If already assigned to this slot, they are not available
+                if (in_array($employee->id, $assignedUserIds)) {
+                    continue;
+                }
+
+                // Display available staff from that scheduled slot office location (territory) only
+                if ($slot->scheduled_office && $employee->territory_id != $slot->scheduled_office) {
+                    continue;
+                }
+
+                // Filter assignments for today
+                $employeeAssignmentsToday = isset($allWeeklyAssignments[$employee->id])
+                    ? $allWeeklyAssignments[$employee->id]->filter(function ($assignment) use ($slotDayKey) {
+                        return $assignment->slot && $assignment->slot->scheduled_start_time->format('Y-m-d') === $slotDayKey;
+                    })
+                    : collect();
+
+                $dayStart = $slotStart->copy()->startOfDay();
+                $dayEnd = $slotStart->copy()->endOfDay();
+
+                $busyIntervals = [];
+                foreach ($employeeAssignmentsToday as $assignment) {
+                    $sStart = $assignment->slot->scheduled_start_time;
+                    $sEnd = $assignment->slot->scheduled_end_time;
+
+                    $clampedStart = $sStart->lt($dayStart) ? $dayStart : $sStart;
+                    $clampedEnd = $sEnd->gt($dayEnd) ? $dayEnd : $sEnd;
+
+                    if ($clampedStart->lt($clampedEnd)) {
+                        $busyIntervals[] = [
+                            'start' => $clampedStart,
+                            'end' => $clampedEnd
+                        ];
+                    }
+                }
+
+                // Sort busy intervals
+                usort($busyIntervals, function ($a, $b) {
+                    return $a['start']->timestamp <=> $b['start']->timestamp;
+                });
+
+                // Merge overlapping/adjacent
+                $mergedBusy = [];
+                foreach ($busyIntervals as $interval) {
+                    if (empty($mergedBusy)) {
+                        $mergedBusy[] = $interval;
+                    } else {
+                        $last = &$mergedBusy[count($mergedBusy) - 1];
+                        if ($interval['start']->lte($last['end'])) {
+                            if ($interval['end']->gt($last['end'])) {
+                                $last['end'] = $interval['end'];
+                            }
+                        } else {
+                            $mergedBusy[] = $interval;
+                        }
+                    }
+                }
+
+                // Compute free intervals
+                $freeIntervals = [];
+                $currentStart = $dayStart;
+                foreach ($mergedBusy as $busy) {
+                    if ($currentStart->lt($busy['start'])) {
+                        $freeIntervals[] = [
+                            'start' => $currentStart->copy(),
+                            'end' => $busy['start']->copy()
+                        ];
+                    }
+                    $currentStart = $busy['end'];
+                }
+                if ($currentStart->lt($dayEnd)) {
+                    $freeIntervals[] = [
+                        'start' => $currentStart,
+                        'end' => $dayEnd
+                    ];
+                }
+
+                // Check if current slot fits entirely in one of the free intervals
+                $isAvailable = false;
+                $availableTimeRange = '';
+                foreach ($freeIntervals as $free) {
+                    if ($free['start']->lte($slotStart) && $free['end']->gte($slotEnd)) {
+                        $isAvailable = true;
+                        $availableTimeRange = $free['start']->format('H:i') . ' - ' . $free['end']->format('H:i');
+                        break;
+                    }
+                }
+
+                if ($isAvailable) {
+                    // Check vacation status
+                    $onVacation = $allWeeklyTimeOffs->contains(function ($timeOff) use ($employee, $slotDayKey) {
+                        return $timeOff->user_id === $employee->id &&
+                            $timeOff->start_date &&
+                            $timeOff->end_date &&
+                            $timeOff->start_date->format('Y-m-d') <= $slotDayKey &&
+                            $timeOff->end_date->format('Y-m-d') >= $slotDayKey;
+                    });
+
+                    $availableStaff[] = [
+                        'user' => $employee,
+                        'available_time' => $availableTimeRange,
+                        'on_vacation' => $onVacation
+                    ];
+                }
+            }
+
+            // Assign this calculated list to slot object dynamically
+            $slot->availableStaff = collect($availableStaff);
+        }
+
+        // 6. Group employees into hourly buckets for the week
+        $buckets = [
+            '0' => [],
+            '<5' => [],
+            '<10' => [],
+            '<15' => [],
+            '<20' => [],
+            '<25' => [],
+            '<30' => [],
+            '<35' => [],
+            '<40' => [],
+            '>40' => [],
+        ];
+
+        // Let's get all clocks for this week to avoid N+1 queries
+        $weeklyClocks = ServiceOrderSlotClock::whereBetween('clocked_in_at', [$startOfWeek, $endOfWeek])
+            ->get()
+            ->groupBy('clocked_by');
+
+        foreach ($employees as $employee) {
+            $totalHours = 0;
+            $processedClockIds = [];
+
+            // Get weekly assignments for this employee
+            $assignments = isset($allWeeklyAssignments[$employee->id]) 
+                ? $allWeeklyAssignments[$employee->id] 
+                : collect();
+
+            // Get weekly clocks for this employee
+            $clocks = isset($weeklyClocks[$employee->id])
+                ? $weeklyClocks[$employee->id]
+                : collect();
+
+            // Process assignments: use actual clock hours if present, fallback to scheduled hours
+            foreach ($assignments as $assignment) {
+                if (!$assignment->slot) {
+                    continue;
+                }
+                
+                // Find if there is a clock record for this employee and this slot
+                $slotClock = $clocks->first(function ($clock) use ($assignment) {
+                    return $clock->service_order_slot_id === $assignment->service_order_slot_id;
+                });
+
+                if ($slotClock) {
+                    if (in_array(strtolower($slotClock->type), ['service', 'travel'])) {
+                        $totalHours += $slotClock->clocked_hours ?? $slotClock->calculateHours();
+                    }
+                    $processedClockIds[] = $slotClock->id;
+                } else {
+                    $sStart = $assignment->slot->scheduled_start_time;
+                    $sEnd = $assignment->slot->scheduled_end_time;
+                    if ($sStart && $sEnd) {
+                        $totalHours += \Carbon\Carbon::parse($sStart)->diffInMinutes(\Carbon\Carbon::parse($sEnd)) / 60.0;
+                    }
+                }
+            }
+
+            // Process any remaining clocks that were not tied to processed slots
+            foreach ($clocks as $clock) {
+                if (!in_array($clock->id, $processedClockIds)) {
+                    if (in_array(strtolower($clock->type), ['service', 'travel'])) {
+                        $totalHours += $clock->clocked_hours ?? $clock->calculateHours();
+                    }
+                }
+            }
+
+            $totalHours = round($totalHours, 1);
+
+            $bucketKey = '0';
+            if ($totalHours == 0) {
+                $bucketKey = '0';
+            } elseif ($totalHours < 5) {
+                $bucketKey = '<5';
+            } elseif ($totalHours < 10) {
+                $bucketKey = '<10';
+            } elseif ($totalHours < 15) {
+                $bucketKey = '<15';
+            } elseif ($totalHours < 20) {
+                $bucketKey = '<20';
+            } elseif ($totalHours < 25) {
+                $bucketKey = '<25';
+            } elseif ($totalHours < 30) {
+                $bucketKey = '<30';
+            } elseif ($totalHours < 35) {
+                $bucketKey = '<35';
+            } elseif ($totalHours < 40) {
+                $bucketKey = '<40';
+            } else {
+                $bucketKey = '>40';
+            }
+
+            $buckets[$bucketKey][] = [
+                'employee' => $employee,
+                'hours' => $totalHours,
+            ];
+        }
+
+        // Group slots by day for presentation
+        $groupedSlots = $slots->groupBy(function ($slot) {
+            return \Carbon\Carbon::parse($slot->scheduled_start_time)->format('Y-m-d');
+        });
+
+        return view('admin.team-availability.index', [
+            'slots' => $groupedSlots,
+            'start' => $start,
+            'end' => $end,
+            'date' => $date,
+            'buckets' => $buckets
+        ]);
     }
 
     /**
