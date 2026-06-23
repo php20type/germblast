@@ -59,21 +59,21 @@
             border-bottom-right-radius: 12px !important;
         }
 
-        /* Legacy Row Styling Mappings */
-        .equipment-report-table tbody tr.table-primary td {
-            background-color: #cfe2ff !important;
+        /* Row Status Styling to match legend */
+        .equipment-report-table tbody tr.row-status-pending td {
+            background-color: #f3f4f6 !important;
         }
-        .equipment-report-table tbody tr.table-warning td {
-            background-color: #fff3cd !important;
+        .equipment-report-table tbody tr.row-status-scheduled td {
+            background-color: #fff8eb !important;
         }
-        .equipment-report-table tbody tr.table-info td {
-            background-color: #cff4fc !important;
+        .equipment-report-table tbody tr.row-status-in-progress td {
+            background-color: #fffbeb !important;
         }
-        .equipment-report-table tbody tr.table-success td {
-            background-color: #d1e7dd !important;
+        .equipment-report-table tbody tr.row-status-completed td {
+            background-color: #f0fdfa !important;
         }
-        .equipment-report-table tbody tr.table-danger td {
-            background-color: #f8d7da !important;
+        .equipment-report-table tbody tr.row-status-cancelled td {
+            background-color: #fef2f2 !important;
         }
 
         /* Section Card Refinement */
@@ -542,11 +542,11 @@
                                                      @forelse ( $serviceOrders as $order)
                                                          @php
                                                              $rowClass = match($order->status) {
-                                                                 'pending'     => 'table-primary',
-                                                                 'scheduled'   => 'table-warning',
-                                                                 'in_progress' => 'table-info',
-                                                                 'completed'   => 'table-success',
-                                                                 'cancelled'   => 'table-danger',
+                                                                 'pending'     => 'row-status-pending',
+                                                                 'scheduled'   => 'row-status-scheduled',
+                                                                 'in_progress' => 'row-status-in-progress',
+                                                                 'completed'   => 'row-status-completed',
+                                                                 'cancelled'   => 'row-status-cancelled',
                                                                  default       => ''
                                                              };
                                                          @endphp
