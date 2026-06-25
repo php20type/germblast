@@ -162,12 +162,7 @@
             padding-bottom: 15px !important;
             margin-bottom: 20px !important;
         }
-
-        .main-content {
-            background-color: #ffffff;
-            border-radius: 10px;
-        }
-
+        
         /* Custom Premium Status Badges & Selectors */
         .status-pill {
             font-size: 12px !important;

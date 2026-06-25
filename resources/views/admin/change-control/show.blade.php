@@ -89,19 +89,33 @@
             font-size: 14px !important;
         }
 
+        .equipment-report-table tbody th {
+            background-color: #fff !important;
+            border-bottom: 1px solid #f3f4f6 !important;
+            color: #374151 !important;
+            font-weight: 600 !important;
+            padding: 15px 20px !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+            text-align: left !important;
+        }
+
         .equipment-report-table td:last-child {
             border-right: none !important;
         }
 
-        .equipment-report-table tbody tr:last-child td {
+        .equipment-report-table tbody tr:last-child td,
+        .equipment-report-table tbody tr:last-child th {
             border-bottom: none !important;
         }
 
-        .equipment-report-table tbody tr:last-child td:first-child {
+        .equipment-report-table tbody tr:last-child td:first-child,
+        .equipment-report-table tbody tr:last-child th:first-child {
             border-bottom-left-radius: 12px !important;
         }
 
-        .equipment-report-table tbody tr:last-child td:last-child {
+        .equipment-report-table tbody tr:last-child td:last-child,
+        .equipment-report-table tbody tr:last-child th:last-child {
             border-bottom-right-radius: 12px !important;
         }
 
@@ -131,11 +145,6 @@
             border-bottom: 1px solid #f3f4f6 !important;
             padding-bottom: 15px !important;
             margin-bottom: 20px !important;
-        }
-
-        .main-content {
-            background-color: #ffffff;
-            border-radius: 10px;
         }
 
         /* Status Pills styling matching Fulfill Order */
@@ -363,24 +372,24 @@
                                         <table class="table table-hover equipment-report-table">
                                             <tbody>
                                                 <tr>
-                                                    <th style="width: 25%; text-align: left !important; background-color: rgba(255, 184, 28, 0.1) !important;">Title</th>
-                                                    <td style="text-align: left !important; font-weight: 600;">{{ $changeRequest->title }}</td>
+                                                    <th class="w-25">Title</th>
+                                                    <td class="fw-semibold">{{ $changeRequest->title }}</td>
                                                 </tr>
                                                 <tr>
-                                                    <th style="text-align: left !important; background-color: rgba(255, 184, 28, 0.1) !important;">Description</th>
-                                                    <td style="text-align: left !important; white-space: pre-line; line-height: 1.6;">{{ $changeRequest->description ?? 'No description provided.' }}</td>
+                                                    <th>Description</th>
+                                                    <td>{{ $changeRequest->description ?? 'No description provided.' }}</td>
                                                 </tr>
                                                 <tr>
-                                                    <th style="text-align: left !important; background-color: rgba(255, 184, 28, 0.1) !important;">Requester</th>
-                                                    <td style="text-align: left !important;">{{ $changeRequest->requester->name ?? 'System' }}</td>
+                                                    <th>Requester</th>
+                                                    <td>{{ $changeRequest->requester->name ?? 'System' }}</td>
                                                 </tr>
                                                 <tr>
-                                                    <th style="text-align: left !important; background-color: rgba(255, 184, 28, 0.1) !important;">Created At</th>
-                                                    <td style="text-align: left !important;">{{ $changeRequest->created_at->format('M d, Y h:i A') }}</td>
+                                                    <th>Created At</th>
+                                                    <td>{{ $changeRequest->created_at->format('M d, Y h:i A') }}</td>
                                                 </tr>
                                                 <tr>
-                                                    <th style="text-align: left !important; background-color: rgba(255, 184, 28, 0.1) !important;">Last Updated</th>
-                                                    <td style="text-align: left !important;">{{ $changeRequest->updated_at->format('M d, Y h:i A') }}</td>
+                                                    <th>Last Updated</th>
+                                                    <td>{{ $changeRequest->updated_at->format('M d, Y h:i A') }}</td>
                                                 </tr>
                                             </tbody>
                                         </table>

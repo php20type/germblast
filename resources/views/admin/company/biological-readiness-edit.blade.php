@@ -31,11 +31,6 @@
             padding-bottom: 15px !important;
             margin-bottom: 20px !important;
         }
-
-        .main-content {
-            background-color: #ffffff;
-            border-radius: 10px;
-        }
     </style>
 @endpush
 
@@ -63,7 +58,7 @@
                                 </p>
                             </div>
                             <div class="right-part-sec">
-                                <button type="submit" class="btn btn-export fw-semibold">
+                                <button type="submit" class="btn btn-export">
                                     Update
                                 </button>
                             </div>

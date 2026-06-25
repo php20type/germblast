@@ -104,11 +104,6 @@
             margin-bottom: 20px !important;
         }
 
-        .main-content {
-            background-color: #ffffff;
-            border-radius: 10px;
-        }
-
         /* Custom Premium Status Badges & Selectors */
         .status-pill {
             font-size: 12px !important;
@@ -194,7 +189,7 @@
                                         <div class="section-header d-flex justify-content-between align-items-center">
                                             <h3 class="section-title">IAQ Zones</h3>
                                             @can('company.dashboard.edit')
-                                                <a href="#" class="btn btn-sm btn-export fw-semibold" onclick="addZone()">Add Zone</a>
+                                                <a href="#" class="btn btn-sm btn-export" onclick="addZone()">Add Zone</a>
                                             @endcan
                                         </div>
 
@@ -211,7 +206,7 @@
                                                         <tr>
                                                             <td>
                                                                 @can('company.dashboard.edit')
-                                                                    <a href="javascript:void(0)" class="fw-bold text-decoration-none text-primary"
+                                                                    <a href="javascript:void(0)" class="text-decoration-none text-primary"
                                                                         onclick="editZone({{ $zone->id }})">
                                                                         {{ $zone->name }}
                                                                     </a>
@@ -239,7 +234,7 @@
                                         <div class="section-header d-flex justify-content-between align-items-center">
                                             <h3 class="section-title">IAQ Devices</h3>
                                             @can('company.dashboard.edit')
-                                                <a href="#" class="btn btn-sm btn-export fw-semibold" onclick="addDevice()">Add Meter</a>
+                                                <a href="#" class="btn btn-sm btn-export" onclick="addDevice()">Add Meter</a>
                                             @endcan
                                         </div>
 
@@ -258,7 +253,7 @@
                                                         <tr>
                                                             <td>
                                                                 @can('company.dashboard.edit')
-                                                                    <a href="javascript:void(0)" class="fw-bold text-decoration-none text-primary"
+                                                                    <a href="javascript:void(0)" class="text-decoration-none text-primary"
                                                                         onclick="editDevice({{ $device->id }})">
                                                                         {{ $device->name }}
                                                                     </a>
@@ -292,7 +287,7 @@
                                             <h3 class="section-title">Biological Response Intake</h3>
                                             @can('company.dashboard.edit')
                                                 <a href="{{ route('admin.company.biological.response', $company->id) }}"
-                                                    class="btn btn-sm btn-export fw-semibold">Add Intake</a>
+                                                    class="btn btn-sm btn-export">Add Intake</a>
                                             @endcan
                                         </div>
 
@@ -311,7 +306,7 @@
                                                         <tr>
                                                             <td>
                                                                 @can('company.dashboard.edit')
-                                                                    <a href="{{ route('admin.company.biological.response.edit', [$company->id, $intake->id]) }}" class="fw-bold text-decoration-none text-primary">
+                                                                    <a href="{{ route('admin.company.biological.response.edit', [$company->id, $intake->id]) }}" class="text-decoration-none text-primary">
                                                                         {{ $intake->project_name }}
                                                                     </a>
                                                                 @else
@@ -344,7 +339,7 @@
                                             <h3 class="section-title">Biological Readiness Intake</h3>
                                             @can('company.dashboard.edit')
                                                 <a href="{{ route('admin.company.biological.readiness', $company->id) }}"
-                                                    class="btn btn-sm btn-export fw-semibold">Add Intake</a>
+                                                    class="btn btn-sm btn-export">Add Intake</a>
                                             @endcan
                                         </div>
 
@@ -364,7 +359,7 @@
                                                         <tr>
                                                             <td>
                                                                 @can('company.dashboard.edit')
-                                                                    <a href="{{ route('admin.company.biological.readiness.edit', [$company->id, $readiness->id]) }}" class="fw-bold text-decoration-none text-primary">
+                                                                    <a href="{{ route('admin.company.biological.readiness.edit', [$company->id, $readiness->id]) }}" class="text-decoration-none text-primary">
                                                                         {{ $readiness->project_name }}
                                                                     </a>
                                                                 @else
@@ -400,7 +395,7 @@
                                             <h3 class="section-title">Indoor Air Quality</h3>
                                             @can('company.dashboard.edit')
                                                 <a href="{{ route('admin.company.iaq.survey', $company->id) }}"
-                                                class="btn btn-sm btn-export fw-semibold">Create IAQ Survey</a>
+                                                class="btn btn-sm btn-export">Create IAQ Survey</a>
                                             @endcan
                                         </div>
 
@@ -420,7 +415,7 @@
                                                         <tr>
                                                             <td>
                                                                 @can('company.dashboard.edit')
-                                                                <a href="{{ route('admin.company.iaq.survey.edit', [$company->id, $survey->id]) }}" class="fw-bold text-decoration-none text-primary">
+                                                                <a href="{{ route('admin.company.iaq.survey.edit', [$company->id, $survey->id]) }}" class="text-decoration-none text-primary">
                                                                     {{ $survey->survey_name ?? '-' }}
                                                                 </a>
                                                                 @else
@@ -462,7 +457,7 @@
                                             <h3 class="section-title">Water Management</h3>
                                             @can('company.dashboard.edit')
                                             <a href="{{ route('admin.company.water.management', $company->id) }}"
-                                                class="btn btn-sm btn-export fw-semibold">Create H2O Survey</a>
+                                                class="btn btn-sm btn-export">Create H2O Survey</a>
                                             @endcan
                                         </div>
 
@@ -481,7 +476,7 @@
                                                         <tr>
                                                             <td>
                                                                 @can('company.dashboard.edit')
-                                                                <a href="{{ route('admin.company.water.management.edit', [$company->id, $water->id]) }}" class="fw-bold text-decoration-none text-primary">
+                                                                <a href="{{ route('admin.company.water.management.edit', [$company->id, $water->id]) }}" class="text-decoration-none text-primary">
                                                                     {{ $water->survey_name ?? '-' }}
                                                                 </a>
                                                                 @else
@@ -515,8 +510,8 @@
                                         <div class="section-header d-flex justify-content-between align-items-center">
                                             <h3 class="section-title">Services</h3>
                                             <div class="d-flex gap-2">
-                                                <button class="btn btn-sm btn-export fw-semibold">Schedule Response</button>
-                                                <button class="btn btn-sm btn-add-audience fw-semibold">Schedule RGB</button>
+                                                <button class="btn btn-sm btn-export">Schedule Response</button>
+                                                <button class="btn btn-sm btn-add-audience">Schedule RGB</button>
                                             </div>
                                         </div>
 
@@ -552,7 +547,7 @@
                                                          @endphp
                                                          <tr class="{{ $rowClass }} small">
                                                             <td>
-                                                                <a href="{{ route('admin.lead.service.fulfill_order', $order->id) }}" class="fw-bold text-decoration-none text-primary">
+                                                                <a href="{{ route('admin.lead.service.fulfill_order', $order->id) }}" class="text-decoration-none text-primary">
                                                                     Order ID: {{ $order->order_no }}
                                                                 </a>
                                                                 <div class="mt-1">

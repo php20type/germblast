@@ -100,11 +100,6 @@
             padding-bottom: 15px !important;
             margin-bottom: 20px !important;
         }
-
-        .main-content {
-            background-color: #ffffff;
-            border-radius: 10px;
-        }
     </style>
 @endpush
 
@@ -132,7 +127,7 @@
                                     </p>
                                 </div>
                                 <div class="right-part d-flex align-items-center gap-2">
-                                    <button type="submit" class="btn btn-success fw-semibold">
+                                    <button type="submit" class="btn btn-success">
                                         Save Evaluations
                                     </button>
                                 </div>
