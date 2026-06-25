@@ -178,22 +178,24 @@
 <div class="companies-section my-4">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12 p-0">
+            <!-- Sidebar -->
+            @include('admin.corporate-tools.sidebar')
+
+            <!-- Main Content -->
+            <div class="col-md-10 p-0">
                 <div class="main-content">
 
                     <!-- Header -->
-                    <div class="heading-area-sec border-bottom-0 pb-0">
+                    <div class="heading-area-sec mb-3">
                         <div class="left-part-sec">
-                            <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">ALL EXPENSE REPORTS <span style="font-size: 24px;">📌</span></h3>
-                            <p class="text-muted mb-0" style="font-size: 16px;">Manage and review all employee expense reports</p>
+                            <h3 class="mb-1">ALL EXPENSE REPORTS <span style="font-size: 24px;">📌</span></h3>
+                            <p class="text-muted mb-0">Manage and review all employee expense reports</p>
                         </div>
                         <div class="right-part-sec">
-                            <a href="{{ route('admin.expense-report.personal.create') }}" class="btn btn-export" style="margin-right: 10px;">+ ADD PERSONAL EXPENSE REPORT</a>
-                            <a href="{{ route('admin.expense-report.corporate.create') }}" class="btn btn-export">+ ADD CORPORATE EXPENSE REPORT</a>
+                            <a href="{{ route('admin.expense-report.personal.create') }}" class="btn btn-export" style="margin-right: 10px;">+ PERSONAL EXPENSE</a>
+                            <a href="{{ route('admin.expense-report.corporate.create') }}" class="btn btn-export">+ CORPORATE EXPENSE</a>
                         </div>
                     </div>
-
-                    <hr class="mx-4 my-4" style="opacity: 0.1;">
 
                     <!-- Global Search & Filter -->
                     <div class="filter-section px-4">
@@ -237,7 +239,7 @@
                             </nav>
                         </div>
 
-                        <hr class="mx-4 mb-4 mt-0" style="opacity: 0.1;">
+                        <hr class="mb-4 mt-0" style="opacity: 0.1;">
 
                         <!-- TAB CONTENT -->
                         <div class="tab-content px-4 pb-4">

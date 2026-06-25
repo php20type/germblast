@@ -204,15 +204,19 @@
 <div class="companies-section my-4">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12 p-0">
+            <!-- Sidebar -->
+            @include('admin.hr.sidebar')
+
+            <!-- Main Content -->
+            <div class="col-md-10 p-0">
                 <div class="main-content">
                     <div class="sales-dashboard">
 
                         {{-- Header --}}
-                        <div class="heading-area-sec border-bottom-0 pb-0">
+                        <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">TIME OFF REQUESTS</h3>
-                                <p class="text-muted mb-0" style="font-size: 15px;">
+                                <h3 class="mb-1">TIME OFF REQUESTS</h3>
+                                <p class="text-muted mb-0">
                                     Request time off, manage approval requests, and track balances.
                                 </p>
                             </div>
@@ -222,8 +226,6 @@
                                 </button>
                             </div>
                         </div>
-
-                        <hr class="mx-4 my-4" style="opacity: .1;">
 
                         {{-- Alert Notifications --}}
                         @if(session('success'))
@@ -533,7 +535,7 @@ $(document).ready(function () {
     $(document).on('click', '.inline-approve-btn', function () {
         var id = $(this).data('id');
         var notes = $('#notes-input-' + id).val();
-        
+
         var form = $('<form>', {
             method: 'POST',
             action: '/admin/hr/time-off/' + id + '/approve'
@@ -548,7 +550,7 @@ $(document).ready(function () {
     $(document).on('click', '.inline-reject-btn', function () {
         var id = $(this).data('id');
         var notes = $('#notes-input-' + id).val();
-        
+
         var form = $('<form>', {
             method: 'POST',
             action: '/admin/hr/time-off/' + id + '/reject'

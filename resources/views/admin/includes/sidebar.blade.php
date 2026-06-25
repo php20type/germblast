@@ -7,7 +7,7 @@
     </div>
     <nav class="sidebar-nav">
         <ul class="list-inline">
-            <li class="{{ request()->routeIs('admin.sales.*') ? 'active' : '' }}">
+            <li class="{{ request()->routeIs('admin.sales.*', 'admin.equipment-loan.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.sales.index') }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon18.svg") }} alt="icon" />
@@ -90,26 +90,6 @@
                     </div>
                 </a>
             </li>
-            <li class="{{ request()->routeIs('admin.scheduling_calendar.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.scheduling_calendar.index') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon6.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Scheduling Calendar
-                    </div>
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('admin.all_schedules.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.all_schedules.index') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon6.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        All Schedules
-                    </div>
-                </a>
-            </li>
             <li class="{{ request()->routeIs('admin.my-jobs.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.my-jobs.index') }}">
                     <div class="icon-round">
@@ -120,187 +100,76 @@
                     </div>
                 </a>
             </li>
-            <li class="{{ request()->routeIs('admin.vehicle.planning') ? 'active' : '' }}">
-                <a href="{{ route('admin.vehicle.planning') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon13.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Vehicle Planning
-                    </div>
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('admin.team.availability') ? 'active' : '' }}">
-                <a href="{{ route('admin.team.availability') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon4.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Team Availability
-                    </div>
-                </a>
-            </li>
+
             <hr>
-            <li class="{{ request()->routeIs('admin.expense-report.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.expense-report.index') }}">
+            @php
+                $isOperationsActive = request()->routeIs([
+                    'admin.all_schedules.*',
+                    'admin.failures.*',
+                    'admin.hr.driver-report.*',
+                    'admin.equipment-management.*',
+                    'admin.scheduling_calendar.*',
+                    'admin.team.availability',
+                    'admin.vehicle.planning',
+                    'admin.warehouse.maintenance',
+                    'admin.warehouse.calendar',
+                ]);
+            @endphp
+            <li class="{{ $isOperationsActive ? 'active' : '' }}">
+                <a href="{{ route('admin.all_schedules.index') }}">
                     <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon2.svg") }} alt="icon" />
+                        <img src={{ asset("img/icons/menu-icon6.svg") }} alt="icon" />
                     </div>
                     <div class="nav-text ms-3">
-                        Expense Report
+                        Operations
                     </div>
                 </a>
             </li>
-            <li class="{{ request()->routeIs('admin.job-profitability.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.job-profitability.index') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon18.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Job Profitability
-                    </div>
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('admin.equipment-management.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.equipment-management.index') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon19.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Equipment Management
-                    </div>
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('admin.equipment-loan.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.equipment-loan.index') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon19.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Equipment Loan
-                    </div>
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('admin.consumable-reports.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.consumable-reports.index') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon15.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Consumable Reports
-                    </div>
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('admin.inventory-report.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.inventory-report.index') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon15.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Inventory Report
-                    </div>
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('admin.change-control.*') ? 'active' : '' }}">
+            @php
+                $isCorporateToolsActive = request()->routeIs([
+                    'admin.change-control.*',
+                    'admin.consumable-reports.*',
+                    'admin.expense-report.*',
+                    'admin.inventory-report.*',
+                    'admin.office-duties.*',
+                    'admin.job-profitability.*'
+                ]);
+            @endphp
+            <li class="{{ $isCorporateToolsActive ? 'active' : '' }}">
                 <a href="{{ route('admin.change-control.index') }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon15.svg") }} alt="icon" />
                     </div>
                     <div class="nav-text ms-3">
-                        Change Control
+                        Corporate Tools
                     </div>
                 </a>
             </li>
-            <li class="{{ request()->routeIs('admin.failures.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.failures.index') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon15.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Business Failures
-                    </div>
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('admin.office-duties.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.office-duties.index') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon15.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Office Duties
-                    </div>
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('admin.warehouse.maintenance') ? 'active' : '' }}">
-                <a href="{{ route('admin.warehouse.maintenance') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon13.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Warehouse Maintenance
-                    </div>
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('admin.warehouse.calendar') ? 'active' : '' }}">
-                <a href="{{ route('admin.warehouse.calendar') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon8.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Warehouse Calendar
-                    </div>
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('admin.hr.feedback.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.hr.feedback.create') }}">
+
+
+
+
+
+            @php
+                $isHRActive = request()->routeIs([
+                    'admin.employee.*',
+                    'admin.hr.time-off.*',
+                    'admin.hr.praise.*',
+                    'admin.hr.rewards.*',
+                    'admin.hr.feedback.*'
+                ]);
+            @endphp
+            <li class="{{ $isHRActive ? 'active' : '' }}">
+                <a href="{{ auth()->user()->isSuperAdmin() ? route('admin.employee.index') : route('admin.hr.time-off.index') }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon2.svg") }} alt="icon" />
                     </div>
                     <div class="nav-text ms-3">
-                        Anonymous Feedback
+                        Human Resources
                     </div>
                 </a>
             </li>
-            <li class="{{ request()->routeIs('admin.hr.time-off.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.hr.time-off.index') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon15.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Time Off Requests
-                    </div>
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('admin.hr.praise.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.hr.praise.create') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon2.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Core Value Praise
-                    </div>
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('admin.hr.rewards.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.hr.rewards.index') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon15.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        GB Rewards
-                    </div>
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('admin.hr.driver-report.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.hr.driver-report.index') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon15.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Driver Report
-                    </div>
-                </a>
-            </li>
+
             @if(auth()->user()->isSuperAdmin())
                 <li class="{{ request()->routeIs('admin.roles.permissions') ? 'active' : '' }}">
                     <a href="{{ route('admin.roles.permissions') }}">
@@ -309,16 +178,6 @@
                         </div>
                         <div class="nav-text ms-3">
                             Role
-                        </div>
-                    </a>
-                </li>
-                <li class="{{ request()->routeIs('admin.employee.*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.employee.index') }}">
-                        <div class="icon-round">
-                            <img src={{ asset("img/icons/menu-icon4.svg") }} alt="icon" />
-                        </div>
-                        <div class="nav-text ms-3">
-                            Employees
                         </div>
                     </a>
                 </li>

@@ -166,16 +166,14 @@
                     <div class="main-content">
 
                         <!-- Header (matching GermBlast standard index layout) -->
-                        <div class="heading-area-sec mb-0 border-bottom-0 pb-0 mx-4">
+                        <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">MY DAILY JOBS <span
+                                <h3 class="mb-1">MY DAILY JOBS <span
                                         style="font-size: 24px;">💼</span></h3>
-                                <p class="text-muted mb-0" style="font-size: 16px;">Review and manage your personal
+                                <p class="text-muted mb-0">Review and manage your personal
                                     scheduled assignments for the day</p>
                             </div>
                         </div>
-
-                        <hr class="mx-4 my-4" style="opacity: 0.1;">
 
                         <!-- Restyled Header Filter Control Bar (Matching Vehicle Planning & All Schedules exactly) -->
                         <div class="filter-section py-3 px-4 mx-4 my-3 rounded-3 border bg-white"
@@ -261,7 +259,7 @@
                                     <div class="text-center py-5 my-2">
                                         <div class="mb-3" style="font-size: 40px;">🌴</div>
                                         <h5 class="fw-semibold text-dark">No Jobs Assigned</h5>
-                                        <p class="text-muted mb-0" style="font-size: 0.9rem;">You don't have any jobs scheduled
+                                        <p class="text-muted mb-0">You don't have any jobs scheduled
                                             or assigned on this date.</p>
                                     </div>
                                 @else

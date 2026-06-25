@@ -143,14 +143,17 @@
 <div class="companies-section my-4">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12 p-0">
+            <!-- Sidebar -->
+            @include('admin.corporate-tools.sidebar')
 
+            <!-- Main Content -->
+            <div class="col-md-10 p-0">
                 <div class="sales-dashboard">
 
                     <!-- HEADER -->
-                    <div class="dashboard-header section-card d-flex justify-content-between align-items-center">
+                    <div class="dashboard-header section-card d-flex justify-content-between align-items-center mb-3">
                         <div>
-                            <h3 class="mb-2" style="font-weight: 500;">Expense Report #{{ $report->id }}</h3>
+                            <h3 class="mb-1">Expense Report #{{ $report->id }}</h3>
                             <p class="text-muted mb-0">Employee: <strong>{{ $report->user->name }}</strong> | Type: <strong>{{ $report->report_type }}</strong></p>
                         </div>
                         <div>

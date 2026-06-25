@@ -8,16 +8,19 @@
     <div class="companies-section my-4">
         <div class="container-fluid">
             <div class="row">
+                <!-- Sidebar -->
+                @include('admin.hr.sidebar')
+
                 <!-- Main Content -->
-                <div class="col-md-12 p-0">
+                <div class="col-md-10 p-0">
                     <div class="main-content">
                         <!-- Header -->
-                        <div class="heading-area-sec">
+                        <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
                                 <h3 class="mb-1">All EMPLOYEES <span style="font-size: 24px;">📌</span></h3>
                                 <p class="text-muted mb-0">Internal users excluding clients</p>
                             </div>
-                            <div class="right-part">
+                            <div class="right-part-sec">
                                 <a href="{{ route('admin.employee.create') }}" class="btn btn-export">+ Add Employee</a>
                             </div>
                         </div>

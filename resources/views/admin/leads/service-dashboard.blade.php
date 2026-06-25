@@ -233,11 +233,11 @@
 
                     <div class="main-content">
                         <!-- Header -->
-                        <div class="heading-area-sec border-bottom-0 pb-0">
+                        <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">SERVICE DASHBOARD<span
+                                <h3 class="mb-1">SERVICE DASHBOARD<span
                                         style="font-size: 24px;">📌</span></h3>
-                                <p class="text-muted mb-2" style="font-size: 16px;">Order ID:
+                                <p class="text-muted mb-0">Order ID:
                                     {{ $order->order_no ?? 'N/A' }}
                                 </p>
                                 
@@ -262,9 +262,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <hr class="mx-4 my-4" style="opacity: 0.1;">
-
 
                         <!-- TABS -->
                         <div class="navbar-tabs px-4">
@@ -322,7 +319,7 @@
                             </nav>
                         </div>
 
-                        <hr class="mx-4 mb-4 mt-0" style="opacity: 0.1;">
+                        <hr class="mb-4 mt-0" style="opacity: 0.1;">
 
                         <!-- Tab Content Section -->
                         <div class="tab-content px-4" id="fulfillOrderTabContent">

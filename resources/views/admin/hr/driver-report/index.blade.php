@@ -70,19 +70,20 @@
     <div class="companies-section my-4">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-12 p-0">
+                <!-- Sidebar -->
+                @include('admin.operations.sidebar')
+
+                <!-- Main Content -->
+                <div class="col-md-10 p-0">
                     <div class="main-content">
-                        
+
                         <!-- Header -->
-                        <div class="heading-area-sec border-bottom-0 pb-0">
+                        <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">DRIVER REPORT <span
-                                        style="font-size: 24px;">📌</span></h3>
-                                <p class="text-muted mb-0" style="font-size: 16px;">Track and analyze driver status and points across the organization.</p>
+                                <h3 class="mb-1">Driver Report</h3>
+                                <p class="text-muted mb-0">Track and analyze driver status and points across the organization.</p>
                             </div>
                         </div>
-
-                        <hr class="mx-4 my-4" style="opacity: 0.1;">
 
                         @if(session('success'))
                             <div class="px-4">

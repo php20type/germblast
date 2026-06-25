@@ -93,18 +93,16 @@
                     <div class="main-content pb-2">
 
                         <!-- Header -->
-                        <div class="heading-area-sec border-bottom-0 pb-0">
+                        <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">
+                                <h3 class="mb-1">
                                     SERVICE DETAILS <span style="font-size: 24px;">📌</span>
                                 </h3>
-                                <p class="text-muted mb-0" style="font-size: 16px;">
+                                <p class="text-muted mb-0">
                                     Congrats! You won a lead! Fill in the service details and schedule configurations below.
                                 </p>
                             </div>
                         </div>
-
-                        <hr class="mx-4 my-4" style="opacity: 0.1;">
 
                         <!-- Card 1: Create New Service -->
                         <div class="section-card mx-4 mb-4">
@@ -359,7 +357,7 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h5 class="fw-bold text-success mb-1 text-uppercase">PROFITABILITY ANALYSIS</h5>
-                                    <p class="text-muted mb-0" style="font-size:0.9rem;">Calculated summary of won service proposal value</p>
+                                    <p class="text-muted mb-0">Calculated summary of won service proposal value</p>
                                 </div>
                                 <div class="text-end">
                                     <span class="text-secondary fw-semibold d-block" style="font-size: 0.85rem;">Proposal Value</span>

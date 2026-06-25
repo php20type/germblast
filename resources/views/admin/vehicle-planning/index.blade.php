@@ -100,17 +100,18 @@
     <div class="companies-section my-4">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-12 p-0">
+                <!-- Sidebar -->
+                @include('admin.operations.sidebar')
+
+                <!-- Main Content -->
+                <div class="col-md-10 p-0">
 
                     <div class="main-content">
-                        <!-- Header (matching GermBlast standard index layout) -->
-                        <div class="heading-area-sec mb-0 border-bottom-0">
+                        <!-- Header -->
+                        <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-1">VEHICLE PLANNING
-                                    <span style="font-size: 24px;">📌</span>
-                                </h3>
-                                <p class="text-muted mb-0">Manage week-by-week service slot planning and vehicle assignments
-                                </p>
+                                <h3 class="mb-1">Vehicle Planning</h3>
+                                <p class="text-muted mb-0">Manage week-by-week service slot planning and vehicle assignments</p>
                             </div>
                         </div>
 

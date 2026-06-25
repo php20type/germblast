@@ -976,7 +976,7 @@ title {
     min-height: 100vh;
     color: #ffffff;
     padding: 14px;
-
+    margin-bottom: 20px;
     position: sticky;
     top: 10px;
 }

@@ -53,12 +53,12 @@
                         <div class="main-content">
 
                             {{-- HEADER --}}
-                            <div class="heading-area-sec border-bottom-0 pb-0">
+                            <div class="heading-area-sec mb-3">
                                 <div class="left-part-sec">
-                                    <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">
+                                    <h3 class="mb-1">
                                         WATER MANAGEMENT <span style="font-size: 24px;">💧</span>
                                     </h3>
-                                    <p class="text-muted mb-2" style="font-size: 16px;">
+                                    <p class="text-muted mb-0">
                                         Edit Water Management Phase
                                     </p>
                                 </div>
@@ -198,170 +198,169 @@
                                     <table class="table table-bordered align-middle">
                                         <tbody>
 
-                                        <tr>
-                                            <th>Healthcare Facility</th>
-                                            <td>
-                                                <select name="is_healthcare_facility" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1"
-                                                        {{ $waterManagement->is_healthcare_facility == 1 ? 'selected' : '' }}>
-                                                        Yes</option>
-                                                    <option value="0"
-                                                        {{ $waterManagement->is_healthcare_facility == 0 ? 'selected' : '' }}>
-                                                        No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <th>Healthcare Facility</th>
+                                                <td>
+                                                    <select name="is_healthcare_facility" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1"
+                                                            {{ $waterManagement->is_healthcare_facility == 1 ? 'selected' : '' }}>
+                                                            Yes</option>
+                                                        <option value="0"
+                                                            {{ $waterManagement->is_healthcare_facility == 0 ? 'selected' : '' }}>
+                                                            No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <th>Houses Elderly Patients</th>
-                                            <td>
-                                                <select name="houses_elderly_patients" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1"
-                                                        {{ $waterManagement->houses_elderly_patients == 1 ? 'selected' : '' }}>
-                                                        Yes</option>
-                                                    <option value="0"
-                                                        {{ $waterManagement->houses_elderly_patients == 0 ? 'selected' : '' }}>
-                                                        No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <th>Houses Elderly Patients</th>
+                                                <td>
+                                                    <select name="houses_elderly_patients" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1"
+                                                            {{ $waterManagement->houses_elderly_patients == 1 ? 'selected' : '' }}>
+                                                            Yes</option>
+                                                        <option value="0"
+                                                            {{ $waterManagement->houses_elderly_patients == 0 ? 'selected' : '' }}>
+                                                            No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <th>Multiple Housing Units</th>
-                                            <td>
-                                                <select name="has_multiple_housing_units" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1"
-                                                        {{ $waterManagement->has_multiple_housing_units == 1 ? 'selected' : '' }}>
-                                                        Yes</option>
-                                                    <option value="0"
-                                                        {{ $waterManagement->has_multiple_housing_units == 0 ? 'selected' : '' }}>
-                                                        No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <th>Multiple Housing Units</th>
+                                                <td>
+                                                    <select name="has_multiple_housing_units" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1"
+                                                            {{ $waterManagement->has_multiple_housing_units == 1 ? 'selected' : '' }}>
+                                                            Yes</option>
+                                                        <option value="0"
+                                                            {{ $waterManagement->has_multiple_housing_units == 0 ? 'selected' : '' }}>
+                                                            No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <th>More Than Two Floors</th>
-                                            <td>
-                                                <select name="has_more_than_two_floors" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1"
-                                                        {{ $waterManagement->has_more_than_two_floors == 1 ? 'selected' : '' }}>
-                                                        Yes</option>
-                                                    <option value="0"
-                                                        {{ $waterManagement->has_more_than_two_floors == 0 ? 'selected' : '' }}>
-                                                        No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <th>More Than Two Floors</th>
+                                                <td>
+                                                    <select name="has_more_than_two_floors" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1"
+                                                            {{ $waterManagement->has_more_than_two_floors == 1 ? 'selected' : '' }}>
+                                                            Yes</option>
+                                                        <option value="0"
+                                                            {{ $waterManagement->has_more_than_two_floors == 0 ? 'selected' : '' }}>
+                                                            No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <th>Cooling Tower</th>
-                                            <td>
-                                                <select name="has_cooling_tower" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1"
-                                                        {{ $waterManagement->has_cooling_tower == 1 ? 'selected' : '' }}>
-                                                        Yes</option>
-                                                    <option value="0"
-                                                        {{ $waterManagement->has_cooling_tower == 0 ? 'selected' : '' }}>No
-                                                    </option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <th>Cooling Tower</th>
+                                                <td>
+                                                    <select name="has_cooling_tower" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1"
+                                                            {{ $waterManagement->has_cooling_tower == 1 ? 'selected' : '' }}>
+                                                            Yes</option>
+                                                        <option value="0"
+                                                            {{ $waterManagement->has_cooling_tower == 0 ? 'selected' : '' }}>No
+                                                        </option>
+                                                    </select>
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <th>Hot Tub or Spa</th>
-                                            <td>
-                                                <select name="has_hot_tub_or_spa" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1"
-                                                        {{ $waterManagement->has_hot_tub_or_spa == 1 ? 'selected' : '' }}>
-                                                        Yes</option>
-                                                    <option value="0"
-                                                        {{ $waterManagement->has_hot_tub_or_spa == 0 ? 'selected' : '' }}>
-                                                        No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <th>Hot Tub or Spa</th>
+                                                <td>
+                                                    <select name="has_hot_tub_or_spa" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1"
+                                                            {{ $waterManagement->has_hot_tub_or_spa == 1 ? 'selected' : '' }}>
+                                                            Yes</option>
+                                                        <option value="0"
+                                                            {{ $waterManagement->has_hot_tub_or_spa == 0 ? 'selected' : '' }}>
+                                                            No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <th>Indoor Fountain</th>
-                                            <td>
-                                                <select name="has_indoor_fountain" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1"
-                                                        {{ $waterManagement->has_indoor_fountain == 1 ? 'selected' : '' }}>
-                                                        Yes</option>
-                                                    <option value="0"
-                                                        {{ $waterManagement->has_indoor_fountain == 0 ? 'selected' : '' }}>
-                                                        No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <th>Indoor Fountain</th>
+                                                <td>
+                                                    <select name="has_indoor_fountain" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1"
+                                                            {{ $waterManagement->has_indoor_fountain == 1 ? 'selected' : '' }}>
+                                                            Yes</option>
+                                                        <option value="0"
+                                                            {{ $waterManagement->has_indoor_fountain == 0 ? 'selected' : '' }}>
+                                                            No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <th>Central Mister / Humidifier</th>
-                                            <td>
-                                                <select name="has_central_mister_or_humidifier" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1"
-                                                        {{ $waterManagement->has_central_mister_or_humidifier == 1 ? 'selected' : '' }}>
-                                                        Yes</option>
-                                                    <option value="0"
-                                                        {{ $waterManagement->has_central_mister_or_humidifier == 0 ? 'selected' : '' }}>
-                                                        No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <th>Central Mister / Humidifier</th>
+                                                <td>
+                                                    <select name="has_central_mister_or_humidifier" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1"
+                                                            {{ $waterManagement->has_central_mister_or_humidifier == 1 ? 'selected' : '' }}>
+                                                            Yes</option>
+                                                        <option value="0"
+                                                            {{ $waterManagement->has_central_mister_or_humidifier == 0 ? 'selected' : '' }}>
+                                                            No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <th>Organ Transplant Conducted</th>
-                                            <td>
-                                                <select name="conducts_organ_transplant" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1"
-                                                        {{ $waterManagement->conducts_organ_transplant == 1 ? 'selected' : '' }}>
-                                                        Yes</option>
-                                                    <option value="0"
-                                                        {{ $waterManagement->conducts_organ_transplant == 0 ? 'selected' : '' }}>
-                                                        No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <th>Organ Transplant Conducted</th>
+                                                <td>
+                                                    <select name="conducts_organ_transplant" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1"
+                                                            {{ $waterManagement->conducts_organ_transplant == 1 ? 'selected' : '' }}>
+                                                            Yes</option>
+                                                        <option value="0"
+                                                            {{ $waterManagement->conducts_organ_transplant == 0 ? 'selected' : '' }}>
+                                                            No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <th>History of Legionella</th>
-                                            <td>
-                                                <select name="history_of_legionella" class="form-select">
-                                                    <option value="">Select</option>
-                                                    <option value="1"
-                                                        {{ $waterManagement->history_of_legionella == 1 ? 'selected' : '' }}>
-                                                        Yes</option>
-                                                    <option value="0"
-                                                        {{ $waterManagement->history_of_legionella == 0 ? 'selected' : '' }}>
-                                                        No</option>
-                                                </select>
-                                            </td>
-                                        </tr>
-
-                                    </tbody>
-                                </table>
+                                            <tr>
+                                                <th>History of Legionella</th>
+                                                <td>
+                                                    <select name="history_of_legionella" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="1"
+                                                            {{ $waterManagement->history_of_legionella == 1 ? 'selected' : '' }}>
+                                                            Yes</option>
+                                                        <option value="0"
+                                                            {{ $waterManagement->history_of_legionella == 0 ? 'selected' : '' }}>
+                                                            No</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
 
-                            {{-- MONITORING --}}
-                            <div class="section-card">
-                                <div class="section-header">
-                                    <h3 class="section-title">Current Monitoring Activities</h3>
+                                {{-- MONITORING --}}
+                                <div class="section-card">
+                                    <div class="section-header">
+                                        <h3 class="section-title">Current Monitoring Activities</h3>
+                                    </div>
+
+                                    <textarea name="current_monitoring_activities" class="form-control" rows="5">{{ $waterManagement->current_monitoring_activities }}</textarea>
                                 </div>
 
-                                <textarea name="current_monitoring_activities" class="form-control" rows="5">{{ $waterManagement->current_monitoring_activities }}</textarea>
-                            </div>
-
-                        </div>
                     </div>
                     </form>
 

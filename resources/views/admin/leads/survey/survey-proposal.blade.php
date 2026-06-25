@@ -117,8 +117,6 @@
         }
 
         .section-header {
-            border-bottom: 1px solid #f3f4f6 !important;
-            padding-bottom: 15px !important;
             margin-bottom: 20px !important;
         }
 
@@ -195,25 +193,25 @@
                         <div class="main-content">
                             {{-- HEADER --}}
                             <div
-                                class="heading-area-sec border-bottom-0 pb-0 px-4 pt-4 d-flex justify-content-between align-items-center">
+                                class="heading-area-sec mb-3">
                                 <div class="left-part-sec">
-                                    <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">
+                                    <h3 class="mb-1">
                                         SURVEY & PROPOSAL <span style="font-size: 24px;">📋</span>
                                     </h3>
-                                    <p class="text-muted mb-2" style="font-size: 16px;">
+                                    <p class="text-muted mb-0">
                                         Record survey results on this page
                                     </p>
                                 </div>
                                 <div class="right-part d-flex align-items-center gap-2">
                                     @if ($isEditable)
-                                        <button type="submit" class="btn btn-success fw-semibold">
+                                        <button type="submit" class="btn btn-success">
                                             Save Survey Proposal
                                         </button>
                                     @elseif (auth()->user()->isSalesManager() || auth()->user()->isSuperAdmin() && !$isEditable && $surveyProposal->status !== 'approved')
-                                        <button type="button" class="btn btn-success fw-semibold" id="approveProposalBtn">
+                                        <button type="button" class="btn btn-success" id="approveProposalBtn">
                                             <i class="ti ti-check me-1"></i> Approve
                                         </button>
-                                        <button type="button" class="btn btn-danger fw-semibold" data-bs-toggle="modal"
+                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
                                             data-bs-target="#rejectModal">
                                             <i class="ti ti-x me-1"></i> Reject
                                         </button>
@@ -363,11 +361,11 @@
                                                 <div>
                                                     @if ($isEditable)
                                                         <a href="{{ route('admin.survey.proposal.facility', $surveyProposal->id) }}"
-                                                            class="btn btn-sm btn-export fw-semibold" target="_blank">
+                                                            class="btn btn-sm btn-export" target="_blank">
                                                             Add Facility
                                                         </a>
                                                     @else
-                                                        <button class="btn btn-sm btn-secondary fw-semibold" disabled>
+                                                        <button class="btn btn-sm btn-secondary" disabled>
                                                             <i class="ti ti-lock me-1"></i> Add Facility
                                                         </button>
                                                     @endif
@@ -403,7 +401,7 @@
                                                                         @if ($isEditable)
                                                                             <a href="{{ route('admin.survey.proposal.facility.edit', $facility->id) }}"
                                                                                 target="_blank"
-                                                                                class="fw-bold text-decoration-none text-primary">
+                                                                                class="text-decoration-none text-primary">
                                                                                 {{ $facility->facility_name }}
                                                                             </a>
                                                                         @else
@@ -419,18 +417,18 @@
                                                                         @if ($isEditable)
                                                                             @if(!$facility->is_added_to_company)
                                                                                 <button type="button"
-                                                                                    class="btn btn-sm btn-primary fw-semibold add-to-company-btn"
+                                                                                    class="btn btn-sm btn-primary add-to-company-btn"
                                                                                     data-id="{{ $facility->id }}">
                                                                                     Add to Company
                                                                                 </button>
                                                                             @else
                                                                                 <button type="button"
-                                                                                    class="btn btn-sm btn-success fw-semibold" disabled>
+                                                                                    class="btn btn-sm btn-success" disabled>
                                                                                     Added
                                                                                 </button>
                                                                             @endif
                                                                         @else
-                                                                            <button class="btn btn-secondary btn-sm fw-semibold"
+                                                                            <button class="btn btn-secondary btn-sm"
                                                                                 disabled>
                                                                                 <i class="ti ti-lock me-1"></i> Add to Company
                                                                             </button>
@@ -468,11 +466,11 @@
                                                 <div>
                                                     @if ($isEditable)
                                                         <a href="{{ route('admin.survey.proposal.equipment', $surveyProposal->id) }}"
-                                                            class="btn btn-sm btn-export fw-semibold" target="_blank">
+                                                            class="btn btn-sm btn-export" target="_blank">
                                                             Add Evaluation
                                                         </a>
                                                     @else
-                                                        <button class="btn btn-sm btn-secondary fw-semibold" disabled>
+                                                        <button class="btn btn-sm btn-secondary" disabled>
                                                             <i class="ti ti-lock me-1"></i> Add Evaluation
                                                         </button>
                                                     @endif
@@ -505,7 +503,7 @@
                                                                         @if ($isEditable)
                                                                             <a href="{{ route('admin.survey.proposal.equipment.edit', $evaluation->id) }}"
                                                                                 target="_blank"
-                                                                                class="fw-bold text-decoration-none text-primary">
+                                                                                class="text-decoration-none text-primary">
                                                                                 {{ $evaluation->name }}
                                                                             </a>
                                                                         @else
@@ -554,11 +552,11 @@
                                                 <div>
                                                     @if ($isEditable)
                                                         <a href="{{ route('admin.survey.proposal.pricing.proposal', $surveyProposal->id) }}"
-                                                            class="btn btn-sm btn-export fw-semibold" target="_blank">
+                                                            class="btn btn-sm btn-export" target="_blank">
                                                             Add Pricing Summary
                                                         </a>
                                                     @else
-                                                        <button class="btn btn-sm btn-secondary fw-semibold" disabled>
+                                                        <button class="btn btn-sm btn-secondary" disabled>
                                                             <i class="ti ti-lock me-1"></i> Add Pricing Summary
                                                         </button>
                                                     @endif
@@ -592,7 +590,7 @@
                                                                         @if ($isEditable)
                                                                             <a href="{{ route('admin.pricing_proposal.edit', $pricingProposal->id) }}"
                                                                                 target="_blank"
-                                                                                class="fw-bold text-decoration-none text-primary">
+                                                                                class="text-decoration-none text-primary">
                                                                                 {{ $pricingProposal->proposal_name ?? 'Unnamed Proposal' }}
                                                                             </a>
                                                                         @else
@@ -681,12 +679,12 @@
                                             <div class="d-flex justify-content-end align-items-center mt-3">
 
                                                 <a href="#" id="proposalViewBtn"
-                                                    class="btn btn-sm btn-primary fw-semibold mx-2" target="_blank">
+                                                    class="btn btn-sm btn-primary mx-2" target="_blank">
                                                     <i class="ti ti-eye me-1"></i> View Proposal
                                                 </a>
 
                                                 <a href="#" id="proposalDownloadBtn"
-                                                    class="btn btn-sm btn-success fw-semibold">
+                                                    class="btn btn-sm btn-success">
                                                     <i class="ti ti-download me-1"></i> Download Proposal
                                                 </a>
 

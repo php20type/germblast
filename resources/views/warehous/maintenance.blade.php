@@ -332,16 +332,18 @@
     <div class="companies-section my-4">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-12 p-0">
-                    
+                <!-- Sidebar -->
+                @include('admin.operations.sidebar')
+
+                <!-- Main Content -->
+                <div class="col-md-10 p-0">
+
                     <div class="main-content">
-                        <!-- Header (matching Equipment Report layout) -->
-                        <div class="heading-area-sec border-bottom-0 pb-0">
+                        <!-- Header -->
+                        <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">
-                                    WAREHOUSE MAINTENANCE <span style="font-size: 24px;">📌</span>
-                                </h3>
-                                <p class="text-muted mb-0" style="font-size: 16px;">
+                                <h3 class="mb-1">Warehouse</h3>
+                                <p class="text-muted mb-0">
                                     Track and complete warehouse duties and standard operations.
                                 </p>
                             </div>
@@ -351,8 +353,6 @@
                                 </button>
                             </div>
                         </div>
-
-                        <hr class="mx-4 my-4" style="opacity: 0.1;">
 
                         <!-- TABS (matching Equipment Report layouts) -->
                         <div class="navbar-tabs px-4">

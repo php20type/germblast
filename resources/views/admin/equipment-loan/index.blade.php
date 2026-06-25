@@ -99,16 +99,20 @@
     <div class="companies-section my-4">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-12 p-0">
+                <!-- Sidebar -->
+                @include('admin.sales.sidebar')
+
+                <!-- Main Content -->
+                <div class="col-md-10 p-0">
                     <div class="main-content">
                         
 
 
                         <!-- Header Area -->
-                        <div class="heading-area-sec border-bottom-0 pb-0">
+                        <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">EQUIPMENT LOAN/RENTAL <span style="font-size: 24px;">📌</span></h3>
-                                <p class="text-muted mb-0" style="font-size: 16px;">Track and manage equipment checkout, returns, and sales.</p>
+                                <h3 class="mb-1">EQUIPMENT LOAN/RENTAL <span style="font-size: 24px;">📌</span></h3>
+                                <p class="text-muted mb-0">Track and manage equipment checkout, returns, and sales.</p>
                             </div>
                             <div class="right-part-sec">
                                 <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#AddEquipmentModal">
@@ -116,8 +120,6 @@
                                 </button>
                             </div>
                         </div>
-
-                        <hr class="mx-4 my-4" style="opacity: 0.1;">
 
                         <!-- Table Card -->
                         <div class="px-4 pb-4">

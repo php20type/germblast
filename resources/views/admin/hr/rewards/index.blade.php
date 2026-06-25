@@ -91,34 +91,36 @@
 @section('content')
     <div class="companies-section my-4">
         <div class="container-fluid">
-            <div class="row company-details-section">
-                <div class="col-md-12 p-0">
-                    <div class="main-content">
-                        <div class="sales-dashboard">
+        <div class="row">
+            <!-- Sidebar -->
+            @include('admin.hr.sidebar')
 
-                            {{-- Header --}}
-                            <div class="heading-area-sec border-bottom-0 pb-0">
-                                <div class="left-part-sec">
-                                    @if(auth()->user()->isSuperAdmin())
-                                        <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">GB Rewards Management 🏆</h3>
-                                        <p class="text-muted mb-0" style="font-size: 15px;">
-                                            Assign and manage rewards for all GermBlast employees.
-                                        </p>    
-                                    @else
-                                        <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">GB Rewards 🏆</h3>
-                                        <p class="text-muted mb-0" style="font-size: 15px;">
-                                            Review all rewards, milestones, and recognitions awarded to you.
-                                        </p>
-                                    @endif
-                                </div>
+            <!-- Main Content -->
+            <div class="col-md-10 p-0">
+                <div class="main-content">
+                    <div class="sales-dashboard">
+
+                        {{-- Header --}}
+                        <div class="heading-area-sec mb-3">
+                            <div class="left-part-sec">
                                 @if(auth()->user()->isSuperAdmin())
-                                    <div class="right-part-sec">
-                                        <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#AddReward">+ Add Reward</button>
-                                    </div>
+                                    <h3 class="mb-1">GB Rewards Management 🏆</h3>
+                                    <p class="text-muted mb-0">
+                                        Assign and manage rewards for all GermBlast employees.
+                                    </p>    
+                                @else
+                                    <h3 class="mb-1">GB Rewards 🏆</h3>
+                                    <p class="text-muted mb-0">
+                                        Review all rewards, milestones, and recognitions awarded to you.
+                                    </p>
                                 @endif
                             </div>
-
-                            <hr class="mx-4 my-4" style="opacity: .1;">
+                            @if(auth()->user()->isSuperAdmin())
+                                <div class="right-part-sec">
+                                    <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#AddReward">+ Add Reward</button>
+                                </div>
+                            @endif
+                        </div>
 
                             @if(session('success'))
                                 <div class="px-4">
@@ -135,7 +137,7 @@
                                     <div class="section-card text-center py-5">
                                         <div class="mb-3" style="font-size: 40px;">🏅</div>
                                         <h5 class="fw-semibold text-dark">No Rewards Found</h5>
-                                        <p class="text-muted mb-0" style="font-size: 0.9rem;">
+                                        <p class="text-muted mb-0">
                                             {{ auth()->user()->isSuperAdmin() ? 'No employee rewards have been registered yet.' : "You haven't received any rewards yet. Keep up the great work!" }}
                                         </p>
                                     </div>

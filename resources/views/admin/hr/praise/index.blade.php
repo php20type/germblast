@@ -5,25 +5,27 @@
 @section('content')
     <div class="companies-section my-4">
         <div class="container-fluid">
-            <div class="row company-details-section">
-                <div class="col-md-12 p-0">
-                    <div class="main-content">
-                        <div class="sales-dashboard">
+        <div class="row">
+            <!-- Sidebar -->
+            @include('admin.hr.sidebar')
 
-                            {{-- Header --}}
-                            <div class="heading-area-sec border-bottom-0 pb-0">
-                                <div class="left-part-sec">
-                                    <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">Core Value Praise Submissions</h3>
-                                    <p class="text-muted mb-0" style="font-size: 15px;">
-                                        Review praise submissions and core values recognition.
-                                    </p>
-                                </div>
-                                <div class="right-part-sec">
-                                    <a href="{{ route('admin.hr.praise.create') }}" class="btn btn-export">+ Submit Praise</a>
-                                </div>
+            <!-- Main Content -->
+            <div class="col-md-10 p-0">
+                <div class="main-content">
+                    <div class="sales-dashboard">
+
+                        {{-- Header --}}
+                        <div class="heading-area-sec mb-3">
+                            <div class="left-part-sec">
+                                <h3 class="mb-1">Core Value Praise Submissions</h3>
+                                <p class="text-muted mb-0">
+                                    Review praise submissions and core values recognition.
+                                </p>
                             </div>
-
-                            <hr class="mx-4 my-4" style="opacity: .1;">
+                            <div class="right-part-sec">
+                                <a href="{{ route('admin.hr.praise.create') }}" class="btn btn-export">+ Submit Praise</a>
+                            </div>
+                        </div>
 
                             @if(session('success'))
                                 <div class="px-4">
@@ -35,7 +37,7 @@
                             @endif
 
                             {{-- Timeline --}}
-                            <div class="px-4 pb-4">
+                            <div class="px-4 pb-4 company-details-section">
                                 <div class="section-card">
 
                                     <div class="timeline-container">

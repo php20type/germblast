@@ -74,18 +74,16 @@
 
                     <div class="main-content">
                         <!-- Header (matching Warehouse calendar layout) -->
-                        <div class="heading-area-sec border-bottom-0 pb-0">
+                        <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">
+                                <h3 class="mb-1">
                                     SERVICE CALENDAR <span style="font-size: 24px;">📅</span>
                                 </h3>
-                                <p class="text-muted mb-0" style="font-size: 16px;">
+                                <p class="text-muted mb-0">
                                     Manage, schedule, and view upcoming service orders across all locations.
                                 </p>
                             </div>
                         </div>
-
-                        <hr class="mx-4 my-4" style="opacity: 0.1;">
 
                         <!-- Controls and Calendar in PX-4 wrapper matching Warehouse Calendar layout -->
                         <div class="px-4 py-2">

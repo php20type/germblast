@@ -3,13 +3,16 @@
 @section('title', 'Edit Employee')
 
 @section('content')
-
 <div class="companies-section my-4">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12 p-0">
+            <!-- Sidebar -->
+            @include('admin.hr.sidebar')
 
-                <div class="sales-dashboard">
+            <!-- Main Content -->
+            <div class="col-md-10 p-0">
+                <div class="main-content">
+                    <div class="sales-dashboard">
 
                     <form action="{{ route('admin.employee.update', $employee->id) }}"
                         method="POST"
@@ -18,21 +21,21 @@
                         @csrf
 
                             {{-- HEADER --}}
-                            <div class="dashboard-header section-card d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h1 class="display-6 mb-2 fw-bold">Edit Employee</h1>
-                                    <p class="text-muted">Update employee details and role</p>
+                            <div class="heading-area-sec mb-3">
+                                <div class="left-part-sec">
+                                    <h3 class="mb-1">Edit Employee</h3>
+                                    <p class="text-muted mb-0">Update employee details and role</p>
                                 </div>
-
-                                <button type="submit" class="btn btn-success">
-                                    Update Employee
-                                </button>
+                                <div class="right-part-sec">
+                                    <button type="submit" class="btn btn-success">
+                                        Update Employee
+                                    </button>
+                                </div>
                             </div>
 
                             {{-- BASIC INFORMATION --}}
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="section-card">
+                            <div class="px-4 pb-2">
+                                <div class="section-card">
                                         <div class="section-header">
                                             <h3 class="section-title">Basic Information</h3>
                                         </div>
@@ -204,12 +207,10 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
                             {{-- SPECIAL CERTIFICATIONS --}}
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="section-card">
+                            <div class="px-4 pb-2">
+                                <div class="section-card">
                                         <div class="section-header">
                                             <h3 class="section-title">Special Certifications</h3>
                                         </div>
@@ -251,7 +252,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
                     </form>
 
@@ -259,9 +259,8 @@
                     <form id="mask-fit-form" method="POST" action="{{ route('admin.employee.mask-fit-test.store', $employee->id) }}">
                         @csrf
 
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="section-card">
+                            <div class="px-4 pb-2">
+                                <div class="section-card">
                                         <div class="section-header">
                                             <h3 class="section-title">Add a Mask Fit Test Record</h3>
                                         </div>
@@ -305,13 +304,11 @@
                                         </table>
                                     </div>
                                 </div>
-                            </div>
                     </form>
 
                     {{-- MASK FIT TEST RECORDS LISTING --}}
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="section-card">
+                    <div class="px-4 pb-2">
+                        <div class="section-card">
                                 <div class="section-header d-flex justify-content-between align-items-center">
                                     <h3 class="section-title">Mask Fit Test Records</h3>
                                     <span class="text-muted" id="mask-fit-count">{{ $maskFitTestRecords->count() }} Record(s) Found</span>
@@ -352,8 +349,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
 
                     {{-- DRIVER LOG FORM --}}
@@ -362,7 +357,7 @@
 
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="section-card">
+                            <div class="section-card">
                                     <div class="section-header">
                                         <h3 class="section-title">Add Driver Log</h3>
                                     </div>
@@ -400,15 +395,15 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                </div>
                             </div>
-                        </div>
                     </form>
 
 
                     {{-- DRIVER LOG LISTING --}}
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="section-card">
+                        <div class="section-card">
                                 <div class="section-header d-flex justify-content-between">
                                     <h3 class="section-title">Driver Logs</h3>
                                     <span class="text-muted">{{ $driverLogs->count() }} Record(s)</span>
@@ -442,9 +437,9 @@
                                         </table>
                                     </div>
                                 </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
 
 
                     {{-- DRIVER SUSPENSION FORM --}}
@@ -453,7 +448,7 @@
 
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="section-card">
+                            <div class="section-card">
                                     <div class="section-header">
                                         <h3 class="section-title">Add Driver Suspension</h3>
                                     </div>
@@ -484,15 +479,15 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                </div>
                             </div>
-                        </div>
                     </form>
 
 
                     {{-- DRIVER SUSPENSION LISTING FORM --}}
                     <div class="row">
                         <div class="col-md-12">
-                            <div class="section-card">
+                        <div class="section-card">
                                 <div class="section-header d-flex justify-content-between">
                                     <h3 class="section-title">Driver Suspension Records</h3>
                                     <span class="text-muted">{{ $driverSuspensions->count() }} Record(s)</span>
@@ -538,6 +533,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 @endsection
 

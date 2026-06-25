@@ -11,7 +11,7 @@
 
         /* Modern Tabs styling matching Fulfill Order */
         .navbar-tabs {
-            border-bottom: 1px solid #f3f4f6;
+            border-bottom: 1px solid #dee2e6;
             padding-bottom: 5px;
             overflow-x: auto !important;
             overflow-y: hidden !important;
@@ -291,14 +291,18 @@
 <div class="companies-section my-4">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12 p-0">
+            <!-- Sidebar -->
+            @include('admin.corporate-tools.sidebar')
+
+            <!-- Main Content -->
+            <div class="col-md-10 p-0">
                 <div class="main-content">
                     
                     <!-- Header -->
-                    <div class="heading-area-sec border-bottom-0 pb-0">
+                    <div class="heading-area-sec mb-3">
                         <div class="left-part-sec">
-                            <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">CHANGE REQUEST DETAILS <span style="font-size: 24px;">🔄</span></h3>
-                            <p class="text-muted mb-2" style="font-size: 16px;">Request ID: #{{ $changeRequest->id }}</p>
+                            <h3 class="mb-1">CHANGE REQUEST DETAILS <span style="font-size: 24px;">🔄</span></h3>
+                            <p class="text-muted mb-2">Request ID: #{{ $changeRequest->id }}</p>
                             
                             <div class="d-flex align-items-center gap-3 flex-wrap mt-2 mb-3">
                                 <div class="d-flex align-items-center gap-2 mb-0">
@@ -324,10 +328,8 @@
                         </div>
                     </div>
 
-                    <hr class="mx-4 my-4" style="opacity: 0.1;">
-
                     <!-- TABS -->
-                    <div class="navbar-tabs px-4">
+                    <div class="navbar-tabs px-4 mb-3">
                         <nav class="nav nav-tabs mb-0 flex-nowrap" id="changeRequestTabs" role="tablist">
                             <button class="nav-link active" id="details-tab" data-bs-toggle="tab"
                                 data-bs-target="#details" type="button" role="tab" aria-controls="details"
@@ -346,8 +348,6 @@
                             </button>
                         </nav>
                     </div>
-
-                    <hr class="mx-4 mb-4 mt-0" style="opacity: 0.1;">
 
                     <!-- Tab Content Section -->
                     <div class="tab-content px-4" id="changeRequestTabContent">

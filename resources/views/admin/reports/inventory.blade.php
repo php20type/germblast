@@ -86,16 +86,20 @@
 @section('content')
     <div class="companies-section my-4">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12 p-0">
-                    <div class="main-content">
+        <div class="row">
+            <!-- Sidebar -->
+            @include('admin.corporate-tools.sidebar')
+
+            <!-- Main Content -->
+            <div class="col-md-10 p-0">
+                <div class="main-content">
 
                         <!-- Header matching GermBlast standard layout -->
-                        <div class="heading-area-sec border-bottom-0 pb-0">
+                        <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">INVENTORY <span
+                                <h3 class="mb-1">INVENTORY <span
                                         style="font-size: 24px;">📦</span></h3>
-                                <p class="text-muted mb-0" style="font-size: 16px;">Track stock levels, reorder points, and
+                                <p class="text-muted mb-0">Track stock levels, reorder points, and
                                     required actions.</p>
                             </div>
                             <div class="right-part-sec">
@@ -104,8 +108,6 @@
                                 </button>
                             </div>
                         </div>
-
-                        <hr class="mx-4 my-4" style="opacity: 0.1;">
 
                         @if(session('success'))
                             <div class="alert alert-success alert-dismissible fade show mx-4" role="alert">

@@ -137,14 +137,12 @@
                 <div class="col-md-10 p-0">
                     <div class="main-content">
                         <!-- Header -->
-                        <div class="heading-area-sec border-bottom-0 pb-0">
+                        <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">INVOICES REPORT <span style="font-size: 24px;">📄</span></h3>
-                                <p class="text-muted mb-0" style="font-size: 16px;">Track and view all generated invoices across your organization.</p>
+                                <h3 class="mb-1">INVOICES REPORT <span style="font-size: 24px;">📄</span></h3>
+                                <p class="text-muted mb-0">Track and view all generated invoices across your organization.</p>
                             </div>
                         </div>
-
-                        <hr class="mx-4 my-4" style="opacity: 0.1;">
 
                         <!-- Table Container -->
                         <div class="px-4 pb-4">

@@ -249,10 +249,10 @@
 
                     <div class="main-content">
                         <!-- Header -->
-                        <div class="heading-area-sec border-bottom-0 pb-0">
+                        <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">FULFILL ORDER <span style="font-size: 24px;">📌</span></h3>
-                                <p class="text-muted mb-2" style="font-size: 16px;">Order ID: {{ $order->order_no ?? '' }}</p>
+                                <h3 class="mb-1">FULFILL ORDER <span style="font-size: 24px;">📌</span></h3>
+                                <p class="text-muted mb-0">Order ID: {{ $order->order_no ?? '' }}</p>
                                 
                                 <div class="d-flex align-items-center gap-3 flex-wrap mt-2 mb-3">
                                     <form action="{{ route('admin.lead.service.order.update_status', $order->id) }}" method="POST" class="d-flex align-items-center gap-2 mb-0">
@@ -286,7 +286,7 @@
                             </div>
                         </div>
 
-                        <hr class="mx-4 my-4" style="opacity: 0.1;">
+                        
 
 
                         <!-- TABS -->
@@ -351,7 +351,7 @@
                             </nav>
                         </div>
 
-                        <hr class="mx-4 mb-4 mt-0" style="opacity: 0.1;">
+                        <hr class="mb-4 mt-0" style="opacity: 0.1;">
 
 
                         <!-- Tab Content Section -->

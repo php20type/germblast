@@ -183,14 +183,12 @@
                     <div class="main-content">
 
                         <!-- Header (matching GermBlast standard index layout) -->
-                        <div class="heading-area-sec mb-0 border-bottom-0 pb-0 px-4 pt-4">
+                        <div class="heading-area-sec px-4 pt-4 mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">EXECUTIVE SALES DASHBOARD <span style="font-size: 24px;">📊</span></h3>
-                                <p class="text-muted mb-0" style="font-size: 16px;">Overview of sales metrics, services, and monthly performance breakdown</p>
+                                <h3 class="mb-1">EXECUTIVE SALES DASHBOARD <span style="font-size: 24px;">📊</span></h3>
+                                <p class="text-muted mb-0">Overview of sales metrics, services, and monthly performance breakdown</p>
                             </div>
                         </div>
-
-                        <hr class="mx-4 my-4" style="opacity: 0.1;">
 
                         <!-- Restyled Header Filter Control Bar (Matching Vehicle Planning exactly) -->
                         <div class="filter-section py-3 px-4 mx-4 my-3 rounded-3 border bg-white"
@@ -199,8 +197,6 @@
 
                                 <!-- Left Side: Current Range Header -->
                                 <div>
-                                    <span class="text-secondary text-uppercase fw-bold d-block"
-                                        style="font-size: 9px; letter-spacing: 0.5px;">Active Reporting Period</span>
                                     <h4 class="mb-0 fw-bold text-dark" style="font-size: 18px;">
                                         Month of: {{ $start->format('F Y') }}
                                     </h4>

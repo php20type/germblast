@@ -51,15 +51,19 @@
 <div class="companies-section my-4">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12 p-0">
+            <!-- Sidebar -->
+            @include('admin.hr.sidebar')
+
+            <!-- Main Content -->
+            <div class="col-md-10 p-0">
                 <div class="main-content">
                     <div class="sales-dashboard">
 
                         {{-- Header --}}
-                        <div class="heading-area-sec border-bottom-0 pb-0">
+                        <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">ANONYMOUS FEEDBACK</h3>
-                                <p class="text-muted mb-0" style="font-size: 15px;">
+                                <h3 class="mb-1">ANONYMOUS FEEDBACK</h3>
+                                <p class="text-muted mb-0">
                                     Your identity is completely protected. Share your honest thoughts.
                                 </p>
                             </div>
@@ -69,8 +73,6 @@
                             </div>
                             @endif
                         </div>
-
-                        <hr class="mx-4 my-4" style="opacity: .1;">
 
                         <div class="px-4 pb-4">
 

@@ -118,19 +118,21 @@
 
     <div class="companies-section my-4">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12 p-0">
-                    <div class="main-content">
-                        
+        <div class="row">
+            <!-- Sidebar -->
+            @include('admin.corporate-tools.sidebar')
+
+            <!-- Main Content -->
+            <div class="col-md-10 p-0">
+                <div class="main-content">
+
                         <!-- Header matching GermBlast standard layout -->
-                        <div class="heading-area-sec border-bottom-0 pb-0">
+                        <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-1" style="font-size: 26px; font-weight: 500;">Profitability This Month <span style="font-size: 24px;">📈</span></h3>
-                                <p class="text-muted mb-0" style="font-size: 14px;">Last Updated: {{ now()->format('m/d/y') }}</p>
+                                <h3 class="mb-1">Profitability This Month <span style="font-size: 24px;">📈</span></h3>
+                                <p class="text-muted mb-0">Last Updated: {{ now()->format('m/d/y') }}</p>
                             </div>
                         </div>
-
-                        <hr class="mx-4 my-4" style="opacity: 0.1;">
 
                         <!-- Restyled Header Filter Control Bar (Matching All Schedules exactly) -->
                         <div class="filter-section py-3 px-4 mx-4 my-3 rounded-3 border bg-white"
@@ -204,7 +206,7 @@
                                             @php
                                                 $isPink = $record['row_class'] === 'row-pink';
                                                 $isGreen = $record['row_class'] === 'row-green';
-                                                
+
                                                 // Dynamic colors based on row state
                                                 $valClass = $isPink ? 'text-danger-custom' : '';
                                                 $priceClass = $isGreen ? 'text-success-custom' : ($isPink ? 'text-danger-custom' : '');

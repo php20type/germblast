@@ -2,33 +2,34 @@
 <div class="col-md-2">
     <div class="sidebar">
         <div class="mt-2">
-            <h6 class="text-uppercase text-light mb-3">Sales 💼</h6>
+            <h6 class="text-uppercase text-light mb-3">Corporate Tools ⚙️</h6>
         </div>
         <div class="my-3">
             <input type="text" class="form-control search-box" placeholder="🔍">
         </div>
         <hr>
 
-        <div id="sales-tools-list">
-            <a class="nav-link {{ request()->routeIs('admin.sales.index') ? 'active' : '' }}" href="{{ route('admin.sales.index') }}">
-                Dashboard
+        <div id="corporate-tools-list">
+            <a class="nav-link {{ request()->routeIs('admin.change-control.*') ? 'active' : '' }}" href="{{ route('admin.change-control.index') }}">
+                Change Control
+            </a>
+            <a class="nav-link {{ request()->routeIs('admin.consumable-reports.*') ? 'active' : '' }}" href="{{ route('admin.consumable-reports.index') }}">
+                Consumable Reports
             </a>
 
-            <a class="nav-link {{ request()->routeIs('admin.sales.executive') ? 'active' : '' }}" href="{{ route('admin.sales.executive') }}">
-                Executive Dashboard
+            <a class="nav-link {{ request()->routeIs('admin.expense-report.*') ? 'active' : '' }}" href="{{ route('admin.expense-report.index') }}">
+                Expense Report
+            </a>
+            <a class="nav-link {{ request()->routeIs('admin.inventory-report.*') ? 'active' : '' }}" href="{{ route('admin.inventory-report.index') }}">
+                Inventory Reporting
+            </a>
+            <a class="nav-link {{ request()->routeIs('admin.job-profitability.*') ? 'active' : '' }}" href="{{ route('admin.job-profitability.index') }}">
+                Job Profitability
+            </a>
+            <a class="nav-link {{ request()->routeIs('admin.office-duties.*') ? 'active' : '' }}" href="{{ route('admin.office-duties.index') }}">
+                Office Duties
             </a>
 
-            <a class="nav-link {{ request()->routeIs('admin.sales.schedule.meeting') ? 'active' : '' }}" href="{{ route('admin.sales.schedule.meeting') }}">
-                Schedule Meetings
-            </a>
-
-            <a class="nav-link {{ request()->routeIs('admin.sales.invoices*') ? 'active' : '' }}" href="{{ route('admin.sales.invoices') }}">
-                Invoice
-            </a>
-
-            <a class="nav-link {{ request()->routeIs('admin.equipment-loan.*') ? 'active' : '' }}" href="{{ route('admin.equipment-loan.index') }}">
-                Equipment Loan
-            </a>
 
             <div id="nothing-found" style="display:none; color: rgba(255,255,255,0.6); padding: 10px 0;">Nothing found.</div>
         </div>
@@ -38,7 +39,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchBox = document.querySelector('.search-box');
-        const toolsList = document.querySelectorAll('#sales-tools-list a');
+        const toolsList = document.querySelectorAll('#corporate-tools-list a');
         const nothingFound = document.getElementById('nothing-found');
 
         if (searchBox) {

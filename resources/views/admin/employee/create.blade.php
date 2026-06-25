@@ -6,132 +6,136 @@
     <div class="companies-section my-4">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-12 p-0">
+                <!-- Sidebar -->
+                @include('admin.hr.sidebar')
 
-                    <form action="{{ route('admin.employee.store') }}" method="POST" id="employee-add-form">
-                        @csrf
+                <!-- Main Content -->
+                <div class="col-md-10 p-0">
+                    <div class="main-content">
 
-                        <div class="sales-dashboard">
+                        <form action="{{ route('admin.employee.store') }}" method="POST" id="employee-add-form">
+                            @csrf
 
-                            {{-- HEADER --}}
-                            <div class="dashboard-header section-card d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h1 class="display-6 mb-2 fw-bold">Add Employee</h1>
-                                    <p class="text-muted">Create and assign role-based access for an employee</p>
-                                </div>
+                            <div class="sales-dashboard">
 
+                        {{-- HEADER --}}
+                        <div class="heading-area-sec mb-3">
+                            <div class="left-part-sec">
+                                <h3 class="mb-1">Add Employee</h3>
+                                <p class="text-muted mb-0">Create and assign role-based access for an employee</p>
+                            </div>
+                            <div class="right-part-sec">
                                 <button type="submit" class="btn btn-success">
                                     Save Employee
                                 </button>
                             </div>
+                        </div>
 
                             {{-- BASIC INFORMATION --}}
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="section-card">
-                                        <div class="section-header">
-                                            <h3 class="section-title">Basic Information</h3>
-                                        </div>
-
-                                        <table class="table table-bordered align-middle">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Name</th>
-                                                    <td>
-                                                        <input type="text" name="name" class="form-control" required>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Email</th>
-                                                    <td>
-                                                        <input type="email" name="email" class="form-control" required>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Password</th>
-                                                    <td>
-                                                        <div class="input-group">
-                                                            <input type="password" name="password" id="password"
-                                                                class="form-control" required>
-                                                            <button type="button"
-                                                                class="btn btn-outline-secondary toggle-password"
-                                                                data-target="password">
-                                                                <i class="fas fa-eye"></i>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Confirm Password</th>
-                                                    <td>
-                                                        <div class="input-group">
-                                                            <input type="password" name="password_confirmation"
-                                                                id="password_confirmation" class="form-control" required>
-                                                            <button type="button"
-                                                                class="btn btn-outline-secondary toggle-password"
-                                                                data-target="password_confirmation">
-                                                                <i class="fas fa-eye"></i>
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Role</th>
-                                                    <td>
-                                                        <select name="role" class="form-select" required>
-                                                            <option value="">Select Role</option>
-                                                            @foreach ($roles as $role)
-                                                                <option value="{{ $role->name }}">
-                                                                    {{ strtoupper(str_replace('_', ' ', $role->name)) }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Staff Type</th>
-                                                    <td>
-                                                        <select name="staff_type" class="form-select">
-                                                            <option value="">Select Staff Type</option>
-                                                            <option value="leader">Leader</option>
-                                                            <option value="technician">Technician</option>
-                                                            <option value="corporate">Corporate</option>
-                                                        </select>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <th>Territory</th>
-                                                    <td>
-                                                        <select name="territory_id" class="form-select">
-                                                            <option value="">Select Territory</option>
-                                                            @foreach ($territories as $territory)
-                                                                <option value="{{ $territory->id }}">
-                                                                    {{ $territory->name }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </td>
-                                                </tr>
-
-                                            </tbody>
-                                        </table>
+                            <div class="px-4 pb-2">
+                                <div class="section-card">
+                                    <div class="section-header">
+                                        <h3 class="section-title">Basic Information</h3>
                                     </div>
+
+                                    <table class="table table-bordered align-middle">
+                                        <tbody>
+                                            <tr>
+                                                <th>Name</th>
+                                                <td>
+                                                    <input type="text" name="name" class="form-control" required>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Email</th>
+                                                <td>
+                                                    <input type="email" name="email" class="form-control" required>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Password</th>
+                                                <td>
+                                                    <div class="input-group">
+                                                        <input type="password" name="password" id="password"
+                                                            class="form-control" required>
+                                                        <button type="button"
+                                                            class="btn btn-outline-secondary toggle-password"
+                                                            data-target="password">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Confirm Password</th>
+                                                <td>
+                                                    <div class="input-group">
+                                                        <input type="password" name="password_confirmation"
+                                                            id="password_confirmation" class="form-control" required>
+                                                        <button type="button"
+                                                            class="btn btn-outline-secondary toggle-password"
+                                                            data-target="password_confirmation">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Role</th>
+                                                <td>
+                                                    <select name="role" class="form-select" required>
+                                                        <option value="">Select Role</option>
+                                                        @foreach ($roles as $role)
+                                                            <option value="{{ $role->name }}">
+                                                                {{ strtoupper(str_replace('_', ' ', $role->name)) }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Staff Type</th>
+                                                <td>
+                                                    <select name="staff_type" class="form-select" required>
+                                                        <option value="">Select Staff Type</option>
+                                                        <option value="leader">Leader</option>
+                                                        <option value="technician">Technician</option>
+                                                        <option value="corporate">Corporate</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <th>Territory</th>
+                                                <td>
+                                                    <select name="territory_id" class="form-select">
+                                                        <option value="">Select Territory</option>
+                                                        @foreach ($territories as $territory)
+                                                            <option value="{{ $territory->id }}">
+                                                                {{ $territory->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
 
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
     </div>
+</div>
 @endsection
 
 @push('scripts')
