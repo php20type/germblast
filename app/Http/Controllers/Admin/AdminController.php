@@ -55,4 +55,56 @@ class AdminController extends Controller
             'competitors'
         ));
     }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+
+        if (empty($query)) {
+            return response()->json([
+                'companies' => [],
+                'people' => [],
+                'leads' => []
+            ]);
+        }
+
+        $companies = Company::where('name', 'like', "%{$query}%")
+            ->limit(10)
+            ->get(['id', 'name'])
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'url' => route('admin.company.show', $item->id)
+                ];
+            });
+
+        $people = People::where('name', 'like', "%{$query}%")
+            ->limit(10)
+            ->get(['id', 'name'])
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'url' => route('admin.people.show', $item->id)
+                ];
+            });
+
+        $leads = Lead::where('name', 'like', "%{$query}%")
+            ->limit(10)
+            ->get(['id', 'name'])
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'url' => route('admin.lead.show', $item->id)
+                ];
+            });
+
+        return response()->json([
+            'companies' => $companies,
+            'people' => $people,
+            'leads' => $leads
+        ]);
+    }
 }

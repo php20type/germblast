@@ -4,9 +4,10 @@
 
         <div class="top-header-rightmenu">
             <div class="search-bar position-relative">
-                <form class="search-form">
-                    <input type="search" class="form-control" placeholder="Search name..." aria-label="Search">
+                <form class="search-form" onsubmit="return false;">
+                    <input type="search" id="globalSearchInput" class="form-control" placeholder="Search name..." aria-label="Search" autocomplete="off" data-search-url="{{ route('admin.global-search') }}">
                 </form>
+                <div class="search-results-dropdown" id="globalSearchResults"></div>
             </div>
             <div class="navigation-button">
                 <ul class="list-inline mb-0">

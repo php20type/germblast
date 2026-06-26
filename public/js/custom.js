@@ -87,3 +87,120 @@
         }, true);
     }
 })();
+
+// Global Search Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('globalSearchInput');
+    const searchResults = document.getElementById('globalSearchResults');
+    let debounceTimer;
+
+    if (!searchInput || !searchResults) return;
+
+    // Get the search URL from the data attribute
+    const searchUrl = searchInput.getAttribute('data-search-url');
+    if (!searchUrl) return;
+
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const query = this.value.trim();
+
+        if (query.length < 2) {
+            searchResults.innerHTML = '';
+            searchResults.classList.remove('active');
+            return;
+        }
+
+        searchResults.innerHTML = '<div class="search-results-loading"><i class="fa-solid fa-spinner fa-spin me-2"></i>Searching...</div>';
+        searchResults.classList.add('active');
+
+        debounceTimer = setTimeout(function() {
+            fetch(searchUrl + "?query=" + encodeURIComponent(query), {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                let html = '';
+                let hasResults = false;
+
+                // Group 1: Companies
+                if (data.companies && data.companies.length > 0) {
+                    hasResults = true;
+                    html += '<div class="search-results-group">Companies</div>';
+                    data.companies.forEach(function(item) {
+                        html += `<a href="${item.url}" class="search-results-item">
+                            <i class="fa-solid fa-building"></i>
+                            <span>${item.name}</span>
+                        </a>`;
+                    });
+                }
+
+                // Group 2: People
+                if (data.people && data.people.length > 0) {
+                    hasResults = true;
+                    html += '<div class="search-results-group">People</div>';
+                    data.people.forEach(function(item) {
+                        html += `<a href="${item.url}" class="search-results-item">
+                            <i class="fa-solid fa-user"></i>
+                            <span>${item.name}</span>
+                        </a>`;
+                    });
+                }
+
+                // Group 3: Leads
+                if (data.leads && data.leads.length > 0) {
+                    hasResults = true;
+                    html += '<div class="search-results-group">Leads</div>';
+                    data.leads.forEach(function(item) {
+                        html += `<a href="${item.url}" class="search-results-item">
+                            <i class="fa-solid fa-bullhorn"></i>
+                            <span>${item.name}</span>
+                        </a>`;
+                    });
+                }
+
+                if (!hasResults) {
+                    html = `<div class="search-results-empty">No results found for "${query}"</div>`;
+                }
+
+                searchResults.innerHTML = html;
+                searchResults.classList.add('active');
+            })
+            .catch(error => {
+                console.error('Error during search:', error);
+                searchResults.innerHTML = '<div class="search-results-empty text-danger">An error occurred while searching.</div>';
+                searchResults.classList.add('active');
+            });
+        }, 300);
+    });
+
+    // Close search dropdown on click outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-bar')) {
+            searchResults.classList.remove('active');
+        }
+    });
+
+    // Re-show dropdown if input is focused and has text
+    searchInput.addEventListener('focus', function() {
+        if (this.value.trim().length >= 2) {
+            searchResults.classList.add('active');
+        }
+    });
+
+    // Close dropdown on escape key
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            searchResults.classList.remove('active');
+            searchInput.blur();
+        }
+    });
+});
