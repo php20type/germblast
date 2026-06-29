@@ -1645,20 +1645,28 @@
                                     </div>
 
                                     <div id="company-list">
-                                        <div class="company-list d-flex justify-content-between align-items-center mb-3"
+                                        <div class="company-list d-block mb-3"
                                             id="company-{{ $leads->company->id }}">
-                                            <div class="row">
-                                                <div class="col-2">
+                                            <div class="row align-items-center w-100 m-0 g-2">
+                                                <div class="col-3 col-sm-2 p-0">
                                                     <div class="company-icon">
                                                         <img src="{{ asset('img/home/companyimages1.png') }}"
                                                             alt="Company Logo" class="img-fluid">
                                                     </div>
                                                 </div>
-                                                <div class="col-10">
+                                                <div class="col-9 col-sm-10 p-0 ps-2">
                                                     <div class="company-name">
-                                                        <p><b>{{ $leads->company->name ?? 'N/A' }}</b></p>
-                                                        <p>{{ $leads->company->description ?? 'N/A' }}</p>
-                                                        <p>{{ $leads->company->companyAddress->address ?? 'N/A' }}</p>
+                                                        <p class="mb-1"><b>
+                                                            @can('company.detail.view')
+                                                                <a href="{{ route('admin.company.show', $leads->company->id) }}" class="text-decoration-none text-dark">
+                                                                    {{ $leads->company->name ?? 'N/A' }}
+                                                                </a>
+                                                            @else
+                                                                {{ $leads->company->name ?? 'N/A' }}
+                                                            @endcan
+                                                        </b></p>
+                                                        <p class="mb-1">{{ $leads->company->description ?? 'N/A' }}</p>
+                                                        <p class="mb-1 text-muted">{{ $leads->company->companyAddress->address ?? 'N/A' }}</p>
 
                                                         @can('company.dashboard.view')
                                                             <a href="{{ route('admin.company.dashboard', $leads->company->id) }}"
@@ -1669,7 +1677,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-
                                         </div>
                                     </div>
 
@@ -1702,36 +1709,42 @@
 
                                     <div id="people-list">
                                         @foreach ($leads->peoples as $person)
-                                            <div class="company-list d-flex justify-content-between align-items-center mb-3"
+                                            <div class="company-list d-block mb-3"
                                                 id="person-{{ $person->id }}">
-                                                <div class="row">
-                                                    <div class="col-2">
+                                                <div class="row align-items-center w-100 m-0 g-2">
+                                                    <div class="col-3 col-sm-2 p-0">
                                                         <div class="company-icon">
                                                             <img src="{{ asset('img/home/profile-image.png') }}"
                                                                 alt="People Logo" class="img-fluid">
                                                         </div>
                                                     </div>
-                                                    <div class="col-10">
+                                                    <div class="@can('lead.detail.edit') col-7 col-sm-8 @else col-9 col-sm-10 @endcan p-0 ps-2">
                                                         <div class="company-name">
-                                                            <p><strong>{{ $person->name }}</strong></p>
-                                                            <p>{{ $person->bio ?? 'N/A' }}</p>
-                                                            <p>{{ $person->peoplePhone->phone ?? 'N/A' }}</p>
-                                                            <p>{{ $person->peopleEmail->email ?? 'N/A' }}</p>
-                                                            <p class="text-warning">Contacted 8 Feb 2022</p>
+                                                            <p class="mb-1"><strong>
+                                                                @can('people.detail.view')
+                                                                    <a href="{{ route('admin.people.show', $person->id) }}" class="text-decoration-none text-dark">
+                                                                        {{ $person->name }}
+                                                                    </a>
+                                                                @else
+                                                                    {{ $person->name }}
+                                                                @endcan
+                                                            </strong></p>
+                                                            <p class="mb-1">{{ $person->bio ?? 'N/A' }}</p>
+                                                            <p class="mb-1">{{ $person->peoplePhone->phone ?? 'N/A' }}</p>
+                                                            <p class="mb-1 text-muted">{{ $person->peopleEmail->email ?? 'N/A' }}</p>
+                                                            <p class="mb-1 text-warning">Contacted 8 Feb 2022</p>
                                                         </div>
                                                     </div>
+                                                    @can('lead.detail.edit')
+                                                        <div class="col-2 p-0 text-end">
+                                                            <button class="btn btn-sm btn-outline-secondary delete-item"
+                                                                data-lead="{{ $leads->id }}" data-id="{{ $person->id }}"
+                                                                data-type="people" data-target="person-{{ $person->id }}">
+                                                                <i class="fas fa-times"></i>
+                                                            </button>
+                                                        </div>
+                                                    @endcan
                                                 </div>
-
-                                                @can('lead.detail.edit')
-                                                    <div id="delete-people">
-                                                        <button class="btn btn-sm btn-outline-secondary delete-item"
-                                                            data-lead="{{ $leads->id }}" data-id="{{ $person->id }}"
-                                                            data-type="people" data-target="person-{{ $person->id }}">
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
-                                                    </div>
-                                                @endcan
-
                                             </div>
                                         @endforeach
                                     </div>

@@ -939,9 +939,9 @@ class PeopleController extends Controller
                 ]);
                 break;
 
-            case 'user_id':
+            case 'assignee_id':
                 $people->update([
-                    'user_id' => $request->value,
+                    'assignee_id' => $request->value,
                 ]);
 
                 $newAssignee = User::find($request->value)->name ?? 'Unassigned';

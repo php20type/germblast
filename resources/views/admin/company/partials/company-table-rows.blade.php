@@ -16,7 +16,7 @@
                  @endcan
              </div>
              <div class="company-name">
-                 {{ $company->peoples->first()?->name ?? 'N/A' }}
+                 {{ $company->assignee->name ?? 'N/A' }}
              </div>
          </td>
          <td>

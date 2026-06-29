@@ -126,8 +126,8 @@
                                 <div class="form-group">
                                     <label class="form-label">Description</label>
                                     <span class="text-danger">*</span>
-                                    <input type="text" name="description"
-                                        placeholder="Add some description about the company..." class="form-control" />
+                                    <textarea name="description" rows="3"
+                                        placeholder="Add some description about the company..." class="form-control"></textarea>
                                 </div>
                             </div>
                             <div class="col-lg-6">
@@ -215,7 +215,9 @@
                                     <select name="assignee_id" class="form-select">
                                         <option value="">Select assignee</option>
                                         @foreach ($users as $user)
-                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                            @if($user->isSalesRepresentative())
+                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                            @endif
                                         @endforeach
                                     </select>
                                 </div>
@@ -348,7 +350,9 @@
                                     <select name="assignee_id" class="form-select">
                                         <option value="">Select assignee</option>
                                         @foreach ($users as $user)
-                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                            @if($user->isSalesRepresentative())
+                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                            @endif
                                         @endforeach
                                     </select>
                                 </div>
@@ -441,9 +445,11 @@
                                     <select name="assignee_id" class="form-select">
                                         <option value="">Select assignee</option>
                                         @foreach ($users as $user)
-                                            <option value="{{ $user->id }}">
-                                                {{ $user->name }}
-                                            </option>
+                                            @if($user->isSalesRepresentative())
+                                                <option value="{{ $user->id }}">
+                                                    {{ $user->name }}
+                                                </option>
+                                            @endif
                                         @endforeach
                                     </select>
                                 </div>

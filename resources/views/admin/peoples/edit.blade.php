@@ -201,7 +201,7 @@
                             <div class="mt-2" id="contact-types-badges-container">
                                 @if(!empty($peoples->contact_types))
                                     @foreach ($peoples->contact_types as $type)
-                                        <span class="badge bg-warning text-dark mx-1 px-2 py-1" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; border-radius: 4px; display: inline-block;">
+                                        <span class="badge bg-warning text-white mx-1 px-2 py-1 text-uppercase rounded d-inline-block">
                                             <i class="fas fa-address-card me-1"></i>{{ $type }}
                                         </span>
                                     @endforeach
@@ -230,32 +230,42 @@
                                 @endcan
                             </div>
 
-                            @foreach ($peoples->companiesAlt as $company)
-                                <div class="people-card mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <img src="{{ asset('img/home/companyimages1.png') }}" alt="{{ $company->name }}"
-                                            class="person-avatar me-3">
-                                        <div>
-                                            <h6 class="mb-0">{{ $company->name ?? 'N/A' }}</h6>
-                                            <small class="text-warning">{{ $company->description ?? 'N/A' }}</small>
-                                        </div>
-                                    </div>
+                             @foreach ($peoples->companiesAlt as $company)
+                                 <div class="people-card mb-3 d-block">
+                                     <div class="row align-items-center w-100 m-0 g-2">
+                                         <div class="col-md-8 col-12 d-flex align-items-center p-0">
+                                             <img src="{{ asset('img/home/companyimages1.png') }}" alt="{{ $company->name }}"
+                                                 class="person-avatar me-3 flex-shrink-0">
+                                             <div>
+                                                 <h6 class="mb-0">
+                                                     @can('company.detail.view')
+                                                         <a href="{{ route('admin.company.show', $company->id) }}" class="text-decoration-none text-dark">
+                                                             {{ $company->name ?? 'N/A' }}
+                                                         </a>
+                                                     @else
+                                                         {{ $company->name ?? 'N/A' }}
+                                                     @endcan
+                                                 </h6>
+                                                 <small class="text-warning">{{ $company->description ?? 'N/A' }}</small>
+                                             </div>
+                                         </div>
 
-                                    <div class="d-flex gap-3 align-items-center mt-2">
-                                        <div class="text-end">
-                                            <div>{{ $company->companyPhone->phone ?? 'N/A' }}</div>
-                                            <div class="text-muted">{{ $company->companyAddress->address ?? 'N/A' }}</div>
-                                        </div>
+                                         <div class="col-md-4 col-12 d-flex justify-content-md-end justify-content-between align-items-center gap-3 p-0 mt-2 mt-md-0">
+                                             <div class="text-md-end text-start">
+                                                 <div>{{ $company->companyPhone->phone ?? 'N/A' }}</div>
+                                                 <div class="text-muted">{{ $company->companyAddress->address ?? 'N/A' }}</div>
+                                             </div>
 
-                                        @can('people.detail.edit')
-                                            <button class="btn btn-sm btn-outline-secondary remove-company-btn"
-                                                data-company-id="{{ $company->id }}" data-people-id="{{ $peoples->id }}">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        @endcan
-                                    </div>
-                                </div>
-                            @endforeach
+                                             @can('people.detail.edit')
+                                                 <button class="btn btn-sm btn-outline-secondary remove-company-btn"
+                                                     data-company-id="{{ $company->id }}" data-people-id="{{ $peoples->id }}">
+                                                     <i class="fas fa-times"></i>
+                                                 </button>
+                                             @endcan
+                                         </div>
+                                     </div>
+                                 </div>
+                             @endforeach
 
 
                             @can('people.detail.edit')
@@ -1131,14 +1141,16 @@
                             @can('people.detail.edit')
                                 <div class="form-group mb-3">
                                     <label for="assigneeSelect" class="form-label"><b>ASSIGNEE</b> </label>
-                                    <select class="form-select people-update" data-field="user_id" data-field-name="Assingee"
+                                    <select class="form-select people-update" data-field="assignee_id" data-field-name="Assignee"
                                         id="assigneeSelect">
                                         <option selected>Select assignee</option>
                                         @foreach ($users as $user)
-                                            <option value="{{ $user->id }}"
-                                                {{ $peoples->user_id == $user->id ? 'selected' : '' }}>
-                                                {{ $user->name }}
-                                            </option>
+                                            @if($user->isSalesRepresentative())
+                                                <option value="{{ $user->id }}"
+                                                    {{ $peoples->assignee_id == $user->id ? 'selected' : '' }}>
+                                                    {{ $user->name }}
+                                                </option>
+                                            @endif
                                         @endforeach
                                     </select>
                                 </div>
@@ -1190,10 +1202,12 @@
                                     <select class="form-select" disabled>
                                         <option selected>Select assignee</option>
                                         @foreach ($users as $user)
-                                            <option value="{{ $user->id }}"
-                                                {{ $peoples->user_id == $user->id ? 'selected' : '' }}>
-                                                {{ $user->name }}
-                                            </option>
+                                            @if($user->isSalesRepresentative())
+                                                <option value="{{ $user->id }}"
+                                                    {{ $peoples->assignee_id == $user->id ? 'selected' : '' }}>
+                                                    {{ $user->name }}
+                                                </option>
+                                            @endif
                                         @endforeach
                                     </select>
                                 </div>
@@ -1739,9 +1753,11 @@
                                     <select name="assignee_id" class="form-select">
                                         <option value="">Choose...</option>
                                         @foreach ($users as $user)
-                                            <option value="{{ $user->id }}">
-                                                {{ $user->name }}
-                                            </option>
+                                            @if($user->isSalesRepresentative())
+                                                <option value="{{ $user->id }}">
+                                                    {{ $user->name }}
+                                                </option>
+                                            @endif
                                         @endforeach
                                     </select>
                                 </div>
@@ -1760,31 +1776,34 @@
                             <!-- Product Row Container -->
                             <div id="productRowContainer" class="mt-3">
                                 <div class="row product-row">
-                                    <div class="col-lg-4">
+                                    <div class="col-lg-12">
                                         <div class="form-group">
-                                            <label class="form-label">Products</label>
+                                            <label class="form-label">Product</label>
+                                            <span class="text-danger">*</span>
                                             <select class="form-select mt-2" name="product_id[]">
-                                                <option value="">Choose...</option>
+                                                <option value="">Select product...</option>
                                                 @foreach ($products as $product)
-                                                    <option value="{{ $product->id }}">{{ $product->name }}
-                                                    </option>
+                                                    <option value="{{ $product->id }}">{{ $product->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-4">
+                                    <div class="col-lg-6">
                                         <div class="form-group">
                                             <label class="form-label">Qty :</label>
+                                            <span class="text-danger">*</span>
                                             <input type="number" name="quantity[]" placeholder="Add quantity"
                                                 class="form-control" />
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-4">
+                                    <div class="col-lg-6">
                                         <div class="form-group d-flex justify-content-between align-items-end">
                                             <div style="width: 100%">
-                                                <label class="form-label fw-light">U.S(USD)</label>
+                                                <label class="form-label">Price <span
+                                                        class="fw-light">(USD)</span></label>
+                                                <span class="text-danger">*</span>
                                                 <input type="number" name="price[]" step="0.01"
                                                     placeholder="Add price" class="form-control" />
                                             </div>
@@ -1816,18 +1835,15 @@
                                     @error('company_id')
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
-                                    {{-- <select name="company_id[]" id="companySelect" class="form-select">
-                                        @foreach ($companies as $company)
-                                        <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                        @endforeach
-                                    </select> --}}
-                                    <select name="company_id[]" id="companySelect" class="form-select" multiple>
-                                        <option value="">Choose Company</option>
-                                        @foreach ($companies as $company)
-                                            <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                    <select name="company_id" id="companySelect" class="form-select select2">
+                                        <option value=""></option>
+                                        @foreach ($companies as $c)
+                                            <option value="{{ $c->id }}"
+                                                {{ $peoples->companiesAlt->contains('id', $c->id) ? 'selected' : '' }}>
+                                                {{ $c->name }}
+                                            </option>
                                         @endforeach
                                     </select>
-
                                 </div>
                             </div>
                             <div class="col-lg-12">
@@ -2997,7 +3013,7 @@
                     confidence: {
                         required: true
                     },
-                    "company_id[]": {
+                    "company_id": {
                         required: true
                     },
                     "person_id[]": {
@@ -3035,7 +3051,7 @@
                     confidence: {
                         required: "Please enter the confidence level."
                     },
-                    "company_id[]": {
+                    "company_id": {
                         required: "Please select a company."
                     },
                     "person_id[]": {

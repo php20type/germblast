@@ -223,29 +223,38 @@
                             </div>
 
                             @foreach ($company->peoples as $people)
-                                <div class="people-card mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <img src="{{ asset('img/home/profile.png') }}" alt="{{ $people->name }}"
-                                            class="person-avatar me-3">
-                                        <div>
-                                            <h6 class="mb-0">{{ $people->name ?? 'N/A' }}</h6>
-                                            <small class="text-warning">{{ $people->bio ?? 'N/A' }}</small>
+                                <div class="people-card mb-3 d-block">
+                                    <div class="row align-items-center w-100 m-0 g-2">
+                                        <div class="col-md-8 col-12 d-flex align-items-center p-0">
+                                            <img src="{{ asset('img/home/profile.png') }}" alt="{{ $people->name }}"
+                                                class="person-avatar me-3 flex-shrink-0">
+                                            <div>
+                                                <h6 class="mb-0">
+                                                    @can('people.detail.view')
+                                                        <a href="{{ route('admin.people.show', $people->id) }}" class="text-decoration-none text-dark">
+                                                            {{ $people->name ?? 'N/A' }}
+                                                        </a>
+                                                    @else
+                                                        {{ $people->name ?? 'N/A' }}
+                                                    @endcan
+                                                </h6>
+                                                <small class="text-warning">{{ $people->bio ?? 'N/A' }}</small>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="d-flex gap-3 align-items-center">
-                                        <div class="text-end">
-                                            <div>{{ $people->peoplePhone->phone ?? 'N/A' }}</div>
-                                            <div class="text-muted">{{ $people->peopleEmail->email ?? 'N/A' }}</div>
+                                        <div class="col-md-4 col-12 d-flex justify-content-md-end justify-content-between align-items-center gap-3 p-0 mt-2 mt-md-0">
+                                            <div class="text-md-end text-start">
+                                                <div>{{ $people->peoplePhone->phone ?? 'N/A' }}</div>
+                                                <div class="text-muted">{{ $people->peopleEmail->email ?? 'N/A' }}</div>
+                                            </div>
+
+                                            @can('company.detail.edit')
+                                                <button class="btn btn-sm btn-outline-secondary remove-person-btn"
+                                                    data-people-id="{{ $people->id }}" data-company-id="{{ $company->id }}">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            @endcan
                                         </div>
-
-                                        @can('company.detail.edit')
-                                            <button class="btn btn-sm btn-outline-secondary remove-person-btn"
-                                                data-people-id="{{ $people->id }}" data-company-id="{{ $company->id }}">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        @endcan
-
                                     </div>
                                 </div>
                             @endforeach
@@ -1236,6 +1245,7 @@
                                 @can('company.detail.edit')
                                     <select class="form-select company-update" data-field-name="Company Type"
                                         data-field="company_type_id">
+                                        <option value="">Please Select</option>
                                         @foreach ($company_types as $company_type)
                                             <option value="{{ $company_type->id }}"
                                                 {{ $company->company_type_id == $company_type->id ? 'selected' : '' }}>
@@ -1244,6 +1254,7 @@
                                     </select>
                                 @else
                                     <select class="form-select" disabled>
+                                        <option value="">Please Select</option>
                                         @foreach ($company_types as $company_type)
                                             <option value="{{ $company_type->id }}"
                                                 {{ $company->company_type_id == $company_type->id ? 'selected' : '' }}>
@@ -1258,6 +1269,7 @@
                                 @can('company.detail.edit')
                                     <select class="form-select company-update" data-field-name="Industry"
                                         data-field="industry_id">
+                                        <option value="">Please Select</option>
                                         @foreach ($industries as $industry)
                                             <option value="{{ $industry->id }}"
                                                 {{ $company->industry_id == $industry->id ? 'selected' : '' }}>
@@ -1267,6 +1279,7 @@
                                     </select>
                                 @else
                                     <select class="form-select" disabled>
+                                        <option value="">Please Select</option>
                                         @foreach ($industries as $industry)
                                             <option value="{{ $industry->id }}"
                                                 {{ $company->industry_id == $industry->id ? 'selected' : '' }}>
@@ -1281,21 +1294,27 @@
                                 <label class="form-label"><b>ASSIGNEE</b></label>
                                 @can('company.detail.edit')
                                     <select class="form-select company-update" data-field-name="Assignee"
-                                        data-field="user_id">
+                                        data-field="assignee_id">
+                                        <option value="">Please Select</option>
                                         @foreach ($users as $user)
-                                            <option value="{{ $user->id }}"
-                                                {{ $company->user_id == $user->id ? 'selected' : '' }}>
-                                                {{ $user->name }}
-                                            </option>
+                                            @if($user->isSalesRepresentative())
+                                                <option value="{{ $user->id }}"
+                                                    {{ $company->assignee_id == $user->id ? 'selected' : '' }}>
+                                                    {{ $user->name }}
+                                                </option>
+                                            @endif
                                         @endforeach
                                     </select>
                                 @else
                                     <select class="form-select" disabled>
+                                        <option value="">Please Select</option>
                                         @foreach ($users as $user)
-                                            <option value="{{ $user->id }}"
-                                                {{ $company->user_id == $user->id ? 'selected' : '' }}>
-                                                {{ $user->name }}
-                                            </option>
+                                            @if($user->isSalesRepresentative())
+                                                <option value="{{ $user->id }}"
+                                                    {{ $company->assignee_id == $user->id ? 'selected' : '' }}>
+                                                    {{ $user->name }}
+                                                </option>
+                                            @endif
                                         @endforeach
                                     </select>
                                 @endcan
@@ -1306,6 +1325,7 @@
                                 @can('company.detail.edit')
                                     <select class="form-select company-update" data-field-name="Territory"
                                         data-field="territory_id">
+                                        <option value="">Please Select</option>
                                         @foreach ($territories as $territory)
                                             <option value="{{ $territory->id }}"
                                                 {{ $company->territory_id == $territory->id ? 'selected' : '' }}>
@@ -1315,6 +1335,7 @@
                                     </select>
                                 @else
                                     <select class="form-select" disabled>
+                                        <option value="">Please Select</option>
                                         @foreach ($territories as $territory)
                                             <option value="{{ $territory->id }}"
                                                 {{ $company->territory_id == $territory->id ? 'selected' : '' }}>
@@ -1863,9 +1884,11 @@
                                     <select name="assignee_id" class="form-select">
                                         <option value="">Select assignee</option>
                                         @foreach ($users as $user)
-                                            <option value="{{ $user->id }}">
-                                                {{ $user->name }}
-                                            </option>
+                                            @if($user->isSalesRepresentative())
+                                                <option value="{{ $user->id }}">
+                                                    {{ $user->name }}
+                                                </option>
+                                            @endif
                                         @endforeach
                                     </select>
                                 </div>
@@ -3451,7 +3474,7 @@
                     confidence: {
                         required: true
                     },
-                    "company_id[]": {
+                    "company_id": {
                         required: true
                     },
                     "person_id[]": {
@@ -3489,7 +3512,7 @@
                     confidence: {
                         required: "Please enter the confidence level."
                     },
-                    "company_id[]": {
+                    "company_id": {
                         required: "Please select a company."
                     },
                     "person_id[]": {

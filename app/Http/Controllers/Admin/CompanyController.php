@@ -241,7 +241,8 @@ class CompanyController extends Controller
             return redirect()->back()->with('success', 'Company created successfully!');
 
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Something went wrong!');
+            Log::error('Company Creation Failed: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
         }
     }
 
@@ -783,9 +784,9 @@ class CompanyController extends Controller
                 ]);
                 break;
 
-            case 'user_id':
+            case 'assignee_id':
                 $company->update([
-                    'user_id' => $request->value,
+                    'assignee_id' => $request->value,
                 ]);
 
                 $newAssignee = User::find($request->value)->name ?? 'Unassigned';

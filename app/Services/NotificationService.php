@@ -31,9 +31,9 @@ class NotificationService
                         'company_id' => $company->id,
                         'name' => $company->name,
                         'description' => $company->description,
-                        'company_type' => $company->companyType->type ?? 'N/A',
-                        'industry' => $company->industry->name ?? 'N/A',
-                        'territory' => $company->territory->name ?? 'N/A',
+                        'company_type' => $company->companyType?->type ?? 'N/A',
+                        'industry' => $company->industry?->name ?? 'N/A',
+                        'territory' => $company->territory?->name ?? 'N/A',
                     ]
                 );
             }

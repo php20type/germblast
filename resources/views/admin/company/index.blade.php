@@ -55,8 +55,10 @@
                                             <select class="form-select" aria-label="Default select example" name="assignee_id">
                                                 <option value="">Assignee</option>
                                                 @foreach ($users as $user)
-                                                    <option value="{{ $user->id }}">{{ $user->name }}
-                                                    </option>
+                                                    @if($user->isSalesRepresentative())
+                                                        <option value="{{ $user->id }}">{{ $user->name }}
+                                                        </option>
+                                                    @endif
                                                 @endforeach
                                             </select>
                                         </div>
@@ -126,7 +128,7 @@
                                                         @endcan
                                                     </div>
                                                     <div class="company-name">
-                                                        {{ $company->peoples->first()?->name ?? 'N/A' }}
+                                                        {{ $company->assignee->name ?? 'N/A' }}
                                                     </div>
                                                 </td>
                                                 <td>
