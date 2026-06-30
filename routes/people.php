@@ -58,6 +58,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
             Route::post('{people}/update-detail', [PeopleController::class, 'updateDetail'])->name('updateDetail');
             Route::post('{people}/company/add', [PeopleController::class, 'addCompany'])->name('companies.add');
             Route::post('{people}/remove-company', [PeopleController::class, 'removeCompany'])->name('company.remove');
+            Route::post('{people}/lead/add', [PeopleController::class, 'addLead'])->name('leads.add');
+            Route::post('{people}/remove-lead', [PeopleController::class, 'removeLead'])->name('lead.remove');
             Route::post('{people}/tags/add', [PeopleController::class, 'addTag'])->name('tags.add');
             Route::post('{people}/tags/{tag}/remove', [PeopleController::class, 'removeTag'])->name('tags.remove');
             Route::post('{people}/update-field', [PeopleController::class, 'updateField'])->name('update.field');

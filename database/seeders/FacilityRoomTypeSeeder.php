@@ -21,11 +21,14 @@ class FacilityRoomTypeSeeder extends Seeder
         }
 
         foreach ($roomTypes as $type) {
-            FacilityRoomType::create([
-                'id'             => $type['id'],
-                'input_name'     => $type['input_name'],
-                'name'           => $type['name'],
-            ]);
+            FacilityRoomType::updateOrCreate(
+                ['id' => $type['id']],
+                [
+                    'input_name'     => $type['input_name'],
+                    'name'           => $type['name'],
+                    'facility_types' => $type['facility_types'] ?? [],
+                ]
+            );
         }
     }
 }

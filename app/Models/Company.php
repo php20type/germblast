@@ -142,17 +142,7 @@ class Company extends Model
             ->withTimestamps();
     }
 
-    // People Company pivot table
-    public function peopleCompany()
-    {
-        return $this->hasMany(PeopleCompany::class, 'company_id');
-    }
 
-    public function peoplesAlt()
-    {
-        return $this->belongsToMany(People::class, 'people_companies')
-            ->withTimestamps();
-    }
 
     public function leadCompany()
     {

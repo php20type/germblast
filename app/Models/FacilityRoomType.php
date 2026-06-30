@@ -12,5 +12,10 @@ class FacilityRoomType extends Model
         'input_name',
         'name',
         'hours_required',
+        'facility_types',
+    ];
+
+    protected $casts = [
+        'facility_types' => 'array',
     ];
 }

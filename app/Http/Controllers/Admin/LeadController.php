@@ -489,7 +489,8 @@ class LeadController extends Controller
             // }
 
             if ($request->filled('person_id')) {
-                $lead->peoples()->attach($request->person_id);
+                $personIds = array_unique((array) $request->person_id);
+                $lead->peoples()->attach($personIds);
             }
 
             if ($request->filled('product_id')) {

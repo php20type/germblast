@@ -19,19 +19,7 @@ class SurveyFacility extends Model
         'facility_type',
 
         // Additional facility details
-        'square_footage',
-        'offices',
-        'standard_bathrooms',
-        'single_bathrooms',
-        'football_lockerroom',
-        'regular_lockerrooms',
-        'weight_room',
-        'training_room',
-        'equipment_room',
-        'coachs_office',
-        'shoulder_pads',
-        'helmets',
-        'wrestling_mats',
+        'room_counts',
 
         // Man hours + cost
         'man_hours',
@@ -44,6 +32,7 @@ class SurveyFacility extends Model
 
     protected $casts = [
         'is_added_to_company' => 'boolean',
+        'room_counts' => 'array',
     ];
 
     protected $with = ['country', 'state', 'city'];

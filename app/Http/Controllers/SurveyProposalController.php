@@ -206,35 +206,25 @@ class SurveyProposalController extends Controller
 
             // -----------------------------------------
             // ADD ALL DYNAMIC FIELDS FROM facility_room_types TABLE
+            // AND CALCULATE MAN-HOURS
             // -----------------------------------------
-            $totalCount = 0;
-
-            foreach (FacilityRoomType::all() as $type) {
-                $value = intval($request->{$type->input_name} ?? 0);
-
-                // Add field to data array
-                $facilityData[$type->input_name] = $value;
-
-                // Count for Man-Hours (all fields included)
-                $totalCount += $value;
-            }
-
-            // -----------------------------------------
-            // MAN-HOURS CALCULATION
-            // -----------------------------------------
-            // $manHours = $totalCount > 0 ? $totalCount * 0.5 : 0;
+            $roomCounts = [];
             $manHours = 0;
 
             foreach (FacilityRoomType::all() as $type) {
-
                 $value = intval($request->{$type->input_name} ?? 0);
 
-                // Save field dynamically
-                $facilityData[$type->input_name] = $value;
+                if ($value > 0) {
+                    // Add field to room counts array
+                    $roomCounts[$type->input_name] = $value;
+                }
 
                 // Calculate man hours using DB value
                 $manHours += $value * floatval($type->hours_required);
             }
+
+            // Save JSON room counts to facilityData
+            $facilityData['room_counts'] = $roomCounts;
             $manHoursCost = $manHours * 28.75;
 
             $facilityData['man_hours'] = $manHours;
@@ -382,39 +372,31 @@ class SurveyProposalController extends Controller
 
             // -----------------------------------------
             // DYNAMIC FIELDS FROM facility_room_types TABLE
+            // AND MAN-HOURS CALCULATION
             // -----------------------------------------
-            $totalCount = 0;
-
-            foreach (FacilityRoomType::all() as $type) {
-
-                $value = intval($request->{$type->input_name} ?? 0);
-
-                // Add dynamic fields to update array
-                $facilityData[$type->input_name] = $value;
-
-                $totalCount += $value;
-            }
-
-            // -----------------------------------------
-            // MAN-HOURS CALCULATION
-            // -----------------------------------------
-            // $manHours = $totalCount > 0 ? $totalCount * 0.5 : 0;
+            $roomCounts = [];
             $manHours = 0;
 
             foreach (FacilityRoomType::all() as $type) {
 
                 $value = intval($request->{$type->input_name} ?? 0);
 
-                // Save field dynamically
-                $facilityData[$type->input_name] = $value;
+                if ($value > 0) {
+                    // Add dynamic fields to room counts array
+                    $roomCounts[$type->input_name] = $value;
+                }
 
                 // Calculate man hours using DB value
                 $manHours += $value * floatval($type->hours_required);
             }
+            
+            // Save JSON room counts to facilityData
+            $facilityData['room_counts'] = $roomCounts;
             $manHoursCost = $manHours * 28.75;
 
             $facilityData['man_hours'] = $manHours;
             $facilityData['man_hours_cost'] = $manHoursCost;
+            $facilityData['total_cost'] = round($manHoursCost, 2);
 
             // -----------------------------------------
             // UPDATE FACILITY RECORD

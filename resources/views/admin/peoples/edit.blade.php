@@ -230,7 +230,7 @@
                                 @endcan
                             </div>
 
-                             @foreach ($peoples->companiesAlt as $company)
+                             @foreach ($peoples->companies as $company)
                                  <div class="people-card mb-3 d-block">
                                      <div class="row align-items-center w-100 m-0 g-2">
                                          <div class="col-md-8 col-12 d-flex align-items-center p-0">
@@ -1102,11 +1102,28 @@
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h6>LEADS</h6>
                                 @can('people.detail.edit')
-                                    @can('lead.create')
-                                        <a href="javascript:void(0)" onclick="addLead()" class="text-warning">Create a lead</a>
-                                    @endcan
+                                    <div class="d-flex gap-2">
+                                        <a href="javascript:void(0);" class="text-warning" id="toggleAddLead">Link Lead</a>
+                                        @can('lead.create')
+                                            <a href="javascript:void(0)" onclick="addLead()" class="text-warning">Create a lead</a>
+                                        @endcan
+                                    </div>
                                 @endcan
                             </div>
+
+                            @can('people.detail.edit')
+                                <div id="addLeadForm" class="mt-2 mb-3" style="display: none;">
+                                    <div class="mb-3">
+                                        <select class="form-select lead-update" id="leadsSelect">
+                                            <option selected>Add Lead</option>
+                                            @foreach ($availableLeads as $availableLead)
+                                                <option value="{{ $availableLead->id }}">{{ $availableLead->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            @endcan
+
                             <div class="lead-carder" @can('people.detail.edit') onclick="relatedLeads()" @endcan>
                                 <div class="row text-center">
                                     <div class="col-3">
@@ -1839,7 +1856,7 @@
                                         <option value=""></option>
                                         @foreach ($companies as $c)
                                             <option value="{{ $c->id }}"
-                                                {{ $peoples->companiesAlt->contains('id', $c->id) ? 'selected' : '' }}>
+                                                {{ $peoples->companies->contains('id', $c->id) ? 'selected' : '' }}>
                                                 {{ $c->name }}
                                             </option>
                                         @endforeach
@@ -2129,8 +2146,16 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div title="Total Value">
-                                    ${{ \App\Helpers\Helper::calculateTotalValue($related_lead) }}
+                                <div class="d-flex align-items-center gap-3">
+                                    <div title="Total Value">
+                                        ${{ \App\Helpers\Helper::calculateTotalValue($related_lead) }}
+                                    </div>
+                                    @can('people.detail.edit')
+                                        <button class="btn btn-sm btn-outline-secondary remove-lead-btn"
+                                            data-lead-id="{{ $related_lead->id }}" data-people-id="{{ $peoples->id }}">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    @endcan
                                 </div>
                             </div>
                         @endforeach
@@ -2498,12 +2523,26 @@
             const toggleBtn = document.getElementById('toggleAddCompany');
             const formDiv = document.getElementById('addCompanyForm');
 
+            const toggleLeadBtn = document.getElementById('toggleAddLead');
+            const formLeadDiv = document.getElementById('addLeadForm');
+
             // Toggle Add Company
             if (toggleBtn && formDiv) {
                 toggleBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     formDiv.style.display =
                         (formDiv.style.display === "none" || formDiv.style.display === "") ?
+                        "block" :
+                        "none";
+                });
+            }
+
+            // Toggle Add Lead
+            if (toggleLeadBtn && formLeadDiv) {
+                toggleLeadBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    formLeadDiv.style.display =
+                        (formLeadDiv.style.display === "none" || formLeadDiv.style.display === "") ?
                         "block" :
                         "none";
                 });
@@ -2637,6 +2676,108 @@
                                     title: 'Error',
                                     text: xhr.responseJSON?.message ||
                                         'Something went wrong.'
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+
+            // ==============================
+            // Adding lead to people
+            // ==============================
+            $('#leadsSelect').change(function() {
+                let leadId = $(this).val();
+                let leadName = $("#leadsSelect option:selected").text();
+
+                if (!leadId || leadId === "Add Lead") {
+                    return; // ignore placeholder
+                }
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Do you want to add " + leadName + " to this person?",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonColor: "#28a745",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, Add"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/admin/people/{{ $peoples->id }}/lead/add",
+                            method: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                lead_id: leadId
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Added",
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: xhr.responseJSON?.message ||
+                                        "Something went wrong."
+                                });
+                            }
+                        });
+                    } else {
+                        // Reset dropdown back to default if cancelled
+                        $('#leadsSelect').val("Add Lead");
+                    }
+                });
+            });
+
+            // ==============================
+            // Remove lead from the person
+            // ==============================
+            $(document).on('click', '.remove-lead-btn', function() {
+                let leadId = $(this).data('lead-id');
+                let peopleId = $(this).data('people-id');
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'This lead will be removed from the person.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: 'Yes, remove'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `/admin/people/${peopleId}/remove-lead`,
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                lead_id: leadId
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Removed',
+                                    text: response.message,
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                                location.reload();
+                            },
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: xhr.responseJSON?.message || 'Something went wrong.'
                                 });
                             }
                         });

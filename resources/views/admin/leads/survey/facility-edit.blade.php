@@ -225,14 +225,20 @@
                                                     <th>Facility Type</th>
                                                     <td>
                                                         <select name="facility_type" class="form-control">
-                                                            <option value="hospital"
-                                                                {{ $facility->facility_type == 'hospital' ? 'selected' : '' }}>
-                                                                Hospital
-                                                            </option>
-                                                            <option value="clinic"
-                                                                {{ $facility->facility_type == 'clinic' ? 'selected' : '' }}>
-                                                                Clinic
-                                                            </option>
+                                                            <option value="hospital" {{ $facility->facility_type == 'hospital' ? 'selected' : '' }}>Hospital</option>
+                                                            <option value="clinic" {{ $facility->facility_type == 'clinic' ? 'selected' : '' }}>Clinic</option>
+                                                            <option value="elementary school" {{ $facility->facility_type == 'elementary school' ? 'selected' : '' }}>Elementary School</option>
+                                                            <option value="middle school" {{ $facility->facility_type == 'middle school' ? 'selected' : '' }}>Middle School</option>
+                                                            <option value="high school" {{ $facility->facility_type == 'high school' ? 'selected' : '' }}>High School</option>
+                                                            <option value="high school athletics" {{ $facility->facility_type == 'high school athletics' ? 'selected' : '' }}>High School Athletics</option>
+                                                            <option value="middle school athletics" {{ $facility->facility_type == 'middle school athletics' ? 'selected' : '' }}>Middle School Athletics</option>
+                                                            <option value="buses" {{ $facility->facility_type == 'buses' ? 'selected' : '' }}>Buses</option>
+                                                            <option value="office" {{ $facility->facility_type == 'office' ? 'selected' : '' }}>Office</option>
+                                                            <option value="office building" {{ $facility->facility_type == 'office building' ? 'selected' : '' }}>Office Building</option>
+                                                            <option value="church" {{ $facility->facility_type == 'church' ? 'selected' : '' }}>Church</option>
+                                                            <option value="daycare" {{ $facility->facility_type == 'daycare' ? 'selected' : '' }}>Daycare</option>
+                                                            <option value="hotel" {{ $facility->facility_type == 'hotel' ? 'selected' : '' }}>Hotel</option>
+                                                            <option value="other" {{ $facility->facility_type == 'other' ? 'selected' : '' }}>Other</option>
                                                         </select>
                                                     </td>
                                                 </tr>
@@ -314,7 +320,7 @@
                                                             <div class="text-upload col-6">
                                                                 <a href="{{ asset('storage/' . $map->file_path) }}"
                                                                     download>
-                                                                    <p class="mb-1 fw-semibold">{{ $map->file_name }}</p>
+                                                                    <p class="mb-1 fw-semibold text-break">{{ $map->file_name }}</p>
                                                                     <p class="text-muted mb-0 small">
                                                                         {{ number_format(Storage::disk('public')->size($map->file_path) / 1024, 2) }}
                                                                         KB
@@ -423,7 +429,7 @@
                                                             <div class="text-upload col-6">
                                                                 <a href="{{ asset('storage/' . $atp->file_path) }}"
                                                                     download>
-                                                                    <p class="mb-1 fw-semibold">{{ $atp->file_name }}</p>
+                                                                    <p class="mb-1 fw-semibold text-break">{{ $atp->file_name }}</p>
                                                                     <p class="text-muted mb-0 small">
                                                                         {{ number_format(Storage::disk('public')->size($atp->file_path) / 1024, 2) }}
                                                                         KB
@@ -486,10 +492,10 @@
                                                 </tr>
 
                                                 @foreach ($facilityRoomTypes as $types)
-                                                    <tr>
+                                                    <tr class="room-type-row" data-input-name="{{ $types->input_name }}" data-categories="{{ json_encode($types->facility_types) }}">
                                                         <th>{{ $types->name }}</th>
                                                         <td><input type="number" class="form-control"
-                                                                name="{{ $types->input_name }}" value="{{ $facility->{$types->input_name} ?? 0 }}"
+                                                                name="{{ $types->input_name }}" value="{{ $facility->room_counts[$types->input_name] ?? 0 }}"
 >
                                                         </td>
                                                     </tr>
@@ -559,7 +565,7 @@
             @endforeach
 
             $("#update-facility-form").validate({
-                ignore: [],
+                ignore: ":hidden",
                 rules: facilityRules,
 
                 errorElement: 'span',
@@ -580,6 +586,26 @@
                     }
                 }
             });
+
+            // Dynamic Category Filtering
+            function updateRoomTypesVisibility() {
+                let selectedType = $('select[name="facility_type"]').val() || 'other';
+                
+                $('.room-type-row').each(function() {
+                    let categories = $(this).data('categories');
+                    if (!categories || categories.length === 0 || categories.includes(selectedType)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            }
+            
+            $('select[name="facility_type"]').on('change', function() {
+                $('.room-type-row input').val(0);
+                updateRoomTypesVisibility();
+            });
+            updateRoomTypesVisibility(); // Initialize on load
 
 
             // AJAX SUBMIT

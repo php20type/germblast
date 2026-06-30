@@ -225,7 +225,7 @@ class SaleController extends Controller
     public function index(Request $request)
     {
         $leads = Lead::with('assignee', 'companies', 'products', 'peoples', 'sources', 'competitors')->get();
-        $peoples = People::with('peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleCompany')->get();
+        $peoples = People::with('peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'companyPeople')->get();
 
         // Call separated calculation function
         $data = $this->calculateLeadData();

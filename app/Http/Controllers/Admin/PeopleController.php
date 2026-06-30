@@ -11,7 +11,8 @@ use App\Models\Industry;
 use App\Models\Lead;
 use App\Models\People;
 use App\Models\PeopleAddress;
-use App\Models\PeopleCompany;
+use App\Models\CompanyPeople;
+use App\Models\LeadPeople;
 use App\Models\PeopleEmail;
 use App\Models\PeopleFile;
 use App\Models\PeoplePhone;
@@ -62,7 +63,7 @@ class PeopleController extends Controller
         }
 
         if ($request->filled('company_id')) {
-            $query->whereHas('companiesAlt', fn ($q) => $q->where('company_id', $request->company_id)
+            $query->whereHas('companies', fn ($q) => $q->where('company_id', $request->company_id)
             );
         }
 
@@ -108,7 +109,7 @@ class PeopleController extends Controller
         $query = People::with([
             'companies', 'tags', 'user',
             'peopleEmail', 'peoplePhone', 'peopleAddress',
-            'peopleUrl', 'peopleCompany',
+            'peopleUrl', 'companyPeople',
         ]);
 
         // Apply shared filters
@@ -139,7 +140,7 @@ class PeopleController extends Controller
         $query = People::with([
             'companies', 'tags', 'user',
             'peopleEmail', 'peoplePhone', 'peopleAddress',
-            'peopleUrl', 'peopleCompany',
+            'peopleUrl', 'companyPeople',
         ])->where('user_id', $id);
 
         // Apply shared filters
@@ -171,7 +172,7 @@ class PeopleController extends Controller
         $users = User::all();
 
         // Fetch people assigned to current user with updated relationships
-        $peoples = People::with(['companies', 'tags', 'user', 'peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl',  'peopleCompany'])
+        $peoples = People::with(['companies', 'tags', 'user', 'peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl',  'companyPeople'])
             ->where('user_id', $user->id)
             ->get();
 
@@ -238,8 +239,8 @@ class PeopleController extends Controller
             'peopleAddress',
             'peoplePhone',
             'peopleUrl',
-            'peopleCompany',
-            'companiesAlt',
+            'companyPeople',
+            'companies',
             'leadPeople',
             'leads',
             'companyPeople',
@@ -412,8 +413,11 @@ class PeopleController extends Controller
         $products = Product::all();
         $companies = Company::all();
 
-        $assignedCompanyIds = $peoples->companiesAlt->pluck('id');
+        $assignedCompanyIds = $peoples->companies->pluck('id');
         $availableCompanies = Company::whereNotIn('id', $assignedCompanyIds)->get();
+
+        $assignedLeadIds = $peoples->leads->pluck('id');
+        $availableLeads = Lead::whereNotIn('id', $assignedLeadIds)->get();
 
         // Fetch all leads with their relations
         $leads = Lead::with([
@@ -539,6 +543,7 @@ class PeopleController extends Controller
             'industries',
             'territories',
             'availableCompanies',
+            'availableLeads',
             'allpeoples',
             'products',
             'companies',
@@ -560,7 +565,7 @@ class PeopleController extends Controller
         ]);
 
         // Prevent duplicates
-        $exists = PeopleCompany::where('people_id', $peopleId)
+        $exists = CompanyPeople::where('people_id', $peopleId)
             ->where('company_id', $request->company_id)
             ->exists();
 
@@ -572,7 +577,7 @@ class PeopleController extends Controller
         }
 
         // Create new record
-        PeopleCompany::create([
+        CompanyPeople::create([
             'people_id' => $peopleId,
             'company_id' => $request->company_id,
         ]);
@@ -602,7 +607,7 @@ class PeopleController extends Controller
         ]);
 
         // Find the pivot record
-        $companyPeople = PeopleCompany::where('people_id', $peopleId)
+        $companyPeople = CompanyPeople::where('people_id', $peopleId)
             ->where('company_id', $request->company_id)
             ->first();
 
@@ -631,6 +636,102 @@ class PeopleController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Company removed from person successfully!',
+        ]);
+    }
+
+    public function addLead(Request $request, $peopleId)
+    {
+        $request->validate([
+            'lead_id' => 'required|exists:leads,id',
+        ]);
+
+        // Prevent duplicates
+        $exists = LeadPeople::where('people_id', $peopleId)
+            ->where('lead_id', $request->lead_id)
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'This lead is already linked to the person.',
+            ], 422);
+        }
+
+        // Create new record
+        LeadPeople::create([
+            'people_id' => $peopleId,
+            'lead_id' => $request->lead_id,
+        ]);
+
+        // Timeline entry for person
+        $personName = People::find($peopleId)->name;
+        $leadName = Lead::find($request->lead_id)->name;
+
+        Timeline::create([
+            'user_id' => auth()->id(),
+            'owner_type' => 'people',
+            'owner_id' => $peopleId,
+            'action_type' => 'added_lead',
+            'description' => "added lead {$leadName} to {$personName}",
+        ]);
+
+        // Also add timeline to Lead to be bidirectional
+        Timeline::create([
+            'user_id' => auth()->id(),
+            'owner_type' => 'lead',
+            'owner_id' => $request->lead_id,
+            'action_type' => 'added_person',
+            'description' => "added {$personName} to {$leadName}",
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Lead added to people successfully!',
+        ]);
+    }
+
+    public function removeLead(Request $request, $peopleId)
+    {
+        $request->validate([
+            'lead_id' => 'required|exists:leads,id',
+        ]);
+
+        $leadPeople = LeadPeople::where('people_id', $peopleId)
+            ->where('lead_id', $request->lead_id)
+            ->first();
+
+        if (!$leadPeople) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'This lead is not linked to the person.',
+            ], 404);
+        }
+
+        $leadPeople->delete();
+
+        $personName = People::find($peopleId)->name;
+        $leadName = Lead::find($request->lead_id)->name;
+
+        Timeline::create([
+            'user_id' => auth()->id(),
+            'owner_type' => 'people',
+            'owner_id' => $peopleId,
+            'action_type' => 'removed_lead',
+            'description' => "removed lead {$leadName} from {$personName}",
+        ]);
+
+        // Also add timeline to Lead to be bidirectional
+        Timeline::create([
+            'user_id' => auth()->id(),
+            'owner_type' => 'lead',
+            'owner_id' => $request->lead_id,
+            'action_type' => 'removed_person',
+            'description' => "removed {$personName} from {$leadName}",
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Lead removed from people successfully!',
         ]);
     }
 

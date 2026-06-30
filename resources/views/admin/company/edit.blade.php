@@ -313,22 +313,48 @@
                                                 <i class="fas fa-map-marker-alt"></i>
                                             </div>
 
-                                            <div class="flex-1">
-                                                <h6 class="mb-1 fw-semibold">
-                                                    {{ $location->location_name ?? 'Location' }}
-                                                </h6>
+                                            <div class="flex-1 d-flex justify-content-between align-items-start w-100">
+                                                <div>
+                                                    <h6 class="mb-1 fw-semibold">
+                                                        {{ $location->location_name ?? 'Location' }}
+                                                    </h6>
 
-                                                <p class="mb-0">
-                                                    {{ $location->address_1 }}
-                                                    {{ $location->address_2 ? ', ' . $location->address_2 : '' }}
-                                                </p>
+                                                    <p class="mb-0">
+                                                        {{ $location->address_1 }}
+                                                        {{ $location->address_2 ? ', ' . $location->address_2 : '' }}
+                                                    </p>
 
-                                                <p class="text-muted mb-0">
-                                                    {{ optional($location->city)->name }},
-                                                    {{ optional($location->state)->name }},
-                                                    {{ optional($location->country)->name }}
-                                                    {{ $location->zip ? ' - ' . $location->zip : '' }}
-                                                </p>
+                                                    <p class="text-muted mb-0">
+                                                        {{ optional($location->city)->name }},
+                                                        {{ optional($location->state)->name }},
+                                                        {{ optional($location->country)->name }}
+                                                        {{ $location->zip ? ' - ' . $location->zip : '' }}
+                                                    </p>
+                                                </div>
+
+                                                @can('company.detail.edit')
+                                                    <div class="d-flex gap-2 ms-3">
+                                                        <!-- Edit Location -->
+                                                        <button class="btn btn-sm btn-outline-primary edit-location-btn"
+                                                            data-id="{{ $location->id }}"
+                                                            data-name="{{ $location->location_name }}"
+                                                            data-address1="{{ $location->address_1 }}"
+                                                            data-address2="{{ $location->address_2 }}"
+                                                            data-country="{{ $location->country_id }}"
+                                                            data-state="{{ $location->state_id }}"
+                                                            data-city="{{ $location->city_id }}"
+                                                            data-zip="{{ $location->zip }}"
+                                                            title="Edit Location">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+
+                                                        <!-- Delete Location -->
+                                                        <button class="btn btn-sm btn-outline-secondary delete-location-btn"
+                                                            data-id="{{ $location->id }}" title="Delete Location">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                @endcan
                                             </div>
                                         </div>
                                     </div>
@@ -2427,7 +2453,24 @@
         }
 
         function addLocation() {
-            $('#AddLocation').modal('show');
+            const modal = $('#AddLocation');
+            modal.find('.modal-title').text('Add Location');
+            modal.find('button[type="submit"]').text('Save Location');
+            
+            // Reset form action back to create URL
+            $('#add-company-location').attr('action', "{{ route('admin.company.location.add', $company->id) }}");
+            
+            // Reset fields
+            $('#add-company-location')[0].reset();
+            
+            // Reset Select2 fields explicitly
+            $('#country_select').val('').trigger('change.select2');
+            
+            // Re-disable state and city
+            $('#state_select').empty().append('<option value="">Select State</option>').prop('disabled', true).trigger('change.select2');
+            $('#city_select').empty().append('<option value="">Select City</option>').prop('disabled', true).trigger('change.select2');
+            
+            modal.modal('show');
         }
 
         $(document).ready(function() {
@@ -3421,6 +3464,97 @@
                 });
             });
 
+
+            // Edit Location Click
+            $(document).on('click', '.edit-location-btn', function() {
+                const btn = $(this);
+                const modal = $('#AddLocation');
+                
+                modal.find('.modal-title').text('Edit Location');
+                modal.find('button[type="submit"]').text('Update Location');
+                
+                const updateUrl = `/admin/company/location/${btn.data('id')}/update`;
+                $('#add-company-location').attr('action', updateUrl);
+
+                modal.find('input[name="location_name"]').val(btn.data('name'));
+                modal.find('input[name="address_1"]').val(btn.data('address1'));
+                modal.find('input[name="address_2"]').val(btn.data('address2'));
+                modal.find('input[name="zip"]').val(btn.data('zip'));
+
+                const countryId = btn.data('country');
+                const stateId = btn.data('state');
+                const cityId = btn.data('city');
+                
+                if (countryId) {
+                    $('#country_select').val(countryId).trigger('change.select2');
+                    
+                    $.get(`/states/${countryId}`, function(states) {
+                        let stateSelect = $('#state_select');
+                        stateSelect.empty().append('<option value="">Select State</option>').prop('disabled', false);
+                        $.each(states, function(i, state) {
+                            stateSelect.append(`<option value="${state.state_id}">${state.name}</option>`);
+                        });
+                        
+                        if (stateId) {
+                            stateSelect.val(stateId).trigger('change.select2');
+                            
+                            $.get(`/cities/${stateId}`, function(cities) {
+                                let citySelect = $('#city_select');
+                                citySelect.empty().append('<option value="">Select City</option>').prop('disabled', false);
+                                $.each(cities, function(i, city) {
+                                    citySelect.append(`<option value="${city.id}">${city.name}</option>`);
+                                });
+                                
+                                if (cityId) {
+                                    citySelect.val(cityId).trigger('change.select2');
+                                }
+                            });
+                        } else {
+                            $('#city_select').empty().append('<option value="">Select City</option>').prop('disabled', true).trigger('change.select2');
+                        }
+                    });
+                }
+
+                modal.modal('show');
+            });
+
+            // Delete Location
+            $(document).on('click', '.delete-location-btn', function() {
+                let locationId = $(this).data('id');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'This location will be permanently deleted.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `/admin/company/location/${locationId}/delete`,
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: response.message,
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            },
+                            error: function(xhr) {
+                                Swal.fire('Error!', xhr.responseJSON?.message || 'Something went wrong.', 'error');
+                            }
+                        });
+                    }
+                });
+            });
 
 
             $('#activity_participant_select').select2({

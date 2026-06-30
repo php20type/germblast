@@ -606,6 +606,40 @@ class CompanyController extends Controller
         ], 201);
     }
 
+    public function updateLocation(Request $request, $locationId)
+    {
+        $location = CompanyLocation::findOrFail($locationId);
+        
+        $validated = $request->validate([
+            'location_name' => 'required|string|max:255',
+            'address_1' => 'required|string|max:255',
+            'address_2' => 'nullable|string|max:255',
+            'country_id' => 'required|integer',
+            'state_id' => 'required|integer',
+            'city_id' => 'required|integer',
+            'zip' => 'required|string|max:20',
+        ]);
+
+        $location->update($validated);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Company location updated successfully.',
+            'data' => $location,
+        ], 200);
+    }
+
+    public function deleteLocation($locationId)
+    {
+        $location = CompanyLocation::findOrFail($locationId);
+        $location->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Company location deleted successfully.',
+        ], 200);
+    }
+
     public function addPeople(Request $request, $companyId)
     {
 

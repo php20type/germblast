@@ -383,7 +383,7 @@
                                                 </tr>
 
                                                 @foreach ($facilityRoomTypes as $types)
-                                                    <tr>
+                                                    <tr class="room-type-row" data-input-name="{{ $types->input_name }}" data-categories="{{ json_encode($types->facility_types) }}">
                                                         <th>{{ $types->name }}</th>
                                                         <td><input type="number" class="form-control"
                                                                 name="{{ $types->input_name }}" value="0">
@@ -474,7 +474,7 @@
             @endforeach
 
             $("#add-facility-form").validate({
-                ignore: [],
+                ignore: ":hidden",
                 rules: facilityRules,
 
                 errorElement: 'span',
@@ -495,6 +495,28 @@
                     }
                 }
             });
+
+            // Dynamic Category Filtering
+            function updateRoomTypesVisibility() {
+                let selectedType = $('select[name="facility_type"]').val() || 'other';
+                
+                $('.room-type-row').each(function() {
+                    let categories = $(this).data('categories');
+                    // if categories is null or empty, or includes the selected type
+                    if (!categories || categories.length === 0 || categories.includes(selectedType)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                        $(this).find('input').val(0); // reset when hidden
+                    }
+                });
+            }
+            
+            $('select[name="facility_type"]').on('change', function() {
+                $('.room-type-row input').val(0);
+                updateRoomTypesVisibility();
+            });
+            updateRoomTypesVisibility(); // Initialize on load
 
 
             // AJAX SUBMIT

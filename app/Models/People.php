@@ -34,7 +34,7 @@ class People extends Model
 
     protected $morphClass = 'People';
 
-    protected $with = ['peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'peopleCompany', 'peopleTags', 'tags', 'peopleFile', 'task'];
+    protected $with = ['peopleEmail', 'peoplePhone', 'peopleAddress', 'peopleUrl', 'companyPeople', 'peopleTags', 'tags', 'peopleFile', 'task'];
 
     public function activity(): MorphMany
     {
@@ -103,17 +103,7 @@ class People extends Model
         return $this->hasOne(PeopleUrl::class, 'people_id');
     }
 
-    public function peopleCompany()
-    {
-        return $this->hasMany(PeopleCompany::class, 'people_id');
-    }
 
-    // Belongs to many pivot table relation for people_companies table
-    public function companiesAlt()
-    {
-        return $this->belongsToMany(Company::class, 'people_companies')
-            ->withTimestamps();
-    }
 
     // Lead People pivot table
     public function leadPeople()

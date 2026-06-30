@@ -129,7 +129,7 @@
                                                                     @endcan
                                                                 </div>
                                                                 <div class="company-name">
-                                                                    {{ $people->companiesAlt->first()?->name ?? 'N/A' }}
+                                                                    {{ $people->companies->first()?->name ?? 'N/A' }}
                                                                 </div>
                                                                 @if(!empty($people->contact_types))
                                                                     <div class="contact-types-list mt-1 d-flex flex-wrap gap-1">

@@ -2,66 +2,655 @@
     {
         "id": 1,
         "name": "Square Footage",
-        "input_name": "square_footage"
+        "input_name": "square_footage",
+        "facility_types": [
+            "hospital",
+            "clinic",
+            "elementary school",
+            "middle school",
+            "high school",
+            "high school athletics",
+            "middle school athletics",
+            "buses",
+            "office",
+            "office building",
+            "church",
+            "daycare",
+            "hotel",
+            "other"
+        ]
     },
     {
         "id": 2,
         "name": "Offices",
-        "input_name": "offices"
+        "input_name": "offices",
+        "facility_types": [
+            "hospital",
+            "clinic",
+            "elementary school",
+            "middle school",
+            "high school",
+            "high school athletics",
+            "middle school athletics",
+            "buses",
+            "office",
+            "office building",
+            "church",
+            "daycare",
+            "hotel",
+            "other"
+        ]
     },
     {
         "id": 3,
-        "name": "Community Bathrooms",
-        "input_name": "standard_bathrooms"
+        "name": "Standard (Community) Bathrooms",
+        "input_name": "standard_bathrooms",
+        "facility_types": [
+            "hospital",
+            "clinic",
+            "elementary school",
+            "middle school",
+            "high school",
+            "high school athletics",
+            "middle school athletics",
+            "office",
+            "office building",
+            "church",
+            "daycare",
+            "hotel"
+        ]
     },
     {
         "id": 4,
         "name": "Single Bathrooms",
-        "input_name": "single_bathrooms"
+        "input_name": "single_bathrooms",
+        "facility_types": [
+            "hospital",
+            "clinic",
+            "elementary school",
+            "middle school",
+            "high school",
+            "high school athletics",
+            "middle school athletics",
+            "office",
+            "office building",
+            "church",
+            "daycare",
+            "hotel"
+        ]
     },
     {
         "id": 5,
-        "name": "Football Locker Room",
-        "input_name": "football_lockerroom"
+        "name": "Football Lockerroom",
+        "input_name": "football_lockerroom",
+        "facility_types": [
+            "high school athletics",
+            "middle school athletics"
+        ]
     },
     {
         "id": 6,
-        "name": "Regular Locker Rooms",
-        "input_name": "regular_lockerrooms"
+        "name": "Regular Lockerrooms",
+        "input_name": "regular_lockerrooms",
+        "facility_types": [
+            "high school athletics",
+            "middle school athletics"
+        ]
     },
     {
         "id": 7,
         "name": "Weight Room",
-        "input_name": "weight_room"
+        "input_name": "weight_room",
+        "facility_types": [
+            "high school athletics",
+            "middle school athletics"
+        ]
     },
     {
         "id": 8,
         "name": "Training Room",
-        "input_name": "training_room"
+        "input_name": "training_room",
+        "facility_types": [
+            "high school athletics",
+            "middle school athletics"
+        ]
     },
     {
         "id": 9,
         "name": "Equipment Room",
-        "input_name": "equipment_room"
+        "input_name": "equipment_room",
+        "facility_types": [
+            "high school athletics",
+            "middle school athletics"
+        ]
     },
     {
         "id": 10,
         "name": "Coach's Office",
-        "input_name": "coachs_office"
+        "input_name": "coachs_office",
+        "facility_types": [
+            "high school athletics",
+            "middle school athletics"
+        ]
     },
     {
         "id": 11,
         "name": "Shoulder Pads",
-        "input_name": "shoulder_pads"
+        "input_name": "shoulder_pads",
+        "facility_types": [
+            "high school athletics",
+            "middle school athletics"
+        ]
     },
     {
         "id": 12,
         "name": "Helmets",
-        "input_name": "helmets"
+        "input_name": "helmets",
+        "facility_types": [
+            "high school athletics",
+            "middle school athletics"
+        ]
     },
     {
         "id": 13,
         "name": "Wrestling Mats",
-        "input_name": "wrestling_mats"
+        "input_name": "wrestling_mats",
+        "facility_types": [
+            "high school athletics",
+            "middle school athletics"
+        ]
+    },
+    {
+        "id": 14,
+        "name": "Med Surg Rooms",
+        "input_name": "med_surg_rooms",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 15,
+        "name": "ICU Rooms",
+        "input_name": "icu_rooms",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 16,
+        "name": "Common Areas (count chairs)",
+        "input_name": "common_areas",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 17,
+        "name": "Radiology",
+        "input_name": "radiology",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 18,
+        "name": "Respiratory Therapy",
+        "input_name": "respiratory_therapy",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 19,
+        "name": "Physical Therapy",
+        "input_name": "physical_therapy",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 20,
+        "name": "Rehab Center",
+        "input_name": "rehab_center",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 21,
+        "name": "Activity Room",
+        "input_name": "activity_room",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 22,
+        "name": "Operating Room",
+        "input_name": "operating_room",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 23,
+        "name": "PACU Beds",
+        "input_name": "pacu_beds",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 24,
+        "name": "Burn ICU Rooms",
+        "input_name": "burn_icu_rooms",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 25,
+        "name": "Cancer Center",
+        "input_name": "cancer_center",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 26,
+        "name": "Dialysis Rooms",
+        "input_name": "dialysis_rooms",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 27,
+        "name": "Labor and Delivery Patient Rooms",
+        "input_name": "labor_delivery_patient_rooms",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 28,
+        "name": "Labor and Delivery Operating Rooms",
+        "input_name": "labor_delivery_operating_rooms",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 29,
+        "name": "ED Room",
+        "input_name": "ed_room",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 30,
+        "name": "ED Trauma Room",
+        "input_name": "ed_trauma_room",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 31,
+        "name": "Cysto Room",
+        "input_name": "cysto_room",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 32,
+        "name": "Endo Room",
+        "input_name": "endo_room",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 33,
+        "name": "Interventional Radiology (IR) Lab",
+        "input_name": "ir_lab",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 34,
+        "name": "Cath Lab",
+        "input_name": "cath_lab",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 35,
+        "name": "Clinic Room",
+        "input_name": "clinic_room",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 36,
+        "name": "Dietary",
+        "input_name": "dietary",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 37,
+        "name": "Breakroom",
+        "input_name": "breakroom",
+        "facility_types": [
+            "hospital",
+            "clinic",
+            "office",
+            "office building"
+        ]
+    },
+    {
+        "id": 38,
+        "name": "Lab",
+        "input_name": "lab",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 39,
+        "name": "Pharmacy",
+        "input_name": "pharmacy",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 40,
+        "name": "Nurses' Station",
+        "input_name": "nurses_station",
+        "facility_types": [
+            "hospital",
+            "clinic"
+        ]
+    },
+    {
+        "id": 41,
+        "name": "3rd Grade and Above Classrooms",
+        "input_name": "third_grade_and_above",
+        "facility_types": [
+            "elementary school"
+        ]
+    },
+    {
+        "id": 42,
+        "name": "PreK–2nd Classrooms",
+        "input_name": "prek_2nd_classrooms",
+        "facility_types": [
+            "elementary school"
+        ]
+    },
+    {
+        "id": 43,
+        "name": "Cafeteria & Kitchen",
+        "input_name": "cafeteria_kitchen",
+        "facility_types": [
+            "elementary school",
+            "middle school",
+            "high school",
+            "office",
+            "office building",
+            "church",
+            "daycare"
+        ]
+    },
+    {
+        "id": 44,
+        "name": "Library",
+        "input_name": "library",
+        "facility_types": [
+            "elementary school",
+            "middle school",
+            "high school"
+        ]
+    },
+    {
+        "id": 45,
+        "name": "Computer Lab",
+        "input_name": "computer_lab",
+        "facility_types": [
+            "elementary school",
+            "middle school",
+            "high school"
+        ]
+    },
+    {
+        "id": 46,
+        "name": "Nurses Office",
+        "input_name": "nurses_office",
+        "facility_types": [
+            "elementary school",
+            "middle school",
+            "high school"
+        ]
+    },
+    {
+        "id": 47,
+        "name": "Special Ed Room",
+        "input_name": "special_ed_room",
+        "facility_types": [
+            "elementary school",
+            "middle school",
+            "high school"
+        ]
+    },
+    {
+        "id": 48,
+        "name": "Teacher's Lounge/Workroom",
+        "input_name": "teachers_lounge",
+        "facility_types": [
+            "elementary school",
+            "middle school",
+            "high school"
+        ]
+    },
+    {
+        "id": 49,
+        "name": "Auditorium (Chair Count)",
+        "input_name": "auditorium",
+        "facility_types": [
+            "elementary school",
+            "middle school",
+            "high school",
+            "church"
+        ]
+    },
+    {
+        "id": 50,
+        "name": "Middle School Classrooms",
+        "input_name": "middle_school_classrooms",
+        "facility_types": [
+            "middle school"
+        ]
+    },
+    {
+        "id": 51,
+        "name": "High School/Low Touchpoint Classrooms",
+        "input_name": "high_school_classrooms",
+        "facility_types": [
+            "high school",
+            "church"
+        ]
+    },
+    {
+        "id": 52,
+        "name": "Bus Count",
+        "input_name": "bus_count",
+        "facility_types": [
+            "buses"
+        ]
+    },
+    {
+        "id": 53,
+        "name": "Lobby (Count Chairs)",
+        "input_name": "lobby",
+        "facility_types": [
+            "office",
+            "office building",
+            "hotel"
+        ]
+    },
+    {
+        "id": 54,
+        "name": "Cubicle",
+        "input_name": "cubicle",
+        "facility_types": [
+            "office",
+            "office building"
+        ]
+    },
+    {
+        "id": 55,
+        "name": "Reception Area",
+        "input_name": "reception_area",
+        "facility_types": [
+            "office",
+            "office building"
+        ]
+    },
+    {
+        "id": 56,
+        "name": "Elevator",
+        "input_name": "elevator",
+        "facility_types": [
+            "office",
+            "office building",
+            "church",
+            "hotel"
+        ]
+    },
+    {
+        "id": 57,
+        "name": "Conference Room (Count Chairs/Capacity)",
+        "input_name": "conference_room",
+        "facility_types": [
+            "office",
+            "office building",
+            "church",
+            "hotel"
+        ]
+    },
+    {
+        "id": 58,
+        "name": "Stairwell (Count Floors in Each Well)",
+        "input_name": "stairwell",
+        "facility_types": [
+            "office",
+            "office building",
+            "church",
+            "hotel"
+        ]
+    },
+    {
+        "id": 59,
+        "name": "Server Room",
+        "input_name": "server_room",
+        "facility_types": [
+            "office",
+            "office building"
+        ]
+    },
+    {
+        "id": 60,
+        "name": "Lounge",
+        "input_name": "lounge",
+        "facility_types": [
+            "office",
+            "office building",
+            "church",
+            "daycare"
+        ]
+    },
+    {
+        "id": 61,
+        "name": "Early Childhood Classroom",
+        "input_name": "early_childhood_classroom",
+        "facility_types": [
+            "church",
+            "daycare"
+        ]
+    },
+    {
+        "id": 62,
+        "name": "Gym/Activity Room",
+        "input_name": "gym_activity_room",
+        "facility_types": [
+            "church",
+            "daycare",
+            "hotel"
+        ]
+    },
+    {
+        "id": 63,
+        "name": "Front Desk",
+        "input_name": "front_desk",
+        "facility_types": [
+            "hotel"
+        ]
+    },
+    {
+        "id": 64,
+        "name": "Laundry",
+        "input_name": "laundry",
+        "facility_types": [
+            "hotel"
+        ]
+    },
+    {
+        "id": 65,
+        "name": "Business Center",
+        "input_name": "business_center",
+        "facility_types": [
+            "hotel"
+        ]
+    },
+    {
+        "id": 66,
+        "name": "Guest Room with Bathroom",
+        "input_name": "guest_room_with_bathroom",
+        "facility_types": [
+            "hotel"
+        ]
     }
 ]
