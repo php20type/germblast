@@ -739,7 +739,7 @@
                                         {{-- Companies --}}
                                         <optgroup label="Companies">
                                             @foreach ($companies as $company)
-                                                <option value="{{ $company->id }}" data-entity-type="company">
+                                                <option value="company:{{ $company->id }}" data-entity-type="company">
                                                     {{ $company->name }}
                                                 </option>
                                             @endforeach
@@ -748,7 +748,7 @@
                                         {{-- Peoples --}}
                                         <optgroup label="Peoples">
                                             @foreach ($peoples as $people)
-                                                <option value="{{ $people->id }}" data-entity-type="people">
+                                                <option value="people:{{ $people->id }}" data-entity-type="people">
                                                     {{ $people->name }}
                                                 </option>
                                             @endforeach
@@ -757,7 +757,7 @@
                                         {{-- Users --}}
                                         <optgroup label="Users">
                                             @foreach ($users as $user)
-                                                <option value="{{ $user->id }}" data-entity-type="user">
+                                                <option value="user:{{ $user->id }}" data-entity-type="user">
                                                     {{ $user->name }}
                                                 </option>
                                             @endforeach

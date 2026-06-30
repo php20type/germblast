@@ -671,7 +671,7 @@
                                                         {{-- Companies --}}
                                                         <optgroup label="Companies">
                                                             @foreach ($companies as $c)
-                                                                <option value="{{ $c->id }}"
+                                                                <option value="company:{{ $c->id }}"
                                                                     data-entity-type="company"
                                                                     {{ $c->id == $company->id ? 'selected' : '' }}>
                                                                     {{ $c->name }}
@@ -683,7 +683,7 @@
                                                         {{-- Peoples --}}
                                                         <optgroup label="Peoples">
                                                             @foreach ($allpeoples as $people)
-                                                                <option value="{{ $people->id }}"
+                                                                <option value="people:{{ $people->id }}"
                                                                     data-entity-type="people">
                                                                     {{ $people->name }}
                                                                 </option>
@@ -693,7 +693,7 @@
                                                         {{-- Users --}}
                                                         <optgroup label="Users">
                                                             @foreach ($users as $user)
-                                                                <option value="{{ $user->id }}" data-entity-type="user">
+                                                                <option value="user:{{ $user->id }}" data-entity-type="user">
                                                                     {{ $user->name }}
                                                                 </option>
                                                             @endforeach
@@ -2184,7 +2184,7 @@
                                         {{-- Companies --}}
                                         <optgroup label="Companies">
                                             @foreach ($companies as $c)
-                                                <option value="{{ $c->id }}" data-entity-type="company"
+                                                <option value="company:{{ $c->id }}" data-entity-type="company"
                                                     {{ $c->id == $company->id ? 'selected' : '' }}>
                                                     {{ $c->name }}
                                                 </option>
@@ -2194,7 +2194,7 @@
                                         {{-- Peoples --}}
                                         <optgroup label="Peoples">
                                             @foreach ($allpeoples as $people)
-                                                <option value="{{ $people->id }}" data-entity-type="people">
+                                                <option value="people:{{ $people->id }}" data-entity-type="people">
                                                     {{ $people->name }}
                                                 </option>
                                             @endforeach
@@ -2203,7 +2203,7 @@
                                         {{-- Users --}}
                                         <optgroup label="Users">
                                             @foreach ($users as $user)
-                                                <option value="{{ $user->id }}" data-entity-type="user">
+                                                <option value="user:{{ $user->id }}" data-entity-type="user">
                                                     {{ $user->name }}
                                                 </option>
                                             @endforeach
@@ -4044,9 +4044,12 @@
                 // Collect selected participants with their entity types
                 var selectedParticipants = $('#activity_participant_select option:selected').map(
                     function() {
+                        var val = $(this).val();
+                        var type = $(this).data('entity-type') || val.split(':')[0];
+                        var id = val.includes(':') ? val.split(':')[1] : val;
                         return {
-                            id: $(this).val(),
-                            type: $(this).data('entity-type')
+                            id: id,
+                            type: type
                         };
                     }).get();
 

@@ -147,19 +147,80 @@ class Helper
 
         switch ($entityType) {
             case 'company':
-                $query->where('owner_type', 'Company')->where('owner_id', $entityId);
+                $peopleIds = \Illuminate\Support\Facades\DB::table('company_peoples')->where('company_id', $entityId)->pluck('people_id');
+                
+                $query->where(function ($q) use ($entityId, $peopleIds) {
+                    // Notes owned by this Company
+                    $q->where(function ($sub) use ($entityId) {
+                        $sub->where('owner_type', 'Company')->where('owner_id', $entityId);
+                    })
+                    // Or Company is explicitly mentioned
+                    ->orWhereHas('companies', function ($sub) use ($entityId) {
+                        $sub->where('company_id', $entityId);
+                    })
+                    // Or Notes owned by related People
+                    ->orWhere(function ($sub) use ($peopleIds) {
+                        $sub->where('owner_type', 'People')->whereIn('owner_id', $peopleIds);
+                    });
+                });
                 break;
 
             case 'people':
-                $query->where('owner_type', 'People')->where('owner_id', $entityId);
+                $companyIds = \Illuminate\Support\Facades\DB::table('company_peoples')->where('people_id', $entityId)->pluck('company_id');
+                
+                $query->where(function ($q) use ($entityId, $companyIds) {
+                    // Notes owned by this Person
+                    $q->where(function ($sub) use ($entityId) {
+                        $sub->where('owner_type', 'People')->where('owner_id', $entityId);
+                    })
+                    // Or Person is explicitly mentioned
+                    ->orWhereHas('peoples', function ($sub) use ($entityId) {
+                        $sub->where('people_id', $entityId);
+                    })
+                    // Or Notes owned by related Company
+                    ->orWhere(function ($sub) use ($companyIds) {
+                        $sub->where('owner_type', 'Company')->whereIn('owner_id', $companyIds);
+                    });
+                });
                 break;
 
             case 'lead':
-                $query->where('owner_type', 'Lead')->where('owner_id', $entityId);
+                $lead = \App\Models\Lead::find($entityId);
+                $companyId = $lead ? $lead->company_id : null;
+                $peopleIds = $lead ? $lead->peoples()->pluck('people_id') : [];
+
+                $query->where(function ($q) use ($entityId, $companyId, $peopleIds) {
+                    // Notes owned by this Lead
+                    $q->where(function ($sub) use ($entityId) {
+                        $sub->where('owner_type', 'Lead')->where('owner_id', $entityId);
+                    })
+                    // Or Notes owned by related Company
+                    ->orWhere(function ($sub) use ($companyId) {
+                        if ($companyId) {
+                            $sub->where('owner_type', 'Company')->where('owner_id', $companyId);
+                        } else {
+                            $sub->whereRaw('1 = 0'); // false condition if no company
+                        }
+                    })
+                    // Or Notes owned by related People
+                    ->orWhere(function ($sub) use ($peopleIds) {
+                        if (count($peopleIds) > 0) {
+                            $sub->where('owner_type', 'People')->whereIn('owner_id', $peopleIds);
+                        } else {
+                            $sub->whereRaw('1 = 0'); // false condition if no people
+                        }
+                    });
+                });
                 break;
 
             case 'user':
-                $query->where('owner_type', 'User')->where('owner_id', $entityId);
+                $query->where(function ($q) use ($entityId) {
+                    $q->where(function ($sub) use ($entityId) {
+                        $sub->where('owner_type', 'User')->where('owner_id', $entityId);
+                    })->orWhereHas('users', function ($sub) use ($entityId) {
+                        $sub->where('user_id', $entityId);
+                    });
+                });
                 break;
 
             default:

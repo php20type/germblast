@@ -74,6 +74,20 @@ class ActivityController extends Controller
             $activity->leads()->sync($request->leads_ids);
         }
 
+        // Auto-attach related Company and People if the activity is logged against a Lead
+        if (strtolower($request->owner_type) === 'lead') {
+            $lead = \App\Models\Lead::find($request->owner_id);
+            if ($lead) {
+                if ($lead->company_id) {
+                    $activity->companies()->syncWithoutDetaching([$lead->company_id]);
+                }
+                $peopleIds = $lead->peoples()->pluck('people_id')->toArray();
+                if (!empty($peopleIds)) {
+                    $activity->peoples()->syncWithoutDetaching($peopleIds);
+                }
+            }
+        }
+
         // Helper function to convert comma-separated string to array
         $convertToArray = fn ($value) => array_filter(is_array($value) ? $value : explode(',', $value));
 
@@ -161,6 +175,20 @@ class ActivityController extends Controller
         // Attach related leads
         if ($request->filled('leads_ids')) {
             $activity->leads()->sync($request->leads_ids);
+        }
+
+        // Auto-attach related Company and People if the activity is logged against a Lead
+        if (strtolower($request->owner_type) === 'lead') {
+            $lead = \App\Models\Lead::find($request->owner_id);
+            if ($lead) {
+                if ($lead->company_id) {
+                    $activity->companies()->syncWithoutDetaching([$lead->company_id]);
+                }
+                $peopleIds = $lead->peoples()->pluck('people_id')->toArray();
+                if (!empty($peopleIds)) {
+                    $activity->peoples()->syncWithoutDetaching($peopleIds);
+                }
+            }
         }
 
         // Helper to convert comma-separated string to array
