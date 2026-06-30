@@ -485,8 +485,8 @@
 
                                     </div>
 
-                                    @if(auth()->user()->isSuperAdmin())
-                                        <div id="site-survey-stage" class="{{ $leads->stage_id == 3 ? '' : 'd-none' }}">
+                                    @if(auth()->user()->isSuperAdmin() || auth()->user()->isSalesManager() || auth()->user()->isSalesRepresentative())
+                                        <div id="site-survey-stage" class="{{ $leads->stage_id >= 3 ? '' : 'd-none' }}">
                                             {{-- SURVEY & PROPOSAL --}}
                                             <div class="task-section mt-2">
                                                 <div class="company-list mb-3 border rounded p-4 shadow-sm bg-white">
@@ -556,8 +556,8 @@
                                         <a href="#" class="d-none text-warning">Edit processes</a>
                                     </div>
 
-                                    @if(auth()->user()->isSalesManager())
-                                        <div id="site-survey-stage" class="{{ $leads->stage_id == 3 ? '' : 'd-none' }}">
+                                    @if(auth()->user()->isSuperAdmin() || auth()->user()->isSalesManager() || auth()->user()->isSalesRepresentative())
+                                        <div id="site-survey-stage" class="{{ $leads->stage_id >= 3 ? '' : 'd-none' }}">
                                             {{-- SURVEY & PROPOSAL --}}
                                             <div class="task-section mt-2">
                                                 <div class="company-list mb-3 border rounded p-4 shadow-sm bg-white">
