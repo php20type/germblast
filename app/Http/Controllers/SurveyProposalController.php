@@ -22,6 +22,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class SurveyProposalController extends Controller
@@ -33,7 +34,9 @@ class SurveyProposalController extends Controller
         $facilities = SurveyFacility::where('survey_proposal_id', $surveyProposal->id)->get();
         $equipments = EquipmentEvaluation::where('survey_proposal_id', $surveyProposal->id)->get();
 
-        $totalSquareFootage = $facilities->sum('square_footage');
+        $totalSquareFootage = $facilities->sum(function ($facility) {
+            return $facility->room_counts['square_footage'] ?? 0;
+        });
         $totalFacilityManHours = $facilities->sum('man_hours');
         $totalFacilityCost = $facilities->sum('man_hours_cost');
 
@@ -176,12 +179,14 @@ class SurveyProposalController extends Controller
             'zip' => 'required|string|max:20',
             'facility_type' => 'required|string',
 
-            'map_name' => 'required|string|max:255',
-            'map_file' => 'required|file|max:10240',
+            'map_name' => 'nullable|string|max:255',
+            'map_file' => 'nullable|array',
+            'map_file.*' => 'nullable|file|max:10240',
 
-            'atp_location' => 'required|string|max:255',
-            'atp_value' => 'required|numeric|min:0',
-            'atp_file' => 'required|file|max:10240',
+            'atp_location' => 'nullable|string|max:255',
+            'atp_value' => 'nullable|numeric|min:0',
+            'atp_file' => 'nullable|array',
+            'atp_file.*' => 'nullable|file|max:10240',
         ]);
 
         try {
@@ -241,47 +246,47 @@ class SurveyProposalController extends Controller
             // SAVE MAP FILE
             // -----------------------------------------
             if ($request->hasFile('map_file')) {
+                foreach ($request->file('map_file') as $file) {
+                    $original = $file->getClientOriginalName();
+                    $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
+                    $ext = $file->getClientOriginalExtension();
+                    $filename = Str::random(10) . '_' . $clean . '.' . $ext;
 
-                $file = $request->file('map_file');
-                $original = $file->getClientOriginalName();
-                $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
-                $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10) . '_' . $clean . '.' . $ext;
+                    $path = $file->storeAs('facility/maps', $filename, 'public');
 
-                $path = $file->storeAs('facility/maps', $filename, 'public');
-
-                SurveyFacilityMap::create([
-                    'user_id' => auth()->id(),
-                    'survey_facility_id' => $facility->id,
-                    'map_name' => $request->map_name,
-                    'file_name' => $original,
-                    'file_path' => $path,
-                    'file_type' => $ext,
-                ]);
+                    SurveyFacilityMap::create([
+                        'user_id' => auth()->id(),
+                        'survey_facility_id' => $facility->id,
+                        'map_name' => $request->map_name,
+                        'file_name' => $original,
+                        'file_path' => $path,
+                        'file_type' => $ext,
+                    ]);
+                }
             }
 
             // -----------------------------------------
             // SAVE ATP FILE
             // -----------------------------------------
             if ($request->hasFile('atp_file')) {
+                foreach ($request->file('atp_file') as $file) {
+                    $original = $file->getClientOriginalName();
+                    $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
+                    $ext = $file->getClientOriginalExtension();
+                    $filename = Str::random(10) . '_' . $clean . '.' . $ext;
 
-                $file = $request->file('atp_file');
-                $original = $file->getClientOriginalName();
-                $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
-                $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10) . '_' . $clean . '.' . $ext;
+                    $path = $file->storeAs('facility/atp', $filename, 'public');
 
-                $path = $file->storeAs('facility/atp', $filename, 'public');
-
-                SurveyFacilityAtp::create([
-                    'user_id' => auth()->id(),
-                    'survey_facility_id' => $facility->id,
-                    'location' => $request->atp_location,
-                    'atp_value' => $request->atp_value,
-                    'file_name' => $original,
-                    'file_path' => $path,
-                    'file_type' => $ext,
-                ]);
+                    SurveyFacilityAtp::create([
+                        'user_id' => auth()->id(),
+                        'survey_facility_id' => $facility->id,
+                        'location' => $request->atp_location,
+                        'atp_value' => $request->atp_value,
+                        'file_name' => $original,
+                        'file_path' => $path,
+                        'file_type' => $ext,
+                    ]);
+                }
             }
 
             return response()->json([
@@ -346,11 +351,18 @@ class SurveyProposalController extends Controller
             'facility_type' => 'required|string',
 
             'map_name' => 'nullable|string|max:255',
-            'map_file' => 'nullable|file|max:10240',
+            'map_file' => 'nullable|array',
+            'map_file.*' => 'nullable|file|max:10240',
 
             'atp_location' => 'nullable|string|max:255',
             'atp_value' => 'nullable|numeric|min:0',
-            'atp_file' => 'nullable|file|max:10240',
+            'atp_file' => 'nullable|array',
+            'atp_file.*' => 'nullable|file|max:10240',
+
+            'deleted_maps' => 'nullable|array',
+            'deleted_maps.*' => 'integer',
+            'deleted_atps' => 'nullable|array',
+            'deleted_atps.*' => 'integer',
         ]);
 
         try {
@@ -407,45 +419,67 @@ class SurveyProposalController extends Controller
             // UPDATE MAP FILE
             // -----------------------------------------
             if ($request->hasFile('map_file')) {
+                foreach ($request->file('map_file') as $file) {
+                    $original = $file->getClientOriginalName();
+                    $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
+                    $ext = $file->getClientOriginalExtension();
+                    $filename = Str::random(10) . '_' . $clean . '.' . $ext;
 
-                $file = $request->file('map_file');
-                $original = $file->getClientOriginalName();
-                $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
-                $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10) . '_' . $clean . '.' . $ext;
-                $path = $file->storeAs('facility/maps', $filename, 'public');
+                    $path = $file->storeAs('facility/maps', $filename, 'public');
 
-                SurveyFacilityMap::create([
-                    'user_id' => auth()->id(),
-                    'survey_facility_id' => $facility->id,
-                    'map_name' => $request->map_name,
-                    'file_name' => $original,
-                    'file_path' => $path,
-                    'file_type' => $ext,
-                ]);
+                    SurveyFacilityMap::create([
+                        'user_id' => auth()->id(),
+                        'survey_facility_id' => $facility->id,
+                        'map_name' => $request->map_name,
+                        'file_name' => $original,
+                        'file_path' => $path,
+                        'file_type' => $ext,
+                    ]);
+                }
             }
 
             // -----------------------------------------
             // UPDATE ATP FILE
             // -----------------------------------------
             if ($request->hasFile('atp_file')) {
+                foreach ($request->file('atp_file') as $file) {
+                    $original = $file->getClientOriginalName();
+                    $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
+                    $ext = $file->getClientOriginalExtension();
+                    $filename = Str::random(10) . '_' . $clean . '.' . $ext;
 
-                $file = $request->file('atp_file');
-                $original = $file->getClientOriginalName();
-                $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
-                $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10) . '_' . $clean . '.' . $ext;
-                $path = $file->storeAs('facility/atp', $filename, 'public');
+                    $path = $file->storeAs('facility/atp', $filename, 'public');
 
-                SurveyFacilityAtp::create([
-                    'user_id' => auth()->id(),
-                    'survey_facility_id' => $facility->id,
-                    'location' => $request->atp_location,
-                    'atp_value' => $request->atp_value,
-                    'file_name' => $original,
-                    'file_path' => $path,
-                    'file_type' => $ext,
-                ]);
+                    SurveyFacilityAtp::create([
+                        'user_id' => auth()->id(),
+                        'survey_facility_id' => $facility->id,
+                        'location' => $request->atp_location,
+                        'atp_value' => $request->atp_value,
+                        'file_name' => $original,
+                        'file_path' => $path,
+                        'file_type' => $ext,
+                        'file_type' => $ext,
+                    ]);
+                }
+            }
+
+            // -----------------------------------------
+            // DELETE REMOVED MAPS & ATPS
+            // -----------------------------------------
+            if ($request->has('deleted_maps')) {
+                $mapsToDelete = SurveyFacilityMap::whereIn('id', $request->deleted_maps)->get();
+                foreach ($mapsToDelete as $map) {
+                    Storage::disk('public')->delete($map->file_path);
+                    $map->delete();
+                }
+            }
+
+            if ($request->has('deleted_atps')) {
+                $atpsToDelete = SurveyFacilityAtp::whereIn('id', $request->deleted_atps)->get();
+                foreach ($atpsToDelete as $atp) {
+                    Storage::disk('public')->delete($atp->file_path);
+                    $atp->delete();
+                }
             }
 
             return response()->json([
@@ -507,8 +541,9 @@ class SurveyProposalController extends Controller
         // Validate fixed fields only
         $request->validate([
             'name' => 'required|string|max:255',
-            'utility_file' => 'required|file|max:10240',
             'description' => 'nullable|string|max:500',
+            'utility_file' => 'nullable|array',
+            'utility_file.*' => 'nullable|file|max:10240',
         ]);
 
         try {
@@ -536,12 +571,12 @@ class SurveyProposalController extends Controller
             // ------------------------------------------
             // PROCESS WASHING FIELDS
             // ------------------------------------------
+            $washCounts = [];
             foreach ($washingTypes as $type) {
-
                 $count = intval($request->{$type->input_name} ?? 0);
-
-                // Store dynamic value
-                $equipmentData[$type->input_name] = $count;
+                
+                // Store in JSON array even if 0
+                $washCounts[$type->input_name] = $count;
 
                 // Man-hours = count × hours_required
                 $washHours += $count * floatval($type->hours_required);
@@ -550,12 +585,12 @@ class SurveyProposalController extends Controller
             // ------------------------------------------
             // PROCESS CLEANING FIELDS
             // ------------------------------------------
+            $cleaningCounts = [];
             foreach ($cleaningTypes as $type) {
-
                 $count = intval($request->{$type->input_name} ?? 0);
 
-                // Store dynamic value
-                $equipmentData[$type->input_name] = $count;
+                // Store in JSON array even if 0
+                $cleaningCounts[$type->input_name] = $count;
 
                 // Man-hours = count × hours_required
                 $cleanHours += $count * floatval($type->hours_required);
@@ -566,6 +601,9 @@ class SurveyProposalController extends Controller
             // ------------------------------------------
             $washCost = $washHours * 28.75;
             $cleanCost = $cleanHours * 28.75;
+            
+            $equipmentData['wash_counts'] = $washCounts;
+            $equipmentData['cleaning_counts'] = $cleaningCounts;
 
             $equipmentData['wash_man_hours'] = $washHours;
             $equipmentData['wash_man_hours_cost'] = $washCost;
@@ -583,23 +621,23 @@ class SurveyProposalController extends Controller
             // SAVE IMAGE
             // ------------------------------------------
             if ($request->hasFile('utility_file')) {
+                foreach ($request->file('utility_file') as $file) {
+                    $original = $file->getClientOriginalName();
+                    $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
+                    $ext = $file->getClientOriginalExtension();
+                    $filename = Str::random(10) . '_' . $clean . '.' . $ext;
 
-                $file = $request->file('utility_file');
-                $original = $file->getClientOriginalName();
-                $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
-                $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10) . '_' . $clean . '.' . $ext;
+                    $path = $file->storeAs('equipment/images', $filename, 'public');
 
-                $path = $file->storeAs('equipment/images', $filename, 'public');
-
-                SurveyEquipmentImage::create([
-                    'user_id' => auth()->id(),
-                    'survey_equipment_id' => $equipment->id,
-                    'description' => $request->description,
-                    'file_name' => $original,
-                    'file_path' => $path,
-                    'file_type' => $ext,
-                ]);
+                    SurveyEquipmentImage::create([
+                        'user_id' => auth()->id(),
+                        'survey_equipment_id' => $equipment->id,
+                        'description' => $request->description,
+                        'file_name' => $original,
+                        'file_path' => $path,
+                        'file_type' => $ext,
+                    ]);
+                }
             }
 
             return response()->json([
@@ -624,8 +662,11 @@ class SurveyProposalController extends Controller
         // Validate only fixed fields
         $request->validate([
             'name' => 'required|string|max:255',
-            'utility_file' => 'nullable|file|max:10240',
             'description' => 'nullable|string|max:500',
+            'utility_file' => 'nullable|array',
+            'utility_file.*' => 'nullable|file|max:10240',
+            'deleted_utilities' => 'nullable|array',
+            'deleted_utilities.*' => 'integer',
         ]);
 
         try {
@@ -651,12 +692,12 @@ class SurveyProposalController extends Controller
             // ------------------------------------------
             // UPDATE WASHING FIELDS
             // ------------------------------------------
+            $washCounts = [];
             foreach ($washingTypes as $type) {
-
                 $count = intval($request->{$type->input_name} ?? 0);
 
-                // Store dynamic value
-                $equipmentData[$type->input_name] = $count;
+                // Store in JSON array even if 0
+                $washCounts[$type->input_name] = $count;
 
                 // Man-hours = count × hours_required
                 $washHours += $count * floatval($type->hours_required);
@@ -665,11 +706,12 @@ class SurveyProposalController extends Controller
             // ------------------------------------------
             // UPDATE CLEANING FIELDS
             // ------------------------------------------
+            $cleaningCounts = [];
             foreach ($cleaningTypes as $type) {
-
                 $count = intval($request->{$type->input_name} ?? 0);
 
-                $equipmentData[$type->input_name] = $count;
+                // Store in JSON array even if 0
+                $cleaningCounts[$type->input_name] = $count;
 
                 // Man-hours = count × hours_required
                 $cleanHours += $count * floatval($type->hours_required);
@@ -680,6 +722,9 @@ class SurveyProposalController extends Controller
             // ------------------------------------------
             $washCost = $washHours * 28.75;
             $cleanCost = $cleanHours * 28.75;
+
+            $equipmentData['wash_counts'] = $washCounts;
+            $equipmentData['cleaning_counts'] = $cleaningCounts;
 
             $equipmentData['wash_man_hours'] = $washHours;
             $equipmentData['wash_man_hours_cost'] = $washCost;
@@ -695,23 +740,34 @@ class SurveyProposalController extends Controller
             // SAVE NEW IMAGE (optional)
             // ------------------------------------------
             if ($request->hasFile('utility_file')) {
+                foreach ($request->file('utility_file') as $file) {
+                    $original = $file->getClientOriginalName();
+                    $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
+                    $ext = $file->getClientOriginalExtension();
+                    $filename = Str::random(10) . '_' . $clean . '.' . $ext;
 
-                $file = $request->file('utility_file');
-                $original = $file->getClientOriginalName();
-                $clean = Str::slug(pathinfo($original, PATHINFO_FILENAME));
-                $ext = $file->getClientOriginalExtension();
-                $filename = Str::random(10) . '_' . $clean . '.' . $ext;
+                    $path = $file->storeAs('equipment/images', $filename, 'public');
 
-                $path = $file->storeAs('equipment/images', $filename, 'public');
+                    SurveyEquipmentImage::create([
+                        'user_id' => auth()->id(),
+                        'survey_equipment_id' => $equipment->id,
+                        'description' => $request->description,
+                        'file_name' => $original,
+                        'file_path' => $path,
+                        'file_type' => $ext,
+                    ]);
+                }
+            }
 
-                SurveyEquipmentImage::create([
-                    'user_id' => auth()->id(),
-                    'survey_equipment_id' => $equipment->id,
-                    'description' => $request->description,
-                    'file_name' => $original,
-                    'file_path' => $path,
-                    'file_type' => $ext,
-                ]);
+            // ------------------------------------------
+            // DELETE REMOVED UTILITIES
+            // ------------------------------------------
+            if ($request->has('deleted_utilities')) {
+                $utilitiesToDelete = SurveyEquipmentImage::whereIn('id', $request->deleted_utilities)->get();
+                foreach ($utilitiesToDelete as $utility) {
+                    Storage::disk('public')->delete($utility->file_path);
+                    $utility->delete();
+                }
             }
 
             return response()->json([
@@ -1149,7 +1205,9 @@ class SurveyProposalController extends Controller
         ]);
     }
 
-    public function addFacilityToCompany($facilityId)
+
+
+    public function addFacilityToCompany(Request $request, $facilityId)
     {
         $facility = SurveyFacility::with('surveyProposal.company')->findOrFail($facilityId);
 

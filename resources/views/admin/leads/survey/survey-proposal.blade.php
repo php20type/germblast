@@ -405,7 +405,7 @@
                                                                     </td>
                                                                     <td>{{ ucfirst($facility->facility_type) }}</td>
                                                                     <td>{{ $facility->address }}</td>
-                                                                    <td>{{ $facility->square_footage }}</td>
+                                                                    <td>{{ $facility->room_counts['square_footage'] ?? 0 }}</td>
                                                                     <td>{{ $facility->man_hours }}</td>
                                                                     <td>${{ number_format($facility->man_hours_cost, 2) }}</td>
                                                                     <td>

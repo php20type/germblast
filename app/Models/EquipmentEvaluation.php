@@ -13,70 +13,19 @@ class EquipmentEvaluation extends Model
         'survey_proposal_id',
         'name',
 
-        'non_electric_gurney',
-        'wheelchair',
-        'transport_chair',
-        'iv_pole',
-        'food_cart',
-        'miscellaneous_pieces',
+        'wash_counts',
+        'cleaning_counts',
+        
         'wash_man_hours',
         'wash_man_hours_cost',
-
-        'anesthesia_cart',
-        'or_table',
-        'stainless_steel_cart',
-        'stainless_steel_table',
-        'electrosurgical_device',
-        'wall_mounted_monitor',
-        'vital_signs_monitor',
-        'vital_signs_monitor_ecg',
-        'dvt_scd_device',
-        'cpm',
-        'infusion_pump',
-        'bipap',
-        'cpap',
-        'pulse_oximeter',
-        'hospital_bed',
-        'electric_gurney',
-        'manual_gurney',
-
-        'pca',
-        'cow',
-        'patient_air_warmer',
-        'enteral_feeding_pump',
-        'geri_chair',
-        'electric_scale',
-        'defibrillator',
-        'med_cart',
-        'crash_cart',
-        'bassinet',
-        'infant_incubator',
-        'infant_warmer',
-        'ultrasound',
-        'overbed_table',
-
-        'portable_suction_pump',
-        'stainless_steel_linen_cart',
-        'stainless_steel_basin',
-        'radiology_vest',
-        'wall_mounted_computer',
-        'telemedicine_device',
-        'blower_mattress',
-        'rolling_transfer_boards',
-        'glucometer',
-        'telemetry_monitor',
-        'telemetry_pack',
-        'patient_lift',
-        'heat_lamp',
-        'treadmill',
-        'recumbant_bike',
-        'misc_carts_baskets',
-
         'cleaning_man_hours',
         'cleaning_man_hours_cost',
-
-        // Total cost
         'total_cost'
+    ];
+
+    protected $casts = [
+        'wash_counts' => 'array',
+        'cleaning_counts' => 'array',
     ];
 
      public function surveyProposal()

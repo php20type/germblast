@@ -189,13 +189,10 @@
                                                 <tr>
                                                     <th>Upload Photo</th>
                                                     <td>
-                                                        <input type="file" class="form-control" name="utility_file"
-                                                            id="utility_file">
+                                                        <input type="file" class="form-control" name="utility_file[]"
+                                                            id="utility_file" multiple>
                                                         {{-- Preview Box --}}
-                                                        <div id="utility-preview" class="mt-2" style="display: none;">
-                                                            <img src="" class="img-fluid rounded"
-                                                                style="width: 90px; height: 90px; object-fit: cover; border: 1px solid #ccc;">
-                                                        </div>
+                                                        <div id="utility-preview" class="mt-2 d-flex flex-wrap gap-2"></div>
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -297,7 +294,7 @@
                                                         <td>
                                                             <input type="number" class="form-control"
                                                                 name="{{ $type->input_name }}"
-                                                                value="{{ $equipment->{$type->input_name} ?? 0 }}">
+                                                                value="{{ $equipment->wash_counts[$type->input_name] ?? 0 }}">
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -345,9 +342,10 @@
                                                 @foreach ($cleaningTypes as $type)
                                                     <tr>
                                                         <th>{{ $type->name }}</th>
-                                                        <td><input type="number" class="form-control"
+                                                        <td>
+                                                            <input type="number" class="form-control"
                                                                 name="{{ $type->input_name }}"
-                                                                value="{{ $equipment->{$type->input_name} ?? 0 }}">
+                                                                value="{{ $equipment->cleaning_counts[$type->input_name] ?? 0 }}">
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -430,6 +428,14 @@
                 }
             });
 
+            // Handle Utility Deletion
+            $(document).on('click', '.delete-equipment-image-btn', function() {
+                let imgId = $(this).data('id');
+                let btn = $(this);
+                $('#update-equipment-form').append(`<input type="hidden" name="deleted_utilities[]" value="${imgId}">`);
+                btn.closest('.col-md-3').remove();
+            });
+
             // AJAX SUBMIT
             $('#update-equipment-form').submit(function(e) {
                 e.preventDefault();
@@ -456,8 +462,7 @@
                             showConfirmButton: false,
                             timer: 2000
                         });
-
-                        setTimeout(() => location.reload(), 2000);
+                        setTimeout(() => window.location.href = "{{ route('admin.lead.survey.proposal', $equipment->surveyProposal->lead_id) }}", 2000);
                     },
 
                     error: function(xhr) {
@@ -477,23 +482,78 @@
                 let input = document.getElementById(inputId);
                 let previewContainer = document.getElementById(previewId);
 
-                if (!input || !previewContainer) return; // Element doesn't exist, stop script
+                if (!input || !previewContainer) return;
 
-                let previewImage = previewContainer.querySelector('img');
+                // Create a DataTransfer object to hold files
+                let dataTransfer = new DataTransfer();
 
                 input.addEventListener('change', function(event) {
-                    if (event.target.files && event.target.files[0]) {
-
-                        let reader = new FileReader();
-
-                        reader.onload = function(e) {
-                            previewImage.src = e.target.result;
-                            previewContainer.style.display = 'block';
-                        };
-
-                        reader.readAsDataURL(event.target.files[0]);
+                    let files = event.target.files;
+                    
+                    // Add new files to our dataTransfer object
+                    for (let i = 0; i < files.length; i++) {
+                        dataTransfer.items.add(files[i]);
                     }
+                    
+                    // Update input files
+                    input.files = dataTransfer.files;
+                    
+                    renderPreviews();
                 });
+
+                function renderPreviews() {
+                    previewContainer.innerHTML = ''; // clear current
+                    
+                    let files = input.files;
+                    
+                    for (let i = 0; i < files.length; i++) {
+                        let file = files[i];
+                        let reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            let div = document.createElement('div');
+                            div.style.position = 'relative';
+                            div.style.display = 'inline-block';
+                            
+                            let img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.className = 'img-fluid rounded';
+                            img.style.width = '90px';
+                            img.style.height = '90px';
+                            img.style.objectFit = 'cover';
+                            img.style.border = '1px solid #ccc';
+                            
+                            let closeBtn = document.createElement('button');
+                            closeBtn.innerHTML = '&times;';
+                            closeBtn.className = 'btn btn-sm btn-danger';
+                            closeBtn.style.position = 'absolute';
+                            closeBtn.style.top = '-5px';
+                            closeBtn.style.right = '-5px';
+                            closeBtn.style.padding = '0px 5px';
+                            closeBtn.style.borderRadius = '50%';
+                            closeBtn.style.lineHeight = '1';
+                            
+                            closeBtn.onclick = function(e) {
+                                e.preventDefault();
+                                // Remove file from dataTransfer
+                                let newDataTransfer = new DataTransfer();
+                                for(let j = 0; j < input.files.length; j++) {
+                                    if(j !== i) {
+                                        newDataTransfer.items.add(input.files[j]);
+                                    }
+                                }
+                                input.files = newDataTransfer.files;
+                                dataTransfer = newDataTransfer; // update reference
+                                renderPreviews(); // re-render
+                            };
+                            
+                            div.appendChild(img);
+                            div.appendChild(closeBtn);
+                            previewContainer.appendChild(div);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                }
             }
 
             // Attach previews

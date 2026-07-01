@@ -46,6 +46,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
             Route::post('facility/{facility}/add-to-company', [SurveyProposalController::class, 'addFacilityToCompany'])
                 ->name('facility.add_to_company');
 
+
             Route::get('{survey_proposal}/equipment', [SurveyProposalController::class, 'survey_equipment'])
                 ->name('equipment');
 
