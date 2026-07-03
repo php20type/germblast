@@ -908,7 +908,7 @@ class PeopleController extends Controller
 
             // Step 6: Store company
             if ($request->company_id) {
-                PeopleCompany::create([
+                CompanyPeople::create([
                     'people_id' => $people->id,
                     'company_id' => $request->company_id,
                 ]);
