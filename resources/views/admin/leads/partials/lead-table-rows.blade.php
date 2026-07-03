@@ -14,7 +14,7 @@
                      </span>
                  @endcan
              </div>
-             <div class="company-name">{{ $lead['people_name'] }}</div>
+             <div class="company-name">{{ $lead['company_name'] }}</div>
          </td>
 
          <td>{{ $lead['created_at'] }}</td>

@@ -89,6 +89,7 @@ class LeadController extends Controller
     {
         return Lead::with([
             'assignee',
+            'company',
             'companies',
             'products',
             'peoples',
@@ -157,6 +158,7 @@ class LeadController extends Controller
                 'id' => $lead->id,
                 'name' => $lead->name,
                 'people_name' => $lead->peoples->first()->name ?? 'N/A',
+                'company_name' => $lead->company->name ?? 'N/A',
                 'created_at' => $lead->created_at->diffForHumans(null, true),
                 'total_price' => Helper::calculateTotalValue($group),
                 'stage_name' => $lead->stages->name ?? 'N/A',

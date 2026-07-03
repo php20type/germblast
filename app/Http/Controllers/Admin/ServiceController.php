@@ -975,7 +975,6 @@ class ServiceController extends Controller
                 'serviceOrder.service.lead.company',
                 'serviceOrder'
             ])
-            ->where('is_confirmed', true)
             ->get();
 
         $events = $slots->map(function ($slot) {
