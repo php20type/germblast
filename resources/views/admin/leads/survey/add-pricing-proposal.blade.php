@@ -214,7 +214,7 @@
                                                     <th>Estimated Pricing Total</th>
                                                     <td>
                                                         <input type="text" name="pricing_total" class="form-control"
-                                                            value="">
+                                                            value="" readonly>
                                                     </td>
                                                 </tr>
 
@@ -222,7 +222,7 @@
                                                     <th>Partial Cost of Service</th>
                                                     <td>
                                                         <input type="text" name="partial_cost_service"
-                                                            class="form-control" value="">
+                                                            class="form-control" value="" readonly>
                                                     </td>
                                                 </tr>
 
@@ -235,7 +235,7 @@
                                                     <th>Awareness</th>
                                                     <td>
                                                         <input type="text" class="form-control" name="awareness"
-                                                            value="">
+                                                            value="" readonly>
                                                     </td>
                                                 </tr>
 
@@ -243,7 +243,7 @@
                                                     <th>Education</th>
                                                     <td>
                                                         <input type="text" class="form-control" name="education"
-                                                            value="">
+                                                            value="" readonly>
                                                     </td>
                                                 </tr>
 
@@ -251,7 +251,7 @@
                                                     <th>Technology</th>
                                                     <td>
                                                         <input type="text" class="form-control" name="technology"
-                                                            value="">
+                                                            value="" readonly>
                                                     </td>
                                                 </tr>
 
@@ -259,7 +259,7 @@
                                                     <th>Response</th>
                                                     <td>
                                                         <input type="text" class="form-control" name="response"
-                                                            value="">
+                                                            value="" readonly>
                                                     </td>
                                                 </tr>
 
@@ -272,8 +272,8 @@
                                                 <tr>
                                                     <th>Logistics Expense</th>
                                                     <td>
-                                                        <input type="text" class="form-control" name="logistics_expense"
-                                                            value="">
+                                                        28.75
+                                                        <input type="hidden" name="logistics_expense" value="28.75">
                                                     </td>
                                                 </tr>
 
@@ -451,11 +451,17 @@
 
             $('input[name="pricing_total"]').val(total.toFixed(2));
 
-            // awareness & technology = total / 10
-            let splitValue = total / 10;
+            let awarenessVal = total / 10;
+            let educationVal = total / 10;
+            let technologyVal = total * 0.015;
+            let responseVal = total * 0.09;
+            let logisticsVal = 28.75;
 
-            $('input[name="awareness"]').val(splitValue.toFixed(2));
-            $('input[name="technology"]').val(splitValue.toFixed(2));
+            $('input[name="awareness"]').val(awarenessVal.toFixed(2));
+            $('input[name="education"]').val(educationVal.toFixed(2));
+            $('input[name="technology"]').val(technologyVal.toFixed(2));
+            $('input[name="response"]').val(responseVal.toFixed(2));
+            $('input[name="logistics_expense"]').val(logisticsVal.toFixed(2));
         }
 
 
@@ -551,7 +557,7 @@
                             timer: 2000,
                             showConfirmButton: false
                         });
-                        setTimeout(() => location.reload(), 2000);
+                        setTimeout(() => window.location.href = "{{ route('admin.lead.survey.proposal', $surveyProposal->lead_id) }}", 2000);
                     },
 
                     error: function(xhr) {

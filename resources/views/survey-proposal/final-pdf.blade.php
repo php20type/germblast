@@ -100,8 +100,13 @@
         <img src="{{ public_path('img/survey-proposal/page1_img1.png') }}"
             style="position:absolute; top:0; left:0; width:612pt; height:792pt;">
 
+        <div style="position: absolute; top: 680pt; left: 300pt;">
+            <div style="color: #58595b; font-size: 16pt; margin-top: 4pt;">Prepared Exclusively For</div>
+            <div style="color: #58595b; font-size: 16pt; margin-left: 15pt;">{{ $survey->company->name }}</div>
+        </div>
+
         <div class="footer">
-            © 2025 GermBlast. All Rights Reserved.
+            © {{ now()->year }} GermBlast. All Rights Reserved.
         </div>
     </div>
 
@@ -179,7 +184,7 @@
         </div>
 
         <div class="footer">
-            © 2025 GermBlast. All Rights Reserved.
+            © {{ now()->year }} GermBlast. All Rights Reserved.
         </div>
     </div>
 
@@ -242,7 +247,7 @@
         </div>
 
         <div class="footer">
-            © 2025 GermBlast. All Rights Reserved.
+            © {{ now()->year }} GermBlast. All Rights Reserved.
         </div>
     </div>
 
@@ -326,7 +331,7 @@
         </div>
 
         <div class="footer">
-            © 2025 GermBlast. All Rights Reserved.
+            © {{ now()->year }} GermBlast. All Rights Reserved.
         </div>
 
     </div>
@@ -376,6 +381,19 @@
                     </tr>
                 </table>
 
+                @php
+                    $basePrice = $pricing->override_pricing > 0 ? $pricing->override_pricing : $pricing->pricing_total;
+                    $annualPrice = $basePrice * $pricing->services_per_year;
+                    
+                    $discountPercentage = $pricing->discounts ?? 0;
+                    
+                    $discountPerService = $basePrice * ($discountPercentage / 100);
+                    $discountAnnual = $annualPrice * ($discountPercentage / 100);
+                    
+                    $finalPerService = $basePrice - $discountPerService;
+                    $finalAnnual = $annualPrice - $discountAnnual;
+                @endphp
+
                 <!-- PRICING TABLE -->
                 <table class="table">
                     <tr>
@@ -387,20 +405,22 @@
                     <tr>
                         <td>Germblast Service</td>
                         <td>{{ $pricing->services_per_year }}</td>
-                        <td>${{ number_format($pricing->partial_cost_service, 2) }}</td>
-                        <td>${{ number_format($pricing->pricing_total, 2) }}</td>
+                        <td>${{ number_format($basePrice, 2) }}</td>
+                        <td>${{ number_format($annualPrice, 2) }}</td>
                     </tr>
-                    {{-- <tr>
-                        <td>Discount 7.50%</td>
+                    @if($discountPercentage > 0)
+                    <tr>
+                        <td>Discount {{ number_format($discountPercentage, 2) }}%</td>
                         <td></td>
-                        <td>$2,161.92</td>
-                        <td>$6,485.76</td>
-                    </tr> --}}
+                        <td>-${{ number_format($discountPerService, 2) }}</td>
+                        <td>-${{ number_format($discountAnnual, 2) }}</td>
+                    </tr>
+                    @endif
                     <tr>
                         <td><strong>Total</strong></td>
                         <td></td>
-                        <td></td>
-                        <td><strong>${{ number_format($pricing->pricing_total, 2) }}</strong></td>
+                        <td><strong>${{ number_format($finalPerService, 2) }}</strong></td>
+                        <td><strong>${{ number_format($finalAnnual, 2) }}</strong></td>
                     </tr>
                 </table>
 
@@ -571,7 +591,7 @@
         </div>
 
         <div class="footer">
-            © 2025 GermBlast. All Rights Reserved.
+            © {{ now()->year }} GermBlast. All Rights Reserved.
         </div>
 
     </div>
@@ -654,7 +674,7 @@
         </div>
 
         <div class="footer">
-            © 2025 GermBlast. All Rights Reserved.
+            © {{ now()->year }} GermBlast. All Rights Reserved.
         </div>
 
     </div>
@@ -764,7 +784,7 @@
 
 
         <div class="footer">
-            © 2025 GermBlast. All Rights Reserved.
+            © {{ now()->year }} GermBlast. All Rights Reserved.
         </div>
 
     </div>
@@ -847,7 +867,7 @@
 
 
         <div class="footer">
-            © 2025 GermBlast. All Rights Reserved.
+            © {{ now()->year }} GermBlast. All Rights Reserved.
         </div>
 
     </div>
@@ -939,7 +959,7 @@
 
 
         <div class="footer">
-            © 2025 GermBlast. All Rights Reserved.
+            © {{ now()->year }} GermBlast. All Rights Reserved.
         </div>
 
     </div>
@@ -993,7 +1013,7 @@
         </div>
 
         <div class="footer">
-            © 2025 GermBlast. All Rights Reserved.
+            © {{ now()->year }} GermBlast. All Rights Reserved.
         </div>
 
     </div>
@@ -1126,7 +1146,7 @@
         </div>
 
         <div class="footer">
-            © 2025 GermBlast. All Rights Reserved.
+            © {{ now()->year }} GermBlast. All Rights Reserved.
         </div>
 
     </div>

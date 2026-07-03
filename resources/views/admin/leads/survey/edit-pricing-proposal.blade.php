@@ -205,7 +205,7 @@
                                                     <th>Estimated Pricing Total</th>
                                                     <td>
                                                         <input type="text" name="pricing_total" class="form-control"
-                                                            value="{{ $pricingProposal->pricing_total ?? '' }}">
+                                                            value="{{ $pricingProposal->pricing_total ?? '' }}" readonly>
                                                     </td>
                                                 </tr>
 
@@ -214,7 +214,7 @@
                                                     <td>
                                                         <input type="text" name="partial_cost_service"
                                                             class="form-control"
-                                                            value="{{ $pricingProposal->partial_cost_service ?? '' }}">
+                                                            value="{{ $pricingProposal->partial_cost_service ?? '' }}" readonly>
                                                     </td>
                                                 </tr>
 
@@ -226,25 +226,25 @@
                                                 <tr>
                                                     <th>Awareness</th>
                                                     <td><input type="text" name="awareness" class="form-control"
-                                                            value="{{ $pricingProposal->awareness ?? '' }}"></td>
+                                                            value="{{ $pricingProposal->awareness ?? '' }}" readonly></td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>Education</th>
                                                     <td><input type="text" name="education" class="form-control"
-                                                            value="{{ $pricingProposal->education ?? '' }}"></td>
+                                                            value="{{ $pricingProposal->education ?? '' }}" readonly></td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>Technology</th>
                                                     <td><input type="text" name="technology" class="form-control"
-                                                            value="{{ $pricingProposal->technology ?? '' }}"></td>
+                                                            value="{{ $pricingProposal->technology ?? '' }}" readonly></td>
                                                 </tr>
 
                                                 <tr>
                                                     <th>Response</th>
                                                     <td><input type="text" name="response" class="form-control"
-                                                            value="{{ $pricingProposal->response ?? '' }}"></td>
+                                                            value="{{ $pricingProposal->response ?? '' }}" readonly></td>
                                                 </tr>
 
                                                 <tr>
@@ -254,8 +254,10 @@
 
                                                 <tr>
                                                     <th>Logistics Expense</th>
-                                                    <td><input type="text" name="logistics_expense" class="form-control"
-                                                            value="{{ $pricingProposal->logistics_expense ?? '' }}"></td>
+                                                    <td>
+                                                        28.75
+                                                        <input type="hidden" name="logistics_expense" value="28.75">
+                                                    </td>
                                                 </tr>
 
                                                 <tr>
@@ -283,32 +285,32 @@
                                             <tbody>
 
                                                 <tr>
-                                                    <th style="width:35%">Proposal Name *</th>
+                                                    <th style="width:35%">Proposal Name <span class="text-danger">*</span></th>
                                                     <td><input type="text" class="form-control" name="proposal_name"
                                                             value="{{ $pricingProposal->proposal_name ?? '' }}"></td>
                                                 </tr>
 
                                                 <tr>
-                                                    <th>Proposal Order *</th>
+                                                    <th>Proposal Order <span class="text-danger">*</span></th>
                                                     <td><input type="number" class="form-control" name="proposal_order"
                                                             value="{{ $pricingProposal->proposal_order ?? '0' }}"></td>
                                                 </tr>
 
                                                 <tr>
-                                                    <th>Override Pricing *</th>
+                                                    <th>Override Pricing <span class="text-danger">*</span></th>
                                                     <td><input type="text" class="form-control" name="override_pricing"
                                                             value="{{ $pricingProposal->override_pricing ?? '0.00' }}">
                                                     </td>
                                                 </tr>
 
                                                 <tr>
-                                                    <th>Discounts (%) *</th>
+                                                    <th>Discounts (%) <span class="text-danger">*</span></th>
                                                     <td><input type="number" class="form-control" name="discounts"
                                                             value="{{ $pricingProposal->discounts ?? '0.00' }}"></td>
                                                 </tr>
 
                                                 <tr>
-                                                    <th>Services *</th>
+                                                    <th>Services <span class="text-danger">*</span></th>
                                                     <td>
                                                         <input type="text" class="form-control" name="services"
                                                             value='@json(
@@ -319,7 +321,7 @@
                                                 </tr>
 
                                                 <tr>
-                                                    <th>Description *</th>
+                                                    <th>Description <span class="text-danger">*</span></th>
                                                     <td>
                                                         <textarea class="form-control" name="descriptions" rows="2">{{ $pricingProposal->descriptions ?? '' }}</textarea>
                                                     </td>
@@ -343,7 +345,7 @@
                                             <tbody>
 
                                                 <tr>
-                                                    <th style="width:35%">Services per Year *</th>
+                                                    <th style="width:35%">Services per Year <span class="text-danger">*</span></th>
                                                     <td><input type="number" class="form-control"
                                                             name="services_per_year"
                                                             value="{{ $pricingProposal->services_per_year ?? '' }}"
@@ -351,13 +353,13 @@
                                                 </tr>
 
                                                 <tr>
-                                                    <th>Contract Terms (Years) *</th>
+                                                    <th>Contract Terms (Years) <span class="text-danger">*</span></th>
                                                     <td><input type="number" class="form-control" name="contract_terms"
                                                             value="{{ $pricingProposal->contract_terms ?? '' }}"></td>
                                                 </tr>
 
                                                 <tr>
-                                                    <th>Prepayment Discount *</th>
+                                                    <th>Prepayment Discount <span class="text-danger">*</span></th>
                                                     <td>
                                                         <select name="prepayment_discount" class="form-control">
                                                             <option value="">Select Option</option>
@@ -418,11 +420,17 @@
 
             $('input[name="pricing_total"]').val(total.toFixed(2));
 
-            // awareness & technology = total / 10
-            let splitValue = total / 10;
+            let awarenessVal = total / 10;
+            let educationVal = total / 10;
+            let technologyVal = total * 0.015;
+            let responseVal = total * 0.09;
+            let logisticsVal = 28.75;
 
-            $('input[name="awareness"]').val(splitValue.toFixed(2));
-            $('input[name="technology"]').val(splitValue.toFixed(2));
+            $('input[name="awareness"]').val(awarenessVal.toFixed(2));
+            $('input[name="education"]').val(educationVal.toFixed(2));
+            $('input[name="technology"]').val(technologyVal.toFixed(2));
+            $('input[name="response"]').val(responseVal.toFixed(2));
+            $('input[name="logistics_expense"]').val(logisticsVal.toFixed(2));
         }
 
 
@@ -511,7 +519,7 @@
                             timer: 2000,
                             showConfirmButton: false
                         });
-                        setTimeout(() => location.reload(), 2000);
+                        setTimeout(() => window.location.href = "{{ route('admin.lead.survey.proposal', $pricingProposal->surveyProposal->lead_id) }}", 2000);
                     },
 
                     error: function(xhr) {
