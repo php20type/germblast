@@ -250,6 +250,7 @@
                                 <p class="text-muted mb-0">Order ID: {{ $order->order_no ?? '' }}</p>
                                 
                                 <div class="d-flex align-items-center gap-3 flex-wrap mt-2 mb-3">
+                                    {{--
                                     <form action="{{ route('admin.lead.service.order.update_status', $order->id) }}" method="POST" class="d-flex align-items-center gap-2 mb-0">
                                         @csrf
                                         <label class="text-muted mb-0 fw-semibold" style="font-size: 14px;">Order Status:</label>
@@ -261,6 +262,7 @@
                                             <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                                         </select>
                                     </form>
+                                    --}}
                                     <span class="status-pill status-pill-{{ $order->status ?? 'pending' }}">
                                         {{ ucfirst(str_replace('_', ' ', $order->status ?? 'pending')) }}
                                     </span>
@@ -462,7 +464,7 @@
                                                         <th>Clock In</th>
                                                         <th>Clock Out</th>
                                                         <th>Status</th>
-                                                        <th>Action</th>
+                                                        {{-- <th>Action</th> --}}
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -485,6 +487,7 @@
                                                                     {{ ucfirst(str_replace('_', ' ', $slot->status ?? 'pending')) }}
                                                                 </span>
                                                             </td>
+                                                            {{--
                                                             <td>
                                                                 <form action="{{ route('admin.lead.service.slot.update_status', $slot->id) }}" method="POST" class="d-flex align-items-center gap-1 mb-0">
                                                                     @csrf
@@ -498,6 +501,7 @@
                                                                     </select>
                                                                 </form>
                                                             </td>
+                                                            --}}
                                                         </tr>
                                                     @empty
                                                         <tr>

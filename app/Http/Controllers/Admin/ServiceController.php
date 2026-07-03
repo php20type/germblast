@@ -1658,9 +1658,7 @@ class ServiceController extends Controller
         return redirect()->back()->with('success', 'ATP detail removed successfully.');
     }
 
-    /**
-     * Update Service Order status manually.
-     */
+    /*
     public function updateOrderStatus(Request $request, $orderId)
     {
         $request->validate([
@@ -1671,7 +1669,6 @@ class ServiceController extends Controller
         $newStatus = $request->input('status');
 
         if ($newStatus === 'completed') {
-            // Verify that all associated Scheduled Slots are already marked as Completed.
             $nonCompletedSlots = $order->orderSlots->filter(function ($slot) {
                 return $slot->status !== 'completed';
             });
@@ -1702,9 +1699,6 @@ class ServiceController extends Controller
         return redirect()->back()->with('success', 'Service Order status updated to ' . ucfirst($newStatus) . ' successfully.');
     }
 
-    /**
-     * Update Scheduled Slot status manually.
-     */
     public function updateSlotStatus(Request $request, $slotId)
     {
         $request->validate([
@@ -1732,6 +1726,7 @@ class ServiceController extends Controller
 
         return redirect()->back()->with('success', 'Slot status updated to ' . ucfirst($newStatus) . ' successfully.');
     }
+    */
 
     public function saveInvoice(Request $request, $orderId)
     {
