@@ -313,6 +313,11 @@
                                     type="button" role="tab" aria-controls="staffing" aria-selected="false">
                                     Staffing
                                 </button>
+                                <button class="nav-link" id="vehicle-planning-tab" data-bs-toggle="tab"
+                                    data-bs-target="#vehicle-planning" type="button" role="tab"
+                                    aria-controls="vehicle-planning" aria-selected="false">
+                                    Vehicle Planning
+                                </button>
                                 <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes"
                                     type="button" role="tab" aria-controls="notes" aria-selected="false">
                                     Notes
@@ -324,7 +329,7 @@
                                 <button class="nav-link" id="schedule-view-tab" data-bs-toggle="tab"
                                     data-bs-target="#schedule-view" type="button" role="tab"
                                     aria-controls="schedule-view" aria-selected="false">
-                                    Schedule View
+                                    Job Clocks
                                 </button>
                                 {{-- <button class="nav-link" id="job-clocks-tab" data-bs-toggle="tab"
                                     data-bs-target="#job-clocks" type="button" role="tab" aria-controls="job-clocks"
@@ -1244,15 +1249,18 @@
 
                                                     {{-- Summary Footer --}}
                                                     @php
-                                                        $totalHours    = $slot->staff->sum('slot_hours');
-                                                        $totalCost     = $slot->staff->sum('cost');
+                                                        $staffCount    = $slot->staff->count();
+                                                        $scheduledHrs  = $slot->scheduled_hours ?? 0;
+                                                        $totalHours    = $scheduledHrs * $staffCount;
+                                                        
                                                         $invoiceAmount = $order->service->price_per_service ?? 0;
-                                                        $peoplePct     = $invoiceAmount > 0 ? round(($totalCost / $invoiceAmount) * 100) : 0;
+                                                        $totalCost     = 28.78 * $totalHours;
+                                                        $peoplePct     = $invoiceAmount > 0 ? round(($totalCost * 100) / $invoiceAmount) : 0;
                                                     @endphp
                                                     <div class="mt-3 pt-3 border-top d-flex gap-4">
                                                         <small class="text-muted">People Percentage: <strong>{{ $peoplePct }}%</strong></small>
                                                         <small class="text-muted">Invoice: <strong>${{ number_format($invoiceAmount, 2) }}</strong></small>
-                                                        <small class="text-muted">Hours: <strong>{{ $totalHours }}</strong></small>
+                                                        <small class="text-muted">Hours: <strong>{{ number_format($totalHours, 2) }}</strong></small>
                                                         <small class="text-muted">Cost: <strong>${{ number_format($totalCost, 2) }}</strong></small>
                                                     </div>
 
@@ -1272,6 +1280,104 @@
                                 @endif
 
                             </div>
+
+                        <!-- Vehicle Planning Tab -->
+                        <div class="tab-pane fade" id="vehicle-planning" role="tabpanel"
+                            aria-labelledby="vehicle-planning-tab">
+                            
+                            @if($confirmedSlots->count())
+                                <div class="section-card mt-3">
+                                    <div class="navbar-tabs overflow-auto">
+                                        <nav class="nav nav-tabs mb-3 flex-nowrap" id="vehiclePlanningSlotTabs" role="tablist">
+                                            @foreach ($confirmedSlots as $slot)
+                                                <button class="nav-link {{ $loop->first ? 'active' : '' }}"
+                                                    id="vehicle-planning-slot-{{ $slot->id }}-tab" data-bs-toggle="tab"
+                                                    data-bs-target="#vehicle-planning-slot-{{ $slot->id }}"
+                                                    type="button" role="tab">
+                                                    Slot #{{ $loop->iteration }}
+                                                    <small class="text-muted ms-1">{{ \Carbon\Carbon::parse($slot->scheduled_start_time)->format('M d') }}</small>
+                                                </button>
+                                            @endforeach
+                                        </nav>
+                                    </div>
+                                    <div class="tab-content" id="vehiclePlanningSlotTabContent">
+                                        @foreach($confirmedSlots as $slot)
+                                            <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
+                                                id="vehicle-planning-slot-{{ $slot->id }}"
+                                                role="tabpanel">
+                                                {{-- Time & Facility Info --}}
+                                                <div class="border rounded p-3 mb-3 bg-light">
+                                                    <p class="mb-1"><strong>Office:</strong> {{ $slot->office->name ?? 'N/A' }}</p>
+                                                    <p class="mb-1"><strong>Schedule:</strong> {{ $slot->scheduled_start_time }} — {{ $slot->scheduled_end_time }}</p>
+                                                    <p class="mb-0"><strong>Arrival Time:</strong> {{ $slot->scheduled_arrival_time }}</p>
+                                                </div>
+
+                                                {{-- Facilities --}}
+                                                @if($slot->facilities->count())
+                                                    <div class="mb-3">
+                                                        <p class="fw-semibold mb-2">Facilities</p>
+                                                        <div class="d-flex flex-wrap gap-2">
+                                                            @foreach($slot->facilities as $facility)
+                                                                <div class="border rounded p-2 text-center bg-white" style="min-width: 160px;">
+                                                                    <i class="fas fa-map-marker-alt text-danger mb-1"></i>
+                                                                    <p class="mb-0 small fw-semibold">{{ $facility->companyLocation->location_name ?? '-' }}</p>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                @endif
+
+                                                {{-- Two Column Layout --}}
+                                                <div class="row g-3">
+
+                                                    {{-- LEFT: Assigned Vehicles --}}
+                                                    <div class="col-md-5">
+                                                        <div class="border rounded p-3 h-100">
+                                                            <h6 class="fw-bold mb-3">Assigned Vehicles</h6>
+
+                                                            @forelse($slot->vehicles as $vehicle)
+                                                                <div class="d-flex justify-content-between align-items-center border rounded p-2 mb-2 bg-success bg-opacity-25">
+                                                                    <div>
+                                                                        <span class="fw-semibold small">
+                                                                            <i class="fas fa-truck me-2"></i>{{ $vehicle->name }}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            @empty
+                                                                <p class="text-muted small">No vehicles assigned yet.</p>
+                                                            @endforelse
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- RIGHT: Assign Action --}}
+                                                    <div class="col-md-7">
+                                                        <div class="border rounded p-3 h-100 d-flex flex-column justify-content-center align-items-center bg-light text-center">
+                                                            <h6 class="fw-bold mb-2">Vehicle Management</h6>
+                                                            <p class="text-muted small mb-3">
+                                                                Assign and manage vehicles for this slot via the Vehicle Planning dashboard.
+                                                            </p>
+                                                            <a href="{{ route('admin.vehicle.planning', ['date' => \Carbon\Carbon::parse($slot->scheduled_start_time)->format('Y-m-d')]) }}" class="btn btn-primary" target="_blank">
+                                                                </i> Open Vehicle Planning
+                                                            </a>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @else
+                                <div class="row mt-3">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+                                            <p class="text-center text-muted mb-0">No confirmed slots found. Confirm slots in the Confirmations tab first.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
+                        </div>
 
                         <!-- Notes Tab -->
                         <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
@@ -1806,6 +1912,7 @@
                                                                     <th>By</th>
                                                                     <th>Hours</th>
                                                                     <th>Status</th>
+                                                                    <th>Action</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -1848,7 +1955,65 @@
                                                                                 <span class="badge bg-warning text-dark">Running</span>
                                                                             @endif
                                                                         </td>
+                                                                        <td>
+                                                                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editClockModal-{{ $clock->id }}">
+                                                                                <i class="fas fa-edit"></i> Edit
+                                                                            </button>
+                                                                        </td>
                                                                     </tr>
+
+                                                                    <!-- Edit Clock Modal -->
+                                                                    <div class="modal fade" id="editClockModal-{{ $clock->id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                                        <div class="modal-dialog modal-fullscreen">
+                                                                            <div class="modal-content">
+                                                                                <div class="modal-header">
+                                                                                    <h1 class="modal-title" id="exampleModalLabel">Edit Job Clock</h1>
+                                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                                </div>
+                                                                                <div class="modal-body">
+                                                                                    <form action="{{ route('admin.lead.service.clock.update', $clock->id) }}" method="POST" class="company-form">
+                                                                                        @csrf
+                                                                                        <div class="row mx-0">
+                                                                                            <div class="col-lg-12">
+                                                                                                <div class="form-group">
+                                                                                                    <label class="form-label">Type</label>
+                                                                                                    <span class="text-danger">*</span>
+                                                                                                    <select class="form-select" name="type" required>
+                                                                                                        @foreach(['service', 'travel', 'break', 'office work', 'warehouse', 'training', 'service prep', 'umc'] as $t)
+                                                                                                            <option value="{{ $t }}" {{ $clock->type === $t ? 'selected' : '' }}>{{ ucwords($t) }}</option>
+                                                                                                        @endforeach
+                                                                                                    </select>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="col-lg-12">
+                                                                                                <div class="form-group">
+                                                                                                    <label class="form-label">Clock In</label>
+                                                                                                    <input type="datetime-local" class="form-control" name="clocked_in_at" value="{{ $clock->clocked_in_at ? \Carbon\Carbon::parse($clock->clocked_in_at)->format('Y-m-d\TH:i') : '' }}">
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="col-lg-12">
+                                                                                                <div class="form-group">
+                                                                                                    <label class="form-label">Clock Out</label>
+                                                                                                    <input type="datetime-local" class="form-control" name="clocked_out_at" value="{{ $clock->clocked_out_at ? \Carbon\Carbon::parse($clock->clocked_out_at)->format('Y-m-d\TH:i') : '' }}">
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="modal-footer d-flex justify-content-between">
+                                                                                            <button type="button" class="btn btn-danger" onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this job clock?')) document.getElementById('delete-clock-{{ $clock->id }}').submit();">Delete</button>
+                                                                                            <div>
+                                                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </form>
+                                                                                    <form id="delete-clock-{{ $clock->id }}" action="{{ route('admin.lead.service.clock.delete', $clock->id) }}" method="POST" style="display: none;">
+                                                                                        @csrf
+                                                                                        @method('DELETE')
+                                                                                    </form>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                 @endforeach
                                                             </tbody>
                                                         </table>
@@ -1856,59 +2021,9 @@
                                                         <p class="text-muted mb-3">No clock entries yet.</p>
                                                     @endif
 
-                                                    {{-- Active / Clock-In Form --}}
-                                                    @php $runningClock = $slot->clocks->whereNull('clocked_out_at')->first(); @endphp
-
-                                                    @if($runningClock)
-                                                        <div class="border rounded p-3 bg-light mb-3">
-                                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                                <div>
-                                                                    @php $badge = $badgeMap[$runningClock->type] ?? 'bg-secondary'; @endphp
-                                                                    <span class="badge {{ $badge }} fs-6 px-3 py-2">{{ ucwords($runningClock->type) }}</span>
-                                                                    <span class="ms-2 text-muted small">Started: {{ $runningClock->clocked_in_at }}</span>
-                                                                </div>
-                                                                <small class="text-muted">
-                                                                    ⏱ Since Clock In:
-                                                                    <strong><span data-clockin-time="{{ $runningClock->clocked_in_at }}"></span></strong>
-                                                                </small>
-                                                            </div>
-                                                            <div class="d-flex justify-content-end">
-                                                                <form action="{{ route('admin.lead.service.clock_out') }}" method="POST">
-                                                                    @csrf
-                                                                    <input type="hidden" name="slot_id" value="{{ $slot->id }}">
-                                                                    <input type="hidden" name="type" value="{{ $runningClock->type }}">
-                                                                    <button type="submit" class="btn btn-danger">
-                                                                        <i class="fas fa-stop-circle me-1"></i>
-                                                                        Clock Out — {{ ucwords($runningClock->type) }}
-                                                                    </button>
-                                                                </form>
-                                                            </div>
-                                                        </div>
-                                                    @else
-                                                        <form action="{{ route('admin.lead.service.clock_in') }}" method="POST" class="clock-in-form" data-vehicles="{{ json_encode($slot->vehicles->map(fn($v) => ['id' => $v->id, 'name' => $v->name ?? $v->plate_number ?? 'Vehicle #'.$v->id])) }}">
-                                                            @csrf
-                                                            <input type="hidden" name="slot_id" value="{{ $slot->id }}" class="clock-in-slot-id">
-                                                            <div class="d-flex gap-2 align-items-center">
-                                                                <select class="form-select clock-type-select" name="type" required>
-                                                                    <option value="">-- Select Type --</option>
-                                                                    <option value="service">Service</option>
-                                                                    <option value="travel">Travel</option>
-                                                                    <option value="break">Break</option>
-                                                                    <option value="office work">Office Work</option>
-                                                                    <option value="warehouse">Warehouse</option>
-                                                                    <option value="training">Training</option>
-                                                                    <option value="service prep">Service Prep</option>
-                                                                    <option value="umc">UMC</option>
-                                                                </select>
-                                                                <button type="submit" class="btn btn-success px-4 text-nowrap">
-                                                                    <i class="fas fa-play-circle me-1"></i> Clock In
-                                                                </button>
-                                                            </div>
-                                                        </form>
-                                                    @endif
                                                 </div>
 
-                                                {{-- Technicians --}}
+                                                {{-- Technicians 
                                                 <div class="section-card">
                                                     <div class="section-header mb-3">
                                                         <h5 class="section-title">Technicians</h5>
@@ -1944,6 +2059,7 @@
                                                         <p class="text-muted mb-0">No technicians assigned.</p>
                                                     @endif
                                                 </div>
+                                                --}}
 
                                                 {{-- Stats --}}
                                                 @php
@@ -1959,7 +2075,7 @@
                                                     <div class="section-header mb-3">
                                                         <h5 class="section-title">Stats</h5>
                                                     </div>
-                                                    <div class="mt-3 pt-3 d-flex gap-4 flex-wrap">
+                                                    <!-- <div class="mt-3 pt-3 d-flex gap-4 flex-wrap">
                                                         <small class="text-muted">People Percentage: <strong>{{ $peoplePct }}%</strong></small>
                                                         <small class="text-muted">Invoice: <strong>${{ number_format($invoiceAmt, 2) }}</strong></small>
                                                         <small class="text-muted">Scheduled Hours: <strong>{{ $slot->scheduled_hours }}</strong></small>
@@ -1968,6 +2084,161 @@
                                                         <small class="text-muted">Travel Hours: <strong>{{ $travelHours }}</strong></small>
                                                         <small class="text-muted">Break Hours: <strong>{{ $breakHours }}</strong></small>
                                                         <small class="text-muted">Cost: <strong>${{ number_format($totalCost, 2) }}</strong></small>
+                                                    </div> -->
+                                                    @php
+                                                        // Calculate Dynamic Summary
+                                                        $travelDurationMinutes = 0;
+                                                        $serviceDurationMinutes = 0;
+
+                                                        foreach ($slot->clocks as $clock) {
+                                                            if ($clock->clocked_in_at && $clock->clocked_out_at) {
+                                                                $in = \Carbon\Carbon::parse($clock->clocked_in_at);
+                                                                $out = \Carbon\Carbon::parse($clock->clocked_out_at);
+                                                                $diff = $in->diffInMinutes($out);
+                                                                
+                                                                if (strtolower($clock->type) === 'travel') {
+                                                                    $travelDurationMinutes += $diff;
+                                                                } elseif (strtolower($clock->type) === 'service') {
+                                                                    $serviceDurationMinutes += $diff;
+                                                                }
+                                                            }
+                                                        }
+
+                                                        $calcTravelHours = round($travelDurationMinutes / 60, 2);
+                                                        $calcServiceHours = round($serviceDurationMinutes / 60, 2);
+
+                                                        $techCount = $slot->staff->count();
+                                                        
+                                                        $totalTravelHours = $calcTravelHours * $techCount;
+                                                        $totalServiceHours = $calcServiceHours * $techCount;
+
+                                                        $travelPrice = $totalTravelHours * 25;
+                                                        
+                                                        // Service Price = Invoice Amount ÷ Estimated Cost
+                                                        $servicePrice = $totalCost > 0 ? ($invoiceAmt / $totalCost) : 0;
+                                                    @endphp
+
+                                                    <div class="mt-4 row">
+                                                        <div class="col-lg-6 mb-4">
+                                                            <div class="table-responsive">
+                                                                <table class="table table-bordered table-hover equipment-report-table bg-white">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Calendar Slot</th>
+                                                                            <th class="text-end">Travel Bill</th>
+                                                                            <th class="text-end">Service Bill</th>
+                                                                            <th class="text-end">Tech Count</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>{{ \Carbon\Carbon::parse($slot->scheduled_start_time)->format('m/d/y H:i') }}</td>
+                                                                            <td class="text-end">{{ number_format($calcTravelHours, 2) }}</td>
+                                                                            <td class="text-end">{{ number_format($calcServiceHours, 2) }}</td>
+                                                                            <td class="text-end">{{ number_format($techCount, 2) }}</td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-6 mb-4">
+                                                            <div class="table-responsive">
+                                                                <table class="table table-bordered table-hover equipment-report-table bg-white">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th></th>
+                                                                            <th class="text-end">Hours</th>
+                                                                            <th class="text-end">Price</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>Total Travel</td>
+                                                                            <td class="text-end">{{ number_format($totalTravelHours, 2) }}</td>
+                                                                            <td class="text-end">{{ number_format($travelPrice, 2) }}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Total Service</td>
+                                                                            <td class="text-end">{{ number_format($totalServiceHours, 2) }}</td>
+                                                                            <td class="text-end">{{ number_format($servicePrice, 2) }}</td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {{-- JobClock Audit Log --}}
+                                                <div class="section-card mt-4">
+                                                    <div class="section-header mb-3">
+                                                        <h5 class="section-title">JobClock Audit Log</h5>
+                                                    </div>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered table-hover equipment-report-table bg-white mb-0">
+                                                            <thead class="table-light">
+                                                                <tr>
+                                                                    <th>Action</th>
+                                                                    <th>State</th>
+                                                                    <th>Clock Type</th>
+                                                                    <th>Leader</th>
+                                                                    <th>Start</th>
+                                                                    <th>End</th>
+                                                                    <th>Changed By</th>
+                                                                    <th>Changed On</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @php
+                                                                    $auditLogs = \App\Models\JobClockAuditLog::with(['clock.clockedBy', 'user'])
+                                                                        ->whereIn('slot_clock_id', $slot->clocks()->withTrashed()->pluck('id'))
+                                                                        ->orderBy('created_at', 'desc')
+                                                                        ->get();
+                                                                @endphp
+                                                                @forelse($auditLogs as $log)
+                                                                    @if(strtolower($log->action) === 'edit' || strtolower($log->action) === 'update')
+                                                                        <!-- New State -->
+                                                                        <tr>
+                                                                            <td>update</td>
+                                                                            <td>new</td>
+                                                                            <td>{{ ucwords($log->new_type) }}</td>
+                                                                            <td>{{ $log->clock->clockedBy->name ?? 'N/A' }}</td>
+                                                                            <td>{{ $log->new_clocked_in_at ? \Carbon\Carbon::parse($log->new_clocked_in_at)->format('Y-m-d H:i') : '' }}</td>
+                                                                            <td>{{ $log->new_clocked_out_at ? \Carbon\Carbon::parse($log->new_clocked_out_at)->format('Y-m-d H:i') : '' }}</td>
+                                                                            <td>{{ $log->user->name ?? 'System' }}</td>
+                                                                            <td>{{ $log->created_at->format('Y-m-d H:i:s') }}</td>
+                                                                        </tr>
+                                                                        <!-- Old State -->
+                                                                        <tr>
+                                                                            <td>update</td>
+                                                                            <td>old</td>
+                                                                            <td>{{ ucwords($log->old_type) }}</td>
+                                                                            <td>{{ $log->clock->clockedBy->name ?? 'N/A' }}</td>
+                                                                            <td>{{ $log->old_clocked_in_at ? \Carbon\Carbon::parse($log->old_clocked_in_at)->format('Y-m-d H:i') : '' }}</td>
+                                                                            <td>{{ $log->old_clocked_out_at ? \Carbon\Carbon::parse($log->old_clocked_out_at)->format('Y-m-d H:i') : '' }}</td>
+                                                                            <td>{{ $log->user->name ?? 'System' }}</td>
+                                                                            <td>{{ $log->created_at->format('Y-m-d H:i:s') }}</td>
+                                                                        </tr>
+                                                                    @elseif(strtolower($log->action) === 'delete')
+                                                                        <!-- Deleted State -->
+                                                                        <tr>
+                                                                            <td>delete</td>
+                                                                            <td>old</td>
+                                                                            <td>{{ ucwords($log->old_type) }}</td>
+                                                                            <td>{{ $log->clock->clockedBy->name ?? 'N/A' }}</td>
+                                                                            <td>{{ $log->old_clocked_in_at ? \Carbon\Carbon::parse($log->old_clocked_in_at)->format('Y-m-d H:i') : '' }}</td>
+                                                                            <td>{{ $log->old_clocked_out_at ? \Carbon\Carbon::parse($log->old_clocked_out_at)->format('Y-m-d H:i') : '' }}</td>
+                                                                            <td>{{ $log->user->name ?? 'System' }}</td>
+                                                                            <td>{{ $log->created_at->format('Y-m-d H:i:s') }}</td>
+                                                                        </tr>
+                                                                    @endif
+                                                                @empty
+                                                                    <tr>
+                                                                        <td colspan="8" class="text-center text-muted py-3">No audit logs found.</td>
+                                                                    </tr>
+                                                                @endforelse
+                                                            </tbody>
+                                                        </table>
                                                     </div>
                                                 </div>
 

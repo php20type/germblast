@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ServiceOrderSlotClock extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'service_order_slot_clocks';
 
     protected $fillable = [
@@ -33,10 +36,9 @@ class ServiceOrderSlotClock extends Model
     public function calculateHours(): float
     {
         if ($this->clocked_in_at && $this->clocked_out_at) {
-            return round(
-                $this->clocked_in_at->diffInMinutes($this->clocked_out_at) / 60,
-                2
-            );
+            $in = \Carbon\Carbon::parse($this->clocked_in_at);
+            $out = \Carbon\Carbon::parse($this->clocked_out_at);
+            return round($in->diffInMinutes($out) / 60, 2);
         }
         return 0;
     }
@@ -51,4 +53,8 @@ class ServiceOrderSlotClock extends Model
         return $this->belongsTo(User::class, 'driver_user_id');
     }
 
+    public function auditLogs()
+    {
+        return $this->hasMany(JobClockAuditLog::class, 'slot_clock_id');
+    }
 }

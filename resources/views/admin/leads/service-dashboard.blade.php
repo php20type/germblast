@@ -1025,31 +1025,7 @@
                                                             @endif
                                                         </div>
 
-                                                        {{-- Stats --}}
-                                                        @php
-                                                            $totalClocked = $slot->clocks->sum('clocked_hours');
-                                                            $serviceHours = $slot->clocks->where('type', 'service')->sum('clocked_hours');
-                                                            $travelHours = $slot->clocks->where('type', 'travel')->sum('clocked_hours');
-                                                            $breakHours = $slot->clocks->where('type', 'break')->sum('clocked_hours');
-                                                            $invoiceAmt = $order->service->price_per_service ?? 0;
-                                                            $totalCost = $slot->staff->sum('cost');
-                                                            $peoplePct = $invoiceAmt > 0 ? round(($totalCost / $invoiceAmt) * 100) : 0;
-                                                        @endphp
-                                                        <div class="section-card">
-                                                            <div class="section-header mb-3">
-                                                                <h5 class="section-title">Stats</h5>
-                                                            </div>
-                                                            <div class="mt-3 pt-3 d-flex gap-4 flex-wrap">
-                                                                <small class="text-muted">People Percentage: <strong>{{ $peoplePct }}%</strong></small>
-                                                                <small class="text-muted">Invoice: <strong>${{ number_format($invoiceAmt, 2) }}</strong></small>
-                                                                <small class="text-muted">Scheduled Hours: <strong>{{ $slot->scheduled_hours }}</strong></small>
-                                                                <small class="text-muted">Total Clocked Hours: <strong>{{ $totalClocked }}</strong></small>
-                                                                <small class="text-muted">Service Hours: <strong>{{ $serviceHours }}</strong></small>
-                                                                <small class="text-muted">Travel Hours: <strong>{{ $travelHours }}</strong></small>
-                                                                <small class="text-muted">Break Hours: <strong>{{ $breakHours }}</strong></small>
-                                                                <small class="text-muted">Cost: <strong>${{ number_format($totalCost, 2) }}</strong></small>
-                                                            </div>
-                                                        </div>
+
 
                                                     </div>
                                                 @endforeach

@@ -923,6 +923,73 @@ class ServiceController extends Controller
         );
     }
 
+    public function updateClock(Request $request, $clockId)
+    {
+        $request->validate([
+            'type'           => 'required|in:service,travel,break,office work,warehouse,training,service prep,umc',
+            'clocked_in_at'  => 'nullable|date',
+            'clocked_out_at' => 'nullable|date|after_or_equal:clocked_in_at',
+        ]);
+
+        $clock = \App\Models\ServiceOrderSlotClock::findOrFail($clockId);
+
+        // Store original values for audit logging
+        $oldType = $clock->type;
+        $oldClockedInAt = $clock->clocked_in_at;
+        $oldClockedOutAt = $clock->clocked_out_at;
+
+        $clock->type = $request->type;
+        $clock->clocked_in_at = $request->clocked_in_at;
+        $clock->clocked_out_at = $request->clocked_out_at;
+        
+        $clock->save();
+
+        if ($clock->clocked_in_at && $clock->clocked_out_at) {
+            $clock->clocked_hours = $clock->calculateHours();
+            $clock->save();
+        } else {
+            $clock->clocked_hours = null;
+            $clock->save();
+        }
+
+        // Record audit log
+        \App\Models\JobClockAuditLog::create([
+            'slot_clock_id' => $clock->id,
+            'action' => 'Edit',
+            'old_type' => $oldType,
+            'new_type' => $clock->type,
+            'old_clocked_in_at' => $oldClockedInAt,
+            'new_clocked_in_at' => $clock->clocked_in_at,
+            'old_clocked_out_at' => $oldClockedOutAt,
+            'new_clocked_out_at' => $clock->clocked_out_at,
+            'user_id' => auth()->id(),
+        ]);
+
+        return redirect()->back()->with('success', 'Job clock updated successfully.');
+    }
+
+    public function deleteClock($clockId)
+    {
+        $clock = \App\Models\ServiceOrderSlotClock::findOrFail($clockId);
+
+        // Record audit log BEFORE deleting
+        \App\Models\JobClockAuditLog::create([
+            'slot_clock_id' => $clock->id,
+            'action' => 'Delete',
+            'old_type' => $clock->type,
+            'new_type' => null,
+            'old_clocked_in_at' => $clock->clocked_in_at,
+            'new_clocked_in_at' => null,
+            'old_clocked_out_at' => $clock->clocked_out_at,
+            'new_clocked_out_at' => null,
+            'user_id' => auth()->id(),
+        ]);
+
+        $clock->delete();
+
+        return redirect()->back()->with('success', 'Job clock deleted successfully.');
+    }
+
         public function calendar()
     {
         return view('admin.calendar.index');

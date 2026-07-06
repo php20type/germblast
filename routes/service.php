@@ -41,6 +41,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
         Route::post('service/clock-in',  [ServiceController::class, 'clockIn'])->name('service.clock_in');
         Route::post('service/clock-out', [ServiceController::class, 'clockOut'])->name('service.clock_out');
+        Route::post('service/clock/{clockId}/update', [ServiceController::class, 'updateClock'])->name('service.clock.update');
+        Route::delete('service/clock/{clockId}/delete', [ServiceController::class, 'deleteClock'])->name('service.clock.delete');
 
         Route::get('service/fulfill-order/{orderId}', [ServiceController::class, 'fulfillOrder'])->name('service.fulfill_order');
         Route::post('service/fulfill-order/{orderId}/book', [ServiceController::class, 'fulfillOrder_book'])->name('service.fulfill_order.book');

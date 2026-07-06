@@ -435,4 +435,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(EmployeeReward::class, 'user_id');
     }
+
+    public function jobClockAuditLogs()
+    {
+        return $this->hasMany(JobClockAuditLog::class, 'user_id');
+    }
 }
