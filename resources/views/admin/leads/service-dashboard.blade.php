@@ -275,6 +275,10 @@
                                     type="button" role="tab" aria-controls="summary" aria-selected="false">
                                     Summary
                                 </button>
+                                <button class="nav-link" id="consumables-tab" data-bs-toggle="tab" data-bs-target="#consumables"
+                                    type="button" role="tab" aria-controls="consumables" aria-selected="false">
+                                    Consumables
+                                </button>
                                 <button class="nav-link" id="schedule-tab" data-bs-toggle="tab" data-bs-target="#schedule"
                                     type="button" role="tab" aria-controls="schedule" aria-selected="false">
                                     Schedule
@@ -461,60 +465,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- Consumables Section -->
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="section-card">
-                                                <div class="section-header d-flex justify-content-between align-items-center mb-3">
-                                                    <h5 class="section-title">Consumables (Pre-Service Initial Counts)</h5>
-                                                </div>
-                                                <form class="pre-checklist-consumables-form" id="preChecklistConsumablesForm">
-                                                    @csrf
-                                                    <div class="table-responsive">
-                                                        <table class="table table-hover equipment-report-table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Item</th>
-                                                                    <th>Pre-Service Quantity</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @foreach ([
-                                                                        'microfiber_bins' => 'Microfiber Bins',
-                                                                        'disposable_microfiber' => 'Disposable Microfiber (Count Packs, Not Cloths)',
-                                                                        'atp_swabs' => 'ATP Swabs',
-                                                                        'gallons_water' => 'Gallons of Water',
-                                                                        'gallons_d2' => 'Gallons of D2',
-                                                                        'bottles_oxivir' => 'Bottles of Oxivir Concentrate',
-                                                                        'bottles_shield' => 'Bottles of Shield Concentrate',
-                                                                        'gallons_opticide' => 'Gallons of Opticide',
-                                                                        'gallons_halomist' => 'Gallons of Halomist (Gallons in Halomist Units)',
-                                                                        'gallons_sterifab' => 'Gallons of Sterifab',
-                                                                        'boxes_gloves' => 'Boxes of Gloves',
-                                                                        'monster_mop_fibers' => 'Monster Mop Fibers'
-                                                                    ] as $key => $label)
-                                                                        <tr>
-                                                                            <td class="align-middle fw-semibold" style="width: 60%;">{{ $label }}</td>
-                                                                            <td>
-                                                                                <input type="number" step="any" min="0" 
-                                                                                    name="pre_checklist_consumables[{{ $key }}]" 
-                                                                                    class="form-control form-control-sm text-center" 
-                                                                                    value="{{ $order->pre_checklist_consumables[$key] ?? 0 }}">
-                                                                            </td>
-                                                                        </tr>
-                                                                @endforeach
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                    <div class="text-end mt-3">
-                                                        <button type="submit" class="btn btn-primary btn-sm save-pre-consumables-btn">
-                                                            <i class="fas fa-save me-1"></i> Save Pre-Service Consumables
-                                                        </button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
+
 
                                     <!-- Service Plan Section -->
                                     <div class="row">
@@ -778,6 +729,65 @@
                                          </div>
                                      </div>
                                  </div>
+
+                                <!-- Consumables Tab -->
+                                <div class="tab-pane fade" id="consumables" role="tabpanel" aria-labelledby="consumables-tab">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="section-card">
+                                                <div class="section-header d-flex justify-content-between align-items-center mb-3">
+                                                    <h5 class="section-title">Consumables</h5>
+                                                </div>
+                                                <form class="consumables-form" id="consumablesForm">
+                                                    @csrf
+                                                    <div class="table-responsive">
+                                                        <table class="table table-hover equipment-report-table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Item</th>
+                                                                    <th>Quantity</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach ([
+                                                                        'microfiber_bins' => 'Microfiber Bins',
+                                                                        'disposable_microfiber' => 'Disposable Microfiber',
+                                                                        'atp_swabs' => 'ATP Swabs',
+                                                                        'water' => 'Water',
+                                                                        'oxivir' => 'Oxivir',
+                                                                        'opticide' => 'Opticide',
+                                                                        'halomist' => 'Halomist',
+                                                                        'gloves' => 'Gloves',
+                                                                        'sterifab' => 'Sterifab',
+                                                                        'd2' => 'D2',
+                                                                        'shield' => 'Shield',
+                                                                        'rinse_aid' => 'Rinse Aid',
+                                                                        'wash_cleaner' => 'Wash Cleaner',
+                                                                        'rust_inhibitor' => 'Rust Inhibitor'
+                                                                    ] as $key => $label)
+                                                                        <tr>
+                                                                            <td class="align-middle fw-semibold" style="width: 60%;">{{ $label }}</td>
+                                                                            <td>
+                                                                                <input type="number" step="any" min="0" 
+                                                                                    name="consumables[{{ $key }}]" 
+                                                                                    class="form-control form-control-sm text-center" 
+                                                                                    value="{{ $order->consumables[$key] ?? 0 }}">
+                                                                            </td>
+                                                                        </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div class="text-end mt-3">
+                                                        <button type="submit" class="btn btn-primary btn-sm save-consumables-btn">
+                                                            <i class="fas fa-save me-1"></i> Save Consumables
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <!-- Schedule Tab -->
                                 <div class="tab-pane fade" id="schedule" role="tabpanel" aria-labelledby="schedule-tab">
@@ -1774,64 +1784,7 @@
                                 <div class="tab-pane fade" id="post-checklist" role="tabpanel"
                                     aria-labelledby="post-checklist-tab">
                                     
-                                    <!-- Consumables Section -->
-                                    <div class="row mt-3">
-                                        <div class="col-md-12">
-                                            <div class="section-card">
-                                                <div class="section-header d-flex justify-content-between align-items-center mb-3">
-                                                    <h5 class="section-title">Consumables (Post-Service Remaining Counts)</h5>
-                                                </div>
-                                                <form class="post-checklist-consumables-form" id="postChecklistConsumablesForm">
-                                                    @csrf
-                                                    <div class="table-responsive">
-                                                        <table class="table table-hover equipment-report-table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Item</th>
-                                                                    <th class="text-center" style="width: 20%;">Pre-Service Qty</th>
-                                                                    <th class="text-center" style="width: 20%;">Post-Service Qty</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @foreach ([
-                                                                    'microfiber_bins' => 'Microfiber Bins',
-                                                                    'disposable_microfiber' => 'Disposable Microfiber (Count Packs, Not Cloths)',
-                                                                    'atp_swabs' => 'ATP Swabs',
-                                                                    'gallons_water' => 'Gallons of Water',
-                                                                    'gallons_d2' => 'Gallons of D2',
-                                                                    'bottles_oxivir' => 'Bottles of Oxivir Concentrate',
-                                                                    'bottles_shield' => 'Bottles of Shield Concentrate',
-                                                                    'gallons_opticide' => 'Gallons of Opticide',
-                                                                    'gallons_halomist' => 'Gallons of Halomist (Gallons in Halomist Units)',
-                                                                    'gallons_sterifab' => 'Gallons of Sterifab',
-                                                                    'boxes_gloves' => 'Boxes of Gloves',
-                                                                    'monster_mop_fibers' => 'Monster Mop Fibers'
-                                                                ] as $key => $label)
-                                                                    <tr>
-                                                                        <td class="align-middle fw-semibold" style="width: 60%;">{{ $label }}</td>
-                                                                        <td class="align-middle text-center font-monospace" style="font-size: 14px; background-color: #fdfaf2; color: #b58900; font-weight: bold;">
-                                                                            {{ floatval($order->pre_checklist_consumables[$key] ?? 0) }}
-                                                                        </td>
-                                                                        <td>
-                                                                            <input type="number" step="any" min="0" 
-                                                                                name="post_checklist_consumables[{{ $key }}]" 
-                                                                                class="form-control form-control-sm text-center" 
-                                                                                value="{{ $order->post_checklist_consumables[$key] ?? 0 }}">
-                                                                        </td>
-                                                                    </tr>
-                                                                @endforeach
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                    <div class="text-end mt-3">
-                                                        <button type="submit" class="btn btn-primary btn-sm save-post-consumables-btn">
-                                                            <i class="fas fa-save me-1"></i> Save Post-Service Consumables
-                                                        </button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
+
 
                                     <!-- Plan Debrief Section -->
                                     <div class="row">
@@ -2107,6 +2060,34 @@
             });
 
             // ==============================
+            // Save Consumables
+            // ==============================
+            $(document).on('submit', '#consumablesForm', function (e) {
+                e.preventDefault();
+                const form = $(this);
+                const orderId = {{ $order->id }};
+                
+                $.ajax({
+                    url: "{{ route('admin.lead.service.order.update_consumables', ['orderId' => ':orderId']) }}".replace(':orderId', orderId),
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success('Consumables saved successfully!');
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                        }
+                    },
+                    error: function (xhr) {
+                        toastr.error('Failed to save consumables');
+                    }
+                });
+            });
+
+            // ==============================
             // Save Service Plan Narrative
             // ==============================
             $(document).on('submit', '.service-plan-form', function (e) {
@@ -2297,56 +2278,6 @@
                     },
                     error: function (xhr) {
                         toastr.error('Failed to update plan review status');
-                    }
-                });
-            });
-
-            // ==============================
-            // Save Pre-Service Consumables
-            // ==============================
-            $(document).on('submit', '#preChecklistConsumablesForm', function (e) {
-                e.preventDefault();
-                const form = $(this);
-                const orderId = {{ $order->id }};
-
-                $.ajax({
-                    url: "{{ route('admin.lead.service.order.update_checklist', ['orderId' => ':orderId']) }}".replace(':orderId', orderId),
-                    type: 'POST',
-                    data: form.serialize(),
-                    success: function (response) {
-                        if (response.success) {
-                            toastr.success('Pre-service consumables saved successfully!');
-                        } else {
-                            toastr.error(response.message || 'An error occurred');
-                        }
-                    },
-                    error: function (xhr) {
-                        toastr.error('Failed to save pre-service consumables');
-                    }
-                });
-            });
-
-            // ==============================
-            // Save Post-Service Consumables
-            // ==============================
-            $(document).on('submit', '#postChecklistConsumablesForm', function (e) {
-                e.preventDefault();
-                const form = $(this);
-                const orderId = {{ $order->id }};
-
-                $.ajax({
-                    url: "{{ route('admin.lead.service.order.update_checklist', ['orderId' => ':orderId']) }}".replace(':orderId', orderId),
-                    type: 'POST',
-                    data: form.serialize(),
-                    success: function (response) {
-                        if (response.success) {
-                            toastr.success('Post-service consumables saved successfully!');
-                        } else {
-                            toastr.error(response.message || 'An error occurred');
-                        }
-                    },
-                    error: function (xhr) {
-                        toastr.error('Failed to save post-service consumables');
                     }
                 });
             });

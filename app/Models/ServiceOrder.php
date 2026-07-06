@@ -21,15 +21,13 @@ class ServiceOrder extends Model
         'plan_debrief',
 
         // Checklist consumables
-        'pre_checklist_consumables',
-        'post_checklist_consumables',
+        'consumables',
         'hotel_details',
         'atp_details',
     ];
 
     protected $casts = [
-        'pre_checklist_consumables' => 'array',
-        'post_checklist_consumables' => 'array',
+        'consumables' => 'array',
         'hotel_details' => 'array',
         'atp_details' => 'array',
     ];

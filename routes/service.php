@@ -47,6 +47,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::get('service/fulfill-order/{orderId}', [ServiceController::class, 'fulfillOrder'])->name('service.fulfill_order');
         Route::post('service/fulfill-order/{orderId}/book', [ServiceController::class, 'fulfillOrder_book'])->name('service.fulfill_order.book');
         Route::post('order/{orderId}/update-checklist', [ServiceController::class, 'updateChecklist'])->name('service.order.update_checklist');
+        Route::post('order/{orderId}/update-consumables', [ServiceController::class, 'updateConsumables'])->name('service.order.update_consumables');
         Route::post('order/{orderId}/employee-performance/store', [ServiceController::class, 'storeEmployeePerformance'])->name('service.order.employee_performance.store');
 
         Route::get('service/service-dashboard/{orderId}', [ServiceController::class, 'service_dashboard'])->name('service.service_dashboard');

@@ -1416,24 +1416,6 @@ class ServiceController extends Controller
             $updateData['plan_debrief'] = $request->input('plan_debrief');
         }
 
-        // Update pre_checklist_consumables if provided
-        if ($request->has('pre_checklist_consumables')) {
-            $request->validate([
-                'pre_checklist_consumables' => 'nullable|array',
-                'pre_checklist_consumables.*' => 'nullable|numeric|min:0',
-            ]);
-            $updateData['pre_checklist_consumables'] = $request->input('pre_checklist_consumables');
-        }
-
-        // Update post_checklist_consumables if provided
-        if ($request->has('post_checklist_consumables')) {
-            $request->validate([
-                'post_checklist_consumables' => 'nullable|array',
-                'post_checklist_consumables.*' => 'nullable|numeric|min:0',
-            ]);
-            $updateData['post_checklist_consumables'] = $request->input('post_checklist_consumables');
-        }
-
         // Update the order if there's data to update
         if (!empty($updateData)) {
             $order->update($updateData);
@@ -1449,6 +1431,30 @@ class ServiceController extends Controller
         }
 
         return redirect()->back()->with('success', 'Checklist updated successfully.');
+    }
+
+    public function updateConsumables(Request $request, $orderId)
+    {
+        $order = \App\Models\ServiceOrder::findOrFail($orderId);
+
+        $request->validate([
+            'consumables' => 'nullable|array',
+            'consumables.*' => 'nullable|numeric|min:0',
+        ]);
+
+        $order->update([
+            'consumables' => $request->input('consumables')
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Consumables updated successfully',
+                'order' => $order
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Consumables updated successfully.');
     }
 
     /**
