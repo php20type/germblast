@@ -2004,6 +2004,62 @@
                 @endforeach
             @endif
 
+            // Persist active tab in URL query parameters
+            $(function() {
+                function getQueryParam(name) {
+                    var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+                    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+                }
+
+                function setQueryParam(params) {
+                    var url = new URL(window.location.href);
+                    for (var key in params) {
+                        if (params[key] === null) {
+                            url.searchParams.delete(key);
+                        } else {
+                            url.searchParams.set(key, params[key]);
+                        }
+                    }
+                    history.replaceState(null, null, url.pathname + url.search + url.hash);
+                }
+
+                var activeTab = getQueryParam('tab');
+                var activeSubtab = getQueryParam('subtab');
+
+                if (activeTab) {
+                    var tabBtn = $('[data-bs-target="#' + activeTab + '"], [href="#' + activeTab + '"]');
+                    if (tabBtn.length) {
+                        tabBtn.click();
+                    }
+                }
+                if (activeSubtab) {
+                    var subtabBtn = $('[data-bs-target="#' + activeSubtab + '"], [href="#' + activeSubtab + '"]');
+                    if (subtabBtn.length) {
+                        subtabBtn.click();
+                    }
+                }
+
+                $(document).on('shown.bs.tab', 'button[data-bs-toggle="tab"], a[data-bs-toggle="tab"]', function(e) {
+                    var target = $(e.target).attr('data-bs-target') || $(e.target).attr('href');
+                    if (target) {
+                        var tabId = target.replace('#', '');
+                        var parentPane = $(e.target).closest('.tab-pane');
+                        if (parentPane.length) {
+                            var parentTabId = parentPane.attr('id');
+                            setQueryParam({
+                                'tab': parentTabId,
+                                'subtab': tabId
+                            });
+                        } else {
+                            setQueryParam({
+                                'tab': tabId,
+                                'subtab': null
+                            });
+                        }
+                    }
+                });
+            });
+
             // Live Clock — update all .live-clock and .live-date elements
             function updateClock() {
                 const now = new Date();
