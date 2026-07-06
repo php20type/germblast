@@ -1801,13 +1801,63 @@ class ServiceController extends Controller
     }
     */
 
-    public function saveInvoice(Request $request, $orderId)
+    public function generateInvoice(Request $request, $orderId)
     {
         $order = ServiceOrder::findOrFail($orderId);
 
+        $withInventory = $request->input('with_inventory') == 1;
+
+        $totalAmount = $order->service->price_per_service ?? 0.00;
+
+        $items = [];
+        $items[] = [
+            'type' => 'GermBlast Flat Fee',
+            'qty' => 1,
+            'price' => (float) $totalAmount,
+            'total' => (float) $totalAmount,
+        ];
+
+        if ($withInventory) {
+            $consumablesQty = 0;
+            if (is_array($order->consumables)) {
+                $consumablesQty = array_sum($order->consumables);
+            }
+            if ($consumablesQty <= 0) {
+                $consumablesQty = 1;
+            }
+
+            $items[] = [
+                'type' => 'Service Supplies',
+                'qty' => $consumablesQty,
+                'price' => 0.00,
+                'total' => 0.00,
+            ];
+        }
+
+        $invoice = ServiceOrderInvoice::create([
+            'service_order_id' => $order->id,
+            'invoice_date' => today(),
+            'notes' => 'Thank you for your business!',
+            'line_items' => $items,
+            'total_amount' => $totalAmount,
+            'created_by' => auth()->id(),
+        ]);
+
+        $invoice->update([
+            'invoice_no' => 'INVODR' . str_pad($invoice->id, 3, '0', STR_PAD_LEFT)
+        ]);
+
+        // Update Order Status to Complete
+        $order->update(['status' => 'Complete']);
+
+        return redirect()->back()->with('success', 'Invoice generated successfully and Order marked as Complete.');
+    }
+
+    public function updateInvoice(Request $request, $invoiceId)
+    {
+        $invoice = ServiceOrderInvoice::findOrFail($invoiceId);
+
         $request->validate([
-            'invoice_no' => 'required|string',
-            'due_date' => 'required|date',
             'notes' => 'nullable|string',
             'items' => 'required|array',
             'items.*.type' => 'required|string',
@@ -1828,19 +1878,13 @@ class ServiceController extends Controller
             ];
         }
 
-        $invoice = ServiceOrderInvoice::create([
-            'service_order_id' => $order->id,
-            'invoice_no' => $request->invoice_no,
-            'invoice_date' => today(),
-            'due_date' => $request->due_date,
-            'status' => 'Draft',
+        $invoice->update([
             'notes' => $request->notes,
             'line_items' => $items,
             'total_amount' => $totalAmount,
-            'created_by' => auth()->id(),
         ]);
 
-        return redirect()->route('admin.lead.service.fulfill_order', $order->id)->with('success', 'Invoice generated successfully.');
+        return redirect()->back()->with('success', 'Invoice updated successfully.');
     }
 
     public function shareInvoice(Request $request, $invoiceId)
@@ -1856,18 +1900,9 @@ class ServiceController extends Controller
             return redirect()->back()->with('error', 'Customer does not have a valid email address.');
         }
 
-        if ($invoice->status === 'Cancelled') {
-            if ($request->ajax()) {
-                return response()->json(['success' => false, 'message' => 'Cannot share cancelled invoices.']);
-            }
-            return redirect()->back()->with('error', 'Cannot share cancelled invoices.');
-        }
-
         $invoiceDetails = [
             'invoice_no' => $invoice->invoice_no,
             'invoice_date' => $invoice->invoice_date ? ($invoice->invoice_date instanceof \Carbon\Carbon ? $invoice->invoice_date->format('Y-m-d') : $invoice->invoice_date) : date('Y-m-d'),
-            'due_date' => $invoice->due_date ? ($invoice->due_date instanceof \Carbon\Carbon ? $invoice->due_date->format('Y-m-d') : $invoice->due_date) : date('Y-m-d'),
-            'status' => $invoice->status,
             'notes' => $invoice->notes,
             'items' => $invoice->line_items,
             'total_amount' => $invoice->total_amount,
@@ -1888,9 +1923,8 @@ class ServiceController extends Controller
         // Dispatch SendEmailJob using NotificationService
         $this->notify->shareInvoice($recipientEmail, $order, $invoiceDetails, $attachment);
 
-        // Update status and sent info
+        // Update sent info
         $invoice->update([
-            'status' => 'Sent',
             'sent_by' => auth()->id(),
             'sent_date' => now(),
         ]);
@@ -1913,8 +1947,6 @@ class ServiceController extends Controller
         $invoiceDetails = [
             'invoice_no' => $invoice->invoice_no,
             'invoice_date' => $invoice->invoice_date ? ($invoice->invoice_date instanceof \Carbon\Carbon ? $invoice->invoice_date->format('Y-m-d') : $invoice->invoice_date) : date('Y-m-d'),
-            'due_date' => $invoice->due_date ? ($invoice->due_date instanceof \Carbon\Carbon ? $invoice->due_date->format('Y-m-d') : $invoice->due_date) : date('Y-m-d'),
-            'status' => $invoice->status,
             'notes' => $invoice->notes,
             'items' => $invoice->line_items,
             'total_amount' => $invoice->total_amount,
@@ -1932,8 +1964,6 @@ class ServiceController extends Controller
         $invoiceDetails = [
             'invoice_no' => $invoice->invoice_no,
             'invoice_date' => $invoice->invoice_date ? ($invoice->invoice_date instanceof \Carbon\Carbon ? $invoice->invoice_date->format('Y-m-d') : $invoice->invoice_date) : date('Y-m-d'),
-            'due_date' => $invoice->due_date ? ($invoice->due_date instanceof \Carbon\Carbon ? $invoice->due_date->format('Y-m-d') : $invoice->due_date) : date('Y-m-d'),
-            'status' => $invoice->status,
             'notes' => $invoice->notes,
             'items' => $invoice->line_items,
             'total_amount' => $invoice->total_amount,
@@ -1952,7 +1982,7 @@ class ServiceController extends Controller
             fputcsv($file, ['Invoice Number', $invoiceDetails['invoice_no']]);
             fputcsv($file, ['Order Number', $order->order_no ?? 'N/A']);
             fputcsv($file, ['Invoice Date', $invoiceDetails['invoice_date'] ?? '']);
-            fputcsv($file, ['Due Date', $invoiceDetails['due_date'] ?? '']);
+
 
             fputcsv($file, ['Customer Name', $order->service->lead->company->name ?? 'N/A']);
             fputcsv($file, []); // Empty row
@@ -1984,62 +2014,6 @@ class ServiceController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
-    public function markPaid(Request $request, $invoiceId)
-    {
-        $invoice = ServiceOrderInvoice::findOrFail($invoiceId);
-
-        if ($invoice->status === 'Cancelled') {
-            if ($request->ajax()) {
-                return response()->json(['success' => false, 'message' => 'Cannot mark a cancelled invoice as Paid.']);
-            }
-            return redirect()->back()->with('error', 'Cannot mark a cancelled invoice as Paid.');
-        }
-
-        $invoice->update([
-            'status' => 'Paid',
-            'updated_by' => auth()->id()
-        ]);
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Invoice marked as Paid successfully.'
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Invoice marked as Paid successfully.');
-    }
-
-    public function cancelInvoice(Request $request, $invoiceId)
-    {
-        $invoice = ServiceOrderInvoice::findOrFail($invoiceId);
-
-        $request->validate([
-            'cancellation_reason' => 'required|string|max:1000'
-        ]);
-
-        if ($invoice->status === 'Paid') {
-            if ($request->ajax()) {
-                return response()->json(['success' => false, 'message' => 'Cannot cancel a paid invoice.']);
-            }
-            return redirect()->back()->with('error', 'Cannot cancel a paid invoice.');
-        }
-
-        $invoice->update([
-            'status' => 'Cancelled',
-            'cancellation_reason' => $request->cancellation_reason,
-            'updated_by' => auth()->id()
-        ]);
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Invoice cancelled successfully.'
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Invoice cancelled successfully.');
-    }
 
     public function saveRoomRecord(Request $request, $orderId)
     {

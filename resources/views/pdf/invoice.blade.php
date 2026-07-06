@@ -124,7 +124,7 @@
             <div><strong>Invoice Number:</strong> {{ $invoiceDetails['invoice_no'] ?? '' }}</div>
             <div><strong>Order Number:</strong> {{ $order->order_no ?? 'N/A' }}</div>
             <div><strong>Invoice Date:</strong> {{ \Carbon\Carbon::parse($invoiceDetails['invoice_date'] ?? date('Y-m-d'))->format('M d, Y') }}</div>
-            <div><strong>Due Date:</strong> {{ \Carbon\Carbon::parse($invoiceDetails['due_date'] ?? date('Y-m-d'))->format('M d, Y') }}</div>
+
 
         </div>
         <div class="clear"></div>

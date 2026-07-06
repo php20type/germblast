@@ -14,24 +14,19 @@ class ServiceOrderInvoice extends Model
     protected $fillable = [
         'service_order_id',
         'invoice_no',
-        'invoice_type',
         'invoice_date',
-        'due_date',
-        'status',
         'line_items',   
         'notes',
         'total_amount',
         'created_by',
         'updated_by',
         'sent_by',
-        'sent_date',
-        'cancellation_reason'
+        'sent_date'
     ];
 
     protected $casts = [
         'line_items' => 'array',
         'invoice_date' => 'date:Y-m-d',
-        'due_date' => 'date:Y-m-d',
         'sent_date' => 'datetime'
     ];
 

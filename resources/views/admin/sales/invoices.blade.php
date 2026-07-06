@@ -60,34 +60,7 @@
             border-bottom-right-radius: 12px !important;
         }
 
-        /* Status Badge from Reference */
-        .status-pill {
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 12px;
-            display: inline-block;
-        }
 
-        .status-pill-draft {
-            background: #f3f4f6;
-            color: #4b5563;
-        }
-
-        .status-pill-sent {
-            background: #eef2ff;
-            color: #4f46e5;
-        }
-
-        .status-pill-paid {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .status-pill-cancelled {
-            background: #fee2e2;
-            color: #dc2626;
-        }
 
         /* Action Buttons */
         .action-btn {
@@ -153,9 +126,7 @@
                                             <th>Invoice No</th>
                                             <th>Company</th>
                                             <th>Invoice Date</th>
-                                            <th>Due Date</th>
                                             <th>Total Amount</th>
-                                            <th>Status</th>
                                             <th class="text-center" style="width: 180px;">Downloads</th>
                                         </tr>
                                     </thead>
@@ -183,18 +154,7 @@
                                                     {{ $invoice->invoice_date ? $invoice->invoice_date->format('d M Y') : 'N/A' }}
                                                 </td>
                                                 <td>
-                                                    {{ $invoice->due_date ? $invoice->due_date->format('d M Y') : 'N/A' }}
-                                                </td>
-                                                <td>
                                                     {{ $invoice->total_amount ? '$' . number_format($invoice->total_amount, 2) : '$0.00' }}
-                                                </td>
-                                                <td>
-                                                    @php
-                                                        $statusLower = strtolower($invoice->status ?? 'draft');
-                                                    @endphp
-                                                    <span class="status-pill status-pill-{{ $statusLower }}">
-                                                        {{ $invoice->status ?? 'Draft' }}
-                                                    </span>
                                                 </td>
                                                 <td class="text-center">
                                                     <div class="d-flex justify-content-center gap-2">

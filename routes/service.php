@@ -29,12 +29,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::post('order/{orderId}/notes/add', [ServiceController::class, 'addServiceNote'])->name('service.order.notes.add');
         Route::post('order/{orderId}/inventory/update', [ServiceController::class, 'updateInventory'])->name('service.order.inventory.update');
 
-        Route::post('order/{orderId}/invoice/save', [ServiceController::class, 'saveInvoice'])->name('service.order.invoice.save');
+        Route::post('order/{orderId}/invoice/generate', [ServiceController::class, 'generateInvoice'])->name('service.order.invoice.generate');
+        Route::post('invoice/{invoiceId}/update', [ServiceController::class, 'updateInvoice'])->name('service.order.invoice.update');
         Route::post('invoice/{invoiceId}/share', [ServiceController::class, 'shareInvoice'])->name('service.order.invoice.share');
         Route::get('invoice/{invoiceId}/download/pdf', [ServiceController::class, 'downloadInvoicePdf'])->name('service.order.invoice.download.pdf');
         Route::get('invoice/{invoiceId}/download/csv', [ServiceController::class, 'downloadInvoiceCsv'])->name('service.order.invoice.download.csv');
-        Route::post('invoice/{invoiceId}/mark-paid', [ServiceController::class, 'markPaid'])->name('service.order.invoice.mark_paid');
-        Route::post('invoice/{invoiceId}/cancel', [ServiceController::class, 'cancelInvoice'])->name('service.order.invoice.cancel');
         
         Route::post('outline/{outlineId}/update', [ServiceController::class, 'updateOutlineRange'])->name('service.outline.update');
         Route::post('service/{serviceId}/outline/add', [ServiceController::class, 'addServiceOutline'])->name('service.outline.add');
