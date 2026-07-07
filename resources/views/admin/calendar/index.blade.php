@@ -101,8 +101,11 @@
                                         <span style="background-color:#6c757d; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(108,117,125,0.15);">
                                             ● Pending
                                         </span>
-                                        <span style="background-color:#0d6efd; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(13,110,253,0.15);">
+                                        <span style="background-color:#ffb400; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(255,180,0,0.15);">
                                             ● Scheduled
+                                        </span>
+                                        <span style="background-color:#0d6efd; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(13,110,253,0.15);">
+                                            ● Confirmed
                                         </span>
                                         <span style="background-color:#198754; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(25,135,84,0.15);">
                                             ● Completed
@@ -173,10 +176,9 @@
 
                     const statusColors = {
                         'pending':     '#6c757d',
-                        'scheduled':   '#0d6efd',
-                        'confirmed':   '#0d6efd',
-                        'in_progress': '#0d6efd',
-                        'completed':   '#198754',
+                        'scheduled': '#ffb400',
+                        'confirmed': '#0d6efd',
+                        'completed': '#198754',
                         'cancelled':   '#dc3545',
                     };
                     const color = statusColors[props.status] ?? '#6c757d';

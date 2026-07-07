@@ -61,4 +61,25 @@ class CompanyLocation extends Model
     {
         return $this->hasMany(ServiceOrderSlotFacility::class, 'company_location_id');
     }
+
+    public function getFullAddressAttribute()
+    {
+        $parts = [];
+        if (!empty($this->address_1)) {
+            $parts[] = trim($this->address_1);
+        }
+        if (!empty($this->address_2)) {
+            $parts[] = trim($this->address_2);
+        }
+        if ($this->city && !empty($this->city->name)) {
+            $parts[] = trim($this->city->name);
+        }
+        if ($this->state && !empty($this->state->name)) {
+            $parts[] = trim($this->state->name);
+        }
+        if (!empty($this->zip)) {
+            $parts[] = trim($this->zip);
+        }
+        return implode(', ', $parts);
+    }
 }

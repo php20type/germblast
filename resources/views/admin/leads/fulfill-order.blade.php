@@ -257,7 +257,7 @@
                                         <select name="status" class="status-select" onchange="this.form.submit()" style="width: auto; min-width: 140px;">
                                             <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending</option>
                                             <option value="scheduled" {{ $order->status === 'scheduled' ? 'selected' : '' }}>Scheduled</option>
-                                            <option value="in_progress" {{ $order->status === 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                                            <option value="confirmed" {{ $order->status === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
                                             <option value="completed" {{ $order->status === 'completed' ? 'selected' : '' }}>Completed</option>
                                             <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                                         </select>
@@ -500,7 +500,6 @@
                                                                         <option value="pending" {{ $slot->status === 'pending' ? 'selected' : '' }}>Pending</option>
                                                                         <option value="scheduled" {{ $slot->status === 'scheduled' ? 'selected' : '' }}>Scheduled</option>
                                                                         <option value="confirmed" {{ $slot->status === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                                                                        <option value="in_progress" {{ $slot->status === 'in_progress' ? 'selected' : '' }}>In Progress</option>
                                                                         <option value="completed" {{ $slot->status === 'completed' ? 'selected' : '' }}>Completed</option>
                                                                         <option value="cancelled" {{ $slot->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                                                                     </select>
@@ -935,7 +934,10 @@
                                                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                                                 <span>
                                                                     <i class="fas fa-building me-2 text-muted"></i>
-                                                                    {{ $facility->companyLocation->location_name }}
+                                                                    <strong class="text-dark">{{ $facility->companyLocation->location_name }}</strong>
+                                                                    @if($facility->companyLocation && $facility->companyLocation->full_address)
+                                                                        <span class="text-muted d-block ms-4" style="font-size: 12px;">{{ $facility->companyLocation->full_address }}</span>
+                                                                    @endif
                                                                 </span>
                                                                 <form action="{{ route('admin.lead.service.slot.facility.remove', $facility->id) }}" method="POST" class="d-inline">
                                                                     @csrf
@@ -959,7 +961,7 @@
                                                                 @foreach($companyLocations as $location)
                                                                     {{-- Skip already-added ones --}}
                                                                     @unless($slot->facilities->pluck('company_location_id')->contains($location->id))
-                                                                        <option value="{{ $location->id }}">{{ $location->location_name }}</option>
+                                                                        <option value="{{ $location->id }}">{{ $location->location_name }}{{ $location->full_address ? ' (' . $location->full_address . ')' : '' }}</option>
                                                                     @endunless
                                                                 @endforeach
                                                             </select>
@@ -1028,9 +1030,12 @@
                                                             <p class="fw-semibold mb-2">Facilities</p>
                                                             <div class="d-flex flex-wrap gap-2">
                                                                 @foreach($slot->facilities as $facility)
-                                                                    <div class="border rounded p-2 text-center bg-white" style="min-width: 160px;">
-                                                                        <i class="fas fa-map-marker-alt text-danger mb-1"></i>
-                                                                        <p class="mb-0 small fw-semibold">{{ $facility->companyLocation->location_name ?? '-' }}</p>
+                                                                    <div class="border rounded p-2 text-center bg-white" style="min-width: 160px; max-width: 220px;">
+                                                                        <i class="fas fa-map-marker-alt text-danger mb-1 fs-5"></i>
+                                                                        <p class="mb-0 fw-bold text-dark" style="font-size: 14px;">{{ $facility->companyLocation->location_name ?? '-' }}</p>
+                                                                        @if($facility->companyLocation && $facility->companyLocation->full_address)
+                                                                            <span class="text-muted d-block mt-1" style="font-size: 13px;">{{ $facility->companyLocation->full_address }}</span>
+                                                                        @endif
                                                                     </div>
                                                                 @endforeach
                                                             </div>
@@ -1318,9 +1323,12 @@
                                                         <p class="fw-semibold mb-2">Facilities</p>
                                                         <div class="d-flex flex-wrap gap-2">
                                                             @foreach($slot->facilities as $facility)
-                                                                <div class="border rounded p-2 text-center bg-white" style="min-width: 160px;">
-                                                                    <i class="fas fa-map-marker-alt text-danger mb-1"></i>
-                                                                    <p class="mb-0 small fw-semibold">{{ $facility->companyLocation->location_name ?? '-' }}</p>
+                                                                <div class="border rounded p-2 text-center bg-white" style="min-width: 160px; max-width: 220px;">
+                                                                    <i class="fas fa-map-marker-alt text-danger mb-1 fs-5"></i>
+                                                                    <p class="mb-0 fw-bold text-dark" style="font-size: 14px;">{{ $facility->companyLocation->location_name ?? '-' }}</p>
+                                                                    @if($facility->companyLocation && $facility->companyLocation->full_address)
+                                                                        <span class="text-muted d-block mt-1" style="font-size: 13px;">{{ $facility->companyLocation->full_address }}</span>
+                                                                    @endif
                                                                 </div>
                                                             @endforeach
                                                         </div>
@@ -1908,11 +1916,11 @@
                                                             @if($slot->facilities->count())
                                                                 <div class="d-flex flex-wrap gap-2">
                                                                     @foreach($slot->facilities as $facility)
-                                                                        <div class="border rounded p-2 text-center bg-white" style="min-width: 160px;">
-                                                                            <i class="fas fa-map-marker-alt text-danger mb-1"></i>
-                                                                            <p class="mb-0 small fw-semibold">{{ $facility->companyLocation->location_name ?? '-' }}</p>
-                                                                            @if(!empty($facility->companyLocation->address))
-                                                                                <small class="text-muted d-block mt-1" style="font-size: 11px;">{{ $facility->companyLocation->address }}</small>
+                                                                        <div class="border rounded p-2 text-center bg-white" style="min-width: 160px; max-width: 220px;">
+                                                                            <i class="fas fa-map-marker-alt text-danger mb-1 fs-5"></i>
+                                                                            <p class="mb-0 fw-bold text-dark" style="font-size: 14px;">{{ $facility->companyLocation->location_name ?? '-' }}</p>
+                                                                            @if($facility->companyLocation && $facility->companyLocation->full_address)
+                                                                                <span class="text-muted d-block mt-1" style="font-size: 13px;">{{ $facility->companyLocation->full_address }}</span>
                                                                             @endif
                                                                         </div>
                                                                     @endforeach

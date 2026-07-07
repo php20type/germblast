@@ -882,7 +882,6 @@ class ServiceController extends Controller
 
         $slot->clocks()->create($clockData);
 
-        $slot->serviceOrder->update(['status' => 'in_progress']);
 
         return redirect()->back()->with('success',
             ucfirst($request->type) . ' clock started.'
@@ -1009,7 +1008,6 @@ class ServiceController extends Controller
                 'end'   => $order->intended_date,
                 'color' => match($order->status) {
                     'scheduled'   => '#0d6efd',
-                    'in_progress' => '#ffc107',
                     'completed'   => '#198754',
                     'cancelled'   => '#dc3545',
                     default       => '#6c757d',
@@ -1055,7 +1053,6 @@ class ServiceController extends Controller
                 'color' => match($slot->status) {
                     'scheduled'   => '#ffb81c',
                     'confirmed'   => '#0d6efd',
-                    'in_progress' => '#ffc107',
                     'completed'   => '#198754',
                     'cancelled'   => '#dc3545',
                     default       => '#6c757d',
@@ -1735,7 +1732,7 @@ class ServiceController extends Controller
     public function updateOrderStatus(Request $request, $orderId)
     {
         $request->validate([
-            'status' => 'required|string|in:pending,scheduled,in_progress,completed,cancelled',
+            'status' => 'required|string|in:pending,scheduled,confirmed,completed,cancelled',
         ]);
 
         $order = ServiceOrder::findOrFail($orderId);
@@ -1775,7 +1772,7 @@ class ServiceController extends Controller
     public function updateSlotStatus(Request $request, $slotId)
     {
         $request->validate([
-            'status' => 'required|string|in:pending,scheduled,confirmed,in_progress,completed,cancelled',
+            'status' => 'required|string|in:pending,scheduled,confirmed,completed,cancelled',
         ]);
 
         $slot = ServiceOrderSlot::findOrFail($slotId);
@@ -1785,7 +1782,7 @@ class ServiceController extends Controller
             'status' => $newStatus
         ]);
 
-        if (in_array($newStatus, ['confirmed', 'in_progress'])) {
+        if ($newStatus === 'confirmed') {
             $this->notify->dayOfService($slot);
         }
 

@@ -574,19 +574,39 @@
                                                 <div class="section-header mb-3">
                                                     <h5 class="section-title">Staff</h5>
                                                 </div>
-                                                <label class="form-label">Certified Details</label>
+                                                <label class="form-label">Assigned Staff Members</label>
                                                 <div class="mb-3">
                                                     <table class="table table-sm table-hover equipment-report-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="padding: 10px 15px !important;">Slot</th>
+                                                                <th style="padding: 10px 15px !important;">Staff Member</th>
+                                                                <th style="padding: 10px 15px !important;">Role</th>
+                                                            </tr>
+                                                        </thead>
                                                         <tbody>
-                                                            <tr>
-                                                                <td>Test C</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>Test D</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>Test A</td>
-                                                            </tr>
+                                                            @php $hasStaff = false; @endphp
+                                                            @foreach($order->orderSlots as $slot)
+                                                                @foreach($slot->staff as $staffMember)
+                                                                    @php $hasStaff = true; @endphp
+                                                                    <tr>
+                                                                        <td style="padding: 10px 15px !important;" class="fw-semibold text-primary">Slot #{{ $loop->parent->iteration }}</td>
+                                                                        <td style="padding: 10px 15px !important;" class="fw-semibold text-dark">{{ $staffMember->user->name ?? 'N/A' }}</td>
+                                                                        <td style="padding: 10px 15px !important;">
+                                                                            @if($staffMember->is_leader)
+                                                                                <span class="badge bg-warning text-dark fw-bold" style="font-size: 11px; padding: 4px 8px; border-radius: 4px;">LEADER</span>
+                                                                            @else
+                                                                                <span class="badge bg-light text-secondary border fw-medium" style="font-size: 11px; padding: 4px 8px; border-radius: 4px;">Staff</span>
+                                                                            @endif
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            @endforeach
+                                                            @if(!$hasStaff)
+                                                                <tr>
+                                                                    <td colspan="3" class="text-center text-muted py-3">No staff assigned to this service order slots yet.</td>
+                                                                </tr>
+                                                            @endif
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -846,9 +866,9 @@
                                                                     @if($slot->vehicles->count())
                                                                         <div class="d-flex flex-wrap gap-2">
                                                                             @foreach($slot->vehicles as $vehicle)
-                                                                                <div class="border rounded p-2 text-center bg-white" style="min-width: 160px;">
-                                                                                    <i class="fas fa-car text-danger mb-1"></i>
-                                                                                    <p class="mb-0 small fw-semibold">{{ $vehicle->name ?? $vehicle->plate_number ?? 'Vehicle #' . $vehicle->id }}</p>
+                                                                                <div class="border rounded p-2 text-center bg-white" style="min-width: 160px; max-width: 220px;">
+                                                                                    <i class="fas fa-car text-danger mb-1 fs-5"></i>
+                                                                                    <p class="mb-0 fw-semibold" style="font-size: 14px;">{{ $vehicle->name ?? $vehicle->plate_number ?? 'Vehicle #' . $vehicle->id }}</p>
                                                                                 </div>
                                                                             @endforeach
                                                                         </div>
@@ -865,11 +885,11 @@
                                                                     @if($slot->facilities->count())
                                                                         <div class="d-flex flex-wrap gap-2">
                                                                             @foreach($slot->facilities as $facility)
-                                                                                <div class="border rounded p-2 text-center bg-white" style="min-width: 160px;">
-                                                                                    <i class="fas fa-map-marker-alt text-danger mb-1"></i>
-                                                                                    <p class="mb-0 small fw-semibold">{{ $facility->companyLocation->location_name ?? '-' }}</p>
-                                                                                    @if(!empty($facility->companyLocation->address))
-                                                                                        <small class="text-muted d-block mt-1" style="font-size: 11px;">{{ $facility->companyLocation->address }}</small>
+                                                                                <div class="border rounded p-2 text-center bg-white" style="min-width: 160px; max-width: 220px;">
+                                                                                    <i class="fas fa-map-marker-alt text-danger mb-1 fs-5"></i>
+                                                                                    <p class="mb-0 fw-bold text-dark" style="font-size: 14px;">{{ $facility->companyLocation->location_name ?? '-' }}</p>
+                                                                                    @if($facility->companyLocation && $facility->companyLocation->full_address)
+                                                                                        <span class="text-muted d-block mt-1" style="font-size: 13px;">{{ $facility->companyLocation->full_address }}</span>
                                                                                     @endif
                                                                                 </div>
                                                                             @endforeach
@@ -1093,7 +1113,7 @@
                                                              foreach($order->orderSlots as $slot) {
                                                                  foreach($slot->facilities as $fac) {
                                                                      if ($fac->companyLocation) {
-                                                                         $uniqueLocations->put($fac->companyLocation->id, $fac->companyLocation->location_name);
+                                                                         $uniqueLocations->put($fac->companyLocation->id, $fac->companyLocation->location_name . ($fac->companyLocation->full_address ? ' (' . $fac->companyLocation->full_address . ')' : ''));
                                                                      }
                                                                  }
                                                              }
@@ -1145,7 +1165,7 @@
                                                                      if (!empty($atp['facility_id']) && $atp['facility_id'] !== 'N/A') {
                                                                          $location = \App\Models\CompanyLocation::find($atp['facility_id']);
                                                                          if ($location) {
-                                                                             $facilityName = $location->location_name;
+                                                                             $facilityName = $location->location_name . ($location->full_address ? ' - ' . $location->full_address : '');
                                                                          }
                                                                      }
                                                                      

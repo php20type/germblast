@@ -519,7 +519,7 @@
                                             Legend:
                                             <span class="status-pill status-pill-pending">Pending</span>,
                                             <span class="status-pill status-pill-scheduled">Scheduled</span>,
-                                            <span class="status-pill status-pill-in_progress">In Progress</span>,
+                                            <span class="status-pill status-pill-confirmed">Confirmed</span>,
                                             <span class="status-pill status-pill-completed">Completed</span>,
                                             <span class="status-pill status-pill-cancelled">Cancelled</span>
                                         </p>
@@ -539,7 +539,7 @@
                                                              $rowClass = match($order->status) {
                                                                  'pending'     => 'row-status-pending',
                                                                  'scheduled'   => 'row-status-scheduled',
-                                                                 'in_progress' => 'row-status-in-progress',
+                                                                 'confirmed'   => 'row-status-confirmed',
                                                                  'completed'   => 'row-status-completed',
                                                                  'cancelled'   => 'row-status-cancelled',
                                                                  default       => ''
