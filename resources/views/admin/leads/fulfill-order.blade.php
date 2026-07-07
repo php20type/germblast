@@ -1581,76 +1581,80 @@
                                                 <h4 class="mb-1 text-dark" style="font-weight: 400;">Invoice It</h4>
                                                 <h6 class="mb-4 text-secondary" style="font-weight: 400;">Inventory Breakdown</h6>
 
-                                                <table class="table equipment-report-table">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Item</th>
-                                                            <th style="width: 200px;">Quantity</th>
-                                                            <th style="width: 200px;">Value</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @php
-                                                            $consumablesList = [
-                                                                'disposable_microfiber' => 'Disposable Microfiber',
-                                                                'atp_swabs' => 'ATP Swabs',
-                                                                'water' => 'Water',
-                                                                'oxivir' => 'Oxivir',
-                                                                'opticide' => 'Opticide',
-                                                                'halomist' => 'Halomist',
-                                                                'gloves' => 'Gloves',
-                                                                'sterifab' => 'Sterifab',
-                                                                'd2' => 'D2',
-                                                                'shield' => 'Shield',
-                                                                'rinse_aid' => 'Rinse Aid',
-                                                                'wash_cleaner' => 'Wash Cleaner',
-                                                                'rust_inhibitor' => 'Rust Inhibitor'
-                                                            ];
-                                                        @endphp
-                                                        @foreach($consumablesList as $key => $label)
-                                                            <tr>
-                                                                <td class="align-middle">{{ $label }}</td>
-                                                                <td class="align-middle">{{ $order->consumables[$key] ?? 0 }}</td>
-                                                                <td class="align-middle">$0.00</td>
-                                                            </tr>
-                                                        @endforeach
-                                                        <tr>
-                                                            <td></td>
-                                                            <td class="fw-bold text-dark text-end">Total</td>
-                                                            <td class="fw-bold text-dark">$0.00</td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-
-                                                <div class="mt-4 pt-3">
-                                                    <p class="mb-0 text-dark">Pricing for this order is currently set at: ${{ number_format($order->service->price_per_service ?? 0.00, 2) }}</p>
-                                                    <p class="mb-3 text-dark">If you bill with inventory charges this is what your line items will bill as:</p>
+                                                <form action="{{ route('admin.lead.service.order.invoice.generate', $order->id) }}" method="POST" id="generate-invoice-form">
+                                                    @csrf
                                                     <table class="table equipment-report-table">
-                                                        <tbody>
+                                                        <thead>
                                                             <tr>
-                                                                <td class="align-middle text-dark">GermBlast</td>
-                                                                <td class="align-middle text-dark text-end">${{ number_format($order->service->price_per_service ?? 0.00, 2) }}</td>
+                                                                <th>Item</th>
+                                                                <th style="width: 150px;">Quantity</th>
+                                                                <th style="width: 150px;">Price per Unit</th>
+                                                                <th style="width: 150px;" class="text-end">Value</th>
                                                             </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @php
+                                                                $consumablesList = [
+                                                                    'disposable_microfiber' => 'Disposable Microfiber',
+                                                                    'atp_swabs' => 'ATP Swabs',
+                                                                    'water' => 'Water',
+                                                                    'oxivir' => 'Oxivir',
+                                                                    'opticide' => 'Opticide',
+                                                                    'halomist' => 'Halomist',
+                                                                    'gloves' => 'Gloves',
+                                                                    'sterifab' => 'Sterifab',
+                                                                    'd2' => 'D2',
+                                                                    'shield' => 'Shield',
+                                                                    'rinse_aid' => 'Rinse Aid',
+                                                                    'wash_cleaner' => 'Wash Cleaner',
+                                                                    'rust_inhibitor' => 'Rust Inhibitor'
+                                                                ];
+                                                            @endphp
+                                                            @foreach($consumablesList as $key => $label)
+                                                                @php
+                                                                    $qty = $order->consumables[$key] ?? 0;
+                                                                @endphp
+                                                                <tr>
+                                                                    <td class="align-middle">{{ $label }}</td>
+                                                                    <td class="align-middle text-center">{{ $qty }}</td>
+                                                                    <td class="align-middle">
+                                                                        <div class="input-group input-group-sm">
+                                                                            <span class="input-group-text">$</span>
+                                                                            <input type="number" name="consumable_prices[{{ $key }}]" class="form-control consumable-price" data-qty="{{ $qty }}" value="0.00" min="0" step="0.01">
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="align-middle text-end fw-semibold consumable-value-text">$0.00</td>
+                                                                </tr>
+                                                            @endforeach
                                                             <tr>
-                                                                <td class="align-middle text-dark">Service Supplies</td>
-                                                                <td class="align-middle text-dark text-end">$0.00</td>
+                                                                <td colspan="3" class="fw-bold text-dark text-end">Total Service Supplies:</td>
+                                                                <td class="fw-bold text-dark text-end">$<span id="inventory-total-value">0.00</span></td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
-                                                </div>
 
-                                                <div class="d-flex gap-3 mt-4 pt-3">
-                                                    <form action="{{ route('admin.lead.service.order.invoice.generate', $order->id) }}" method="POST">
-                                                        @csrf
-                                                        <input type="hidden" name="with_inventory" value="1">
-                                                        <button type="submit" class="btn btn-success">Invoice With Inventory Billing</button>
-                                                    </form>
-                                                    <form action="{{ route('admin.lead.service.order.invoice.generate', $order->id) }}" method="POST">
-                                                        @csrf
-                                                        <input type="hidden" name="with_inventory" value="0">
-                                                        <button type="submit" class="btn btn-primary">Invoice Without Inventory Billing</button>
-                                                    </form>
-                                                </div>
+                                                    <div class="mt-4 pt-3">
+                                                        <p class="mb-0 text-dark">Pricing for this order is currently set at: ${{ number_format($order->service->price_per_service ?? 0.00, 2) }}</p>
+                                                        <p class="mb-3 text-dark">If you bill with inventory charges this is what your line items will bill as:</p>
+                                                        <table class="table equipment-report-table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td class="align-middle text-dark">GermBlast</td>
+                                                                    <td class="align-middle text-dark text-end">${{ number_format($order->service->price_per_service ?? 0.00, 2) }}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="align-middle text-dark">Service Supplies</td>
+                                                                    <td class="align-middle text-dark text-end">$<span id="summary-service-supplies">0.00</span></td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+
+                                                    <div class="d-flex gap-3 mt-4 pt-3">
+                                                        <button type="submit" name="with_inventory" value="1" class="btn btn-success">Invoice With Inventory Billing</button>
+                                                        <button type="submit" name="with_inventory" value="0" class="btn btn-primary">Invoice Without Inventory Billing</button>
+                                                    </div>
+                                                </form>
                                             </div>
                                         @else
                                         <h5 class="section-title mb-4">Invoices</h5>
@@ -3153,5 +3157,30 @@
             }
         });
     });
+    // ==========================================
+    // Dynamic Inventory Breakdown Calculation
+    // ==========================================
+    function calculateInventoryBreakdown() {
+        let total = 0;
+        $('.consumable-price').each(function() {
+            const qty = parseFloat($(this).data('qty')) || 0;
+            const price = parseFloat($(this).val()) || 0;
+            const subtotal = qty * price;
+            
+            // Update individual row text
+            $(this).closest('tr').find('.consumable-value-text').text('$' + subtotal.toFixed(2));
+            
+            total += subtotal;
+        });
+
+        const formattedTotal = total.toFixed(2);
+        $('#inventory-total-value').text(formattedTotal);
+        $('#summary-service-supplies').text(formattedTotal);
+    }
+
+    $(document).on('input', '.consumable-price', function() {
+        calculateInventoryBreakdown();
+    });
+
 </script>
 @endpush

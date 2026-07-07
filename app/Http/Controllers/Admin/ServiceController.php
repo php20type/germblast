@@ -1819,19 +1819,33 @@ class ServiceController extends Controller
 
         if ($withInventory) {
             $consumablesQty = 0;
+            $consumablesTotalValue = 0.00;
+
             if (is_array($order->consumables)) {
                 $consumablesQty = array_sum($order->consumables);
+                $prices = $request->input('consumable_prices', []);
+                
+                foreach ($order->consumables as $key => $qty) {
+                    $price = isset($prices[$key]) ? (float)$prices[$key] : 0.00;
+                    $consumablesTotalValue += ($qty * $price);
+                }
             }
+
             if ($consumablesQty <= 0) {
                 $consumablesQty = 1;
             }
 
+            // Since it's a single line item, we just make the price = total_value / qty to keep the math valid on the invoice line item, OR just set price to total and qty to 1.
+            // Let's just set the price to the total value and qty to 1 so the invoice looks completely clean!
             $items[] = [
                 'type' => 'Service Supplies',
-                'qty' => $consumablesQty,
-                'price' => 0.00,
-                'total' => 0.00,
+                'qty' => 1,
+                'price' => round($consumablesTotalValue, 2),
+                'total' => round($consumablesTotalValue, 2),
             ];
+
+            // Make sure the total amount of the whole invoice includes the service supplies
+            $totalAmount += round($consumablesTotalValue, 2);
         }
 
         $invoice = ServiceOrderInvoice::create([
