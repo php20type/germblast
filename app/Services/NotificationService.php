@@ -14,7 +14,7 @@ class NotificationService
 
     public function __construct()
     {
-        $this->sendEmail = true;
+        $this->sendEmail = false;
         $this->sendSMS = false;
     }
 
