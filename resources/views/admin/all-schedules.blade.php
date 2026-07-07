@@ -275,7 +275,7 @@
                                                         </td>
                                                         <td><span class="badge bg-secondary text-white rounded-pill px-2 py-1">{{ round($slot->scheduled_hours ?? 0, 2) }} hours</span></td>
                                                         <td>
-                                                            <a href="{{ route('admin.lead.service.fulfill_order', $order->id) }}"
+                                                            <a href="{{ route('admin.lead.service.service_dashboard', $order->id) }}"
                                                                class="btn btn-sm btn-export px-3" style="font-size:0.78rem;">
                                                                 View Details
                                                             </a>

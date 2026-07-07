@@ -186,7 +186,7 @@
                             <tbody>
                                 <tr style="border-bottom: 1px solid #e5e7eb;">
                                     <th style="background-color: #fafafa; padding: 12px 15px; font-size: 13px; font-weight: 600; width: 40%;">Order No</th>
-                                    <td style="padding: 12px 15px; font-size: 13px;"><a href="${props.fulfill_url}" class="fw-bold text-decoration-none" style="color: #ffb400;">${props.order_no ?? '-'}</a></td>
+                                    <td style="padding: 12px 15px; font-size: 13px;"><a href="${props.service_dashboard_url}" class="fw-bold text-decoration-none" style="color: #ffb400;">${props.order_no ?? '-'}</a></td>
                                 </tr>
                                 <tr style="border-bottom: 1px solid #e5e7eb;">
                                     <th style="background-color: #fafafa; padding: 12px 15px; font-size: 13px; font-weight: 600;">Service</th>

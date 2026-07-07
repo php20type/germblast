@@ -195,7 +195,7 @@
 
                                                     {{-- COMPANY LINK --}}
                                                     <div class="fw-bold text-dark mb-1" style="font-size: 12px; line-height: 1.3;">
-                                                        <a href="{{ route('admin.lead.service.fulfill_order', $slot->serviceOrder->id) }}"
+                                                        <a href="{{ route('admin.lead.service.service_dashboard', $slot->serviceOrder->id) }}"
                                                             class="company-link text-primary hover-underline">
                                                             {{ $slot->serviceOrder->service->lead->company->name ?? '-' }}
                                                         </a>
@@ -203,7 +203,7 @@
 
                                                     {{-- SERVICE ORDER HYPERLINK --}}
                                                     <div class="mb-2" style="font-size: 13px;">
-                                                        <a href="{{ route('admin.lead.service.fulfill_order', $slot->serviceOrder->id) }}"
+                                                        <a href="{{ route('admin.lead.service.service_dashboard', $slot->serviceOrder->id) }}"
                                                             class="company-link text-primary hover-underline fw-bold">
                                                             <i class="fas fa-file-invoice me-1"></i>Service Order #{{ $slot->serviceOrder->order_no ?? $slot->serviceOrder->id }}
                                                         </a>

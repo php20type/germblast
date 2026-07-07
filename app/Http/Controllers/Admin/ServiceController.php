@@ -1023,7 +1023,7 @@ class ServiceController extends Controller
                     'price'        => $order->service->price_per_service ?? '-',
                     'status'       => $order->status,
                     'scheduled_start_time' => $order->orderSlots->first()?->scheduled_start_time,
-                    'fulfill_url'  => route('admin.lead.service.fulfill_order', $order->id),
+                    'service_dashboard_url'  => route('admin.lead.service.service_dashboard', $order->id),
                 ],
             ];
         });
@@ -1069,7 +1069,7 @@ class ServiceController extends Controller
                     'price'        => $order->service->price_per_service ?? '-',
                     'status'       => $slot->status ?? 'pending',
                     'scheduled_start_time' => $slot->scheduled_start_time,
-                    'fulfill_url'  => route('admin.lead.service.fulfill_order', $order->id),
+                    'service_dashboard_url'  => route('admin.lead.service.service_dashboard', $order->id),
                 ],
             ];
         });

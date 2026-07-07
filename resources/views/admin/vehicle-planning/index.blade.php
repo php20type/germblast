@@ -195,7 +195,7 @@
 
                                                     {{-- COMPANY LINK --}}
                                                     <div class="fw-bold text-dark mb-1" style="font-size: 14px; line-height: 1.3;">
-                                                        <a href="{{ route('admin.lead.service.fulfill_order', $slot->serviceOrder->id) }}"
+                                                        <a href="{{ route('admin.lead.service.service_dashboard', $slot->serviceOrder->id) }}"
                                                             class="company-link text-primary hover-underline">
                                                             {{ $slot->serviceOrder->service->lead->company->name ?? '-' }}
                                                         </a>

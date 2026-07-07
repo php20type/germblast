@@ -547,7 +547,7 @@
                                                          @endphp
                                                          <tr class="{{ $rowClass }} small">
                                                             <td>
-                                                                <a href="{{ route('admin.lead.service.fulfill_order', $order->id) }}" class="text-decoration-none text-primary">
+                                                                <a href="{{ route('admin.lead.service.service_dashboard', $order->id) }}" class="text-decoration-none text-primary">
                                                                     Order ID: {{ $order->order_no }}
                                                                 </a>
                                                                 <div class="mt-1">
