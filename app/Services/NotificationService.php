@@ -504,8 +504,8 @@ class NotificationService
         if (!$order) return;
         $service = $order->service ?? null;
 
-        // Fetch sales team users
-        $salesTeam = \App\Models\User::all()->filter(fn($u) => $u->isSalesTeam());
+        // Fetch sales managers and sales reps
+        $salesTeam = \App\Models\User::all()->filter(fn($u) => $u->isSalesManager() || $u->isSalesRepresentative());
 
         foreach ($salesTeam as $member) {
             if ($this->sendEmail && $member->email) {

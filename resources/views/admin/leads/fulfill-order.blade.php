@@ -1054,11 +1054,33 @@
                                                                     @php
                                                                         $isLeader = $staffMember->is_leader ?? false;
                                                                         $cardClass = $isLeader ? 'border-warning bg-warning bg-opacity-10' : 'bg-success bg-opacity-25';
+
+                                                                        $tech = $staffMember->user;
+                                                                        $slotDate = \Carbon\Carbon::parse($slot->scheduled_start_time);
+                                                                        $startOfWeek = $slotDate->copy()->startOfWeek(\Carbon\Carbon::SUNDAY);
+                                                                        $endOfWeek = $slotDate->copy()->endOfWeek(\Carbon\Carbon::SATURDAY);
+
+                                                                        $weeklySlots = \App\Models\ServiceOrderSlot::whereHas('staff', function($q) use ($tech) {
+                                                                                $q->where('user_id', $tech->id);
+                                                                            })
+                                                                            ->whereBetween('scheduled_start_time', [$startOfWeek, $endOfWeek])
+                                                                            ->get();
+                                                                            
+                                                                        $weeklyHours = $weeklySlots->sum('scheduled_hours');
+                                                                        $hrs = floor($weeklyHours);
+                                                                        $mins = round(($weeklyHours - $hrs) * 60);
+                                                                        $formattedHours = sprintf('%02d:%02d', $hrs, $mins);
+
+                                                                        $otherSlots = $weeklySlots->filter(function($s) use ($slotDate, $slot) {
+                                                                            return \Carbon\Carbon::parse($s->scheduled_start_time)->format('Y-m-d') === $slotDate->format('Y-m-d')
+                                                                                && $s->id !== $slot->id;
+                                                                        });
+
                                                                     @endphp
                                                                     <div class="d-flex justify-content-between align-items-center border rounded p-2 mb-2 {{ $cardClass }}">
                                                                         <div>
                                                                             <span class="fw-semibold small">
-                                                                                {{ $staffMember->user->name }}
+                                                                                {{ $tech->name }} | {{ $formattedHours }} |
                                                                                 @if($isLeader)
                                                                                     <span class="badge bg-warning text-dark ms-1" style="font-size: 10px; font-weight: 700;">
                                                                                         LEADER
@@ -1066,9 +1088,20 @@
                                                                                 @endif
                                                                             </span><br>
                                                                             <small class="text-muted">{{ $staffMember->slot_hours }} hrs</small>
-                                                                            @php $roles = implode(' | ', $staffMember->user->specialties); @endphp
-                                                                            @if($roles)
-                                                                                <br><small class="text-muted">{{ $roles }}</small>
+                                                                            @php $roles = implode(' | ', $tech->specialties); @endphp
+                                                                            
+                                                                            @if($otherSlots->count() > 0)
+                                                                                <span class="d-block mt-1 text-muted" style="font-size:11px;">
+                                                                                    Booked: 
+                                                                                    @foreach($otherSlots as $os)
+                                                                                        {{ \Carbon\Carbon::parse($os->scheduled_start_time)->format('h:iA') }} - {{ \Carbon\Carbon::parse($os->scheduled_end_time)->format('h:iA') }}@if(!$loop->last), @endif
+                                                                                    @endforeach
+                                                                                    @if($roles) | {{ $roles }} @endif
+                                                                                </span>
+                                                                            @else
+                                                                                @if($roles)
+                                                                                    <br><small class="text-muted">{{ $roles }}</small>
+                                                                                @endif
                                                                             @endif
                                                                         </div>
                                                                         <div class="d-flex align-items-center gap-2">
@@ -1146,9 +1179,33 @@
                                                                             <p class="text-muted small fw-semibold mb-2">Leaders</p>
                                                                             @foreach($staffForTerritory['leader'] as $tech)
                                                                                 @if(!in_array($tech->id, $assignedUserIds))
-                                                                                    @php $roles = implode(' | ', $tech->specialties); @endphp
+                                                                                    @php
+                                                                                        $roles = implode(' | ', $tech->specialties);
+                                                                                        $slotDate = \Carbon\Carbon::parse($slot->scheduled_start_time);
+                                                                                        $startOfWeek = $slotDate->copy()->startOfWeek(\Carbon\Carbon::SUNDAY);
+                                                                                        $endOfWeek = $slotDate->copy()->endOfWeek(\Carbon\Carbon::SATURDAY);
+
+                                                                                        $weeklySlots = \App\Models\ServiceOrderSlot::whereHas('staff', function($q) use ($tech) {
+                                                                                                $q->where('user_id', $tech->id);
+                                                                                            })
+                                                                                            ->whereBetween('scheduled_start_time', [$startOfWeek, $endOfWeek])
+                                                                                            ->get();
+                                                                                            
+                                                                                        $weeklyHours = $weeklySlots->sum('scheduled_hours');
+                                                                                        $hrs = floor($weeklyHours);
+                                                                                        $mins = round(($weeklyHours - $hrs) * 60);
+                                                                                        $formattedHours = sprintf('%02d:%02d', $hrs, $mins);
+
+                                                                                        $otherSlots = $weeklySlots->filter(function($s) use ($slotDate, $slot) {
+                                                                                            return \Carbon\Carbon::parse($s->scheduled_start_time)->format('Y-m-d') === $slotDate->format('Y-m-d')
+                                                                                                && $s->id !== $slot->id;
+                                                                                        });
+
+                                                                                        $bgColor = '#4caf50';
+                                                                                        $textColor = 'text-white';
+                                                                                    @endphp
                                                                                     <div class="d-flex justify-content-between align-items-center rounded p-2 mb-1"
-                                                                                        style="background-color: #4caf50;">
+                                                                                        style="background-color: {{ $bgColor }};">
                                                                                         <div class="d-flex align-items-center gap-2">
                                                                                             <input type="checkbox"
                                                                                                 class="form-check-input mt-0"
@@ -1156,9 +1213,18 @@
                                                                                                 value="{{ $tech->id }}"
                                                                                                 id="staff-{{ $slot->id }}-{{ $tech->id }}">
                                                                                             <label for="staff-{{ $slot->id }}-{{ $tech->id }}"
-                                                                                                class="text-white small mb-0" style="cursor:pointer;">
-                                                                                                {{ $tech->name }}
-                                                                                                @if($roles) &nbsp;|&nbsp; {{ $roles }} @endif
+                                                                                                class="{{ $textColor }} small mb-0" style="cursor:pointer;">
+                                                                                                {{ $tech->name }} | {{ $formattedHours }} |
+                                                                                                @if($otherSlots->count() > 0)
+                                                                                                    <span class="d-block mt-1" style="font-size:11px;">
+                                                                                                        @foreach($otherSlots as $os)
+                                                                                                            {{ \Carbon\Carbon::parse($os->scheduled_start_time)->format('h:iA') }} - {{ \Carbon\Carbon::parse($os->scheduled_end_time)->format('h:iA') }}@if(!$loop->last), @endif
+                                                                                                        @endforeach
+                                                                                                        @if($roles) {{ $roles }} @endif
+                                                                                                    </span>
+                                                                                                @else
+                                                                                                    @if($roles) <span class="d-block mt-1" style="font-size:11px;">{{ $roles }}</span> @endif
+                                                                                                @endif
                                                                                             </label>
                                                                                         </div>
                                                                                         <button type="button"
@@ -1178,9 +1244,33 @@
                                                                             <p class="text-muted small fw-semibold mt-3 mb-2">Technicians</p>
                                                                             @foreach($staffForTerritory['technician'] as $tech)
                                                                                 @if(!in_array($tech->id, $assignedUserIds))
-                                                                                    @php $roles = implode(' | ', $tech->specialties); @endphp
+                                                                                    @php
+                                                                                        $roles = implode(' | ', $tech->specialties);
+                                                                                        $slotDate = \Carbon\Carbon::parse($slot->scheduled_start_time);
+                                                                                        $startOfWeek = $slotDate->copy()->startOfWeek(\Carbon\Carbon::SUNDAY);
+                                                                                        $endOfWeek = $slotDate->copy()->endOfWeek(\Carbon\Carbon::SATURDAY);
+
+                                                                                        $weeklySlots = \App\Models\ServiceOrderSlot::whereHas('staff', function($q) use ($tech) {
+                                                                                                $q->where('user_id', $tech->id);
+                                                                                            })
+                                                                                            ->whereBetween('scheduled_start_time', [$startOfWeek, $endOfWeek])
+                                                                                            ->get();
+                                                                                            
+                                                                                        $weeklyHours = $weeklySlots->sum('scheduled_hours');
+                                                                                        $hrs = floor($weeklyHours);
+                                                                                        $mins = round(($weeklyHours - $hrs) * 60);
+                                                                                        $formattedHours = sprintf('%02d:%02d', $hrs, $mins);
+
+                                                                                        $otherSlots = $weeklySlots->filter(function($s) use ($slotDate, $slot) {
+                                                                                            return \Carbon\Carbon::parse($s->scheduled_start_time)->format('Y-m-d') === $slotDate->format('Y-m-d')
+                                                                                                && $s->id !== $slot->id;
+                                                                                        });
+
+                                                                                        $bgColor = '#4caf50';
+                                                                                        $textColor = 'text-white';
+                                                                                    @endphp
                                                                                     <div class="d-flex justify-content-between align-items-center rounded p-2 mb-1"
-                                                                                        style="background-color: #4caf50;">
+                                                                                        style="background-color: {{ $bgColor }};">
                                                                                         <div class="d-flex align-items-center gap-2">
                                                                                             <input type="checkbox"
                                                                                                 class="form-check-input mt-0"
@@ -1188,9 +1278,18 @@
                                                                                                 value="{{ $tech->id }}"
                                                                                                 id="staff-{{ $slot->id }}-{{ $tech->id }}">
                                                                                             <label for="staff-{{ $slot->id }}-{{ $tech->id }}"
-                                                                                                class="text-white small mb-0" style="cursor:pointer;">
-                                                                                                {{ $tech->name }}
-                                                                                                @if($roles) &nbsp;|&nbsp; {{ $roles }} @endif
+                                                                                                class="{{ $textColor }} small mb-0" style="cursor:pointer;">
+                                                                                                {{ $tech->name }} | {{ $formattedHours }} |
+                                                                                                @if($otherSlots->count() > 0)
+                                                                                                    <span class="d-block mt-1" style="font-size:11px;">
+                                                                                                        @foreach($otherSlots as $os)
+                                                                                                            {{ \Carbon\Carbon::parse($os->scheduled_start_time)->format('h:iA') }} - {{ \Carbon\Carbon::parse($os->scheduled_end_time)->format('h:iA') }}@if(!$loop->last), @endif
+                                                                                                        @endforeach
+                                                                                                        @if($roles) {{ $roles }} @endif
+                                                                                                    </span>
+                                                                                                @else
+                                                                                                    @if($roles) <span class="d-block mt-1" style="font-size:11px;">{{ $roles }}</span> @endif
+                                                                                                @endif
                                                                                             </label>
                                                                                         </div>
                                                                                         <button type="button"
@@ -1210,9 +1309,33 @@
                                                                             <p class="text-muted small fw-semibold mt-3 mb-2">Corporate</p>
                                                                             @foreach($staffForTerritory['corporate'] as $tech)
                                                                                 @if(!in_array($tech->id, $assignedUserIds))
-                                                                                    @php $roles = implode(' | ', $tech->specialties); @endphp
+                                                                                    @php
+                                                                                        $roles = implode(' | ', $tech->specialties);
+                                                                                        $slotDate = \Carbon\Carbon::parse($slot->scheduled_start_time);
+                                                                                        $startOfWeek = $slotDate->copy()->startOfWeek(\Carbon\Carbon::SUNDAY);
+                                                                                        $endOfWeek = $slotDate->copy()->endOfWeek(\Carbon\Carbon::SATURDAY);
+
+                                                                                        $weeklySlots = \App\Models\ServiceOrderSlot::whereHas('staff', function($q) use ($tech) {
+                                                                                                $q->where('user_id', $tech->id);
+                                                                                            })
+                                                                                            ->whereBetween('scheduled_start_time', [$startOfWeek, $endOfWeek])
+                                                                                            ->get();
+                                                                                            
+                                                                                        $weeklyHours = $weeklySlots->sum('scheduled_hours');
+                                                                                        $hrs = floor($weeklyHours);
+                                                                                        $mins = round(($weeklyHours - $hrs) * 60);
+                                                                                        $formattedHours = sprintf('%02d:%02d', $hrs, $mins);
+
+                                                                                        $otherSlots = $weeklySlots->filter(function($s) use ($slotDate, $slot) {
+                                                                                            return \Carbon\Carbon::parse($s->scheduled_start_time)->format('Y-m-d') === $slotDate->format('Y-m-d')
+                                                                                                && $s->id !== $slot->id;
+                                                                                        });
+
+                                                                                        $bgColor = '#4caf50';
+                                                                                        $textColor = 'text-white';
+                                                                                    @endphp
                                                                                     <div class="d-flex justify-content-between align-items-center rounded p-2 mb-1"
-                                                                                        style="background-color: #4caf50;">
+                                                                                        style="background-color: {{ $bgColor }};">
                                                                                         <div class="d-flex align-items-center gap-2">
                                                                                             <input type="checkbox"
                                                                                                 class="form-check-input mt-0"
@@ -1220,9 +1343,18 @@
                                                                                                 value="{{ $tech->id }}"
                                                                                                 id="staff-{{ $slot->id }}-{{ $tech->id }}">
                                                                                             <label for="staff-{{ $slot->id }}-{{ $tech->id }}"
-                                                                                                class="text-white small mb-0" style="cursor:pointer;">
-                                                                                                {{ $tech->name }}
-                                                                                                @if($roles) &nbsp;|&nbsp; {{ $roles }} @endif
+                                                                                                class="{{ $textColor }} small mb-0" style="cursor:pointer;">
+                                                                                                {{ $tech->name }} | {{ $formattedHours }} |
+                                                                                                @if($otherSlots->count() > 0)
+                                                                                                    <span class="d-block mt-1" style="font-size:11px;">
+                                                                                                        @foreach($otherSlots as $os)
+                                                                                                            {{ \Carbon\Carbon::parse($os->scheduled_start_time)->format('h:iA') }} - {{ \Carbon\Carbon::parse($os->scheduled_end_time)->format('h:iA') }}@if(!$loop->last), @endif
+                                                                                                        @endforeach
+                                                                                                        @if($roles) {{ $roles }} @endif
+                                                                                                    </span>
+                                                                                                @else
+                                                                                                    @if($roles) <span class="d-block mt-1" style="font-size:11px;">{{ $roles }}</span> @endif
+                                                                                                @endif
                                                                                             </label>
                                                                                         </div>
                                                                                         <button type="button"
@@ -2541,13 +2673,18 @@
     <div class="modal fade" id="userSlotsModal">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5>User Monthly Schedule</h5>
+                <div class="modal-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0">User Weekly Schedule</h5>
+                        <small class="text-muted" id="userSlotsWeek"></small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <table class="table table-hover equipment-report-table">
                         <thead>
                             <tr>
+                                <th>Company</th>
                                 <th>Office</th>
                                 <th>Start time</th>
                                 <th>End time</th>
@@ -2737,12 +2874,13 @@
         }, function (res) {
             let html = '';
 
-            if (res.length === 0) {
-                html = `<tr><td colspan="4" class="text-center">No bookings</td></tr>`;
+            if (res.slots.length === 0) {
+                html = `<tr><td colspan="5" class="text-center">No bookings</td></tr>`;
             } else {
-                res.forEach(row => {
+                res.slots.forEach(row => {
                     html += `
                         <tr>
+                            <td>${row.company}</td>
                             <td>${row.office}</td>
                             <td>${row.start_time}</td>
                             <td>${row.end_time}</td>
@@ -2753,6 +2891,8 @@
             }
 
             $('#userSlotsBody').html(html);
+            $('#userSlotsWeek').text('Week: ' + res.week_range);
+            $('#userSlotsTotalHours').text(res.total_hours);
             $('#userSlotsModal').modal('show');
         });
     });

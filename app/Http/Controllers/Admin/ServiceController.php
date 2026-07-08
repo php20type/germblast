@@ -604,27 +604,39 @@ class ServiceController extends Controller
 
         $date = \Carbon\Carbon::parse($request->date);
 
-        // Month range
-        $startOfMonth = $date->copy()->startOfMonth();
-        $endOfMonth   = $date->copy()->endOfMonth();
+        // Week range based on the scheduled slot date being viewed
+        $startOfWeek = $date->copy()->startOfWeek(\Carbon\Carbon::SUNDAY);
+        $endOfWeek   = $date->copy()->endOfWeek(\Carbon\Carbon::SATURDAY);
 
         $slots = ServiceOrderSlot::whereHas('staff', function ($q) use ($request) {
                 $q->where('user_id', $request->user_id);
             })
-            ->whereBetween('scheduled_start_time', [$startOfMonth, $endOfMonth])
-            ->with('office')
+            ->whereBetween('scheduled_start_time', [$startOfWeek, $endOfWeek])
+            ->with(['office', 'serviceOrder.service.lead.company'])
             ->orderBy('scheduled_start_time')
             ->get()
             ->map(function ($slot) {
+                $companyName = 'N/A';
+                if ($slot->serviceOrder && $slot->serviceOrder->service && $slot->serviceOrder->service->lead && $slot->serviceOrder->service->lead->company) {
+                    $companyName = $slot->serviceOrder->service->lead->company->name;
+                }
+
                 return [
+                    'company'     => $companyName,
                     'office'      => $slot->office->name ?? 'N/A',
-                    'start_time'  => \Carbon\Carbon::parse($slot->scheduled_start_time)->format('d M Y h:i A'),
-                    'end_time'    => \Carbon\Carbon::parse($slot->scheduled_end_time)->format('d M Y h:i A'),
+                    'start_time'  => \Carbon\Carbon::parse($slot->scheduled_start_time)->format('m/d/y h:i A'),
+                    'end_time'    => \Carbon\Carbon::parse($slot->scheduled_end_time)->format('m/d/y h:i A'),
                     'hours'       => $slot->scheduled_hours,
                 ];
             });
 
-        return response()->json($slots);
+        $totalHours = $slots->sum('hours');
+
+        return response()->json([
+            'slots' => $slots,
+            'total_hours' => $totalHours,
+            'week_range' => $startOfWeek->format('m/d/y') . ' - ' . $endOfWeek->format('m/d/y')
+        ]);
     }
 
     public function assignStaff(Request $request, $slotId)
