@@ -148,12 +148,61 @@
                             </div>
                             <div class="col-lg-12">
                                 <div class="form-group">
-                                    <label class="form-label">Address</label>
-                                    <span class="text-danger">*</span>
-                                    <input type="text" name="address" placeholder="Company address"
-                                        class="form-control" />
+                                    <label class="form-label">Location Name</label>
+                                    <input type="text" name="location_name" class="form-control" placeholder="Eg. Head Office, Warehouse, Branch A">
                                 </div>
                             </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Address Line 1</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="text" name="address_1" class="form-control" placeholder="Street address">
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Address Line 2</label>
+                                    <input type="text" name="address_2" class="form-control" placeholder="Suite, floor, unit (optional)">
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Country</label>
+                                    <span class="text-danger">*</span>
+                                    <select name="country_id" class="form-select select2 country_select">
+                                        <option value="">Select Country</option>
+                                        @foreach ($countries as $country)
+                                            <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">State</label>
+                                    <span class="text-danger">*</span>
+                                    <select name="state_id" class="form-select select2 state_select">
+                                        <option value="">Select State</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">City</label>
+                                    <span class="text-danger">*</span>
+                                    <select name="city_id" class="form-select select2 city_select">
+                                        <option value="">Select City</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Zip Code</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="text" name="zip" class="form-control" placeholder="Postal / Zip code">
+                                </div>
+                            </div>
+
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Person</label>
@@ -318,11 +367,61 @@
                             </div>
                             <div class="col-lg-12">
                                 <div class="form-group">
-                                    <label class="form-label">Address</label>
-                                    <span class="text-danger">*</span>
-                                    <textarea name="address" id="address" class="form-control" placeholder="Your address..."></textarea>
+                                    <label class="form-label">Location Name</label>
+                                    <input type="text" name="location_name" class="form-control" placeholder="Eg. Head Office, Warehouse, Branch A">
                                 </div>
                             </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Address Line 1</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="text" name="address_1" class="form-control" placeholder="Street address">
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Address Line 2</label>
+                                    <input type="text" name="address_2" class="form-control" placeholder="Suite, floor, unit (optional)">
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Country</label>
+                                    <span class="text-danger">*</span>
+                                    <select name="country_id" class="form-select select2 country_select">
+                                        <option value="">Select Country</option>
+                                        @foreach ($countries as $country)
+                                            <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">State</label>
+                                    <span class="text-danger">*</span>
+                                    <select name="state_id" class="form-select select2 state_select">
+                                        <option value="">Select State</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">City</label>
+                                    <span class="text-danger">*</span>
+                                    <select name="city_id" class="form-select select2 city_select">
+                                        <option value="">Select City</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Zip Code</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="text" name="zip" class="form-control" placeholder="Postal / Zip code">
+                                </div>
+                            </div>
+
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">URL</label>
@@ -920,7 +1019,42 @@
                     allowClear: true
 
                 });
+            });
 
+            $('#AddCompany').on('shown.bs.modal', function() {
+                $(this).find('.country_select').select2({
+                    dropdownParent: $('#AddCompany'),
+                    placeholder: 'Select Country',
+                    allowClear: true
+                });
+                $(this).find('.state_select').select2({
+                    dropdownParent: $('#AddCompany'),
+                    placeholder: 'Select State',
+                    allowClear: true
+                });
+                $(this).find('.city_select').select2({
+                    dropdownParent: $('#AddCompany'),
+                    placeholder: 'Select City',
+                    allowClear: true
+                });
+            });
+
+            $('#AddPerson').on('shown.bs.modal', function() {
+                $(this).find('.country_select').select2({
+                    dropdownParent: $('#AddPerson'),
+                    placeholder: 'Select Country',
+                    allowClear: true
+                });
+                $(this).find('.state_select').select2({
+                    dropdownParent: $('#AddPerson'),
+                    placeholder: 'Select State',
+                    allowClear: true
+                });
+                $(this).find('.city_select').select2({
+                    dropdownParent: $('#AddPerson'),
+                    placeholder: 'Select City',
+                    allowClear: true
+                });
             });
 
             $('#AddActivity').on('shown.bs.modal', function() {
@@ -1680,6 +1814,7 @@
             });
 
         });
+
     </script>
 
 
@@ -1784,6 +1919,7 @@
             );
 
         });
+
     </script>
 
     <script>
@@ -1812,5 +1948,48 @@
             // in case an option is pre-selected (though not required by your current form)
             updateRelatedType();
         });
+
+    </script>
+
+    <script>
+    $(document).ready(function() {
+        // Address cascades for Add Location structures
+        $('.country_select').on('change', function() {
+            let countryId = $(this).val();
+            let modal = $(this).closest('.modal');
+            let stateSelect = modal.find('.state_select');
+            let citySelect = modal.find('.city_select');
+
+            stateSelect.empty().append('<option value="">Select State</option>').prop('disabled', true).trigger('change');
+            citySelect.empty().append('<option value="">Select City</option>').prop('disabled', true).trigger('change');
+
+            if (!countryId) return;
+            $.get(`/states/` + countryId, function(states) {
+                stateSelect.prop('disabled', false);
+                $.each(states, function(i, state) {
+                    stateSelect.append(`<option value="` + state.state_id + `">` + state.name + `</option>`);
+                });
+            });
+        });
+
+        $('.state_select').on('change', function() {
+            let stateId = $(this).val();
+            let modal = $(this).closest('.modal');
+            let citySelect = modal.find('.city_select');
+
+            citySelect.empty().append('<option value="">Select City</option>').prop('disabled', true).trigger('change');
+            if (!stateId) return;
+            $.get(`/cities/` + stateId, function(cities) {
+                citySelect.prop('disabled', false);
+                $.each(cities, function(i, city) {
+                    citySelect.append(`<option value="` + city.id + `">` + city.name + `</option>`);
+                });
+            });
+        });
+    });
     </script>
 @endpush
+
+
+
+

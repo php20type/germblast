@@ -359,7 +359,7 @@
                         </td>
                         <td style="width:50%; vertical-align:top;">
                             <strong>{{ $survey->company->name }}</strong><br>
-                            {{ $survey->company->companyAddress->address ?? '' }}<br>
+                            {{ $survey->company->locations->first()->full_address ?? '' }}<br>
                             {{ $survey->company->companyPhone->phone ?? '' }}
                         </td>
                     </tr>

@@ -106,7 +106,7 @@
                         <!-- Map Section -->
                         <div class="map-container">
                             @php
-                                $mapAddress = !empty($addresses) ? $addresses[0]['value'] : '';
+                                $mapAddress = $company->locations->first()->full_address ?? '';
                             @endphp
                             @if($mapAddress)
                                 <iframe
@@ -1544,98 +1544,7 @@
 
                             <hr>
 
-                            {{-- Add Address Option --}}
-                            <div class="sidebar-section" id="address">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h6 class="form-label">ADDRESS</h6>
-                                    @can('company.detail.edit')
-                                        <div class="text-warning small toggle-inline-address" style="cursor: pointer;">
-                                            Add/Update Address
-                                        </div>
-                                    @endcan
-                                </div>
 
-                                <div class="col-12 inline-detail-input">
-                                    <div class="row g-2" id="address-list">
-                                        @forelse($addresses as $address)
-                                            <div class="col-12 mb-2">
-                                                <div class="row g-2">
-                                                    <!-- Type Selector -->
-                                                    <div class="col-md-4">
-                                                        <select name="address_type[]" class="form-control" disabled>
-                                                            @foreach ($addressTypes as $field => $label)
-                                                                <option value="{{ $field }}"
-                                                                    {{ $address['selected'] === $field ? 'selected' : '' }}>
-                                                                    {{ $label }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-
-                                                    <!-- Value Input -->
-                                                    <div class="col-md-8 d-flex gap-3 align-items-center">
-                                                        <input type="text" name="address_value[]" class="form-control"
-                                                            value="{{ $address['value'] }}" placeholder="Enter address"
-                                                            disabled>
-
-                                                        @can('company.detail.edit')
-                                                            <button class="btn btn-sm btn-outline-secondary delete-field-btn"
-                                                                data-company-id="{{ $company->id }}"
-                                                                data-type="{{ $address['selected'] }}"
-                                                                data-category="address"
-                                                                {{ $address['selected'] === 'address' ? 'disabled' : '' }}>
-                                                                <i class="fas fa-times"></i>
-                                                            </button>
-                                                        @endcan
-                                                    </div>
-
-                                                </div>
-                                            </div>
-                                        @empty
-                                            <p class="small m-2">N/A</p>
-                                        @endforelse
-                                    </div>
-                                </div>
-
-                                <div class="col-12 inline-detail-address" style="display: none;"
-                                    data-company-id="{{ $company->id }}">
-                                    <div class="row g-2">
-                                        <!-- Type Selector -->
-                                        <div class="col-md-4">
-                                            <select name="address_type" class="form-select" id="new-address-type">
-                                                <option value="address">Address</option>
-                                                <option value="main_address">Main Address</option>
-                                                <option value="work_address">Work Address</option>
-                                                <option value="home_address">Home Address</option>
-                                                <option value="billing_address">Billing Address</option>
-                                                <option value="mailing_address">Mailing Address</option>
-                                            </select>
-                                        </div>
-
-                                        <!-- Value Input -->
-                                        <div class="col-md-8">
-                                            <input type="text" name="address_value" class="form-control"
-                                                id="new-address-value" placeholder="Enter address">
-                                        </div>
-
-                                        <!-- Buttons -->
-                                        <div class="d-flex justify-content-end align-items-center mt-2"
-                                            style="gap: 10px;">
-                                            <button class="btn btn-sm btn-outline-success editable-icon"
-                                                id="address-submit" title="Save Address">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-danger editable-icon"
-                                                id="address-cancel" title="Cancel">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <hr>
 
                             {{-- Add Phone Option --}}
                             <div class="sidebar-section" id="phone">
@@ -3816,9 +3725,7 @@
                 $('.inline-detail-email').toggle(); // smooth animation
             });
 
-            $('.toggle-inline-address').on('click', function() {
-                $('.inline-detail-address').toggle(); // smooth animation
-            });
+
 
             $('.toggle-inline-phone').on('click', function() {
                 $('.inline-detail-phone').toggle(); // smooth animation
@@ -3839,16 +3746,7 @@
 
             });
 
-            // Address Cancel Buttons
-            $('#address-cancel').on('click', function() {
-                // Hide input section
-                $('.inline-detail-address').hide();
 
-                // Reset fields
-                $('.inline-detail-address select[name="address_type"]').prop('selectedIndex', 0);
-                $('.inline-detail-address input[name="address_value"]').val('');
-
-            });
 
             // Phone Cancel Buttons
             $('#phone-cancel').on('click', function() {
@@ -3917,7 +3815,7 @@
 
             // Calls for each category
             handleUpdateClick('#email-submit', '.inline-detail-email', 'email', "{{ csrf_token() }}");
-            handleUpdateClick('#address-submit', '.inline-detail-address', 'address', "{{ csrf_token() }}");
+
             handleUpdateClick('#phone-submit', '.inline-detail-phone', 'phone', "{{ csrf_token() }}");
             handleUpdateClick('#url-submit', '.inline-detail-url', 'url', "{{ csrf_token() }}");
 

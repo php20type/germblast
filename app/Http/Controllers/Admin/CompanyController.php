@@ -203,11 +203,17 @@ class CompanyController extends Controller
                 ]);
             }
 
-            // Step 4: Store addresses
-            if ($request->address) {
-                CompanyAddress::create([
+            // Step 4: Store locations
+            if ($request->address_1 || $request->location_name) {
+                CompanyLocation::create([
                     'company_id' => $company->id,
-                    'address' => $request->address,
+                    'location_name' => $request->location_name ?? 'Primary Location',
+                    'address_1' => $request->address_1,
+                    'address_2' => $request->address_2,
+                    'country_id' => $request->country_id,
+                    'state_id' => $request->state_id,
+                    'city_id' => $request->city_id,
+                    'zip' => $request->zip,
                 ]);
             }
 
@@ -910,7 +916,7 @@ class CompanyController extends Controller
     {
         $request->validate([
             'company_id' => 'required|exists:companies,id',
-            'category' => 'required|in:email,address,phone,url',
+            'category' => 'required|in:email,phone,url',
             'type' => 'required|string',
             'value' => 'required',
         ]);
@@ -928,16 +934,7 @@ class CompanyController extends Controller
                 ]);
                 break;
 
-            case 'address':
-                $request->validate([
-                    'type' => 'in:address,main_address,work_address,home_address,billing_address,mailing_address',
-                    'value' => 'string',
-                ]);
 
-                $record = CompanyAddress::firstOrNew([
-                    'company_id' => $request->company_id,
-                ]);
-                break;
 
             case 'phone':
                 $request->validate([
@@ -976,7 +973,7 @@ class CompanyController extends Controller
     {
         $request->validate([
             'company_id' => 'required|exists:companies,id',
-            'category' => 'required|in:email,address,phone,url',
+            'category' => 'required|in:email,phone,url',
             'type' => 'required|string',
         ]);
 
@@ -987,17 +984,7 @@ class CompanyController extends Controller
                 $model = CompanyEmail::where('company_id', $request->company_id)->first();
                 break;
 
-            case 'address':
-                $allowed = [
-                    'address',
-                    'main_address',
-                    'work_address',
-                    'home_address',
-                    'billing_address',
-                    'mailing_address',
-                ];
-                $model = CompanyAddress::where('company_id', $request->company_id)->first();
-                break;
+
 
             case 'phone':
                 $allowed = [

@@ -1616,7 +1616,7 @@
                                                     <div class="company-name">
                                                         <p><b>{{ $leadCompany->name ?? 'N/A' }}</b></p>
                                                         <p>{{ $leadCompany->description ?? 'N/A' }}</p>
-                                                        <p>{{ $leadCompany->companyAddress->address ?? 'N/A' }}</p>
+                                                        <p>{{ $leadCompany->locations->first()->full_address ?? 'N/A' }}</p>
 
                                                         @can('company.dashboard.view')
                                                         <a href="{{ route('admin.company.dashboard', $leadCompany->id) }}"
@@ -1670,7 +1670,7 @@
                                                             @endcan
                                                         </b></p>
                                                         <p class="mb-1">{{ $leads->company->description ?? 'N/A' }}</p>
-                                                        <p class="mb-1 text-muted">{{ $leads->company->companyAddress->address ?? 'N/A' }}</p>
+                                                        <p class="mb-1 text-muted">{{ $leads->company->locations->first()->full_address ?? 'N/A' }}</p>
 
                                                         @can('company.dashboard.view')
                                                             <a href="{{ route('admin.company.dashboard', $leads->company->id) }}"

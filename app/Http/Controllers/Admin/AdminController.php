@@ -7,6 +7,7 @@ use App\Models\ActivityType;
 use App\Models\Company;
 use App\Models\CompanyType;
 use App\Models\Competitor;
+use App\Models\Country;
 use App\Models\Industry;
 use App\Models\Lead;
 use App\Models\People;
@@ -37,6 +38,7 @@ class AdminController extends Controller
         $persontags = Tag::where('tag_id', 3)->get();
 
         $activity_types = ActivityType::all();
+        $countries = Country::all();
 
         return view('admin.dashboard', compact(
             'users',
@@ -52,7 +54,8 @@ class AdminController extends Controller
             'sources',
             'territories',
             'products',
-            'competitors'
+            'competitors',
+            'countries'
         ));
     }
 

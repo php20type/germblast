@@ -915,11 +915,28 @@ class PeopleController extends Controller
             }
 
             // Step 4: Store addresses
-            if ($request->address) {
-                PeopleAddress::create([
-                    'people_id' => $people->id,
-                    'address' => $request->address,
-                ]);
+            if ($request->address_1 || $request->location_name) {
+                $parts = [];
+                if (!empty($request->address_1)) $parts[] = trim($request->address_1);
+                if (!empty($request->address_2)) $parts[] = trim($request->address_2);
+                if (!empty($request->city_id)) {
+                    $city = \App\Models\City::find($request->city_id);
+                    if ($city) $parts[] = $city->name;
+                }
+                if (!empty($request->state_id)) {
+                    $state = \App\Models\State::find($request->state_id);
+                    if ($state) $parts[] = $state->name;
+                }
+                if (!empty($request->zip)) $parts[] = trim($request->zip);
+                
+                $fullAddress = implode(', ', $parts);
+                
+                if (!empty($fullAddress)) {
+                    PeopleAddress::create([
+                        'people_id' => $people->id,
+                        'address' => $fullAddress,
+                    ]);
+                }
             }
 
             // Step 5: Store URLs

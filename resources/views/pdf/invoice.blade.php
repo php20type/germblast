@@ -141,11 +141,8 @@
         <div class="address-box right">
             <div class="address-title">Customer</div>
             <div><strong>{{ $order->service->lead->company->name ?? 'N/A' }}</strong></div>
-            @if ($order->service->lead->company && $order->service->lead->company->companyAddress)
-                <div>{{ $order->service->lead->company->companyAddress->address }}</div>
-                @if ($order->service->lead->company->companyAddress->mailing_address)
-                    <div>{{ $order->service->lead->company->companyAddress->mailing_address }}</div>
-                @endif
+            @if ($order->service->lead->company && $order->service->lead->company->locations->first())
+                <div>{{ $order->service->lead->company->locations->first()->full_address }}</div>
             @endif
             @if ($order->service->lead->company && $order->service->lead->company->companyPhone)
                 <div>Phone: {{ $order->service->lead->company->companyPhone->phone }}</div>

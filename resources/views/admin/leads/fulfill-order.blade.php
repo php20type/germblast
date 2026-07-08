@@ -1872,11 +1872,8 @@
                                                     <div class="col-md-6">
                                                         <p class="fw-bold mb-1 text-secondary">Customer</p>
                                                         <p class="mb-0 small fw-bold">{{ $order->service->lead->company->name ?? 'N/A' }}</p>
-                                                        @if ($order->service->lead->company && $order->service->lead->company->companyAddress)
-                                                            <p class="mb-0 small">{{ $order->service->lead->company->companyAddress->address }}</p>
-                                                            @if ($order->service->lead->company->companyAddress->mailing_address)
-                                                                <p class="mb-0 small">{{ $order->service->lead->company->companyAddress->mailing_address }}</p>
-                                                            @endif
+                                                        @if ($order->service->lead->company && $order->service->lead->company->locations->first())
+                                                            <p class="mb-0 small">{{ $order->service->lead->company->locations->first()->full_address }}</p>
                                                         @endif
                                                         @if ($order->service->lead->company && $order->service->lead->company->companyPhone)
                                                             <p class="mb-0 small">{{ $order->service->lead->company->companyPhone->phone }}</p>

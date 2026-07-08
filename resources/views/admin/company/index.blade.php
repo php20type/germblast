@@ -137,7 +137,7 @@
                                                 {{-- peoples of that company info --}}
                                                 <td>{{ \Carbon\Carbon::parse($company->created_at)->format('d F Y') }}</td>
                                                 <td>
-                                                    {{ $company->companyAddress->address ?? 'N/A' }}
+                                                    {{ $company->locations->first()->full_address ?? 'N/A' }}
                                                 </td>
                                                 <td><span class="badge-customer">
                                                         {{ $company->companyType->type ?? 'N/A' }}

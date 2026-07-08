@@ -271,7 +271,7 @@
                                          <div class="col-md-4 col-12 d-flex justify-content-md-end justify-content-between align-items-center gap-3 p-0 mt-2 mt-md-0">
                                              <div class="text-md-end text-start">
                                                  <div>{{ $company->companyPhone->phone ?? 'N/A' }}</div>
-                                                 <div class="text-muted">{{ $company->companyAddress->address ?? 'N/A' }}</div>
+                                                 <div class="text-muted">{{ $company->locations->first()->full_address ?? 'N/A' }}</div>
                                              </div>
 
                                              @can('people.detail.edit')
