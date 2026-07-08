@@ -1880,10 +1880,13 @@ class ServiceController extends Controller
             'invoice_no' => 'INVODR' . str_pad($invoice->id, 3, '0', STR_PAD_LEFT)
         ]);
 
-        // Update Order Status to Complete
-        $order->update(['status' => 'Complete']);
+        // Update Order Status to completed
+        $order->update(['status' => 'completed']);
 
-        return redirect()->back()->with('success', 'Invoice generated successfully and Order marked as Complete.');
+        // Automatically mark all slots as completed
+        $order->orderSlots()->update(['status' => 'completed']);
+
+        return redirect()->back()->with('success', 'Invoice generated successfully and Order marked as completed.');
     }
 
     public function updateInvoice(Request $request, $invoiceId)

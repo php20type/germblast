@@ -322,9 +322,19 @@
                                                                 {{ \Carbon\Carbon::parse($order->intended_date)->format('M d, Y') }}
                                                             </td>
                                                             <td style="padding: 12px 15px;">
-                                                                <span class="status-pill status-pill-{{ $order->status ?? 'pending' }}">
-                                                                    {{ ucfirst(str_replace('_', ' ', $order->status ?? 'pending')) }}
-                                                                </span>
+                                                            @php
+                                                            $displayStatus = $order->status ?? 'pending';
+                                                            if ($order->orderSlots && $order->orderSlots->where('status', 'completed')->count() > 0) {
+                                                                $displayStatus = 'completed';
+                                                            } elseif ($order->orderSlots && $order->orderSlots->where('status', 'confirmed')->count() > 0) {
+                                                                $displayStatus = 'confirmed';
+                                                            } elseif ($order->orderSlots && $order->orderSlots->where('status', 'scheduled')->count() > 0) {
+                                                                $displayStatus = 'scheduled';
+                                                            }
+                                                        @endphp
+                                                        <span class="status-pill status-pill-{{ $displayStatus }}">
+                                                            {{ strtoupper(str_replace('_', ' ', $displayStatus)) }}
+                                                        </span>
                                                             </td>
                                                             <td style="padding: 12px 15px;" class="text-end">
                                                                 <a href="{{ route('admin.lead.service.fulfill_order', $order->id) }}" class="btn btn-export btn-sm py-1 px-3">
