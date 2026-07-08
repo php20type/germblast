@@ -739,6 +739,30 @@ class CompanyController extends Controller
         ]);
     }
 
+    public function updatePhoto(Request $request, $companyId)
+    {
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
+        ]);
+
+        $company = \App\Models\Company::findOrFail($companyId);
+
+        if ($request->hasFile('photo')) {
+            if ($company->photo) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($company->photo);
+            }
+            $path = $request->file('photo')->store('company_photos', 'public');
+            $company->photo = $path;
+            $company->save();
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Photo updated successfully!',
+            'photo_url' => asset('storage/' . $company->photo),
+        ]);
+    }
+
     public function addTag(Request $request, $companyId)
     {
         $request->validate([

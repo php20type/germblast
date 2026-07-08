@@ -861,6 +861,30 @@ class PeopleController extends Controller
         ]);
     }
 
+    public function updatePhoto(Request $request, $peopleId)
+    {
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
+        ]);
+
+        $people = \App\Models\People::findOrFail($peopleId);
+
+        if ($request->hasFile('photo')) {
+            if ($people->photo) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($people->photo);
+            }
+            $path = $request->file('photo')->store('people_photos', 'public');
+            $people->photo = $path;
+            $people->save();
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Photo updated successfully!',
+            'photo_url' => asset('storage/' . $people->photo),
+        ]);
+    }
+
     public function store(Request $request)
     {
         try {

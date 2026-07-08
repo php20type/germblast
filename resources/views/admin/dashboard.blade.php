@@ -326,7 +326,6 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">URL</label>
-                                    <span class="text-danger">*</span>
                                     <input type="text" name="url" placeholder="https://..."
                                         class="form-control" />
                                 </div>
@@ -1351,7 +1350,7 @@
                         required: true
                     },
                     url: {
-                        required: true,
+                        required: false,
                         url: true
                     },
                     tag_id: {
@@ -1384,7 +1383,6 @@
                         required: "Please enter the address."
                     },
                     url: {
-                        required: "Please enter the url.",
                         url: "The url field must be a valid URL."
                     },
                     tag_id: {

@@ -593,7 +593,12 @@
                                                                         @endif
                                                                     </td>
 
-                                                                    <td>${{ number_format($pricingProposal->pricing_total ?? 0, 2) }}
+                                                                    <td>
+                                                                        @if (!empty($pricingProposal->override_pricing) && $pricingProposal->override_pricing > 0)
+                                                                            ${{ number_format($pricingProposal->override_pricing, 2) }}
+                                                                        @else
+                                                                            ${{ number_format($pricingProposal->pricing_total ?? 0, 2) }}
+                                                                        @endif
                                                                     </td>
 
                                                                     <td>
@@ -962,12 +967,7 @@
                     specialist_narrative: {
                         required: true
                     },
-                    supplemental_title: {
-                        required: true
-                    },
-                    supplemental_body: {
-                        required: true
-                    }
+                    // supplemental fields are optional
                 },
                 messages: {},
                 errorElement: 'span',

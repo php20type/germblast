@@ -101,8 +101,8 @@ class SurveyProposalController extends Controller
 
             'specialist_narrative' => 'required|string',
 
-            'supplemental_title' => 'required|string',
-            'supplemental_body' => 'required|string',
+            'supplemental_title' => 'nullable|string',
+            'supplemental_body' => 'nullable|string',
         ];
 
         $validated = $request->validate($rules);
@@ -804,8 +804,8 @@ class SurveyProposalController extends Controller
     {
         $validated = $request->validate([
             // Pricing values
-            'pricing_total' => 'required|numeric|min:0',
-            'partial_cost_service' => 'required|numeric|min:0',
+            'pricing_total' => 'nullable|numeric|min:0',
+            'partial_cost_service' => 'nullable|numeric|min:0',
             'awareness' => 'nullable|numeric|min:0',
             'education' => 'nullable|numeric|min:0',
             'technology' => 'nullable|numeric|min:0',
@@ -840,8 +840,8 @@ class SurveyProposalController extends Controller
             $pricing = PricingProposal::create([
                 'survey_proposal_id' => $survey_proposal->id,
 
-                'pricing_total' => $validated['pricing_total'],
-                'partial_cost_service' => $validated['partial_cost_service'],
+                'pricing_total' => $validated['pricing_total'] ?? 0,
+                'partial_cost_service' => $validated['partial_cost_service'] ?? 0,
                 'awareness' => $validated['awareness'] ?? 0,
                 'education' => $validated['education'] ?? 0,
                 'technology' => $validated['technology'] ?? 0,
@@ -934,8 +934,8 @@ class SurveyProposalController extends Controller
     {
         $validated = $request->validate([
             // Pricing values (already calculated in JS)
-            'pricing_total' => 'required|numeric|min:0',
-            'partial_cost_service' => 'required|numeric|min:0',
+            'pricing_total' => 'nullable|numeric|min:0',
+            'partial_cost_service' => 'nullable|numeric|min:0',
             'awareness' => 'nullable|numeric|min:0',
             'education' => 'nullable|numeric|min:0',
             'technology' => 'nullable|numeric|min:0',
@@ -968,8 +968,8 @@ class SurveyProposalController extends Controller
              * STEP 1 — Update Pricing Proposal
              * -------------------------------- */
             $pricing->update([
-                'pricing_total' => $validated['pricing_total'],
-                'partial_cost_service' => $validated['partial_cost_service'],
+                'pricing_total' => $validated['pricing_total'] ?? 0,
+                'partial_cost_service' => $validated['partial_cost_service'] ?? 0,
                 'awareness' => $validated['awareness'] ?? 0,
                 'education' => $validated['education'] ?? 0,
                 'technology' => $validated['technology'] ?? 0,

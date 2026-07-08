@@ -105,17 +105,36 @@
                     <div class="main-content">
                         <!-- Map Section -->
                         <div class="map-container">
-                            <iframe
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d56430970.783862405!2d-173.4960524!3d30.314748300000012!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8647393108e90293%3A0x2541772067591635!2sValero!5e0!3m2!1sen!2sin!4v1750656614795!5m2!1sen!2sin"
-                                width="100%" height="240" style="border:0;" allowfullscreen="" loading="lazy"
-                                referrerpolicy="no-referrer-when-downgrade"></iframe>
+                            @php
+                                $mapAddress = !empty($addresses) ? $addresses[0]['value'] : '';
+                            @endphp
+                            @if($mapAddress)
+                                <iframe
+                                    src="https://maps.google.com/maps?q={{ urlencode($mapAddress) }}&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                                    width="100%" height="240" style="border:0;" allowfullscreen="" loading="lazy"
+                                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+                            @else
+                                <iframe
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d56430970.783862405!2d-173.4960524!3d30.314748300000012!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8647393108e90293%3A0x2541772067591635!2sValero!5e0!3m2!1sen!2sin!4v1750656614795!5m2!1sen!2sin"
+                                    width="100%" height="240" style="border:0;" allowfullscreen="" loading="lazy"
+                                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+                            @endif
                         </div>
 
                         <!-- Lead Header -->
                         <div class="lead-header">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="d-flex">
-                                    <img src="{{ asset('img/home/image25.png') }}" alt="Company" class="company-logo me-3">
+                                    <div class="position-relative photo-upload-container me-3" style="cursor: pointer; border-radius: 8px; overflow: hidden; display: inline-block; width: max-content; height: max-content;">
+                                        <img src="{{ $company->photo ? asset('storage/' . $company->photo) : asset('img/home/image25.png') }}" alt="Company"
+                                            class="company-logo" id="company-profile-photo" style="object-fit: cover; display: block;">
+                                        @can('company.detail.edit')
+                                        <div class="photo-overlay d-flex justify-content-center align-items-center position-absolute top-0 start-0 w-100 h-100 text-white" style="background: rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.2s;" id="company-photo-overlay">
+                                            <i class="fas fa-camera"></i>
+                                        </div>
+                                        <input type="file" id="company-photo-upload" class="d-none" accept="image/*">
+                                        @endcan
+                                    </div>
                                     <div>
                                         @can('company.detail.edit')
                                             <!-- Company Name -->
@@ -226,8 +245,8 @@
                                 <div class="people-card mb-3 d-block">
                                     <div class="row align-items-center w-100 m-0 g-2">
                                         <div class="col-md-8 col-12 d-flex align-items-center p-0">
-                                            <img src="{{ asset('img/home/profile.png') }}" alt="{{ $people->name }}"
-                                                class="person-avatar me-3 flex-shrink-0">
+                                            <img src="{{ $people->photo ? asset('storage/' . $people->photo) : asset('img/home/profile.png') }}" alt="{{ $people->name }}"
+                                                class="person-avatar me-3 flex-shrink-0" style="object-fit: cover;">
                                             <div>
                                                 <h6 class="mb-0">
                                                     @can('people.detail.view')
@@ -2360,7 +2379,6 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Address Line 2</label>
-                                    <span class="text-danger">*</span>
                                     <input type="text" name="address_2" class="form-control"
                                         placeholder="Suite, floor, unit (optional)">
                                 </div>
@@ -3351,9 +3369,7 @@
                     address_1: {
                         required: true
                     },
-                    address_2: {
-                        required: true
-                    },
+                    // address_2 is optional
                     country_id: {
                         required: true
                     },
@@ -3374,9 +3390,7 @@
                     address_1: {
                         required: "Please enter address line 1."
                     },
-                    address_2: {
-                        required: "Please enter address line 2."
-                    },
+                    // address_2 is optional
                     country_id: {
                         required: "Please select a country."
                     },
@@ -3695,7 +3709,7 @@
                         toastr.success('Lead created successfully!');
                         $('#add-lead-form')[0].reset();
                         $('#AddLead').modal('hide');
-
+                        location.reload();
                     },
                     error: function(xhr) {
                         alert(xhr.responseText);
@@ -4884,7 +4898,51 @@
                 });
             });
 
+            // Photo Upload
+            $('.photo-upload-container').hover(
+                function() { $(this).find('.photo-overlay').css('opacity', '1'); },
+                function() { $(this).find('.photo-overlay').css('opacity', '0'); }
+            );
 
+            $('#company-photo-overlay').on('click', function() {
+                $('#company-photo-upload').click();
+            });
+
+            $('#company-photo-upload').on('change', function() {
+                var file = this.files[0];
+                if (!file) return;
+
+                var formData = new FormData();
+                formData.append('photo', file);
+                formData.append('_token', '{{ csrf_token() }}');
+
+                $.ajax({
+                    url: '{{ route('admin.company.updatePhoto', ['company' => $company->id]) }}',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            $('#company-profile-photo').attr('src', response.photo_url);
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Updated',
+                                text: response.message,
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON?.message || 'Error uploading photo'
+                        });
+                    }
+                });
+            });
 
         });
     </script>

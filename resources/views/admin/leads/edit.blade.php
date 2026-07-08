@@ -1654,8 +1654,8 @@
                                             <div class="row align-items-start w-100 m-0 g-2">
                                                 <div class="col-3 col-sm-2 p-0">
                                                     <div class="company-icon">
-                                                        <img src="{{ asset('img/home/companyimages1.png') }}"
-                                                            alt="Company Logo" class="img-fluid">
+                                                        <img src="{{ $leads->company->photo ? asset('storage/' . $leads->company->photo) : asset('img/home/companyimages1.png') }}"
+                                                            alt="Company Logo" class="img-fluid" style="object-fit: cover; width: 100%; height: 100%;">
                                                     </div>
                                                 </div>
                                                 <div class="col-9 col-sm-10 p-0 ps-2">
@@ -1718,8 +1718,8 @@
                                                 <div class="row align-items-start w-100 m-0 g-2">
                                                     <div class="col-3 col-sm-2 p-0">
                                                         <div class="company-icon">
-                                                            <img src="{{ asset('img/home/profile-image.png') }}"
-                                                                alt="People Logo" class="img-fluid">
+                                                            <img src="{{ $person->photo ? asset('storage/' . $person->photo) : asset('img/home/profile-image.png') }}"
+                                                                alt="People Logo" class="img-fluid" style="object-fit: cover; width: 100%; height: 100%; border-radius: 50%;">
                                                         </div>
                                                     </div>
                                                     <div class="@can('lead.detail.edit') col-7 col-sm-8 @else col-9 col-sm-10 @endcan p-0 ps-2">

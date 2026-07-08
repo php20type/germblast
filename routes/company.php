@@ -48,6 +48,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
             Route::post('location/{location}/update', [CompanyController::class, 'updateLocation'])->name('location.update');
             Route::post('location/{location}/delete', [CompanyController::class, 'deleteLocation'])->name('location.delete');
             Route::post('{company}/update-detail', [CompanyController::class, 'updateDetail'])->name('updateDetail');
+            Route::post('{company}/update-photo', [CompanyController::class, 'updatePhoto'])->name('updatePhoto');
             Route::post('{company}/people/add', [CompanyController::class, 'addPeople'])->name('people.add');
             Route::post('{company}/remove-person', [CompanyController::class, 'removePerson'])->name('people.remove');
             Route::post('{company}/tags/add', [CompanyController::class, 'addTag'])->name('tags.add');
