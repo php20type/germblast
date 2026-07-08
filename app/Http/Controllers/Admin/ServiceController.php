@@ -346,6 +346,72 @@ class ServiceController extends Controller
         return view('admin.leads.fulfill-order', compact('order', 'companyLocations', 'territories', 'allStaff', 'disciplinaryIssues', 'assignedEmployees', 'assignedDrivers', 'allVehicles'));
     }
 
+    public function serviceAudit(Request $request, $orderId)
+    {
+        $order = ServiceOrder::with([
+            'orderSlots.staff.user',
+            'orderSlots.clocks',
+            'service.lead.company'
+        ])->findOrFail($orderId);
+
+        // Group staff by employee
+        $employees = [];
+        $slots = $order->orderSlots->sortBy('scheduled_start_time')->values();
+
+        foreach ($slots as $slotIndex => $slot) {
+            foreach ($slot->staff as $staff) {
+                $user = $staff->user;
+                if (!$user) {
+                    continue;
+                }
+                $userId = $staff->user_id;
+                if (!isset($employees[$userId])) {
+                    $employees[$userId] = [
+                        'user' => $user,
+                        'hourly_rate' => $user->hourly_rate ?? 0,
+                        'overtime_rate' => $user->overtime_rate ?? 0,
+                        'total_hours' => 0,
+                        'overtime_hours' => 0,
+                        'scheduled_days' => array_fill(0, count($slots), ''),
+                        'actual_worked' => 0,
+                        'budgeted' => 0,
+                        'extended_actual_cost' => 0,
+                        'total_with_benefits' => 0,
+                        'budget_variance' => 0,
+                        'total_scheduled_hours' => 0,
+                    ];
+                }
+                
+                // For this slot, the employee is scheduled for $staff->slot_hours
+                $hours = $staff->slot_hours ?? 0;
+                $employees[$userId]['total_scheduled_hours'] += $hours;
+                $employees[$userId]['scheduled_days'][$slotIndex] = $hours;
+                $employees[$userId]['budgeted'] += ($hours * ($user->hourly_rate ?? 0));
+                
+                // Actual worked: if anyone clocked for this slot, every assigned staff member gets the actual clocked hours of that slot
+                $actual = 0;
+                if ($slot->clocks->isNotEmpty()) {
+                    foreach ($slot->clocks as $clock) {
+                        $actual += $clock->clocked_hours ?? $clock->calculateHours();
+                    }
+                }
+                $employees[$userId]['actual_worked'] += $actual;
+            }
+        }
+
+        // Calculate variances for each employee
+        foreach ($employees as $userId => &$emp) {
+            $emp['total_hours'] = $emp['actual_worked'] - $emp['overtime_hours'];
+            $emp['actual_worked'] = $emp['total_hours'] + $emp['overtime_hours'];
+            $emp['deviation_from_schedule'] = $emp['actual_worked'] - $emp['total_scheduled_hours'];
+            $emp['extended_actual_cost'] = ($emp['hourly_rate'] * $emp['total_hours']) + ($emp['overtime_rate'] * $emp['overtime_hours']);
+            $emp['total_with_benefits'] = $emp['extended_actual_cost'] * 1.20;
+            $emp['budget_variance'] = $emp['budgeted'] - $emp['total_with_benefits'];
+        }
+
+        return view('admin.leads.service-audit', compact('order', 'slots', 'employees'));
+    }
+
     public function service_dashboard(Request $request, $orderId)
     {
         $order = ServiceOrder::with([
@@ -1008,26 +1074,25 @@ class ServiceController extends Controller
 
     public function calendarOrders()
     {
-        $orders = ServiceOrder::with(['service.lead.company','orderSlots'])
-            ->whereNotNull('intended_date')
+        $slots = ServiceOrderSlot::with([
+                'serviceOrder.service.lead.company',
+                'serviceOrder'
+            ])
+            ->whereNotNull('scheduled_start_time')
             ->get();
 
-        $events = $orders->map(function ($order) {
-            $displayStatus = $order->status ?? 'pending';
-            if ($order->orderSlots->where('status', 'completed')->count() > 0) {
-                $displayStatus = 'completed';
-            } elseif ($order->orderSlots->where('status', 'confirmed')->count() > 0) {
-                $displayStatus = 'confirmed';
-            } elseif ($order->orderSlots->where('status', 'scheduled')->count() > 0) {
-                $displayStatus = 'scheduled';
+        $events = $slots->map(function ($slot) {
+            $order = $slot->serviceOrder;
+            if (!$order) {
+                return null;
             }
 
             return [
-                'id'    => $order->id,
-                'title' => $order->service->service_name ?? 'Service Order',
-                'start' => $order->intended_date,
-                'end'   => $order->intended_date,
-                'color' => match($displayStatus) {
+                'id'    => $slot->id,
+                'title' => $order->service->lead->company->name ?? $order->service->service_name ?? 'Service Order',
+                'start' => $slot->scheduled_start_time,
+                'end'   => $slot->scheduled_end_time,
+                'color' => match($slot->status) {
                     'scheduled'   => '#ffb81c',
                     'confirmed'   => '#0d6efd',
                     'completed'   => '#069697',
@@ -1041,12 +1106,12 @@ class ServiceController extends Controller
                     'company_name' => $order->service->lead->company->name ?? '-',
                     'po_number'    => $order->service->po_number ?? '-',
                     'price'        => $order->service->price_per_service ?? '-',
-                    'status'       => $displayStatus,
-                    'scheduled_start_time' => $order->orderSlots->first()?->scheduled_start_time,
+                    'status'       => $slot->status ?? 'pending',
+                    'scheduled_start_time' => $slot->scheduled_start_time,
                     'service_dashboard_url'  => route('admin.lead.service.service_dashboard', $order->id),
                 ],
             ];
-        });
+        })->filter()->values();
 
         return response()->json($events);
     }
@@ -1069,7 +1134,7 @@ class ServiceController extends Controller
 
             return [
                 'id'    => $slot->id,
-                'title' => $order->service->service_name ?? 'Service Order',
+                'title' => $order->service->lead->company->name ?? $order->service->service_name ?? 'Service Order',
                 'start' => $slot->scheduled_start_time,
                 'end'   => $slot->scheduled_end_time,
                 'color' => match($slot->status) {
@@ -1080,6 +1145,7 @@ class ServiceController extends Controller
                     default       => '#6c757d',
                 },
                 'extendedProps' => [
+                    'order_id'     => $order->id,
                     'order_no'     => $order->order_no,
                     'service_name' => $order->service->service_name ?? '-',
                     'lead_name'    => $order->service->lead->name ?? '-',
@@ -1089,6 +1155,7 @@ class ServiceController extends Controller
                     'status'       => $slot->status ?? 'pending',
                     'scheduled_start_time' => $slot->scheduled_start_time,
                     'service_dashboard_url'  => route('admin.lead.service.service_dashboard', $order->id),
+                    'service_audit_url'  => route('admin.lead.service.order.audit', $order->id),
                 ],
             ];
         });

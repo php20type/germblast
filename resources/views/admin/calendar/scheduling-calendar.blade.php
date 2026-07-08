@@ -179,59 +179,9 @@
 
                 eventClick: function (info) {
                     const props = info.event.extendedProps;
-
-                    const statusColors = {
-                        'pending':     '#6c757d',
-                        'scheduled': '#ffb81c',
-                        'confirmed': '#0d6efd',
-                        'completed': '#069697',
-                        'cancelled':   '#dc3545',
-                    };
-                    const color = statusColors[props.status] ?? '#6c757d';
-
-                    const content = `
-                        <table class="table align-middle mb-0" style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; border-collapse: separate; border-spacing: 0;">
-                            <tbody>
-                                <tr style="border-bottom: 1px solid #e5e7eb;">
-                                    <th style="background-color: #fafafa; padding: 12px 15px; font-size: 13px; font-weight: 600; width: 40%;">Order No</th>
-                                    <td style="padding: 12px 15px; font-size: 13px;"><a href="${props.service_dashboard_url}" class="fw-bold text-decoration-none" style="color: #ffb400;">${props.order_no ?? '-'}</a></td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid #e5e7eb;">
-                                    <th style="background-color: #fafafa; padding: 12px 15px; font-size: 13px; font-weight: 600;">Service</th>
-                                    <td style="padding: 12px 15px; font-size: 13px; color: #555;">${props.service_name}</td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid #e5e7eb;">
-                                    <th style="background-color: #fafafa; padding: 12px 15px; font-size: 13px; font-weight: 600;">Lead</th>
-                                    <td style="padding: 12px 15px; font-size: 13px; color: #555;">${props.lead_name}</td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid #e5e7eb;">
-                                    <th style="background-color: #fafafa; padding: 12px 15px; font-size: 13px; font-weight: 600;">Company</th>
-                                    <td style="padding: 12px 15px; font-size: 13px; color: #555;">${props.company_name}</td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid #e5e7eb;">
-                                    <th style="background-color: #fafafa; padding: 12px 15px; font-size: 13px; font-weight: 600;">PO Number</th>
-                                    <td style="padding: 12px 15px; font-size: 13px; color: #555;">${props.po_number}</td>
-                                </tr>
-                                <tr style="border-bottom: 1px solid #e5e7eb;">
-                                    <th style="background-color: #fafafa; padding: 12px 15px; font-size: 13px; font-weight: 600;">Price / Service</th>
-                                    <td style="padding: 12px 15px; font-size: 13px; color: #374151; font-weight: 600;">$${props.price}</td>
-                                </tr>
-                                <tr>
-                                    <th style="background-color: #fafafa; padding: 12px 15px; font-size: 13px; font-weight: 600;">Status</th>
-                                    <td style="padding: 12px 15px;">
-                                        <span class="badge text-white text-uppercase" style="background-color: ${color}; font-size: 10px; font-weight: 600; padding: 6px 14px; border-radius: 30px; letter-spacing: 0.5px;">
-                                            ${props.status.charAt(0).toUpperCase() + props.status.slice(1)}
-                                        </span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    `;
-
-                    document.getElementById('orderModalBody').innerHTML = content;
-
-                    var modal = new bootstrap.Modal(document.getElementById('orderModal'));
-                    modal.show();
+                    if (props.service_audit_url) {
+                        window.location.href = props.service_audit_url;
+                    }
                 },
 
                 // eventDidMount: function (info) {
@@ -251,10 +201,7 @@
                                 <div style="font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                     ${info.event.title}
                                 </div>
-                                <div style="font-size: 11px; opacity: 0.9; margin-top: 2px;">
-                                    #${props.order_no ?? '-'}
-                                    ${timeStr ? '&nbsp;•&nbsp;' + timeStr : ''}
-                                </div>
+                                ${timeStr ? `<div style="font-size: 11px; opacity: 0.9; margin-top: 2px;">${timeStr}</div>` : ''}
                             </div>
                         `
                     };

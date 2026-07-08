@@ -49,6 +49,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::post('order/{orderId}/update-consumables', [ServiceController::class, 'updateConsumables'])->name('service.order.update_consumables');
         Route::post('order/{orderId}/employee-performance/store', [ServiceController::class, 'storeEmployeePerformance'])->name('service.order.employee_performance.store');
 
+        Route::get('order/{orderId}/audit', [ServiceController::class, 'serviceAudit'])->name('service.order.audit');
         Route::get('service/service-dashboard/{orderId}', [ServiceController::class, 'service_dashboard'])->name('service.service_dashboard');
         Route::post('service/slot/{slotId}/equipment/assign', [ServiceController::class, 'assignEquipment'])->name('service.slot.assign_equipment');
         Route::post('service/slot/{slotId}/equipment/{equipmentId}/remove', [ServiceController::class, 'removeEquipment'])->name('service.slot.remove_equipment');
