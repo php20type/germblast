@@ -106,13 +106,13 @@
                                         <span style="background-color:#6c757d; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(108,117,125,0.15);">
                                             ● Pending
                                         </span>
-                                        <span style="background-color:#6b7280; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(107,114,128,0.15);">
+                                        <span style="background-color:#ffb81c; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(255,184,28,0.15);">
                                             ● Scheduled
                                         </span>
-                                        <span style="background-color:#ffb81c; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(255,184,28,0.15);">
+                                        <span style="background-color:#0d6efd; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(13,110,253,0.15);">
                                             ● Confirmed
                                         </span>
-                                        <span style="background-color:#0ea5e9; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(14,165,233,0.15);">
+                                        <span style="background-color:#069697; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(6,150,151,0.15);">
                                             ● Completed
                                         </span>
                                         <span style="background-color:#dc3545; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(220,53,69,0.15);">
@@ -182,9 +182,9 @@
 
                     const statusColors = {
                         'pending':     '#6c757d',
-                        'scheduled': '#6b7280',
-                        'confirmed': '#ffb81c',
-                        'completed': '#0ea5e9',
+                        'scheduled': '#ffb81c',
+                        'confirmed': '#0d6efd',
+                        'completed': '#069697',
                         'cancelled':   '#dc3545',
                     };
                     const color = statusColors[props.status] ?? '#6c757d';

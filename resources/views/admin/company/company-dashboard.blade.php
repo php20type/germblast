@@ -137,6 +137,10 @@
             border-color: rgba(13, 110, 253, 0.2) !important;
         }
 
+        .equipment-report-table tbody tr.row-status-confirmed td {
+            background-color: #f0f7ff !important;
+        }
+
         .status-pill-in_progress {
             background-color: rgba(255, 193, 7, 0.15) !important;
             color: #926d00 !important;
@@ -536,7 +540,15 @@
                                                 <tbody>
                                                      @forelse ( $serviceOrders as $order)
                                                          @php
-                                                             $rowClass = match($order->status) {
+                                                             $displayStatus = $order->status ?? 'pending';
+                                                             if ($order->orderSlots->where('status', 'completed')->count() > 0) {
+                                                                 $displayStatus = 'completed';
+                                                             } elseif ($order->orderSlots->where('status', 'confirmed')->count() > 0) {
+                                                                 $displayStatus = 'confirmed';
+                                                             } elseif ($order->orderSlots->where('status', 'scheduled')->count() > 0) {
+                                                                 $displayStatus = 'scheduled';
+                                                             }
+                                                             $rowClass = match($displayStatus) {
                                                                  'pending'     => 'row-status-pending',
                                                                  'scheduled'   => 'row-status-scheduled',
                                                                  'confirmed'   => 'row-status-confirmed',
@@ -576,8 +588,8 @@
                                                                 @endif
                                                             </td>
                                                             <td>
-                                                                <span class="status-pill status-pill-{{ $order->status ?? 'pending' }}">
-                                                                    {{ ucfirst(str_replace('_', ' ', $order->status ?? 'pending')) }}
+                                                                <span class="status-pill status-pill-{{ $displayStatus }}">
+                                                                    {{ ucfirst(str_replace('_', ' ', $displayStatus)) }}
                                                                 </span>
                                                             </td>
                                                         </tr>

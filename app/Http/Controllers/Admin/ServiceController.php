@@ -1013,14 +1013,24 @@ class ServiceController extends Controller
             ->get();
 
         $events = $orders->map(function ($order) {
+            $displayStatus = $order->status ?? 'pending';
+            if ($order->orderSlots->where('status', 'completed')->count() > 0) {
+                $displayStatus = 'completed';
+            } elseif ($order->orderSlots->where('status', 'confirmed')->count() > 0) {
+                $displayStatus = 'confirmed';
+            } elseif ($order->orderSlots->where('status', 'scheduled')->count() > 0) {
+                $displayStatus = 'scheduled';
+            }
+
             return [
                 'id'    => $order->id,
                 'title' => $order->service->service_name ?? 'Service Order',
                 'start' => $order->intended_date,
                 'end'   => $order->intended_date,
-                'color' => match($order->status) {
-                    'scheduled'   => '#0d6efd',
-                    'completed'   => '#198754',
+                'color' => match($displayStatus) {
+                    'scheduled'   => '#ffb81c',
+                    'confirmed'   => '#0d6efd',
+                    'completed'   => '#069697',
                     'cancelled'   => '#dc3545',
                     default       => '#6c757d',
                 },
@@ -1031,7 +1041,7 @@ class ServiceController extends Controller
                     'company_name' => $order->service->lead->company->name ?? '-',
                     'po_number'    => $order->service->po_number ?? '-',
                     'price'        => $order->service->price_per_service ?? '-',
-                    'status'       => $order->status,
+                    'status'       => $displayStatus,
                     'scheduled_start_time' => $order->orderSlots->first()?->scheduled_start_time,
                     'service_dashboard_url'  => route('admin.lead.service.service_dashboard', $order->id),
                 ],
@@ -1065,7 +1075,7 @@ class ServiceController extends Controller
                 'color' => match($slot->status) {
                     'scheduled'   => '#ffb81c',
                     'confirmed'   => '#0d6efd',
-                    'completed'   => '#198754',
+                    'completed'   => '#069697',
                     'cancelled'   => '#dc3545',
                     default       => '#6c757d',
                 },
