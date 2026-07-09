@@ -1182,6 +1182,7 @@
                                                                                     @php
                                                                                         $roles = implode(' | ', $tech->specialties);
                                                                                         $slotDate = \Carbon\Carbon::parse($slot->scheduled_start_time);
+                                                                                        $slotDateStr = $slotDate->toDateString();
                                                                                         $startOfWeek = $slotDate->copy()->startOfWeek(\Carbon\Carbon::SUNDAY);
                                                                                         $endOfWeek = $slotDate->copy()->endOfWeek(\Carbon\Carbon::SATURDAY);
 
@@ -1201,20 +1202,62 @@
                                                                                                 && $s->id !== $slot->id;
                                                                                         });
 
-                                                                                        $bgColor = '#4caf50';
-                                                                                        $textColor = 'text-white';
+                                                                                        // Check availability record
+                                                                                        $dayOfWeek = strtolower($slotDate->format('D')); // mon, tue, wed...
+                                                                                        $availability = \App\Models\EmployeeAvailability::where('user_id', $tech->id)
+                                                                                            ->where('start_date', '<=', $slotDateStr)
+                                                                                            ->where('end_date', '>=', $slotDateStr)
+                                                                                            ->first();
+                                                                                        
+                                                                                        $isAvailable = false;
+                                                                                        $availDetail = '';
+                                                                                        if ($availability) {
+                                                                                            $availStartStr = $availability->{$dayOfWeek . '_start'} ?? '00:00';
+                                                                                            $availEndStr = $availability->{$dayOfWeek . '_end'} ?? '23:59';
+                                                                                            
+                                                                                            $baseDate = '2000-01-01 ';
+                                                                                            $availStart = \Carbon\Carbon::parse($baseDate . $availStartStr);
+                                                                                            $availEnd = \Carbon\Carbon::parse($baseDate . $availEndStr);
+                                                                                            if ($availEnd->lessThanOrEqualTo($availStart)) {
+                                                                                                $availEnd->addDay();
+                                                                                            }
+                                                                                            
+                                                                                            $slotStartParsed = \Carbon\Carbon::parse($baseDate . \Carbon\Carbon::parse($slot->scheduled_start_time)->format('H:i'));
+                                                                                            $slotEndParsed = \Carbon\Carbon::parse($baseDate . \Carbon\Carbon::parse($slot->scheduled_end_time)->format('H:i'));
+                                                                                            if ($slotEndParsed->lessThanOrEqualTo($slotStartParsed)) {
+                                                                                                $slotEndParsed->addDay();
+                                                                                            }
+                                                                                            
+                                                                                            if ($slotStartParsed->greaterThanOrEqualTo($availStart) && $slotEndParsed->lessThanOrEqualTo($availEnd)) {
+                                                                                                $isAvailable = true;
+                                                                                            }
+                                                                                            $availDetail = $availStartStr . '-' . $availEndStr;
+                                                                                        }
+
+                                                                                        if ($isAvailable) {
+                                                                                            $bgColor = '#4caf50';
+                                                                                            $textColor = 'text-white';
+                                                                                        } else {
+                                                                                            $bgColor = '#ea3d2f';
+                                                                                            $textColor = 'text-white';
+                                                                                        }
                                                                                     @endphp
                                                                                     <div class="d-flex justify-content-between align-items-center rounded p-2 mb-1"
-                                                                                        style="background-color: {{ $bgColor }};">
+                                                                                        style="background-color: {{ $bgColor }}; opacity: {{ $isAvailable ? '1' : '0.6' }};">
                                                                                         <div class="d-flex align-items-center gap-2">
                                                                                             <input type="checkbox"
                                                                                                 class="form-check-input mt-0"
                                                                                                 name="user_ids[]"
                                                                                                 value="{{ $tech->id }}"
-                                                                                                id="staff-{{ $slot->id }}-{{ $tech->id }}">
+                                                                                                id="staff-{{ $slot->id }}-{{ $tech->id }}"
+                                                                                                {{ $isAvailable ? '' : 'disabled' }}>
                                                                                             <label for="staff-{{ $slot->id }}-{{ $tech->id }}"
-                                                                                                class="{{ $textColor }} small mb-0" style="cursor:pointer;">
-                                                                                                {{ $tech->name }} | {{ $formattedHours }} |
+                                                                                                class="{{ $textColor }} small mb-0" style="cursor:{{ $isAvailable ? 'pointer' : 'not-allowed' }};">
+                                                                                                {{ $tech->name }} | {{ $formattedHours }} 
+                                                                                                @if(!$isAvailable)
+                                                                                                    <strong class="text-warning">(Unavailable{{ $availDetail ? ': ' . $availDetail : '' }})</strong>
+                                                                                                @endif
+                                                                                                |
                                                                                                 @if($otherSlots->count() > 0)
                                                                                                     <span class="d-block mt-1" style="font-size:11px;">
                                                                                                         @foreach($otherSlots as $os)
@@ -1247,6 +1290,7 @@
                                                                                     @php
                                                                                         $roles = implode(' | ', $tech->specialties);
                                                                                         $slotDate = \Carbon\Carbon::parse($slot->scheduled_start_time);
+                                                                                        $slotDateStr = $slotDate->toDateString();
                                                                                         $startOfWeek = $slotDate->copy()->startOfWeek(\Carbon\Carbon::SUNDAY);
                                                                                         $endOfWeek = $slotDate->copy()->endOfWeek(\Carbon\Carbon::SATURDAY);
 
@@ -1266,20 +1310,62 @@
                                                                                                 && $s->id !== $slot->id;
                                                                                         });
 
-                                                                                        $bgColor = '#4caf50';
-                                                                                        $textColor = 'text-white';
+                                                                                        // Check availability record
+                                                                                        $dayOfWeek = strtolower($slotDate->format('D')); // mon, tue, wed...
+                                                                                        $availability = \App\Models\EmployeeAvailability::where('user_id', $tech->id)
+                                                                                            ->where('start_date', '<=', $slotDateStr)
+                                                                                            ->where('end_date', '>=', $slotDateStr)
+                                                                                            ->first();
+                                                                                        
+                                                                                        $isAvailable = false;
+                                                                                        $availDetail = '';
+                                                                                        if ($availability) {
+                                                                                            $availStartStr = $availability->{$dayOfWeek . '_start'} ?? '00:00';
+                                                                                            $availEndStr = $availability->{$dayOfWeek . '_end'} ?? '23:59';
+                                                                                            
+                                                                                            $baseDate = '2000-01-01 ';
+                                                                                            $availStart = \Carbon\Carbon::parse($baseDate . $availStartStr);
+                                                                                            $availEnd = \Carbon\Carbon::parse($baseDate . $availEndStr);
+                                                                                            if ($availEnd->lessThanOrEqualTo($availStart)) {
+                                                                                                $availEnd->addDay();
+                                                                                            }
+                                                                                            
+                                                                                            $slotStartParsed = \Carbon\Carbon::parse($baseDate . \Carbon\Carbon::parse($slot->scheduled_start_time)->format('H:i'));
+                                                                                            $slotEndParsed = \Carbon\Carbon::parse($baseDate . \Carbon\Carbon::parse($slot->scheduled_end_time)->format('H:i'));
+                                                                                            if ($slotEndParsed->lessThanOrEqualTo($slotStartParsed)) {
+                                                                                                $slotEndParsed->addDay();
+                                                                                            }
+                                                                                            
+                                                                                            if ($slotStartParsed->greaterThanOrEqualTo($availStart) && $slotEndParsed->lessThanOrEqualTo($availEnd)) {
+                                                                                                $isAvailable = true;
+                                                                                            }
+                                                                                            $availDetail = $availStartStr . '-' . $availEndStr;
+                                                                                        }
+
+                                                                                        if ($isAvailable) {
+                                                                                            $bgColor = '#4caf50';
+                                                                                            $textColor = 'text-white';
+                                                                                        } else {
+                                                                                            $bgColor = '#ea3d2f';
+                                                                                            $textColor = 'text-white';
+                                                                                        }
                                                                                     @endphp
                                                                                     <div class="d-flex justify-content-between align-items-center rounded p-2 mb-1"
-                                                                                        style="background-color: {{ $bgColor }};">
+                                                                                        style="background-color: {{ $bgColor }}; opacity: {{ $isAvailable ? '1' : '0.6' }};">
                                                                                         <div class="d-flex align-items-center gap-2">
                                                                                             <input type="checkbox"
                                                                                                 class="form-check-input mt-0"
                                                                                                 name="user_ids[]"
                                                                                                 value="{{ $tech->id }}"
-                                                                                                id="staff-{{ $slot->id }}-{{ $tech->id }}">
+                                                                                                id="staff-{{ $slot->id }}-{{ $tech->id }}"
+                                                                                                {{ $isAvailable ? '' : 'disabled' }}>
                                                                                             <label for="staff-{{ $slot->id }}-{{ $tech->id }}"
-                                                                                                class="{{ $textColor }} small mb-0" style="cursor:pointer;">
-                                                                                                {{ $tech->name }} | {{ $formattedHours }} |
+                                                                                                class="{{ $textColor }} small mb-0" style="cursor:{{ $isAvailable ? 'pointer' : 'not-allowed' }};">
+                                                                                                {{ $tech->name }} | {{ $formattedHours }} 
+                                                                                                @if(!$isAvailable)
+                                                                                                    <strong class="text-warning">(Unavailable{{ $availDetail ? ': ' . $availDetail : '' }})</strong>
+                                                                                                @endif
+                                                                                                |
                                                                                                 @if($otherSlots->count() > 0)
                                                                                                     <span class="d-block mt-1" style="font-size:11px;">
                                                                                                         @foreach($otherSlots as $os)
@@ -1312,6 +1398,7 @@
                                                                                     @php
                                                                                         $roles = implode(' | ', $tech->specialties);
                                                                                         $slotDate = \Carbon\Carbon::parse($slot->scheduled_start_time);
+                                                                                        $slotDateStr = $slotDate->toDateString();
                                                                                         $startOfWeek = $slotDate->copy()->startOfWeek(\Carbon\Carbon::SUNDAY);
                                                                                         $endOfWeek = $slotDate->copy()->endOfWeek(\Carbon\Carbon::SATURDAY);
 
@@ -1331,20 +1418,62 @@
                                                                                                 && $s->id !== $slot->id;
                                                                                         });
 
-                                                                                        $bgColor = '#4caf50';
-                                                                                        $textColor = 'text-white';
+                                                                                        // Check availability record
+                                                                                        $dayOfWeek = strtolower($slotDate->format('D')); // mon, tue, wed...
+                                                                                        $availability = \App\Models\EmployeeAvailability::where('user_id', $tech->id)
+                                                                                            ->where('start_date', '<=', $slotDateStr)
+                                                                                            ->where('end_date', '>=', $slotDateStr)
+                                                                                            ->first();
+                                                                                        
+                                                                                        $isAvailable = false;
+                                                                                        $availDetail = '';
+                                                                                        if ($availability) {
+                                                                                            $availStartStr = $availability->{$dayOfWeek . '_start'} ?? '00:00';
+                                                                                            $availEndStr = $availability->{$dayOfWeek . '_end'} ?? '23:59';
+                                                                                            
+                                                                                            $baseDate = '2000-01-01 ';
+                                                                                            $availStart = \Carbon\Carbon::parse($baseDate . $availStartStr);
+                                                                                            $availEnd = \Carbon\Carbon::parse($baseDate . $availEndStr);
+                                                                                            if ($availEnd->lessThanOrEqualTo($availStart)) {
+                                                                                                $availEnd->addDay();
+                                                                                            }
+                                                                                            
+                                                                                            $slotStartParsed = \Carbon\Carbon::parse($baseDate . \Carbon\Carbon::parse($slot->scheduled_start_time)->format('H:i'));
+                                                                                            $slotEndParsed = \Carbon\Carbon::parse($baseDate . \Carbon\Carbon::parse($slot->scheduled_end_time)->format('H:i'));
+                                                                                            if ($slotEndParsed->lessThanOrEqualTo($slotStartParsed)) {
+                                                                                                $slotEndParsed->addDay();
+                                                                                            }
+                                                                                            
+                                                                                            if ($slotStartParsed->greaterThanOrEqualTo($availStart) && $slotEndParsed->lessThanOrEqualTo($availEnd)) {
+                                                                                                $isAvailable = true;
+                                                                                            }
+                                                                                            $availDetail = $availStartStr . '-' . $availEndStr;
+                                                                                        }
+
+                                                                                        if ($isAvailable) {
+                                                                                            $bgColor = '#4caf50';
+                                                                                            $textColor = 'text-white';
+                                                                                        } else {
+                                                                                            $bgColor = '#ea3d2f';
+                                                                                            $textColor = 'text-white';
+                                                                                        }
                                                                                     @endphp
                                                                                     <div class="d-flex justify-content-between align-items-center rounded p-2 mb-1"
-                                                                                        style="background-color: {{ $bgColor }};">
+                                                                                        style="background-color: {{ $bgColor }}; opacity: {{ $isAvailable ? '1' : '0.6' }};">
                                                                                         <div class="d-flex align-items-center gap-2">
                                                                                             <input type="checkbox"
                                                                                                 class="form-check-input mt-0"
                                                                                                 name="user_ids[]"
                                                                                                 value="{{ $tech->id }}"
-                                                                                                id="staff-{{ $slot->id }}-{{ $tech->id }}">
+                                                                                                id="staff-{{ $slot->id }}-{{ $tech->id }}"
+                                                                                                {{ $isAvailable ? '' : 'disabled' }}>
                                                                                             <label for="staff-{{ $slot->id }}-{{ $tech->id }}"
-                                                                                                class="{{ $textColor }} small mb-0" style="cursor:pointer;">
-                                                                                                {{ $tech->name }} | {{ $formattedHours }} |
+                                                                                                class="{{ $textColor }} small mb-0" style="cursor:{{ $isAvailable ? 'pointer' : 'not-allowed' }};">
+                                                                                                {{ $tech->name }} | {{ $formattedHours }} 
+                                                                                                @if(!$isAvailable)
+                                                                                                    <strong class="text-warning">(Unavailable{{ $availDetail ? ': ' . $availDetail : '' }})</strong>
+                                                                                                @endif
+                                                                                                |
                                                                                                 @if($otherSlots->count() > 0)
                                                                                                     <span class="d-block mt-1" style="font-size:11px;">
                                                                                                         @foreach($otherSlots as $os)

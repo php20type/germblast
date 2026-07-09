@@ -377,7 +377,7 @@ class ServiceController extends Controller
                 if (!isset($employees[$userId])) {
                     // Fetch prior hours worked in the same week (excluding current order)
                     $otherSlotIds = \App\Models\ServiceOrderSlotStaff::where('user_id', $userId)
-                        ->whereHas('serviceOrderSlot', function ($q) use ($startOfWeek, $endOfWeek, $order) {
+                        ->whereHas('slot', function ($q) use ($startOfWeek, $endOfWeek, $order) {
                             $q->where('service_order_id', '!=', $order->id)
                               ->whereBetween('scheduled_start_time', [$startOfWeek, $endOfWeek]);
                         })
@@ -396,6 +396,17 @@ class ServiceController extends Controller
                         }
                     }
 
+                    $slotDateForLimit = $firstSlotTime->toDateString();
+                    $availabilityForLimit = \App\Models\EmployeeAvailability::where('user_id', $userId)
+                        ->where('start_date', '<=', $slotDateForLimit)
+                        ->where('end_date', '>=', $slotDateForLimit)
+                        ->first();
+                    
+                    $maxHoursLimit = $availabilityForLimit ? $availabilityForLimit->max_hours : 40;
+                    if ($maxHoursLimit <= 0) {
+                        $maxHoursLimit = 40;
+                    }
+
                     $employees[$userId] = [
                         'user' => $user,
                         'hourlyRate' => $user->hourly_rate ?? 0,
@@ -410,6 +421,7 @@ class ServiceController extends Controller
                         'totalWithBenefits' => 0,
                         'budgetVariance' => 0,
                         'totalScheduledHours' => 0,
+                        'maxHoursLimit' => $maxHoursLimit,
                     ];
                 }
                 
@@ -434,12 +446,13 @@ class ServiceController extends Controller
         foreach ($employees as $userId => &$emp) {
             $priorWorkedHours = $emp['priorWorkedHours'];
             $totalWorkedHoursInJob = $emp['actualWorkedHours'];
+            $maxHoursLimit = $emp['maxHoursLimit'] ?? 40;
 
-            if ($priorWorkedHours >= 40) {
+            if ($priorWorkedHours >= $maxHoursLimit) {
                 $emp['regularHours'] = 0;
                 $emp['overtimeHours'] = $totalWorkedHoursInJob;
             } else {
-                $remainingRegularHoursLimit = 40 - $priorWorkedHours;
+                $remainingRegularHoursLimit = $maxHoursLimit - $priorWorkedHours;
                 if ($totalWorkedHoursInJob <= $remainingRegularHoursLimit) {
                     $emp['regularHours'] = $totalWorkedHoursInJob;
                     $emp['overtimeHours'] = 0;
@@ -767,6 +780,46 @@ class ServiceController extends Controller
         foreach ($request->user_ids as $userId) {
             $alreadyAssigned = $slot->staff()->where('user_id', $userId)->exists();
             if ($alreadyAssigned) continue;
+
+            $user = User::find($userId);
+            $userName = $user ? $user->name : 'Staff Member';
+
+            // Check availability
+            $slotDate = $slotStart->toDateString();
+            $dayOfWeek = strtolower($slotStart->format('D')); // mon, tue, wed, thu, fri, sat, sun
+            
+            $availability = \App\Models\EmployeeAvailability::where('user_id', $userId)
+                ->where('start_date', '<=', $slotDate)
+                ->where('end_date', '>=', $slotDate)
+                ->first();
+
+            if (!$availability) {
+                return redirect()->back()->with('error', "{$userName} has no availability records configured for this date ({$slotStart->format('M d, Y')}).");
+            }
+            
+            $availStartStr = $availability->{$dayOfWeek . '_start'} ?? '00:00';
+            $availEndStr = $availability->{$dayOfWeek . '_end'} ?? '23:59';
+            
+            $baseDate = '2000-01-01 ';
+            $availStart = \Carbon\Carbon::parse($baseDate . $availStartStr);
+            $availEnd = \Carbon\Carbon::parse($baseDate . $availEndStr);
+            if ($availEnd->lessThanOrEqualTo($availStart)) {
+                $availEnd->addDay();
+            }
+            
+            $slotStartTimeStr = $slotStart->format('H:i');
+            $slotEndTimeStr = $slotEnd->format('H:i');
+            
+            $slotStartParsed = \Carbon\Carbon::parse($baseDate . $slotStartTimeStr);
+            $slotEndParsed = \Carbon\Carbon::parse($baseDate . $slotEndTimeStr);
+            if ($slotEndParsed->lessThanOrEqualTo($slotStartParsed)) {
+                $slotEndParsed->addDay();
+            }
+            
+            if ($slotStartParsed->lessThan($availStart) || $slotEndParsed->greaterThan($availEnd)) {
+                $timeframeRange = $availability->start_date->format('m/d/y') . ' - ' . $availability->end_date->format('m/d/y');
+                return redirect()->back()->with('error', "{$userName} is not available during the scheduled slot ({$slotStart->format('h:i A')} - {$slotEnd->format('h:i A')}). Available time for {$slotStart->format('l')}: {$availStartStr} - {$availEndStr} (within timeframe {$timeframeRange}).");
+            }
 
             // Check for overlapping assignments
             $overlappingAssignment = ServiceOrderSlotStaff::where('user_id', $userId)
@@ -1326,6 +1379,40 @@ class ServiceController extends Controller
 
                 // Display available staff from that scheduled slot office location (territory) only
                 if ($slot->scheduled_office && $employee->territory_id != $slot->scheduled_office) {
+                    continue;
+                }
+
+                // Filter by employee's availability record for this slot date/time
+                $dayOfWeek = strtolower($slotStart->format('D')); // mon, tue, wed...
+                $availability = \App\Models\EmployeeAvailability::where('user_id', $employee->id)
+                    ->where('start_date', '<=', $slotDayKey)
+                    ->where('end_date', '>=', $slotDayKey)
+                    ->first();
+                
+                if (!$availability) {
+                    continue;
+                }
+                
+                $availStartStr = $availability->{$dayOfWeek . '_start'} ?? '00:00';
+                $availEndStr = $availability->{$dayOfWeek . '_end'} ?? '23:59';
+                
+                $baseDate = '2000-01-01 ';
+                $availStart = \Carbon\Carbon::parse($baseDate . $availStartStr);
+                $availEnd = \Carbon\Carbon::parse($baseDate . $availEndStr);
+                if ($availEnd->lessThanOrEqualTo($availStart)) {
+                    $availEnd->addDay();
+                }
+                
+                $slotStartTimeStr = $slotStart->format('H:i');
+                $slotEndTimeStr = $slotEnd->format('H:i');
+                
+                $slotStartParsed = \Carbon\Carbon::parse($baseDate . $slotStartTimeStr);
+                $slotEndParsed = \Carbon\Carbon::parse($baseDate . $slotEndTimeStr);
+                if ($slotEndParsed->lessThanOrEqualTo($slotStartParsed)) {
+                    $slotEndParsed->addDay();
+                }
+                
+                if ($slotStartParsed->lessThan($availStart) || $slotEndParsed->greaterThan($availEnd)) {
                     continue;
                 }
 
