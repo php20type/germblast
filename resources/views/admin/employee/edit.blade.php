@@ -194,6 +194,15 @@
                                             </div>
 
                                             <div class="col-md-6">
+                                                <label class="form-label">Overtime Hourly Rate <span class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="text" name="overtime_rate" class="form-control"
+                                                        value="{{ old('overtime_rate', $employee->overtime_rate) }}">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
                                                 <label class="form-label">Training Level <span class="text-danger">*</span></label>
                                                 <select name="training_level" class="form-select">
                                                     <option value="Trainee" {{ old('training_level', $employee->training_level) == 'Trainee' ? 'selected' : '' }}>Trainee</option>
@@ -585,6 +594,7 @@
             cell_phone: { required: true, digits: true, minlength: 10, maxlength: 10 },
 
             hourly_rate: { required: true, number: true, min: 0 },
+            overtime_rate: { required: true, number: true, min: 0 },
 
             training_level: { required: true },
 
@@ -616,6 +626,12 @@
 
             hourly_rate: {
                 required: "Hourly rate is required.",
+                number: "Enter a valid number.",
+                min: "Must be greater than or equal to 0."
+            },
+
+            overtime_rate: {
+                required: "Overtime hourly rate is required.",
                 number: "Enter a valid number.",
                 min: "Must be greater than or equal to 0."
             },

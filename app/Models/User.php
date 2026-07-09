@@ -37,6 +37,7 @@ class User extends Authenticatable
         'cell_phone',
         'profile_image',
         'hourly_rate',
+        'overtime_rate',
         'training_level',
         'employee_type',
         'active',

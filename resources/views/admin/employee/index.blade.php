@@ -53,6 +53,7 @@
                                             <th>Staff Type</th>
                                             <th>Territory</th>
                                             <th>Hourly Rate</th>
+                                            <th>Overtime Rate</th>
                                             <th>Joined</th>
                                         </tr>
                                     </thead>
@@ -111,6 +112,21 @@
                 $(document).on('click', '.toggle-rate', function () {
                     let icon = $(this);
                     let span = icon.closest('td').find('.hourly-rate');
+
+                    let value = span.data('value');
+
+                    if (icon.hasClass('fa-eye')) {
+                        span.text('$' + value);
+                        icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                    } else {
+                        span.text('*****');
+                        icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                    }
+                });
+
+                $(document).on('click', '.toggle-overtime-rate', function () {
+                    let icon = $(this);
+                    let span = icon.closest('td').find('.overtime-rate-display');
 
                     let value = span.data('value');
 

@@ -122,6 +122,7 @@ class EmployeeController extends Controller
 
             'cell_phone' => 'required|digits:10',
             'hourly_rate' => 'required|numeric|min:0',
+            'overtime_rate' => 'required|numeric|min:0',
 
             'training_level' => 'required|in:Trainee,Level I,Level II,Level III,Level IV',
 
@@ -146,6 +147,7 @@ class EmployeeController extends Controller
 
             'cell_phone' => $validated['cell_phone'],
             'hourly_rate' => $validated['hourly_rate'],
+            'overtime_rate' => $validated['overtime_rate'],
 
             'training_level' => $validated['training_level'],
 

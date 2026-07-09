@@ -62,10 +62,19 @@
                 <i class="fas fa-eye ms-2 toggle-rate" style="cursor:pointer;"></i>
             </div>
         </td>
+        <td>
+            <div class="d-flex align-items-center">
+                <span class="overtime-rate-display" data-value="{{ $employee->overtime_rate ?? 0 }}">
+                    *****
+                </span>
+
+                <i class="fas fa-eye ms-2 toggle-overtime-rate" style="cursor:pointer;"></i>
+            </div>
+        </td>
         <td>{{ \Carbon\Carbon::parse($employee->created_at)->format('d F Y') }}</td>
-    </tr>
-@empty
-    <tr>
-        <td colspan="7" class="text-center">No employees found</td>
-    </tr>
-@endforelse
+     </tr>
+ @empty
+     <tr>
+         <td colspan="8" class="text-center">No employees found</td>
+     </tr>
+ @endforelse
