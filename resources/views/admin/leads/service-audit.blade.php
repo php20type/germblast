@@ -173,21 +173,21 @@
                                                 @forelse($employees as $emp)
                                                     <tr>
                                                         <td class="text-start fw-bold">{{ $emp['user']->name ?? 'Unknown' }}</td>
-                                                        <td>{{ number_format($emp['hourly_rate'], 2) }}</td>
-                                                        <td>{{ number_format($emp['overtime_rate'], 2) }}</td>
-                                                        <td>{{ number_format($emp['total_hours'], 2) }}</td>
-                                                        <td>{{ number_format($emp['overtime_hours'], 2) }}</td>
+                                                        <td>{{ number_format($emp['hourlyRate'], 2) }}</td>
+                                                        <td>{{ number_format($emp['overtimeRate'], 2) }}</td>
+                                                        <td>{{ number_format($emp['regularHours'], 2) }}</td>
+                                                        <td>{{ number_format($emp['overtimeHours'], 2) }}</td>
                                                         
-                                                        @foreach($emp['scheduled_days'] as $hours)
+                                                        @foreach($emp['scheduledDays'] as $hours)
                                                             <td class="text-danger fw-bold">{{ $hours ? number_format($hours, 1) : '' }}</td>
                                                         @endforeach
                                                         
-                                                        <td>{{ number_format($emp['actual_worked'], 2) }}</td>
-                                                        <td>{{ number_format($emp['deviation_from_schedule'], 2) }}</td>
-                                                        <td>{{ number_format($emp['budgeted'], 2) }}</td>
-                                                        <td>{{ number_format($emp['extended_actual_cost'], 2) }}</td>
-                                                        <td>{{ number_format($emp['total_with_benefits'], 2) }}</td>
-                                                        <td>{{ number_format($emp['budget_variance'], 2) }}</td>
+                                                        <td>{{ number_format($emp['actualWorkedHours'], 2) }}</td>
+                                                        <td>{{ number_format($emp['deviationFromSchedule'], 2) }}</td>
+                                                        <td>{{ number_format($emp['budgetedAmount'], 2) }}</td>
+                                                        <td>{{ number_format($emp['extendedActualCost'], 2) }}</td>
+                                                        <td>{{ number_format($emp['totalWithBenefits'], 2) }}</td>
+                                                        <td>{{ number_format($emp['budgetVariance'], 2) }}</td>
                                                     </tr>
                                                 @empty
                                                     <tr>
@@ -203,21 +203,21 @@
                                                         <td class="text-start">Total / Average</td>
                                                         <td>-</td>
                                                         <td>-</td>
-                                                        <td>{{ number_format(collect($employees)->sum('total_hours'), 2) }}</td>
-                                                        <td>{{ number_format(collect($employees)->sum('overtime_hours'), 2) }}</td>
+                                                        <td>{{ number_format(collect($employees)->sum('regularHours'), 2) }}</td>
+                                                        <td>{{ number_format(collect($employees)->sum('overtimeHours'), 2) }}</td>
                                                         
                                                         @foreach($slots as $index => $slot)
                                                             <td class="text-danger">
-                                                                {{ number_format(collect($employees)->sum(function($emp) use ($index) { return (float)($emp['scheduled_days'][$index] ?? 0); }), 1) }}
+                                                                {{ number_format(collect($employees)->sum(function($emp) use ($index) { return (float)($emp['scheduledDays'][$index] ?? 0); }), 1) }}
                                                             </td>
                                                         @endforeach
                                                         
-                                                        <td>{{ number_format(collect($employees)->sum('actual_worked'), 2) }}</td>
-                                                        <td>{{ number_format(collect($employees)->sum('deviation_from_schedule'), 2) }}</td>
-                                                        <td>{{ number_format(collect($employees)->sum('budgeted'), 2) }}</td>
-                                                        <td>{{ number_format(collect($employees)->sum('extended_actual_cost'), 2) }}</td>
-                                                        <td>{{ number_format(collect($employees)->sum('total_with_benefits'), 2) }}</td>
-                                                        <td>{{ number_format(collect($employees)->sum('budget_variance'), 2) }}</td>
+                                                        <td>{{ number_format(collect($employees)->sum('actualWorkedHours'), 2) }}</td>
+                                                        <td>{{ number_format(collect($employees)->sum('deviationFromSchedule'), 2) }}</td>
+                                                        <td>{{ number_format(collect($employees)->sum('budgetedAmount'), 2) }}</td>
+                                                        <td>{{ number_format(collect($employees)->sum('extendedActualCost'), 2) }}</td>
+                                                        <td>{{ number_format(collect($employees)->sum('totalWithBenefits'), 2) }}</td>
+                                                        <td>{{ number_format(collect($employees)->sum('budgetVariance'), 2) }}</td>
                                                     </tr>
                                                 @endif
                                             </tbody>

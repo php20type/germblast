@@ -169,6 +169,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('hr/driver-report', [EmployeeController::class, 'driverReport'])->name('hr.driver-report.index');
     Route::post('hr/driver-report/{userId}', [EmployeeController::class, 'updateDriverReport'])->name('hr.driver-report.update');
 
+    // Employee Work Report
+    Route::get('work-report', [EmployeeController::class, 'workReport'])->name('work-report.index');
+
     // Inventory Report
     Route::get('inventory-report', [InventoryReportController::class, 'index'])->name('inventory-report.index');
     Route::post('inventory-report', [InventoryReportController::class, 'store'])->name('inventory-report.store');

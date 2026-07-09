@@ -304,4 +304,141 @@ class EmployeeController extends Controller
 
         return redirect()->back()->with('success', 'Driver report updated successfully!');
     }
+
+    /**
+     * Display the employee work report page with monthly payroll statistics.
+     */
+    public function workReport(Request $request)
+    {
+        $selectedMonth = $request->input('month', now()->format('Y-m'));
+        $monthDate = \Carbon\Carbon::parse($selectedMonth . '-01');
+        $startOfMonth = $monthDate->copy()->startOfMonth();
+        $endOfMonth = $monthDate->copy()->endOfMonth();
+
+        // 4 weekly ranges definition for columns
+        $w1Start = $startOfMonth->copy();
+        $w1End = $startOfMonth->copy()->addDays(6)->endOfDay();
+
+        $w2Start = $startOfMonth->copy()->addDays(7)->startOfDay();
+        $w2End = $startOfMonth->copy()->addDays(13)->endOfDay();
+
+        $w3Start = $startOfMonth->copy()->addDays(14)->startOfDay();
+        $w3End = $startOfMonth->copy()->addDays(20)->endOfDay();
+
+        $w4Start = $startOfMonth->copy()->addDays(21)->startOfDay();
+        $w4End = $endOfMonth->copy()->endOfDay();
+
+        $employees = User::withoutRole('customer')->orderBy('name')->get();
+
+        $reportData = [];
+
+        foreach ($employees as $employee) {
+            $userId = $employee->id;
+            $hourlyRate = $employee->hourly_rate ?? 0;
+            $overtimeRate = $employee->overtime_rate ?? 0;
+
+            // Fetch all slot assignments for this employee in the weeks spanned by the month
+            $extendedStart = $startOfMonth->copy()->startOfWeek();
+            $extendedEnd = $endOfMonth->copy()->endOfWeek();
+
+            $allStaffSlots = \App\Models\ServiceOrderSlotStaff::where('user_id', $userId)
+                ->whereHas('slot', function ($q) use ($extendedStart, $extendedEnd) {
+                    $q->whereBetween('scheduled_start_time', [$extendedStart, $extendedEnd]);
+                })
+                ->with(['slot.clocks'])
+                ->get()
+                ->map(fn($s) => $s->slot)
+                ->filter()
+                ->sortBy('scheduled_start_time')
+                ->values();
+
+            // Group slots by ISO week
+            $slotsByWeek = [];
+            foreach ($allStaffSlots as $s) {
+                $weekKey = \Carbon\Carbon::parse($s->scheduled_start_time)->format('o-W');
+                $slotsByWeek[$weekKey][] = $s;
+            }
+
+            $w1Actual = 0;
+            $w2Actual = 0;
+            $w3Actual = 0;
+            $w4Actual = 0;
+
+            $totalRegular = 0;
+            $totalOvertime = 0;
+
+            foreach ($slotsByWeek as $weekKey => $weekSlots) {
+                $priorWorkedHours = 0;
+                foreach ($weekSlots as $slot) {
+                    $slotTime = \Carbon\Carbon::parse($slot->scheduled_start_time);
+
+                    // Calculate actual worked hours for this slot
+                    $slotActualHours = 0;
+                    if ($slot->clocks->isNotEmpty()) {
+                        foreach ($slot->clocks as $clock) {
+                            $slotActualHours += $clock->clocked_hours ?? $clock->calculateHours();
+                        }
+                    }
+
+                    // Split slot actual hours into regular and overtime
+                    $slotRegular = 0;
+                    $slotOvertime = 0;
+
+                    if ($priorWorkedHours >= 40) {
+                        $slotRegular = 0;
+                        $slotOvertime = $slotActualHours;
+                    } else {
+                        $remainingRegular = 40 - $priorWorkedHours;
+                        if ($slotActualHours <= $remainingRegular) {
+                            $slotRegular = $slotActualHours;
+                            $slotOvertime = 0;
+                        } else {
+                            $slotRegular = $remainingRegular;
+                            $slotOvertime = $slotActualHours - $remainingRegular;
+                        }
+                    }
+
+                    // Accumulate weekly hours
+                    $priorWorkedHours += $slotActualHours;
+
+                    // Only count totals if the slot is within the selected month
+                    if ($slotTime->between($startOfMonth, $endOfMonth)) {
+                        $totalRegular += $slotRegular;
+                        $totalOvertime += $slotOvertime;
+
+                        if ($slotTime->between($w1Start, $w1End)) {
+                            $w1Actual += $slotActualHours;
+                        } elseif ($slotTime->between($w2Start, $w2End)) {
+                            $w2Actual += $slotActualHours;
+                        } elseif ($slotTime->between($w3Start, $w3End)) {
+                            $w3Actual += $slotActualHours;
+                        } elseif ($slotTime->between($w4Start, $w4End)) {
+                            $w4Actual += $slotActualHours;
+                        }
+                    }
+                }
+            }
+
+            // Calculations
+            $regularPay = $totalRegular * $hourlyRate;
+            $overtimePay = $totalOvertime * $overtimeRate;
+            $totalMonthlyPay = $regularPay + $overtimePay;
+
+            $reportData[] = [
+                'employee' => $employee,
+                'name' => $employee->name,
+                'w1Actual' => $w1Actual,
+                'w2Actual' => $w2Actual,
+                'w3Actual' => $w3Actual,
+                'w4Actual' => $w4Actual,
+                'totalRegular' => $totalRegular,
+                'totalOvertime' => $totalOvertime,
+                'regularPay' => $regularPay,
+                'overtimePay' => $overtimePay,
+                'totalMonthlyPay' => $totalMonthlyPay,
+            ];
+        }
+
+        return view('admin.hr.work-report.index', compact('reportData', 'selectedMonth', 'monthDate'));
+    }
 }

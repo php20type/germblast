@@ -358,6 +358,15 @@ class ServiceController extends Controller
         $employees = [];
         $slots = $order->orderSlots->sortBy('scheduled_start_time')->values();
 
+        $firstSlot = $slots->first();
+        if ($firstSlot && $firstSlot->scheduled_start_time) {
+            $firstSlotTime = \Carbon\Carbon::parse($firstSlot->scheduled_start_time);
+        } else {
+            $firstSlotTime = \Carbon\Carbon::now();
+        }
+        $startOfWeek = $firstSlotTime->copy()->startOfWeek();
+        $endOfWeek = $firstSlotTime->copy()->endOfWeek();
+
         foreach ($slots as $slotIndex => $slot) {
             foreach ($slot->staff as $staff) {
                 $user = $staff->user;
@@ -366,47 +375,85 @@ class ServiceController extends Controller
                 }
                 $userId = $staff->user_id;
                 if (!isset($employees[$userId])) {
+                    // Fetch prior hours worked in the same week (excluding current order)
+                    $otherSlotIds = \App\Models\ServiceOrderSlotStaff::where('user_id', $userId)
+                        ->whereHas('serviceOrderSlot', function ($q) use ($startOfWeek, $endOfWeek, $order) {
+                            $q->where('service_order_id', '!=', $order->id)
+                              ->whereBetween('scheduled_start_time', [$startOfWeek, $endOfWeek]);
+                        })
+                        ->pluck('service_order_slot_id');
+
+                    $otherSlots = \App\Models\ServiceOrderSlot::with('clocks')
+                        ->whereIn('id', $otherSlotIds)
+                        ->get();
+
+                    $priorWorkedHours = 0;
+                    foreach ($otherSlots as $otherSlot) {
+                        if ($otherSlot->clocks->isNotEmpty()) {
+                            foreach ($otherSlot->clocks as $clock) {
+                                $priorWorkedHours += $clock->clocked_hours ?? $clock->calculateHours();
+                            }
+                        }
+                    }
+
                     $employees[$userId] = [
                         'user' => $user,
-                        'hourly_rate' => $user->hourly_rate ?? 0,
-                        'overtime_rate' => $user->overtime_rate ?? 0,
-                        'total_hours' => 0,
-                        'overtime_hours' => 0,
-                        'scheduled_days' => array_fill(0, count($slots), ''),
-                        'actual_worked' => 0,
-                        'budgeted' => 0,
-                        'extended_actual_cost' => 0,
-                        'total_with_benefits' => 0,
-                        'budget_variance' => 0,
-                        'total_scheduled_hours' => 0,
+                        'hourlyRate' => $user->hourly_rate ?? 0,
+                        'overtimeRate' => $user->overtime_rate ?? 0,
+                        'regularHours' => 0,
+                        'overtimeHours' => 0,
+                        'scheduledDays' => array_fill(0, count($slots), ''),
+                        'actualWorkedHours' => 0,
+                        'priorWorkedHours' => $priorWorkedHours,
+                        'budgetedAmount' => 0,
+                        'extendedActualCost' => 0,
+                        'totalWithBenefits' => 0,
+                        'budgetVariance' => 0,
+                        'totalScheduledHours' => 0,
                     ];
                 }
                 
-                // For this slot, the employee is scheduled for $staff->slot_hours
-                $hours = $staff->slot_hours ?? 0;
-                $employees[$userId]['total_scheduled_hours'] += $hours;
-                $employees[$userId]['scheduled_days'][$slotIndex] = $hours;
-                $employees[$userId]['budgeted'] += ($hours * ($user->hourly_rate ?? 0));
+                // For this slot, the employee is scheduled for slot hours
+                $slotHours = $staff->slot_hours ?? 0;
+                $employees[$userId]['totalScheduledHours'] += $slotHours;
+                $employees[$userId]['scheduledDays'][$slotIndex] = $slotHours;
+                $employees[$userId]['budgetedAmount'] += ($slotHours * ($user->hourly_rate ?? 0));
                 
                 // Actual worked: if anyone clocked for this slot, every assigned staff member gets the actual clocked hours of that slot
-                $actual = 0;
+                $clockedHours = 0;
                 if ($slot->clocks->isNotEmpty()) {
                     foreach ($slot->clocks as $clock) {
-                        $actual += $clock->clocked_hours ?? $clock->calculateHours();
+                        $clockedHours += $clock->clocked_hours ?? $clock->calculateHours();
                     }
                 }
-                $employees[$userId]['actual_worked'] += $actual;
+                $employees[$userId]['actualWorkedHours'] += $clockedHours;
             }
         }
 
-        // Calculate variances for each employee
+        // Calculate variances and overtime for each employee
         foreach ($employees as $userId => &$emp) {
-            $emp['total_hours'] = $emp['actual_worked'] - $emp['overtime_hours'];
-            $emp['actual_worked'] = $emp['total_hours'] + $emp['overtime_hours'];
-            $emp['deviation_from_schedule'] = $emp['actual_worked'] - $emp['total_scheduled_hours'];
-            $emp['extended_actual_cost'] = ($emp['hourly_rate'] * $emp['total_hours']) + ($emp['overtime_rate'] * $emp['overtime_hours']);
-            $emp['total_with_benefits'] = $emp['extended_actual_cost'] * 1.20;
-            $emp['budget_variance'] = $emp['budgeted'] - $emp['total_with_benefits'];
+            $priorWorkedHours = $emp['priorWorkedHours'];
+            $totalWorkedHoursInJob = $emp['actualWorkedHours'];
+
+            if ($priorWorkedHours >= 40) {
+                $emp['regularHours'] = 0;
+                $emp['overtimeHours'] = $totalWorkedHoursInJob;
+            } else {
+                $remainingRegularHoursLimit = 40 - $priorWorkedHours;
+                if ($totalWorkedHoursInJob <= $remainingRegularHoursLimit) {
+                    $emp['regularHours'] = $totalWorkedHoursInJob;
+                    $emp['overtimeHours'] = 0;
+                } else {
+                    $emp['regularHours'] = $remainingRegularHoursLimit;
+                    $emp['overtimeHours'] = $totalWorkedHoursInJob - $remainingRegularHoursLimit;
+                }
+            }
+
+            $emp['actualWorkedHours'] = $emp['regularHours'] + $emp['overtimeHours'];
+            $emp['deviationFromSchedule'] = $emp['actualWorkedHours'] - $emp['totalScheduledHours'];
+            $emp['extendedActualCost'] = ($emp['hourlyRate'] * $emp['regularHours']) + ($emp['overtimeRate'] * $emp['overtimeHours']);
+            $emp['totalWithBenefits'] = $emp['extendedActualCost'] * 1.20;
+            $emp['budgetVariance'] = $emp['budgetedAmount'] - $emp['totalWithBenefits'];
         }
 
         return view('admin.leads.service-audit', compact('order', 'slots', 'employees'));
@@ -714,10 +761,31 @@ class ServiceController extends Controller
 
         $slot = ServiceOrderSlot::with('serviceOrder.service')->findOrFail($slotId);
         $slotHours = $slot->scheduled_hours ?? 0;
+        $slotStart = $slot->scheduled_start_time;
+        $slotEnd = $slot->scheduled_end_time;
 
         foreach ($request->user_ids as $userId) {
             $alreadyAssigned = $slot->staff()->where('user_id', $userId)->exists();
             if ($alreadyAssigned) continue;
+
+            // Check for overlapping assignments
+            $overlappingAssignment = ServiceOrderSlotStaff::where('user_id', $userId)
+                ->where('service_order_slot_id', '!=', $slotId)
+                ->whereHas('slot', function ($q) use ($slotStart, $slotEnd) {
+                    $q->where('scheduled_start_time', '<', $slotEnd)
+                      ->where('scheduled_end_time', '>', $slotStart);
+                })
+                ->with('slot')
+                ->first();
+
+            if ($overlappingAssignment) {
+                $user = User::find($userId);
+                $userName = $user ? $user->name : 'Staff';
+                $overlapStart = $overlappingAssignment->slot->scheduled_start_time->format('h:i A');
+                $overlapEnd = $overlappingAssignment->slot->scheduled_end_time->format('h:i A');
+                $overlapDate = $overlappingAssignment->slot->scheduled_start_time->format('M d, Y');
+                return redirect()->back()->with('error', "{$userName} is already booked for that same date and time ({$overlapDate} from {$overlapStart} to {$overlapEnd}).");
+            }
 
             $user = User::findOrFail($userId);
             $cost = round($slotHours * ($user->hourly_rate ?? 0), 2);

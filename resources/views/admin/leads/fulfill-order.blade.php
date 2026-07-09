@@ -2751,7 +2751,16 @@
         toastr.success("{{ session('success') }}");
     @endif
     @if(session('error'))
-        toastr.error("{{ session('error') }}");
+        @if(str_contains(session('error'), 'booked') || str_contains(session('error'), 'conflict') || str_contains(session('error'), 'schedule'))
+            Swal.fire({
+                title: 'Schedule Conflict!',
+                text: "{{ session('error') }}",
+                icon: 'error',
+                confirmButtonColor: '#0d6efd'
+            });
+        @else
+            toastr.error("{{ session('error') }}");
+        @endif
     @endif
     @if(session('warning'))
         toastr.warning("{{ session('warning') }}");
