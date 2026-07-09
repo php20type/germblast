@@ -369,6 +369,20 @@ class EmployeeController extends Controller
 
             foreach ($slotsByWeek as $weekKey => $weekSlots) {
                 $priorWorkedHours = 0;
+                
+                $firstSlotOfWeek = reset($weekSlots);
+                $firstSlotDate = \Carbon\Carbon::parse($firstSlotOfWeek->scheduled_start_time)->toDateString();
+                
+                $availability = \App\Models\EmployeeAvailability::where('user_id', $userId)
+                    ->where('start_date', '<=', $firstSlotDate)
+                    ->where('end_date', '>=', $firstSlotDate)
+                    ->first();
+                    
+                $maxHoursLimit = $availability ? $availability->max_hours : 40;
+                if ($maxHoursLimit <= 0) {
+                    $maxHoursLimit = 40;
+                }
+
                 foreach ($weekSlots as $slot) {
                     $slotTime = \Carbon\Carbon::parse($slot->scheduled_start_time);
 
@@ -384,11 +398,11 @@ class EmployeeController extends Controller
                     $slotRegular = 0;
                     $slotOvertime = 0;
 
-                    if ($priorWorkedHours >= 40) {
+                    if ($priorWorkedHours >= $maxHoursLimit) {
                         $slotRegular = 0;
                         $slotOvertime = $slotActualHours;
                     } else {
-                        $remainingRegular = 40 - $priorWorkedHours;
+                        $remainingRegular = $maxHoursLimit - $priorWorkedHours;
                         if ($slotActualHours <= $remainingRegular) {
                             $slotRegular = $slotActualHours;
                             $slotOvertime = 0;
@@ -424,6 +438,16 @@ class EmployeeController extends Controller
             $overtimePay = $totalOvertime * $overtimeRate;
             $totalMonthlyPay = $regularPay + $overtimePay;
 
+            $monthDateStr = $monthDate->toDateString();
+            $monthAvailability = \App\Models\EmployeeAvailability::where('user_id', $employee->id)
+                ->where('start_date', '<=', $monthDateStr)
+                ->where('end_date', '>=', $monthDateStr)
+                ->first();
+            $maxHours = $monthAvailability ? $monthAvailability->max_hours : 40;
+            if ($maxHours <= 0) {
+                $maxHours = 40;
+            }
+
             $reportData[] = [
                 'employee' => $employee,
                 'name' => $employee->name,
@@ -436,9 +460,53 @@ class EmployeeController extends Controller
                 'regularPay' => $regularPay,
                 'overtimePay' => $overtimePay,
                 'totalMonthlyPay' => $totalMonthlyPay,
+                'maxHours' => $maxHours,
             ];
         }
 
         return view('admin.hr.work-report.index', compact('reportData', 'selectedMonth', 'monthDate'));
+    }
+
+    public function storeAvailability(Request $request, $id)
+    {
+        $employee = User::findOrFail($id);
+
+        $validated = $request->validate([
+            'availability_id' => 'nullable|integer',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'avg_hours' => 'required|integer|min:0',
+            'max_hours' => 'required|integer|min:0',
+            'mon_start' => 'required|string|max:5',
+            'mon_end' => 'required|string|max:5',
+            'tue_start' => 'required|string|max:5',
+            'tue_end' => 'required|string|max:5',
+            'wed_start' => 'required|string|max:5',
+            'wed_end' => 'required|string|max:5',
+            'thu_start' => 'required|string|max:5',
+            'thu_end' => 'required|string|max:5',
+            'fri_start' => 'required|string|max:5',
+            'fri_end' => 'required|string|max:5',
+            'sat_start' => 'required|string|max:5',
+            'sat_end' => 'required|string|max:5',
+            'sun_start' => 'required|string|max:5',
+            'sun_end' => 'required|string|max:5',
+        ]);
+
+        if (!empty($validated['availability_id'])) {
+            $availability = \App\Models\EmployeeAvailability::where('user_id', $employee->id)
+                ->findOrFail($validated['availability_id']);
+            $availability->update($validated);
+            $message = 'Availability record updated successfully.';
+        } else {
+            $availability = $employee->availabilities()->create($validated);
+            $message = 'Availability record created successfully.';
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'data' => $availability,
+        ]);
     }
 }

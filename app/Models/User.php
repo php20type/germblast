@@ -441,4 +441,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(JobClockAuditLog::class, 'user_id');
     }
+
+    public function availabilities()
+    {
+        return $this->hasMany(EmployeeAvailability::class, 'user_id')->orderBy('start_date', 'desc');
+    }
 }

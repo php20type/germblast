@@ -538,6 +538,172 @@
                         </div>
                     </div>
 
+                    {{-- AVAILABILITY RECORDS LISTING --}}
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="section-card">
+                                <div class="section-header d-flex justify-content-between align-items-center">
+                                    <h3 class="section-title">List of Availability Records</h3>
+                                    <button type="button" class="btn btn-primary btn-sm" id="btn-new-availability">
+                                        New Availability
+                                    </button>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <div class="table-container p-0">
+                                        <table class="table table-hover align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Timeframe</th>
+                                                    <th>Avg Hours</th>
+                                                    <th>Max Hours</th>
+                                                    <th>Monday</th>
+                                                    <th>Tuesday</th>
+                                                    <th>Wednesday</th>
+                                                    <th>Thursday</th>
+                                                    <th>Friday</th>
+                                                    <th>Saturday</th>
+                                                    <th>Sunday</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse($employee->availabilities as $availability)
+                                                    <tr>
+                                                        <td>
+                                                            <a href="javascript:void(0)" class="edit-availability-link fw-semibold text-primary" data-id="{{ $availability->id }}" data-data="{{ json_encode($availability) }}">
+                                                                {{ $availability->id }}
+                                                            </a>
+                                                        </td>
+                                                        <td>{{ $availability->start_date ? \Carbon\Carbon::parse($availability->start_date)->format('m/d/y') : '' }} - {{ $availability->end_date ? \Carbon\Carbon::parse($availability->end_date)->format('m/d/y') : '' }}</td>
+                                                        <td>{{ $availability->avg_hours }}</td>
+                                                        <td>{{ $availability->max_hours }}</td>
+                                                        <td>{{ $availability->mon_start }} - {{ $availability->mon_end }}</td>
+                                                        <td>{{ $availability->tue_start }} - {{ $availability->tue_end }}</td>
+                                                        <td>{{ $availability->wed_start }} - {{ $availability->wed_end }}</td>
+                                                        <td>{{ $availability->thu_start }} - {{ $availability->thu_end }}</td>
+                                                        <td>{{ $availability->fri_start }} - {{ $availability->fri_end }}</td>
+                                                        <td>{{ $availability->sat_start }} - {{ $availability->sat_end }}</td>
+                                                        <td>{{ $availability->sun_start }} - {{ $availability->sun_end }}</td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="11" class="text-center">No availability records found</td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- AVAILABILITY MODAL --}}
+                    <div class="modal fade" id="availabilityModal" tabindex="-1" aria-labelledby="availabilityModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-fullscreen">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h1 class="modal-title" id="availabilityModalLabel">Update Availability</h1>
+                                    <div>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                </div>
+                                <div class="modal-body ps-0">
+                                    <form class="company-form" id="availability-form" method="POST" action="">
+                                        @csrf
+                                        <input type="hidden" name="availability_id" id="availability_id">
+
+                                        <div class="row mx-0">
+                                            <div class="col-lg-6 col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">Start Date</label>
+                                                    <span class="text-danger">*</span>
+                                                    <input type="date" name="start_date" id="avail_start_date" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">End Date</label>
+                                                    <span class="text-danger">*</span>
+                                                    <input type="date" name="end_date" id="avail_end_date" class="form-control" required>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mx-0 mt-3">
+                                            <div class="col-lg-6 col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">Avg Hours/Week</label>
+                                                    <span class="text-danger">*</span>
+                                                    <input type="number" name="avg_hours" id="avail_avg_hours" class="form-control" required min="0">
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">Max Hours/Week</label>
+                                                    <span class="text-danger">*</span>
+                                                    <input type="number" name="max_hours" id="avail_max_hours" class="form-control" required min="0">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mx-0 mt-4">
+                                            <div class="col-lg-12">
+                                                <div class="form-group">
+                                                    <label class="form-label d-block mb-2 fw-bold text-uppercase">Daily Availability Timeframes</label>
+                                                    <small class="text-muted d-block mb-3"><strong>IMPORTANT</strong> Format for times should be hour:minute am/pm. 9:15 am or 6:00 pm. No other text can be present.</small>
+                                                    
+                                                    @php
+                                                        $days = [
+                                                            'mon' => 'Monday',
+                                                            'tue' => 'Tuesday',
+                                                            'wed' => 'Wednesday',
+                                                            'thu' => 'Thursday',
+                                                            'fri' => 'Friday',
+                                                            'sat' => 'Saturday',
+                                                            'sun' => 'Sunday'
+                                                        ];
+                                                    @endphp
+                                                    
+                                                    <div class="table-responsive mt-2">
+                                                        <table class="table align-middle">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th style="width: 30%;">Day</th>
+                                                                    <th>Start Time</th>
+                                                                    <th>End Time</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach($days as $key => $dayName)
+                                                                    <tr>
+                                                                        <td class="fw-semibold">{{ $dayName }}</td>
+                                                                        <td>
+                                                                            <input type="time" name="{{ $key }}_start" id="avail_{{ $key }}_start" class="form-control text-center" style="max-width: 180px;" required value="00:00">
+                                                                        </td>
+                                                                        <td>
+                                                                            <input type="time" name="{{ $key }}_end" id="avail_{{ $key }}_end" class="form-control text-center" style="max-width: 180px;" required value="23:59">
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="modal-footer mt-4">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="submit" class="btn btn-success" id="btn-save-availability">Update</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -882,6 +1048,88 @@
             $('#remove-profile-image').val('0');
             $('#remove-photo-btn').show();
         }
+    });
+
+    /* ===============================
+       Availability Modal Handlers
+    =============================== */
+    const availabilityModal = new bootstrap.Modal(document.getElementById('availabilityModal'));
+
+    $('#btn-new-availability').on('click', function () {
+        $('#availabilityModalLabel').text('New Availability');
+        $('#availability-form')[0].reset();
+        $('#availability_id').val('');
+        // set default dates
+        const todayStr = new Date().toISOString().split('T')[0];
+        $('#avail_start_date').val(todayStr);
+        $('#avail_end_date').val(todayStr);
+        $('#avail_avg_hours').val('0');
+        $('#avail_max_hours').val('0');
+        // set default times
+        ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].forEach(day => {
+            $(`#avail_${day}_start`).val('00:00');
+            $(`#avail_${day}_end`).val('23:59');
+        });
+        $('#btn-save-availability').text('Create');
+        $('#availability-form').attr('action', "{{ route('admin.employee.availability.store', $employee->id) }}");
+        availabilityModal.show();
+    });
+
+    $(document).on('click', '.edit-availability-link', function () {
+        const data = $(this).data('data');
+        $('#availabilityModalLabel').text('Update Availability');
+        $('#availability-form')[0].reset();
+        $('#availability_id').val(data.id);
+        
+        // Parse dates
+        const startDate = data.start_date ? data.start_date.split('T')[0] : '';
+        const endDate = data.end_date ? data.end_date.split('T')[0] : '';
+        
+        $('#avail_start_date').val(startDate);
+        $('#avail_end_date').val(endDate);
+        $('#avail_avg_hours').val(data.avg_hours);
+        $('#avail_max_hours').val(data.max_hours);
+        
+        ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].forEach(day => {
+            $(`#avail_${day}_start`).val(data[`${day}_start`]);
+            $(`#avail_${day}_end`).val(data[`${day}_end`]);
+        });
+        
+        $('#btn-save-availability').text('Update');
+        $('#availability-form').attr('action', "{{ route('admin.employee.availability.store', $employee->id) }}");
+        availabilityModal.show();
+    });
+
+    $('#availability-form').on('submit', function (e) {
+        e.preventDefault();
+        const form = $(this);
+        
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: form.serialize(),
+            success: function (response) {
+                availabilityModal.hide();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Saved',
+                    text: response.message || 'Availability record saved successfully.',
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(() => {
+                    location.reload();
+                });
+            },
+            error: function (xhr) {
+                if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                    $.each(xhr.responseJSON.errors, function (field, messages) {
+                        messages.forEach(msg => toastr.error(msg));
+                    });
+                    return;
+                }
+                toastr.error(xhr.responseJSON?.message || 'Something went wrong while saving availability.');
+            }
+        });
     });
 
 </script>

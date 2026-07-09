@@ -182,7 +182,7 @@
                                                         Overtime : ${{ number_format($row['employee']->overtime_rate ?? 0, 2) }}/hr
                                                     </div>
                                                     <div class="small text-muted" style="font-size: 11px;">
-                                                        Weekly : 40 hrs
+                                                        Weekly : {{ $row['maxHours'] }} hrs
                                                     </div>
                                                 </td>
                                                 <td>{{ $row['w1Actual'] > 0 ? number_format($row['w1Actual'], 2) : '-' }}</td>
