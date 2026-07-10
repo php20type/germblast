@@ -248,8 +248,7 @@
                                     ${info.event.title}
                                 </div>
                                 <div style="font-size: 11px; opacity: 0.9; margin-top: 2px;">
-                                    #${props.order_no ?? '-'}
-                                    ${timeStr ? '&nbsp;•&nbsp;' + timeStr : ''}
+                                    ${timeStr}
                                 </div>
                             </div>
                         `
