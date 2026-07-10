@@ -143,74 +143,139 @@ class JobProfitabilityController extends Controller
                 $price = $order->service->price_per_service ?? $order->service->total_price ?? 0;
             }
 
-            // Budget hours & Budget labor
             $budgetHours = 0;
-            $budgetLabor = 0;
-            $hasStaff = false;
-
-            foreach ($order->orderSlots as $slot) {
-                if ($slot->staff->isNotEmpty()) {
-                    $hasStaff = true;
-                    $budgetHours += $slot->staff->sum('slot_hours');
-                    $budgetLabor += $slot->staff->sum('cost');
-                }
-            }
-
-            if (!$hasStaff) {
-                $budgetHours = $order->orderSlots->sum('scheduled_hours');
-                // fallback budget labor estimate ($25/hr default)
-                $budgetLabor = $budgetHours * 25;
-            }
-
-            // Actual hours, Overtime hours & Actual labor cost from Clocks
-            $actualHours = 0;
-            $otHours = 0;
-            $actualLabor = 0;
             $hasClocks = false;
 
-            foreach ($order->orderSlots as $slot) {
+            $employees = [];
+            $slots = $order->orderSlots->sortBy('scheduled_start_time')->values();
+
+            $firstSlot = $slots->first();
+            if ($firstSlot && $firstSlot->scheduled_start_time) {
+                $firstSlotTime = \Carbon\Carbon::parse($firstSlot->scheduled_start_time);
+            } else {
+                $firstSlotTime = \Carbon\Carbon::now();
+            }
+            $startOfWeek = $firstSlotTime->copy()->startOfWeek();
+            $endOfWeek = $firstSlotTime->copy()->endOfWeek();
+
+            foreach ($slots as $slotIndex => $slot) {
                 if ($slot->clocks->isNotEmpty()) {
                     $hasClocks = true;
-                    // Group clocks by technician clocked_by
-                    $userClocks = $slot->clocks->groupBy('clocked_by');
+                }
+                foreach ($slot->staff as $staff) {
+                    $user = $staff->user;
+                    if (!$user) {
+                        continue;
+                    }
+                    $userId = $staff->user_id;
+                    if (!isset($employees[$userId])) {
+                        $otherSlotIds = \App\Models\ServiceOrderSlotStaff::where('user_id', $userId)
+                            ->whereHas('slot', function ($q) use ($startOfWeek, $endOfWeek, $order) {
+                                $q->where('service_order_id', '!=', $order->id)
+                                  ->whereBetween('scheduled_start_time', [$startOfWeek, $endOfWeek]);
+                            })
+                            ->pluck('service_order_slot_id');
 
-                    foreach ($userClocks as $userId => $clocks) {
-                        if (!$userId) continue;
+                        $otherSlots = \App\Models\ServiceOrderSlot::with('clocks')
+                            ->whereIn('id', $otherSlotIds)
+                            ->get();
 
-                        $totalClocksHours = 0;
-                        foreach ($clocks as $clock) {
-                            if (in_array(strtolower($clock->type), ['service', 'travel'])) {
-                                $totalClocksHours += $clock->clocked_hours ?? $clock->calculateHours();
+                        $priorWorkedHours = 0;
+                        foreach ($otherSlots as $otherSlot) {
+                            if ($otherSlot->clocks->isNotEmpty()) {
+                                foreach ($otherSlot->clocks as $clock) {
+                                    $priorWorkedHours += $clock->clocked_hours ?? $clock->calculateHours();
+                                }
                             }
                         }
 
-                        if ($totalClocksHours > 0) {
-                            $user = $clocks->first()->clockedBy ?? \App\Models\User::find($userId);
-                            $rate = $user ? ($user->hourly_rate ?? 0) : 0;
-                            if ($rate == 0) {
-                                $rate = 20; // fallback rate
-                            }
+                        $slotDateForLimit = $firstSlotTime->toDateString();
+                        $availabilityForLimit = \App\Models\EmployeeAvailability::where('user_id', $userId)
+                            ->where('start_date', '<=', $slotDateForLimit)
+                            ->where('end_date', '>=', $slotDateForLimit)
+                            ->first();
+                        
+                        $maxHoursLimit = $availabilityForLimit ? $availabilityForLimit->max_hours : 40;
+                        if ($maxHoursLimit <= 0) {
+                            $maxHoursLimit = 40;
+                        }
 
-                            // 8-hour overtime threshold per slot/day
-                            $reg = min(8, $totalClocksHours);
-                            $ot = max(0, $totalClocksHours - 8);
-
-                            $actualHours += $reg;
-                            $otHours += $ot;
-                            $actualLabor += ($reg * $rate) + ($ot * $rate * 1.5);
+                        $employees[$userId] = [
+                            'hourlyRate' => $user->hourly_rate ?? 0,
+                            'overtimeRate' => $user->overtime_rate ?? 0,
+                            'actualWorkedHours' => 0,
+                            'priorWorkedHours' => $priorWorkedHours,
+                            'budgetedAmount' => 0,
+                            'maxHoursLimit' => $maxHoursLimit,
+                        ];
+                    }
+                    
+                    $slotHours = $staff->slot_hours ?? 0;
+                    $budgetHours += $slotHours;
+                    $employees[$userId]['budgetedAmount'] += ($slotHours * ($user->hourly_rate ?? 0));
+                    
+                    $clockedHours = 0;
+                    if ($slot->clocks->isNotEmpty()) {
+                        foreach ($slot->clocks as $clock) {
+                            $clockedHours += $clock->clocked_hours ?? $clock->calculateHours();
                         }
                     }
+                    $employees[$userId]['actualWorkedHours'] += $clockedHours;
                 }
             }
+
+            $actualWorkedHoursTotal = 0;
+            $overtimeHoursTotal = 0;
+            $budgetedAmountTotal = 0;
+            $totalWithBenefitsTotal = 0;
+
+            foreach ($employees as $userId => $emp) {
+                $priorWorkedHours = $emp['priorWorkedHours'];
+                $totalWorkedHoursInJob = $emp['actualWorkedHours'];
+                $maxHoursLimit = $emp['maxHoursLimit'];
+
+                if ($priorWorkedHours >= $maxHoursLimit) {
+                    $regularHours = 0;
+                    $overtimeHours = $totalWorkedHoursInJob;
+                } else {
+                    $remainingRegularHoursLimit = $maxHoursLimit - $priorWorkedHours;
+                    if ($totalWorkedHoursInJob <= $remainingRegularHoursLimit) {
+                        $regularHours = $totalWorkedHoursInJob;
+                        $overtimeHours = 0;
+                    } else {
+                        $regularHours = $remainingRegularHoursLimit;
+                        $overtimeHours = $totalWorkedHoursInJob - $remainingRegularHoursLimit;
+                    }
+                }
+
+                $actualWorkedHoursTotal += ($regularHours + $overtimeHours);
+                $overtimeHoursTotal += $overtimeHours;
+                
+                $extendedActualCost = ($emp['hourlyRate'] * $regularHours) + ($emp['overtimeRate'] * $overtimeHours);
+                $totalWithBenefits = $extendedActualCost * 1.20;
+                
+                $budgetedAmountTotal += $emp['budgetedAmount'];
+                $totalWithBenefitsTotal += $totalWithBenefits;
+            }
+
+            if (empty($employees)) {
+                $budgetHours = $order->orderSlots->sum('scheduled_hours');
+                $budgetedAmountTotal = $budgetHours * 25;
+            }
+
+            $actualHours = $actualWorkedHoursTotal;
+            $otHours = $overtimeHoursTotal;
+            $budgetLabor = $budgetedAmountTotal;
+            $actualLabor = $totalWithBenefitsTotal;
 
             // If there are no slots scheduled, we treat all metrics as '-'
             $hasSlots = $order->orderSlots->isNotEmpty();
 
             // Calculate Ratios and Delta
             if ($hasSlots) {
-                $ratioHours = $budgetHours > 0 ? ($actualHours + $otHours) / $budgetHours : 0;
+                $ratioHours = $budgetHours > 0 ? $actualHours / $budgetHours : 0;
                 $ratioLabor = $budgetLabor > 0 ? $actualLabor / $budgetLabor : 0;
-                $delta = $actualLabor - $budgetLabor;
+                $delta = $budgetLabor - $actualLabor;
 
                 // Format values
                 $displayHours = $actualHours > 0 ? number_format($actualHours, 2) : '0.00';

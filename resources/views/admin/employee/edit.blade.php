@@ -544,7 +544,7 @@
                             <div class="section-card">
                                 <div class="section-header d-flex justify-content-between align-items-center">
                                     <h3 class="section-title">List of Availability Records</h3>
-                                    <button type="button" class="btn btn-primary btn-sm" id="btn-new-availability">
+                                    <button type="button" class="btn btn-primary" id="btn-new-availability">
                                         New Availability
                                     </button>
                                 </div>
@@ -1100,36 +1100,57 @@
         availabilityModal.show();
     });
 
-    $('#availability-form').on('submit', function (e) {
-        e.preventDefault();
-        const form = $(this);
-        
-        $.ajax({
-            url: form.attr('action'),
-            type: 'POST',
-            data: form.serialize(),
-            success: function (response) {
-                availabilityModal.hide();
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Saved',
-                    text: response.message || 'Availability record saved successfully.',
-                    showConfirmButton: false,
-                    timer: 2000
-                }).then(() => {
-                    location.reload();
-                });
-            },
-            error: function (xhr) {
-                if (xhr.status === 422 && xhr.responseJSON?.errors) {
-                    $.each(xhr.responseJSON.errors, function (field, messages) {
-                        messages.forEach(msg => toastr.error(msg));
+    $("#availability-form").validate({  
+        rules: {
+            start_date: { required: true, date: true },
+            end_date: { required: true, date: true },
+            avg_hours: { required: true, number: true, min: 0 },
+            max_hours: { required: true, number: true, min: 0 },
+            mon_start: { required: true }, mon_end: { required: true },
+            tue_start: { required: true }, tue_end: { required: true },
+            wed_start: { required: true }, wed_end: { required: true },
+            thu_start: { required: true }, thu_end: { required: true },
+            fri_start: { required: true }, fri_end: { required: true },
+            sat_start: { required: true }, sat_end: { required: true },
+            sun_start: { required: true }, sun_end: { required: true }
+        },
+        messages: {
+            start_date: "Please select a start date.",
+            end_date: "Please select a valid end date.",
+            avg_hours: "Enter average hours.",
+            max_hours: "Enter max hours."
+        },
+        submitHandler: function(form, event) {
+            event.preventDefault();
+            const $form = $(form);
+            
+            $.ajax({
+                url: $form.attr('action'),
+                type: 'POST',
+                data: $form.serialize(),
+                success: function (response) {
+                    availabilityModal.hide();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Saved',
+                        text: response.message || 'Availability record saved successfully.',
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(() => {
+                        location.reload();
                     });
-                    return;
+                },
+                error: function (xhr) {
+                    if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                        $.each(xhr.responseJSON.errors, function (field, messages) {
+                            messages.forEach(msg => toastr.error(msg));
+                        });
+                        return;
+                    }
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while saving availability.');
                 }
-                toastr.error(xhr.responseJSON?.message || 'Something went wrong while saving availability.');
-            }
-        });
+            });
+        }
     });
 
 </script>
