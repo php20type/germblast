@@ -53,4 +53,54 @@ return [
         'pricing.proposal.delete',
     ],
 
+    'Service' => [
+        'service.dashboard.view',
+        'service.fulfill_order.view',
+        'service.fulfill_order.edit',
+    ],
+
+    'HR Module' => [
+        'hr.module.view',
+        'hr.module.create',
+        'hr.module.edit',
+        'hr.module.delete',
+    ],
+
+    'Warehouse Module' => [
+        'warehouse.module.view',
+        'warehouse.module.create',
+        'warehouse.module.edit',
+        'warehouse.module.delete',
+    ],
+
+    'Operations Module' => [
+        'operations.module.view',
+        'operations.module.create',
+        'operations.module.edit',
+        'operations.module.delete',
+    ],
+
+    'Reports' => [
+        'reports.work_report.view',
+        'reports.work_report.create',
+        'reports.work_report.edit',
+        'reports.work_report.delete',
+
+        'reports.expense.view',
+        'reports.expense.create',
+        'reports.expense.edit',
+        'reports.expense.delete',
+
+        'reports.consumable.view',
+        'reports.consumable.create',
+        'reports.consumable.edit',
+        'reports.consumable.delete',
+
+        'reports.job_profitability.view',
+        'reports.job_profitability.create',
+        'reports.job_profitability.edit',
+        'reports.job_profitability.delete',
+    ],
+
 ];
+

@@ -1,5 +1,18 @@
 <?php
 
+$allGroups = [
+    'Company',
+    'People',
+    'Lead',
+    'Survey Proposal',
+    'Pricing Proposal',
+    'Service',
+    'HR Module',
+    'Warehouse Module',
+    'Operations Module',
+    'Reports',
+];
+
 return [
 
     /*
@@ -7,13 +20,7 @@ return [
     | Super Admin
     |--------------------------------------------------------------------------
     */
-    'super_admin' => [
-        'Company',
-        'People',
-        'Lead',
-        'Survey Proposal',
-        'Pricing Proposal',
-    ],
+    'super_admin' => $allGroups,
 
 
     /*
@@ -21,13 +28,7 @@ return [
     | Sales Manager
     |--------------------------------------------------------------------------
     */
-    'sales_manager' => [
-        'Company',
-        'People',
-        'Lead',
-        'Survey Proposal',
-        'Pricing Proposal',
-    ],
+    'sales_manager' => $allGroups,
 
 
     /*
@@ -35,13 +36,7 @@ return [
     | Sales Representative
     |--------------------------------------------------------------------------
     */
-    'sales_representative' => [
-        'Company',
-        'People',
-        'Lead',
-        'Survey Proposal',
-        'Pricing Proposal',
-    ],
+    'sales_representative' => $allGroups,
 
 
     /*
@@ -49,13 +44,7 @@ return [
     | Sales Team
     |--------------------------------------------------------------------------
     */
-    'sales_team' => [
-        'Company',
-        'People',
-        'Lead',
-        'Survey Proposal',
-        'Pricing Proposal',
-    ],
+    'sales_team' => $allGroups,
 
 
     /*
@@ -63,13 +52,7 @@ return [
     | Technician
     |--------------------------------------------------------------------------
     */
-    'technician' => [
-        'Company',
-        'People',
-        'Lead',
-        'Survey Proposal',
-        'Pricing Proposal',
-    ],
+    'technician' => $allGroups,
 
 
     /*
@@ -77,13 +60,7 @@ return [
     | Warehouse Technician
     |--------------------------------------------------------------------------
     */
-    'warehouse_technician' => [
-        'Company',
-        'People',
-        'Lead',
-        'Survey Proposal',
-        'Pricing Proposal',
-    ],
+    'warehouse_technician' => $allGroups,
 
 
     /*
@@ -91,13 +68,7 @@ return [
     | Training Supervisor
     |--------------------------------------------------------------------------
     */
-    'training_supervisor' => [
-        'Company',
-        'People',
-        'Lead',
-        'Survey Proposal',
-        'Pricing Proposal',
-    ],
+    'training_supervisor' => $allGroups,
 
 
     /*
@@ -105,13 +76,7 @@ return [
     | Supervisor
     |--------------------------------------------------------------------------
     */
-    'supervisor' => [
-        'Company',
-        'People',
-        'Lead',
-        'Survey Proposal',
-        'Pricing Proposal',
-    ],
+    'supervisor' => $allGroups,
 
 
     /*
@@ -119,13 +84,7 @@ return [
     | Job Manager
     |--------------------------------------------------------------------------
     */
-    'job_manager' => [
-        'Company',
-        'People',
-        'Lead',
-        'Survey Proposal',
-        'Pricing Proposal',
-    ],
+    'job_manager' => $allGroups,
 
 
     /*
@@ -133,13 +92,7 @@ return [
     | Warehouse Manager
     |--------------------------------------------------------------------------
     */
-    'warehouse_manager' => [
-        'Company',
-        'People',
-        'Lead',
-        'Survey Proposal',
-        'Pricing Proposal',
-    ],
+    'warehouse_manager' => $allGroups,
 
 
     /*
@@ -147,13 +100,7 @@ return [
     | Assistant Operations Manager
     |--------------------------------------------------------------------------
     */
-    'assistant_operations_manager' => [
-        'Company',
-        'People',
-        'Lead',
-        'Survey Proposal',
-        'Pricing Proposal',
-    ],
+    'assistant_operations_manager' => $allGroups,
 
 
     /*
@@ -161,13 +108,7 @@ return [
     | Operations Manager
     |--------------------------------------------------------------------------
     */
-    'operations_manager' => [
-        'Company',
-        'People',
-        'Lead',
-        'Survey Proposal',
-        'Pricing Proposal',
-    ],
+    'operations_manager' => $allGroups,
 
 
     /*
@@ -175,13 +116,7 @@ return [
     | Regional Operations Manager
     |--------------------------------------------------------------------------
     */
-    'regional_operations_manager' => [
-        'Company',
-        'People',
-        'Lead',
-        'Survey Proposal',
-        'Pricing Proposal',
-    ],
+    'regional_operations_manager' => $allGroups,
 
 
     /*
@@ -189,13 +124,7 @@ return [
     | Field Epidemiology Team
     |--------------------------------------------------------------------------
     */
-    'field_epidemiology_team' => [
-        'Company',
-        'People',
-        'Lead',
-        'Survey Proposal',
-        'Pricing Proposal',
-    ],
+    'field_epidemiology_team' => $allGroups,
 
 
     /*
@@ -203,13 +132,7 @@ return [
     | Corporate Team
     |--------------------------------------------------------------------------
     */
-    'corporate_team' => [
-        'Company',
-        'People',
-        'Lead',
-        'Survey Proposal',
-        'Pricing Proposal',
-    ],
+    'corporate_team' => $allGroups,
 
 
     /*
@@ -217,13 +140,15 @@ return [
     | Senior Corporate
     |--------------------------------------------------------------------------
     */
-    'senior_corporate' => [
-        'Company',
-        'People',
-        'Lead',
-        'Survey Proposal',
-        'Pricing Proposal',
-    ],
+    'senior_corporate' => $allGroups,
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | HR
+    |--------------------------------------------------------------------------
+    */
+    'hr' => $allGroups,
 
 
     /*
@@ -231,8 +156,6 @@ return [
     | Customer
     |--------------------------------------------------------------------------
     */
-    'customer' => [
-        'Company',
-    ],
+    'customer' => $allGroups,
 
 ];

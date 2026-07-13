@@ -80,6 +80,71 @@ class PermissionSeeder extends Seeder
             34 => 'pricing.proposal.create',
             35 => 'pricing.proposal.edit',
             36 => 'pricing.proposal.delete',
+
+            /*
+            |--------------------------------------------------
+            | Service Module (Fulfill Order, Dashboard)
+            |--------------------------------------------------
+            */
+            37 => 'service.dashboard.view',
+            38 => 'service.dashboard.edit',
+            39 => 'service.fulfill_order.view',
+            40 => 'service.fulfill_order.edit',
+
+            /*
+            |--------------------------------------------------
+            | HR Module
+            |--------------------------------------------------
+            */
+            41 => 'hr.module.view',
+            42 => 'hr.module.create',
+            43 => 'hr.module.edit',
+            44 => 'hr.module.delete',
+
+            /*
+            |--------------------------------------------------
+            | Warehouse Module
+            |--------------------------------------------------
+            */
+            45 => 'warehouse.module.view',
+            46 => 'warehouse.module.create',
+            47 => 'warehouse.module.edit',
+            48 => 'warehouse.module.delete',
+
+            /*
+            |--------------------------------------------------
+            | Operations Module
+            |--------------------------------------------------
+            */
+            49 => 'operations.module.view',
+            50 => 'operations.module.create',
+            51 => 'operations.module.edit',
+            52 => 'operations.module.delete',
+
+            /*
+            |--------------------------------------------------
+            | Reports Module
+            |--------------------------------------------------
+            */
+            53 => 'reports.work_report.view',
+            54 => 'reports.work_report.create',
+            55 => 'reports.work_report.edit',
+            56 => 'reports.work_report.delete',
+
+            57 => 'reports.expense.view',
+            58 => 'reports.expense.create',
+            59 => 'reports.expense.edit',
+            60 => 'reports.expense.delete',
+
+            61 => 'reports.consumable.view',
+            62 => 'reports.consumable.create',
+            63 => 'reports.consumable.edit',
+            64 => 'reports.consumable.delete',
+
+            65 => 'reports.job_profitability.view',
+            66 => 'reports.job_profitability.create',
+            67 => 'reports.job_profitability.edit',
+            68 => 'reports.job_profitability.delete',
         ];
 
         foreach ($permissions as $id => $name) {

@@ -30,6 +30,7 @@ class RoleSeeder extends Seeder
             15 => 'corporate_team',
             16 => 'senior_corporate',
             17 => 'customer',
+            18 => 'hr',
         ];
 
         foreach ($roles as $id => $name) {
