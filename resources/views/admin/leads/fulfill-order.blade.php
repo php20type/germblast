@@ -1234,6 +1234,18 @@
                                                                                             $availDetail = $availStartStr . '-' . $availEndStr;
                                                                                         }
 
+                                                                                        $isOnLeave = false;
+                                                                                        $timeOff = \App\Models\TimeOffRequest::where('user_id', $tech->id)
+                                                                                            ->where('status', 'approved')
+                                                                                            ->where('start_date', '<=', $slotDateStr)
+                                                                                            ->where('end_date', '>=', $slotDateStr)
+                                                                                            ->first();
+                                                                                        
+                                                                                        if ($timeOff) {
+                                                                                            $isAvailable = false;
+                                                                                            $isOnLeave = true;
+                                                                                        }
+
                                                                                         if ($isAvailable) {
                                                                                             $bgColor = '#4caf50';
                                                                                             $textColor = 'text-white';
@@ -1255,7 +1267,11 @@
                                                                                                 class="{{ $textColor }} small mb-0" style="cursor:{{ $isAvailable ? 'pointer' : 'not-allowed' }};">
                                                                                                 {{ $tech->name }} | {{ $formattedHours }} 
                                                                                                 @if(!$isAvailable)
-                                                                                                    <strong class="text-warning">(Unavailable{{ $availDetail ? ': ' . $availDetail : '' }})</strong>
+                                                                                                    @if($isOnLeave)
+                                                                                                        <strong class="text-warning">(On Leave)</strong>
+                                                                                                    @else
+                                                                                                        <strong class="text-warning">(Unavailable{{ $availDetail ? ': ' . $availDetail : '' }})</strong>
+                                                                                                    @endif
                                                                                                 @endif
                                                                                                 |
                                                                                                 @if($otherSlots->count() > 0)
@@ -1342,6 +1358,18 @@
                                                                                             $availDetail = $availStartStr . '-' . $availEndStr;
                                                                                         }
 
+                                                                                        $isOnLeave = false;
+                                                                                        $timeOff = \App\Models\TimeOffRequest::where('user_id', $tech->id)
+                                                                                            ->where('status', 'approved')
+                                                                                            ->where('start_date', '<=', $slotDateStr)
+                                                                                            ->where('end_date', '>=', $slotDateStr)
+                                                                                            ->first();
+                                                                                        
+                                                                                        if ($timeOff) {
+                                                                                            $isAvailable = false;
+                                                                                            $isOnLeave = true;
+                                                                                        }
+
                                                                                         if ($isAvailable) {
                                                                                             $bgColor = '#4caf50';
                                                                                             $textColor = 'text-white';
@@ -1363,7 +1391,11 @@
                                                                                                 class="{{ $textColor }} small mb-0" style="cursor:{{ $isAvailable ? 'pointer' : 'not-allowed' }};">
                                                                                                 {{ $tech->name }} | {{ $formattedHours }} 
                                                                                                 @if(!$isAvailable)
-                                                                                                    <strong class="text-warning">(Unavailable{{ $availDetail ? ': ' . $availDetail : '' }})</strong>
+                                                                                                    @if($isOnLeave)
+                                                                                                        <strong class="text-warning">(On Leave)</strong>
+                                                                                                    @else
+                                                                                                        <strong class="text-warning">(Unavailable{{ $availDetail ? ': ' . $availDetail : '' }})</strong>
+                                                                                                    @endif
                                                                                                 @endif
                                                                                                 |
                                                                                                 @if($otherSlots->count() > 0)
@@ -1450,6 +1482,18 @@
                                                                                             $availDetail = $availStartStr . '-' . $availEndStr;
                                                                                         }
 
+                                                                                        $isOnLeave = false;
+                                                                                        $timeOff = \App\Models\TimeOffRequest::where('user_id', $tech->id)
+                                                                                            ->where('status', 'approved')
+                                                                                            ->where('start_date', '<=', $slotDateStr)
+                                                                                            ->where('end_date', '>=', $slotDateStr)
+                                                                                            ->first();
+                                                                                        
+                                                                                        if ($timeOff) {
+                                                                                            $isAvailable = false;
+                                                                                            $isOnLeave = true;
+                                                                                        }
+
                                                                                         if ($isAvailable) {
                                                                                             $bgColor = '#4caf50';
                                                                                             $textColor = 'text-white';
@@ -1471,7 +1515,11 @@
                                                                                                 class="{{ $textColor }} small mb-0" style="cursor:{{ $isAvailable ? 'pointer' : 'not-allowed' }};">
                                                                                                 {{ $tech->name }} | {{ $formattedHours }} 
                                                                                                 @if(!$isAvailable)
-                                                                                                    <strong class="text-warning">(Unavailable{{ $availDetail ? ': ' . $availDetail : '' }})</strong>
+                                                                                                    @if($isOnLeave)
+                                                                                                        <strong class="text-warning">(On Leave)</strong>
+                                                                                                    @else
+                                                                                                        <strong class="text-warning">(Unavailable{{ $availDetail ? ': ' . $availDetail : '' }})</strong>
+                                                                                                    @endif
                                                                                                 @endif
                                                                                                 |
                                                                                                 @if($otherSlots->count() > 0)

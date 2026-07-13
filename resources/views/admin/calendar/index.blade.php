@@ -39,19 +39,29 @@
         }
 
         .fc-event {
-            border: none !important;
-            border-radius: 6px !important;
-            padding: 5px 8px !important;
-            margin: 2px 4px !important;
-            font-weight: 600 !important;
+            border-width: 2px !important;
+            border-style: solid !important;
+            border-radius: 4px !important;
+            padding: 2px 4px !important;
+            margin: 1px 2px !important;
+            font-weight: 700 !important;
             font-size: 12px !important;
             cursor: pointer !important;
             transition: transform 0.15s ease !important;
-            color: #ffffff !important;
         }
 
         .fc-event:hover {
             transform: scale(1.02);
+        }
+
+        /* Combined status overrides for border colors or shadows */
+        .fc-event.has-no-staff.is-confirmed:not(.is-meet-job) {
+            border-color: #007bff !important;
+        }
+
+        .fc-event.has-no-staff.is-confirmed.is-meet-job {
+            border-color: #fd7e14 !important;
+            box-shadow: inset 4px 0 0 0 #007bff !important;
         }
 
         /* Custom Card layout consistent with site structures */
@@ -88,35 +98,38 @@
 
                         <!-- Controls and Calendar in PX-4 wrapper matching Warehouse Calendar layout -->
                         <div class="px-4 py-2">
-
-                            <!-- Status Legend Card -->
-                            <div class="calendar-card">
-                                <div class="section-header mb-4">
-                                    <h5 class="fw-bold text-dark"
-                                        style="font-size: 18px; letter-spacing: 0.5px; text-transform: uppercase;">
-                                        Status Legend
-                                    </h5>
-                                </div>
-                                <div class="card-body p-0">
-                                    <div class="d-flex gap-3 flex-wrap align-items-center">
-                                        <span style="background-color:#6c757d; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(108,117,125,0.15);">
-                                            ● Pending
-                                        </span>
-                                        <span style="background-color:#ffb81c; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(255,184,28,0.15);">
-                                            ● Scheduled
-                                        </span>
-                                        <span style="background-color:#0d6efd; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(13,110,253,0.15);">
-                                            ● Confirmed
-                                        </span>
-                                        <span style="background-color:#069697; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(6,150,151,0.15);">
-                                            ● Completed
-                                        </span>
-                                        <span style="background-color:#dc3545; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(220,53,69,0.15);">
-                                            ● Cancelled
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
+                             <!-- Status Legend Card -->
+                             <div class="calendar-card" style="padding: 20px !important; margin-bottom: 20px !important;">
+                                 <div class="section-header mb-2">
+                                     <h6 class="text-muted mb-2" style="font-size: 14px; font-weight: 500;">
+                                         Legend
+                                     </h6>
+                                 </div>
+                                 <div class="card-body p-0">
+                                     <div class="d-flex gap-2 flex-wrap align-items-center">
+                                         <!-- No Staff -->
+                                         <div style="background-color: #dc3545; border: 2px solid #dc3545; color: #ffffff; padding: 6px 14px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: none; letter-spacing: 0.5px;">
+                                             No Staff
+                                         </div>
+                                         <!-- Not Confirmed -->
+                                         <div style="background-color: #28a745; border: 2px solid #28a745; color: #ffffff; padding: 6px 14px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: none; letter-spacing: 0.5px;">
+                                             Not Confirmed
+                                         </div>
+                                         <!-- Confirmed -->
+                                         <div style="background-color: #007bff; border: 2px solid #007bff; color: #ffffff; padding: 6px 14px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: none; letter-spacing: 0.5px;">
+                                             Confirmed
+                                         </div>
+                                         <!-- Meet At Job -->
+                                         <div style="background-color: #ffffff; border: 2px solid #fd7e14; color: #000000; padding: 6px 14px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: none; letter-spacing: 0.5px;">
+                                             Meet At Job
+                                         </div>
+                                         <!-- Completed -->
+                                         <div style="background-color: #343a40; border: 2px solid #343a40; color: #ffffff; padding: 6px 14px; border-radius: 4px; font-size: 12px; font-weight: 700; text-transform: none; letter-spacing: 0.5px;">
+                                             Completed
+                                         </div>
+                                      </div>
+                                  </div>
+                              </div>
 
                             <!-- Calendar Card -->
                             <div class="calendar-card mt-4">
@@ -176,14 +189,27 @@
                 eventClick: function (info) {
                     const props = info.event.extendedProps;
 
-                    const statusColors = {
-                        'pending':     '#6c757d',
-                        'scheduled': '#ffb81c',
-                        'confirmed': '#0d6efd',
-                        'completed': '#069697',
-                        'cancelled':   '#dc3545',
-                    };
-                    const color = statusColors[props.status] ?? '#6c757d';
+                    let badgesHtml = '';
+                    if (props.status === 'completed') {
+                        badgesHtml = `<span class="badge text-uppercase" style="background-color: #343a40; color: #ffffff; font-size: 10px; font-weight: 600; padding: 6px 14px; border-radius: 30px; letter-spacing: 0.5px;">Completed</span>`;
+                    } else {
+                        const isConfirmed = info.event.classNames.includes('is-confirmed');
+                        const isMeetJob = info.event.classNames.includes('is-meet-job');
+                        const hasNoStaff = info.event.classNames.includes('has-no-staff') || info.event.classNames.includes('no-staff') || props.status === 'no-staff';
+
+                        if (isConfirmed) {
+                            badgesHtml += `<span class="badge text-uppercase me-1" style="background-color: #007bff; color: #ffffff; font-size: 10px; font-weight: 600; padding: 6px 14px; border-radius: 30px; letter-spacing: 0.5px;">Confirmed</span>`;
+                            if (hasNoStaff) {
+                                badgesHtml += `<span class="badge text-uppercase me-1" style="background-color: #dc3545; color: #ffffff; font-size: 10px; font-weight: 600; padding: 6px 14px; border-radius: 30px; letter-spacing: 0.5px;">No Staff</span>`;
+                            }
+                        } else {
+                            badgesHtml += `<span class="badge text-uppercase me-1" style="background-color: #28a745; color: #ffffff; font-size: 10px; font-weight: 600; padding: 6px 14px; border-radius: 30px; letter-spacing: 0.5px;">Not Confirmed</span>`;
+                        }
+
+                        if (isMeetJob) {
+                            badgesHtml += `<span class="badge text-uppercase me-1" style="background-color: #ffffff; color: #000000; border: 2px solid #fd7e14; font-size: 10px; font-weight: 600; padding: 4px 12px; border-radius: 30px; letter-spacing: 0.5px;">Meet At Job</span>`;
+                        }
+                    }
 
                     const content = `
                         <table class="table align-middle mb-0" style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; border-collapse: separate; border-spacing: 0;">
@@ -215,9 +241,9 @@
                                 <tr>
                                     <th style="background-color: #fafafa; padding: 12px 15px; font-size: 13px; font-weight: 600;">Status</th>
                                     <td style="padding: 12px 15px;">
-                                        <span class="badge text-white text-uppercase" style="background-color: ${color}; font-size: 10px; font-weight: 600; padding: 6px 14px; border-radius: 30px; letter-spacing: 0.5px;">
-                                            ${props.status.charAt(0).toUpperCase() + props.status.slice(1)}
-                                        </span>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            ${badgesHtml}
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -237,19 +263,24 @@
                     const props = info.event.extendedProps;
                     const startTime = props.scheduled_start_time ?? null;
 
-                    let timeStr = startTime
-                        ? new Date(startTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
-                        : '';
+                    let timeStr = '';
+                    if (startTime) {
+                        const dateObj = new Date(startTime);
+                        let hours = dateObj.getHours();
+                        const minutes = dateObj.getMinutes();
+                        const ampm = hours >= 12 ? 'p' : 'a';
+                        hours = hours % 12;
+                        hours = hours ? hours : 12;
+                        const minutesStr = minutes === 0 ? '' : ':' + (minutes < 10 ? '0' + minutes : minutes);
+                        timeStr = hours + minutesStr + ampm;
+                    }
+
+                    const textColor = info.event.textColor ?? '#000000';
 
                     return {
                         html: `
-                            <div style="padding: 4px 6px; width: 100%; border-radius: 4px; overflow: hidden;">
-                                <div style="font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                    ${info.event.title}
-                                </div>
-                                <div style="font-size: 11px; opacity: 0.9; margin-top: 2px;">
-                                    ${timeStr}
-                                </div>
+                            <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; font-weight: 700; color: ${textColor} !important; width: 100%;">
+                                <span style="margin-right: 4px; font-weight: 700;">${timeStr}</span>${info.event.title}
                             </div>
                         `
                     };

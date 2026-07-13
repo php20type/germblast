@@ -1197,7 +1197,8 @@ class ServiceController extends Controller
     {
         $slots = ServiceOrderSlot::with([
                 'serviceOrder.service.lead.company',
-                'serviceOrder'
+                'serviceOrder',
+                'staff'
             ])
             ->whereNotNull('scheduled_start_time')
             ->get();
@@ -1208,18 +1209,58 @@ class ServiceController extends Controller
                 return null;
             }
 
+            // Determine status, colors & class names based on the Matrix legend
+            $hasStaff = $slot->staff->count() > 0;
+            $isConfirmed = (bool) $slot->is_confirmed;
+            $isMeetJob = $slot->meet === 'facility';
+
+            if ($slot->status === 'completed') {
+                $status = 'completed';
+                $backgroundColor = '#343a40';
+                $borderColor = '#343a40';
+                $textColor = '#ffffff';
+            } else {
+                if (!$isConfirmed) {
+                    $status = 'not-confirmed';
+                    $backgroundColor = '#28a745';
+                    $textColor = '#ffffff';
+                    $borderColor = $isMeetJob ? '#fd7e14' : '#28a745';
+                } else {
+                    // Confirmed slots
+                    if (!$hasStaff) {
+                        $status = 'no-staff';
+                        $backgroundColor = '#dc3545';
+                        $textColor = '#ffffff';
+                        $borderColor = $isMeetJob ? '#fd7e14' : '#007bff';
+                    } else {
+                        // Confirmed and has staff
+                        $status = 'confirmed';
+                        $backgroundColor = '#007bff';
+                        $textColor = '#ffffff';
+
+                        if ($isMeetJob) {
+                            $borderColor = '#fd7e14';
+                        } else {
+                            $borderColor = $backgroundColor;
+                        }
+                    }
+                }
+            }
+
             return [
                 'id'    => $slot->id,
                 'title' => $order->service->lead->company->name ?? $order->service->service_name ?? 'Service Order',
                 'start' => $slot->scheduled_start_time,
                 'end'   => $slot->scheduled_end_time,
-                'color' => match($slot->status) {
-                    'scheduled'   => '#ffb81c',
-                    'confirmed'   => '#0d6efd',
-                    'completed'   => '#069697',
-                    'cancelled'   => '#dc3545',
-                    default       => '#6c757d',
-                },
+                'backgroundColor' => $backgroundColor,
+                'borderColor'     => $borderColor,
+                'textColor'       => $textColor,
+                'classNames' => [
+                    $status,
+                    $isConfirmed ? 'is-confirmed' : 'is-not-confirmed',
+                    $isMeetJob ? 'is-meet-job' : 'is-meet-office',
+                    $hasStaff ? 'has-staff' : 'has-no-staff',
+                ],
                 'extendedProps' => [
                     'order_no'     => $order->order_no,
                     'service_name' => $order->service->service_name ?? '-',
@@ -1227,7 +1268,7 @@ class ServiceController extends Controller
                     'company_name' => $order->service->lead->company->name ?? '-',
                     'po_number'    => $order->service->po_number ?? '-',
                     'price'        => $order->service->price_per_service ?? '-',
-                    'status'       => $slot->status ?? 'pending',
+                    'status'       => $status,
                     'scheduled_start_time' => $slot->scheduled_start_time,
                     'service_dashboard_url'  => route('admin.lead.service.service_dashboard', $order->id),
                 ],
