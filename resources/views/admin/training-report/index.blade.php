@@ -127,7 +127,7 @@
                                 <table id="trainingReportTable" class="table table-hover w-100 equipment-report-table mb-0">
                                     <thead>
                                         <tr>
-                                            <th style="width: 100px;">Profile</th>
+                                            <th style="min-width: 100px; width: 100px;">Profile</th>
                                             <th style="min-width: 200px;">Employee</th>
                                             @foreach($tests as $test)
                                                 <th style="min-width: 200px; text-align: center;">
@@ -154,7 +154,6 @@
                                                 <td>
                                                     <span class="fw-semibold text-dark">{{ $employee->name }}</span>
                                                     <div class="small text-muted" style="font-size: 12px;">{{ $employee->email }}</div>
-                                                    <div style="font-size: 11px; color: #6c757d; margin-top: 2px;">{{ ucfirst($employee->role) }}</div>
                                                 </td>
                                                 
                                                 @foreach($tests as $test)
