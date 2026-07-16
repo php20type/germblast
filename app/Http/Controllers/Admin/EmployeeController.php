@@ -101,7 +101,15 @@ class EmployeeController extends Controller
         $driverLogs = DriverLog::with('item')->where('user_id', $id)->latest()->get();
         $driverSuspensions = DriverSuspensionRecord::where('user_id', $id)->latest()->get();
 
-        return view('admin.employee.edit', compact('employee', 'roles', 'territories','maskTypes','maskFitTestRecords','driverLogItems','driverLogs','driverSuspensions'));
+        $categories = \App\Models\TrainingCategory::with(['tests' => function($query) {
+            $query->where('status', 'Active')->orderBy('name');
+        }])->orderBy('name')->get();
+        $userAttempts = \App\Models\TrainingAttempt::where('employee_id', $id)->get();
+
+        return view('admin.employee.edit', compact(
+            'employee', 'roles', 'territories', 'maskTypes', 'maskFitTestRecords',
+            'driverLogItems', 'driverLogs', 'driverSuspensions', 'categories', 'userAttempts'
+        ));
     }
 
     public function update(Request $request, $id)

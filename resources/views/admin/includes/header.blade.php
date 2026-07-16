@@ -118,6 +118,13 @@
                                 </a>
                             </li>
                             <li>
+                                <a class="dropdown-item d-flex align-items-center py-2 px-3 rounded"
+                                    href="{{ route('admin.employee-training.index') }}">
+                                    <i class="fas fa-graduation-cap text-info" style="font-size: 20px; width: 35px; text-align: center; margin-right: 12px;"></i>
+                                    <span>My Training</span>
+                                </a>
+                            </li>
+                            <li>
                                 <hr class="dropdown-divider">
                             </li>
                             <li>

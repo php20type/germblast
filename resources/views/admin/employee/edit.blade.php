@@ -2,6 +2,63 @@
 
 @section('title', 'Edit Employee')
 
+@push('styles')
+    <style>
+        .equipment-report-table {
+            border: 1px solid #e5e7eb !important;
+            border-radius: 12px !important;
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            overflow: hidden !important;
+            background: #fff !important;
+            width: 100% !important;
+            margin-top: 10px !important;
+        }
+
+        .equipment-report-table thead th {
+            background-color: rgba(255, 184, 28, 0.4) !important;
+            border-bottom: 1px solid #e5e7eb !important;
+            color: #374151 !important;
+            font-weight: 600 !important;
+            padding: 18px 20px !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+        }
+
+        .equipment-report-table thead th:first-child {
+            border-top-left-radius: 12px !important;
+        }
+
+        .equipment-report-table thead th:last-child {
+            border-top-right-radius: 12px !important;
+            border-right: none !important;
+        }
+
+        .equipment-report-table td {
+            padding: 15px 20px !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid #f3f4f6 !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+        }
+
+        .equipment-report-table td:last-child {
+            border-right: none !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td {
+            border-bottom: none !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 12px !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 12px !important;
+        }
+    </style>
+@endpush
 @section('content')
 <div class="companies-section my-4">
     <div class="container-fluid">
@@ -703,6 +760,96 @@
                             </div>
                         </div>
                     </div>
+
+                    {{-- TRAINING RECORDS LISTING --}}
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="section-card">
+                                <div class="section-header d-flex justify-content-between align-items-center">
+                                    <h3 class="section-title">Training Tests Status</h3>
+                                </div>
+
+                                <div class="px-4 pb-4">
+                                    @foreach($categories as $category)
+                                        @if($category->tests->count() > 0)
+                                            <h5 class="mt-4 mb-3 fw-bold text-dark border-bottom pb-2">{{ $category->name }}</h5>
+                                            
+                                            <div class="table-responsive">
+                                                <table class="table table-hover w-100 equipment-report-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th style="width: 40%;">Training/Test Name</th>
+                                                                <th style="width: 40%;">Test History</th>
+                                                                <th style="width: 20%; text-align: center;">Status</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach($category->tests as $test)
+                                                                @php
+                                                                    $testAttempts = $userAttempts->where('training_test_id', $test->id);
+                                                                    $passed = $testAttempts->where('status', 'Passed')->count() > 0;
+                                                                    $attemptsUsed = $testAttempts->count();
+                                                                @endphp
+                                                                <tr>
+                                                                    <td>
+                                                                        <div class="fw-semibold text-dark">
+                                                                            {{ $test->name }}
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        @if($attemptsUsed > 0)
+                                                                            <div class="d-flex flex-column gap-2 mt-1 mb-2">
+                                                                                @foreach($testAttempts as $attempt)
+                                                                                    @if($attempt->status == 'Passed')
+                                                                                        <a href="{{ route('admin.employee-training.certificate', $attempt->id) }}" target="_blank" class="d-flex align-items-center justify-content-between px-3 py-2 w-100 text-decoration-none transition-all" style="max-width: 280px; background: #f0fdf4; border-radius: 6px; border: 1px solid #bbf7d0;">
+                                                                                <div class="d-flex flex-column">
+                                                                                    <span style="font-size: 13px;" class="text-success fw-bold">Attempt {{ $attempt->attempt_number }}</span>
+                                                                                    <span class="fw-normal text-muted" style="font-size: 11px;">{{ \Carbon\Carbon::parse($attempt->submitted_at)->format('m/d/Y') }}</span>
+                                                                                </div>
+                                                                                <div class="d-flex flex-column text-end">
+                                                                                    <span style="font-size: 13px;" class="fw-bold text-success">{{ round($attempt->score, 1) }}%</span>
+                                                                                    <span style="font-size: 11px;" class="fw-bold text-success">{{ $attempt->status }}</span>
+                                                                                </div>
+                                                                                        </a>
+                                                                                    @else
+                                                                                        <div class="d-flex align-items-center justify-content-between px-3 py-2 w-100" style="max-width: 280px; background: #f9fafb; border-radius: 6px; border: 1px solid #e5e7eb;">
+                                                                                <div class="d-flex flex-column">
+                                                                                    <span style="font-size: 13px;" class="text-muted fw-bold">Attempt {{ $attempt->attempt_number }}</span>
+                                                                                    <span class="fw-normal text-muted" style="font-size: 11px;">{{ \Carbon\Carbon::parse($attempt->submitted_at)->format('m/d/Y') }}</span>
+                                                                                </div>
+                                                                                <div class="d-flex flex-column text-end">
+                                                                                    <span style="font-size: 13px;" class="fw-bold text-danger">{{ round($attempt->score, 1) }}%</span>
+                                                                                    <span style="font-size: 11px;" class="fw-bold text-danger">{{ $attempt->status }}</span>
+                                                                                </div>
+                                                                                        </div>
+                                                                                    @endif
+                                                                                @endforeach
+                                                                            </div>
+                                                                        @else
+                                                                            <span class="text-muted fst-italic">Not Attempted</span>
+                                                                        @endif
+                                                                    </td>
+                                                                    <td style="text-align: center;">
+                                                                        @if($passed)
+                                                                            <span class="badge bg-success"><i class="fa-solid fa-check-circle me-1"></i> Passed</span>
+                                                                        @elseif($attemptsUsed > 0)
+                                                                            <span class="badge bg-danger"><i class="fa-solid fa-times-circle me-1"></i> Failed</span>
+                                                                        @else
+                                                                            <span class="badge bg-secondary"><i class="fa-solid fa-clock me-1"></i> Pending</span>
+                                                                        @endif
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                            </div>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
 
                 </div>
             </div>

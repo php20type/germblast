@@ -113,6 +113,9 @@
                     'admin.vehicle.planning',
                     'admin.warehouse.maintenance',
                     'admin.warehouse.calendar',
+                    'admin.training-categories.*',
+                    'admin.training-tests.*',
+                    'admin.training-questions.*',
                 ]);
             @endphp
             <li class="{{ $isOperationsActive ? 'active' : '' }}">

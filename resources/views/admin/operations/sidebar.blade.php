@@ -56,6 +56,21 @@
                 Warehouse Calendar
             </a>
 
+            <a class="nav-link {{ request()->routeIs('admin.training-categories.*') ? 'active' : '' }}"
+                href="{{ route('admin.training-categories.index') }}">
+                Training Categories
+            </a>
+
+            <a class="nav-link {{ request()->routeIs('admin.training-tests.*') ? 'active' : '' }}"
+                href="{{ route('admin.training-tests.index') }}">
+                Training Tests
+            </a>
+
+            <a class="nav-link {{ request()->routeIs('admin.training-questions.*') ? 'active' : '' }}"
+                href="{{ route('admin.training-questions.index') }}">
+                Training Questions
+            </a>
+
             <div id="nothing-found" style="display:none; color: rgba(255,255,255,0.6); padding: 10px 0;">Nothing found.</div>
         </div>
     </div>

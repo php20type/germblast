@@ -21,6 +21,9 @@ use App\Http\Controllers\Admin\EmployeeRewardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EquipmentManagementController;
 use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\Admin\TrainingCategoryController;
+use App\Http\Controllers\Admin\TrainingTestController;
+use App\Http\Controllers\Admin\TrainingQuestionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -141,6 +144,35 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/warehouse/tasks/complete/{id}', [WarehouseController::class, 'complete'])->name('warehouse.tasks.complete');
     Route::post('/warehouse/tasks/reset/{id}', [WarehouseController::class, 'reset'])->name('warehouse.tasks.reset');
     Route::post('/warehouse/tasks/delete/{id}', [WarehouseController::class, 'destroy'])->name('warehouse.tasks.destroy');
+
+    // Training Categories
+    Route::get('training-categories/index', [TrainingCategoryController::class, 'index'])->name('training-categories.index');
+    Route::get('training-categories/create', [TrainingCategoryController::class, 'create'])->name('training-categories.create');
+    Route::post('training-categories/store', [TrainingCategoryController::class, 'store'])->name('training-categories.store');
+    Route::get('training-categories/edit/{id}', [TrainingCategoryController::class, 'edit'])->name('training-categories.edit');
+    Route::post('training-categories/update/{id}', [TrainingCategoryController::class, 'update'])->name('training-categories.update');
+    Route::post('training-categories/delete/{id}', [TrainingCategoryController::class, 'destroy'])->name('training-categories.destroy');
+
+    // Training Tests
+    Route::get('training-tests/index', [TrainingTestController::class, 'index'])->name('training-tests.index');
+    Route::get('training-tests/create', [TrainingTestController::class, 'create'])->name('training-tests.create');
+    Route::post('training-tests/store', [TrainingTestController::class, 'store'])->name('training-tests.store');
+    Route::get('training-tests/edit/{id}', [TrainingTestController::class, 'edit'])->name('training-tests.edit');
+    Route::post('training-tests/update/{id}', [TrainingTestController::class, 'update'])->name('training-tests.update');
+    Route::post('training-tests/delete/{id}', [TrainingTestController::class, 'destroy'])->name('training-tests.destroy');
+
+    // Training Questions
+    Route::get('training-questions/index', [TrainingQuestionController::class, 'index'])->name('training-questions.index');
+    Route::get('training-questions/show/{test_id}', [TrainingQuestionController::class, 'show'])->name('training-questions.show');
+    Route::post('training-questions/store', [TrainingQuestionController::class, 'store'])->name('training-questions.store');
+    Route::post('training-questions/update/{id}', [TrainingQuestionController::class, 'update'])->name('training-questions.update');
+    Route::post('training-questions/delete/{id}', [TrainingQuestionController::class, 'destroy'])->name('training-questions.destroy');
+
+    // Employee Training Module
+    Route::get('employee-training', [\App\Http\Controllers\Admin\EmployeeTrainingController::class, 'index'])->name('employee-training.index');
+    Route::get('employee-training/{test_id}/quiz', [\App\Http\Controllers\Admin\EmployeeTrainingController::class, 'show'])->name('employee-training.show');
+    Route::post('employee-training/{test_id}/submit', [\App\Http\Controllers\Admin\EmployeeTrainingController::class, 'submit'])->name('employee-training.submit');
+    Route::get('employee-training/certificate/{attempt_id}', [\App\Http\Controllers\Admin\EmployeeTrainingController::class, 'certificate'])->name('employee-training.certificate');
 
     Route::get('/warehouse/calendar', [WarehouseController::class, 'calendar'])->name('warehouse.calendar');
     Route::post('/warehouse/calendar/store', [WarehouseController::class, 'storeSchedule'])->name('warehouse.calendar.store');
