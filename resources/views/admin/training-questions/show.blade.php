@@ -128,13 +128,7 @@
                                                            data-bs-target="#createModal">
                                                             <i class="fa-solid fa-gear"></i>
                                                         </a>
-                                                        
-                                                        <form action="{{ route('admin.training-questions.destroy', $q->id) }}" method="POST" style="display:inline;">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-link text-danger p-0 border-0 btn-delete" style="font-size: 16px;">
-                                                                <i class="fa-solid fa-trash"></i>
-                                                            </button>
-                                                        </form>
+
                                                     </div>
                                                 </td>
                                             </tr>
@@ -270,7 +264,7 @@
                     <div class="option-row">
                         <input class="form-check-input correct-radio" type="radio" name="correct_radio" value="${opt}" ${isChecked} required>
                         <input type="text" class="form-control option-input" name="options[]" value="${opt}" required>
-                        <button type="button" class="btn btn-sm btn-danger btn-remove-option"><i class="fa-solid fa-trash"></i></button>
+                        <button type="button" class="btn btn-sm btn-outline-danger btn-remove-option"><i class="fa-solid fa-xmark"></i></button>
                     </div>`;
                     container.append(html);
                 });
@@ -283,7 +277,7 @@
             <div class="option-row">
                 <input class="form-check-input correct-radio" type="radio" name="correct_radio" value="" required>
                 <input type="text" class="form-control option-input" name="options[]" value="" required>
-                <button type="button" class="btn btn-sm btn-danger btn-remove-option"><i class="fa-solid fa-trash"></i></button>
+                <button type="button" class="btn btn-sm btn-outline-danger btn-remove-option"><i class="fa-solid fa-xmark"></i></button>
             </div>`;
             $('#optionsContainer').append(html);
         });
@@ -344,38 +338,7 @@
             $('#createForm').attr('action', '{{ url('admin/training-questions/update') }}/' + id);
         });
         
-        $(document).on('click', '.btn-delete', function(e) {
-            e.preventDefault();
-            let form = $(this).closest('form');
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You want to delete this question?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: form.attr('action'),
-                        method: 'POST',
-                        data: form.serialize(),
-                        success: function(response) {
-                            if(response.success) {
-                                toastr.success(response.message);
-                                setTimeout(() => window.location.reload(), 1000);
-                            } else {
-                                toastr.error(response.message);
-                            }
-                        },
-                        error: function(xhr) {
-                            toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
-                        }
-                    });
-                }
-            });
-        });
+
 
         $('#createForm').on('submit', function(e) {
             e.preventDefault();

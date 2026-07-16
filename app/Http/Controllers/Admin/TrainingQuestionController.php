@@ -96,15 +96,4 @@ class TrainingQuestionController extends Controller
         }
     }
 
-    public function destroy($id)
-    {
-        try {
-            $question = TrainingQuestion::findOrFail($id);
-            $question->delete();
-
-            return response()->json(['success' => true, 'message' => 'Question deleted successfully.']);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Something went wrong: ' . $e->getMessage()], 500);
-        }
-    }
 }

@@ -84,21 +84,4 @@ class TrainingCategoryController extends Controller
         }
     }
 
-    public function destroy($id)
-    {
-        try {
-            $category = TrainingCategory::findOrFail($id);
-            $category->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Training Category deleted successfully.'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Something went wrong: ' . $e->getMessage()
-            ], 500);
-        }
-    }
 }

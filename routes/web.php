@@ -151,7 +151,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('training-categories/store', [TrainingCategoryController::class, 'store'])->name('training-categories.store');
     Route::get('training-categories/edit/{id}', [TrainingCategoryController::class, 'edit'])->name('training-categories.edit');
     Route::post('training-categories/update/{id}', [TrainingCategoryController::class, 'update'])->name('training-categories.update');
-    Route::post('training-categories/delete/{id}', [TrainingCategoryController::class, 'destroy'])->name('training-categories.destroy');
 
     // Training Tests
     Route::get('training-tests/index', [TrainingTestController::class, 'index'])->name('training-tests.index');
@@ -159,14 +158,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('training-tests/store', [TrainingTestController::class, 'store'])->name('training-tests.store');
     Route::get('training-tests/edit/{id}', [TrainingTestController::class, 'edit'])->name('training-tests.edit');
     Route::post('training-tests/update/{id}', [TrainingTestController::class, 'update'])->name('training-tests.update');
-    Route::post('training-tests/delete/{id}', [TrainingTestController::class, 'destroy'])->name('training-tests.destroy');
 
     // Training Questions
     Route::get('training-questions/index', [TrainingQuestionController::class, 'index'])->name('training-questions.index');
     Route::get('training-questions/show/{test_id}', [TrainingQuestionController::class, 'show'])->name('training-questions.show');
     Route::post('training-questions/store', [TrainingQuestionController::class, 'store'])->name('training-questions.store');
     Route::post('training-questions/update/{id}', [TrainingQuestionController::class, 'update'])->name('training-questions.update');
-    Route::post('training-questions/delete/{id}', [TrainingQuestionController::class, 'destroy'])->name('training-questions.destroy');
 
     // Employee Training Module
     Route::get('employee-training', [\App\Http\Controllers\Admin\EmployeeTrainingController::class, 'index'])->name('employee-training.index');

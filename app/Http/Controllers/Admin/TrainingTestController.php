@@ -92,21 +92,4 @@ class TrainingTestController extends Controller
         }
     }
 
-    public function destroy($id)
-    {
-        try {
-            $test = TrainingTest::findOrFail($id);
-            $test->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Training Test deleted successfully.'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Something went wrong: ' . $e->getMessage()
-            ], 500);
-        }
-    }
 }

@@ -106,12 +106,7 @@
                                                            data-bs-target="#createModal">
                                                             <i class="fa-solid fa-gear"></i>
                                                         </a>
-                                                        <form action="{{ route('admin.training-categories.destroy', $category->id) }}" method="POST" style="display:inline;">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-link text-danger p-0 border-0 btn-delete" style="font-size: 16px;">
-                                                                <i class="fa-solid fa-trash"></i>
-                                                            </button>
-                                                        </form>
+
                                                     </div>
                                                 </td>
                                             </tr>
@@ -235,38 +230,7 @@
             });
         });
 
-        $(document).on('click', '.btn-delete', function(e) {
-            e.preventDefault();
-            let form = $(this).closest('form');
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You want to delete this category?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: form.attr('action'),
-                        method: 'POST',
-                        data: form.serialize(),
-                        success: function(response) {
-                            if(response.success) {
-                                toastr.success(response.message);
-                                setTimeout(() => window.location.reload(), 1000);
-                            } else {
-                                toastr.error(response.message);
-                            }
-                        },
-                        error: function(xhr) {
-                            toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
-                        }
-                    });
-                }
-            });
-        });
+
     });
 </script>
 @endpush
