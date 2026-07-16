@@ -165,6 +165,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('training-questions/store', [TrainingQuestionController::class, 'store'])->name('training-questions.store');
     Route::post('training-questions/update/{id}', [TrainingQuestionController::class, 'update'])->name('training-questions.update');
 
+    // Training Report
+    Route::get('training-report/index', [\App\Http\Controllers\Admin\TrainingReportController::class, 'index'])->name('training-report.index');
+
     // Employee Training Module
     Route::get('employee-training', [\App\Http\Controllers\Admin\EmployeeTrainingController::class, 'index'])->name('employee-training.index');
     Route::get('employee-training/{test_id}/quiz', [\App\Http\Controllers\Admin\EmployeeTrainingController::class, 'show'])->name('employee-training.show');
