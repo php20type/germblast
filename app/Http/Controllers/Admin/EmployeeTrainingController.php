@@ -12,9 +12,11 @@ class EmployeeTrainingController extends Controller
     public function index()
     {
         // Get categories that have active tests
-        $categories = TrainingCategory::with(['tests' => function($query) {
-            $query->where('status', 'Active')->orderBy('name');
-        }])->orderBy('name')->get();
+        $categories = TrainingCategory::with([
+            'tests' => function ($query) {
+                $query->where('status', 'Active')->orderBy('name');
+            }
+        ])->orderBy('name')->get();
 
         $userAttempts = \App\Models\TrainingAttempt::where('employee_id', auth()->id())->get();
 
@@ -23,14 +25,17 @@ class EmployeeTrainingController extends Controller
 
     public function show($test_id)
     {
-        $test = TrainingTest::with(['category', 'questions' => function($query) {
-            $query->orderBy('sort_order', 'asc');
-        }])->findOrFail($test_id);
+        $test = TrainingTest::with([
+            'category',
+            'questions' => function ($query) {
+                $query->orderBy('sort_order', 'asc');
+            }
+        ])->findOrFail($test_id);
 
         $attempts = \App\Models\TrainingAttempt::where('employee_id', auth()->id())
             ->where('training_test_id', $test_id)
             ->get();
-            
+
 
 
         $attemptsUsed = $attempts->count();
@@ -42,11 +47,11 @@ class EmployeeTrainingController extends Controller
     {
         try {
             $test = TrainingTest::with('questions')->findOrFail($test_id);
-            
+
             $attempts = \App\Models\TrainingAttempt::where('employee_id', auth()->id())
                 ->where('training_test_id', $test_id)
                 ->get();
-                
+
             // Calculate score
             $totalMarks = 0;
             $earnedMarks = 0;
@@ -55,7 +60,7 @@ class EmployeeTrainingController extends Controller
             foreach ($test->questions as $question) {
                 $totalMarks += $question->marks;
                 $userAnswer = $answers[$question->id] ?? null;
-    
+
                 if (is_array($userAnswer)) {
                     if (count($userAnswer) == 1 && $userAnswer[0] == $question->correct_answer) {
                         $earnedMarks += $question->marks;
@@ -101,7 +106,7 @@ class EmployeeTrainingController extends Controller
             ->firstOrFail();
 
         $test = TrainingTest::findOrFail($attempt->training_test_id);
-        
+
         // If an employee is viewing, ensure they can only view their own certificate.
         // But if an Admin (HR) is viewing from the profile page, they should be able to view it.
         // Assuming Admin role can view anything. If there is strict isolation, check here.

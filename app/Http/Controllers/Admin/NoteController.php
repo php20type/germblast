@@ -47,7 +47,34 @@ class NoteController extends Controller
 
         // Attach mentioned users
         if ($request->filled('mentioned_user_ids')) {
-            $note->users()->sync($convertToArray($request->mentioned_user_ids));
+            $userIds = $convertToArray($request->mentioned_user_ids);
+            $note->users()->sync($userIds);
+            
+            $ownerContext = 'a note';
+            if (strtolower($validated['owner_type']) === 'company') {
+                $ownerName = \App\Models\Company::find($validated['owner_id'])->name ?? 'Unknown Company';
+                $ownerContext = "Company: {$ownerName}";
+            } elseif (strtolower($validated['owner_type']) === 'lead') {
+                $ownerName = \App\Models\Lead::find($validated['owner_id'])->name ?? 'Unknown Lead';
+                $ownerContext = "Lead: {$ownerName}";
+            } elseif (strtolower($validated['owner_type']) === 'people') {
+                $ownerName = \App\Models\People::find($validated['owner_id'])->name ?? 'Unknown Person';
+                $ownerContext = "Person: {$ownerName}";
+            }
+            
+            $notify = app(\App\Services\NotificationService::class);
+            $sender = auth()->user()->name ?? 'Someone';
+            foreach ($userIds as $uid) {
+                $notify->sendInApp(
+                    $uid,
+                    'You were mentioned',
+                    "{$sender} mentioned you in a note on {$ownerContext}.",
+                    'notes',
+                    $note->id,
+                    'mention',
+                    get_class($note)
+                );
+            }
         }
 
         // Return JSON for AJAX

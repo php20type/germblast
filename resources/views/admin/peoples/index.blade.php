@@ -65,10 +65,8 @@
                                                             name="assignee_id">
                                                             <option value="">Assingee</option>
                                                             @foreach ($users as $user)
-                                                                @if($user->isSalesRepresentative())
-                                                                    <option value="{{ $user->id }}">{{ $user->name }}
+                                                                <option value="{{ $user->id }}">{{ $user->name }}
                                                                     </option>
-                                                                @endif
                                                             @endforeach
                                                         </select>
                                                     </div>
@@ -255,11 +253,9 @@
                                     <select name="assignee_id" class="form-select">
                                         <option value="">Choose...</option>
                                         @foreach ($users as $user)
-                                            @if($user->isSalesRepresentative())
-                                                <option value="{{ $user->id }}">
+                                            <option value="{{ $user->id }}">
                                                     {{ $user->name }}
                                                 </option>
-                                            @endif
                                         @endforeach
                                     </select>
                                 </div>

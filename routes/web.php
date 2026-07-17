@@ -145,6 +145,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/warehouse/tasks/reset/{id}', [WarehouseController::class, 'reset'])->name('warehouse.tasks.reset');
     Route::post('/warehouse/tasks/delete/{id}', [WarehouseController::class, 'destroy'])->name('warehouse.tasks.destroy');
 
+    // System Notifications
+    Route::get('notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/{id}/mark-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('notifications/mark-all-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::get('notifications/latest', [\App\Http\Controllers\Admin\NotificationController::class, 'getLatest'])->name('notifications.latest');
+
     // Training Categories
     Route::get('training-categories/index', [TrainingCategoryController::class, 'index'])->name('training-categories.index');
     Route::get('training-categories/create', [TrainingCategoryController::class, 'create'])->name('training-categories.create');

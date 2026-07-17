@@ -264,9 +264,7 @@
                                     <select name="assignee_id" class="form-select">
                                         <option value="">Select assignee</option>
                                         @foreach ($users as $user)
-                                            @if($user->isSalesRepresentative())
-                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                            @endif
+                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -448,9 +446,7 @@
                                     <select name="assignee_id" class="form-select">
                                         <option value="">Select assignee</option>
                                         @foreach ($users as $user)
-                                            @if($user->isSalesRepresentative())
-                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                            @endif
+                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -543,11 +539,9 @@
                                     <select name="assignee_id" class="form-select">
                                         <option value="">Select assignee</option>
                                         @foreach ($users as $user)
-                                            @if($user->isSalesRepresentative())
-                                                <option value="{{ $user->id }}">
+                                            <option value="{{ $user->id }}">
                                                     {{ $user->name }}
                                                 </option>
-                                            @endif
                                         @endforeach
                                     </select>
                                 </div>

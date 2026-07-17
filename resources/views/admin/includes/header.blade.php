@@ -18,7 +18,7 @@
                             </div>
                         </a>
                     </li>
-                    <!-- <li class="list-inline-item">
+                    <li class="list-inline-item">
                         <a href="#" class="dropdown item-nav" data-bs-toggle="dropdown">
                             <div class="icon-round position-relative" title="Notifications">
                                 <i class="fa-solid fa-bell"></i>
@@ -31,7 +31,7 @@
 
                             <li class="px-3 py-2 d-flex justify-content-between align-items-center">
                                 <strong>Notifications</strong>
-                                <button class="btn btn-sm btn-link p-0" style="font-size: 0.85rem;">Mark as Read</button>
+                                <button class="btn btn-sm btn-link p-0" id="markAllAsReadBtn" style="font-size: 0.85rem;">Mark all as Read</button>
                             </li>
 
                             <li><hr class="dropdown-divider"></li>
@@ -42,9 +42,14 @@
                                 </div>
                             </li>
 
+                            <li><hr class="dropdown-divider"></li>
+
+                            <li class="px-3 py-2 text-center">
+                                <a href="{{ route('admin.notifications.index') }}" class="text-decoration-none fw-bold" style="font-size: 0.9rem;">View All Notifications</a>
+                            </li>
                         </ul>
 
-                    </li> -->
+                    </li>
                 </ul>
             </div>
         </div>
@@ -148,3 +153,79 @@
     </div>
 </div>
 <!-- header end -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Load latest notifications
+    function loadNotifications() {
+        $.ajax({
+            url: "{{ route('admin.notifications.latest') }}",
+            type: "GET",
+            success: function(response) {
+                if (response.success) {
+                    let badge = $('#notificationBadge');
+                    if (response.unread_count > 0) {
+                        badge.text(response.unread_count).show();
+                    } else {
+                        badge.hide();
+                    }
+
+                    let list = $('#notificationList');
+                    list.empty();
+
+                    if (response.notifications.length === 0) {
+                        list.append('<div class="px-3 py-3 text-center text-muted">No notifications</div>');
+                    } else {
+                        response.notifications.forEach(function(notif) {
+                            let unreadClass = notif.is_read ? '' : 'fw-bold bg-light';
+                            let dot = notif.is_read ? '' : '<span class="badge bg-primary rounded-circle p-1 ms-2" style="width:8px;height:8px;"></span>';
+                            list.append(`
+                                <a href="#" class="dropdown-item py-2 px-3 border-bottom ${unreadClass}" onclick="markNotificationAsRead(${notif.id}); return false;" style="white-space: normal;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-1 text-dark" style="font-size: 0.9rem;">${notif.title} ${dot}</h6>
+                                        <small class="text-muted" style="font-size: 0.75rem;">${notif.time_ago}</small>
+                                    </div>
+                                    <p class="mb-1 text-muted" style="font-size: 0.8rem;">${notif.message}</p>
+                                    ${notif.module ? `<span class="badge bg-secondary" style="font-size: 0.65rem;">${notif.module}</span>` : ''}
+                                </a>
+                            `);
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    // Call initially
+    loadNotifications();
+
+    // Mark all as read
+    $('#markAllAsReadBtn').on('click', function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: "{{ route('admin.notifications.mark-all-read') }}",
+            type: "POST",
+            data: { _token: "{{ csrf_token() }}" },
+            success: function(response) {
+                if (response.success) {
+                    loadNotifications();
+                }
+            }
+        });
+    });
+
+    window.markNotificationAsRead = function(id) {
+        $.ajax({
+            url: "/admin/notifications/" + id + "/mark-read",
+            type: "POST",
+            data: { _token: "{{ csrf_token() }}" },
+            success: function(response) {
+                if (response.success) {
+                    // Navigate to notifications page or module if needed. For now, just reload the list.
+                    loadNotifications();
+                }
+            }
+        });
+    };
+});
+</script>

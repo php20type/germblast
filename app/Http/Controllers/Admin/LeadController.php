@@ -1112,6 +1112,9 @@ class LeadController extends Controller
                     'action_type' => 'updated_assignee',
                     'description' => "reassigned {$leadName} from {$oldAssignee} to {$newAssignee}",
                 ]);
+                
+                $notify = app(\App\Services\NotificationService::class);
+                $notify->leadAssigned($lead);
 
                 return response()->json([
                     'success' => true,

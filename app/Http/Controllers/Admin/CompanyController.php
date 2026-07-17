@@ -862,6 +862,19 @@ class CompanyController extends Controller
                     'action_type' => 'updated_assignee',
                     'description' => "reassigned {$companyName} to {$newAssignee}",
                 ]);
+                
+                if ($request->value) {
+                    $notify = app(\App\Services\NotificationService::class);
+                    $notify->sendInApp(
+                        $request->value,
+                        'Company Assigned',
+                        "You have been assigned as the Sales Rep for company {$companyName}.",
+                        'companies',
+                        $company->id,
+                        'company_assigned',
+                        get_class($company)
+                    );
+                }
                 break;
 
             case 'industry_id':

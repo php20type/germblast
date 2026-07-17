@@ -1180,12 +1180,10 @@
                                         id="assigneeSelect">
                                         <option selected>Select assignee</option>
                                         @foreach ($users as $user)
-                                            @if($user->isSalesRepresentative())
-                                                <option value="{{ $user->id }}"
+                                            <option value="{{ $user->id }}"
                                                     {{ $peoples->assignee_id == $user->id ? 'selected' : '' }}>
                                                     {{ $user->name }}
                                                 </option>
-                                            @endif
                                         @endforeach
                                     </select>
                                 </div>
@@ -1237,12 +1235,10 @@
                                     <select class="form-select" disabled>
                                         <option selected>Select assignee</option>
                                         @foreach ($users as $user)
-                                            @if($user->isSalesRepresentative())
-                                                <option value="{{ $user->id }}"
+                                            <option value="{{ $user->id }}"
                                                     {{ $peoples->assignee_id == $user->id ? 'selected' : '' }}>
                                                     {{ $user->name }}
                                                 </option>
-                                            @endif
                                         @endforeach
                                     </select>
                                 </div>
@@ -1788,11 +1784,9 @@
                                     <select name="assignee_id" class="form-select">
                                         <option value="">Choose...</option>
                                         @foreach ($users as $user)
-                                            @if($user->isSalesRepresentative())
-                                                <option value="{{ $user->id }}">
+                                            <option value="{{ $user->id }}">
                                                     {{ $user->name }}
                                                 </option>
-                                            @endif
                                         @endforeach
                                     </select>
                                 </div>

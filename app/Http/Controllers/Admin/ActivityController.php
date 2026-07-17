@@ -103,7 +103,34 @@ class ActivityController extends Controller
 
         // Attach related users
         if ($request->filled('mentioned_user_ids')) {
-            $activity->mentionUsers()->sync($convertToArray($request->mentioned_user_ids));
+            $userIds = $convertToArray($request->mentioned_user_ids);
+            $activity->mentionUsers()->sync($userIds);
+            
+            $ownerContext = 'an activity';
+            if (strtolower($validated['owner_type']) === 'company') {
+                $ownerName = \App\Models\Company::find($validated['owner_id'])->name ?? 'Unknown Company';
+                $ownerContext = "Company: {$ownerName}";
+            } elseif (strtolower($validated['owner_type']) === 'lead') {
+                $ownerName = \App\Models\Lead::find($validated['owner_id'])->name ?? 'Unknown Lead';
+                $ownerContext = "Lead: {$ownerName}";
+            } elseif (strtolower($validated['owner_type']) === 'people') {
+                $ownerName = \App\Models\People::find($validated['owner_id'])->name ?? 'Unknown Person';
+                $ownerContext = "Person: {$ownerName}";
+            }
+            
+            $notify = app(\App\Services\NotificationService::class);
+            $sender = auth()->user()->name ?? 'Someone';
+            foreach ($userIds as $uid) {
+                $notify->sendInApp(
+                    $uid,
+                    'You were mentioned',
+                    "{$sender} mentioned you in an activity on {$ownerContext}.",
+                    'activities',
+                    $activity->id,
+                    'mention',
+                    get_class($activity)
+                );
+            }
         }
 
         //  Return JSON response for AJAX
@@ -202,7 +229,34 @@ class ActivityController extends Controller
             $activity->mentionPeoples()->sync($convertToArray($request->mentioned_people_ids));
         }
         if ($request->filled('mentioned_user_ids')) {
-            $activity->mentionUsers()->sync($convertToArray($request->mentioned_user_ids));
+            $userIds = $convertToArray($request->mentioned_user_ids);
+            $activity->mentionUsers()->sync($userIds);
+            
+            $ownerContext = 'a scheduled activity';
+            if (strtolower($validated['owner_type']) === 'company') {
+                $ownerName = \App\Models\Company::find($validated['owner_id'])->name ?? 'Unknown Company';
+                $ownerContext = "Company: {$ownerName}";
+            } elseif (strtolower($validated['owner_type']) === 'lead') {
+                $ownerName = \App\Models\Lead::find($validated['owner_id'])->name ?? 'Unknown Lead';
+                $ownerContext = "Lead: {$ownerName}";
+            } elseif (strtolower($validated['owner_type']) === 'people') {
+                $ownerName = \App\Models\People::find($validated['owner_id'])->name ?? 'Unknown Person';
+                $ownerContext = "Person: {$ownerName}";
+            }
+            
+            $notify = app(\App\Services\NotificationService::class);
+            $sender = auth()->user()->name ?? 'Someone';
+            foreach ($userIds as $uid) {
+                $notify->sendInApp(
+                    $uid,
+                    'You were mentioned',
+                    "{$sender} mentioned you in a scheduled activity on {$ownerContext}.",
+                    'activities',
+                    $activity->id,
+                    'mention',
+                    get_class($activity)
+                );
+            }
         }
 
         // Return JSON for AJAX

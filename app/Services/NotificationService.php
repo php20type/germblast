@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Jobs\SendEmailJob;
 use App\Jobs\SendSMSJob;
 use Carbon\Carbon;
+use App\Models\SystemNotification;
 
 class NotificationService
 {
@@ -16,6 +17,34 @@ class NotificationService
     {
         $this->sendEmail = false;
         $this->sendSMS = false;
+    }
+
+    /**
+     * Send an in-app notification to a specific user.
+     */
+    public function sendInApp(
+        $user,
+        $title,
+        $message,
+        $module = null,
+        $referenceId = null,
+        $type = null,
+        $referenceType = null,
+        $createdBy = null
+    ) {
+        $userId = is_object($user) ? $user->id : $user;
+
+        return SystemNotification::create([
+            'user_id' => $userId,
+            'title' => $title,
+            'message' => $message,
+            'module' => $module,
+            'type' => $type,
+            'reference_id' => $referenceId,
+            'reference_type' => $referenceType,
+            'is_read' => false,
+            'created_by' => $createdBy ?? (auth()->check() ? auth()->id() : null),
+        ]);
     }
 
     public function companyCreated($company)
@@ -44,6 +73,16 @@ class NotificationService
                     "New company created: {$company->name}"
                 );
             }
+
+            $this->sendInApp(
+                $manager,
+                'New Company Created',
+                "A new company '{$company->name}' has been created.",
+                'companies',
+                $company->id,
+                'created',
+                get_class($company)
+            );
         }
     }
 
@@ -85,6 +124,16 @@ class NotificationService
                     "A new lead has been created: {$lead->name}"
                 );
             }
+
+            $this->sendInApp(
+                $recipient,
+                'New Lead Created',
+                "A new lead '{$lead->name}' has been created.",
+                'leads',
+                $lead->id,
+                'created',
+                get_class($lead)
+            );
         }
     }
 
@@ -113,6 +162,17 @@ class NotificationService
                 "Lead assigned: {$lead->name}"
             )->delay(now()->addSeconds(12)); // same delay as email
         }
+
+        $companyName = $lead->companies->pluck('name')->join(', ') ?: 'Unknown Company';
+        $this->sendInApp(
+            $assignee,
+            'Lead Assigned',
+            "You have been assigned a new lead: {$lead->name} ({$companyName})",
+            'leads',
+            $lead->id,
+            'assigned',
+            get_class($lead)
+        );
     }
 
     public function initialMeetingScheduled($lead, $date)
@@ -146,6 +206,17 @@ class NotificationService
                     "Initial Meeting Scheduled for Lead: {$lead->name} at {$date}"
                 );
             }
+
+            $companyName = $lead->companies->pluck('name')->join(', ') ?: 'Unknown Company';
+            $this->sendInApp(
+                $recipient,
+                'Meeting Scheduled',
+                "An initial meeting has been scheduled for lead {$lead->name} ({$companyName}) at {$date}.",
+                'leads',
+                $lead->id,
+                'meeting_scheduled',
+                get_class($lead)
+            );
         }
     }
 
@@ -181,6 +252,17 @@ class NotificationService
                     "Initial Meeting Completed for Lead: {$lead->name}"
                 );
             }
+
+            $companyName = $lead->companies->pluck('name')->join(', ') ?: 'Unknown Company';
+            $this->sendInApp(
+                $recipient,
+                'Meeting Completed',
+                "The initial meeting for lead {$lead->name} ({$companyName}) has been completed.",
+                'leads',
+                $lead->id,
+                'meeting_completed',
+                get_class($lead)
+            );
         }
     }
 
@@ -219,6 +301,17 @@ class NotificationService
                     "Site Survey Scheduled for Lead: {$lead->name}"
                 );
             }
+
+            $companyName = $lead->companies->pluck('name')->join(', ') ?: 'Unknown Company';
+            $this->sendInApp(
+                $recipient,
+                'Site Survey Scheduled',
+                "A site survey has been scheduled for lead {$lead->name} ({$companyName}).",
+                'leads',
+                $lead->id,
+                'survey_scheduled',
+                get_class($lead)
+            );
         }
     }
 
@@ -258,6 +351,17 @@ class NotificationService
                     "Site Survey Completed for Lead: {$lead->name}"
                 );
             }
+
+            $companyName = $lead->companies->pluck('name')->join(', ') ?: 'Unknown Company';
+            $this->sendInApp(
+                $recipient,
+                'Site Survey Completed',
+                "The site survey for lead {$lead->name} ({$companyName}) has been completed.",
+                'leads',
+                $lead->id,
+                'survey_completed',
+                get_class($lead)
+            );
         }
     }
 
@@ -298,6 +402,16 @@ class NotificationService
                     "New meeting scheduled: {$meeting->name} on {$meeting->date} ({$startTime} - {$endTime}) by " . ($meeting->user->name ?? 'System')
                 )->delay(now()->addSeconds(12)); // MAILTRAP rate-limit
             }
+
+            $this->sendInApp(
+                $recipient,
+                'Calendar Meeting Scheduled',
+                "New meeting scheduled: {$meeting->name} on {$meeting->date}.",
+                'calendar',
+                $meeting->id,
+                'meeting_scheduled',
+                get_class($meeting)
+            );
         }
     }
 
@@ -338,6 +452,16 @@ class NotificationService
                     "Meeting Updated: {$meeting->name} on {$meeting->date} ({$startTime} - {$endTime}) by " . ($meeting->user->name ?? 'System')
                 )->delay(now()->addSeconds(12)); // MAILTRAP rate-limit
             }
+
+            $this->sendInApp(
+                $recipient,
+                'Calendar Meeting Updated',
+                "The meeting {$meeting->name} has been updated.",
+                'calendar',
+                $meeting->id,
+                'meeting_updated',
+                get_class($meeting)
+            );
         }
     }
 
@@ -367,6 +491,17 @@ class NotificationService
                 "You have been assigned to Order #{$order->order_no} — {$service->service_name}"
             );
         }
+
+        $companyName = $order->service->lead->company->name ?? 'Unknown Company';
+        $this->sendInApp(
+            $user,
+            'Job Assigned',
+            "You have been assigned to Order #{$order->order_no} for {$companyName} — {$service->service_name}.",
+            'operations',
+            $order->id,
+            'job_assigned',
+            get_class($order)
+        );
     }
 
     public function proposalApprovalStage($lead, $surveyProposal)
@@ -411,6 +546,16 @@ class NotificationService
                     "Proposal Approval Stage reached for Lead: {$lead->name}. Survey Proposal Link: {$surveyProposalLink}"
                 );
             }
+
+            $this->sendInApp(
+                $recipient,
+                'Proposal Approval Stage',
+                "Proposal Approval Stage reached for Lead: {$lead->name}.",
+                'leads',
+                $lead->id,
+                'proposal_approval',
+                get_class($lead)
+            );
         }
     }
 
@@ -440,6 +585,17 @@ class NotificationService
                 "You have been unassigned from Order #{$order->order_no} — {$service->service_name}"
             );
         }
+
+        $companyName = $order->service->lead->company->name ?? 'Unknown Company';
+        $this->sendInApp(
+            $user,
+            'Job Unassigned',
+            "You have been unassigned from Order #{$order->order_no} for {$companyName}.",
+            'operations',
+            $order->id,
+            'job_unassigned',
+            get_class($order)
+        );
     }
 
     public function staffMarkedAsLeader($user, $slot)
@@ -468,6 +624,17 @@ class NotificationService
                 "You have been marked as Leader for Order #{$order->order_no} — {$service->service_name}"
             );
         }
+
+        $companyName = $order->service->lead->company->name ?? 'Unknown Company';
+        $this->sendInApp(
+            $user,
+            'Marked as Leader',
+            "You have been marked as Leader for Order #{$order->order_no} ({$companyName}).",
+            'operations',
+            $order->id,
+            'marked_leader',
+            get_class($order)
+        );
     }
 
     public function staffUnmarkedAsLeader($user, $slot)
@@ -496,6 +663,17 @@ class NotificationService
                 "You have been unmarked as Leader for Order #{$order->order_no} — {$service->service_name}"
             );
         }
+
+        $companyName = $order->service->lead->company->name ?? 'Unknown Company';
+        $this->sendInApp(
+            $user,
+            'Unmarked as Leader',
+            "You have been unmarked as Leader for Order #{$order->order_no} ({$companyName}).",
+            'operations',
+            $order->id,
+            'unmarked_leader',
+            get_class($order)
+        );
     }
 
     public function serviceNoteAdded($note)
@@ -529,6 +707,17 @@ class NotificationService
                     "New service note added to Order #{$order->order_no} by " . ($note->user->name ?? 'System') . ": {$note->notes}"
                 );
             }
+
+            $companyName = $order->service->lead->company->name ?? 'Unknown Company';
+            $this->sendInApp(
+                $member,
+                'Service Note Added',
+                "New service note added to Order #{$order->order_no} ({$companyName}) by " . ($note->user->name ?? 'System'),
+                'operations',
+                $order->id,
+                'service_note',
+                get_class($order)
+            );
         }
     }
 
@@ -592,6 +781,17 @@ class NotificationService
                 "Reminder: You have a GermBlast Service Order scheduled today! Order #{$order->order_no} ({$service->service_name}) from " . $slot->scheduled_start_time->format('h:i A') . " to " . $slot->scheduled_end_time->format('h:i A') . "."
             );
         }
+
+        $companyName = $order->service->lead->company->name ?? 'Unknown Company';
+        $this->sendInApp(
+            $user,
+            'Service Order Today',
+            "Reminder: You have a Service Order scheduled today! Order #{$order->order_no} ({$companyName}).",
+            'operations',
+            $order->id,
+            'service_order_today',
+            get_class($order)
+        );
     }
 
     public function dayOfServiceSalesRepNotification($user, $slot)
@@ -622,6 +822,17 @@ class NotificationService
                 "Reminder: GermBlast Service Order #{$order->order_no} ({$service->service_name}) is scheduled today from " . $slot->scheduled_start_time->format('h:i A') . " to " . $slot->scheduled_end_time->format('h:i A') . "."
             );
         }
+
+        $companyName = clone($order)->service->lead->company->name ?? 'Unknown Company';
+        $this->sendInApp(
+            $user,
+            'Service Order Today (Sales)',
+            "Reminder: Service Order #{$order->order_no} ({$companyName}) is scheduled today.",
+            'operations',
+            $order->id,
+            'service_order_today_sales',
+            get_class($order)
+        );
     }
 
     // =======================
@@ -706,6 +917,16 @@ class NotificationService
                     "New Time Off Request submitted by {$employee->name} from " . $timeOffRequest->start_date->format('M d, Y') . " to " . $timeOffRequest->end_date->format('M d, Y') . "."
                 );
             }
+
+            $this->sendInApp(
+                $admin,
+                'Time Off Request Submitted',
+                "New Time Off Request submitted by {$employee->name}.",
+                'hr',
+                $timeOffRequest->id,
+                'time_off_submitted',
+                get_class($timeOffRequest)
+            );
         }
     }
 
@@ -735,6 +956,16 @@ class NotificationService
                 "Your Time Off Request for " . $timeOffRequest->start_date->format('M d, Y') . " to " . $timeOffRequest->end_date->format('M d, Y') . " has been {$timeOffRequest->status}."
             );
         }
+
+        $this->sendInApp(
+            $employee,
+            'Time Off Request Actioned',
+            "Your Time Off Request has been {$timeOffRequest->status}.",
+            'hr',
+            $timeOffRequest->id,
+            'time_off_actioned',
+            get_class($timeOffRequest)
+        );
     }
 
 }

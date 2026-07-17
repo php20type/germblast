@@ -60,10 +60,8 @@
                                                 <select class="form-select" name="assignee_id" aria-label="Assigned to select">
                                                     <option value="">Assignee</option>
                                                     @foreach ($users as $user)
-                                                        @if($user->isSalesRepresentative())
-                                                            <option value="{{ $user->id }}">{{ $user->name }}
+                                                        <option value="{{ $user->id }}">{{ $user->name }}
                                                             </option>
-                                                        @endif
                                                     @endforeach
                                                 </select>
                                             </div>
