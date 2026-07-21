@@ -2,6 +2,10 @@
 
 @section('title', 'Service Dashboard')
 
+@php
+    $canEdit = auth()->user()->can('service.dashboard.edit');
+@endphp
+
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <style>
@@ -365,24 +369,26 @@
                                         </table>
 
                                         <!-- Barcode Assignment Form for this specific slot -->
-                                        <form action="{{ route('admin.lead.service.slot.assign_equipment', $slot->id) }}" method="POST" class="mb-0">
-                                            @csrf
-                                            <div class="row align-items-center">
-                                                <div class="col-md-5">
-                                                    <div class="input-group">
-                                                        <span class="input-group-text bg-light border-end-0">
-                                                            <i class="fas fa-barcode"></i>
-                                                        </span>
-                                                        <input type="text" name="barcode" class="form-control border-start-0 bg-light" placeholder="Scan or enter barcode for Slot #{{ $loop->iteration }}..." required>
+                                        @if($canEdit)
+                                            <form action="{{ route('admin.lead.service.slot.assign_equipment', $slot->id) }}" method="POST" class="mb-0">
+                                                @csrf
+                                                <div class="row align-items-center">
+                                                    <div class="col-md-5">
+                                                        <div class="input-group">
+                                                            <span class="input-group-text bg-light border-end-0">
+                                                                <i class="fas fa-barcode"></i>
+                                                            </span>
+                                                            <input type="text" name="barcode" class="form-control border-start-0 bg-light" placeholder="Scan or enter barcode for Slot #{{ $loop->iteration }}..." required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <button type="submit" class="btn btn-export">
+                                                            Assign to Slot #{{ $loop->iteration }}
+                                                        </button>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-4">
-                                                    <button type="submit" class="btn btn-export">
-                                                        Assign to Slot #{{ $loop->iteration }}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </form>
+                                            </form>
+                                        @endif
                                     </div>
                                 @empty
                                     <div class="section-card">
@@ -424,12 +430,14 @@
                                                                     </span>
                                                                 </td>
                                                                 <td class="text-end">
-                                                                    <form action="{{ route('admin.lead.service.slot.remove_equipment', [$slot->id, $equipment->id]) }}" method="POST" class="d-inline">
-                                                                        @csrf
-                                                                        <button type="submit" class="btn btn-sm btn-outline-danger px-3" style="border-radius: 8px; font-weight: 600;">
-                                                                            <i class="fas fa-trash-alt me-1"></i> Remove
-                                                                        </button>
-                                                                    </form>
+                                                                    @if($canEdit)
+                                                                        <form action="{{ route('admin.lead.service.slot.remove_equipment', [$slot->id, $equipment->id]) }}" method="POST" class="d-inline">
+                                                                            @csrf
+                                                                            <button type="submit" class="btn btn-sm btn-outline-danger px-3" style="border-radius: 8px; font-weight: 600;">
+                                                                                <i class="fas fa-trash-alt me-1"></i> Remove
+                                                                            </button>
+                                                                        </form>
+                                                                    @endif
                                                                 </td>
                                                             </tr>
                                                         @endforeach
@@ -491,13 +499,15 @@
                                                     @csrf
                                                     <div class="mb-3">
                                                         <label for="service_plan_narrative" class="form-label">Narrative:</label>
-                                                        <textarea class="form-control" id="service_plan_narrative" name="service_plan_narrative" rows="6" placeholder="Enter service plan narrative here...">{{ $order->service_plan_narrative ?? '' }}</textarea>
+                                                        <textarea class="form-control" id="service_plan_narrative" name="service_plan_narrative" rows="6" placeholder="Enter service plan narrative here..." {{ $canEdit ? '' : 'disabled' }}>{{ $order->service_plan_narrative ?? '' }}</textarea>
                                                     </div>
+                                                    @if($canEdit)
                                                     <div class="text-end">
                                                         <button type="submit" class="btn btn-primary btn-sm save-service-plan-btn">
                                                             <i class="fas fa-save me-1"></i> Update Narrative
                                                         </button>
                                                     </div>
+                                                    @endif
                                                 </form>
                                             </div>
                                         </div>
@@ -515,6 +525,7 @@
                                                         <span class="badge badge-plan-review-status {{ $order->plan_review_status == 'REVIEWED' ? 'bg-success' : 'bg-warning' }}" style="font-size: 12px; padding: 6px 12px;">
                                                             {{ $order->plan_review_status ?? 'PENDING' }}
                                                         </span>
+                                                        @if($canEdit)
                                                         <button type="button" class="btn btn-sm btn-plan-review-toggle {{ $order->plan_review_status == 'REVIEWED' ? 'btn-success' : 'btn-outline-success' }}" data-order-id="{{ $order->id }}" style="transition: all 0.3s ease;">
                                                             @if($order->plan_review_status == 'REVIEWED')
                                                                 <i class="bi bi-arrow-counterclockwise"></i> Undo Review
@@ -522,6 +533,7 @@
                                                                 <i class="bi bi-check-circle"></i> Review Done
                                                             @endif
                                                         </button>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </div>
@@ -556,12 +568,14 @@
                                                 <form class="sales-narrative-form" id="salesNarrativeForm">
                                                     @csrf
                                                     <label class="form-label">Sales Narrative</label>
-                                                    <textarea class="form-control" id="sales_narrative" name="sales_narrative" rows="4" placeholder="Sales narrative reference...">{{ $order->sales_narrative ?? '' }}</textarea>
+                                                    <textarea class="form-control" id="sales_narrative" name="sales_narrative" rows="4" placeholder="Sales narrative reference..." {{ $canEdit ? '' : 'disabled' }}>{{ $order->sales_narrative ?? '' }}</textarea>
+                                                    @if($canEdit)
                                                     <div class="text-end mt-3">
                                                         <button type="submit" class="btn btn-primary btn-sm save-sales-narrative-btn">
                                                             <i class="fas fa-save me-1"></i> Update Narrative
                                                         </button>
                                                     </div>
+                                                    @endif
                                                 </form>
                                             </div>
                                         </div>
@@ -659,6 +673,7 @@
                                                  <div class="section-header mb-3">
                                                      <h5 class="section-title">Add Hotel Details</h5>
                                                  </div>
+                                                 @if($canEdit)
                                                  <form id="hotel-details-form" action="{{ route('admin.lead.service.order.hotel.save', $order->id) }}" method="POST" class="mb-0">
                                                      @csrf
                                                      <div class="mb-3">
@@ -687,6 +702,7 @@
                                                          <i class="fa-solid fa-circle-check me-1"></i> Save
                                                      </button>
                                                  </form>
+                                                 @endif
                                              </div>
                                          </div>
 
@@ -729,9 +745,11 @@
                                                                          {{ $hotel['confirmation_no'] ?? 'N/A' }}
                                                                      </td>
                                                                      <td class="text-end">
+                                                                         @if($canEdit)
                                                                          <button type="button" class="btn-delete-hotel btn btn-sm btn-link text-danger p-0" data-id="{{ $hotel['id'] ?? '' }}">
                                                                              <i class="fa-solid fa-trash fs-5"></i>
                                                                          </button>
+                                                                         @endif
                                                                      </td>
                                                                  </tr>
                                                              @empty
@@ -791,18 +809,21 @@
                                                                                 <input type="number" step="any" min="0" 
                                                                                     name="consumables[{{ $key }}]" 
                                                                                     class="form-control form-control-sm text-center" 
-                                                                                    value="{{ $order->consumables[$key] ?? 0 }}">
+                                                                                    value="{{ $order->consumables[$key] ?? 0 }}"
+                                                                                    {{ $canEdit ? '' : 'disabled' }}>
                                                                             </td>
                                                                         </tr>
                                                                 @endforeach
                                                             </tbody>
                                                         </table>
                                                     </div>
+                                                    @if($canEdit)
                                                     <div class="text-end mt-3">
                                                         <button type="submit" class="btn btn-primary btn-sm save-consumables-btn">
                                                             <i class="fas fa-save me-1"></i> Save Consumables
                                                         </button>
                                                     </div>
+                                                    @endif
                                                 </form>
                                             </div>
                                         </div>
@@ -983,6 +1004,7 @@
                                                                         </small>
                                                                     </div>
                                                                     <div class="d-flex justify-content-end">
+                                                                        @if($canEdit)
                                                                         <form action="{{ route('admin.lead.service.clock_out') }}" method="POST">
                                                                             @csrf
                                                                             <input type="hidden" name="slot_id" value="{{ $slot->id }}">
@@ -992,9 +1014,11 @@
                                                                                 Clock Out — {{ ucwords($runningClock->type) }}
                                                                             </button>
                                                                         </form>
+                                                                        @endif
                                                                     </div>
                                                                 </div>
                                                             @else
+                                                                @if($canEdit)
                                                                 <form action="{{ route('admin.lead.service.clock_in') }}" method="POST" class="clock-in-form" data-vehicles="{{ json_encode($slot->vehicles->map(fn($v) => ['id' => $v->id, 'name' => $v->name ?? $v->plate_number ?? 'Vehicle #'.$v->id])) }}">
                                                                     @csrf
                                                                     <input type="hidden" name="slot_id" value="{{ $slot->id }}" class="clock-in-slot-id">
@@ -1015,6 +1039,7 @@
                                                                         </button>
                                                                     </div>
                                                                 </form>
+                                                                @endif
                                                             @endif
                                                         </div>
 
@@ -1089,6 +1114,7 @@
                                                  <div class="section-header mb-3">
                                                      <h5 class="section-title">Add ATP Details</h5>
                                                  </div>
+                                                 @if($canEdit)
                                                  <form id="atp-details-form" action="{{ route('admin.lead.service.order.atp.save', $order->id) }}" method="POST" class="mb-0">
                                                      @csrf
                                                      <div class="mb-3">
@@ -1129,6 +1155,7 @@
                                                          Add ATP
                                                      </button>
                                                  </form>
+                                                 @endif
                                              </div>
                                          </div>
 
@@ -1230,6 +1257,7 @@
                                                  <div class="section-header mb-3">
                                                      <h5 class="section-title">Add Barcoded Room</h5>
                                                  </div>
+                                                 @if($canEdit)
                                                  <form id="room-record-form" action="{{ route('admin.lead.service.order.room_record.save', $order->id) }}" method="POST" class="mb-0">
                                                      @csrf
                                                      <p class="text-muted mb-2" style="font-size: 14px;">For an existing barcode:</p>
@@ -1241,6 +1269,7 @@
                                                          Submit
                                                      </button>
                                                  </form>
+                                                 @endif
                                              </div>
                                          </div>
 
@@ -1269,12 +1298,14 @@
                                                                          {{ $record->created_at->format('m/d/y h:i A') }}
                                                                      </td>
                                                                      <td class="text-end">
+                                                                         @if($canEdit)
                                                                          <form action="{{ route('admin.lead.service.order.room_record.delete', $record->id) }}" method="POST" class="d-inline room-delete-form">
                                                                              @csrf
                                                                              <button type="submit" class="btn btn-sm btn-link text-danger p-0">
                                                                                  <i class="fa-solid fa-trash fs-5"></i>
                                                                              </button>
                                                                          </form>
+                                                                         @endif
                                                                      </td>
                                                                  </tr>
                                                              @empty
@@ -1301,6 +1332,7 @@
                                                   <div class="section-header mb-3">
                                                       <h5 class="section-title">Equipment Barcode Record</h5>
                                                   </div>
+                                                  @if($canEdit)
                                                   <form action="{{ route('admin.lead.service.order.equipment_record.save', $order->id) }}" method="POST" class="mb-0">
                                                       @csrf
                                                       <div class="d-flex flex-wrap gap-2 align-items-center">
@@ -1325,6 +1357,7 @@
                                                           </div>
                                                       </div>
                                                   </form>
+                                                  @endif
                                               </div>
  
                                               {{-- Card 2: Newly Barcoded Equipment --}}
@@ -1395,12 +1428,14 @@
                                                                           {{ $record->created_at->format('m/d/y h:i A') }}
                                                                       </td>
                                                                       <td class="text-end">
+                                                                          @if($canEdit)
                                                                           <form action="{{ route('admin.lead.service.order.equipment_record.delete', $record->id) }}" method="POST" class="d-inline equipment-delete-form">
                                                                               @csrf
                                                                               <button type="submit" class="btn btn-sm btn-link text-danger p-0">
                                                                                   <i class="fa-solid fa-trash fs-5"></i>
                                                                               </button>
                                                                           </form>
+                                                                          @endif
                                                                       </td>
                                                                   </tr>
                                                               @empty
@@ -1428,6 +1463,7 @@
                                                  <div class="section-header mb-3">
                                                      <h5 class="section-title">Clean Patch Record</h5>
                                                  </div>
+                                                 @if($canEdit)
                                                  <form id="clean-patch-form" action="{{ route('admin.lead.service.order.clean_patch.save', $order->id) }}" method="POST" class="mb-0">
                                                      @csrf
                                                      <div class="d-flex flex-wrap gap-2 align-items-center">
@@ -1451,6 +1487,7 @@
                                                          </div>
                                                      </div>
                                                  </form>
+                                                 @endif
                                              </div>
                                          </div>
 
@@ -1493,12 +1530,14 @@
                                                                          {{ $patch->created_at->format('m/d/y h:i A') }}
                                                                      </td>
                                                                      <td class="text-end">
+                                                                         @if($canEdit)
                                                                          <form action="{{ route('admin.lead.service.order.clean_patch.delete', $patch->id) }}" method="POST" class="d-inline patch-delete-form">
                                                                              @csrf
                                                                              <button type="submit" class="btn btn-sm btn-link text-danger p-0">
                                                                                  <i class="fa-solid fa-trash fs-5"></i>
                                                                              </button>
                                                                          </form>
+                                                                         @endif
                                                                      </td>
                                                                  </tr>
                                                              @empty
@@ -1550,6 +1589,7 @@
                                                     </div>
 
                                                     {{-- Edit Form --}}
+                                                    @if($canEdit)
                                                     <form action="{{ route('admin.lead.service.outline.update', $outline->id) }}" method="POST" class="mt-2">
                                                         @csrf
                                                         <div class="row mt-2 g-2">
@@ -1576,6 +1616,7 @@
                                                             </div>
                                                         </div>
                                                     </form>
+                                                    @endif
                                                 </div>
                                             @empty
                                                 <p class="text-muted">No contract details found.</p>
@@ -1620,6 +1661,7 @@
                                                 @endif
 
                                             {{-- Add Note Form --}}
+                                            @if($canEdit)
                                             <form action="{{ route('admin.lead.service.order.notes.add', $order->id) }}"
                                                 method="POST" enctype="multipart/form-data">
                                                 @csrf
@@ -1664,6 +1706,7 @@
                                                     </tbody>
                                                 </table>
                                             </form>
+                                            @endif
 
                                             </div>
                                         </div>
@@ -1749,6 +1792,7 @@
                                                 @endif
 
                                                 <!-- Add New Performance Record Form -->
+                                                @if($canEdit)
                                                 <div>
                                                     <h6 class="mb-3">Record New Performance Issue</h6>
                                                     <form id="employeePerformanceForm" class="employee-performance-form">
@@ -1792,6 +1836,7 @@
                                                         </table>
                                                     </form>
                                                 </div>
+                                                @endif
 
                                             </div>
                                         </div>
@@ -1835,14 +1880,16 @@
                                                     @csrf
                                                     <div class="mb-3">
                                                         <label for="plan_debrief" class="form-label">Debrief</label>
-                                                        <textarea class="form-control" id="plan_debrief" name="plan_debrief" rows="10" placeholder="Enter your debrief here...">{{ $order->plan_debrief ?? '' }}</textarea>
+                                                        <textarea class="form-control" id="plan_debrief" name="plan_debrief" rows="10" placeholder="Enter your debrief here..." {{ $canEdit ? '' : 'disabled' }}>{{ $order->plan_debrief ?? '' }}</textarea>
                                                     </div>
 
+                                                    @if($canEdit)
                                                     <div class="text-start">
                                                         <button type="submit" class="btn btn-primary btn-sm save-debrief-btn">
                                                             <i class="fas fa-save me-1"></i> Update Debrief
                                                         </button>
                                                     </div>
+                                                    @endif
                                                 </form>
                                             </div>
                                         </div>

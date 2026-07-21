@@ -153,6 +153,7 @@
 
 
 
+            @can('hr.module.view')
             @php
                 $isHRActive = request()->routeIs([
                     'admin.employee.*',
@@ -163,7 +164,7 @@
                 ]);
             @endphp
             <li class="{{ $isHRActive ? 'active' : '' }}">
-                <a href="{{ auth()->user()->isSuperAdmin() ? route('admin.employee.index') : route('admin.hr.time-off.index') }}">
+                <a href="{{ auth()->user()->can('hr.module.edit') || auth()->user()->isSuperAdmin() ? route('admin.employee.index') : route('admin.employee.index') }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon2.svg") }} alt="icon" />
                     </div>
@@ -172,6 +173,7 @@
                     </div>
                 </a>
             </li>
+            @endcan
 
             @if(auth()->user()->isSuperAdmin())
                 <li class="{{ request()->routeIs('admin.roles.permissions') ? 'active' : '' }}">

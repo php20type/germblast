@@ -292,6 +292,10 @@ class ServiceController extends Controller
 
     public function fulfillOrder(Request $request, $orderId)
     {
+        if (!auth()->user()->can('service.fulfill_order.view')) {
+            abort(403, 'Unauthorized access to fulfill order.');
+        }
+
         $order = ServiceOrder::with([
             'invoice',
             'invoices.creator',
@@ -474,6 +478,10 @@ class ServiceController extends Controller
 
     public function service_dashboard(Request $request, $orderId)
     {
+        if (!auth()->user()->can('service.dashboard.view')) {
+            abort(403, 'Unauthorized access to service dashboard.');
+        }
+
         $order = ServiceOrder::with([
             'invoice',
             'orderSlots.clocks.clockedBy',

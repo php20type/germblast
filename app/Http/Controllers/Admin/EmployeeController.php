@@ -15,9 +15,28 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules;
 use Spatie\Permission\Models\Role;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class EmployeeController extends Controller
+class EmployeeController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:hr.module.view', only: ['index', 'edit', 'driverReport', 'workReport']),
+            new Middleware('permission:hr.module.edit', only: [
+                'create',
+                'store',
+                'update',
+                'storeMaskFitTest',
+                'storeDriverLog',
+                'storeDriverSuspension',
+                'updateDriverReport',
+                'storeAvailability',
+            ]),
+        ];
+    }
+
     public function index(Request $request)
     {
         $query = User::withoutRole('customer');

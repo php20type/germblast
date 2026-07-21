@@ -2,6 +2,10 @@
 
 @section('title', 'Fulfill Order')
 
+@php
+    $canEdit = auth()->user()->can('service.fulfill_order.edit');
+@endphp
+
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <style>
@@ -381,20 +385,20 @@
                                                     <tbody>
                                                         <tr>
                                                             <th>Start Time</th>
-                                                            <td><input type="datetime-local" class="form-control" name="scheduled_start_time"></td>
+                                                            <td><input type="datetime-local" class="form-control" name="scheduled_start_time" {{ !$canEdit ? 'disabled' : '' }}></td>
                                                         </tr>
                                                         <tr>
                                                             <th>End Time</th>
-                                                            <td><input type="datetime-local" class="form-control" name="scheduled_end_time"></td>
+                                                            <td><input type="datetime-local" class="form-control" name="scheduled_end_time" {{ !$canEdit ? 'disabled' : '' }}></td>
                                                         </tr>
                                                         <tr>
                                                             <th>Arrival Time</th>
-                                                            <td><input type="time" class="form-control" name="scheduled_arrival_time"></td>
+                                                            <td><input type="time" class="form-control" name="scheduled_arrival_time" {{ !$canEdit ? 'disabled' : '' }}></td>
                                                         </tr>
                                                         <tr>
                                                             <th>Office</th>
                                                             <td>
-                                                                <select class="form-select" name="scheduled_office">
+                                                                <select class="form-select" name="scheduled_office" {{ !$canEdit ? 'disabled' : '' }}>
                                                                     @foreach($territories as $territory)
                                                                         <option value="{{ $territory->id }}">{{ $territory->name }}</option>
                                                                     @endforeach
@@ -404,7 +408,7 @@
                                                         <tr>
                                                             <th>Recurrence</th>
                                                             <td>
-                                                                <select class="form-select" name="scheduled_recurrence_rule">
+                                                                <select class="form-select" name="scheduled_recurrence_rule" {{ !$canEdit ? 'disabled' : '' }}>
                                                                     <option value="N/A">N/A</option>
                                                                     <option>Daily</option>
                                                                     <option>Weekly</option>
@@ -417,7 +421,7 @@
                                                         <tr>
                                                             <th>Meet</th>
                                                             <td>
-                                                                <select class="form-select" name="meet">
+                                                                <select class="form-select" name="meet" {{ !$canEdit ? 'disabled' : '' }}>
                                                                     <option value="office">Meet @ Office</option>
                                                                     <option value="facility">Meet @ Facility</option>
                                                                 </select>
@@ -426,7 +430,7 @@
                                                         <tr>
                                                             <th>Overnight</th>
                                                             <td>
-                                                                <select class="form-select" name="overnight">
+                                                                <select class="form-select" name="overnight" {{ !$canEdit ? 'disabled' : '' }}>
                                                                     <option value="0">Not Overnight</option>
                                                                     <option value="1">Overnight</option>
                                                                 </select>
@@ -434,7 +438,9 @@
                                                         </tr>
                                                         <tr>
                                                             <td colspan="2" class="text-end">
-                                                                <button type="submit" class="btn btn-success">Book It</button>
+                                                                @if($canEdit)
+                                                                    <button type="submit" class="btn btn-success">Book It</button>
+                                                                @endif
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -590,20 +596,24 @@
 
                                                     {{-- Confirm Button --}}
                                                     @if(!$slot->is_confirmed)
-                                                        <form action="{{ route('admin.lead.service.slot.confirm', $slot->id) }}" method="POST">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-success">
-                                                                <i class="fas fa-check me-1"></i> Confirm Slot
-                                                            </button>
-                                                        </form>
+                                                        @if($canEdit)
+                                                            <form action="{{ route('admin.lead.service.slot.confirm', $slot->id) }}" method="POST">
+                                                                @csrf
+                                                                <button type="submit" class="btn btn-success">
+                                                                    <i class="fas fa-check me-1"></i> Confirm Slot
+                                                                </button>
+                                                            </form>
+                                                        @endif
                                                     @endif
 
                                                     {{-- Edit Button --}}
-                                                    <button type="button" class="btn btn-outline-primary"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target="#editSlot{{ $slot->id }}">
-                                                        <i class="fas fa-edit me-1"></i> Edit Slot
-                                                    </button>
+                                                    @if($canEdit)
+                                                        <button type="button" class="btn btn-outline-primary"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#editSlot{{ $slot->id }}">
+                                                            <i class="fas fa-edit me-1"></i> Edit Slot
+                                                        </button>
+                                                    @endif
 
                                                 </div>
 
@@ -939,12 +949,14 @@
                                                                         <span class="text-muted d-block ms-4" style="font-size: 12px;">{{ $facility->companyLocation->full_address }}</span>
                                                                     @endif
                                                                 </span>
-                                                                <form action="{{ route('admin.lead.service.slot.facility.remove', $facility->id) }}" method="POST" class="d-inline">
-                                                                    @csrf
-                                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                                        <i class="fas fa-times"></i>
-                                                                    </button>
-                                                                </form>
+                                                                @if($canEdit)
+                                                                    <form action="{{ route('admin.lead.service.slot.facility.remove', $facility->id) }}" method="POST" class="d-inline">
+                                                                        @csrf
+                                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                            <i class="fas fa-times"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                @endif
                                                             </li>
                                                         @endforeach
                                                     </ul>
@@ -956,7 +968,7 @@
                                                 <form action="{{ route('admin.lead.service.slot.facility.add', $slot->id) }}" method="POST">
                                                     @csrf
                                                     <div class="d-flex gap-2">
-                                                            <select class="form-select" name="company_location_id" required>
+                                                            <select class="form-select" name="company_location_id" required {{ !$canEdit ? 'disabled' : '' }}>
                                                                 <option value="">-- Select Location --</option>
                                                                 @foreach($companyLocations as $location)
                                                                     {{-- Skip already-added ones --}}
@@ -965,9 +977,11 @@
                                                                     @endunless
                                                                 @endforeach
                                                             </select>
-                                                        <button type="submit" class="btn btn-success">
-                                                            Add
-                                                        </button>
+                                                        @if($canEdit)
+                                                            <button type="submit" class="btn btn-success">
+                                                                Add
+                                                            </button>
+                                                        @endif
                                                     </div>
                                                 </form>
 
@@ -1114,40 +1128,42 @@
                                                                                 <i class="fas fa-question" style="font-size:9px;"></i>
                                                                             </button>
                                                                             {{-- Toggle Leader Button --}}
-                                                                            <form action="{{ route('admin.lead.service.slot.staff.toggle_leader', $staffMember->id) }}" method="POST" class="d-inline">
-                                                                                @csrf
-                                                                                <button type="submit" class="btn btn-sm {{ $isLeader ? 'btn-warning text-dark' : 'btn-outline-warning border-0' }}" title="{{ $isLeader ? 'Remove Leader Designation' : 'Designate as Leader' }}" style="padding: 4px 6px; line-height: 1;">
-                                                                                    <svg viewBox="0 0 100 100" style="width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; display: inline-block;">
-                                                                                        <!-- Head -->
-                                                                                        <circle cx="33" cy="28" r="9" />
-                                                                                        <!-- Body/Spine -->
-                                                                                        <path d="M33 37 v24" />
-                                                                                        <!-- Left arm (hand on hip) -->
-                                                                                        <path d="M33 41 H23 L19 50 L25 56" />
-                                                                                        <!-- Right arm (pointing up) -->
-                                                                                        <path d="M33 41 L47 29" />
-                                                                                        <!-- Left leg (straight down) -->
-                                                                                        <path d="M33 61 H28 V81" />
-                                                                                        <!-- Right leg (stepped up) -->
-                                                                                        <path d="M33 61 H44 V68 H38" />
-                                                                                        <!-- Podium/Box -->
-                                                                                        <rect x="36" y="68" width="18" height="13" />
-                                                                                        <!-- Dotted ray -->
-                                                                                        <path d="M51 26 L56 22" stroke-dasharray="2,3" />
-                                                                                        <path d="M60 19 L65 15" stroke-dasharray="2,3" />
-                                                                                        <!-- Star -->
-                                                                                        <path d="M74 8 L77 15 L84 18 L77 21 L74 28 L71 21 L64 18 L71 15 Z" fill="currentColor" stroke="none" />
-                                                                                    </svg>
-                                                                                </button>
-                                                                            </form>
+                                                                            @if($canEdit)
+                                                                                <form action="{{ route('admin.lead.service.slot.staff.toggle_leader', $staffMember->id) }}" method="POST" class="d-inline">
+                                                                                    @csrf
+                                                                                    <button type="submit" class="btn btn-sm {{ $isLeader ? 'btn-warning text-dark' : 'btn-outline-warning border-0' }}" title="{{ $isLeader ? 'Remove Leader Designation' : 'Designate as Leader' }}" style="padding: 4px 6px; line-height: 1;">
+                                                                                        <svg viewBox="0 0 100 100" style="width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; display: inline-block;">
+                                                                                            <!-- Head -->
+                                                                                            <circle cx="33" cy="28" r="9" />
+                                                                                            <!-- Body/Spine -->
+                                                                                            <path d="M33 37 v24" />
+                                                                                            <!-- Left arm (hand on hip) -->
+                                                                                            <path d="M33 41 H23 L19 50 L25 56" />
+                                                                                            <!-- Right arm (pointing up) -->
+                                                                                            <path d="M33 41 L47 29" />
+                                                                                            <!-- Left leg (straight down) -->
+                                                                                            <path d="M33 61 H28 V81" />
+                                                                                            <!-- Right leg (stepped up) -->
+                                                                                            <path d="M33 61 H44 V68 H38" />
+                                                                                            <!-- Podium/Box -->
+                                                                                            <rect x="36" y="68" width="18" height="13" />
+                                                                                            <!-- Dotted ray -->
+                                                                                            <path d="M51 26 L56 22" stroke-dasharray="2,3" />
+                                                                                            <path d="M60 19 L65 15" stroke-dasharray="2,3" />
+                                                                                            <!-- Star -->
+                                                                                            <path d="M74 8 L77 15 L84 18 L77 21 L74 28 L71 21 L64 18 L71 15 Z" fill="currentColor" stroke="none" />
+                                                                                        </svg>
+                                                                                    </button>
+                                                                                </form>
 
-                                                                            {{-- Remove Staff Button --}}
-                                                                            <form action="{{ route('admin.lead.service.slot.staff.remove', $staffMember->id) }}" method="POST" class="d-inline">
-                                                                                @csrf
-                                                                                <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Remove Staff Member">
-                                                                                    <i class="fas fa-times"></i>
-                                                                                </button>
-                                                                            </form>
+                                                                                {{-- Remove Staff Button --}}
+                                                                                <form action="{{ route('admin.lead.service.slot.staff.remove', $staffMember->id) }}" method="POST" class="d-inline">
+                                                                                    @csrf
+                                                                                    <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Remove Staff Member">
+                                                                                        <i class="fas fa-times"></i>
+                                                                                    </button>
+                                                                                </form>
+                                                                            @endif
                                                                         </div>
                                                                     </div>
                                                                 @empty
@@ -1262,7 +1278,7 @@
                                                                                                 name="user_ids[]"
                                                                                                 value="{{ $tech->id }}"
                                                                                                 id="staff-{{ $slot->id }}-{{ $tech->id }}"
-                                                                                                {{ $isAvailable ? '' : 'disabled' }}>
+                                                                                                {{ ($isAvailable && $canEdit) ? '' : 'disabled' }}>
                                                                                             <label for="staff-{{ $slot->id }}-{{ $tech->id }}"
                                                                                                 class="{{ $textColor }} small mb-0" style="cursor:{{ $isAvailable ? 'pointer' : 'not-allowed' }};">
                                                                                                 {{ $tech->name }} | {{ $formattedHours }} 
@@ -1386,7 +1402,7 @@
                                                                                                 name="user_ids[]"
                                                                                                 value="{{ $tech->id }}"
                                                                                                 id="staff-{{ $slot->id }}-{{ $tech->id }}"
-                                                                                                {{ $isAvailable ? '' : 'disabled' }}>
+                                                                                                {{ ($isAvailable && $canEdit) ? '' : 'disabled' }}>
                                                                                             <label for="staff-{{ $slot->id }}-{{ $tech->id }}"
                                                                                                 class="{{ $textColor }} small mb-0" style="cursor:{{ $isAvailable ? 'pointer' : 'not-allowed' }};">
                                                                                                 {{ $tech->name }} | {{ $formattedHours }} 
@@ -1510,7 +1526,7 @@
                                                                                                 name="user_ids[]"
                                                                                                 value="{{ $tech->id }}"
                                                                                                 id="staff-{{ $slot->id }}-{{ $tech->id }}"
-                                                                                                {{ $isAvailable ? '' : 'disabled' }}>
+                                                                                                {{ ($isAvailable && $canEdit) ? '' : 'disabled' }}>
                                                                                             <label for="staff-{{ $slot->id }}-{{ $tech->id }}"
                                                                                                 class="{{ $textColor }} small mb-0" style="cursor:{{ $isAvailable ? 'pointer' : 'not-allowed' }};">
                                                                                                 {{ $tech->name }} | {{ $formattedHours }} 
@@ -1547,11 +1563,13 @@
                                                                         @endif
 
                                                                         {{-- Add Selected Button --}}
-                                                                        <div class="mt-3 text-end">
-                                                                            <button type="submit" class="btn btn-success px-4">
-                                                                                Add Selected
-                                                                            </button>
-                                                                        </div>
+                                                                        @if($canEdit)
+                                                                            <div class="mt-3 text-end">
+                                                                                <button type="submit" class="btn btn-success px-4">
+                                                                                    Add Selected
+                                                                                </button>
+                                                                            </div>
+                                                                        @endif
 
                                                                     </form>
                                                                 @endif
@@ -1775,24 +1793,26 @@
                                             </div>
 
                                             {{-- Add Department Form --}}
-                                            <form action="{{ route('admin.lead.service.outline.add', $order->service->id) }}" method="POST">
-                                                @csrf
-                                                <table class="table table-hover equipment-report-table">
-                                                    <tbody>
-                                                        <tr>
-                                                            <th style="width: 25%;">Department Name</th>
-                                                            <td>
-                                                                <input type="text" class="form-control" name="outline_name" placeholder="Enter department name" required>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td colspan="2" class="text-end">
-                                                                <button type="submit" class="btn btn-success">Add Department</button>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </form>
+                                            @if($canEdit)
+                                                <form action="{{ route('admin.lead.service.outline.add', $order->service->id) }}" method="POST">
+                                                    @csrf
+                                                    <table class="table table-hover equipment-report-table">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th style="width: 25%;">Department Name</th>
+                                                                <td>
+                                                                    <input type="text" class="form-control" name="outline_name" placeholder="Enter department name" required>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="2" class="text-end">
+                                                                    <button type="submit" class="btn btn-success">Add Department</button>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </form>
+                                            @endif
 
                                         </div>
                                     </div>
@@ -1833,50 +1853,52 @@
                                             @endif
 
                                         {{-- Add Note Form --}}
-                                        <form action="{{ route('admin.lead.service.order.notes.add', $order->id) }}"
-                                            method="POST" enctype="multipart/form-data">
-                                            @csrf
-                                            <table class="table table-hover equipment-report-table">
-                                                <tbody>
-                                                    <tr>
-                                                        <th>Notes</th>
-                                                        <td>
-                                                            <textarea class="form-control" name="notes" rows="5"></textarea>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Upload Photo <small class="text-muted">(optional)</small></th>
-                                                        <td>
-                                                            <input type="file" class="form-control" name="photo">
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="2">
-                                                            <small class="text-muted">Note: Use the Contracts section to
-                                                                document service that was performed. Discrepancies, damage,
-                                                                or other issues that the sales team should be notified about
-                                                                should be documented and the checkbox checked.</small>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="2">
-                                                            <div class="form-check">
-                                                                <input type="checkbox" class="form-check-input"
-                                                                    name="notify_sales_team" id="notify_sales_team">
-                                                                <label class="form-check-label"
-                                                                    for="notify_sales_team">Notify Sales Team</label>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="2" class="text-end">
-                                                            <button type="submit" class="btn btn-success">Add
-                                                                Notes</button>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </form>
+                                        @if($canEdit)
+                                            <form action="{{ route('admin.lead.service.order.notes.add', $order->id) }}"
+                                                method="POST" enctype="multipart/form-data">
+                                                @csrf
+                                                <table class="table table-hover equipment-report-table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>Notes</th>
+                                                            <td>
+                                                                <textarea class="form-control" name="notes" rows="5"></textarea>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Upload Photo <small class="text-muted">(optional)</small></th>
+                                                            <td>
+                                                                <input type="file" class="form-control" name="photo">
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="2">
+                                                                <small class="text-muted">Note: Use the Contracts section to
+                                                                    document service that was performed. Discrepancies, damage,
+                                                                    or other issues that the sales team should be notified about
+                                                                    should be documented and the checkbox checked.</small>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="2">
+                                                                <div class="form-check">
+                                                                    <input type="checkbox" class="form-check-input"
+                                                                        name="notify_sales_team" id="notify_sales_team">
+                                                                    <label class="form-check-label"
+                                                                        for="notify_sales_team">Notify Sales Team</label>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="2" class="text-end">
+                                                                <button type="submit" class="btn btn-success">Add
+                                                                    Notes</button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </form>
+                                        @endif
 
                                         </div>
                                     </div>
@@ -1967,10 +1989,12 @@
                                                         </table>
                                                     </div>
 
-                                                    <div class="d-flex gap-3 mt-4 pt-3">
-                                                        <button type="submit" name="with_inventory" value="1" class="btn btn-success">Invoice With Inventory Billing</button>
-                                                        <button type="submit" name="with_inventory" value="0" class="btn btn-primary">Invoice Without Inventory Billing</button>
-                                                    </div>
+                                                    @if($canEdit)
+                                                        <div class="d-flex gap-3 mt-4 pt-3">
+                                                            <button type="submit" name="with_inventory" value="1" class="btn btn-success">Invoice With Inventory Billing</button>
+                                                            <button type="submit" name="with_inventory" value="0" class="btn btn-primary">Invoice Without Inventory Billing</button>
+                                                        </div>
+                                                    @endif
                                                 </form>
                                             </div>
                                         @else
@@ -2113,9 +2137,11 @@
                                                 <p class="small mt-2 fw-semibold">Total of Line Items: <strong>$<span id="invoice-grand-total">{{ number_format($invoiceTotal, 2) }}</span></strong></p>
 
                                                 {{-- Add Line Button --}}
-                                                <button type="button" class="btn btn-sm btn-outline-secondary mb-4" id="add-invoice-item-btn">
-                                                    <i class="bi bi-plus-circle"></i> Add Another Line
-                                                </button>
+                                                @if($canEdit)
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary mb-4" id="add-invoice-item-btn">
+                                                        <i class="bi bi-plus-circle"></i> Add Another Line
+                                                    </button>
+                                                @endif
 
                                                 {{-- Notes --}}
                                                 <div class="mb-3">
@@ -2125,9 +2151,11 @@
 
                                                 <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
                                                     <div>
-                                                        <button type="submit" class="btn btn-sm btn-primary px-3">
-                                                            <i class="bi bi-save"></i> Update Invoice
-                                                        </button>
+                                                        @if($canEdit)
+                                                            <button type="submit" class="btn btn-sm btn-primary px-3">
+                                                                <i class="bi bi-save"></i> Update Invoice
+                                                            </button>
+                                                        @endif
                                                     </div>
                                                     <div class="d-flex gap-2">
                                                         <a href="{{ route('admin.lead.service.order.invoice.download.pdf', $lastInvoice->id) }}" class="btn btn-sm btn-outline-danger py-1 px-2" title="Download PDF">
@@ -2297,9 +2325,11 @@
                                                                             @endif
                                                                         </td>
                                                                         <td>
-                                                                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editClockModal-{{ $clock->id }}">
-                                                                                <i class="fas fa-edit"></i> Edit
-                                                                            </button>
+                                                                            @if($canEdit)
+                                                                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editClockModal-{{ $clock->id }}">
+                                                                                    <i class="fas fa-edit"></i> Edit
+                                                                                </button>
+                                                                            @endif
                                                                         </td>
                                                                     </tr>
 
@@ -2340,10 +2370,16 @@
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="modal-footer d-flex justify-content-between">
-                                                                                            <button type="button" class="btn btn-danger" onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this job clock?')) document.getElementById('delete-clock-{{ $clock->id }}').submit();">Delete</button>
+                                                                                            @if($canEdit)
+                                                                                                <button type="button" class="btn btn-danger" onclick="event.preventDefault(); if(confirm('Are you sure you want to delete this job clock?')) document.getElementById('delete-clock-{{ $clock->id }}').submit();">Delete</button>
+                                                                                            @else
+                                                                                                <div></div>
+                                                                                            @endif
                                                                                             <div>
                                                                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                                                                                @if($canEdit)
+                                                                                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                                                                                @endif
                                                                                             </div>
                                                                                         </div>
                                                                                     </form>

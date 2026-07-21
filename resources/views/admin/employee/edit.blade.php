@@ -60,6 +60,9 @@
     </style>
 @endpush
 @section('content')
+@php
+    $canEdit = auth()->user()->can('hr.module.edit');
+@endphp
 <div class="companies-section my-4">
     <div class="container-fluid">
         <div class="row">
@@ -76,6 +79,7 @@
                         id="employee-edit-form"
                         enctype="multipart/form-data">
                         @csrf
+                        <fieldset {{ $canEdit ? '' : 'disabled' }}>
 
                             {{-- HEADER --}}
                             <div class="heading-area-sec mb-3">
@@ -84,9 +88,11 @@
                                     <p class="text-muted mb-0">Update employee details and role</p>
                                 </div>
                                 <div class="right-part-sec">
+                                    @if($canEdit)
                                     <button type="submit" class="btn btn-success">
                                         Update Employee
                                     </button>
+                                    @endif
                                 </div>
                             </div>
 
@@ -317,10 +323,12 @@
 
                                         </div>
                                     </div>
+                                    </div>
                                 </div>
-
+                        </fieldset>
                     </form>
 
+                    @if($canEdit)
                     {{-- MASK FIT TEST FORM (Separate form) --}}
                     <form id="mask-fit-form" method="POST" action="{{ route('admin.employee.mask-fit-test.store', $employee->id) }}">
                         @csrf
@@ -371,6 +379,7 @@
                                     </div>
                                 </div>
                     </form>
+                    @endif
 
                     {{-- MASK FIT TEST RECORDS LISTING --}}
                     <div class="px-4 pb-2">
@@ -417,6 +426,7 @@
                             </div>
 
 
+                    @if($canEdit)
                     {{-- DRIVER LOG FORM --}}
                     <form id="driver-log-form" method="POST" action="{{ route('admin.employee.driver-log.store', $employee->id) }}">
                         @csrf
@@ -464,7 +474,7 @@
                                 </div>
                             </div>
                     </form>
-
+                    @endif
 
                     {{-- DRIVER LOG LISTING --}}
                     <div class="row">
@@ -508,6 +518,7 @@
                             </div>
 
 
+                    @if($canEdit)
                     {{-- DRIVER SUSPENSION FORM --}}
                     <form id="driver-suspension-form" method="POST" action="{{ route('admin.employee.driver-suspension.store', $employee->id) }}">
                         @csrf
@@ -548,7 +559,7 @@
                                 </div>
                             </div>
                     </form>
-
+                    @endif
 
                     {{-- DRIVER SUSPENSION LISTING FORM --}}
                     <div class="row">
@@ -601,9 +612,11 @@
                             <div class="section-card">
                                 <div class="section-header d-flex justify-content-between align-items-center">
                                     <h3 class="section-title">List of Availability Records</h3>
+                                    @if($canEdit)
                                     <button type="button" class="btn btn-primary" id="btn-new-availability">
                                         New Availability
                                     </button>
+                                    @endif
                                 </div>
 
                                 <div class="table-responsive">

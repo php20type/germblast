@@ -20,9 +20,11 @@
                                 <h3 class="mb-1">All EMPLOYEES <span style="font-size: 24px;">📌</span></h3>
                                 <p class="text-muted mb-0">Internal users excluding clients</p>
                             </div>
+                            @can('hr.module.edit')
                             <div class="right-part-sec">
                                 <a href="{{ route('admin.employee.create') }}" class="btn btn-export">+ Add Employee</a>
                             </div>
+                            @endcan
                         </div>
 
                         <!-- Filter Section -->
