@@ -6,9 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\ConsumableReport;
 use App\Models\Company;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ConsumableReportController extends Controller
+class ConsumableReportController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:consumable_report.view', only: ['index']),
+            new Middleware('permission:consumable_report.add', only: ['store']),
+            new Middleware('permission:consumable_report.edit', only: ['update', 'destroy']),
+        ];
+    }
     public function index(Request $request)
     {
         $reports = ConsumableReport::with(['company', 'leader'])->get();

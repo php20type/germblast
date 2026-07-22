@@ -102,11 +102,13 @@
                                 <p class="text-muted mb-0">Track stock levels, reorder points, and
                                     required actions.</p>
                             </div>
+                            @can('inventory_reporting.add')
                             <div class="right-part-sec">
                                 <button class="btn btn-export" onclick="openCreateModal()">
                                     + CREATE ITEM
                                 </button>
                             </div>
+                            @endcan
                         </div>
 
                         @if(session('success'))
@@ -165,6 +167,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="d-flex align-items-center">
+                                                        @can('inventory_reporting.edit')
                                                         <button type="button"
                                                             class="btn btn-outline-dark py-1 px-3 edit-btn me-2"
                                                             style="border-radius: 6px; font-size: 12px; font-weight: 500;"
@@ -184,6 +187,7 @@
                                                             <button type="submit" class="btn btn-outline-danger py-1 px-3"
                                                                 style="border-radius: 6px; font-size: 12px; font-weight: 500;">Del</button>
                                                         </form>
+                                                        @endcan
                                                     </div>
                                                 </td>
                                             </tr>

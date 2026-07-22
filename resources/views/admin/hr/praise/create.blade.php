@@ -82,11 +82,11 @@
                                     Please answer the following questions and submit your feedback.
                                 </p>
                             </div>
-                            @if (auth()->user()->isSuperAdmin())
+                            @can('team_praise.view')
                             <div class="right-part-sec">
                                 <a href="{{ route('admin.hr.praise.index') }}" class="btn btn-export">View Submissions</a>
                             </div>
-                            @endif
+                            @endcan
                         </div>
 
                         <div class="px-4 pb-4">
@@ -104,25 +104,21 @@
                                 <div class="section-card">
                                     
                                     <div class="form-group-praise">
-                                        <label for="recipient_name" class="form-label-praise">Who do you want to praise?</label>
-                                        <input 
-                                            type="text" 
-                                            name="recipient_name" 
-                                            id="recipient_name" 
-                                            list="employee_list" 
-                                            class="input-praise @error('recipient_name') is-invalid @enderror" 
-                                            placeholder="Type or select the employee you want to praise..." 
-                                            required 
-                                            value="{{ old('recipient_name') }}"
-                                            autocomplete="off"
+                                        <label for="recipient_id" class="form-label-praise">Who do you want to praise?</label>
+                                        <select 
+                                            name="recipient_id" 
+                                            id="recipient_id" 
+                                            class="input-praise form-select @error('recipient_id') is-invalid @enderror" 
+                                            required
                                         >
-                                        <input type="hidden" name="recipient_id" id="recipient_id" value="{{ old('recipient_id') }}">
-                                        <datalist id="employee_list">
+                                            <option value="" disabled selected>-- Select an employee --</option>
                                             @foreach($users as $user)
-                                                <option value="{{ $user->name }}" data-id="{{ $user->id }}">
+                                                <option value="{{ $user->id }}" {{ old('recipient_id') == $user->id ? 'selected' : '' }}>
+                                                    {{ $user->name }} ({{ $user->email }})
+                                                </option>
                                             @endforeach
-                                        </datalist>
-                                        @error('recipient_name')
+                                        </select>
+                                        @error('recipient_id')
                                             <div class="text-danger mt-1" style="font-size: 13px;">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -173,20 +169,6 @@
 @push('scripts')
 <script>
 $(document).ready(function () {
-    // Sync recipient_id if user is selected from datalist
-    $('#recipient_name').on('change input', function() {
-        const val = $(this).val();
-        const $options = $('#employee_list option');
-        let matchedId = '';
-        $options.each(function() {
-            if ($(this).val() === val) {
-                matchedId = $(this).data('id');
-                return false; // break
-            }
-        });
-        $('#recipient_id').val(matchedId);
-    });
-
     $('#praiseForm').on('submit', function (e) {
         e.preventDefault();
         const $form = $(this);
@@ -200,7 +182,6 @@ $(document).ready(function () {
             success: function (res) {
                 toastr.success(res.message || 'Praise submitted successfully!');
                 $form[0].reset();
-                $('#recipient_id').val('');
                 $btn.prop('disabled', false).text('Submit Praise');
             },
             error: function (xhr) {

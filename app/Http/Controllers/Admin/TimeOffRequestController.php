@@ -6,10 +6,21 @@ use App\Http\Controllers\Controller;
 use App\Models\TimeOffRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Carbon\Carbon;
 
-class TimeOffRequestController extends Controller
+
+class TimeOffRequestController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:time_off_request.view', only: ['index', 'store']),
+            new Middleware('permission:time_off_request.edit', only: ['approve', 'reject']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -26,9 +37,7 @@ class TimeOffRequestController extends Controller
             ->latest()
             ->get();
 
-        // 2. Company-wide requests (for admins, managers, supervisors)
-        $isAdminOrManager = $user->isSuperAdmin();
-
+        // 2. Company-wide requests (for users with edit permission or super admin)
         $companyRequests = collect();
 
         // Stats queries base
@@ -39,13 +48,13 @@ class TimeOffRequestController extends Controller
         $adminQuery->whereYear('start_date', $selectedYear);
         $employeeQuery->whereYear('start_date', $selectedYear);
 
-        if ($isAdminOrManager) {
+        if ($user->can('time_off_request.edit')) {
             $companyRequests = TimeOffRequest::with(['user', 'manager'])
                 ->whereYear('start_date', $selectedYear)
                 ->latest()
                 ->get();
 
-            // Stats for Admin (Company-wide)
+            // Stats for Manager/Admin (Company-wide)
             $approvedCount = $adminQuery->clone()->where('status', 'approved')->count();
             $pendingCount = $adminQuery->clone()->where('status', 'submitted')->count();
             $rejectedCount = $adminQuery->clone()->where('status', 'rejected')->count();
@@ -61,7 +70,6 @@ class TimeOffRequestController extends Controller
 
         return view('admin.hr.time-off.index', compact(
             'myRequests',
-            'isAdminOrManager',
             'companyRequests',
             'approvedCount',
             'pendingCount',
@@ -113,14 +121,6 @@ class TimeOffRequestController extends Controller
     public function approve(Request $request, $id)
     {
         $user = auth()->user();
-        $isAdminOrManager = $user->isSuperAdmin();
-
-        if (!$isAdminOrManager) {
-            if ($request->ajax()) {
-                return response()->json(['message' => 'Unauthorized action.'], 403);
-            }
-            return redirect()->back()->with('error', 'Unauthorized action.');
-        }
 
         try {
             $timeOffRequest = TimeOffRequest::findOrFail($id);
@@ -152,14 +152,6 @@ class TimeOffRequestController extends Controller
     public function reject(Request $request, $id)
     {
         $user = auth()->user();
-        $isAdminOrManager = $user->isSuperAdmin();
-
-        if (!$isAdminOrManager) {
-            if ($request->ajax()) {
-                return response()->json(['message' => 'Unauthorized action.'], 403);
-            }
-            return redirect()->back()->with('error', 'Unauthorized action.');
-        }
 
         try {
             $timeOffRequest = TimeOffRequest::findOrFail($id);

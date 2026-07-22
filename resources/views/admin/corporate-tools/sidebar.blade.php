@@ -10,25 +10,41 @@
         <hr>
 
         <div id="corporate-tools-list">
+            @can('change_control.view')
             <a class="nav-link {{ request()->routeIs('admin.change-control.*') ? 'active' : '' }}" href="{{ route('admin.change-control.index') }}">
                 Change Control
             </a>
+            @endcan
+
+            @can('consumable_report.view')
             <a class="nav-link {{ request()->routeIs('admin.consumable-reports.*') ? 'active' : '' }}" href="{{ route('admin.consumable-reports.index') }}">
                 Consumable Reports
             </a>
+            @endcan
 
+            @can('expense_report.view')
             <a class="nav-link {{ request()->routeIs('admin.expense-report.*') ? 'active' : '' }}" href="{{ route('admin.expense-report.index') }}">
                 Expense Report
             </a>
+            @endcan
+
+            @can('inventory_reporting.view')
             <a class="nav-link {{ request()->routeIs('admin.inventory-report.*') ? 'active' : '' }}" href="{{ route('admin.inventory-report.index') }}">
                 Inventory Reporting
             </a>
+            @endcan
+
+            @can('job_profitability.view')
             <a class="nav-link {{ request()->routeIs('admin.job-profitability.*') ? 'active' : '' }}" href="{{ route('admin.job-profitability.index') }}">
                 Job Profitability
             </a>
+            @endcan
+
+            @can('office_duties.view')
             <a class="nav-link {{ request()->routeIs('admin.office-duties.*') ? 'active' : '' }}" href="{{ route('admin.office-duties.index') }}">
                 Office Duties
             </a>
+            @endcan
 
 
             <div id="nothing-found" style="display:none; color: rgba(255,255,255,0.6); padding: 10px 0;">Nothing found.</div>

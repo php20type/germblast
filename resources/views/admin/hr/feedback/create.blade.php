@@ -67,11 +67,11 @@
                                     Your identity is completely protected. Share your honest thoughts.
                                 </p>
                             </div>
-                            @if (auth()->user()->isSuperAdmin())
+                            @can('anonymous_feedback.view')
                             <div class="right-part-sec">
                                 <a href="{{ route('admin.hr.feedback.index') }}" class="btn btn-export">View Submissions</a>
                             </div>
-                            @endif
+                            @endcan
                         </div>
 
                         <div class="px-4 pb-4">

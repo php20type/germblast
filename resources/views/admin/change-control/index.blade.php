@@ -123,11 +123,13 @@
                                 <h3 class="mb-1">CHANGE CONTROL <span style="font-size: 24px;">🔄</span></h3>
                                 <p class="text-muted mb-0">Create and track change requests, status approvals, and task tasks.</p>
                             </div>
+                            @can('change_control.add')
                             <div class="right-part-sec">
                                 <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#createRequestModal">
                                     + CREATE REQUEST
                                 </button>
                             </div>
+                            @endcan
                         </div>
 
                         <!-- Table Card -->
@@ -165,6 +167,7 @@
                                                 </td>
                                                 <td>{{ $request->created_at->format('M d, Y') }}</td>
                                                 <td class="text-center">
+                                                    @can('change_control.edit')
                                                     <button type="button" class="btn btn-sm btn-outline-dark edit-request-btn" 
                                                             style="border-radius: 6px; padding: 6px 14px;"
                                                             data-id="{{ $request->id }}" 
@@ -172,6 +175,7 @@
                                                             data-description="{{ $request->description }}">
                                                         Edit
                                                     </button>
+                                                    @endcan
                                                 </td>
                                             </tr>
                                         @endforeach

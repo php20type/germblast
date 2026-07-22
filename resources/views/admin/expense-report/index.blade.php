@@ -191,10 +191,12 @@
                             <h3 class="mb-1">ALL EXPENSE REPORTS <span style="font-size: 24px;">📌</span></h3>
                             <p class="text-muted mb-0">Manage and review all employee expense reports</p>
                         </div>
+                        @can('expense_report.add')
                         <div class="right-part-sec">
                             <a href="{{ route('admin.expense-report.personal.create') }}" class="btn btn-export" style="margin-right: 10px;">+ PERSONAL EXPENSE</a>
                             <a href="{{ route('admin.expense-report.corporate.create') }}" class="btn btn-export">+ CORPORATE EXPENSE</a>
                         </div>
+                        @endcan
                     </div>
 
                     <!-- Global Search & Filter -->

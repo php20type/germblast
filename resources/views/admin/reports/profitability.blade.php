@@ -214,7 +214,11 @@
                                             @endphp
                                             <tr class="{{ $record['row_class'] }}">
                                                 <td>
+                                                    @can('service.fulfill_order.view')
                                                     <a href="{{ route('admin.lead.service.fulfill_order', $record['id']) }}" class="client-link">{{ $record['client'] }}</a>
+                                                    @else
+                                                    <span class="text-dark">{{ $record['client'] }}</span>
+                                                    @endcan
                                                 </td>
                                                 <td class="text-dark">{{ $record['date'] }}</td>
                                                 <td class="{{ $priceClass }}">{{ $record['price'] }}</td>

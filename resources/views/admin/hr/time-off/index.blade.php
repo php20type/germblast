@@ -366,8 +366,8 @@
                             </div>
                         </div>
 
-                        {{-- Section 2: Company-wide Requests (Admin Only) --}}
-                        @if($isAdminOrManager)
+                        {{-- Section 2: Company-wide Requests --}}
+                        @can('time_off_request.edit')
                             <div class="px-4 pb-4">
                                 <div class="section-card">
                                     <div class="section-title">All Requests</div>
@@ -437,7 +437,7 @@
                                     </table>
                                 </div>
                             </div>
-                        @endif
+                        @endcan
 
                     </div>
                 </div>

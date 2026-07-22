@@ -314,6 +314,7 @@
                             <p class="text-muted mb-2">Request ID: #{{ $changeRequest->id }}</p>
                             
                             <div class="d-flex align-items-center gap-3 flex-wrap mt-2 mb-3">
+                                @can('change_control.edit')
                                 <div class="d-flex align-items-center gap-2 mb-0">
                                     <label class="text-muted mb-0 fw-semibold" style="font-size: 14px;">Request Status:</label>
                                     <select name="status" id="changeRequestStatusSelect" class="status-select" style="width: auto; min-width: 140px;">
@@ -323,6 +324,7 @@
                                         <option value="Closed" {{ $changeRequest->status === 'Closed' ? 'selected' : '' }}>Closed</option>
                                     </select>
                                 </div>
+                                @endcan
                                 <span class="status-pill status-pill-{{ strtolower($changeRequest->status) }}" id="statusPillBadge">
                                     {{ $changeRequest->status }}
                                 </span>
@@ -405,9 +407,11 @@
                                     <div class="section-card">
                                         <div class="section-header d-flex justify-content-between align-items-center mb-3">
                                             <h5 class="section-title">Associated Tasks Checklist</h5>
+                                            @can('change_control.edit')
                                             <button class="btn btn-export btn-sm" data-bs-toggle="modal" data-bs-target="#addTaskModal">
                                                 + ADD TASK
                                             </button>
+                                            @endcan
                                         </div>
 
                                         <table class="table table-hover equipment-report-table">
@@ -427,6 +431,7 @@
                                                             <input type="checkbox" class="form-check-input task-checkbox" 
                                                                    data-url="{{ route('admin.change-control.task.status.update', [$changeRequest->id, $task->id]) }}"
                                                                    {{ $task->status === 'Completed' ? 'checked' : '' }}
+                                                                   @cannot('change_control.edit') disabled @endcannot
                                                                    style="width: 18px; height: 18px; cursor: pointer;">
                                                         </td>
                                                         <td style="text-align: left !important;">
@@ -460,6 +465,7 @@
                                 <div class="col-md-12">
                                     
                                     <!-- Add Entry -->
+                                    @can('change_control.edit')
                                     <div class="section-card">
                                         <div class="section-header mb-3">
                                             <h5 class="section-title">Add Documentation / Log Entry</h5>
@@ -474,6 +480,7 @@
                                             </div>
                                         </form>
                                     </div>
+                                    @endcan
 
                                     <!-- History & Timeline Logs -->
                                     <div class="section-card">

@@ -8,8 +8,17 @@ use App\Models\ServiceOrder;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 
-class JobProfitabilityController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class JobProfitabilityController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:job_profitability.view', only: ['index', 'downloadPdf', 'downloadCsv']),
+        ];
+    }
     public function index(Request $request)
     {
         $date = $request->date

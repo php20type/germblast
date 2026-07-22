@@ -13,8 +13,19 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
 
-class ExpenseReportController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class ExpenseReportController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:expense_report.view', only: ['index']),
+            new Middleware('permission:expense_report.add', only: ['personal_create', 'corporate_create']),
+            new Middleware('permission:expense_report.edit', only: ['edit', 'update', 'submit', 'approveItem', 'unsubmit', 'acceptAndFill']),
+        ];
+    }
     public function index(Request $request)
     {
         $baseQuery = ExpenseReport::with('user', 'items');

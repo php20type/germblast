@@ -7,8 +7,19 @@ use App\Models\OfficeDuty;
 use App\Models\OfficeDutyCompletion;
 use Illuminate\Http\Request;
 
-class OfficeDutyController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class OfficeDutyController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:office_duties.view', only: ['index']),
+            new Middleware('permission:office_duties.add', only: ['store']),
+            new Middleware('permission:office_duties.edit', only: ['update', 'complete']),
+        ];
+    }
     public function index()
     {
         $duties = OfficeDuty::with('lastPerformedBy')->get();

@@ -8,9 +8,7 @@ $allGroups = [
     'Pricing Proposal',
     'Service',
     'HR Module',
-    'Warehouse Module',
-    'Operations Module',
-    'Reports',
+    'Corporate Tools Module',
 ];
 
 return [

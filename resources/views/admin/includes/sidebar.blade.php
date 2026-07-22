@@ -128,6 +128,7 @@
                     </div>
                 </a>
             </li>
+            @can('corporate_tools.view')
             @php
                 $isCorporateToolsActive = request()->routeIs([
                     'admin.change-control.*',
@@ -137,9 +138,25 @@
                     'admin.office-duties.*',
                     'admin.job-profitability.*'
                 ]);
+
+                $user = auth()->user();
+                $corpToolsDefaultRoute = route('admin.change-control.index');
+                if ($user->can('change_control.view')) {
+                    $corpToolsDefaultRoute = route('admin.change-control.index');
+                } elseif ($user->can('consumable_report.view')) {
+                    $corpToolsDefaultRoute = route('admin.consumable-reports.index');
+                } elseif ($user->can('expense_report.view')) {
+                    $corpToolsDefaultRoute = route('admin.expense-report.index');
+                } elseif ($user->can('inventory_reporting.view')) {
+                    $corpToolsDefaultRoute = route('admin.inventory-report.index');
+                } elseif ($user->can('job_profitability.view')) {
+                    $corpToolsDefaultRoute = route('admin.job-profitability.index');
+                } elseif ($user->can('office_duties.view')) {
+                    $corpToolsDefaultRoute = route('admin.office-duties.index');
+                }
             @endphp
             <li class="{{ $isCorporateToolsActive ? 'active' : '' }}">
-                <a href="{{ route('admin.change-control.index') }}">
+                <a href="{{ $corpToolsDefaultRoute }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon15.svg") }} alt="icon" />
                     </div>
@@ -148,12 +165,9 @@
                     </div>
                 </a>
             </li>
+            @endcan
 
-
-
-
-
-            @can('hr.module.view')
+            @can('hr.view')
             @php
                 $isHRActive = request()->routeIs([
                     'admin.employee.*',
@@ -162,9 +176,23 @@
                     'admin.hr.rewards.*',
                     'admin.hr.feedback.*'
                 ]);
+
+                $user = auth()->user();
+                $hrDefaultRoute = route('admin.employee.index');
+                if ($user->can('employee.view')) {
+                    $hrDefaultRoute = route('admin.employee.index');
+                } elseif ($user->can('time_off_request.view')) {
+                    $hrDefaultRoute = route('admin.hr.time-off.index');
+                } elseif ($user->can('team_praise.view')) {
+                    $hrDefaultRoute = route('admin.hr.praise.index');
+                } elseif ($user->can('gb_reward.view')) {
+                    $hrDefaultRoute = route('admin.hr.rewards.index');
+                } elseif ($user->can('anonymous_feedback.add') || $user->can('anonymous_feedback.view')) {
+                    $hrDefaultRoute = route('admin.hr.feedback.create');
+                }
             @endphp
             <li class="{{ $isHRActive ? 'active' : '' }}">
-                <a href="{{ auth()->user()->can('hr.module.edit') || auth()->user()->isSuperAdmin() ? route('admin.employee.index') : route('admin.employee.index') }}">
+                <a href="{{ $hrDefaultRoute }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon2.svg") }} alt="icon" />
                     </div>

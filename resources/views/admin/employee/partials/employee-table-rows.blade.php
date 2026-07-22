@@ -17,9 +17,15 @@
         </td> --}}
         <td style="width:220px; min-width:220px;">
             <div class="company-name">
-                <a href="{{ route('admin.employee.edit', $employee->id) }}" class="text-decoration-none text-dark">
-                    {{ $employee->name ?? 'N/A' }}
-                </a>
+                @can('employee.edit')
+                    <a href="{{ route('admin.employee.edit', $employee->id) }}" class="text-decoration-none text-dark">
+                        {{ $employee->name ?? 'N/A' }}
+                    </a>
+                @else
+                    <span class="text-dark">
+                        {{ $employee->name ?? 'N/A' }}
+                    </span>
+                @endcan
             </div>
             @if(count($employee->specialties) > 0)
                 <div class="mt-1 text-muted" style="font-size:0.75rem;">

@@ -8,9 +8,19 @@ use App\Models\ChangeRequestTask;
 use App\Models\ChangeRequestDocumentation;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ChangeControlController extends Controller
+class ChangeControlController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:change_control.view', only: ['index', 'show']),
+            new Middleware('permission:change_control.add', only: ['store']),
+            new Middleware('permission:change_control.edit', only: ['update', 'updateStatus', 'storeTask', 'updateTaskStatus', 'storeDocumentation']),
+        ];
+    }
     /**
      * Display a listing of change requests.
      */

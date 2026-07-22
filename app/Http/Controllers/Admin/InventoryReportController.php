@@ -7,8 +7,19 @@ use Illuminate\Http\Request;
 use App\Models\InventoryItem;
 use Carbon\Carbon;
 
-class InventoryReportController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class InventoryReportController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:inventory_reporting.view', only: ['index']),
+            new Middleware('permission:inventory_reporting.add', only: ['store']),
+            new Middleware('permission:inventory_reporting.edit', only: ['update', 'destroy']),
+        ];
+    }
     public function index()
     {
         $items = InventoryItem::orderBy('name', 'asc')->get();

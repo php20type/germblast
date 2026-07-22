@@ -7,8 +7,19 @@ use App\Models\EmployeeReward;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class EmployeeRewardController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class EmployeeRewardController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:gb_reward.view', only: ['index']),
+            new Middleware('permission:gb_reward.add', only: ['store', 'destroy']),
+        ];
+    }
+
     /**
      * Display a listing of the rewards.
      */
@@ -16,8 +27,8 @@ class EmployeeRewardController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->isSuperAdmin()) {
-            // Super Admin can view all rewards in the system
+        if ($user->can('gb_reward.add') || $user->isSuperAdmin()) {
+            // Users with add permission or Super Admin can view all rewards in the system
             $rewards = EmployeeReward::with('user')->latest()->get();
         } else {
             // Regular employees only view their own rewards
@@ -34,10 +45,6 @@ class EmployeeRewardController extends Controller
      */
     public function store(Request $request)
     {
-        if (!auth()->user()->isSuperAdmin()) {
-            abort(403, 'Unauthorized action.');
-        }
-
         $request->validate([
             'user_id'     => 'required|exists:users,id',
             'name'        => 'required|string|max:255',
@@ -63,10 +70,6 @@ class EmployeeRewardController extends Controller
      */
     public function destroy($id)
     {
-        if (!auth()->user()->isSuperAdmin()) {
-            abort(403, 'Unauthorized action.');
-        }
-
         EmployeeReward::findOrFail($id)->delete();
 
         return redirect()->back()->with('success', 'Reward deleted successfully.');

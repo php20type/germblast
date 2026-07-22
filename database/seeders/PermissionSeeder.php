@@ -96,55 +96,40 @@ class PermissionSeeder extends Seeder
             | HR Module
             |--------------------------------------------------
             */
-            41 => 'hr.module.view',
-            42 => 'hr.module.create',
-            43 => 'hr.module.edit',
-            44 => 'hr.module.delete',
+            41 => 'hr.view',
+            42 => 'employee.view',
+            43 => 'employee.edit',
+            44 => 'time_off_request.view',
+            45 => 'time_off_request.edit',
+            46 => 'team_praise.view',
+            47 => 'team_praise.add',
+            48 => 'gb_reward.view',
+            49 => 'gb_reward.add',
+            50 => 'anonymous_feedback.view',
+            51 => 'anonymous_feedback.add',
 
             /*
             |--------------------------------------------------
-            | Warehouse Module
+            | Corporate Tools Module
             |--------------------------------------------------
             */
-            45 => 'warehouse.module.view',
-            46 => 'warehouse.module.create',
-            47 => 'warehouse.module.edit',
-            48 => 'warehouse.module.delete',
-
-            /*
-            |--------------------------------------------------
-            | Operations Module
-            |--------------------------------------------------
-            */
-            49 => 'operations.module.view',
-            50 => 'operations.module.create',
-            51 => 'operations.module.edit',
-            52 => 'operations.module.delete',
-
-            /*
-            |--------------------------------------------------
-            | Reports Module
-            |--------------------------------------------------
-            */
-            53 => 'reports.work_report.view',
-            54 => 'reports.work_report.create',
-            55 => 'reports.work_report.edit',
-            56 => 'reports.work_report.delete',
-
-            57 => 'reports.expense.view',
-            58 => 'reports.expense.create',
-            59 => 'reports.expense.edit',
-            60 => 'reports.expense.delete',
-
-            61 => 'reports.consumable.view',
-            62 => 'reports.consumable.create',
-            63 => 'reports.consumable.edit',
-            64 => 'reports.consumable.delete',
-
-            65 => 'reports.job_profitability.view',
-            66 => 'reports.job_profitability.create',
-            67 => 'reports.job_profitability.edit',
-            68 => 'reports.job_profitability.delete',
+            52 => 'corporate_tools.view',
+            53 => 'change_control.view',
+            54 => 'change_control.add',
+            55 => 'change_control.edit',
+            56 => 'consumable_report.view',
+            57 => 'consumable_report.add',
+            58 => 'consumable_report.edit',
+            59 => 'expense_report.view',
+            60 => 'expense_report.add',
+            61 => 'expense_report.edit',
+            62 => 'inventory_reporting.view',
+            63 => 'inventory_reporting.add',
+            64 => 'inventory_reporting.edit',
+            65 => 'job_profitability.view',
+            66 => 'office_duties.view',
+            67 => 'office_duties.add',
+            68 => 'office_duties.edit',
         ];
 
         foreach ($permissions as $id => $name) {
@@ -153,5 +138,9 @@ class PermissionSeeder extends Seeder
                 ['name' => $name, 'guard_name' => 'web']
             );
         }
+
+        // Clean up outdated permissions that are no longer in the list
+        Permission::whereIn('name', ['time_off_request.add', 'gb_reward.edit'])->delete();
+        Permission::whereNotIn('id', array_keys($permissions))->delete();
     }
 }

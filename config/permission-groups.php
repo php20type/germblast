@@ -55,52 +55,43 @@ return [
 
     'Service' => [
         'service.dashboard.view',
+        'service.dashboard.edit',
         'service.fulfill_order.view',
         'service.fulfill_order.edit',
     ],
 
     'HR Module' => [
-        'hr.module.view',
-        'hr.module.create',
-        'hr.module.edit',
-        'hr.module.delete',
+        'hr.view',
+        'employee.view',
+        'employee.edit',
+        'time_off_request.view',
+        'time_off_request.edit',
+        'team_praise.view',
+        'team_praise.add',
+        'gb_reward.view',
+        'gb_reward.add',
+        'anonymous_feedback.view',
+        'anonymous_feedback.add',
     ],
 
-    'Warehouse Module' => [
-        'warehouse.module.view',
-        'warehouse.module.create',
-        'warehouse.module.edit',
-        'warehouse.module.delete',
-    ],
-
-    'Operations Module' => [
-        'operations.module.view',
-        'operations.module.create',
-        'operations.module.edit',
-        'operations.module.delete',
-    ],
-
-    'Reports' => [
-        'reports.work_report.view',
-        'reports.work_report.create',
-        'reports.work_report.edit',
-        'reports.work_report.delete',
-
-        'reports.expense.view',
-        'reports.expense.create',
-        'reports.expense.edit',
-        'reports.expense.delete',
-
-        'reports.consumable.view',
-        'reports.consumable.create',
-        'reports.consumable.edit',
-        'reports.consumable.delete',
-
-        'reports.job_profitability.view',
-        'reports.job_profitability.create',
-        'reports.job_profitability.edit',
-        'reports.job_profitability.delete',
+    'Corporate Tools Module' => [
+        'corporate_tools.view',
+        'change_control.view',
+        'change_control.add',
+        'change_control.edit',
+        'consumable_report.view',
+        'consumable_report.add',
+        'consumable_report.edit',
+        'expense_report.view',
+        'expense_report.add',
+        'expense_report.edit',
+        'inventory_reporting.view',
+        'inventory_reporting.add',
+        'inventory_reporting.edit',
+        'job_profitability.view',
+        'office_duties.view',
+        'office_duties.add',
+        'office_duties.edit',
     ],
 
 ];
-

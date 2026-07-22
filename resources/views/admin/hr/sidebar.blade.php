@@ -10,27 +10,35 @@
         <hr>
 
         <div id="hr-tools-list">
-            @if(auth()->user()->isSuperAdmin())
+            @can('employee.view')
                 <a class="nav-link {{ request()->routeIs('admin.employee.*') ? 'active' : '' }}" href="{{ route('admin.employee.index') }}">
                     Employee List & Management
                 </a>
-            @endif
+            @endcan
 
+            @can('time_off_request.view')
             <a class="nav-link {{ request()->routeIs('admin.hr.time-off.*') ? 'active' : '' }}" href="{{ route('admin.hr.time-off.index') }}">
                 Time Off Request
             </a>
+            @endcan
 
-            <a class="nav-link {{ request()->routeIs('admin.hr.praise.*') ? 'active' : '' }}" href="{{ auth()->user()->isSuperAdmin() ? route('admin.hr.praise.index') : route('admin.hr.praise.create') }}">
+            @can('team_praise.view')
+            <a class="nav-link {{ request()->routeIs('admin.hr.praise.*') ? 'active' : '' }}" href="{{ route('admin.hr.praise.index') }}">
                 Team Praise
             </a>
+            @endcan
 
+            @can('gb_reward.view')
             <a class="nav-link {{ request()->routeIs('admin.hr.rewards.*') ? 'active' : '' }}" href="{{ route('admin.hr.rewards.index') }}">
                 GB Rewards
             </a>
+            @endcan
 
-            <a class="nav-link {{ request()->routeIs('admin.hr.feedback.*') ? 'active' : '' }}" href="{{ auth()->user()->isSuperAdmin() ? route('admin.hr.feedback.index') : route('admin.hr.feedback.create') }}">
+            @canany(['anonymous_feedback.add', 'anonymous_feedback.view'])
+            <a class="nav-link {{ request()->routeIs('admin.hr.feedback.*') ? 'active' : '' }}" href="{{ route('admin.hr.feedback.create') }}">
                 Anonymous Feedback
             </a>
+            @endcanany
 
             <div id="nothing-found" style="display:none; color: rgba(255,255,255,0.6); padding: 10px 0;">Nothing found.</div>
         </div>

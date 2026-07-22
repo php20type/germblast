@@ -96,11 +96,13 @@
                                 <h3 class="mb-1">OFFICE CHECKLIST <span style="font-size: 24px;">📌</span></h3>
                                 <p class="text-muted mb-0">Track and perform office duties and checklists.</p>
                             </div>
+                            @can('office_duties.add')
                             <div class="right-part-sec">
                                 <button class="btn btn-export btn-create-task-trigger" data-bs-toggle="modal" data-bs-target="#createTaskModal">
                                     + CREATE TASK
                                 </button>
                             </div>
+                            @endcan
                         </div>
 
                         <!-- Table Card -->
@@ -144,6 +146,7 @@
                                                     @endif
                                                 </td>
                                                 <td style="text-align: right !important; padding: 20px !important; padding-right: 35px !important; border-top: none; vertical-align: middle;">
+                                                    @can('office_duties.edit')
                                                     <div class="d-flex justify-content-end align-items-center gap-3">
                                                         <a href="#" class="text-action btn-edit-task" 
                                                            data-id="{{ $duty->id }}"
@@ -158,12 +161,13 @@
                                                         <a href="#" class="text-action btn-complete-task" 
                                                            data-id="{{ $duty->id }}"
                                                            data-title="{{ $duty->title }}"
-                                                           style="font-size: 18px;" 
+                                                           style="font-size: 14px; font-weight: 500;" 
                                                            data-bs-toggle="modal" 
                                                            data-bs-target="#completeTaskModal">
-                                                            <i class="fa-solid fa-play"></i>
+                                                            Mark Complete
                                                         </a>
                                                     </div>
+                                                    @endcan
                                                 </td>
                                             </tr>
                                         @endforeach

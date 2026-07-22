@@ -120,11 +120,13 @@
                                     <h3 class="mb-1">CONSUMABLE REPORT <span style="font-size: 24px;">📌</span></h3>
                                     <p class="text-muted mb-0">Track and analyze consumable usage across your organization.</p>
                                 </div>
+                                @can('consumable_report.add')
                                 <div class="right-part-sec">
                                     <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#addInventoryModal">
                                         + CREATE REPORT
                                     </button>
                                 </div>
+                                @endcan
                             </div>
 
                             {{-- Table Card --}}
@@ -176,7 +178,8 @@
                                                 <td>{{ floatval($report->wash_pre) }}, {{ floatval($report->wash_post) }}</td>
                                                 <td>{{ floatval($report->rust_pre) }}, {{ floatval($report->rust_post) }}</td>
                                                 <td>
-                                                    <div class="d-flex justify-content-center">
+                                                    <div class="d-flex align-items-center justify-content-center">
+                                                        @can('consumable_report.edit')
                                                         <button class="btn btn-sm btn-outline-dark py-1 px-3 edit-btn me-2"
                                                             style="border-radius: 6px; font-size: 12px; font-weight: 500;"
                                                             data-id="{{ $report->id }}"
@@ -217,6 +220,7 @@
                                                                 class="btn btn-sm btn-outline-danger py-1 px-3"
                                                                 style="border-radius: 6px; font-size: 12px; font-weight: 500;">Del</button>
                                                         </form>
+                                                        @endcan
                                                     </div>
                                                 </td>
                                             </tr>

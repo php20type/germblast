@@ -7,16 +7,24 @@ use App\Models\CoreValuePraise;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class CoreValuePraiseController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class CoreValuePraiseController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:team_praise.view', only: ['index']),
+            new Middleware('permission:team_praise.add', only: ['create', 'store']),
+        ];
+    }
+
     /**
      * Display a listing of the praise submissions.
      */
     public function index()
     {
-        if (!auth()->user()->isSuperAdmin()) {
-            abort(403, 'Unauthorized action.');
-        }
         $praises = CoreValuePraise::with(['sender', 'recipient'])->latest()->get();
         return view('admin.hr.praise.index', compact('praises'));
     }
@@ -36,16 +44,17 @@ class CoreValuePraiseController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'recipient_name' => 'required|string|max:255',
-            'recipient_id'   => 'nullable|exists:users,id',
-            'reason'         => 'required|string|max:5000',
-            'core_value'     => 'required|string|in:Excellence,Extraordinary,Growth,Integrity,Ownership',
+            'recipient_id' => 'required|exists:users,id',
+            'reason'       => 'required|string|max:5000',
+            'core_value'   => 'required|string|in:Excellence,Extraordinary,Growth,Integrity,Ownership',
         ]);
+
+        $recipient = User::findOrFail($request->recipient_id);
 
         CoreValuePraise::create([
             'sender_id'      => auth()->id(),
-            'recipient_id'   => $request->recipient_id,
-            'recipient_name' => $request->recipient_name,
+            'recipient_id'   => $recipient->id,
+            'recipient_name' => $recipient->name,
             'reason'         => $request->reason,
             'core_value'     => $request->core_value,
         ]);

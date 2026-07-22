@@ -22,10 +22,12 @@
                                     Review anonymous employee feedback.
                                 </p>
                             </div>
+                            @can('anonymous_feedback.add')
                             <div class="right-part-sec">
                                 <a href="{{ route('admin.hr.feedback.create') }}" class="btn btn-export">+ Submit
                                     Feedback</a>
                             </div>
+                            @endcan
                         </div>
 
                             {{-- Timeline --}}

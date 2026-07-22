@@ -6,13 +6,21 @@ use App\Http\Controllers\Controller;
 use App\Models\AnonymousFeedback;
 use Illuminate\Http\Request;
 
-class AnonymousFeedbackController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class AnonymousFeedbackController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:anonymous_feedback.view', only: ['index']),
+            new Middleware('permission:anonymous_feedback.add', only: ['create', 'store']),
+        ];
+    }
+
     public function index()
     {
-        if (!auth()->user()->isSuperAdmin()) {
-            abort(403, 'Unauthorized action.');
-        }
         $feedbacks = AnonymousFeedback::latest()->get();
         return view('admin.hr.feedback.index', compact('feedbacks'));
     }
