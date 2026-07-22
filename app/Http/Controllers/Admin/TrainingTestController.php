@@ -7,8 +7,19 @@ use Illuminate\Http\Request;
 use App\Models\TrainingTest;
 use App\Models\TrainingCategory;
 
-class TrainingTestController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class TrainingTestController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:training.view', only: ['index']),
+            new Middleware('permission:training.add', only: ['create', 'store']),
+            new Middleware('permission:training.edit', only: ['edit', 'update']),
+        ];
+    }
     public function index()
     {
         $tests = TrainingTest::with('category')->get();

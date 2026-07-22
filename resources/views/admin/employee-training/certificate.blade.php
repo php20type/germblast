@@ -127,7 +127,7 @@
                 <div class="subtitle">This is to certify that</div>
                 
                 <div class="employee-name">
-                    {{ $employee->first_name }} {{ $employee->last_name }}
+                    {{ $employee->name }}
                 </div>
                 
                 <div class="completed-text">

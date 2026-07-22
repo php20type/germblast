@@ -130,6 +130,31 @@ class PermissionSeeder extends Seeder
             66 => 'office_duties.view',
             67 => 'office_duties.add',
             68 => 'office_duties.edit',
+
+            /*
+            |--------------------------------------------------
+            | Operations Module
+            |--------------------------------------------------
+            */
+            69 => 'operations.view',
+            70 => 'all_schedules.view',
+            71 => 'business_failures.view',
+            72 => 'business_failures.add',
+            73 => 'driver_report.view',
+            74 => 'driver_report.edit',
+            75 => 'equipment_manager.view',
+            76 => 'equipment_manager.add',
+            77 => 'scheduling_calendar.view',
+            78 => 'team_availability.view',
+            79 => 'vehicle_planning.view',
+            80 => 'vehicle_planning.add',
+            81 => 'warehouse.view',
+            82 => 'warehouse.add',
+            83 => 'warehouse_calendar.view',
+            84 => 'warehouse_calendar.edit',
+            85 => 'training.view',
+            86 => 'training.add',
+            87 => 'training.edit',
         ];
 
         foreach ($permissions as $id => $name) {

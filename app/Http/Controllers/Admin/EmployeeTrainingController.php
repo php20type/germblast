@@ -107,12 +107,7 @@ class EmployeeTrainingController extends Controller
 
         $test = TrainingTest::findOrFail($attempt->training_test_id);
 
-        // If an employee is viewing, ensure they can only view their own certificate.
-        // But if an Admin (HR) is viewing from the profile page, they should be able to view it.
-        // Assuming Admin role can view anything. If there is strict isolation, check here.
-        if (auth()->user()->role != 'Admin' && $attempt->employee_id != auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
+
 
         $employee = \App\Models\User::findOrFail($attempt->employee_id);
 

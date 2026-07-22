@@ -347,11 +347,13 @@
                                     Track and complete warehouse duties and standard operations.
                                 </p>
                             </div>
+                            @can('warehouse.add')
                             <div class="right-part-sec">
                                 <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#addDutyModal">
                                     + CREATE DUTY
                                 </button>
                             </div>
+                            @endcan
                         </div>
 
                         <!-- TABS (matching Equipment Report layouts) -->
@@ -425,17 +427,25 @@
                                                         </button>
                                                     </td>
                                                     <td class="align-middle">
-                                                        @if($duty->due)
-                                                            <span class="status-pill status-pill-due cursor-pointer btn-duty-complete" data-id="{{ $duty->id }}">Due</span>
+                                                        @can('warehouse.add')
+                                                            @if($duty->due)
+                                                                <span class="status-pill status-pill-due cursor-pointer btn-duty-complete" data-id="{{ $duty->id }}">Due</span>
+                                                            @else
+                                                                <span class="status-pill status-pill-completed cursor-pointer btn-duty-reset" data-id="{{ $duty->id }}">Completed</span>
+                                                            @endif
                                                         @else
-                                                            <span class="status-pill status-pill-completed cursor-pointer btn-duty-reset" data-id="{{ $duty->id }}">Completed</span>
-                                                        @endif
+                                                            @if($duty->due)
+                                                                <span class="status-pill status-pill-due">Due</span>
+                                                            @else
+                                                                <span class="status-pill status-pill-completed">Completed</span>
+                                                            @endif
+                                                        @endcan
                                                     </td>
                                                     <td class="text-center align-middle">
-                                                        <button class="btn btn-sm btn-outline-dark me-2 btn-duty-complete-btn" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ $duty->due ? '' : 'disabled' }}>
+                                                        <button class="btn btn-sm btn-outline-dark me-2 btn-duty-complete-btn" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ $duty->due && auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
                                                             {{ $duty->due ? 'Complete' : 'Done' }}
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-dark btn-duty-settings" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}">
+                                                        <button class="btn btn-sm btn-outline-dark btn-duty-settings" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
                                                             Settings
                                                         </button>
                                                     </td>
@@ -498,17 +508,25 @@
                                                         </button>
                                                     </td>
                                                     <td class="align-middle">
-                                                        @if($duty->due)
-                                                            <span class="status-pill status-pill-due cursor-pointer btn-duty-complete" data-id="{{ $duty->id }}">Due</span>
+                                                        @can('warehouse.add')
+                                                            @if($duty->due)
+                                                                <span class="status-pill status-pill-due cursor-pointer btn-duty-complete" data-id="{{ $duty->id }}">Due</span>
+                                                            @else
+                                                                <span class="status-pill status-pill-completed cursor-pointer btn-duty-reset" data-id="{{ $duty->id }}">Completed</span>
+                                                            @endif
                                                         @else
-                                                            <span class="status-pill status-pill-completed cursor-pointer btn-duty-reset" data-id="{{ $duty->id }}">Completed</span>
-                                                        @endif
+                                                            @if($duty->due)
+                                                                <span class="status-pill status-pill-due">Due</span>
+                                                            @else
+                                                                <span class="status-pill status-pill-completed">Completed</span>
+                                                            @endif
+                                                        @endcan
                                                     </td>
                                                     <td class="text-center align-middle">
-                                                        <button class="btn btn-sm btn-outline-dark me-2 btn-duty-complete-btn" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ $duty->due ? '' : 'disabled' }}>
+                                                        <button class="btn btn-sm btn-outline-dark me-2 btn-duty-complete-btn" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ $duty->due && auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
                                                             {{ $duty->due ? 'Complete' : 'Done' }}
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-dark btn-duty-settings" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}">
+                                                        <button class="btn btn-sm btn-outline-dark btn-duty-settings" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
                                                             Settings
                                                         </button>
                                                     </td>
@@ -571,17 +589,25 @@
                                                         </button>
                                                     </td>
                                                     <td class="align-middle">
-                                                        @if($duty->due)
-                                                            <span class="status-pill status-pill-due cursor-pointer btn-duty-complete" data-id="{{ $duty->id }}">Due</span>
+                                                        @can('warehouse.add')
+                                                            @if($duty->due)
+                                                                <span class="status-pill status-pill-due cursor-pointer btn-duty-complete" data-id="{{ $duty->id }}">Due</span>
+                                                            @else
+                                                                <span class="status-pill status-pill-completed cursor-pointer btn-duty-reset" data-id="{{ $duty->id }}">Completed</span>
+                                                            @endif
                                                         @else
-                                                            <span class="status-pill status-pill-completed cursor-pointer btn-duty-reset" data-id="{{ $duty->id }}">Completed</span>
-                                                        @endif
+                                                            @if($duty->due)
+                                                                <span class="status-pill status-pill-due">Due</span>
+                                                            @else
+                                                                <span class="status-pill status-pill-completed">Completed</span>
+                                                            @endif
+                                                        @endcan
                                                     </td>
                                                     <td class="text-center align-middle">
-                                                        <button class="btn btn-sm btn-outline-dark me-2 btn-duty-complete-btn" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ $duty->due ? '' : 'disabled' }}>
+                                                        <button class="btn btn-sm btn-outline-dark me-2 btn-duty-complete-btn" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ $duty->due && auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
                                                             {{ $duty->due ? 'Complete' : 'Done' }}
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-dark btn-duty-settings" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}">
+                                                        <button class="btn btn-sm btn-outline-dark btn-duty-settings" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
                                                             Settings
                                                         </button>
                                                     </td>
@@ -644,17 +670,25 @@
                                                         </button>
                                                     </td>
                                                     <td class="align-middle">
-                                                        @if($duty->due)
-                                                            <span class="status-pill status-pill-due cursor-pointer btn-duty-complete" data-id="{{ $duty->id }}">Due</span>
+                                                        @can('warehouse.add')
+                                                            @if($duty->due)
+                                                                <span class="status-pill status-pill-due cursor-pointer btn-duty-complete" data-id="{{ $duty->id }}">Due</span>
+                                                            @else
+                                                                <span class="status-pill status-pill-completed cursor-pointer btn-duty-reset" data-id="{{ $duty->id }}">Completed</span>
+                                                            @endif
                                                         @else
-                                                            <span class="status-pill status-pill-completed cursor-pointer btn-duty-reset" data-id="{{ $duty->id }}">Completed</span>
-                                                        @endif
+                                                            @if($duty->due)
+                                                                <span class="status-pill status-pill-due">Due</span>
+                                                            @else
+                                                                <span class="status-pill status-pill-completed">Completed</span>
+                                                            @endif
+                                                        @endcan
                                                     </td>
                                                     <td class="text-center align-middle">
-                                                        <button class="btn btn-sm btn-outline-dark me-2 btn-duty-complete-btn" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ $duty->due ? '' : 'disabled' }}>
+                                                        <button class="btn btn-sm btn-outline-dark me-2 btn-duty-complete-btn" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ $duty->due && auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
                                                             {{ $duty->due ? 'Complete' : 'Done' }}
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-dark btn-duty-settings" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}">
+                                                        <button class="btn btn-sm btn-outline-dark btn-duty-settings" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
                                                             Settings
                                                         </button>
                                                     </td>
@@ -717,17 +751,25 @@
                                                         </button>
                                                     </td>
                                                     <td class="align-middle">
-                                                        @if($duty->due)
-                                                            <span class="status-pill status-pill-due cursor-pointer btn-duty-complete" data-id="{{ $duty->id }}">Due</span>
+                                                        @can('warehouse.add')
+                                                            @if($duty->due)
+                                                                <span class="status-pill status-pill-due cursor-pointer btn-duty-complete" data-id="{{ $duty->id }}">Due</span>
+                                                            @else
+                                                                <span class="status-pill status-pill-completed cursor-pointer btn-duty-reset" data-id="{{ $duty->id }}">Completed</span>
+                                                            @endif
                                                         @else
-                                                            <span class="status-pill status-pill-completed cursor-pointer btn-duty-reset" data-id="{{ $duty->id }}">Completed</span>
-                                                        @endif
+                                                            @if($duty->due)
+                                                                <span class="status-pill status-pill-due">Due</span>
+                                                            @else
+                                                                <span class="status-pill status-pill-completed">Completed</span>
+                                                            @endif
+                                                        @endcan
                                                     </td>
                                                     <td class="text-center align-middle">
-                                                        <button class="btn btn-sm btn-outline-dark me-2 btn-duty-complete-btn" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ $duty->due ? '' : 'disabled' }}>
+                                                        <button class="btn btn-sm btn-outline-dark me-2 btn-duty-complete-btn" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ $duty->due && auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
                                                             {{ $duty->due ? 'Complete' : 'Done' }}
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-dark btn-duty-settings" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}">
+                                                        <button class="btn btn-sm btn-outline-dark btn-duty-settings" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
                                                             Settings
                                                         </button>
                                                     </td>

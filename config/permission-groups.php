@@ -94,4 +94,26 @@ return [
         'office_duties.edit',
     ],
 
+    'Operations Module' => [
+        'operations.view',
+        'all_schedules.view',
+        'business_failures.view',
+        'business_failures.add',
+        'driver_report.view',
+        'driver_report.edit',
+        'equipment_manager.view',
+        'equipment_manager.add',
+        'scheduling_calendar.view',
+        'team_availability.view',
+        'vehicle_planning.view',
+        'vehicle_planning.add',
+        'warehouse.view',
+        'warehouse.add',
+        'warehouse_calendar.view',
+        'warehouse_calendar.edit',
+        'training.view',
+        'training.add',
+        'training.edit',
+    ],
+
 ];

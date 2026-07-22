@@ -8,8 +8,17 @@ use App\Models\User;
 use App\Models\TrainingTest;
 use App\Models\TrainingAttempt;
 
-class TrainingReportController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class TrainingReportController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:training.view', only: ['index']),
+        ];
+    }
     public function index()
     {
         // Get all active tests to display as columns

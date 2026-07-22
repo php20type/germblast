@@ -205,6 +205,19 @@
                 'Inventory Reporting' => ['inventory_reporting.view', 'inventory_reporting.add', 'inventory_reporting.edit'],
                 'Job Profitability' => ['job_profitability.view'],
                 'Office Duties' => ['office_duties.view', 'office_duties.add', 'office_duties.edit'],
+            ],
+            'Operations Module' => [
+                'General Module Access' => ['operations.view'],
+                'All Schedules' => ['all_schedules.view'],
+                'Business Failures' => ['business_failures.view', 'business_failures.add'],
+                'Driver Report' => ['driver_report.view', 'driver_report.edit'],
+                'Equipment Manager' => ['equipment_manager.view', 'equipment_manager.add'],
+                'Scheduling Calendar' => ['scheduling_calendar.view'],
+                'Team Availability' => ['team_availability.view'],
+                'Vehicle Planning' => ['vehicle_planning.view', 'vehicle_planning.add'],
+                'Warehouse' => ['warehouse.view', 'warehouse.add'],
+                'Warehouse Calendar' => ['warehouse_calendar.view', 'warehouse_calendar.edit'],
+                'Training' => ['training.view', 'training.add', 'training.edit'],
             ]
         ];
 
@@ -293,6 +306,27 @@
             'office_duties.view' => 'View Office Duties',
             'office_duties.add' => 'Add Office Duties',
             'office_duties.edit' => 'Edit Office Duties',
+
+            // Operations Module
+            'operations.view' => 'View Operations Module',
+            'all_schedules.view' => 'View All Schedules',
+            'business_failures.view' => 'View Business Failures',
+            'business_failures.add' => 'Add Business Failure',
+            'driver_report.view' => 'View Driver Report',
+            'driver_report.edit' => 'Edit Driver Report',
+            'equipment_manager.view' => 'View Equipment Manager',
+            'equipment_manager.add' => 'Add Equipment Manager',
+            'scheduling_calendar.view' => 'View Scheduling Calendar',
+            'team_availability.view' => 'View Team Availability',
+            'vehicle_planning.view' => 'View Vehicle Planning',
+            'vehicle_planning.add' => 'Add Vehicle Planning',
+            'warehouse.view' => 'View Warehouse',
+            'warehouse.add' => 'Add Warehouse',
+            'warehouse_calendar.view' => 'View Warehouse Calendar',
+            'warehouse_calendar.edit' => 'Edit Warehouse Calendar',
+            'training.view' => 'View Training',
+            'training.add' => 'Add Training',
+            'training.edit' => 'Edit Training',
         ];
     @endphp
 

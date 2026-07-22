@@ -27,9 +27,20 @@ use App\Models\ServiceOrderRoomRecord;
 use App\Models\ServiceOrderEquipmentRecord;
 use App\Models\ServiceOrderCleanPatch;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ServiceController extends Controller
+class ServiceController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:all_schedules.view', only: ['all_schedules']),
+            new Middleware('permission:scheduling_calendar.view', only: ['schedulingCalendar', 'schedulingCalendarOrders']),
+            new Middleware('permission:vehicle_planning.view', only: ['vehiclePlanning']),
+            new Middleware('permission:team_availability.view', only: ['teamAvailability']),
+        ];
+    }
     protected $orderService;
     protected $notify;
 

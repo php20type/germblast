@@ -8,8 +8,20 @@ use App\Models\Vehicle;
 use App\Models\WarehouseSchedule;
 use App\Models\User;
 
-class WarehouseController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class WarehouseController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:warehouse.view', only: ['maintenance']),
+            new Middleware('permission:warehouse.add', only: ['store', 'update', 'complete', 'reset', 'destroy']),
+            new Middleware('permission:warehouse_calendar.view', only: ['calendar']),
+            new Middleware('permission:warehouse_calendar.edit', only: ['storeSchedule', 'destroySchedule']),
+        ];
+    }
     /**
      * Display the warehouse maintenance dashboard.
      *

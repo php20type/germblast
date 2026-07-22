@@ -68,9 +68,11 @@
                                 <a href="{{ route('admin.training-questions.index') }}" class="btn btn-outline-secondary d-flex align-items-center">
                                     <i class="fa-solid fa-arrow-left me-1"></i> Back to Tests
                                 </a>
+                                @can('training.add')
                                 <button class="btn btn-export btn-create-trigger" data-bs-toggle="modal" data-bs-target="#createModal">
                                     + ADD QUESTION
                                 </button>
+                                @endcan
                             </div>
                         </div>
 
@@ -114,6 +116,7 @@
                                                 </td>
                                                 <td style="text-align: right !important; padding: 20px !important; padding-right: 35px !important;">
                                                     <div class="d-flex justify-content-end align-items-center gap-3">
+                                                        @can('training.edit')
                                                         <a href="#" class="text-action btn-edit" 
                                                            data-id="{{ $q->id }}"
                                                            data-question="{{ $q->question }}"
@@ -128,6 +131,7 @@
                                                            data-bs-target="#createModal">
                                                             <i class="fa-solid fa-gear"></i>
                                                         </a>
+                                                        @endcan
 
                                                     </div>
                                                 </td>

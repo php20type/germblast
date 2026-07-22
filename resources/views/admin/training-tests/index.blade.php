@@ -57,11 +57,13 @@
                                 <h3 class="mb-1">TRAINING TESTS</h3>
                                 <p class="text-muted mb-0">Manage training tests.</p>
                             </div>
+                            @can('training.add')
                             <div class="right-part-sec">
                                 <button class="btn btn-export btn-create-trigger" data-bs-toggle="modal" data-bs-target="#createModal">
                                     + ADD TEST
                                 </button>
                             </div>
+                            @endcan
                         </div>
 
                         <!-- Table Card -->
@@ -99,6 +101,7 @@
                                                 </td>
                                                 <td style="text-align: right !important; padding: 20px !important; padding-right: 35px !important;">
                                                     <div class="d-flex justify-content-end align-items-center gap-3">
+                                                        @can('training.edit')
                                                         <a href="#" class="text-action btn-edit" 
                                                            data-id="{{ $test->id }}"
                                                            data-category_id="{{ $test->category_id }}"
@@ -106,13 +109,13 @@
                                                            data-description="{{ $test->description }}"
                                                            data-video_url="{{ $test->video_url }}"
                                                            data-passing_percentage="{{ $test->passing_percentage }}"
-
                                                            data-status="{{ $test->status }}"
                                                            style="font-size: 16px;" 
                                                            data-bs-toggle="modal" 
                                                            data-bs-target="#createModal">
                                                             <i class="fa-solid fa-gear"></i>
                                                         </a>
+                                                        @endcan
 
                                                     </div>
                                                 </td>

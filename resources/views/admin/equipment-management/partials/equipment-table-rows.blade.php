@@ -11,10 +11,16 @@
                 $statusSlug = strtolower($mappedStatus);
                 $pillClass = 'status-pill-' . $statusSlug;
             @endphp
-            <span class="status-pill {{ $pillClass }} cursor-pointer" data-id="{{ $type->id }}"
-                data-status="{{ $mappedStatus }}" onclick="openStatusModal(this)">
-                {{ ucfirst($mappedStatus) }}
-            </span>
+            @can('equipment_manager.add')
+                <span class="status-pill {{ $pillClass }} cursor-pointer" data-id="{{ $type->id }}"
+                    data-status="{{ $mappedStatus }}" onclick="openStatusModal(this)">
+                    {{ ucfirst($mappedStatus) }}
+                </span>
+            @else
+                <span class="status-pill {{ $pillClass }}">
+                    {{ ucfirst($mappedStatus) }}
+                </span>
+            @endcan
         </td>
         <td class="text-center">
             <button class="btn btn-sm btn-outline-dark me-2" style="border-radius: 6px; padding: 6px 14px;"

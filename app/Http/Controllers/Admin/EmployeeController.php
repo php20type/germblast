@@ -23,7 +23,9 @@ class EmployeeController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:employee.view', only: ['index', 'driverReport', 'workReport']),
+            new Middleware('permission:employee.view', only: ['index', 'workReport']),
+            new Middleware('permission:driver_report.view', only: ['driverReport']),
+            new Middleware('permission:driver_report.edit', only: ['updateDriverReport']),
             new Middleware('permission:employee.edit', only: [
                 'create',
                 'store',

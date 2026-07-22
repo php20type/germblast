@@ -6,8 +6,19 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\TrainingCategory;
 
-class TrainingCategoryController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class TrainingCategoryController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:training.view', only: ['index']),
+            new Middleware('permission:training.add', only: ['create', 'store']),
+            new Middleware('permission:training.edit', only: ['edit', 'update']),
+        ];
+    }
     public function index()
     {
         $categories = TrainingCategory::orderBy('sort_order')->get();

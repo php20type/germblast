@@ -7,8 +7,19 @@ use Illuminate\Http\Request;
 use App\Models\TrainingQuestion;
 use App\Models\TrainingTest;
 
-class TrainingQuestionController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class TrainingQuestionController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:training.view', only: ['index', 'show']),
+            new Middleware('permission:training.add', only: ['store']),
+            new Middleware('permission:training.edit', only: ['update']),
+        ];
+    }
     public function index()
     {
         // Load all tests with their question counts

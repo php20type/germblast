@@ -338,11 +338,13 @@
                                 <h3 class="mb-1">Equipment Manager</h3>
                                 <p class="text-muted mb-0">Track and analyze equipment status across your organization.</p>
                             </div>
+                            @can('equipment_manager.add')
                             <div class="right-part-sec">
                                 <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#addEquipmentModal">
                                     + CREATE EQUIPMENT
                                 </button>
                             </div>
+                            @endcan
                         </div>
 
                         <!-- TABS -->
@@ -599,6 +601,7 @@
     {{-- ============================================================ --}}
     {{-- UNIVERSAL STATUS CHANGE MODAL --}}
     {{-- ============================================================ --}}
+    @can('equipment_manager.add')
     <div class="modal fade" id="universalStatusModal" tabindex="-1" aria-labelledby="universalStatusModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -620,6 +623,7 @@
             </div>
         </div>
     </div>
+    @endcan
 
     {{-- ============================================================ --}}
     {{-- EQUIPMENT STATUS HISTORY MODAL --}}

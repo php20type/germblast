@@ -8,8 +8,18 @@ use App\Models\BusinessFailureDocumentation;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
-class BusinessFailureController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class BusinessFailureController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:business_failures.view', only: ['index']),
+            new Middleware('permission:business_failures.add', only: ['store', 'storeDocumentation']),
+        ];
+    }
     /**
      * Display a listing of the business failures.
      */

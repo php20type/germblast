@@ -159,50 +159,50 @@
                                 <div class="card-body p-0">
                                     <div class="row">
                                         <!-- LEFT COLUMN: CONTROLS FORM -->
+                                        @can('warehouse_calendar.edit')
                                         <div class="col-lg-7 border-end pe-lg-5">
                                             <form id="createScheduleForm" class="company-form">
                                                 <div class="form-group mb-4">
                                                     <label for="employee_select" class="form-label">Employee</label>
-                                                    <span class="text-danger">*</span>
-                                                    <select class="form-select mt-2" id="employee_select" name="employee"
-                                                        required>
-                                                        @foreach($employees as $employee)
-                                                            <option value="{{ $employee->name }}">{{ $employee->name }}</option>
+                                                    <select id="employee_select" name="employee" class="form-select" required>
+                                                        <option value="" disabled selected>Select Employee</option>
+                                                        @foreach($employees as $emp)
+                                                            <option value="{{ $emp->name }}">{{ $emp->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
 
-                                                <div class="form-group mb-4">
-                                                    <label for="start_time" class="form-label">Start Time</label>
-                                                    <span class="text-danger">*</span>
-                                                    <input type="datetime-local" class="form-control mt-2" id="start_time"
-                                                        name="start_time" required>
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-4">
+                                                        <div class="form-group">
+                                                            <label for="start_time_input" class="form-label">Start Time</label>
+                                                            <input type="datetime-local" id="start_time_input" name="start_time" class="form-control" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6 mb-4">
+                                                        <div class="form-group">
+                                                            <label for="end_time_input" class="form-label">End Time</label>
+                                                            <input type="datetime-local" id="end_time_input" name="end_time" class="form-control" required>
+                                                        </div>
+                                                    </div>
                                                 </div>
 
                                                 <div class="form-group mb-4">
-                                                    <label for="end_time" class="form-label">End Time</label>
-                                                    <span class="text-danger">*</span>
-                                                    <input type="datetime-local" class="form-control mt-2" id="end_time"
-                                                        name="end_time" required>
-                                                </div>
-
-                                                <div class="form-group mb-4">
-                                                    <label for="schedule_type" class="form-label">Schedule Type</label>
-                                                    <span class="text-danger">*</span>
-                                                    <select class="form-select mt-2" id="schedule_type" name="type"
-                                                        required>
+                                                    <label for="duty_type_select" class="form-label">Type</label>
+                                                    <select id="duty_type_select" name="type" class="form-select" required>
                                                         <option value="1">Regular Service</option>
                                                         <option value="2">Call</option>
                                                     </select>
                                                 </div>
 
-                                                <div class="form-group mb-4 pt-2">
+                                                <div class="mt-2">
                                                     <button type="submit" class="btn btn-yellow-rounded">
                                                         Add Schedule
                                                     </button>
                                                 </div>
                                             </form>
                                         </div>
+                                        @endcan
 
                                         <!-- RIGHT COLUMN: CALL LOG TIMELINE (Rendered cleanly via Blade forelse) -->
                                         <div class="col-lg-5 ps-lg-5 mt-4 mt-lg-0">
@@ -229,9 +229,11 @@
                                                         <div style="font-size: 13px; color: #555;">End: {{ $formatEnd }}</div>
                                                         <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top" style="border-top: 1px dashed rgba(255, 180, 0, 0.15) !important;">
                                                             <span style="font-size: 11px; color: #777;">Ref ID: <span class="fw-bold">#SCH-{{ $t['id'] }}</span></span>
+                                                            @can('warehouse_calendar.edit')
                                                             <button class="btn btn-sm btn-outline-danger btn-delete-sch-quick py-1 px-2" data-id="{{ $t['id'] }}" style="font-size: 11px; border-radius: 4px;">
                                                                 <i class="fas fa-trash-alt me-1"></i> Delete
                                                             </button>
+                                                            @endcan
                                                         </div>
                                                     </div>
                                                 @empty

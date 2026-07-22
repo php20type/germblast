@@ -102,6 +102,7 @@
             </li>
 
             <hr>
+            @can('operations.view')
             @php
                 $isOperationsActive = request()->routeIs([
                     'admin.all_schedules.*',
@@ -116,10 +117,35 @@
                     'admin.training-categories.*',
                     'admin.training-tests.*',
                     'admin.training-questions.*',
+                    'admin.training-report.*'
                 ]);
+
+                $user = auth()->user();
+                $operationsDefaultRoute = route('admin.all_schedules.index');
+                if ($user->can('all_schedules.view')) {
+                    $operationsDefaultRoute = route('admin.all_schedules.index');
+                } elseif ($user->can('business_failures.view')) {
+                    $operationsDefaultRoute = route('admin.failures.index');
+                } elseif ($user->can('driver_report.view')) {
+                    $operationsDefaultRoute = route('admin.hr.driver-report.index');
+                } elseif ($user->can('equipment_manager.view')) {
+                    $operationsDefaultRoute = route('admin.equipment-management.index');
+                } elseif ($user->can('scheduling_calendar.view')) {
+                    $operationsDefaultRoute = route('admin.scheduling_calendar.index');
+                } elseif ($user->can('team_availability.view')) {
+                    $operationsDefaultRoute = route('admin.team.availability');
+                } elseif ($user->can('vehicle_planning.view')) {
+                    $operationsDefaultRoute = route('admin.vehicle.planning');
+                } elseif ($user->can('warehouse.view')) {
+                    $operationsDefaultRoute = route('admin.warehouse.maintenance');
+                } elseif ($user->can('warehouse_calendar.view')) {
+                    $operationsDefaultRoute = route('admin.warehouse.calendar');
+                } elseif ($user->can('training.view')) {
+                    $operationsDefaultRoute = route('admin.training-categories.index');
+                }
             @endphp
             <li class="{{ $isOperationsActive ? 'active' : '' }}">
-                <a href="{{ route('admin.all_schedules.index') }}">
+                <a href="{{ $operationsDefaultRoute }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon6.svg") }} alt="icon" />
                     </div>
@@ -128,6 +154,7 @@
                     </div>
                 </a>
             </li>
+            @endcan
             @can('corporate_tools.view')
             @php
                 $isCorporateToolsActive = request()->routeIs([

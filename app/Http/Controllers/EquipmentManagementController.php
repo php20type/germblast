@@ -9,8 +9,18 @@ use App\Models\EquipmentManagementType;
 use App\Models\EquipmentStatusLog;
 
 
-class EquipmentManagementController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class EquipmentManagementController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:equipment_manager.view', only: ['index', 'history']),
+            new Middleware('permission:equipment_manager.add', only: ['store', 'updateStatus']),
+        ];
+    }
     public function index(Request $request)
     {
         $baseQuery = Equipment::with('type');

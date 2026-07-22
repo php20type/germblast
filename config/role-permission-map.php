@@ -9,6 +9,7 @@ $allGroups = [
     'Service',
     'HR Module',
     'Corporate Tools Module',
+    'Operations Module',
 ];
 
 return [

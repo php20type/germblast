@@ -129,16 +129,17 @@
                                                          style="width:60px; height:60px; object-fit:cover; border-radius:50%;">
                                                 </td>
                                                 <td>
-                                                    @if(auth()->user()->isSuperAdmin())
+                                                    @can('employee.edit')
                                                         <a href="{{ route('admin.employee.edit', $driver->id) }}" class="text-decoration-none text-dark fw-semibold">{{ $driver->name }}</a>
                                                     @else
                                                         <span class="fw-semibold text-dark">{{ $driver->name }}</span>
-                                                    @endif
+                                                    @endcan
                                                     <div class="small text-muted" style="font-size: 12px;">{{ $driver->email }}</div>
                                                 </td>
                                                 <td>{!! nl2br(e($status)) !!}</td>
                                                 <td>{!! nl2br(e($points)) !!}</td>
                                                 <td class="text-center">
+                                                    @can('driver_report.edit')
                                                     <button class="btn btn-sm btn-outline-dark me-2 edit-driver-btn"
                                                             style="border-radius: 6px; padding: 6px 14px;"
                                                             data-id="{{ $driver->id }}"
@@ -147,6 +148,7 @@
                                                             data-points="{{ $points }}">
                                                         Edit
                                                     </button>
+                                                    @endcan
                                                 </td>
                                             </tr>
                                         @empty

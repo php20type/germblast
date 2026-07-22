@@ -220,6 +220,7 @@
                                                                         style="font-size: 11px; opacity: 0.8;"></i>
                                                                     {{ $vehicle->name }}
                                                                 </span>
+                                                                @can('vehicle_planning.add')
                                                                 <form
                                                                     action="{{ route('admin.lead.slot.vehicle.remove', [$slot->id, $vehicle->id]) }}"
                                                                     method="POST" class="m-0">
@@ -230,10 +231,12 @@
                                                                         <i class="fas fa-times-circle"></i>
                                                                     </button>
                                                                 </form>
+                                                                @endcan
                                                             </div>
                                                         @endforeach
                                                     </div>
 
+                                                    @can('vehicle_planning.add')
                                                     {{-- ADD VEHICLE FORM --}}
                                                     <div class="mt-2 pt-2 border-top"
                                                         style="border-top: 1px dashed #bfdbfe !important;">
@@ -260,6 +263,7 @@
                                                             </button>
                                                         </form>
                                                     </div>
+                                                    @endcan
 
                                                 </div>
                                             @empty

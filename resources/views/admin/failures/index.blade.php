@@ -49,11 +49,13 @@
                                 <h3 class="mb-2" style="font-size: 26px; font-weight: 500;">BUSINESS FAILURES <span style="font-size: 24px;">⚠️</span></h3>
                                 <p class="text-muted mb-0" style="font-size: 16px;">Track failures, investigate root causes, log corrective actions and record findings.</p>
                             </div>
+                            @can('business_failures.add')
                             <div class="right-part-sec">
                                 <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#createFeedbackModal">
                                     + ADD NEW FEEDBACK
                                 </button>
                             </div>
+                            @endcan
                         </div>
 
                         <hr class="mx-4 my-4" style="opacity: 0.1;">
@@ -73,11 +75,13 @@
                                             </div>
                                         </div>
                                         <div>
+                                            @can('business_failures.add')
                                             <button type="button" class="btn btn-outline-dark add-doc-btn"
                                                     data-id="{{ $failure->id }}"
                                                     data-title="{{ $failure->title }}">
                                                 + Documentation
                                             </button>
+                                            @endcan
                                         </div>
                                     </div>
 
