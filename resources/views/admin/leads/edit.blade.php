@@ -617,11 +617,15 @@
                          <div class="section-card">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5>SERVICE DETAILS</h5>
-                                {{-- @can('lead.detail.edit') --}}
+                                @can('service.fulfill_order.edit')
                                     <a class="text-warning" href="{{ route('admin.lead.service.details', $leads->id) }}" target="_blank">
                                         Go to Service Details
                                     </a>
-                                {{-- @endcan --}}
+                                @else
+                                    <span class="text-muted" style="cursor: not-allowed;">
+                                        Go to Service Details
+                                    </span>
+                                @endcan
                             </div>
                             <div class="d-flex align-items-start">
                                 <div class="task-icon me-3">

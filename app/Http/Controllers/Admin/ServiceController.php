@@ -39,6 +39,22 @@ class ServiceController extends Controller implements HasMiddleware
             new Middleware('permission:scheduling_calendar.view', only: ['schedulingCalendar', 'schedulingCalendarOrders']),
             new Middleware('permission:vehicle_planning.view', only: ['vehiclePlanning']),
             new Middleware('permission:team_availability.view', only: ['teamAvailability']),
+            new Middleware('permission:service.fulfill_order.edit', only: [
+                'getServiceDetails',
+                'storeService',
+                'addIntendedDate',
+                'addRecurrenceSchedule',
+                'fulfillOrder_book',
+                'confirmSlot',
+                'updateSlot',
+                'addFacility',
+                'removeFacility',
+                'assignStaff',
+                'removeStaff',
+                'toggleLeader',
+                'addServiceOutline',
+                'updateOutlineRange'
+            ]),
         ];
     }
     protected $orderService;
