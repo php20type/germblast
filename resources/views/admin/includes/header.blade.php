@@ -1,5 +1,5 @@
 <!-- header start -->
-<div class="header-1">
+<div class="header-1" style="position: relative; z-index: 1050;">
     <div class="header-content">
 
         <div class="top-header-rightmenu">
