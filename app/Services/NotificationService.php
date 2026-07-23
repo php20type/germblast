@@ -84,6 +84,18 @@ class NotificationService
                 get_class($company)
             );
         }
+
+        if ($company->assignee) {
+            $this->sendInApp(
+                $company->assignee,
+                'Company Assigned',
+                "You have been assigned as the Sales Rep for company {$company->name}.",
+                'companies',
+                $company->id,
+                'company_assigned',
+                get_class($company)
+            );
+        }
     }
 
     // This should be sent to sales rep and manager
