@@ -7,6 +7,7 @@
     </div>
     <nav class="sidebar-nav">
         <ul class="list-inline">
+            @if(auth()->user()->isSalesManager() || auth()->user()->isSuperAdmin())
             <li class="{{ request()->routeIs('admin.sales.*', 'admin.equipment-loan.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.sales.index') }}">
                     <div class="icon-round">
@@ -17,6 +18,7 @@
                     </div>
                 </a>
             </li>
+            
             <!-- <li class="">
                 <a href="#">
                     <div class="icon-round">
@@ -38,6 +40,7 @@
                 </a>
             </li> -->
             <hr>
+            @endif
             <li
                 class="{{ request()->routeIs('admin.company.*') || request()->routeIs('admin.company.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.company.index') }}">

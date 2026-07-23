@@ -14,9 +14,17 @@ use App\Models\User;
 use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class SaleController extends Controller
+class SaleController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('role:sales_manager|super_admin'),
+        ];
+    }
     // Calculate percent difference
     private function calculatePercentChange($current, $previous)
     {
