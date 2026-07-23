@@ -36,7 +36,7 @@ class ServiceController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('permission:all_schedules.view', only: ['all_schedules']),
-            new Middleware('permission:scheduling_calendar.view', only: ['schedulingCalendar', 'schedulingCalendarOrders']),
+            new Middleware('permission:scheduling_calendar.view', only: ['schedulingCalendar', 'schedulingCalendarOrders', 'serviceAudit']),
             new Middleware('permission:vehicle_planning.view', only: ['vehiclePlanning']),
             new Middleware('permission:team_availability.view', only: ['teamAvailability']),
             new Middleware('permission:service.fulfill_order.edit', only: [
@@ -51,7 +51,9 @@ class ServiceController extends Controller implements HasMiddleware
                 'removeFacility',
                 'assignStaff',
                 'removeStaff',
-                'toggleLeader',
+                'toggleLeader'
+            ]),
+            new Middleware('permission:service.dashboard.edit', only: [
                 'addServiceOutline',
                 'updateOutlineRange'
             ]),
