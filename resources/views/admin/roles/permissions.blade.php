@@ -404,9 +404,9 @@
                                                                     <input class="form-check-input me-2" type="checkbox" name="permissions[]"
                                                                         value="{{ $permission->name }}" id="perm_{{ $role->id }}_{{ $permission->id }}"
                                                                         {{ $isGranted ? 'checked' : '' }}>
-                                                                    <label class="form-check-label d-block cursor-pointer" for="perm_{{ $role->id }}_{{ $permission->id }}">
-                                                                        <span class="fw-bold d-block text-dark" style="font-size: 15px;">{{ $label }}</span>
-                                                                        <code class="text-muted" style="font-size: 0.85rem;">{{ $permission->name }}</code>
+                                                                    <label class="form-check-label d-block cursor-pointer text-wrap" style="width: 100%;" for="perm_{{ $role->id }}_{{ $permission->id }}">
+                                                                        <span class="fw-bold d-block text-dark text-break" style="font-size: 15px; white-space: normal;">{{ $label }}</span>
+                                                                        <code class="text-muted text-break" style="font-size: 0.85rem; white-space: normal;">{{ $permission->name }}</code>
                                                                     </label>
                                                                 </div>
                                                             </div>
