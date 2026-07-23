@@ -27,7 +27,7 @@
                             </div>
                         </a>
 
-                        <ul class="dropdown-menu shadow" style="width: 400px; border-radius: 10px;">
+                        <ul class="dropdown-menu shadow" style="width: 400px; border-radius: 10px; z-index: 9999 !important; background-color: #ffffff !important;">
 
                             <li class="px-3 py-2 d-flex justify-content-between align-items-center">
                                 <strong>Notifications</strong>

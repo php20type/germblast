@@ -1753,7 +1753,7 @@
                 <div class="modal-header">
                     <h1 class="modal-title" id="exampleModalLabel">Add a lead</h1>
                     <div>
-                        <a href="#" class="link-decoration">Customize fields</a>
+                        <a href="#" class="link-decoration d-none">Customize fields</a>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
@@ -1769,6 +1769,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Lead name</label>
+                                    <span class="text-danger">*</span>
                                     @error('name')
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
@@ -1778,6 +1779,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Assignee</label>
+                                    <span class="text-danger">*</span>
                                     @error('assignee_id')
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
@@ -1794,6 +1796,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Anticipated closed date</label>
+                                    <span class="text-danger">*</span>
                                     @error('close_date')
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
@@ -1851,6 +1854,7 @@
                             <div class="col-lg-12 mt-2">
                                 <div class="form-group">
                                     <label class="form-label">Confidence</label>
+                                    <span class="text-danger">*</span>
                                     @error('confidence')
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
@@ -1861,6 +1865,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Companies</label>
+                                    <span class="text-danger">*</span>
                                     @error('company_id')
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
@@ -1878,6 +1883,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Select Person</label>
+                                    <span class="text-danger">*</span>
                                     @error('person_id')
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
@@ -1898,6 +1904,7 @@
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label class="form-label">Sources</label>
+                                    <span class="text-danger">*</span>
                                     @error('source_id')
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
@@ -1914,6 +1921,7 @@
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label class="form-label">Competitors</label>
+                                    <span class="text-danger">*</span>
                                     @error('competitors_id')
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror

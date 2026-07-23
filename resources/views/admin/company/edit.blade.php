@@ -1931,6 +1931,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Companies</label>
+                                    <span class="text-danger">*</span>
                                     @error('company_id')
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
@@ -1948,6 +1949,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Select Person</label>
+                                    <span class="text-danger">*</span>
                                     @error('person_id')
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
@@ -1966,6 +1968,7 @@
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label class="form-label">Sources</label>
+                                    <span class="text-danger">*</span>
                                     @error('source_id')
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
@@ -1982,6 +1985,7 @@
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label class="form-label">Competitors</label>
+                                    <span class="text-danger">*</span>
                                     @error('competitors_id')
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
@@ -1999,6 +2003,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Tags</label>
+                                    <span class="text-danger">*</span>
                                     <select name="tag_id" class="form-select">
                                         <option value="">Select tag</option>
                                         @foreach ($companytags as $companytag)
