@@ -202,7 +202,7 @@
                                         <button type="submit" class="btn btn-success">
                                             Save Survey Proposal
                                         </button>
-                                    @elseif (auth()->user()->isSalesManager() || auth()->user()->isSuperAdmin() && !$isEditable && $surveyProposal->status !== 'approved')
+                                    @elseif ( (auth()->user()->isSuperAdmin() || (auth()->user()->isSalesManager() && $lead->stage_id == 3)) && !$isEditable && $surveyProposal->status !== 'approved')
                                         <button type="button" class="btn btn-success" id="approveProposalBtn">
                                             <i class="ti ti-check me-1"></i> Approve
                                         </button>
