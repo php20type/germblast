@@ -3025,6 +3025,7 @@ title {
     border-radius: 0 0 12px 12px;
     display: inline-block;
     position: relative;
+    z-index: 1;
 }
 
 .project-container .pipeline-header {
