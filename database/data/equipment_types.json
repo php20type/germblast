@@ -3,318 +3,378 @@
         "id": 1,
         "name": "Anesthesia Cart",
         "input_name": "anesthesia_cart",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.62
     },
     {
         "id": 2,
         "name": "OR Table",
         "input_name": "or_table",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.25
     },
     {
         "id": 3,
         "name": "Stainless Steel Cart",
         "input_name": "stainless_steel_cart",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.15
     },
     {
         "id": 4,
         "name": "Stainless Steel Table",
         "input_name": "stainless_steel_table",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.11
     },
     {
         "id": 5,
         "name": "Electrosurgical Device",
         "input_name": "electrosurgical_device",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.12
     },
     {
         "id": 6,
         "name": "Wall Mounted ECG/EKG Monitor",
         "input_name": "wall_mounted_monitor",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.12
     },
     {
         "id": 7,
         "name": "Vital Signs Monitor",
         "input_name": "vital_signs_monitor",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.12
     },
     {
         "id": 8,
         "name": "Vital Signs Monitor w/ECG",
         "input_name": "vital_signs_monitor_ecg",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.12
     },
     {
         "id": 9,
         "name": "DVT/SCD Device",
         "input_name": "dvt_scd_device",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.12
     },
     {
         "id": 10,
         "name": "CPM (Continuous Passive Motion)",
         "input_name": "cpm",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.15
     },
     {
         "id": 11,
         "name": "Infusion Pump",
         "input_name": "infusion_pump",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.12
     },
     {
         "id": 12,
         "name": "BiPap",
         "input_name": "bipap",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.12
     },
     {
         "id": 13,
         "name": "CPAP",
         "input_name": "cpap",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.12
     },
     {
         "id": 14,
         "name": "Pulse Oximeter",
         "input_name": "pulse_oximeter",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.12
     },
     {
         "id": 15,
         "name": "Hospital Bed",
         "input_name": "hospital_bed",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.75
     },
     {
         "id": 16,
         "name": "Electric Gurney",
         "input_name": "electric_gurney",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.25
     },
     {
         "id": 17,
         "name": "Manual Gurney",
         "input_name": "manual_gurney",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.3
     },
     {
         "id": 18,
         "name": "PCA (Patient Controlled Anesthesia)",
         "input_name": "pca",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.12
     },
     {
         "id": 19,
         "name": "COW/WOW (Computer on Wheels)",
         "input_name": "cow",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.12
     },
     {
         "id": 20,
         "name": "Patient Air Warmer",
         "input_name": "patient_air_warmer",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.12
     },
     {
         "id": 21,
         "name": "Enteral Feeding Pump",
         "input_name": "enteral_feeding_pump",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.12
     },
     {
         "id": 22,
         "name": "Geri Chair",
         "input_name": "geri_chair",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.17
     },
     {
         "id": 23,
         "name": "Electric Scale",
         "input_name": "electric_scale",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.12
     },
     {
         "id": 24,
         "name": "Defibrillator",
         "input_name": "defibrillator",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.62
     },
     {
         "id": 25,
         "name": "Med Cart",
         "input_name": "med_cart",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.15
     },
     {
         "id": 26,
         "name": "Crash Cart",
         "input_name": "crash_cart",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.2
     },
     {
         "id": 27,
         "name": "Bassinet",
         "input_name": "bassinet",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.2
     },
     {
         "id": 28,
         "name": "Infant Incubator",
         "input_name": "infant_incubator",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.2
     },
     {
         "id": 29,
         "name": "Infant Warmer",
         "input_name": "infant_warmer",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.2
     },
     {
         "id": 30,
         "name": "Ultrasound",
         "input_name": "ultrasound",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.62
     },
     {
         "id": 31,
         "name": "Overbed Table",
         "input_name": "overbed_table",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.1
     },
     {
         "id": 32,
         "name": "Portable Suction Pump",
         "input_name": "portable_suction_pump",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.1
     },
     {
         "id": 33,
         "name": "Stainless Steel Linen Cart",
         "input_name": "stainless_steel_linen_cart",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.12
     },
     {
         "id": 34,
         "name": "Stainless Steel Basin",
         "input_name": "stainless_steel_basin",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.12
     },
     {
         "id": 35,
         "name": "Radiology Vest",
         "input_name": "radiology_vest",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.08
     },
     {
         "id": 36,
         "name": "Wall Mounted Computer",
         "input_name": "wall_mounted_computer",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.08
     },
     {
         "id": 37,
         "name": "Telemedicine Device",
         "input_name": "telemedicine_device",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.1
     },
     {
         "id": 38,
         "name": "Blower & Mattress",
         "input_name": "blower_mattress",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.1
     },
     {
         "id": 39,
         "name": "Rolling Transfer Boards",
         "input_name": "rolling_transfer_boards",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.1
     },
     {
         "id": 40,
         "name": "Glucometer",
         "input_name": "glucometer",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.08
     },
     {
         "id": 41,
         "name": "Telemetry Monitor",
         "input_name": "telemetry_monitor",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.08
     },
     {
         "id": 42,
         "name": "Telemetry Pack",
         "input_name": "telemetry_pack",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.04
     },
     {
         "id": 43,
         "name": "Patient Lift",
         "input_name": "patient_lift",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.08
     },
     {
         "id": 44,
         "name": "Heat Lamp",
         "input_name": "heat_lamp",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.08
     },
     {
         "id": 45,
         "name": "Treadmill",
         "input_name": "treadmill",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.58
     },
     {
         "id": 46,
         "name": "Recumbant Bike",
         "input_name": "recumbant_bike",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.08
     },
     {
         "id": 47,
         "name": "Misc. Carts/Baskets",
         "input_name": "misc_carts_baskets",
-        "type": "cleaning"
+        "type": "cleaning",
+        "hours_required": 0.66
     },
     {
         "id": 48,
         "name": "Non Electric Gurney",
         "input_name": "non_electric_gurney",
-        "type": "washing"
+        "type": "washing",
+        "hours_required": 0.5
     },
     {
         "id": 49,
         "name": "Wheelchair",
         "input_name": "wheelchair",
-        "type": "washing"
+        "type": "washing",
+        "hours_required": 0.33
     },
     {
         "id": 50,
         "name": "Transport Chair",
         "input_name": "transport_chair",
-        "type": "washing"
+        "type": "washing",
+        "hours_required": 0.33
     },
     {
         "id": 51,
         "name": "IV Pole",
         "input_name": "iv_pole",
-        "type": "washing"
+        "type": "washing",
+        "hours_required": 0.1
     },
     {
         "id": 52,
         "name": "Food Cart",
         "input_name": "food_cart",
-        "type": "washing"
+        "type": "washing",
+        "hours_required": 0.65
     },
     {
         "id": 53,
         "name": "Miscellaneous Pieces to Wash",
         "input_name": "miscellaneous_pieces",
-        "type": "washing"
+        "type": "washing",
+        "hours_required": 0.5
+    },
+    {
+        "id": 54,
+        "name": "Ventilator",
+        "input_name": "ventilator",
+        "type": "cleaning",
+        "hours_required": 0.15
     }
 ]

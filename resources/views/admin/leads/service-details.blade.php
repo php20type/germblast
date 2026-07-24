@@ -110,54 +110,119 @@
                                 <h5 class="section-title text-uppercase">CREATE NEW SERVICE</h5>
                             </div>
 
-                            <form action="{{ route('admin.lead.service.store', $lead->id) }}" method="POST" id="add-service-details-form">
-                                @csrf
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <form action="{{ route('admin.lead.service.store', $lead->id) }}" method="POST" id="add-service-details-form">
+                                        @csrf
 
-                                <table class="table table-bordered align-middle mb-0">
-                                    <tbody>
-                                        <tr>
-                                            <th style="width: 30%; background-color: #fafafa;" class="fw-semibold text-dark">Name of the Service</th>
-                                            <td>
-                                                <input type="text" class="form-control" name="service_name" required placeholder="e.g. Standard GermBlast Service">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th style="background-color: #fafafa;" class="fw-semibold text-dark">Service Price (per service)</th>
-                                            <td>
-                                                <div class="input-group">
-                                                    <span class="input-group-text">$</span>
-                                                    <input type="number" step="0.01" class="form-control" name="price_per_service" required placeholder="0.00">
+                                        <table class="table table-bordered align-middle mb-0">
+                                            <tbody>
+                                                <tr>
+                                                    <th style="width: 30%; background-color: #fafafa;" class="fw-semibold text-dark">Pricing Proposal</th>
+                                                    <td>
+                                                        <select class="form-select" id="pricing_proposal_select" name="pricing_proposal_id">
+                                                            <option value="">Manual Entry</option>
+                                                            @foreach($pricingProposals as $proposal)
+                                                                <option value="{{ $proposal->id }}">{{ $proposal->proposal_name }} (Est: ${{ number_format($proposal->pricing_total, 2) }}@if($proposal->override_pricing) / Override: ${{ number_format($proposal->override_pricing, 2) }}@endif)</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="width: 30%; background-color: #fafafa;" class="fw-semibold text-dark">Name of the Service</th>
+                                                    <td>
+                                                        <input type="text" class="form-control" name="service_name" id="service_name" required placeholder="e.g. Standard GermBlast Service">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="background-color: #fafafa;" class="fw-semibold text-dark">Service Price (per service)</th>
+                                                    <td>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">$</span>
+                                                            <input type="number" step="0.01" class="form-control" name="price_per_service" id="price_per_service" required placeholder="0.00">
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="background-color: #fafafa;" class="fw-semibold text-dark">Number of Services</th>
+                                                    <td>
+                                                        <input type="number" class="form-control" name="number_of_services" id="number_of_services" required placeholder="1">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="background-color: #fafafa;" class="fw-semibold text-dark">PO Number</th>
+                                                    <td>
+                                                        <input type="text" class="form-control" name="po_number" id="po_number" placeholder="Optional PO number">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th style="background-color: #fafafa;" class="fw-semibold text-dark">Outline</th>
+                                                    <td>
+                                                        <input type="text" class="form-control" name="outlines" id="outlines" placeholder="Type an outline tag and press Enter">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2" class="text-end bg-light">
+                                                        <button type="submit" class="btn btn-export px-4 py-2">
+                                                            Add Service Outline
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </form>
+                                </div>
+                                <div class="col-lg-4 mt-3 mt-lg-0">
+                                    <div class="card h-100 border d-none" id="proposal-summary-card" style="border-radius: 12px; background-color: #fafafa;">
+                                        <div class="card-header bg-white border-bottom py-3">
+                                            <h6 class="fw-bold mb-0 text-uppercase" style="font-size: 13px; letter-spacing: 0.5px; color: #374151;">Proposal Summary</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <small class="text-muted d-block fw-semibold text-uppercase" style="font-size: 10px; letter-spacing: 0.5px;">Proposal Name</small>
+                                                <span class="fw-bold text-dark" id="summary-proposal-name">-</span>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-6">
+                                                    <small class="text-muted d-block fw-semibold text-uppercase" style="font-size: 10px; letter-spacing: 0.5px;">Contract Term</small>
+                                                    <span class="fw-bold text-dark" id="summary-contract-term">-</span>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th style="background-color: #fafafa;" class="fw-semibold text-dark">Number of Services</th>
-                                            <td>
-                                                <input type="number" class="form-control" name="number_of_services" required placeholder="1">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th style="background-color: #fafafa;" class="fw-semibold text-dark">PO Number</th>
-                                            <td>
-                                                <input type="text" class="form-control" name="po_number" placeholder="Optional PO number">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th style="background-color: #fafafa;" class="fw-semibold text-dark">Outline</th>
-                                            <td>
-                                                <input type="text" class="form-control" name="outlines" placeholder="Type an outline tag and press Enter">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2" class="text-end bg-light">
-                                                <button type="submit" class="btn btn-export px-4 py-2">
-                                                    Add Service Outline
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </form>
+                                                <div class="col-6">
+                                                    <small class="text-muted d-block fw-semibold text-uppercase" style="font-size: 10px; letter-spacing: 0.5px;">Services Per Year</small>
+                                                    <span class="fw-bold text-dark" id="summary-services-per-year">-</span>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-6">
+                                                    <small class="text-muted d-block fw-semibold text-uppercase" style="font-size: 10px; letter-spacing: 0.5px;">Est. Pricing</small>
+                                                    <span class="fw-bold text-dark" id="summary-estimated-pricing">-</span>
+                                                </div>
+                                                <div class="col-6">
+                                                    <small class="text-muted d-block fw-semibold text-uppercase" style="font-size: 10px; letter-spacing: 0.5px;">Override Pricing</small>
+                                                    <span class="fw-bold text-dark" id="summary-override-pricing">-</span>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <small class="text-muted d-block fw-semibold text-uppercase" style="font-size: 10px; letter-spacing: 0.5px;">Total Services</small>
+                                                <span class="fw-bold text-success fs-5" id="summary-total-services">-</span>
+                                            </div>
+                                            <hr>
+                                            <div>
+                                                <small class="text-muted d-block fw-semibold text-uppercase mb-2" style="font-size: 10px; letter-spacing: 0.5px;">Services / Outline List</small>
+                                                <ul class="list-group list-group-flush" id="summary-services-list" style="max-height: 150px; overflow-y: auto;">
+                                                    <!-- Dynamic list items -->
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card h-100 border d-flex align-items-center justify-content-center p-4 text-center text-muted" id="proposal-summary-placeholder" style="border-radius: 12px; background-color: #fafafa; border-style: dashed !important; min-height: 250px;">
+                                        <div>
+                                            <i class="fa-regular fa-file-lines fs-2 mb-2 text-secondary"></i>
+                                            <p class="mb-0" style="font-size: 13px;">Select a Pricing Proposal to populate the form and view its summary.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Card 2: Service and Order Details -->
@@ -387,11 +452,87 @@
 
 <script>
     $(document).ready(function() {
+        let tagifyInstance = null;
+        let tagifyInput = document.querySelector('input[name="outlines"]');
+        if (tagifyInput) {
+            tagifyInstance = new Tagify(tagifyInput);
+        }
 
-        document.querySelectorAll('input[name="outlines"]').forEach(function(el){
-            new Tagify(el);
+        $('#pricing_proposal_select').on('change', function() {
+            let proposalId = $(this).val();
+            if (!proposalId) {
+                // Clear form for Manual Entry
+                $('#service_name').val('');
+                $('#price_per_service').val('');
+                $('#number_of_services').val('');
+                $('#po_number').val('');
+                if (tagifyInstance) {
+                    tagifyInstance.removeAllTags();
+                }
+                $('#proposal-summary-card').addClass('d-none');
+                $('#proposal-summary-placeholder').removeClass('d-none');
+                return;
+            }
+
+            // AJAX call to get pricing proposal details
+            $.ajax({
+                url: `/admin/lead/service/pricing-proposal/${proposalId}`,
+                method: 'GET',
+                success: function(response) {
+                    if (response.success && response.proposal) {
+                        let prop = response.proposal;
+                        
+                        // Fill name
+                        $('#service_name').val(prop.proposal_name || '');
+                        
+                        // Price logic: Override pricing if it exists and is > 0, else pricing_total
+                        let overrideVal = parseFloat(prop.override_pricing || 0);
+                        let price = overrideVal > 0 ? prop.override_pricing : prop.pricing_total;
+                        $('#price_per_service').val(parseFloat(price || 0).toFixed(2));
+                        
+                        // Number of services: Services Per Year * Contract Term
+                        let servicesPerYear = parseInt(prop.services_per_year) || 0;
+                        let contractTerms = parseInt(prop.contract_terms) || 0;
+                        let numServices = servicesPerYear * contractTerms;
+                        $('#number_of_services').val(numServices);
+                        
+                        // Outlines tagify population
+                        if (tagifyInstance) {
+                            tagifyInstance.removeAllTags();
+                            if (prop.pricing_services && prop.pricing_services.length > 0) {
+                                let serviceNames = prop.pricing_services.map(s => s.service_name);
+                                tagifyInstance.addTags(serviceNames);
+                            }
+                        }
+
+                        // Update summary card values
+                        $('#summary-proposal-name').text(prop.proposal_name || 'N/A');
+                        $('#summary-contract-term').text(prop.contract_terms ? `${prop.contract_terms} Year(s)` : 'N/A');
+                        $('#summary-services-per-year').text(prop.services_per_year || '0');
+                        $('#summary-estimated-pricing').text(prop.pricing_total ? `$${parseFloat(prop.pricing_total).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'N/A');
+                        $('#summary-override-pricing').text(prop.override_pricing ? `$${parseFloat(prop.override_pricing).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'N/A');
+                        $('#summary-total-services').text(numServices || '0');
+
+                        // Summary Services List
+                        let listHtml = '';
+                        if (prop.pricing_services && prop.pricing_services.length > 0) {
+                            prop.pricing_services.forEach(function(s) {
+                                listHtml += `<li class="list-group-item px-0 py-1 bg-transparent border-0 text-dark" style="font-size: 12px;"><i class="fa-solid fa-chevron-right text-success me-2" style="font-size: 9px;"></i> ${s.service_name}</li>`;
+                            });
+                        } else {
+                            listHtml = '<li class="list-group-item px-0 py-1 bg-transparent border-0 text-muted" style="font-size: 12px;">No services listed</li>';
+                        }
+                        $('#summary-services-list').html(listHtml);
+
+                        $('#proposal-summary-placeholder').addClass('d-none');
+                        $('#proposal-summary-card').removeClass('d-none');
+                    }
+                },
+                error: function(xhr) {
+                    console.error("Error fetching pricing proposal details:", xhr);
+                }
+            });
         });
-
     });
 </script>
 

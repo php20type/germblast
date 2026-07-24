@@ -215,6 +215,7 @@ class SurveyProposalController extends Controller
             // -----------------------------------------
             $roomCounts = [];
             $manHours = 0;
+            $manHoursCost = 0;
 
             foreach (FacilityRoomType::all() as $type) {
                 $value = intval($request->{$type->input_name} ?? 0);
@@ -225,12 +226,18 @@ class SurveyProposalController extends Controller
                 }
 
                 // Calculate man hours using DB value
-                $manHours += $value * floatval($type->hours_required);
+                $hoursForType = $value * floatval($type->hours_required);
+                $manHours += $hoursForType;
+
+                if ($type->input_name === 'bus_count') {
+                    $manHoursCost += $value * 45.00;
+                } else {
+                    $manHoursCost += $hoursForType * 28.75;
+                }
             }
 
             // Save JSON room counts to facilityData
             $facilityData['room_counts'] = $roomCounts;
-            $manHoursCost = $manHours * 28.75;
 
             $facilityData['man_hours'] = $manHours;
             $facilityData['man_hours_cost'] = $manHoursCost;
@@ -388,6 +395,7 @@ class SurveyProposalController extends Controller
             // -----------------------------------------
             $roomCounts = [];
             $manHours = 0;
+            $manHoursCost = 0;
 
             foreach (FacilityRoomType::all() as $type) {
 
@@ -399,12 +407,18 @@ class SurveyProposalController extends Controller
                 }
 
                 // Calculate man hours using DB value
-                $manHours += $value * floatval($type->hours_required);
+                $hoursForType = $value * floatval($type->hours_required);
+                $manHours += $hoursForType;
+
+                if ($type->input_name === 'bus_count') {
+                    $manHoursCost += $value * 45.00;
+                } else {
+                    $manHoursCost += $hoursForType * 28.75;
+                }
             }
             
             // Save JSON room counts to facilityData
             $facilityData['room_counts'] = $roomCounts;
-            $manHoursCost = $manHours * 28.75;
 
             $facilityData['man_hours'] = $manHours;
             $facilityData['man_hours_cost'] = $manHoursCost;

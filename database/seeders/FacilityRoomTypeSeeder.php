@@ -26,6 +26,7 @@ class FacilityRoomTypeSeeder extends Seeder
                 [
                     'input_name'     => $type['input_name'],
                     'name'           => $type['name'],
+                    'hours_required' => $type['hours_required'] ?? 0,
                     'facility_types' => $type['facility_types'] ?? [],
                 ]
             );

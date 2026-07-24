@@ -7,6 +7,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::prefix('lead')->name('lead.')->group(function () {
 
         Route::get('service/details/{lead}', [ServiceController::class, 'getServiceDetails'])->name('service.details');
+        Route::get('service/pricing-proposal/{pricingProposal}', [ServiceController::class, 'getPricingProposalDetails'])->name('service.pricing_proposal_details');
 
         Route::post('service/store/{lead}', [ServiceController::class, 'storeService'])->name('service.store');
         Route::post('service/add-date', [ServiceController::class, 'addIntendedDate'])->name('service.add_date');

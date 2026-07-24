@@ -3,6 +3,7 @@
         "id": 1,
         "name": "Square Footage",
         "input_name": "square_footage",
+        "hours_required": 0,
         "facility_types": [
             "hospital",
             "clinic",
@@ -24,6 +25,7 @@
         "id": 2,
         "name": "Offices",
         "input_name": "offices",
+        "hours_required": 0.25,
         "facility_types": [
             "hospital",
             "clinic",
@@ -45,6 +47,7 @@
         "id": 3,
         "name": "Standard (Community) Bathrooms",
         "input_name": "standard_bathrooms",
+        "hours_required": 0.2,
         "facility_types": [
             "hospital",
             "clinic",
@@ -64,6 +67,7 @@
         "id": 4,
         "name": "Single Bathrooms",
         "input_name": "single_bathrooms",
+        "hours_required": 0.075,
         "facility_types": [
             "hospital",
             "clinic",
@@ -83,6 +87,7 @@
         "id": 5,
         "name": "Football Lockerroom",
         "input_name": "football_lockerroom",
+        "hours_required": 1.0,
         "facility_types": [
             "high school athletics",
             "middle school athletics"
@@ -92,6 +97,7 @@
         "id": 6,
         "name": "Regular Lockerrooms",
         "input_name": "regular_lockerrooms",
+        "hours_required": 0.85,
         "facility_types": [
             "high school athletics",
             "middle school athletics"
@@ -101,6 +107,7 @@
         "id": 7,
         "name": "Weight Room",
         "input_name": "weight_room",
+        "hours_required": 1.5,
         "facility_types": [
             "high school athletics",
             "middle school athletics"
@@ -110,6 +117,7 @@
         "id": 8,
         "name": "Training Room",
         "input_name": "training_room",
+        "hours_required": 0.55,
         "facility_types": [
             "high school athletics",
             "middle school athletics"
@@ -119,6 +127,7 @@
         "id": 9,
         "name": "Equipment Room",
         "input_name": "equipment_room",
+        "hours_required": 0.5,
         "facility_types": [
             "high school athletics",
             "middle school athletics"
@@ -128,6 +137,7 @@
         "id": 10,
         "name": "Coach's Office",
         "input_name": "coachs_office",
+        "hours_required": 0.15,
         "facility_types": [
             "high school athletics",
             "middle school athletics"
@@ -137,6 +147,7 @@
         "id": 11,
         "name": "Shoulder Pads",
         "input_name": "shoulder_pads",
+        "hours_required": 0.04,
         "facility_types": [
             "high school athletics",
             "middle school athletics"
@@ -146,6 +157,7 @@
         "id": 12,
         "name": "Helmets",
         "input_name": "helmets",
+        "hours_required": 0.05,
         "facility_types": [
             "high school athletics",
             "middle school athletics"
@@ -155,6 +167,7 @@
         "id": 13,
         "name": "Wrestling Mats",
         "input_name": "wrestling_mats",
+        "hours_required": 0.75,
         "facility_types": [
             "high school athletics",
             "middle school athletics"
@@ -164,6 +177,7 @@
         "id": 14,
         "name": "Med Surg Rooms",
         "input_name": "med_surg_rooms",
+        "hours_required": 0.4,
         "facility_types": [
             "hospital",
             "clinic"
@@ -173,6 +187,7 @@
         "id": 15,
         "name": "ICU Rooms",
         "input_name": "icu_rooms",
+        "hours_required": 0.75,
         "facility_types": [
             "hospital",
             "clinic"
@@ -182,6 +197,7 @@
         "id": 16,
         "name": "Common Areas (count chairs)",
         "input_name": "common_areas",
+        "hours_required": 0.05,
         "facility_types": [
             "hospital",
             "clinic"
@@ -191,6 +207,7 @@
         "id": 17,
         "name": "Radiology",
         "input_name": "radiology",
+        "hours_required": 0.33,
         "facility_types": [
             "hospital",
             "clinic"
@@ -200,6 +217,7 @@
         "id": 18,
         "name": "Respiratory Therapy",
         "input_name": "respiratory_therapy",
+        "hours_required": 0.28,
         "facility_types": [
             "hospital",
             "clinic"
@@ -209,6 +227,7 @@
         "id": 19,
         "name": "Physical Therapy",
         "input_name": "physical_therapy",
+        "hours_required": 1.0,
         "facility_types": [
             "hospital",
             "clinic"
@@ -218,6 +237,7 @@
         "id": 20,
         "name": "Rehab Center",
         "input_name": "rehab_center",
+        "hours_required": 0.87,
         "facility_types": [
             "hospital",
             "clinic"
@@ -227,6 +247,7 @@
         "id": 21,
         "name": "Activity Room",
         "input_name": "activity_room",
+        "hours_required": 0.83,
         "facility_types": [
             "hospital",
             "clinic"
@@ -236,6 +257,7 @@
         "id": 22,
         "name": "Operating Room",
         "input_name": "operating_room",
+        "hours_required": 1.0,
         "facility_types": [
             "hospital",
             "clinic"
@@ -245,6 +267,7 @@
         "id": 23,
         "name": "PACU Beds",
         "input_name": "pacu_beds",
+        "hours_required": 0.25,
         "facility_types": [
             "hospital",
             "clinic"
@@ -254,6 +277,7 @@
         "id": 24,
         "name": "Burn ICU Rooms",
         "input_name": "burn_icu_rooms",
+        "hours_required": 0.9,
         "facility_types": [
             "hospital",
             "clinic"
@@ -263,6 +287,7 @@
         "id": 25,
         "name": "Cancer Center",
         "input_name": "cancer_center",
+        "hours_required": 0.33,
         "facility_types": [
             "hospital",
             "clinic"
@@ -272,6 +297,7 @@
         "id": 26,
         "name": "Dialysis Rooms",
         "input_name": "dialysis_rooms",
+        "hours_required": 0.33,
         "facility_types": [
             "hospital",
             "clinic"
@@ -281,6 +307,7 @@
         "id": 27,
         "name": "Labor and Delivery Patient Rooms",
         "input_name": "labor_delivery_patient_rooms",
+        "hours_required": 0.5,
         "facility_types": [
             "hospital",
             "clinic"
@@ -290,6 +317,7 @@
         "id": 28,
         "name": "Labor and Delivery Operating Rooms",
         "input_name": "labor_delivery_operating_rooms",
+        "hours_required": 0,
         "facility_types": [
             "hospital",
             "clinic"
@@ -299,6 +327,7 @@
         "id": 29,
         "name": "ED Room",
         "input_name": "ed_room",
+        "hours_required": 0.4,
         "facility_types": [
             "hospital",
             "clinic"
@@ -308,6 +337,7 @@
         "id": 30,
         "name": "ED Trauma Room",
         "input_name": "ed_trauma_room",
+        "hours_required": 0.5,
         "facility_types": [
             "hospital",
             "clinic"
@@ -317,6 +347,7 @@
         "id": 31,
         "name": "Cysto Room",
         "input_name": "cysto_room",
+        "hours_required": 1.0,
         "facility_types": [
             "hospital",
             "clinic"
@@ -326,6 +357,7 @@
         "id": 32,
         "name": "Endo Room",
         "input_name": "endo_room",
+        "hours_required": 1.0,
         "facility_types": [
             "hospital",
             "clinic"
@@ -335,6 +367,7 @@
         "id": 33,
         "name": "Interventional Radiology (IR) Lab",
         "input_name": "ir_lab",
+        "hours_required": 1.0,
         "facility_types": [
             "hospital",
             "clinic"
@@ -344,6 +377,7 @@
         "id": 34,
         "name": "Cath Lab",
         "input_name": "cath_lab",
+        "hours_required": 1.0,
         "facility_types": [
             "hospital",
             "clinic"
@@ -353,6 +387,7 @@
         "id": 35,
         "name": "Clinic Room",
         "input_name": "clinic_room",
+        "hours_required": 0.25,
         "facility_types": [
             "hospital",
             "clinic"
@@ -362,6 +397,7 @@
         "id": 36,
         "name": "Dietary",
         "input_name": "dietary",
+        "hours_required": 1.5,
         "facility_types": [
             "hospital",
             "clinic"
@@ -371,17 +407,17 @@
         "id": 37,
         "name": "Breakroom",
         "input_name": "breakroom",
+        "hours_required": 0.33,
         "facility_types": [
             "hospital",
-            "clinic",
-            "office",
-            "office building"
+            "clinic"
         ]
     },
     {
         "id": 38,
         "name": "Lab",
         "input_name": "lab",
+        "hours_required": 0.75,
         "facility_types": [
             "hospital",
             "clinic"
@@ -391,6 +427,7 @@
         "id": 39,
         "name": "Pharmacy",
         "input_name": "pharmacy",
+        "hours_required": 0.75,
         "facility_types": [
             "hospital",
             "clinic"
@@ -400,23 +437,17 @@
         "id": 40,
         "name": "Nurses' Station",
         "input_name": "nurses_station",
+        "hours_required": 0.25,
         "facility_types": [
             "hospital",
             "clinic"
         ]
     },
     {
-        "id": 41,
-        "name": "3rd Grade and Above Classrooms",
-        "input_name": "third_grade_and_above",
-        "facility_types": [
-            "elementary school"
-        ]
-    },
-    {
         "id": 42,
         "name": "PreK–2nd Classrooms",
         "input_name": "prek_2nd_classrooms",
+        "hours_required": 0.65,
         "facility_types": [
             "elementary school"
         ]
@@ -425,6 +456,7 @@
         "id": 43,
         "name": "Cafeteria & Kitchen",
         "input_name": "cafeteria_kitchen",
+        "hours_required": 1.25,
         "facility_types": [
             "elementary school",
             "middle school",
@@ -439,6 +471,7 @@
         "id": 44,
         "name": "Library",
         "input_name": "library",
+        "hours_required": 0.75,
         "facility_types": [
             "elementary school",
             "middle school",
@@ -449,6 +482,7 @@
         "id": 45,
         "name": "Computer Lab",
         "input_name": "computer_lab",
+        "hours_required": 0.5,
         "facility_types": [
             "elementary school",
             "middle school",
@@ -459,6 +493,7 @@
         "id": 46,
         "name": "Nurses Office",
         "input_name": "nurses_office",
+        "hours_required": 0.25,
         "facility_types": [
             "elementary school",
             "middle school",
@@ -469,6 +504,7 @@
         "id": 47,
         "name": "Special Ed Room",
         "input_name": "special_ed_room",
+        "hours_required": 1.0,
         "facility_types": [
             "elementary school",
             "middle school",
@@ -479,6 +515,7 @@
         "id": 48,
         "name": "Teacher's Lounge/Workroom",
         "input_name": "teachers_lounge",
+        "hours_required": 0.25,
         "facility_types": [
             "elementary school",
             "middle school",
@@ -489,6 +526,7 @@
         "id": 49,
         "name": "Auditorium (Chair Count)",
         "input_name": "auditorium",
+        "hours_required": 0.02,
         "facility_types": [
             "elementary school",
             "middle school",
@@ -500,6 +538,7 @@
         "id": 50,
         "name": "Middle School Classrooms",
         "input_name": "middle_school_classrooms",
+        "hours_required": 0.33,
         "facility_types": [
             "middle school"
         ]
@@ -508,6 +547,7 @@
         "id": 51,
         "name": "High School/Low Touchpoint Classrooms",
         "input_name": "high_school_classrooms",
+        "hours_required": 0.33,
         "facility_types": [
             "high school",
             "church"
@@ -517,6 +557,7 @@
         "id": 52,
         "name": "Bus Count",
         "input_name": "bus_count",
+        "hours_required": 0.33,
         "facility_types": [
             "buses"
         ]
@@ -525,6 +566,7 @@
         "id": 53,
         "name": "Lobby (Count Chairs)",
         "input_name": "lobby",
+        "hours_required": 0.05,
         "facility_types": [
             "office",
             "office building",
@@ -535,6 +577,7 @@
         "id": 54,
         "name": "Cubicle",
         "input_name": "cubicle",
+        "hours_required": 0.13,
         "facility_types": [
             "office",
             "office building"
@@ -544,6 +587,7 @@
         "id": 55,
         "name": "Reception Area",
         "input_name": "reception_area",
+        "hours_required": 0.25,
         "facility_types": [
             "office",
             "office building"
@@ -553,6 +597,7 @@
         "id": 56,
         "name": "Elevator",
         "input_name": "elevator",
+        "hours_required": 0.07,
         "facility_types": [
             "office",
             "office building",
@@ -564,6 +609,7 @@
         "id": 57,
         "name": "Conference Room (Count Chairs/Capacity)",
         "input_name": "conference_room",
+        "hours_required": 0.05,
         "facility_types": [
             "office",
             "office building",
@@ -575,6 +621,7 @@
         "id": 58,
         "name": "Stairwell (Count Floors in Each Well)",
         "input_name": "stairwell",
+        "hours_required": 0.12,
         "facility_types": [
             "office",
             "office building",
@@ -586,6 +633,7 @@
         "id": 59,
         "name": "Server Room",
         "input_name": "server_room",
+        "hours_required": 0.25,
         "facility_types": [
             "office",
             "office building"
@@ -595,6 +643,7 @@
         "id": 60,
         "name": "Lounge",
         "input_name": "lounge",
+        "hours_required": 0.33,
         "facility_types": [
             "office",
             "office building",
@@ -606,6 +655,7 @@
         "id": 61,
         "name": "Early Childhood Classroom",
         "input_name": "early_childhood_classroom",
+        "hours_required": 0.65,
         "facility_types": [
             "church",
             "daycare"
@@ -615,6 +665,7 @@
         "id": 62,
         "name": "Gym/Activity Room",
         "input_name": "gym_activity_room",
+        "hours_required": 1.0,
         "facility_types": [
             "church",
             "daycare",
@@ -625,6 +676,7 @@
         "id": 63,
         "name": "Front Desk",
         "input_name": "front_desk",
+        "hours_required": 0.25,
         "facility_types": [
             "hotel"
         ]
@@ -633,6 +685,7 @@
         "id": 64,
         "name": "Laundry",
         "input_name": "laundry",
+        "hours_required": 0.15,
         "facility_types": [
             "hotel"
         ]
@@ -641,6 +694,7 @@
         "id": 65,
         "name": "Business Center",
         "input_name": "business_center",
+        "hours_required": 0.15,
         "facility_types": [
             "hotel"
         ]
@@ -649,8 +703,19 @@
         "id": 66,
         "name": "Guest Room with Bathroom",
         "input_name": "guest_room_with_bathroom",
+        "hours_required": 0.35,
         "facility_types": [
             "hotel"
+        ]
+    },
+    {
+        "id": 67,
+        "name": "Break Rooms",
+        "input_name": "office_break_rooms",
+        "hours_required": 0.25,
+        "facility_types": [
+            "office",
+            "office building"
         ]
     }
 ]

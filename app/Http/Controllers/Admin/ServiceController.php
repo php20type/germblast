@@ -9,6 +9,7 @@ use App\Models\ServiceOrder;
 use App\Models\ServiceOrderInvoice;
 use App\Models\ServiceOrderSlot;
 use App\Models\ServiceOutline;
+use App\Models\PricingProposal;
 use App\Models\ServiceNote;
 use App\Models\ServiceOrderSlotFacility;
 use App\Models\ServiceOrderSlotStaff;
@@ -72,13 +73,27 @@ class ServiceController extends Controller implements HasMiddleware
 
     public function getServiceDetails(Request $request, $leadId)
     {
-        $lead = Lead::with(['products', 'services.outlines', 'services.orders.orderSlots'])->findOrFail($leadId);
+        $lead = Lead::with(['products', 'services.outlines', 'services.orders.orderSlots', 'surveyProposal'])->findOrFail($leadId);
 
         $services = $lead->services;
         $totalRevenue = $services->sum('total_price');
         $offices = \App\Models\OfficeLocation::where('is_active', 1)->get();
 
-        return view('admin.leads.service-details', compact('services', 'lead', 'totalRevenue', 'offices'));
+        $pricingProposals = PricingProposal::with('pricingServices')
+            ->whereIn('survey_proposal_id', $lead->surveyProposal->pluck('id'))
+            ->get();
+
+        return view('admin.leads.service-details', compact('services', 'lead', 'totalRevenue', 'offices', 'pricingProposals'));
+    }
+
+    public function getPricingProposalDetails($pricingProposalId)
+    {
+        $pricingProposal = PricingProposal::with('pricingServices')->findOrFail($pricingProposalId);
+
+        return response()->json([
+            'success' => true,
+            'proposal' => $pricingProposal
+        ]);
     }
 
     /**

@@ -260,10 +260,18 @@
                                                     </td>
                                                 </tr>
 
+                                                {{-- Old multiplier (5.882) - replaced 2026-07-24 per verified ICIMatrix value of 3.9
                                                 <tr>
                                                     <th>Multiplier</th>
                                                     <td id="multiplier" data-value="5.882">
                                                         5.882
+                                                    </td>
+                                                </tr>
+                                                --}}
+                                                <tr>
+                                                    <th>Multiplier</th>
+                                                    <td id="multiplier" data-value="3.9">
+                                                        3.9
                                                     </td>
                                                 </tr>
 

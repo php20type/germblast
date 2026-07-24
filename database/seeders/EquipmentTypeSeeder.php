@@ -25,12 +25,15 @@ class EquipmentTypeSeeder extends Seeder
         }
 
         foreach ($equipmentTypes as $type) {
-            EquipmentType::create([
-                'id'   => $type['id'],
-                'input_name' => $type['input_name'],
-                'name' => $type['name'],
-                'type' => $type['type'],
-            ]);
+            EquipmentType::updateOrCreate(
+                ['id' => $type['id']],
+                [
+                    'input_name'     => $type['input_name'],
+                    'name'           => $type['name'],
+                    'type'           => $type['type'],
+                    'hours_required' => $type['hours_required'] ?? 0.5,
+                ]
+            );
         }
     }
 }
