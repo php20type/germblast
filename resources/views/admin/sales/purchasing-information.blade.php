@@ -121,21 +121,21 @@
                                         <div class="col-md-4">
                                             <div class="section-subtitle">Pricing & Items</div>
                                             <ul class="purchasing-list">
-                                                <li><a href="#" class="purchasing-link" target="_blank">Catalog & Price List</a></li>
+                                                <li><a href="{{ asset('coop-documents/asc-catalog-price-list.pdf') }}" class="purchasing-link" target="_blank">Catalog & Price List</a></li>
                                             </ul>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="section-subtitle">ASC Letter of Award</div>
                                             <ul class="purchasing-list">
-                                                <li><a href="#" class="purchasing-link" target="_blank">ASC Letter</a></li>
-                                                <li><a href="#" class="purchasing-link" target="_blank">2020 Renewal</a></li>
+                                                <li><a href="{{ asset('coop-documents/asc-letter-of-award.pdf') }}" class="purchasing-link" target="_blank">ASC Letter</a></li>
+                                                <li><a href="{{ asset('coop-documents/asc-2020-renewal.pdf') }}" class="purchasing-link" target="_blank">2020 Renewal</a></li>
                                             </ul>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="section-subtitle">Joining ASC Purchasing Cooperative</div>
                                             <ul class="purchasing-list">
-                                                <li><a href="#" class="purchasing-link" target="_blank">Form to Join ASC</a></li>
-                                                <li><a href="#" class="purchasing-link" target="_blank">Board Resolution Template</a></li>
+                                                <li><a href="{{ asset('coop-documents/asc-membership-form.pdf') }}" class="purchasing-link" target="_blank">Form to Join ASC</a></li>
+                                                <li><a href="{{ asset('coop-documents/asc-board-resolution-template.pdf') }}" class="purchasing-link" target="_blank">Board Resolution Template</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -150,11 +150,11 @@
                                 <div class="card-body">
                                     <div class="section-subtitle">Files for First Choice</div>
                                     <ul class="purchasing-list">
-                                        <li><a href="#" class="purchasing-link" target="_blank">Conditions of Membership</a></li>
-                                        <li><a href="#" class="purchasing-link" target="_blank">Intent Form</a></li>
-                                        <li><a href="#" class="purchasing-link" target="_blank">Member W9</a></li>
-                                        <li><a href="#" class="purchasing-link" target="_blank">New Facility Info Sheet</a></li>
-                                        <li><a href="#" class="purchasing-link" target="_blank">Contracted Member List</a></li>
+                                        <li><a href="{{ asset('coop-documents/first-choice-conditions-of-membership.docx') }}" class="purchasing-link" target="_blank">Conditions of Membership</a></li>
+                                        <li><a href="{{ asset('coop-documents/first-choice-intent-form.docx') }}" class="purchasing-link" target="_blank">Intent Form</a></li>
+                                        <li><a href="{{ asset('coop-documents/first-choice-member-w9.pdf') }}" class="purchasing-link" target="_blank">Member W9</a></li>
+                                        <li><a href="{{ asset('coop-documents/first-choice-new-facility-info-sheet.doc') }}" class="purchasing-link" target="_blank">New Facility Info Sheet</a></li>
+                                        <li><a href="{{ asset('coop-documents/first-choice-contracted-member-list.xlsx') }}" class="purchasing-link" target="_blank">Contracted Member List</a></li>
                                     </ul>
                                 </div>
                             </div>
