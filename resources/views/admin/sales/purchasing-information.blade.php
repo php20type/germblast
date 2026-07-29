@@ -19,7 +19,7 @@
         }
         .purchasing-card .card-header h5 {
             color: #374151;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             margin: 0;
             text-transform: uppercase;
@@ -30,7 +30,7 @@
         }
         .section-subtitle {
             color: #6b7280;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -49,7 +49,7 @@
             position: relative;
             padding-left: 16px;
             margin-bottom: 8px;
-            font-size: 14px;
+            font-size: 16px;
         }
         .purchasing-list li::before {
             content: "•";
@@ -72,7 +72,7 @@
         }
         .contract-text {
             color: #1f2937;
-            font-size: 14px;
+            font-size: 16px;
             margin-bottom: 10px;
             font-weight: 500;
         }
