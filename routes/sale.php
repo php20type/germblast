@@ -21,4 +21,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('meeting/{id}/complete', [SaleController::class, 'complete_meeting'])->name('sales.meeting.complete');
 
     Route::get('/sales/invoices', [SaleController::class, 'invoices'])->name('sales.invoices');
+    Route::get('/sales/contract-exception-report', [SaleController::class, 'contractExceptionReport'])->name('sales.contract_exception_report');
+    Route::get('/sales/purchasing-information', [SaleController::class, 'purchasingInformation'])->name('sales.purchasing_information');
 });

@@ -30,6 +30,14 @@
                 Equipment Loan
             </a>
 
+            <a class="nav-link {{ request()->routeIs('admin.sales.contract_exception_report') ? 'active' : '' }}" href="{{ route('admin.sales.contract_exception_report') }}">
+                Contract Exception Report
+            </a>
+
+            <a class="nav-link {{ request()->routeIs('admin.sales.purchasing_information') ? 'active' : '' }}" href="{{ route('admin.sales.purchasing_information') }}">
+                Purchasing Information
+            </a>
+
             <div id="nothing-found" style="display:none; color: rgba(255,255,255,0.6); padding: 10px 0;">Nothing found.</div>
         </div>
     </div>

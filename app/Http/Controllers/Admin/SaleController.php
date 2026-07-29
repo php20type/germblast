@@ -705,4 +705,22 @@ class SaleController extends Controller implements HasMiddleware
 
         return view('admin.sales.invoices', compact('invoices', 'invoicesCount'));
     }
+    public function contractExceptionReport(Request $request)
+    {
+        $leads = Lead::with(['company', 'surveyProposal'])
+            ->where('lead_status', 'won')
+            ->where(function ($query) {
+                $query->where('is_received_signed_proposal', false)
+                      ->orWhereNull('is_received_signed_proposal');
+            })
+            ->orderBy('close_date', 'desc')
+            ->get();
+
+        return view('admin.sales.contract-exception-report', compact('leads'));
+    }
+
+    public function purchasingInformation()
+    {
+        return view('admin.sales.purchasing-information');
+    }
 }
