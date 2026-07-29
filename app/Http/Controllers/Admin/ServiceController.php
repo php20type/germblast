@@ -477,8 +477,7 @@ class ServiceController extends Controller implements HasMiddleware
                 $slotHours = $staff->slot_hours ?? 0;
                 $employees[$userId]['totalScheduledHours'] += $slotHours;
                 $employees[$userId]['scheduledDays'][$slotIndex] = $slotHours;
-                $employees[$userId]['budgetedAmount'] += ($slotHours * ($user->hourly_rate ?? 0));
-                
+
                 // Actual worked: if anyone clocked for this slot, every assigned staff member gets the actual clocked hours of that slot
                 $clockedHours = 0;
                 if ($slot->clocks->isNotEmpty()) {
@@ -490,11 +489,19 @@ class ServiceController extends Controller implements HasMiddleware
             }
         }
 
+        // Budgeted $ = (Order Price ÷ $86.25/hr) × $24.15/hr, split evenly across every distinct employee on the order
+        $price = $order->service->price_per_service ?? 0;
+        $budgetHoursTotal = $price / 86.25;
+        $budgetAmountTotal = $budgetHoursTotal * 24.15;
+        $employeeCount = count($employees);
+        $budgetedPerEmployee = $employeeCount > 0 ? $budgetAmountTotal / $employeeCount : 0;
+
         // Calculate variances and overtime for each employee
         foreach ($employees as $userId => &$emp) {
             $priorWorkedHours = $emp['priorWorkedHours'];
             $totalWorkedHoursInJob = $emp['actualWorkedHours'];
             $maxHoursLimit = $emp['maxHoursLimit'] ?? 40;
+            $emp['budgetedAmount'] = $budgetedPerEmployee;
 
             if ($priorWorkedHours >= $maxHoursLimit) {
                 $emp['regularHours'] = 0;
@@ -514,7 +521,7 @@ class ServiceController extends Controller implements HasMiddleware
             $emp['deviationFromSchedule'] = $emp['actualWorkedHours'] - $emp['totalScheduledHours'];
             $emp['extendedActualCost'] = ($emp['hourlyRate'] * $emp['regularHours']) + ($emp['overtimeRate'] * $emp['overtimeHours']);
             $emp['totalWithBenefits'] = $emp['extendedActualCost'] * 1.20;
-            $emp['budgetVariance'] = $emp['budgetedAmount'] - $emp['totalWithBenefits'];
+            $emp['budgetVariance'] = $emp['totalWithBenefits'] - $emp['budgetedAmount'];
         }
 
         return view('admin.leads.service-audit', compact('order', 'slots', 'employees'));

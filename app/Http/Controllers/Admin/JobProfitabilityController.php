@@ -152,7 +152,9 @@ class JobProfitabilityController extends Controller implements HasMiddleware
                 $price = $order->service->price_per_service ?? $order->service->total_price ?? 0;
             }
 
-            $budgetHours = 0;
+            // Budget Hours = Order Price ÷ $86.25/hr; Budget $ = Budget Hours × $24.15/hr
+            $budgetHours = $price / 86.25;
+            $budgetedAmountTotal = $budgetHours * 24.15;
             $hasClocks = false;
 
             $employees = [];
@@ -214,15 +216,10 @@ class JobProfitabilityController extends Controller implements HasMiddleware
                             'overtimeRate' => $user->overtime_rate ?? 0,
                             'actualWorkedHours' => 0,
                             'priorWorkedHours' => $priorWorkedHours,
-                            'budgetedAmount' => 0,
                             'maxHoursLimit' => $maxHoursLimit,
                         ];
                     }
-                    
-                    $slotHours = $staff->slot_hours ?? 0;
-                    $budgetHours += $slotHours;
-                    $employees[$userId]['budgetedAmount'] += ($slotHours * ($user->hourly_rate ?? 0));
-                    
+
                     $clockedHours = 0;
                     if ($slot->clocks->isNotEmpty()) {
                         foreach ($slot->clocks as $clock) {
@@ -235,7 +232,6 @@ class JobProfitabilityController extends Controller implements HasMiddleware
 
             $actualWorkedHoursTotal = 0;
             $overtimeHoursTotal = 0;
-            $budgetedAmountTotal = 0;
             $totalWithBenefitsTotal = 0;
 
             foreach ($employees as $userId => $emp) {
@@ -262,14 +258,8 @@ class JobProfitabilityController extends Controller implements HasMiddleware
                 
                 $extendedActualCost = ($emp['hourlyRate'] * $regularHours) + ($emp['overtimeRate'] * $overtimeHours);
                 $totalWithBenefits = $extendedActualCost * 1.20;
-                
-                $budgetedAmountTotal += $emp['budgetedAmount'];
-                $totalWithBenefitsTotal += $totalWithBenefits;
-            }
 
-            if (empty($employees)) {
-                $budgetHours = $order->orderSlots->sum('scheduled_hours');
-                $budgetedAmountTotal = $budgetHours * 25;
+                $totalWithBenefitsTotal += $totalWithBenefits;
             }
 
             $actualHours = $actualWorkedHoursTotal;
@@ -284,7 +274,7 @@ class JobProfitabilityController extends Controller implements HasMiddleware
             if ($hasSlots) {
                 $ratioHours = $budgetHours > 0 ? $actualHours / $budgetHours : 0;
                 $ratioLabor = $budgetLabor > 0 ? $actualLabor / $budgetLabor : 0;
-                $delta = $budgetLabor - $actualLabor;
+                $delta = $actualLabor - $budgetLabor;
 
                 // Format values
                 $displayHours = $actualHours > 0 ? number_format($actualHours, 2) : '0.00';
