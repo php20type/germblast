@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\InventoryReportController;
 use App\Http\Controllers\Admin\JobProfitabilityController;
 use App\Http\Controllers\Admin\ChangeControlController;
 use App\Http\Controllers\Admin\BusinessFailureController;
+use App\Http\Controllers\Admin\IsdAttendanceController;
 use App\Http\Controllers\Admin\LoanEquipmentController;
 use App\Http\Controllers\Admin\AnonymousFeedbackController;
 use App\Http\Controllers\Admin\TimeOffRequestController;
@@ -236,6 +237,23 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('business-failures', [BusinessFailureController::class, 'index'])->name('failures.index');
     Route::post('business-failures', [BusinessFailureController::class, 'store'])->name('failures.store');
     Route::post('business-failures/{id}/documentation', [BusinessFailureController::class, 'storeDocumentation'])->name('failures.documentation.store');
+
+    // ISD Attendance Module
+    Route::get('isd-attendance', [IsdAttendanceController::class, 'index'])->name('isd-attendance.index');
+    Route::get('isd-attendance/campus/{campusId}', [IsdAttendanceController::class, 'attendance'])->name('isd-attendance.campus');
+    Route::post('isd-attendance/store', [IsdAttendanceController::class, 'store'])->name('isd-attendance.store');
+    Route::put('isd-attendance/{id}/update', [IsdAttendanceController::class, 'update'])->name('isd-attendance.update');
+    Route::delete('isd-attendance/{id}/destroy', [IsdAttendanceController::class, 'destroy'])->name('isd-attendance.destroy');
+
+    // ISD School Management
+    Route::post('isd-attendance/school', [IsdAttendanceController::class, 'storeSchool'])->name('isd-attendance.school.store');
+    Route::put('isd-attendance/school/{id}', [IsdAttendanceController::class, 'updateSchool'])->name('isd-attendance.school.update');
+    Route::delete('isd-attendance/school/{id}', [IsdAttendanceController::class, 'destroySchool'])->name('isd-attendance.school.destroy');
+
+    // ISD Campus Management
+    Route::post('isd-attendance/campus', [IsdAttendanceController::class, 'storeCampus'])->name('isd-attendance.campus.store');
+    Route::put('isd-attendance/campus/{id}', [IsdAttendanceController::class, 'updateCampus'])->name('isd-attendance.campus.update');
+    Route::delete('isd-attendance/campus/{id}', [IsdAttendanceController::class, 'destroyCampus'])->name('isd-attendance.campus.destroy');
 });
 
 Route::view('survey-proposal.pdf', 'survey-proposal.pdf')->name('survey.proposal');

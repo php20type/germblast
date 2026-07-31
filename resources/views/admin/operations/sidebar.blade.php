@@ -16,6 +16,10 @@
             </a>
             @endcan
 
+            <a class="nav-link {{ request()->routeIs('admin.isd-attendance.*') ? 'active' : '' }}" href="{{ route('admin.isd-attendance.index') }}">
+                ISD Attendance
+            </a>
+
             @can('business_failures.view')
             <a class="nav-link {{ request()->routeIs('admin.failures.*') ? 'active' : '' }}"
                 href="{{ route('admin.failures.index') }}">
