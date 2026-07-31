@@ -204,10 +204,10 @@ class CompanyController extends Controller
             }
 
             // Step 4: Store locations
-            if ($request->address_1 || $request->location_name) {
+            if ($request->address_1) {
                 CompanyLocation::create([
                     'company_id' => $company->id,
-                    'location_name' => $request->location_name ?? 'Primary Location',
+                    'location_name' => $request->name,
                     'address_1' => $request->address_1,
                     'address_2' => $request->address_2,
                     'country_id' => $request->country_id,

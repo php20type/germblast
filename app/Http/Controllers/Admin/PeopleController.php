@@ -887,6 +887,15 @@ class PeopleController extends Controller
 
     public function store(Request $request)
     {
+        $companyName = null;
+        if ($request->company_id) {
+            $company = Company::find($request->company_id);
+            if ($company) {
+                $companyName = $company->name;
+            }
+        }
+        $request->merge(['location_name' => $companyName ?? 'Primary Location']);
+
         try {
             // Step 1: Create people
             $people = People::create([

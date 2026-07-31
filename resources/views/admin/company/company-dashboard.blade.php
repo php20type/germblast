@@ -131,13 +131,15 @@
             border-color: rgba(255, 184, 28, 0.25) !important;
         }
 
-        .status-pill-confirmed {
+        .status-pill-confirmed,
+        .status-pill-open {
             background-color: rgba(13, 110, 253, 0.12) !important;
             color: #0d6efd !important;
             border-color: rgba(13, 110, 253, 0.2) !important;
         }
 
-        .equipment-report-table tbody tr.row-status-confirmed td {
+        .equipment-report-table tbody tr.row-status-confirmed td,
+        .equipment-report-table tbody tr.row-status-open td {
             background-color: #f0f7ff !important;
         }
 
@@ -513,17 +515,15 @@
                                     <div class="section-card">
                                         <div class="section-header d-flex justify-content-between align-items-center">
                                             <h3 class="section-title">Services</h3>
-                                            <div class="d-flex gap-2">
+                                            {{-- <div class="d-flex gap-2">
                                                 <button class="btn btn-sm btn-export">Schedule Response</button>
                                                 <button class="btn btn-sm btn-add-audience">Schedule RGB</button>
-                                            </div>
+                                            </div> --}}
                                         </div>
 
                                         <p class="small text-muted">
                                             Legend:
-                                            <span class="status-pill status-pill-pending">Pending</span>,
-                                            <span class="status-pill status-pill-scheduled">Scheduled</span>,
-                                            <span class="status-pill status-pill-confirmed">Confirmed</span>,
+                                            <span class="status-pill status-pill-open">Open</span>,
                                             <span class="status-pill status-pill-completed">Completed</span>,
                                             <span class="status-pill status-pill-cancelled">Cancelled</span>
                                         </p>
@@ -534,24 +534,15 @@
                                                     <tr>
                                                         <th>Service Info</th>
                                                         <th>Dates</th>
-                                                        <th>Status</th>
+                                                        {{-- <th>Status</th> --}}
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                      @forelse ( $serviceOrders as $order)
                                                          @php
-                                                             $displayStatus = $order->status ?? 'pending';
-                                                             if ($order->orderSlots->where('status', 'completed')->count() > 0) {
-                                                                 $displayStatus = 'completed';
-                                                             } elseif ($order->orderSlots->where('status', 'confirmed')->count() > 0) {
-                                                                 $displayStatus = 'confirmed';
-                                                             } elseif ($order->orderSlots->where('status', 'scheduled')->count() > 0) {
-                                                                 $displayStatus = 'scheduled';
-                                                             }
+                                                             $displayStatus = strtolower($order->status ?? 'open');
                                                              $rowClass = match($displayStatus) {
-                                                                 'pending'     => 'row-status-pending',
-                                                                 'scheduled'   => 'row-status-scheduled',
-                                                                 'confirmed'   => 'row-status-confirmed',
+                                                                 'open'        => 'row-status-open',
                                                                  'completed'   => 'row-status-completed',
                                                                  'cancelled'   => 'row-status-cancelled',
                                                                  default       => ''
@@ -559,9 +550,36 @@
                                                          @endphp
                                                          <tr class="{{ $rowClass }} small">
                                                             <td>
-                                                                <a href="{{ route('admin.lead.service.service_dashboard', $order->id) }}" class="text-decoration-none text-primary">
-                                                                    Order ID: {{ $order->order_no }}
-                                                                </a>
+                                                                <div class="d-flex align-items-center justify-content-between">
+                                                                    <div>
+                                                                        <a href="{{ route('admin.lead.service.service_dashboard', $order->id) }}" class="text-decoration-none text-primary">
+                                                                            Order ID: {{ $order->order_no }}
+                                                                        </a>
+                                                                    </div>
+                                                                    
+                                                                    <div class="dropdown">
+                                                                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                            Actions
+                                                                        </button>
+                                                                        <ul class="dropdown-menu">
+                                                                            @if($displayStatus !== 'cancelled')
+                                                                                <li>
+                                                                                    <form action="{{ route('admin.lead.service.order.cancel', $order->id) }}" method="POST" class="d-inline form-cancel-order w-100">
+                                                                                        @csrf
+                                                                                        <button type="submit" class="dropdown-item text-danger w-100 text-start border-0 bg-transparent">Cancel Order</button>
+                                                                                    </form>
+                                                                                </li>
+                                                                            @else
+                                                                                <li>
+                                                                                    <form action="{{ route('admin.lead.service.order.reopen', $order->id) }}" method="POST" class="d-inline form-reopen-order w-100">
+                                                                                        @csrf
+                                                                                        <button type="submit" class="dropdown-item text-success w-100 text-start border-0 bg-transparent">Re-Open Order</button>
+                                                                                    </form>
+                                                                                </li>
+                                                                            @endif
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
                                                                 <div class="mt-1">
                                                                     <strong>{{ $order->service->service_name }}</strong>
                                                                 </div>
@@ -587,15 +605,17 @@
                                                                     <div class="text-muted small mt-1">No slots scheduled yet.</div>
                                                                 @endif
                                                             </td>
+                                                            {{-- 
                                                             <td>
                                                                 <span class="status-pill status-pill-{{ $displayStatus }}">
                                                                     {{ ucfirst(str_replace('_', ' ', $displayStatus)) }}
                                                                 </span>
                                                             </td>
+                                                            --}}
                                                         </tr>
                                                     @empty
                                                         <tr>
-                                                            <td colspan="3" class="text-muted text-center py-4">
+                                                            <td colspan="2" class="text-muted text-center py-4">
                                                                 No services scheduled.
                                                             </td>
                                                         </tr>
@@ -1297,7 +1317,41 @@
                 });
             });
 
+            $('.form-cancel-order').submit(function(e) {
+                e.preventDefault();
+                let form = this;
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you really want to cancel this order?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, cancel it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
 
+            $('.form-reopen-order').submit(function(e) {
+                e.preventDefault();
+                let form = this;
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to re-open this order?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, re-open it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
 
         });
     </script>

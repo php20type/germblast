@@ -194,7 +194,8 @@
             border-color: rgba(255, 184, 28, 0.25) !important;
         }
 
-        .status-pill-confirmed {
+        .status-pill-confirmed,
+        .status-pill-open {
             background-color: rgba(13, 110, 253, 0.12) !important;
             color: #0d6efd !important;
             border-color: rgba(13, 110, 253, 0.2) !important;
@@ -267,8 +268,11 @@
                                         </select>
                                     </form>
                                     --}}
-                                    <span class="status-pill status-pill-{{ $order->status ?? 'pending' }}">
-                                        {{ ucfirst(str_replace('_', ' ', $order->status ?? 'pending')) }}
+                                    @php
+                                        $displayOrderStatus = strtolower($order->status ?? 'open');
+                                    @endphp
+                                    <span class="status-pill status-pill-{{ $displayOrderStatus }}">
+                                        {{ ucfirst(str_replace('_', ' ', $displayOrderStatus)) }}
                                     </span>
                                 </div>
                             </div>
@@ -474,7 +478,7 @@
                                                         <th>Recurrence</th>
                                                         <th>Clock In</th>
                                                         <th>Clock Out</th>
-                                                        <th>Status</th>
+                                                        {{-- <th>Status</th> --}}
                                                         {{-- <th>Action</th> --}}
                                                     </tr>
                                                 </thead>
@@ -493,11 +497,13 @@
                                                             <td>{{ $slot->scheduled_recurrence_rule }}</td>
                                                             <td>{{ $slot->clocked_in_at ?? '-' }}</td>
                                                             <td>{{ $slot->clocked_out_at ?? '-' }}</td>
+                                                            {{--
                                                             <td>
-                                                                <span class="status-pill status-pill-{{ $slot->status ?? 'pending' }}">
-                                                                    {{ ucfirst(str_replace('_', ' ', $slot->status ?? 'pending')) }}
+                                                                <span class="status-pill status-pill-{{ $slot->status ?? 'scheduled' }}">
+                                                                    {{ ucfirst(str_replace('_', ' ', $slot->status ?? 'scheduled')) }}
                                                                 </span>
                                                             </td>
+                                                            --}}
                                                             {{--
                                                             <td>
                                                                 <form action="{{ route('admin.lead.service.slot.update_status', $slot->id) }}" method="POST" class="d-flex align-items-center gap-1 mb-0">
@@ -539,11 +545,11 @@
                                                 <div class="section-header d-flex justify-content-between align-items-center mb-3">
                                                     <div class="d-flex align-items-center gap-2">
                                                         <h5 class="section-title mb-0">Slot #{{ $loop->iteration }}</h5>
-                                                        <span class="status-pill status-pill-{{ $slot->status ?? 'pending' }}" style="font-size: 11px !important; padding: 4px 10px !important;">
-                                                            {{ ucfirst(str_replace('_', ' ', $slot->status ?? 'pending')) }}
+                                                        <span class="status-pill status-pill-{{ $slot->status ?? 'scheduled' }}" style="font-size: 11px !important; padding: 4px 10px !important;">
+                                                            {{ ucfirst(str_replace('_', ' ', $slot->status ?? 'scheduled')) }}
                                                         </span>
                                                     </div>
-                                                    @if($slot->is_confirmed)
+                                                    @if($slot->status === 'confirmed' || $slot->is_confirmed)
                                                         <span class="badge bg-success fs-6 px-3 py-2">
                                                             <i class="fas fa-check-circle me-1"></i> Confirmed
                                                         </span>
@@ -595,7 +601,7 @@
                                                 <div class="d-flex gap-2 justify-content-end">
 
                                                     {{-- Confirm Button --}}
-                                                    @if(!$slot->is_confirmed)
+                                                    @if($slot->status !== 'confirmed' && !$slot->is_confirmed)
                                                         @if($canEdit)
                                                             <form action="{{ route('admin.lead.service.slot.confirm', $slot->id) }}" method="POST">
                                                                 @csrf

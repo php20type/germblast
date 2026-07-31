@@ -154,6 +154,7 @@ class ServiceController extends Controller implements HasMiddleware
             'user_id'       => auth()->id(),
             'service_id'    => $service->id,
             'intended_date' => $request->intended_date,
+            'status'        => 'open',
         ]);
 
         $order->update([
@@ -198,7 +199,7 @@ class ServiceController extends Controller implements HasMiddleware
                 'user_id' => auth()->id(),
                 'service_id' => $service->id,
                 'intended_date' => $date,
-                'status' => 'scheduled',
+                'status' => 'open',
             ]);
 
             $order->update([
@@ -340,7 +341,9 @@ class ServiceController extends Controller implements HasMiddleware
             abort(403, 'Unauthorized access to fulfill order.');
         }
 
-        $order = ServiceOrder::with([
+        $order = ServiceOrder::findOrFail($orderId);
+
+        $order->load([
             'invoice',
             'invoices.creator',
             'invoices.updater',
@@ -357,7 +360,7 @@ class ServiceController extends Controller implements HasMiddleware
             'employeePerformances.employee',
             'employeePerformances.issue',
             'employeePerformances.user',
-        ])->findOrFail($orderId);
+        ]);
 
         $companyLocations = $order->service->lead->company->locations;
         $territories = Territory::orderBy('name')->get();
@@ -533,7 +536,9 @@ class ServiceController extends Controller implements HasMiddleware
             abort(403, 'Unauthorized access to service dashboard.');
         }
 
-        $order = ServiceOrder::with([
+        $order = ServiceOrder::findOrFail($orderId);
+
+        $order->load([
             'invoice',
             'orderSlots.clocks.clockedBy',
             'orderSlots.confirmedBy',
@@ -552,7 +557,7 @@ class ServiceController extends Controller implements HasMiddleware
             'equipmentRecords.creator',
             'equipmentRecords.equipment.type',
             'cleanPatches.creator',
-        ])->findOrFail($orderId);
+        ]);
 
         $companyLocations = $order->service->lead->company->locations;
         $territories = Territory::orderBy('name')->get();
@@ -742,6 +747,7 @@ class ServiceController extends Controller implements HasMiddleware
             'is_confirmed'             => false, // reset confirmation on edit
             'confirmed_at'             => null,
             'confirmed_by'             => null,
+            'status'                   => 'scheduled',
         ]);
 
         return redirect()->back()->with('success', 'Slot updated successfully.');
@@ -2141,6 +2147,32 @@ class ServiceController extends Controller implements HasMiddleware
         return redirect()->back()->with('success', 'Slot status updated to ' . ucfirst($newStatus) . ' successfully.');
     }
     */
+
+    public function cancelOrder(Request $request, $orderId)
+    {
+        $order = ServiceOrder::findOrFail($orderId);
+
+        if ($order->status === 'cancelled') {
+            return redirect()->back()->with('error', 'This order is already cancelled.');
+        }
+
+        $order->update(['status' => 'cancelled']);
+
+        return redirect()->back()->with('success', 'Order has been cancelled successfully.');
+    }
+
+    public function reopenOrder(Request $request, $orderId)
+    {
+        $order = ServiceOrder::findOrFail($orderId);
+
+        if ($order->status !== 'cancelled') {
+            return redirect()->back()->with('error', 'This order is not cancelled.');
+        }
+
+        $order->update(['status' => 'open']);
+
+        return redirect()->back()->with('success', 'Order has been reopened successfully.');
+    }
 
     public function generateInvoice(Request $request, $orderId)
     {

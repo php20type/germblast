@@ -1805,51 +1805,48 @@
                                 </div>
                             </div>
 
-                            <!-- Product Row Container -->
-                            <div id="productRowContainer" class="mt-3">
-                                <div class="row product-row">
-                                    <div class="col-lg-12">
-                                        <div class="form-group">
-                                            <label class="form-label">Product</label>
-                                            <span class="text-danger">*</span>
-                                            <select class="form-select mt-2" name="product_id[]">
-                                                <option value="">Select product...</option>
-                                                @foreach ($products as $product)
-                                                    <option value="{{ $product->id }}">{{ $product->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                            <!-- Product Section -->
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <label class="form-label fw-semibold mb-0">Products</label>
+                                        <span class="text-danger">*</span>
                                     </div>
-
-                                    <div class="col-lg-6">
-                                        <div class="form-group">
-                                            <label class="form-label">Qty :</label>
-                                            <span class="text-danger">*</span>
-                                            <input type="number" name="quantity[]" placeholder="Add quantity"
-                                                class="form-control" />
-                                        </div>
-                                    </div>
-
-                                    <div class="col-lg-6">
-                                        <div class="form-group d-flex justify-content-between align-items-end">
-                                            <div style="width: 100%">
-                                                <label class="form-label">Price <span
-                                                        class="fw-light">(USD)</span></label>
-                                                <span class="text-danger">*</span>
-                                                <input type="number" name="price[]" step="0.01"
-                                                    placeholder="Add price" class="form-control" />
+                                    <button type="button" id="addProductRow" class="btn btn-sm btn-link text-primary p-0" style="font-size: 13px;">
+                                        <i class="fas fa-plus me-1"></i> Add New Product
+                                    </button>
+                                </div>
+                                <div id="productRowContainer">
+                                    <div class="product-row mb-2" style="border: 1px solid #dee2e6; border-radius: 8px; padding: 12px; background: #f9fafb;">
+                                        <div class="row g-2 align-items-end">
+                                            <div class="col-12">
+                                                <label class="form-label small text-muted mb-1">Name</label>
+                                                <select class="form-select" name="product_id[]">
+                                                    <option value="">Select product...</option>
+                                                    @foreach ($products as $product)
+                                                        <option value="{{ $product->id }}">{{ $product->name }}</option>
+                                                    @endforeach
+                                                </select>
                                             </div>
-                                            <button type="button"
-                                                class="btn btn-danger btn-sm ms-2 remove-product-row">X</button>
+                                            <div class="col-6">
+                                                <label class="form-label small text-muted mb-1">Qty</label>
+                                                <input type="number" name="quantity[]" placeholder="Quantity" class="form-control" />
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="d-flex align-items-end gap-2">
+                                                    <div class="flex-grow-1">
+                                                        <label class="form-label small text-muted mb-1">Price <span class="fw-light">(USD)</span></label>
+                                                        <input type="number" name="price[]" step="0.01" placeholder="Price" class="form-control" />
+                                                    </div>
+                                                    <button type="button" class="btn btn-outline-danger btn-sm remove-product-row" style="height:38px; padding: 0 10px;">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Add New Product Button -->
-                            <button type="button" id="addProductRow"
-                                class="btn btn-sm btn-link text-primary text-start">
-                                + Add New Product
-                            </button>
 
                             <div class="col-lg-12 mt-2">
                                 <div class="form-group">

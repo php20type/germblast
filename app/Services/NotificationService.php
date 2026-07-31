@@ -794,7 +794,7 @@ class NotificationService
             );
         }
 
-        $companyName = $order->service->lead->company->name ?? 'Unknown Company';
+        $companyName = $order?->service?->lead?->company?->name ?? 'Unknown Company';
         $this->sendInApp(
             $user,
             'Service Order Today',
@@ -835,7 +835,7 @@ class NotificationService
             );
         }
 
-        $companyName = clone($order)->service->lead->company->name ?? 'Unknown Company';
+        $companyName = $order?->service?->lead?->company?->name ?? 'Unknown Company';
         $this->sendInApp(
             $user,
             'Service Order Today (Sales)',

@@ -68,6 +68,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::post('order/{orderId}/clean-patch/save', [ServiceController::class, 'saveCleanPatch'])->name('service.order.clean_patch.save');
         Route::post('clean-patch/{patchId}/delete', [ServiceController::class, 'deleteCleanPatch'])->name('service.order.clean_patch.delete');
 
+        Route::post('order/{orderId}/cancel', [ServiceController::class, 'cancelOrder'])->name('service.order.cancel');
+        Route::post('order/{orderId}/reopen', [ServiceController::class, 'reopenOrder'])->name('service.order.reopen');
         // Route::post('order/{orderId}/status', [ServiceController::class, 'updateOrderStatus'])->name('service.order.update_status');
         // Route::post('service/slot/{slotId}/status', [ServiceController::class, 'updateSlotStatus'])->name('service.slot.update_status');
     });
