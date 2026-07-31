@@ -194,7 +194,8 @@
             border-color: rgba(255, 184, 28, 0.25) !important;
         }
 
-        .status-pill-confirmed {
+        .status-pill-confirmed,
+        .status-pill-open {
             background-color: rgba(13, 110, 253, 0.12) !important;
             color: #0d6efd !important;
             border-color: rgba(13, 110, 253, 0.2) !important;
@@ -242,8 +243,11 @@
                                 
                                 <div class="d-flex align-items-center gap-2 mt-2 mb-3">
                                     <span class="text-muted fw-semibold" style="font-size: 14px;">Order Status:</span>
-                                    <span class="status-pill status-pill-{{ $order->status ?? 'pending' }}">
-                                        {{ ucfirst(str_replace('_', ' ', $order->status ?? 'pending')) }}
+                                    @php
+                                        $displayOrderStatus = strtolower($order->status ?? 'open');
+                                    @endphp
+                                    <span class="status-pill status-pill-{{ $displayOrderStatus }}">
+                                        {{ ucfirst(str_replace('_', ' ', $displayOrderStatus)) }}
                                     </span>
                                 </div>
                             </div>
