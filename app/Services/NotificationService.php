@@ -103,10 +103,6 @@ class NotificationService
     {
         $recipients = collect();
 
-        if ($lead->assignee) {
-            $recipients->push($lead->assignee);
-        }
-
         $salesManagers = \App\Models\User::all()->filter(fn($u) => $u->isSalesManager());
         foreach ($salesManagers as $manager) {
             $recipients->push($manager);
@@ -742,11 +738,9 @@ class NotificationService
 
         // 1. Notify Assigned Staff
         if ($slot->staff) {
-            foreach ($slot->staff as $staffPivot) {
-                $staff = $staffPivot->user;
-                if ($staff) {
-                    $this->dayOfServiceStaffNotification($staff, $slot);
-                }
+            $staffUsers = $slot->staff->map(fn($pivot) => $pivot->user)->filter()->unique('id');
+            foreach ($staffUsers as $staff) {
+                $this->dayOfServiceStaffNotification($staff, $slot);
             }
         }
 
@@ -771,7 +765,7 @@ class NotificationService
         $service = $order->service ?? null;
 
         // Forced Email
-        if ($user->email) {
+        if ($this->sendEmail && $user->email) {
             SendEmailJob::dispatch(
                 $user->email,
                 'day_of_service_staff',
@@ -787,7 +781,7 @@ class NotificationService
         }
 
         // Forced SMS
-        if ($user->cell_phone) {
+        if ($this->sendSMS && $user->cell_phone) {
             SendSMSJob::dispatch(
                 $user->cell_phone,
                 "Reminder: You have a GermBlast Service Order scheduled today! Order #{$order->order_no} ({$service->service_name}) from " . $slot->scheduled_start_time->format('h:i A') . " to " . $slot->scheduled_end_time->format('h:i A') . "."
@@ -812,7 +806,7 @@ class NotificationService
         $service = $order->service ?? null;
 
         // Forced Email
-        if ($user->email) {
+        if ($this->sendEmail && $user->email) {
             SendEmailJob::dispatch(
                 $user->email,
                 'day_of_service_sales_rep',
@@ -828,7 +822,7 @@ class NotificationService
         }
 
         // Forced SMS
-        if ($user->cell_phone) {
+        if ($this->sendSMS && $user->cell_phone) {
             SendSMSJob::dispatch(
                 $user->cell_phone,
                 "Reminder: GermBlast Service Order #{$order->order_no} ({$service->service_name}) is scheduled today from " . $slot->scheduled_start_time->format('h:i A') . " to " . $slot->scheduled_end_time->format('h:i A') . "."
