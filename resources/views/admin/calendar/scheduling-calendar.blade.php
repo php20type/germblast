@@ -103,9 +103,6 @@
                                 </div>
                                 <div class="card-body p-0">
                                     <div class="d-flex gap-3 flex-wrap align-items-center">
-                                        <span style="background-color:#6c757d; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(108,117,125,0.15);">
-                                            ● Pending
-                                        </span>
                                         <span style="background-color:#ffb81c; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(255,184,28,0.15);">
                                             ● Scheduled
                                         </span>
@@ -114,9 +111,6 @@
                                         </span>
                                         <span style="background-color:#069697; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(6,150,151,0.15);">
                                             ● Completed
-                                        </span>
-                                        <span style="background-color:#dc3545; color:#fff; padding: 8px 18px; border-radius: 30px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: none; box-shadow: 0 2px 4px rgba(220,53,69,0.15);">
-                                            ● Cancelled
                                         </span>
                                     </div>
                                 </div>

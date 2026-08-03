@@ -1368,8 +1368,7 @@ class ServiceController extends Controller implements HasMiddleware
                     'scheduled'   => '#ffb81c',
                     'confirmed'   => '#0d6efd',
                     'completed'   => '#069697',
-                    'cancelled'   => '#dc3545',
-                    default       => '#6c757d',
+                    default       => '#ffb81c',
                 },
                 'extendedProps' => [
                     'order_id'     => $order->id,
