@@ -124,6 +124,9 @@ class EquipmentManagementController extends Controller implements HasMiddleware
                 'changed_by'   => auth()->id(),
             ]);
 
+            // Ensure we detach the equipment from all active slots to prevent "ghost" assignments
+            $equipment->slots()->detach();
+
             $equipment->update(['status' => Equipment::STATUS_DIRTY]);
 
             return back()->with('success', 'Equipment has been unassigned successfully.');
@@ -172,6 +175,12 @@ class EquipmentManagementController extends Controller implements HasMiddleware
         // ------------------------------------------------------------------
         $equipment->status      = $integerStatus;
         $equipment->save();
+
+        // If the equipment is transitioning to anything other than ASSIGNED,
+        // it must be detached from any active slots to prevent inconsistencies.
+        if ($integerStatus !== Equipment::STATUS_ASSIGNED) {
+            $equipment->slots()->detach();
+        }
 
         $newStatusText = config("mapping.equipment_status.{$integerStatus}", $newStatus);
         return back()->with('success', 'Equipment status updated to "' . ucfirst($newStatusText) . '" successfully.');

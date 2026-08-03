@@ -382,7 +382,7 @@
                                                             <span class="input-group-text bg-light border-end-0">
                                                                 <i class="fas fa-barcode"></i>
                                                             </span>
-                                                            <input type="text" name="barcode" class="form-control border-start-0 bg-light" placeholder="Scan or enter barcode for Slot #{{ $loop->iteration }}..." required>
+                                                            <input type="text" name="barcode" class="form-control border-start-0 bg-light" placeholder="Enter barcode for Slot #{{ $loop->iteration }}..." required>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-4">
