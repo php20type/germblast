@@ -17,6 +17,8 @@ use Illuminate\Validation\Rules;
 use Spatie\Permission\Models\Role;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use App\Models\Timecard;
+use App\Models\Company;
 
 class EmployeeController extends Controller implements HasMiddleware
 {
@@ -533,5 +535,221 @@ class EmployeeController extends Controller implements HasMiddleware
             'message' => $message,
             'data' => $availability,
         ]);
+    }
+
+    public function timecard_index(Request $request)
+    {
+        $dateParam = $request->input('date', now()->toDateString());
+        $start = \Carbon\Carbon::parse($dateParam)->startOfWeek();
+        $end = $start->copy()->endOfWeek();
+
+        $users = User::with(['timecards' => function($q) use ($start, $end) {
+            $q->whereBetween('work_date', [$start->toDateString(), $end->toDateString()]);
+        }])->orderBy('name', 'asc')->get();
+        
+        $grand_totals = [
+            'reg' => 0, 'drive' => 0, 'ride' => 0, 'ot' => 0, 'train' => 0,
+            'floor' => 0, 'covid' => 0, 'mrgb' => 0, 'wh' => 0, 'break' => 0, 'total' => 0
+        ];
+
+        foreach ($users as $user) {
+            $totals = [
+                'reg' => 0, 'drive' => 0, 'ride' => 0, 'ot' => 0, 'train' => 0,
+                'floor' => 0, 'covid' => 0, 'mrgb' => 0, 'wh' => 0, 'break' => 0, 'total' => 0
+            ];
+
+            foreach ($user->timecards as $tc) {
+                if ($tc->clock_in && $tc->clock_out) {
+                    $hours = \Carbon\Carbon::parse($tc->clock_in)->diffInMinutes(\Carbon\Carbon::parse($tc->clock_out)) / 60;
+                    $totals['total'] += $hours;
+                    
+                    if ($tc->clock_type == 4 || $tc->clock_type == 2) $totals['reg'] += $hours;
+                    if ($tc->clock_type == 1) $totals['ride'] += $hours;
+                    if ($tc->clock_type == 7) $totals['floor'] += $hours;
+                    if ($tc->clock_type == 8) $totals['covid'] += $hours;
+                    if ($tc->clock_type == 5) $totals['wh'] += $hours;
+                    if ($tc->clock_type == 6) $totals['train'] += $hours;
+                    if ($tc->clock_type == 3) $totals['break'] += $hours;
+                }
+            }
+
+            foreach ($totals as $key => $value) {
+                $grand_totals[$key] += $value;
+            }
+            
+            $user->totals = $totals;
+        }
+
+        return view('admin.operations.timecards.index', compact('users', 'grand_totals', 'start', 'end'));
+    }
+
+    public function timecard_details(Request $request, $id)
+    {
+        $dateParam = $request->input('date', now()->toDateString());
+        $start = \Carbon\Carbon::parse($dateParam)->startOfWeek();
+        $end = $start->copy()->endOfWeek();
+
+        $employee = User::with(['timecards' => function($q) use ($start, $end) {
+            $q->whereBetween('work_date', [$start->toDateString(), $end->toDateString()])->with('company');
+        }])->findOrFail($id);
+
+        $totals = [
+            'reg' => 0, 'drive' => 0, 'ride' => 0, 'ot' => 0, 'train' => 0,
+            'floor' => 0, 'covid' => 0, 'mrgb' => 0, 'wh' => 0, 'break' => 0, 'total' => 0
+        ];
+
+        foreach ($employee->timecards as $tc) {
+            if ($tc->clock_in && $tc->clock_out) {
+                $hours = \Carbon\Carbon::parse($tc->clock_in)->diffInMinutes(\Carbon\Carbon::parse($tc->clock_out)) / 60;
+                $tc->calculated_hours = round($hours, 2);
+                $totals['total'] += $hours;
+                
+                if ($tc->clock_type == 4 || $tc->clock_type == 2) $totals['reg'] += $hours;
+                if ($tc->clock_type == 1) $totals['ride'] += $hours;
+                if ($tc->clock_type == 7) $totals['floor'] += $hours;
+                if ($tc->clock_type == 8) $totals['covid'] += $hours;
+                if ($tc->clock_type == 5) $totals['wh'] += $hours;
+                if ($tc->clock_type == 6) $totals['train'] += $hours;
+                if ($tc->clock_type == 3) $totals['break'] += $hours;
+            } else {
+                $tc->calculated_hours = 0;
+            }
+        }
+        $employee->totals = $totals;
+        
+        $companies = Company::orderBy('name')->get();
+        $clock_types = config('mapping.timecard_clock_types', []);
+        return view('admin.operations.timecards.details', compact('employee', 'companies', 'clock_types', 'start', 'end'));
+    }
+
+    public function my_timeclock(Request $request)
+    {
+        $dateParam = $request->input('date', now()->toDateString());
+        $start = \Carbon\Carbon::parse($dateParam)->startOfWeek();
+        $end = $start->copy()->endOfWeek();
+
+        $employee = auth()->user();
+        $employee->load(['timecards' => function($q) use ($start, $end) {
+            $q->whereBetween('work_date', [$start->toDateString(), $end->toDateString()])->with('company');
+        }]);
+
+        $totals = [
+            'reg' => 0, 'drive' => 0, 'ride' => 0, 'ot' => 0, 'train' => 0,
+            'floor' => 0, 'covid' => 0, 'mrgb' => 0, 'wh' => 0, 'break' => 0, 'total' => 0
+        ];
+
+        foreach ($employee->timecards as $tc) {
+            if ($tc->clock_in && $tc->clock_out) {
+                $hours = \Carbon\Carbon::parse($tc->clock_in)->diffInMinutes(\Carbon\Carbon::parse($tc->clock_out)) / 60;
+                $tc->calculated_hours = round($hours, 2);
+                $totals['total'] += $hours;
+                
+                if ($tc->clock_type == 4 || $tc->clock_type == 2) $totals['reg'] += $hours;
+                if ($tc->clock_type == 1) $totals['ride'] += $hours;
+                if ($tc->clock_type == 7) $totals['floor'] += $hours;
+                if ($tc->clock_type == 8) $totals['covid'] += $hours;
+                if ($tc->clock_type == 5) $totals['wh'] += $hours;
+                if ($tc->clock_type == 6) $totals['train'] += $hours;
+                if ($tc->clock_type == 3) $totals['break'] += $hours;
+            } else {
+                $tc->calculated_hours = 0;
+            }
+        }
+        $employee->totals = $totals;
+
+        $companies = Company::orderBy('name')->get();
+        $clock_types = config('mapping.timecard_clock_types', []);
+        return view('admin.operations.timecards.my_timeclock', compact('employee', 'companies', 'clock_types', 'start', 'end'));
+    }
+
+    public function store_timecard(Request $request)
+    {
+        $request->validate([
+            'customer' => 'nullable|exists:companies,id',
+            'work_date' => 'required|date',
+            'clock_in' => 'required',
+            'clock_out' => 'nullable',
+            'clock_type' => 'required|integer|between:0,8',
+            'employee_id' => 'nullable|exists:users,id'
+        ]);
+
+        Timecard::create([
+            'user_id' => $request->employee_id ?? auth()->id(),
+            'company_id' => $request->customer,
+            'work_date' => $request->work_date,
+            'clock_in' => $request->clock_in,
+            'clock_out' => $request->clock_out,
+            'clock_type' => $request->clock_type,
+        ]);
+
+        return redirect()->back()->with('success', 'Timecard punch added successfully!');
+    }
+
+    public function update_timecard(Request $request, $id)
+    {
+        $request->validate([
+            'customer' => 'nullable|exists:companies,id',
+            'work_date' => 'required|date',
+            'clock_in' => 'required',
+            'clock_out' => 'nullable',
+            'clock_type' => 'required|integer|between:0,8',
+            'employee_id' => 'nullable|exists:users,id'
+        ]);
+
+        $timecard = Timecard::findOrFail($id);
+        
+        $timecard->update([
+            'company_id' => $request->customer,
+            'work_date' => $request->work_date,
+            'clock_in' => $request->clock_in,
+            'clock_out' => $request->clock_out,
+            'clock_type' => $request->clock_type,
+        ]);
+
+        return redirect()->back()->with('success', 'Timecard punch updated successfully!');
+    }
+
+    public function hr_timecards(Request $request)
+    {
+        $dateParam = $request->input('date', now()->toDateString());
+        $start = \Carbon\Carbon::parse($dateParam)->startOfWeek();
+        $end = $start->copy()->endOfWeek();
+
+        $users = User::with(['timecards' => function($q) use ($start, $end) {
+            $q->whereBetween('work_date', [$start->toDateString(), $end->toDateString()])->with('company');
+        }])->orderBy('name', 'asc')->get();
+        
+        $clock_types = config('mapping.timecard_clock_types', []);
+
+        foreach ($users as $user) {
+            $reg = 0;
+            $ot = 0;
+            $total = 0;
+
+            foreach ($user->timecards as $tc) {
+                if ($tc->clock_in && $tc->clock_out) {
+                    $hours = \Carbon\Carbon::parse($tc->clock_in)->diffInMinutes(\Carbon\Carbon::parse($tc->clock_out)) / 60;
+                    $tc->calculated_hours = round($hours, 2);
+                    $tc->clock_type_label = $clock_types[$tc->clock_type] ?? 'Unknown';
+                    $total += $hours;
+                }
+            }
+
+            if ($total > 40) {
+                $reg = 40;
+                $ot = $total - 40;
+            } else {
+                $reg = $total;
+                $ot = 0;
+            }
+
+            $user->week_stats = [
+                'reg_hours' => $reg,
+                'ot_hours' => $ot,
+                'total_hours' => $total,
+            ];
+        }
+
+        return view('admin.hr.timecards.index', compact('users', 'start', 'end'));
     }
 }

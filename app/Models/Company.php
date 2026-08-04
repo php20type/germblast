@@ -209,4 +209,9 @@ class Company extends Model
         return $this->hasMany(LoanEquipment::class, 'company_id');
     }
 
+    public function timecards()
+    {
+        return $this->hasMany(Timecard::class, 'company_id');
+    }
+
 }

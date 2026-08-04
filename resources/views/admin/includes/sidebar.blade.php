@@ -110,6 +110,7 @@
                 $isOperationsActive = request()->routeIs([
                     'admin.all_schedules.*',
                     'admin.isd-attendance.*',
+                    'admin.timecards.*',
                     'admin.failures.*',
                     'admin.hr.driver-report.*',
                     'admin.equipment-management.*',
@@ -202,6 +203,7 @@
             @php
                 $isHRActive = request()->routeIs([
                     'admin.employee.*',
+                    'admin.hr.timecards.*',
                     'admin.hr.time-off.*',
                     'admin.hr.praise.*',
                     'admin.hr.rewards.*',

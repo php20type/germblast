@@ -209,8 +209,18 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('hr/driver-report', [EmployeeController::class, 'driverReport'])->name('hr.driver-report.index');
     Route::post('hr/driver-report/{userId}', [EmployeeController::class, 'updateDriverReport'])->name('hr.driver-report.update');
 
+    // HR Timecards
+    Route::get('hr/timecards', [EmployeeController::class, 'hr_timecards'])->name('hr.timecards.index');
+
     // Employee Work Report
     Route::get('work-report', [EmployeeController::class, 'workReport'])->name('work-report.index');
+
+    // Timecards
+    Route::get('timecards', [EmployeeController::class, 'timecard_index'])->name('timecards.index');
+    Route::post('timecards', [EmployeeController::class, 'store_timecard'])->name('timecards.store');
+    Route::get('timecards/{id}', [EmployeeController::class, 'timecard_details'])->name('timecards.details');
+    Route::put('timecards/{id}', [EmployeeController::class, 'update_timecard'])->name('timecards.update');
+    Route::get('my-timeclock', [EmployeeController::class, 'my_timeclock'])->name('my-timeclock');
 
     // Inventory Report
     Route::get('inventory-report', [InventoryReportController::class, 'index'])->name('inventory-report.index');

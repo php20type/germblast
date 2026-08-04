@@ -16,6 +16,10 @@
             </a>
             @endcan
 
+            <a class="nav-link {{ request()->routeIs('admin.timecards.*') ? 'active' : '' }}" href="{{ route('admin.timecards.index') }}">
+                Time Sheets
+            </a>
+
             <a class="nav-link {{ request()->routeIs('admin.isd-attendance.*') ? 'active' : '' }}" href="{{ route('admin.isd-attendance.index') }}">
                 ISD Attendance
             </a>

@@ -55,4 +55,15 @@ return [
         29 => 'Healthcare',
         30 => 'Personal Protective Equipment/Uniform',
     ],
+    'timecard_clock_types' => [
+        0 => 'None',
+        1 => 'Travel',
+        2 => 'Service',
+        3 => 'Break',
+        4 => 'Office Work',
+        5 => 'Warehouse',
+        6 => 'Training',
+        7 => 'Service Prep',
+        8 => 'UMC',
+    ],
 ];

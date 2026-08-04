@@ -446,4 +446,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(EmployeeAvailability::class, 'user_id')->orderBy('start_date', 'desc');
     }
+
+    public function timecards()
+    {
+        return $this->hasMany(Timecard::class, 'user_id');
+    }
 }

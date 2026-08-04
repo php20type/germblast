@@ -15,6 +15,11 @@
                     Employee List & Management
                 </a>
             @endcan
+            
+            <a class="nav-link {{ request()->routeIs('admin.hr.timecards.*') ? 'active' : '' }}" href="{{ route('admin.hr.timecards.index') }}">
+                Timecards
+            </a>
+
 
             @can('time_off_request.view')
             <a class="nav-link {{ request()->routeIs('admin.hr.time-off.*') ? 'active' : '' }}" href="{{ route('admin.hr.time-off.index') }}">
