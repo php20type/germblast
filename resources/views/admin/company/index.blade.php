@@ -20,10 +20,18 @@
                                 <h3 class="mb-1">All COMPANIES <span style="font-size: 24px;">📌</span></h3>
                                 <p class="text-muted mb-0">Accounts and organizations you do business with</p>
                             </div>
-                            <div class="d-none right-part">
+                            <!-- <div class="d-none right-part">
                                 <button class="btn btn-email">Email</button>
                                 <button class="btn btn-export">EXPORT</button>
+                            </div> -->
+                            @can('company.create')
+                            <div class="right-part">
+                                <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#AddCompany">
+                                    <i class="fa-solid fa-plus"></i> 
+                                    Add Company
+                                </button>
                             </div>
+                            @endcan
                         </div>
 
                         <!-- Filter Section -->
@@ -515,6 +523,205 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+            <!-- Add Company Modal Start -->
+            <div class="modal fade" id="AddCompany" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-fullscreen">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title" id="exampleModalLabel">Add a company</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="{{ route('admin.company.store') }}" method="POST" class="company-form"
+                                id="add-company-form">
+                                @csrf
+                                <div class="row mx-0">
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label class="form-label">Company name</label>
+                                            <span class="text-danger">*</span>
+                                            <input type="text" name="name" placeholder="Name" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label class="form-label">Description</label>
+                                            <span class="text-danger">*</span>
+                                            <textarea name="description" rows="3"
+                                                placeholder="Add some description about the company..." class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="form-label">Email</label>
+                                            <span class="text-danger">*</span>
+                                            <input type="text" name="email" placeholder="example@gmail.com"
+                                                class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="form-label">Phone Number</label>
+                                            <span class="text-danger">*</span>
+                                            <input type="text" name="phone" placeholder="123-456-7890"
+                                                class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label class="form-label">Address Line 1</label>
+                                            <span class="text-danger">*</span>
+                                            <input type="text" name="address_1" class="form-control" placeholder="Street address">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label class="form-label">Address Line 2</label>
+                                            <input type="text" name="address_2" class="form-control" placeholder="Suite, floor, unit (optional)">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label class="form-label">Country</label>
+                                            <span class="text-danger">*</span>
+                                            <select name="country_id" class="form-select select2 country_select">
+                                                <option value="">Select Country</option>
+                                                @foreach ($countries as $country)
+                                                    <option value="{{ $country->id }}" {{ $country->id == 233 ? 'selected' : '' }}>{{ $country->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label class="form-label">State</label>
+                                            <span class="text-danger">*</span>
+                                            <select name="state_id" class="form-select select2 state_select">
+                                                <option value="">Select State</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label class="form-label">City</label>
+                                            <span class="text-danger">*</span>
+                                            <select name="city_id" class="form-select select2 city_select">
+                                                <option value="">Select City</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label class="form-label">Zip Code</label>
+                                            <span class="text-danger">*</span>
+                                            <input type="text" name="zip" class="form-control" placeholder="Postal / Zip code">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label class="form-label">Person</label>
+                                            {{-- <span class="text-danger">*</span> --}}
+                                            <select name="people_id" id="add_company_person_select" class="form-select select2">
+                                                <option value="">Select person</option>
+                                                @foreach ($peoples as $people)
+                                                    <option value="{{ $people->id }}">{{ $people->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label class="form-label">URL</label>
+                                            <span class="text-danger">*</span>
+                                            <input type="text" name="url" placeholder="https://" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label class="form-label">Tags</label>
+                                            <span class="text-danger">*</span>
+                                            <select name="tag_id" class="form-select">
+                                                <option value="">Select tag</option>
+                                                @foreach ($companytags as $companytag)
+                                                    <option value="{{ $companytag->id }}">{{ $companytag->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label class="form-label">Company Type</label>
+                                            <span class="text-danger">*</span>
+                                            <select name="company_type_id" class="form-select">
+                                                <option value="">Select company type</option>
+                                                @foreach ($company_types as $company_type)
+                                                    <option value="{{ $company_type->id }}">{{ $company_type->type }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label class="form-label">Tax Rate</label>
+                                            <select name="tax_rate" class="form-select">
+                                                <option value="">Please Select</option>
+                                                @foreach(config('mapping.tax_rates') as $value => $label)
+                                                    <option value="{{ $value }}">{{ $label }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label class="form-label">Assignee</label>
+                                            <span class="text-danger">*</span>
+                                            <select name="assignee_id" class="form-select">
+                                                <option value="">Select assignee</option>
+                                                @foreach ($users as $user)
+                                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label class="form-label">Industry</label>
+                                            <span class="text-danger">*</span>
+                                            <select name="industry_id" class="form-select">
+                                                <option value="">Select industry</option>
+                                                @foreach ($industries as $industry)
+                                                    <option value="{{ $industry->id }}">{{ $industry->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="form-group">
+                                            <label class="form-label">Territory</label>
+                                            <span class="text-danger">*</span>
+                                            <select name="territory_id" class="form-select">
+                                                <option value="">Select territory</option>
+                                                @foreach ($territories as $territory)
+                                                    <option value="{{ $territory->id }}">{{ $territory->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Add Company Modal End -->
 
         @endsection
         @push('scripts')
@@ -843,4 +1050,210 @@
 
                 });
             </script>
+
+            <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            $('#AddCompany').on('shown.bs.modal', function() {
+                $(this).find('.country_select').select2({
+                    dropdownParent: $('#AddCompany'),
+                    placeholder: 'Select Country',
+                    allowClear: true
+                });
+                $(this).find('.state_select').select2({
+                    dropdownParent: $('#AddCompany'),
+                    placeholder: 'Select State',
+                    allowClear: true
+                });
+                $(this).find('.city_select').select2({
+                    dropdownParent: $('#AddCompany'),
+                    placeholder: 'Select City',
+                    allowClear: true
+                });
+                $('#add_company_person_select').select2({
+                    dropdownParent: $('#AddCompany'),
+                    placeholder: 'Select person',
+                    allowClear: true
+                });
+                $(this).find('.country_select').trigger('change');
+            });
+
+        });
+
+
+        $(document).ready(function() {
+
+            // Companies storing and validation
+            $("#add-company-form").validate({
+                ignore: [],
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    description: {
+                        required: true
+                    },
+                    email: {
+                        required: true
+                    },
+                    phone: {
+                        required: true
+                    },
+                    address: {
+                        required: true
+                    },
+                    people_id: {
+                        required: false
+                    },
+                    url: {
+                        required: true,
+                        url: true
+                    },
+                    tag_id: {
+                        required: true
+                    },
+                    company_type_id: {
+                        required: true
+                    },
+                    assignee_id: {
+                        required: true
+                    },
+                    industry_id: {
+                        required: true
+                    },
+                    territory_id: {
+                        required: true
+                    },
+                },
+                messages: {
+                    name: {
+                        required: "Please enter Company name."
+                    },
+                    description: {
+                        required: "Please enter the description."
+                    },
+                    email: {
+                        required: "Please enter the email."
+                    },
+                    phone: {
+                        required: "Please enter the phone number."
+                    },
+                    address: {
+                        required: "Please enter the address."
+                    },
+                    // people_id: {
+                    //     required: "Please select the person."
+                    // },
+                    url: {
+                        required: "Please enter the url.",
+                        url: "The url field must be a valid URL."
+                    },
+                    tag_id: {
+                        required: "Please select a tag."
+                    },
+                    company_type_id: {
+                        required: "Please select a company type."
+                    },
+                    assignee_id: {
+                        required: "Please select an assignee."
+                    },
+                    industry_id: {
+                        required: "Please select an industry."
+                    },
+                    territory_id: {
+                        required: "Please select a territory."
+                    }
+
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent()); // Inserts after the .input-group
+                    } else {
+                        error.insertAfter(element); // Default
+                    }
+                }
+            });
+
+
+            // Submit Lead form
+            $('#add-company-form').submit(function(e) {
+                e.preventDefault();
+
+                const $form = $(this);
+                const $submitBtn = $form.find('button[type="submit"]');
+
+                if (!$form.valid()) return;
+
+                $.ajax({
+                    url: '{{ route('admin.company.store') }}',
+                    method: 'POST',
+                    data: $form.serialize(),
+
+                    beforeSend: function() {
+                        $submitBtn.prop('disabled', true).text('Saving...');
+                    },
+
+                    success: function() {
+                        toastr.success('Company created successfully! Redirecting...');
+                        $form[0].reset();
+
+                        setTimeout(() => {
+                            window.location.href =
+                                "{{ route('admin.company.index') }}";
+                        }, 1500);
+                    },
+
+                    error: function() {
+                        toastr.error('Something went wrong while creating the company.');
+                        $submitBtn.prop('disabled', false).text('Submit');
+                    }
+                });
+            });
+
+        // Address cascades for Add Location structures
+        $('.country_select').on('change', function() {
+            let countryId = $(this).val();
+            let modal = $(this).closest('.modal');
+            let stateSelect = modal.find('.state_select');
+            let citySelect = modal.find('.city_select');
+
+            stateSelect.empty().append('<option value="">Select State</option>').prop('disabled', true).trigger('change');
+            citySelect.empty().append('<option value="">Select City</option>').prop('disabled', true).trigger('change');
+
+            if (!countryId) return;
+            $.get(`/states/` + countryId, function(states) {
+                stateSelect.prop('disabled', false);
+                $.each(states, function(i, state) {
+                    stateSelect.append(`<option value="` + state.state_id + `">` + state.name + `</option>`);
+                });
+                if (countryId == 233) {
+                    stateSelect.val('1407').trigger('change');
+                }
+            });
+        });
+
+        $('.state_select').on('change', function() {
+            let stateId = $(this).val();
+            let modal = $(this).closest('.modal');
+            let citySelect = modal.find('.city_select');
+
+            citySelect.empty().append('<option value="">Select City</option>').prop('disabled', true).trigger('change');
+            if (!stateId) return;
+            $.get(`/cities/` + stateId, function(cities) {
+                citySelect.prop('disabled', false);
+                $.each(cities, function(i, city) {
+                    citySelect.append(`<option value="` + city.id + `">` + city.name + `</option>`);
+                });
+            });
+        });
+    });
+    </script>
         @endpush

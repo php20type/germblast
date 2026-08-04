@@ -69,6 +69,8 @@ Route::middleware('auth')->group(function () {
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     Route::get('dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('forms', [AdminController::class, 'forms'])->name('forms.index');
+    Route::get('imports', [AdminController::class, 'imports'])->name('imports.index');
     Route::get('global-search', [AdminController::class, 'search'])->name('global-search');
 
     // Profile

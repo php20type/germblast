@@ -252,7 +252,11 @@
                                 </div>
                             </div>
                             <div class="right-part-sec">
-                                <div>
+                                <div class="d-flex gap-2">
+                                    <a class="btn btn-outline-secondary" href="javascript:history.back()">
+                                        <i class="fas fa-arrow-left me-1"></i> Back
+                                    </a>
+
                                     <a class="btn btn-export"
                                         href="{{ route('admin.lead.service.fulfill_order', $order->id) }}">
                                         ADMIN VIEW

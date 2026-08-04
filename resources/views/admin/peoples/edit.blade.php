@@ -291,12 +291,46 @@
                                 <div id="addCompanyForm" class="mt-3" style="display: none;">
                                     <div class="mb-3">
                                         <select class="form-select company-update" data-field="" id="companiesSelect">
-                                            <option selected>Add Company</option>
+                                            <option selected>Select Company</option>
                                             @foreach ($availableCompanies as $company)
                                                 <option value="{{ $company->id }}">{{ $company->name }}</option>
                                             @endforeach
                                         </select>
+                                        <div class="mt-2">
+                                            <a href="javascript:void(0)" id="toggleCreateCompanyForm" class="text-warning"><i class="fas fa-plus"></i> Create Company</a>
+                                        </div>
                                     </div>
+                                </div>
+                                <div id="createCompanyForm" class="my-3" style="display: none;">
+                                    <form id="addCompanyAjaxForm" action="{{ route('admin.company.store') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="people_id" value="{{ $peoples->id }}">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <input type="text" name="name" class="form-control" placeholder="Company Name" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <input type="email" name="email" class="form-control" placeholder="Email">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <input type="text" name="phone" class="form-control" placeholder="Phone Number">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <input type="text" name="address_1" class="form-control" placeholder="Address">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <button type="submit" class="btn btn-primary btn-sm">Save Company</button>
+                                        </div>
+                                    </form>
                                 </div>
                             @endcan
 
@@ -1877,7 +1911,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-12">
+                            <div class="col-lg-12 d-none">
                                 <div class="form-group">
                                     <label class="form-label">Select Person</label>
                                     <span class="text-danger">*</span>
@@ -2554,6 +2588,12 @@
                 });
             }
 
+            // Toggle Create Company Form
+            $('#toggleCreateCompanyForm').click(function(e) {
+                e.preventDefault();
+                $('#createCompanyForm').slideToggle();
+            });
+
             // Toggle Add Lead
             if (toggleLeadBtn && formLeadDiv) {
                 toggleLeadBtn.addEventListener('click', function(e) {
@@ -2646,11 +2686,70 @@
                         });
                     } else {
                         // Reset dropdown back to default if cancelled
-                        $('#companiesSelect').val("Add Company");
+                        $('#companiesSelect').val("Select Company");
                     }
                 });
             });
 
+            // ==============================
+            // Create Company ajax form validation and submission
+            // ==============================
+            $("#addCompanyAjaxForm").validate({
+                ignore: [],
+                rules: {
+                    name: { required: true },
+                    email: { email: true }
+                },
+                messages: {
+                    name: { required: "Please enter the company's name." },
+                    email: { email: "Please enter a valid email." }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+
+            $('#addCompanyAjaxForm').submit(function(e) {
+                e.preventDefault();
+
+                if (!$('#addCompanyAjaxForm').valid()) {
+                    return;
+                }
+
+                let form = $(this);
+                let actionUrl = form.attr('action');
+                let method = form.attr('method');
+                let formData = form.serialize();
+
+                $.ajax({
+                    url: actionUrl,
+                    method: method,
+                    data: formData,
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message || 'Company created successfully!',
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => {
+                            location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON?.message || 'Something went wrong.'
+                        });
+                    }
+                });
+            });
 
             // ==============================
             // Remove person from the company

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ActivityType;
 use App\Models\Company;
 use App\Models\Competitor;
+use App\Models\Country;
 use App\Models\Industry;
 use App\Models\Lead;
 use App\Models\People;
@@ -101,6 +102,8 @@ class PeopleController extends Controller
             'territories' => Territory::all(),
             'competitors' => Competitor::all(),
             'peopletags' => Tag::where('tag_id', 3)->get(),
+            'persontags' => Tag::where('tag_id', 3)->get(),
+            'countries' => Country::all(),
         ];
     }
 

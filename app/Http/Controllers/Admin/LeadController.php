@@ -195,6 +195,10 @@ class LeadController extends Controller
             'activity_types' => ActivityType::all(),
             'lead_stages' => LeadStage::all(),
             'leadtags' => Tag::where('tag_id', 1)->get(),
+            'products' => Product::all(),
+            'companies' => Company::all(),
+            'sources' => Source::all(),
+            'competitors' => Competitor::all(),
         ];
     }
 

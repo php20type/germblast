@@ -23,77 +23,85 @@
                 <!-- Top Row -->
                 @can('company.create')
                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-module">
-                    <div class="card-module" data-bs-toggle="modal" data-bs-target="#AddCompany">
+                    <div class="card-module">
                         <div class="icon-wrapper icon-company">
                             <img src={{ asset('img/icons/dashboard-app1.png') }} alt="app icon" />
                             <h5 class="card-title">COMPANY</h5>
                         </div>
-                        <p class="card-text">Organizations And Groups You May Do Business With</p>
+                        <p class="card-text mb-1">{{ $companies->count() }} Total Companies</p>
+                        <p class="card-text text-muted" style="font-size: 13px;">{{ $monthly_companies }} new this month</p>
+                        <div class="mt-3">
+                            <svg viewBox="0 0 100 30" preserveAspectRatio="none" style="width: 100%; height: 50px;">
+                                <path d="M0,25 C25,10 25,25 50,20 C75,15 75,5 100,15 L100,30 L0,30 Z" fill="rgba(111, 66, 193, 0.1)" />
+                                <path d="M0,25 C25,10 25,25 50,20 C75,15 75,5 100,15" fill="none" stroke="#6f42c1" stroke-width="1.5" />
+                            </svg>
+                        </div>
                     </div>
                 </div>
                 @endcan
 
                 @can('people.create')
                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-module">
-                    <div class="card-module" data-bs-toggle="modal" data-bs-target="#AddPerson">
+                    <div class="card-module">
                         <div class="icon-wrapper icon-person">
                             <img src={{ asset('img/icons/dashboard-app2.png') }} alt="app icon" />
                             <h5 class="card-title">PERSON</h5>
                         </div>
-                        <p class="card-text">Individuals You Know Or May Do Business With</p>
+                        <p class="card-text mb-1">{{ $peoples->count() }} Total People</p>
+                        <p class="card-text text-muted" style="font-size: 13px;">{{ $monthly_peoples }} new this month</p>
+                        <div class="mt-3">
+                            <svg viewBox="0 0 100 30" preserveAspectRatio="none" style="width: 100%; height: 50px;">
+                                <path d="M0,20 C25,5 25,30 50,20 C75,10 75,5 100,10 L100,30 L0,30 Z" fill="rgba(13, 110, 253, 0.1)" />
+                                <path d="M0,20 C25,5 25,30 50,20 C75,10 75,5 100,10" fill="none" stroke="#0d6efd" stroke-width="1.5" />
+                            </svg>
+                        </div>
                     </div>
                 </div>
                 @endcan
 
                 @can('lead.create')
                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-module">
-                    <div class="card-module" data-bs-toggle="modal" data-bs-target="#AddLead">
+                    <div class="card-module">
                         <div class="icon-wrapper icon-lead">
                             <img src={{ asset('img/icons/dashboard-app3.png') }} alt="app icon" />
                             <h5 class="card-title">LEAD</h5>
                         </div>
-                        <p class="card-text">A Deal Or Opportunity To Make A Sale</p>
+                        <p class="card-text mb-1">{{ $leads->count() }} Total Leads</p>
+                        <p class="card-text text-muted" style="font-size: 13px;">{{ $monthly_leads }} new this month</p>
+                        <div class="mt-3">
+                            <svg viewBox="0 0 100 30" preserveAspectRatio="none" style="width: 100%; height: 50px;">
+                                <path d="M0,15 C20,25 30,5 50,15 C70,25 80,5 100,10 L100,30 L0,30 Z" fill="rgba(25, 135, 84, 0.1)" />
+                                <path d="M0,15 C20,25 30,5 50,15 C70,25 80,5 100,10" fill="none" stroke="#198754" stroke-width="1.5" />
+                            </svg>
+                        </div>
                     </div>
                 </div>
                 @endcan
 
-                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-module">
-                    <div class="card-module" data-bs-toggle="modal" data-bs-target="#AddActivity">
+                {{-- <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-module">
+                    <div class="card-module">
                         <div class="icon-wrapper icon-activity">
                             <img src={{ asset('img/icons/dashboard-app4.png') }} alt="app icon" />
                             <h5 class="card-title">ACTIVITY</h5>
                         </div>
-                        <p class="card-text">Phone Calls, Meetings, And Other Interactions</p>
+                        <p class="card-text">{{ \App\Models\Activity::count() }} Activities</p>
                     </div>
-                </div>
+                </div> --}}
 
                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-module">
-                    <div class="card-module" data-bs-toggle="modal" data-bs-target="#AddTask">
+                    <div class="card-module">
                         <div class="icon-wrapper icon-task">
                             <img src={{ asset('img/icons/dashboard-app5.png') }} alt="app icon" />
                             <h5 class="card-title">TASK</h5>
                         </div>
-                        <p class="card-text">Reminders And Other Things You Don't Want To Forget</p>
-                    </div>
-                </div>
-
-                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-module">
-                    <div class="card-module">
-                        <div class="icon-wrapper icon-form">
-                            <img src={{ asset('img/icons/dashboard-app6.png') }} alt="app icon" />
-                            <h5 class="card-title">FORM</h5>
+                        <p class="card-text mb-1">{{ \App\Models\Task::whereNull('completed_time')->count() }} Incomplete Tasks</p>
+                        <p class="card-text text-muted" style="font-size: 13px;">{{ $monthly_tasks }} new this month</p>
+                        <div class="mt-3">
+                            <svg viewBox="0 0 100 30" preserveAspectRatio="none" style="width: 100%; height: 50px;">
+                                <path d="M0,10 C20,5 30,25 50,15 C70,5 80,25 100,20 L100,30 L0,30 Z" fill="rgba(220, 53, 69, 0.1)" />
+                                <path d="M0,10 C20,5 30,25 50,15 C70,5 80,25 100,20" fill="none" stroke="#dc3545" stroke-width="1.5" />
+                            </svg>
                         </div>
-                        <p class="card-text">Collect Leads Directly From Your Website</p>
-                    </div>
-                </div>
-
-                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-module">
-                    <div class="card-module">
-                        <div class="icon-wrapper icon-import">
-                            <img src={{ asset('img/icons/dashboard-app7.png') }} alt="app icon" />
-                            <h5 class="card-title">IMPORT</h5>
-                        </div>
-                        <p class="card-text">Transfer Your Existing Data Into Nutshell</p>
                     </div>
                 </div>
 

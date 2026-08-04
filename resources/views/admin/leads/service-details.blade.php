@@ -102,6 +102,11 @@
                                     Congrats! You won a lead! Fill in the service details and schedule configurations below.
                                 </p>
                             </div>
+                            <div class="right-part-sec">
+                                <a href="{{ route('admin.lead.show', $lead->id) }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i> Back to Lead
+                                </a>
+                            </div>
                         </div>
 
                         <!-- Card 1: Create New Service -->

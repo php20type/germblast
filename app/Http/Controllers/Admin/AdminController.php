@@ -40,6 +40,12 @@ class AdminController extends Controller
         $activity_types = ActivityType::all();
         $countries = Country::all();
 
+        // Monthly Stats
+        $monthly_companies = Company::whereMonth('created_at', \Carbon\Carbon::now()->month)->count();
+        $monthly_peoples = People::whereMonth('created_at', \Carbon\Carbon::now()->month)->count();
+        $monthly_leads = Lead::whereMonth('created_at', \Carbon\Carbon::now()->month)->count();
+        $monthly_tasks = \App\Models\Task::whereMonth('created_at', \Carbon\Carbon::now()->month)->count();
+
         return view('admin.dashboard', compact(
             'users',
             'company_types',
@@ -55,8 +61,22 @@ class AdminController extends Controller
             'territories',
             'products',
             'competitors',
-            'countries'
+            'countries',
+            'monthly_companies',
+            'monthly_peoples',
+            'monthly_leads',
+            'monthly_tasks'
         ));
+    }
+
+    public function forms()
+    {
+        return view('admin.coming-soon', ['title' => 'Forms']);
+    }
+
+    public function imports()
+    {
+        return view('admin.coming-soon', ['title' => 'Imports']);
     }
 
     public function search(Request $request)

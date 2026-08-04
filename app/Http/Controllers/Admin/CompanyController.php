@@ -115,6 +115,7 @@ class CompanyController extends Controller
             'competitors' => Competitor::all(),
             'companytags' => Tag::where('tag_id', 2)->get(),
             'company_types' => CompanyType::all(),
+            'countries' => Country::all(),
         ];
     }
 
@@ -434,6 +435,7 @@ class CompanyController extends Controller
 
         $users = User::all();
         $companytags = Tag::where('tag_id', 2)->get();
+        $persontags = Tag::where('tag_id', 3)->get();
         $competitors = Competitor::all();
         $sources = Source::all();
         $company_types = CompanyType::all();
@@ -578,7 +580,8 @@ class CompanyController extends Controller
             'phones',
             'phoneTypes',
             'urls',
-            'urlTypes'
+            'urlTypes',
+            'persontags'
         ));
     }
 

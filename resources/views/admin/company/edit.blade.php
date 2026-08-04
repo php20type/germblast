@@ -281,14 +281,83 @@
                             <div id="addPeopleForm" class="mt-3" style="display: none;">
                                 <div class="mb-3">
                                     <select class="form-select people-update" data-field="" id="peopleSelect">
-                                        <option selected>Add People</option>
+                                        <option selected>Select Person</option>
                                         @foreach ($availablePeoples as $allpeople)
                                             <option value="{{ $allpeople->id }}">
                                                 {{ $allpeople->name }}
                                             </option>
                                         @endforeach
                                     </select>
+                                    <div class="mt-2">
+                                        <a href="javascript:void(0)" id="toggleAddPersonForm" class="text-warning"><i class="fas fa-plus"></i> Create Person</a>
+                                    </div>
                                 </div>
+                            </div>
+                            <div id="addPersonForm" class="my-3" style="display: none;">
+                                <form id="addPersonAjaxForm" action="{{ route('admin.people.store') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="company_id" value="{{ $company->id }}">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-2">
+                                                <input type="text" name="name" class="form-control" placeholder="Person Name" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-2">
+                                                <input type="email" name="email" class="form-control" placeholder="Email" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-2">
+                                                <input type="text" name="phone" class="form-control" placeholder="Phone Number" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-2">
+                                                <input type="text" name="address_1" class="form-control" placeholder="Address" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-2">
+                                                <select class="form-select" id="addPersonAssignee" name="assignee_id" required>
+                                                    <option value="">Select Assignee</option>
+                                                    @foreach ($users as $user)
+                                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-2">
+                                                <select class="form-select" id="addPersonTerritory" name="territory_id" required>
+                                                    <option value="">Select Territory</option>
+                                                    @foreach ($territories as $territory)
+                                                        <option value="{{ $territory->id }}">{{ $territory->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="mb-2">
+                                                <textarea rows="3" placeholder="Bio" name="bio" class="form-control" required></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="mb-2">
+                                                <select class="form-select" id="addPersonTags" name="tag_id" required>
+                                                    <option value="">Select Tags</option>
+                                                    @foreach ($persontags as $tag)
+                                                        <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <button type="submit" class="btn btn-warning btn-sm">Create Person</button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
 
@@ -1925,7 +1994,7 @@
 
                                 </div>
                             </div> --}}
-                            <div class="col-lg-12">
+                            <div class="col-lg-12 d-none">
                                 <div class="form-group">
                                     <label class="form-label">Companies</label>
                                     <span class="text-danger">*</span>
@@ -2773,6 +2842,11 @@
 
 
 
+            $('#toggleAddPersonForm').click(function(e) {
+                e.preventDefault();
+                $('#addPersonForm').slideToggle();
+            });
+
             // ==============================
             // Adding people to the company
             // ==============================
@@ -2780,7 +2854,7 @@
                 let peopleId = $(this).val();
                 let peopleName = $("#peopleSelect option:selected").text();
 
-                if (!peopleId || peopleId === "Add People") {
+                if (!peopleId) {
                     return;
                 }
                 Swal.fire({
@@ -2822,7 +2896,7 @@
                         });
                     } else {
                         // Reset dropdown back to default if cancelled
-                        $('#peopleSelect').val("Add People");
+                        $('#peopleSelect').val("Select Person");
                     }
                 });
             });
@@ -2877,6 +2951,85 @@
                 });
             });
 
+
+            // ==============================
+            // Add Person ajax form validation and submittion
+            // ==============================
+            $("#addPersonAjaxForm").validate({
+                ignore: [],
+                rules: {
+                    name: { required: true },
+                    email: { required: true, email: true },
+                    phone: { required: true },
+                    address_1: { required: true },
+                    tag_id: { required: true },
+                    assignee_id: { required: true },
+                    territory_id: { required: true },
+                    bio: { required: true }
+                },
+                messages: {
+                    name: { required: "Please enter the person's name." },
+                    email: { required: "Please enter an email address.", email: "Please enter a valid email." },
+                    phone: { required: "Please enter a phone number." },
+                    address_1: { required: "Please enter an address." },
+                    tag_id: { required: "Please select a tag." },
+                    assignee_id: { required: "Please select an assignee." },
+                    territory_id: { required: "Please select a territory." },
+                    bio: { required: "Please enter a bio." }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent()); // Inserts after the .input-group
+                    } else {
+                        error.insertAfter(element); // Default
+                    }
+                }
+            });
+
+            $('#addPersonAjaxForm').submit(function(e) {
+                e.preventDefault();
+
+                if (!$('#addPersonAjaxForm').valid()) {
+                    return; // Stop if validation fails
+                }
+
+                let form = $(this);
+                let actionUrl = form.attr('action');
+                let method = form.attr('method');
+                let formData = form.serialize();
+
+                $.ajax({
+                    url: actionUrl,
+                    method: method,
+                    data: formData,
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => {
+                            location.reload(); // reload after popup closes
+                        });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON?.message || 'Something went wrong.'
+                        });
+                    }
+                });
+            });
 
             // ==============================
             // Add Task ajax form validation and submittion
