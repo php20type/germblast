@@ -306,29 +306,93 @@
                                         @csrf
                                         <input type="hidden" name="people_id" value="{{ $peoples->id }}">
                                         <div class="row">
-                                            <div class="col-md-6">
+                                            <div class="col-md-12">
                                                 <div class="mb-2">
                                                     <input type="text" name="name" class="form-control" placeholder="Company Name" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-2">
-                                                    <input type="email" name="email" class="form-control" placeholder="Email">
+                                                    <input type="email" name="email" class="form-control" placeholder="Email" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-2">
-                                                    <input type="text" name="phone" class="form-control" placeholder="Phone Number">
+                                                    <input type="text" name="phone" class="form-control" placeholder="Phone Number" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-2">
-                                                    <input type="text" name="address_1" class="form-control" placeholder="Address">
+                                                    <input type="text" name="address_1" class="form-control" placeholder="Address Line 1" required>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="text-end">
-                                            <button type="submit" class="btn btn-primary btn-sm">Save Company</button>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <select name="country_id" class="form-select" id="company_country_select" required>
+                                                        <option value="">Select Country</option>
+                                                        @foreach ($countries as $country)
+                                                            <option value="{{ $country->id }}" {{ $country->name === 'United States' ? 'selected' : '' }}>{{ $country->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <select name="state_id" class="form-select" id="company_state_select" disabled required>
+                                                        <option value="">Select State</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <select name="city_id" class="form-select" id="company_city_select" disabled required>
+                                                        <option value="">Select City</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <input type="text" name="zip" class="form-control" placeholder="Zip Code" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <select class="form-select" name="tag_id" required>
+                                                        <option value="">Select Tag</option>
+                                                        @foreach ($companytags as $tag)
+                                                            <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <select class="form-select" name="company_type_id" required>
+                                                        <option value="">Select Company Type</option>
+                                                        @foreach ($company_types as $type)
+                                                            <option value="{{ $type->id }}">{{ $type->type }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <select class="form-select" name="assignee_id" required>
+                                                        <option value="">Select Assignee</option>
+                                                        @foreach ($users as $user)
+                                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="mb-2">
+                                                    <textarea name="description" class="form-control" placeholder="Description" rows="2" required></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <button type="submit" class="btn btn-warning btn-sm">Save Company</button>
+                                            </div>
                                         </div>
                                     </form>
                                 </div>
@@ -2694,15 +2758,83 @@
             // ==============================
             // Create Company ajax form validation and submission
             // ==============================
+
+            // Country → States
+            $('#company_country_select').on('change', function() {
+                let countryId = $(this).val();
+                let $stateSelect = $('#company_state_select');
+                let $citySelect = $('#company_city_select');
+
+                $stateSelect.empty().append('<option value="">Select State</option>').prop('disabled', true);
+                $citySelect.empty().append('<option value="">Select City</option>').prop('disabled', true);
+
+                if (!countryId) return;
+
+                $.get(`/states/${countryId}`, function(states) {
+                    let texasFound = false;
+                    states.forEach(function(state) {
+                        let isTexas = (state.name === 'Texas' || state.name === 'Texas ') ? 'selected' : '';
+                        if (isTexas) texasFound = true;
+                        $stateSelect.append(`<option value="${state.id}" ${isTexas}>${state.name}</option>`);
+                    });
+                    $stateSelect.prop('disabled', false);
+                    
+                    // If Texas (or any state) was automatically selected, trigger its change event to fetch cities
+                    if (texasFound) {
+                        $stateSelect.trigger('change');
+                    }
+                });
+            });
+
+            // Trigger country change on load to fetch states for the default selected country
+            $('#company_country_select').trigger('change');
+
+            // State → Cities
+            $('#company_state_select').on('change', function() {
+                let stateId = $(this).val();
+                let $citySelect = $('#company_city_select');
+
+                $citySelect.empty().append('<option value="">Select City</option>').prop('disabled', true);
+
+                if (!stateId) return;
+
+                $.get(`/cities/${stateId}`, function(cities) {
+                    cities.forEach(function(city) {
+                        $citySelect.append(new Option(city.name, city.id));
+                    });
+                    $citySelect.prop('disabled', false);
+                });
+            });
+
             $("#addCompanyAjaxForm").validate({
                 ignore: [],
                 rules: {
                     name: { required: true },
-                    email: { email: true }
+                    email: { required: true, email: true },
+                    phone: { required: true },
+                    address_1: { required: true },
+                    country_id: { required: true },
+                    state_id: { required: true },
+                    city_id: { required: true },
+                    zip: { required: true },
+                    tag_id: { required: true },
+                    company_type_id: { required: true },
+                    assignee_id: { required: true },
+                    description: { required: true }
                 },
                 messages: {
                     name: { required: "Please enter the company's name." },
-                    email: { email: "Please enter a valid email." }
+                    email: { required: "Please enter an email address.", email: "Please enter a valid email." },
+                    phone: { required: "Please enter a phone number." },
+                    address_1: { required: "Please enter an address." },
+                    country_id: { required: "Please select a country." },
+                    state_id: { required: "Please select a state." },
+                    city_id: { required: "Please select a city." },
+                    zip: { required: "Please enter a zip code." },
+                    tag_id: { required: "Please select a tag." },
+                    company_type_id: { required: "Please select a company type." },
+                    assignee_id: { required: "Please select an assignee." },
+                    description: { required: "Please enter a description." }
                 },
                 errorElement: 'span',
                 errorClass: 'invalid-feedback d-block',
@@ -2711,6 +2843,15 @@
                 },
                 unhighlight: function(element) {
                     $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.hasClass('select2') && element.next('.select2-container').length) {
+                        error.insertAfter(element.next('.select2-container'));
+                    } else if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
                 }
             });
 

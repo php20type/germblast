@@ -24,6 +24,7 @@ use App\Models\Source;
 use App\Models\Tag;
 use App\Models\Territory;
 use App\Models\Timeline;
+use App\Models\CompanyType;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -521,6 +522,10 @@ class PeopleController extends Controller
             }
         }
 
+        $companytags = Tag::where('tag_id', 2)->get();
+        $company_types = CompanyType::all();
+        $countries = Country::all();
+
         return view('admin.peoples.edit', compact(
             'peoples',
             'peopleFiles',
@@ -557,7 +562,10 @@ class PeopleController extends Controller
             'phones',
             'phoneTypes',
             'urls',
-            'urlTypes'
+            'urlTypes',
+            'companytags',
+            'company_types',
+            'countries'
         ));
     }
 
