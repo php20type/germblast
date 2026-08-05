@@ -98,6 +98,55 @@ class NotificationService
         }
     }
 
+    public function leadWon($lead)
+    {
+        $recipients = collect();
+
+        $users = \App\Models\User::all()->filter(fn($u) => $u->isSalesManager() || $u->isSuperAdmin());
+        foreach ($users as $user) {
+            $recipients->push($user);
+        }
+
+        $recipients = $recipients->unique('id');
+
+        $companyName = $lead->company->name ?? 'N/A';
+        $totalValue = \App\Helpers\Helper::calculateTotalValue($lead);
+        $formattedValue = '$' . number_format($totalValue, 2);
+
+        foreach ($recipients as $recipient) {
+            if ($this->sendEmail && $recipient->email) {
+                SendEmailJob::dispatch(
+                    $recipient->email,
+                    'lead_won',
+                    [
+                        'lead_id' => $lead->id,
+                        'lead_name' => $lead->name,
+                        'company_name' => $companyName,
+                        'assignee' => $lead->assignee->name ?? 'Unassigned',
+                        'value' => $formattedValue,
+                    ]
+                );
+            }
+
+            if ($this->sendSMS && $recipient->cell_phone) {
+                SendSMSJob::dispatch(
+                    $recipient->cell_phone,
+                    "A lead has been marked as won: {$lead->name}. Value: {$formattedValue}"
+                );
+            }
+
+            $this->sendInApp(
+                $recipient,
+                'Lead Won',
+                "Lead '{$lead->name}' has been marked as won. Company: {$companyName}, Value: {$formattedValue}",
+                'leads',
+                $lead->id,
+                'won',
+                get_class($lead)
+            );
+        }
+    }
+
     // This should be sent to sales rep and manager
     public function leadCreated($lead)
     {
@@ -118,7 +167,7 @@ class NotificationService
                     [
                         'lead_id' => $lead->id,
                         'lead_name' => $lead->name,
-                        'company_name' => $lead->companies->pluck('name')->join(', '),
+                        'company_name' => $lead->company->name ?? 'N/A',
                         'assignee' => $lead->assignee->name ?? 'Unassigned',
                         'close_date' => $lead->close_date,
                         'confidence' => $lead->confidence,
@@ -159,7 +208,7 @@ class NotificationService
                     'lead_id' => $lead->id,
                     'lead_name' => $lead->name,
                     'assignee' => $assignee->name,
-                    'company_name' => $lead->companies->pluck('name')->join(', '),
+                    'company_name' => $lead->company->name ?? 'N/A',
                 ]
             )->delay(now()->addSeconds(12)); // MAILTRAP rate-limit
         }
@@ -202,7 +251,7 @@ class NotificationService
                     [
                         'lead_id' => $lead->id,
                         'lead_name' => $lead->name,
-                        'company_name' => $lead->companies->pluck('name')->join(', '),
+                        'company_name' => $lead->company->name ?? 'N/A',
                         'scheduled_at' => $date,
                     ]
                 );
@@ -247,7 +296,7 @@ class NotificationService
                     [
                         'lead_id' => $lead->id,
                         'lead_name' => $lead->name,
-                        'company_name' => $lead->companies->pluck('name')->join(', '),
+                        'company_name' => $lead->company->name ?? 'N/A',
                         'completed_by' => auth()->user()->name ?? 'System',
                         'completed_at' => now()->format('Y-m-d H:i:s'),
                     ]
@@ -296,7 +345,7 @@ class NotificationService
                     [
                         'lead_id' => $lead->id,
                         'lead_name' => $lead->name,
-                        'company_name' => $lead->companies->pluck('name')->join(', '),
+                        'company_name' => $lead->company->name ?? 'N/A',
                         'scheduled_date' => Carbon::parse($stage->site_survey_scheduled_at)->format('Y-m-d'),
                         'scheduled_time' => Carbon::parse($stage->site_survey_scheduled_at)->format('H:i:s'),
                     ]
@@ -345,7 +394,7 @@ class NotificationService
                     [
                         'lead_id' => $lead->id,
                         'lead_name' => $lead->name,
-                        'company_name' => $lead->companies->pluck('name')->join(', '),
+                        'company_name' => $lead->company->name ?? 'N/A',
                         'completed_date' => Carbon::parse($stage->site_survey_completed_at)->format('Y-m-d'),
                         'completed_time' => Carbon::parse($stage->site_survey_completed_at)->format('H:i:s'),
                         'completed_by' => $stage->siteSurveyCompletedBy->name ?? 'N/A',

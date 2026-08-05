@@ -723,7 +723,7 @@ class LeadController extends Controller
         ));
     }
 
-    public function ajax_update(Request $request)
+    public function ajax_update(Request $request, NotificationService $notify)
     {
         $request->validate([
             'lead_id' => 'required|exists:leads,id',
@@ -737,6 +737,7 @@ class LeadController extends Controller
         $leadName = $lead->name ?? 'Unnamed Lead';
         $description = null;
         $actionType = null;
+        $oldStatus = $lead->lead_status;
 
         if ($request->filled('lead_status')) {
             $lead->lead_status = $request->lead_status;
@@ -770,6 +771,10 @@ class LeadController extends Controller
         }
 
         $lead->save();
+
+        if ($request->filled('lead_status') && $request->lead_status === 'won' && $oldStatus !== 'won') {
+            $notify->leadWon($lead);
+        }
 
         // Save timeline entry if any change occurred
         if ($description && $actionType) {
