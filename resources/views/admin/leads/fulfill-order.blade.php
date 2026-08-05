@@ -278,7 +278,7 @@
                             </div>
                             <div class="right-part-sec">
                                 <div class="d-flex gap-2">
-                                    <a class="btn btn-outline-secondary"
+                                    <a class="btn btn-outline-dark"
                                         href="javascript:history.back()">
                                         <i class="fas fa-arrow-left me-1"></i> Back
                                     </a>
@@ -3561,3 +3561,6 @@
 
 </script>
 @endpush
+
+
+

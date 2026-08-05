@@ -171,7 +171,7 @@
                             </div>
 
                             <!-- Pagination -->
-                            <div class="row">
+                            <div class="row m-3">
                                 <div id="lead-pagination" class="col-12 mt-3">
                                     {{ $paginator->links() }}
                                 </div>
@@ -378,6 +378,9 @@
                         activity_type_filter_id: activity_type_filter_id,
                         month_to_date: month_to_date,
                     },
+                    beforeSend: function() {
+                        AppLoader.show();
+                    },
                     success: function(response) {
                         $('table tbody').html(response.table);
                         $('.company-count').text(response.count + ' Lead Found');
@@ -388,6 +391,9 @@
                     },
                     error: function() {
                         console.error('Error fetching lead data');
+                    },
+                    complete: function() {
+                        AppLoader.hide();
                     }
                 });
             }

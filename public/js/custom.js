@@ -204,3 +204,144 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// ==========================================
+// Global AJAX Setup for Loaders and Delays
+// ==========================================
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof jQuery !== 'undefined') {
+        var originalAjax = jQuery.ajax;
+        jQuery.ajax = function() {
+            var options = arguments[0];
+            if (typeof options === "string") {
+                options = arguments[1] || {};
+                options.url = arguments[0];
+            }
+            
+            var method = (options.method || options.type || 'GET').toUpperCase();
+            
+            // Skip loader for background/search GET requests
+            var isSearch = false;
+            var url = options.url || '';
+            if (typeof url === 'string' && url.includes('/search')) {
+                isSearch = true;
+            }
+            if (options.global === false) {
+                isSearch = true;
+            }
+            
+            // For search GET requests, run immediately without loader/delay
+            if (method === 'GET' && isSearch) {
+                return originalAjax.apply(this, arguments);
+            }
+
+            // Show loader immediately
+            if (typeof AppLoader !== 'undefined') {
+                AppLoader.show();
+            }
+
+            // Wrap success to hide loader before original success runs
+            var origSuccess = options.success;
+            if (origSuccess) {
+                options.success = function() {
+                    if (typeof AppLoader !== 'undefined') {
+                        AppLoader.hide();
+                    }
+                    return origSuccess.apply(this, arguments);
+                };
+            }
+
+            // Wrap error to hide loader before original error runs
+            var origError = options.error;
+            if (origError) {
+                options.error = function() {
+                    if (typeof AppLoader !== 'undefined') {
+                        AppLoader.hide();
+                    }
+                    return origError.apply(this, arguments);
+                };
+            }
+
+            var dfd = jQuery.Deferred();
+            var self = this;
+            var args = arguments;
+            
+            // Delay 500ms
+            setTimeout(function() {
+                // Directly pass the normalized options object instead of args
+                var jqXHR = originalAjax.call(self, options);
+                
+                jqXHR.done(function() {
+                    if (typeof AppLoader !== 'undefined') {
+                        AppLoader.hide(); // Hide if success wasn't in options
+                    }
+                    dfd.resolveWith(this, arguments);
+                }).fail(function() {
+                    if (typeof AppLoader !== 'undefined') {
+                        AppLoader.hide(); // Hide if error wasn't in options
+                    }
+                    dfd.rejectWith(this, arguments);
+                });
+            }, 500);
+
+            var promise = dfd.promise();
+            promise.success = promise.done;
+            promise.error = promise.fail;
+            
+            promise.abort = function() {
+                if (typeof AppLoader !== 'undefined') {
+                    AppLoader.hide();
+                }
+                dfd.reject();
+            };
+            return promise;
+        };
+    }
+
+    // ==========================================
+    // Global fetch Setup for Loaders and Delays
+    // ==========================================
+    if (typeof window.fetch !== 'undefined') {
+        var originalFetch = window.fetch;
+        window.fetch = function() {
+            var args = arguments;
+            var options = args[1] || {};
+            var method = (options.method || 'GET').toUpperCase();
+
+            var url = typeof args[0] === 'string' ? args[0] : (args[0] ? args[0].url : '');
+            var isSearch = false;
+            if (typeof url === 'string' && url.includes('/search')) {
+                isSearch = true;
+            }
+
+            // For search GET requests, run immediately without loader/delay
+            if (method === 'GET' && isSearch) {
+                return originalFetch.apply(this, args);
+            }
+
+            // Show loader immediately
+            if (typeof AppLoader !== 'undefined') {
+                AppLoader.show();
+            }
+
+            return new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                    originalFetch.apply(window, args)
+                        .then(function(response) {
+                            if (typeof AppLoader !== 'undefined') {
+                                AppLoader.hide();
+                            }
+                            resolve(response);
+                        })
+                        .catch(function(error) {
+                            if (typeof AppLoader !== 'undefined') {
+                                AppLoader.hide();
+                            }
+                            reject(error);
+                        });
+                }, 500);
+            });
+        };
+    }
+});
+

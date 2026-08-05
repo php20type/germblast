@@ -10,14 +10,14 @@
         <div class="my-3">
             <input type="text" class="form-control search-box" placeholder="🔍">
         </div>
-        <hr>
+        <!-- <hr>
         <div class="mt-4">
             <h6 class="text-uppercase text-light mb-1">YOUR
                 LISTS
                 🔒</h6>
             <p class="text-light mb-1" style="opacity: 0.8;">You haven't saved any
                 lists.</p>
-        </div>
+        </div> -->
         <hr>
         <div id="shared-lists">
             <div class="mt-4">

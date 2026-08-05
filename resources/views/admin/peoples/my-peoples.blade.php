@@ -305,7 +305,7 @@
                                 </div>
 
                                 <!-- Pagination -->
-                                <div class="row">
+                                <div class="row m-3">
                                     <div id="people-pagination" class="col-12 mt-3">
                                         {{ $peoples->links() }}
                                     </div>
@@ -595,6 +595,9 @@
                             leads_status: leads_status,
                             activity_type_filter_id: activity_type_filter_id,
                         },
+                        beforeSend: function() {
+                            AppLoader.show();
+                        },
                         success: function(response) {
                             $('table tbody').html(response.table);
                             $('.company-count').text(response.count + ' People Found');
@@ -602,6 +605,9 @@
                         },
                         error: function(err) {
                             console.error('Error fetching people data', err);
+                        },
+                        complete: function() {
+                            AppLoader.hide();
                         }
                     });
                 }

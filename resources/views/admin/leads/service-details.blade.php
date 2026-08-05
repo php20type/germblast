@@ -103,7 +103,7 @@
                                 </p>
                             </div>
                             <div class="right-part-sec">
-                                <a href="{{ route('admin.lead.show', $lead->id) }}" class="btn btn-outline-secondary">
+                                <a href="{{ route('admin.lead.show', $lead->id) }}" class="btn btn-outline-dark">
                                     <i class="fas fa-arrow-left me-1"></i> Back to Lead
                                 </a>
                             </div>
@@ -542,5 +542,8 @@
 </script>
 
 @endpush
+
+
+
 
 

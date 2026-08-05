@@ -170,7 +170,7 @@
                         </div>
 
                         <!-- Pagination -->
-                        <div class="row">
+                        <div class="row m-3">
                             <div id="company-pagination" class="col-12 mt-3">
                                 {{ $companies->links() }}
                             </div>
@@ -610,6 +610,9 @@
                             leads_status: leads_status,
                             activity_type_filter_id: activity_type_filter_id,
                         },
+                        beforeSend: function() {
+                            AppLoader.show();
+                        },
                         success: function(response) {
                             $('table tbody').html(response.table);
                             $('.company-count').text(response.count + ' Company Found');
@@ -617,6 +620,9 @@
                         },
                         error: function(err) {
                             console.error('Error fetching company data', err);
+                        },
+                        complete: function() {
+                            AppLoader.hide();
                         }
                     });
                 }

@@ -1343,35 +1343,113 @@ title {
     color: #FFB81C;
 }
 
-/* Custom pagination styles */
-.pagination-custom {
-    margin: 40px 0 20px;
+/* Custom pagination styles (Laravel Standard) */
+.pagination {
+    margin: 25px 0;
+    justify-content: flex-end;
+    align-items: center;
 }
 
-.pagination-custom .page-link {
-    border: none;
-    color: #000000;
+/* Hide all page items by default */
+.pagination .page-item {
+    margin: 0 3px;
+    display: none;
+}
+
+/* Hide SVG arrows if Laravel inserts them, so we can use text */
+.pagination .page-link svg {
+    display: none !important;
+}
+
+/* Force exact text for Previous and Next on all paginations */
+.pagination .page-item:first-child .page-link,
+.pagination .page-item:last-child .page-link {
+    font-size: 0 !important;
+}
+
+.pagination .page-item:first-child .page-link::after {
+    content: "< Previous";
+    font-size: 14px;
+}
+
+.pagination .page-item:last-child .page-link::after {
+    content: "Next >";
+    font-size: 14px;
+}
+
+/* Only show Previous (first-child), Next (last-child), and the Active page */
+.pagination .page-item.active,
+.pagination .page-item:first-child,
+.pagination .page-item:last-child {
+    display: block;
+}
+
+.pagination .page-link {
+    border: 1px solid #e0e0e0;
+    color: #4b5563;
     font-weight: 500;
-    margin: 0 2px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
+    border-radius: 6px;
+    padding: 0.5rem 0.85rem;
+    transition: all 0.2s ease;
+    background-color: #ffffff;
+    min-width: 36px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
 }
 
-.pagination-custom .page-link span {
-    color: #636363;
+.pagination .page-link span {
+    color: inherit;
 }
 
-.pagination-custom .page-link:hover {
-    background-color: #FFB81C;
-    color: white;
-    transform: translateY(-2px);
+.pagination .page-link:hover {
+    background-color: #f8f9fa;
+    border-color: #d1d5db;
+    color: #1f2937;
 }
 
-.pagination-custom .page-item.active .page-link {
+.pagination .page-item.active .page-link,
+.pagination .page-item.active .page-link:hover {
     background-color: #FFB81C;
     border-color: #FFB81C;
-    color: white;
-    z-index: auto;
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(255, 184, 28, 0.2);
+    z-index: 1;
+}
+
+.pagination .page-item.disabled .page-link,
+.pagination .page-item.disabled .page-link:hover {
+    color: #9ca3af;
+    background-color: #f9fafb;
+    border-color: #e5e7eb;
+    pointer-events: none;
+}
+
+/* DataTables Pagination Layout Styles */
+.dataTables_wrapper .row {
+    align-items: center;
+    margin-top: 15px;
+}
+
+.dataTables_wrapper .dataTables_info {
+    padding-top: 0;
+    color: #4b5563;
+    font-size: 14px;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+/* DataTables pagination uses Bootstrap .pagination classes, 
+   so the styling above (.pagination .page-link) will automatically apply. 
+   We just need to override DataTables BS5 specific active state margins */
+.dataTables_wrapper .dataTables_paginate .pagination {
+    margin: 0;
 }
 
 .remove-filter-section {
@@ -4250,4 +4328,14 @@ div[contenteditable="true"]:focus {
     text-align: center;
     color: #6b7280;
     font-size: 14px;
+}
+
+/* Company Dashboard Sub-pages Table Column Width Consistency */
+.dashboard-body .section-card .table tbody tr th:first-child:nth-last-child(2),
+.dashboard-body .section-card .equipment-report-table tbody tr th:first-child:nth-last-child(2) {
+    width: 35%;
+}
+.dashboard-body .section-card .table tbody tr td:nth-child(2):last-child,
+.dashboard-body .section-card .equipment-report-table tbody tr td:nth-child(2):last-child {
+    width: 65%;
 }

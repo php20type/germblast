@@ -92,8 +92,8 @@
                                 </p>
                             </div>
                             <div class="right-part-sec d-flex align-items-center">
-                                <a href="{{ route('admin.isd-attendance.index', ['school_id' => $selectedSchool['id']]) }}" class="btn btn-outline-secondary me-2">
-                                    ⬅ Return to All Campuses
+                                <a href="{{ route('admin.isd-attendance.index', ['school_id' => $selectedSchool['id']]) }}" class="btn btn-outline-dark me-2">
+                                    <i class="fa-solid fa-arrow-left"></i> Return to All Campuses
                                 </a>
                                 <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#AddAttendance">
                                     + ADD ATTENDANCE
