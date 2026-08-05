@@ -27,9 +27,9 @@
                                 </div>
                                 @can('people.create')
                                 <div class="right-part">
-                                    <a href="{{ route('admin.people.index', ['create' => 1]) }}" class="btn btn-export">
+                                    <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#AddPerson">
                                         <i class="fa-solid fa-plus"></i> Add Person
-                                    </a>
+                                    </button>
                                 </div>
                                 @endcan
                             </div>
@@ -518,6 +518,8 @@
             </div>
         </div>
 
+        </div>
+        @include('admin.peoples.partials.add-person-modal')
     @endsection
     @push('scripts')
         <script>
@@ -837,4 +839,5 @@
 
             });
         </script>
+        @include('admin.peoples.partials.add-person-scripts')
     @endpush

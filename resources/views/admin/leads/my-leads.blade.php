@@ -23,9 +23,9 @@
                                 </div>
                                 @can('lead.create')
                             <div class="right-part">
-                                <a href="{{ route('admin.lead.index', ['create' => 1]) }}" class="btn btn-export">
-                                    <i class="fa-solid fa-plus"></i> Add Lead
-                                </a>
+                                <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#AddLead">
+                                        <i class="fa-solid fa-plus"></i> Add Lead
+                                    </button>
                             </div>
                             @endcan
                             </div>
@@ -307,6 +307,12 @@
             </div>
         </div>
 
+        </div>
+
+
+        @include('admin.leads.partials.add-lead-modal')
+
+
     @endsection
 
     @push('scripts')
@@ -446,4 +452,7 @@
 
             });
         </script>
+        @include('admin.leads.partials.add-lead-scripts')
+
     @endpush
+

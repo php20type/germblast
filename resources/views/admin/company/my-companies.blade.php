@@ -23,9 +23,9 @@
                             </div>
                             @can('company.create')
                             <div class="right-part">
-                                <a href="{{ route('admin.company.index', ['create' => 1]) }}" class="btn btn-export">
+                                <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#AddCompany">
                                     <i class="fa-solid fa-plus"></i> Add Company
-                                </a>
+                                </button>
                             </div>
                             @endcan
                         </div>
@@ -523,6 +523,9 @@
         </div>
 
 
+        </div>
+        @include('admin.company.partials.add-company-modal')
+
     @endsection
     @push('scripts')
         <script>
@@ -851,4 +854,5 @@
 
             });
         </script>
+        @include('admin.company.partials.add-company-scripts')
     @endpush
