@@ -28,7 +28,7 @@ class ActionEmail extends Mailable
             subject: match ($this->type) {
                 'company_created' => 'New Company Added',
                 'lead_created' => 'New Lead Created',
-                'lead_won' => 'Lead Won',
+                'lead_status_changed' => 'Lead Status Changed',
                 'lead_assigned' => 'New Lead Assigned to You',
                 'initial_meeting_scheduled' => 'Initial Meeting Scheduled',
                 'initial_meeting_completed' => 'Initial Meeting Completed',

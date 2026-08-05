@@ -772,8 +772,8 @@ class LeadController extends Controller
 
         $lead->save();
 
-        if ($request->filled('lead_status') && $request->lead_status === 'won' && $oldStatus !== 'won') {
-            $notify->leadWon($lead);
+        if ($request->filled('lead_status') && $request->lead_status !== $oldStatus) {
+            $notify->leadStatusChanged($lead, $oldStatus, $request->lead_status);
         }
 
         // Save timeline entry if any change occurred

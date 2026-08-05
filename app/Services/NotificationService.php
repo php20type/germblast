@@ -98,7 +98,7 @@ class NotificationService
         }
     }
 
-    public function leadWon($lead)
+    public function leadStatusChanged($lead, $oldStatus, $newStatus)
     {
         $recipients = collect();
 
@@ -117,12 +117,14 @@ class NotificationService
             if ($this->sendEmail && $recipient->email) {
                 SendEmailJob::dispatch(
                     $recipient->email,
-                    'lead_won',
+                    'lead_status_changed',
                     [
                         'lead_id' => $lead->id,
                         'lead_name' => $lead->name,
                         'company_name' => $companyName,
                         'assignee' => $lead->assignee->name ?? 'Unassigned',
+                        'old_status' => $oldStatus,
+                        'new_status' => $newStatus,
                         'value' => $formattedValue,
                     ]
                 );
@@ -131,17 +133,17 @@ class NotificationService
             if ($this->sendSMS && $recipient->cell_phone) {
                 SendSMSJob::dispatch(
                     $recipient->cell_phone,
-                    "A lead has been marked as won: {$lead->name}. Value: {$formattedValue}"
+                    "Lead '{$lead->name}' status changed from {$oldStatus} to {$newStatus}. Value: {$formattedValue}"
                 );
             }
 
             $this->sendInApp(
                 $recipient,
-                'Lead Won',
-                "Lead '{$lead->name}' has been marked as won. Company: {$companyName}, Value: {$formattedValue}",
+                'Lead Status Changed',
+                "Lead '{$lead->name}' (Company: {$companyName}) status changed from {$oldStatus} to {$newStatus}. Value: {$formattedValue}",
                 'leads',
                 $lead->id,
-                'won',
+                'status_changed',
                 get_class($lead)
             );
         }

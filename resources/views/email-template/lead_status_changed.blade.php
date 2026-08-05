@@ -6,7 +6,7 @@
 </div>
 
 <h2 style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1e293b; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 16px; line-height: 1.4;">
-    Lead Won
+    Lead Status Changed
 </h2>
 
 <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 15px; color: #4b5563; line-height: 1.6; margin-bottom: 16px;">
@@ -14,7 +14,7 @@
 </p>
 
 <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 15px; color: #4b5563; line-height: 1.6; margin-bottom: 20px;">
-    A lead has been successfully marked as won in GermBlast. Below are the lead details:
+    A lead's status has been successfully updated in GermBlast. Below are the lead details:
 </p>
 
 <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 24px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
@@ -30,6 +30,14 @@
         <tr>
             <td style="padding: 4px 0; font-weight: 600; color: #64748b; width: 130px; vertical-align: top;">Company:</td>
             <td style="padding: 4px 0; color: #0f172a; font-weight: 500;">{{ $data['company_name'] }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 4px 0; font-weight: 600; color: #64748b; width: 130px; vertical-align: top;">Old Status:</td>
+            <td style="padding: 4px 0; color: #0f172a; font-weight: 500;">{{ ucfirst($data['old_status']) }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 4px 0; font-weight: 600; color: #64748b; width: 130px; vertical-align: top;">New Status:</td>
+            <td style="padding: 4px 0; color: #0f172a; font-weight: 500;">{{ ucfirst($data['new_status']) }}</td>
         </tr>
         <tr>
             <td style="padding: 4px 0; font-weight: 600; color: #64748b; width: 130px; vertical-align: top;">Value:</td>
