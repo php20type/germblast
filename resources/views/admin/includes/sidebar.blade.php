@@ -234,6 +234,27 @@
             </li>
             @endcan
 
+            <li class="{{ request()->routeIs('admin.forms.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.forms.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon6.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Forms
+                    </div>
+                </a>
+            </li>
+            <li class="{{ request()->routeIs('admin.imports.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.imports.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon7.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Imports
+                    </div>
+                </a>
+            </li>
+            
             @if(auth()->user()->isSuperAdmin())
                 <li class="{{ request()->routeIs('admin.roles.permissions') ? 'active' : '' }}">
                     <a href="{{ route('admin.roles.permissions') }}">
@@ -266,26 +287,6 @@
                     </a>
                 </li>
             @endif
-            <li class="{{ request()->routeIs('admin.forms.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.forms.index') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon6.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Forms
-                    </div>
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('admin.imports.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.imports.index') }}">
-                    <div class="icon-round">
-                        <img src={{ asset("img/icons/menu-icon7.svg") }} alt="icon" />
-                    </div>
-                    <div class="nav-text ms-3">
-                        Imports
-                    </div>
-                </a>
-            </li>
             {{-- <li>
                 <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     <div class="icon-round">

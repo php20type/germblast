@@ -2296,7 +2296,7 @@
                                     </div>
                                 </div>
                                 <div title="Total Value">
-                                    ${{ \App\Helpers\Helper::calculateTotalValue($related_lead) }}
+                                    ${{ number_format(\App\Helpers\Helper::calculateTotalValue($related_lead)) }}
                                 </div>
                             </div>
                         @endforeach

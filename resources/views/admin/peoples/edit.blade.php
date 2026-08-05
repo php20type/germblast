@@ -2263,7 +2263,7 @@
                                 </div>
                                 <div class="d-flex align-items-center gap-3">
                                     <div title="Total Value">
-                                        ${{ \App\Helpers\Helper::calculateTotalValue($related_lead) }}
+                                        ${{ number_format(\App\Helpers\Helper::calculateTotalValue($related_lead)) }}
                                     </div>
                                     @can('people.detail.edit')
                                         <button class="btn btn-sm btn-outline-secondary remove-lead-btn"
