@@ -27,6 +27,7 @@ use App\Models\Source;
 use App\Models\SurveyProposal;
 use App\Models\Tag;
 use App\Models\Task;
+use App\Models\Territory;
 use App\Models\Timeline;
 use App\Models\User;
 use App\Services\NotificationService;
@@ -686,6 +687,8 @@ class LeadController extends Controller
         $lost_outcomes = Outcome::where('type', 'Lost')->get();
         $cancelled_outcomes = Outcome::where('type', 'Cancelled')->get();
         $markets = Market::all();
+        $persontags = Tag::where('tag_id', 3)->get();
+        $territories = Territory::all();
         $stage = $leads->leadStageProcess;
 
         return view('admin.leads.edit', compact(
@@ -714,7 +717,9 @@ class LeadController extends Controller
             'tags',
             'markets',
             'lost_outcomes',
-            'cancelled_outcomes'
+            'cancelled_outcomes',
+            'persontags',
+            'territories'
         ));
     }
 

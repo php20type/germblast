@@ -23,7 +23,7 @@
                 <!-- Top Row -->
                 @can('company.create')
                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-module">
-                    <div class="card-module">
+                    <div class="card-module" style="cursor: pointer;" onclick="window.location.href='{{ route('admin.company.index') }}'">
                         <div class="icon-wrapper icon-company">
                             <img src={{ asset('img/icons/dashboard-app1.png') }} alt="app icon" />
                             <h5 class="card-title">COMPANY</h5>
@@ -42,7 +42,7 @@
 
                 @can('people.create')
                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-module">
-                    <div class="card-module">
+                    <div class="card-module" style="cursor: pointer;" onclick="window.location.href='{{ route('admin.people.index') }}'">
                         <div class="icon-wrapper icon-person">
                             <img src={{ asset('img/icons/dashboard-app2.png') }} alt="app icon" />
                             <h5 class="card-title">PERSON</h5>
@@ -61,7 +61,7 @@
 
                 @can('lead.create')
                 <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12 col-module">
-                    <div class="card-module">
+                    <div class="card-module" style="cursor: pointer;" onclick="window.location.href='{{ route('admin.lead.index') }}'">
                         <div class="icon-wrapper icon-lead">
                             <img src={{ asset('img/icons/dashboard-app3.png') }} alt="app icon" />
                             <h5 class="card-title">LEAD</h5>

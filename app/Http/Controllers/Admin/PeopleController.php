@@ -975,6 +975,36 @@ class PeopleController extends Controller
                 ]);
             }
 
+            // Step 6.5: Store lead relationship if present
+            if ($request->lead_id) {
+                LeadPeople::create([
+                    'people_id' => $people->id,
+                    'lead_id' => $request->lead_id,
+                ]);
+
+                // Attach all companies associated with this lead to the newly created person
+                $lead = Lead::with(['companies'])->find($request->lead_id);
+                if ($lead) {
+                    $companyIds = [];
+                    if ($lead->company_id) {
+                        $companyIds[] = $lead->company_id;
+                    }
+                    if ($lead->companies) {
+                        foreach ($lead->companies as $comp) {
+                            $companyIds[] = $comp->id;
+                        }
+                    }
+                    $companyIds = array_unique($companyIds);
+
+                    foreach ($companyIds as $cId) {
+                        CompanyPeople::firstOrCreate([
+                            'people_id' => $people->id,
+                            'company_id' => $cId,
+                        ]);
+                    }
+                }
+            }
+
             // Step 7: Store tags
             if ($request->tag_id) {
                 PeopleTag::create([
@@ -983,11 +1013,26 @@ class PeopleController extends Controller
                 ]);
             }
 
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Person created successfully!',
+                    'data' => $people
+                ]);
+            }
+
             return redirect()
                 ->back()
                 ->with('success', 'Person created successfully!');
 
         } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Something went wrong: ' . $e->getMessage()
+                ], 500);
+            }
+
             return redirect()
                 ->back()
                 ->with('error', 'Something went wrong!');
