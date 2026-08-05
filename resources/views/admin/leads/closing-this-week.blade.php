@@ -21,10 +21,13 @@
                                     <h3 class="mb-1">CLOSING THIS WEEK <span style="font-size: 24px;">📌</span></h3>
                                     <p class="text-muted mb-0">Business deals with your companies and people</p>
                                 </div>
-                                <div class="d-none right-part">
-                                    <button class="btn btn-email">Email</button>
-                                    <button class="btn btn-export">EXPORT</button>
-                                </div>
+                            @can('lead.create')
+                            <div class="right-part">
+                                <a href="{{ route('admin.lead.index', ['create' => 1]) }}" class="btn btn-export">
+                                    <i class="fa-solid fa-plus"></i> Add Lead
+                                </a>
+                            </div>
+                            @endcan
                             </div>
 
                             <!-- Filter Section -->

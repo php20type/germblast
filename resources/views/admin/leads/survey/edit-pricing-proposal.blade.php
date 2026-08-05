@@ -125,6 +125,9 @@
                                     </p>
                                 </div>
                                 <div class="right-part d-flex align-items-center gap-2">
+                                    <a class="btn btn-outline-secondary" href="{{ route('admin.lead.survey.proposal', $pricingProposal->surveyProposal->lead_id) }}">
+                                        <i class="fas fa-arrow-left me-1"></i> Back
+                                    </a>
                                     <button type="button" id="updatePricingBtn" class="btn btn-success">
                                         Update Pricing Proposal
                                     </button>

@@ -56,7 +56,10 @@
                                         Edit Indoor Air Quality Survey
                                     </p>
                                 </div>
-                                <div class="right-part-sec">
+                                <div class="right-part-sec d-flex align-items-center gap-2">
+                                    <a class="btn btn-outline-secondary" href="{{ route('admin.company.dashboard', $company->id) }}">
+                                        <i class="fas fa-arrow-left me-1"></i> Back
+                                    </a>
                                     <button type="submit" class="btn btn-export">
                                         Update Survey
                                     </button>

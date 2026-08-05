@@ -1053,6 +1053,9 @@
 
             <script>
         document.addEventListener('DOMContentLoaded', function() {
+            if (new URLSearchParams(window.location.search).get('create') === '1') {
+                $('#AddCompany').modal('show');
+            }
 
             $('#AddCompany').on('shown.bs.modal', function() {
                 $(this).find('.country_select').select2({

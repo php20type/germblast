@@ -727,6 +727,9 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            if (new URLSearchParams(window.location.search).get('create') === '1') {
+                $('#AddLead').modal('show');
+            }
 
             flatpickr("#due_date", {
                 enableTime: true,

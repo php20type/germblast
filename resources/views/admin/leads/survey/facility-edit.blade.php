@@ -129,6 +129,9 @@
                                     </p>
                                 </div>
                                 <div class="right-part d-flex align-items-center gap-2">
+                                    <a class="btn btn-outline-secondary" href="{{ route('admin.lead.survey.proposal', $facility->surveyProposal->lead_id) }}">
+                                        <i class="fas fa-arrow-left me-1"></i> Back
+                                    </a>
                                     <button type="submit" class="btn btn-success">
                                         Save Facility
                                     </button>

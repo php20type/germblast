@@ -1035,6 +1035,9 @@
 
          <script>
         document.addEventListener('DOMContentLoaded', function() {
+            if (new URLSearchParams(window.location.search).get('create') === '1') {
+                $('#AddPerson').modal('show');
+            }
 
             $('#AddPerson').on('shown.bs.modal', function() {
                 $(this).find('.country_select').select2({
