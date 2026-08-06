@@ -1345,8 +1345,7 @@
                                 <h6>KEEP IN TOUCH</h6>
                                 <a href="#" class="text-warning d-none">Remind me to follow up</a>
                             </div>
-                            <p class="small text-muted">Last Contacted 3 Years Ago<br>
-                                You've Never Contacted This Company</p>
+                            <p class="small text-muted">Created {{ $company->created_at->diffForHumans() }}</p>
                         </div>
                         {{-- Company section form --}}
                         <div id="company-details-container" data-company-id="{{ $company->id }}">

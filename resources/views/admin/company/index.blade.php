@@ -107,7 +107,7 @@
                                             </th>
                                             <th>Company name</th>
                                             <th>People</th>
-                                            <th>Last contact</th>
+                                            <th>Created at</th>
                                             <th>Address</th>
                                             <th>Company type</th>
                                             <th>Tags</th>

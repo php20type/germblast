@@ -79,7 +79,7 @@
                                                     <img src="img/icons/down-vector.svg" alt="" /> Person name </i>
                                                 </th>
                                                 <th>
-                                                    <img src="img/icons/down-vector.svg" alt="" /> Last contact </i>
+                                                    <img src="img/icons/down-vector.svg" alt="" /> Created at </i>
                                                 </th>
                                                 <th>
                                                     <img src="img/icons/down-vector.svg" alt="" /> Email </i>
