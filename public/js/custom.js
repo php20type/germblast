@@ -229,9 +229,39 @@ document.addEventListener('DOMContentLoaded', function() {
             if (options.global === false) {
                 isSearch = true;
             }
+            if (options.data) {
+                if (typeof options.data === 'string' && options.data.includes('search=')) {
+                    isSearch = true;
+                } else if (typeof options.data === 'object' && ('search' in options.data)) {
+                    isSearch = true;
+                }
+            }
             
             // For search GET requests, run immediately without loader/delay
             if (method === 'GET' && isSearch) {
+                // Mock AppLoader to prevent explicit calls in views
+                if (typeof AppLoader !== 'undefined') {
+                    var _origBeforeSend = options.beforeSend;
+                    var _origComplete = options.complete;
+                    if (_origBeforeSend) {
+                        options.beforeSend = function() {
+                            var _show = AppLoader.show;
+                            AppLoader.show = function(){};
+                            var ret = _origBeforeSend.apply(this, arguments);
+                            AppLoader.show = _show;
+                            return ret;
+                        };
+                    }
+                    if (_origComplete) {
+                        options.complete = function() {
+                            var _hide = AppLoader.hide;
+                            AppLoader.hide = function(){};
+                            var ret = _origComplete.apply(this, arguments);
+                            AppLoader.hide = _hide;
+                            return ret;
+                        };
+                    }
+                }
                 return originalAjax.apply(this, arguments);
             }
 
