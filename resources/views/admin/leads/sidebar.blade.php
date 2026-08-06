@@ -34,6 +34,14 @@
                      </a>
                  @endcan
 
+                 @can('lead.list.all.view')
+                     <a class="nav-link lead-filter {{ request()->routeIs('admin.lead.assigned_leads') ? 'active' : '' }}"
+                         href="{{ route('admin.lead.assigned_leads', auth()->id()) }}">
+                         Assigned leads
+                         <span class="badge bg-light text-dark">{{ $assignedLeadsCount }}</span>
+                     </a>
+                 @endcan
+
                  @can('lead.list.added_this_week.view')
                      <a class="nav-link lead-filter {{ request()->routeIs('admin.lead.added_this_week') ? 'active' : '' }}"
                          href="{{ route('admin.lead.added_this_week') }}">

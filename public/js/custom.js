@@ -266,7 +266,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var self = this;
             var args = arguments;
             
-            // Delay 500ms
+            // Delay 300ms
             setTimeout(function() {
                 // Directly pass the normalized options object instead of args
                 var jqXHR = originalAjax.call(self, options);
@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     dfd.rejectWith(this, arguments);
                 });
-            }, 500);
+            }, 300);
 
             var promise = dfd.promise();
             promise.success = promise.done;
@@ -339,9 +339,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                             reject(error);
                         });
-                }, 500);
+                }, 300);
             });
         };
     }
 });
+
 

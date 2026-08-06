@@ -22,6 +22,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
             ->middleware('permission:company.list.my.view')
             ->name('my_companies');
 
+        Route::get('assigned_companies/{id}', [CompanyController::class, 'assigned_companies'])
+            ->middleware('permission:company.list.all.view')
+            ->name('assigned_companies');
+
         Route::post('store', [CompanyController::class, 'store'])
             ->middleware('permission:company.create')
             ->name('store');

@@ -44,5 +44,18 @@ class CompanyRepository implements CompanyRepositoryInterface
         return $this->model->where('user_id', $userId)->count();
     }
 
+    // Get companies assigned to specific user with relations
+    public function getAssignedByUserWithRelations($userId)
+    {
+        return $this->model->with([
+            'user', 'companyType', 'tags', 'peoples',
+            'companyEmail', 'companyPhone', 'companyAddress', 'companyUrl'
+        ])->where('assignee_id', $userId);
+    }
 
+    // Count companies assigned to user
+    public function countAssignedByUser($userId)
+    {
+        return $this->model->where('assignee_id', $userId)->count();
+    }
 }

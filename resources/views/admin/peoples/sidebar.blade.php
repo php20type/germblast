@@ -32,6 +32,14 @@
                 </a>
                 @endcan
 
+                @can('people.list.all.view')
+                <a class="nav-link people-filter {{ request()->routeIs('admin.people.assigned_peoples') ? 'active' : '' }}"
+                    href="{{ route('admin.people.assigned_peoples', auth()->id()) }}">
+                    Assigned people
+                    <span class="badge bg-light text-dark">{{ $formattedAssignedPeopleCount }}</span>
+                </a>
+                @endcan
+
                 @can('people.list.marketing_contacts.view')
                 <a class="d-none nav-link people-filter {{ request()->routeIs('admin.peoples.marketing_contacts') ? 'active' : '' }}"
                     href="{{ route('admin.people.marketing_contacts') }}">

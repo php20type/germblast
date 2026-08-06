@@ -19,7 +19,7 @@
                             <div class="heading-area-sec">
                                 <div class="left-part-sec">
                                     <h3 class="mb-1">LEADS I'M WATCHING <span style="font-size: 24px;">📌</span></h3>
-                                    <p class="text-muted mb-0">Business deals with your companies and people</p>
+                                    <p class="text-muted mb-0">Business deals you are watching</p>
                                 </div>
                             @can('lead.create')
                             <div class="right-part">
@@ -467,4 +467,5 @@
     @include('admin.leads.partials.add-lead-scripts')
 
 @endpush
+
 

@@ -48,6 +48,7 @@ class CompanyController extends Controller
         $currentUser = auth()->user();
         $totalCompanies = $this->companyRepo->countAll();
         $myCompaniesCount = $this->companyRepo->countByUser($currentUser->id);
+        $assignedCompaniesCount = $this->companyRepo->countAssignedByUser($currentUser->id);
 
         $formattedTotalCompanies = $totalCompanies >= 1000
             ? number_format($totalCompanies / 1000, 1) . 'k'
@@ -57,7 +58,11 @@ class CompanyController extends Controller
             ? number_format($myCompaniesCount / 1000, 1) . 'k'
             : $myCompaniesCount;
 
-        return compact('formattedTotalCompanies', 'formattedMyCompanies');
+        $formattedAssignedCompanies = $assignedCompaniesCount >= 1000
+            ? number_format($assignedCompaniesCount / 1000, 1) . 'k'
+            : $assignedCompaniesCount;
+
+        return compact('formattedTotalCompanies', 'formattedMyCompanies', 'formattedAssignedCompanies');
     }
 
     private function applyCompanyFilters($query, Request $request)
@@ -164,6 +169,31 @@ class CompanyController extends Controller
 
         return view('admin.company.my-companies', array_merge(
             compact('companies', 'totalMyCompanies'),
+            $this->getCompanySharedData(),
+            $this->getSidebarStats()
+        ));
+    }
+
+    public function assigned_companies(Request $request, $id)
+    {
+        $query = $this->applyCompanyFilters(
+            $this->companyRepo->getAssignedByUserWithRelations($id),
+            $request
+        );
+
+        $companies = $query->paginate(10)->appends($request->query());
+        $totalAssignedCompanies = $companies->total();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'table' => view('admin.company.partials.company-table-rows', compact('companies'))->render(),
+                'count' => $totalAssignedCompanies,
+                'pagination' => (string) $companies->links(),
+            ]);
+        }
+
+        return view('admin.company.assigned-companies', array_merge(
+            compact('companies', 'totalAssignedCompanies'),
             $this->getCompanySharedData(),
             $this->getSidebarStats()
         ));

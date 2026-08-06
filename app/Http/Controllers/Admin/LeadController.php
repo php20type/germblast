@@ -61,7 +61,8 @@ class LeadController extends Controller
                 : $count;
         };
 
-        $myLeads = $leads->where('assignee_id', $user->id);
+        $myLeads = $leads->where('creator_id', $user->id);
+        $assignedLeads = $leads->where('assignee_id', $user->id);
         $now = Carbon::now();
         $startOfWeek = $now->copy()->startOfWeek();
         $endOfWeek = $now->copy()->endOfWeek();
@@ -69,15 +70,17 @@ class LeadController extends Controller
         // Counts
         $totalLeads = $leads->count();
         $myLeadsCount = $myLeads->count();
+        $assignedLeadsCount = $assignedLeads->count();
         $addedThisWeekCount = Lead::whereBetween('created_at', [$startOfWeek, $endOfWeek])->count();
         $closingThisWeekCount = Lead::whereBetween('close_date', [$startOfWeek, $endOfWeek])->count();
-        $myLeadOpenStatusCount = Lead::where('lead_status', 'open')->where('assignee_id', $user->id)->count();
-        $myWatchingLeadsCount = Lead::where('is_watching', 1)->where('assignee_id', $user->id)->count();
+        $myLeadOpenStatusCount = Lead::where('lead_status', 'open')->where('creator_id', $user->id)->count();
+        $myWatchingLeadsCount = Lead::where('is_watching', 1)->where('creator_id', $user->id)->count();
         $hotLeadsCount = Lead::where('is_hot', 1)->count();
 
         return [
             'totalLeads' => $formatCount($totalLeads),
             'myLeadsCount' => $formatCount($myLeadsCount),
+            'assignedLeadsCount' => $formatCount($assignedLeadsCount),
             'addedThisWeekCount' => $formatCount($addedThisWeekCount),
             'closingThisWeekCount' => $formatCount($closingThisWeekCount),
             'myLeadOpenStatusCount' => $formatCount($myLeadOpenStatusCount),
@@ -237,7 +240,7 @@ class LeadController extends Controller
     public function my_leads(Request $request, $id)
     {
         $query = $this->applyFilters(
-            $this->baseLeadQuery()->where('assignee_id', $id),
+            $this->baseLeadQuery()->where('creator_id', $id),
             $request
         );
 
@@ -257,15 +260,42 @@ class LeadController extends Controller
             ]);
         }
 
-        return view(
-            'admin.leads.my-leads',
-            array_merge(
-                compact('groupedLeads', 'paginator'),
-                $stats,
-                $this->sharedViewData(),
-                $this->getSidebarStats()
-            )
+        return view('admin.leads.my-leads', array_merge(
+            compact('leads', 'paginator', 'groupedLeads'),
+            $stats,
+            $this->sharedViewData(),
+            $this->getSidebarStats()
+        ));
+    }
+
+    public function assigned_leads(Request $request, $id)
+    {
+        $query = $this->applyFilters(
+            $this->baseLeadQuery()->where('assignee_id', $id),
+            $request
         );
+
+        $paginator = $query->paginate(10)->appends($request->query());
+        $leads = $paginator->getCollection();
+        $groupedLeads = $this->groupLeads($leads);
+        $stats = $this->calculateStats($leads);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'table' => view('admin.leads.partials.lead-table-rows', compact('groupedLeads'))->render(),
+                'count' => $stats['formattedTotalLeads'],
+                'total_value' => $stats['formattedTotalValue'],
+                'avg_value' => $stats['formattedAvgValue'],
+                'avg_confidence' => $stats['avgConfidence'],
+                'pagination' => (string) $paginator->links(),
+            ]);
+        }
+        return view('admin.leads.assigned-leads', array_merge(
+            compact('leads', 'paginator', 'groupedLeads'),
+            $stats,
+            $this->sharedViewData(),
+            $this->getSidebarStats()
+        ));
     }
 
     public function open_leads(Request $request, $id)

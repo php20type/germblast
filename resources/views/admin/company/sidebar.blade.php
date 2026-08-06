@@ -30,6 +30,14 @@
                 </a>
                 @endcan
 
+                @can('company.list.all.view')
+                <a class="nav-link company-filter {{ request()->routeIs('admin.company.assigned_companies') ? 'active' : '' }}"
+                    href="{{ route('admin.company.assigned_companies', auth()->id()) }}">
+                    Assigned companies
+                    <span class="badge bg-light text-dark">{{ $formattedAssignedCompanies }}</span>
+                </a>
+                @endcan
+
                 <div id="nothing-found" style="display:none;">Nothing found.</div>
             </div>
         </div>

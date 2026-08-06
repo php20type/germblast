@@ -1,6 +1,6 @@
 @extends('admin.includes.layout')
 
-@section('title', 'Closing This Week Leads')
+@section('title', 'Assigned leads')
 
 @section('content')
 
@@ -18,10 +18,10 @@
                             <!-- Header -->
                             <div class="heading-area-sec">
                                 <div class="left-part-sec">
-                                    <h3 class="mb-1">CLOSING THIS WEEK <span style="font-size: 24px;">📌</span></h3>
-                                    <p class="text-muted mb-0">Business deals closing this week</p>
+                                    <h3 class="mb-1">Assigned leads <span style="font-size: 24px;">📌</span></h3>
+                                    <p class="text-muted mb-0">Business deals assigned to you</p>
                                 </div>
-                            @can('lead.create')
+                                @can('lead.create')
                             <div class="right-part">
                                 <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#AddLead">
                                         <i class="fa-solid fa-plus"></i> Add Lead
@@ -138,7 +138,7 @@
                                                     <td>
                                                         <div class="company-name">
 
-                                                             @can('lead.detail.view')
+                                                            @can('lead.detail.view')
                                                                 <a href="{{ route('admin.lead.show', $lead['id']) }}"
                                                                     class="text-decoration-none text-dark">
                                                                     {{ $lead['name'] }}
@@ -166,7 +166,6 @@
                                                     <td colspan="9" class="text-center">No leads found</td>
                                                 </tr>
                                             @endforelse
-
                                         </tbody>
                                     </table>
                                 </div>
@@ -190,7 +189,6 @@
                                     @endcan
                                 </div>
                             </div>
-
                         </div>
                     </div>
 
@@ -308,163 +306,160 @@
                 </div>
             </div>
         </div>
-    </div>
+
+        </div>
 
 
-    </div>
+        @include('admin.leads.partials.add-lead-modal')
 
 
+    @endsection
 
-    @include('admin.leads.partials.add-lead-modal')
-
-
-
-@endsection
-@push('scripts')
-    <script>
-        function addFilter() {
-            $('#AddFilter').modal('show');
-        }
-
-        function updateFilterCount() {
-            let count = $('#filter-section input[type="checkbox"]:checked').length;
-
-            if (count > 0) {
-                $('#filterCount').text(count).removeClass('d-none');
-            } else {
-                $('#filterCount').addClass('d-none');
-            }
-        }
-
-        $(document).ready(function() {
-            function fetchLeads() {
-                let search = $('#lead-search').val();
-                let status = $('select[name="status"]').val();
-                let assignee_id = $('select[name="assignee_id"]').val();
-                let hot = $('#checkDefault').is(':checked') ? 'hot' : '';
-
-                // collect checkbox values
-                let lead_tags_filter_id = [];
-                $('input[name="lead_tags_filter_id[]"]:checked').each(function() {
-                    lead_tags_filter_id.push($(this).val());
-                });
-
-                let lead_stage_filter_id = [];
-                $('input[name="lead_stage_filter_id[]"]:checked').each(function() {
-                    lead_stage_filter_id.push($(this).val());
-                });
-
-                let leads_status = [];
-                $('input[name="leads_status[]"]:checked').each(function() {
-                    leads_status.push($(this).val());
-                });
-
-                let activity_type_filter_id = [];
-                $('input[name="activity_type_filter_id[]"]:checked').each(function() {
-                    activity_type_filter_id.push($(this).val());
-                });
-                // New open date filters
-                let month_to_date = $('#month_to_date').is(':checked') ? 1 : 0;
-
-                $.ajax({
-                    url: "{{ route('admin.lead.closing_this_week') }}",
-                    method: "GET",
-                    data: {
-                        search: search,
-                        status: status,
-                        assignee_id: assignee_id,
-                        hot: hot,
-                        lead_tags_filter_id: lead_tags_filter_id,
-                        lead_stage_filter_id: lead_stage_filter_id,
-                        leads_status: leads_status,
-                        activity_type_filter_id: activity_type_filter_id,
-                        month_to_date: month_to_date,
-                    },
-                    beforeSend: function() {
-                        AppLoader.show();
-                    },
-                    success: function(response) {
-                        $('table tbody').html(response.table);
-                        $('.company-count').text(response.count + ' Lead Found');
-                        $('#total-value span').text('$' + response.total_value);
-                        $('#avg-value span').text('$' + response.avg_value);
-                        $('#confidence-value span').text(response.avg_confidence + '%');
-                        $('#lead-pagination').html(response.pagination);
-                    },
-                    error: function() {
-                        console.error('Error fetching lead data');
-                    },
-                    complete: function() {
-                        AppLoader.hide();
-                    }
-                });
+    @push('scripts')
+        <script>
+            function addFilter() {
+                $('#AddFilter').modal('show');
             }
 
-            $('#lead-search').on('input', function () {
-                fetchLeads();
-            });
-            $('#checkDefault, select[name="status"], select[name="assignee_id"]').on('change', fetchLeads);
-            // catch all checkbox changes
-            // $('#filter-section input[type="checkbox"]').on('change', fetchLeads);
-            $('#filter-section input[type="checkbox"]').on('change', function() {
-                fetchLeads();
-                updateFilterCount();
-            });
+            function updateFilterCount() {
+                let count = $('#filter-section input[type="checkbox"]:checked').length;
 
+                if (count > 0) {
+                    $('#filterCount').text(count).removeClass('d-none');
+                } else {
+                    $('#filterCount').addClass('d-none');
+                }
+            }
 
+            $(document).ready(function() {
+                const userId = {{ auth()->id() }};
 
-            $(document).on('click', '.btn-delete', function() {
-                let selectedLeads = $('.row-checkbox:checked').map(function() {
-                    return $(this).data('id');
-                }).get();
+                function fetchLeads() {
+                    let search = $('#lead-search').val();
+                    let status = $('select[name="status"]').val();
+                    let assignee_id = $('select[name="assignee_id"]').val();
+                    let hot = $('#checkDefault').is(':checked') ? 'hot' : '';
 
-                Swal.fire({
-                    title: "Are you sure?",
-                    text: "This action will permanently delete the selected lead.",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#d33",
-                    cancelButtonColor: "#3085d6",
-                    confirmButtonText: "Yes, delete",
-                    cancelButtonText: "Cancel"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: "{{ route('admin.lead.delete') }}",
-                            type: "POST",
-                            data: {
-                                _token: "{{ csrf_token() }}",
-                                ids: selectedLeads
-                            },
-                            success: function(response) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Deleted!',
-                                    text: response.message ||
-                                        'Lead deleted successfully.',
-                                    showConfirmButton: false,
-                                    timer: 2000
-                                });
-                                setTimeout(() => location.reload(), 2000);
-                            },
-                            error: function(xhr) {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error!',
-                                    text: xhr.responseJSON?.message ||
-                                        'Something went wrong while deleting.',
-                                });
-                            }
-                        });
-                    }
+                    // collect checkbox values
+                    let lead_tags_filter_id = [];
+                    $('input[name="lead_tags_filter_id[]"]:checked').each(function() {
+                        lead_tags_filter_id.push($(this).val());
+                    });
+
+                    let lead_stage_filter_id = [];
+                    $('input[name="lead_stage_filter_id[]"]:checked').each(function() {
+                        lead_stage_filter_id.push($(this).val());
+                    });
+
+                    let leads_status = [];
+                    $('input[name="leads_status[]"]:checked').each(function() {
+                        leads_status.push($(this).val());
+                    });
+
+                    let activity_type_filter_id = [];
+                    $('input[name="activity_type_filter_id[]"]:checked').each(function() {
+                        activity_type_filter_id.push($(this).val());
+                    });
+
+                    // New open date filters
+                    let month_to_date = $('#month_to_date').is(':checked') ? 1 : 0;
+
+                    $.ajax({
+                        url: `/admin/lead/my-leads/${userId}`,
+                        method: "GET",
+                        data: {
+                            search: search,
+                            status: status,
+                            assignee_id: assignee_id,
+                            hot: hot,
+                            lead_tags_filter_id: lead_tags_filter_id,
+                            lead_stage_filter_id: lead_stage_filter_id,
+                            leads_status: leads_status,
+                            activity_type_filter_id: activity_type_filter_id,
+                            month_to_date: month_to_date,
+                        },
+                        beforeSend: function() {
+                            AppLoader.show();
+                        },
+                        success: function(response) {
+                            $('table tbody').html(response.table);
+                            $('.company-count').text(response.count + ' Lead Found');
+                            $('#total-value span').text('$' + response.total_value);
+                            $('#avg-value span').text('$' + response.avg_value);
+                            $('#confidence-value span').text(response.avg_confidence + '%');
+                            $('#lead-pagination').html(response.pagination);
+                        },
+                        error: function() {
+                            console.error('Error fetching lead data');
+                        },
+                        complete: function() {
+                            AppLoader.hide();
+                        }
+                    });
+                }
+
+                $('#lead-search').on('input', function () {
+                    fetchLeads();
                 });
+                $('#checkDefault, select[name="status"], select[name="assignee_id"]').on('change', fetchLeads);
+                // catch all checkbox changes
+                // $('#filter-section input[type="checkbox"]').on('change', fetchLeads);
+                $('#filter-section input[type="checkbox"]').on('change', function() {
+                    fetchLeads();
+                    updateFilterCount();
+                });
+
+                $(document).on('click', '.btn-delete', function() {
+                    let selectedLeads = $('.row-checkbox:checked').map(function() {
+                        return $(this).data('id');
+                    }).get();
+
+                    Swal.fire({
+                        title: "Are you sure?",
+                        text: "This action will permanently delete the selected lead.",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#d33",
+                        cancelButtonColor: "#3085d6",
+                        confirmButtonText: "Yes, delete",
+                        cancelButtonText: "Cancel"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: "{{ route('admin.lead.delete') }}",
+                                type: "POST",
+                                data: {
+                                    _token: "{{ csrf_token() }}",
+                                    ids: selectedLeads
+                                },
+                                success: function(response) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Deleted!',
+                                        text: response.message ||
+                                            'Lead deleted successfully.',
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
+                                    setTimeout(() => location.reload(), 2000);
+                                },
+                                error: function(xhr) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error!',
+                                        text: xhr.responseJSON?.message ||
+                                            'Something went wrong while deleting.',
+                                    });
+                                }
+                            });
+                        }
+                    });
+                });
+
             });
+        </script>
+        @include('admin.leads.partials.add-lead-scripts')
 
-
-        });
-    </script>
-    @include('admin.leads.partials.add-lead-scripts')
-
-@endpush
+    @endpush
 
 

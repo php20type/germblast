@@ -8,4 +8,6 @@ interface CompanyRepositoryInterface
     public function getByUserWithRelations($userId);
     public function countAll();
     public function countByUser($userId);
+    public function getAssignedByUserWithRelations($userId);
+    public function countAssignedByUser($userId);
 }

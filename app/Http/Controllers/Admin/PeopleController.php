@@ -39,6 +39,7 @@ class PeopleController extends Controller
 
         $peoples = People::with(['companies', 'tags', 'user'])->get();
         $myPeopleCount = $peoples->where('user_id', $user->id)->count();
+        $assignedPeopleCount = $peoples->where('assignee_id', $user->id)->count();
         $totalPeoples = $peoples->count();
 
         // Conditional formatting
@@ -49,8 +50,12 @@ class PeopleController extends Controller
         $formattedMyPeopleCount = $myPeopleCount >= 1000
             ? number_format($myPeopleCount / 1000, 1).'K'
             : $myPeopleCount;
+            
+        $formattedAssignedPeopleCount = $assignedPeopleCount >= 1000
+            ? number_format($assignedPeopleCount / 1000, 1).'K'
+            : $assignedPeopleCount;
 
-        return compact('myPeopleCount', 'formattedMyPeopleCount', 'totalPeoples', 'formattedTotalPeoples');
+        return compact('formattedTotalPeoples', 'formattedMyPeopleCount', 'formattedAssignedPeopleCount');
     }
 
     private function applyPeopleFilters($query, Request $request)
@@ -162,9 +167,38 @@ class PeopleController extends Controller
             ]);
         }
 
-        // Full page load
         return view('admin.peoples.my-peoples', array_merge(
             compact('peoples', 'myPeoplesCount'),
+            $this->getPeopleSharedData(),
+            $this->getSidebarStats()
+        ));
+    }
+
+    public function assigned_peoples(Request $request, $id)
+    {
+        $query = People::with([
+            'companies', 'tags', 'user',
+            'peopleEmail', 'peoplePhone', 'peopleAddress',
+            'peopleUrl', 'companyPeople',
+        ])->where('assignee_id', $id);
+
+        // Apply shared filters
+        $this->applyPeopleFilters($query, $request);
+
+        $peoples = $query->paginate(10)->appends($request->query());
+        $assignedPeoplesCount = $peoples->total();
+
+        // AJAX response
+        if ($request->ajax()) {
+            return response()->json([
+                'table' => view('admin.peoples.partials.people-table-row', compact('peoples'))->render(),
+                'count' => $assignedPeoplesCount,
+                'pagination' => (string) $peoples->links(),
+            ]);
+        }
+
+        return view('admin.peoples.assigned-peoples', array_merge(
+            compact('peoples', 'assignedPeoplesCount'),
             $this->getPeopleSharedData(),
             $this->getSidebarStats()
         ));
