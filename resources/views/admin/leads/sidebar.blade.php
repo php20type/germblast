@@ -21,8 +21,7 @@
          </div> -->
          <hr>
          <div class="mt-4">
-             <h6 class="text-uppercase text-light mb-2">SHARED
-                 LISTS ⚙️</h6>
+             <h6 class="text-uppercase text-light mb-2 text-nowrap">SHARED LISTS ⚙️</h6>
 
              <div id="shared-lists">
 
