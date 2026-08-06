@@ -481,8 +481,6 @@ class LeadController extends Controller
             'quantity' => 'nullable|array',
             'price' => 'nullable|array',
 
-            // 'company_id' => 'nullable|array',
-            // 'company_id.*' => 'exists:companies,id',
             'company_id' => 'required|exists:companies,id',
 
             'person_id' => 'nullable|array',
@@ -520,10 +518,6 @@ class LeadController extends Controller
                 'lead_id' => $lead->id,
                 'company_id' => $lead->company_id,
             ]);
-
-            // if ($request->filled('company_id')) {
-            //     $lead->companies()->attach($request->company_id);
-            // }
 
             if ($request->filled('person_id')) {
                 $personIds = array_unique((array) $request->person_id);
