@@ -72,19 +72,14 @@
 
                     </li>
                     <li class="list-inline-item ms-2">
-                        <a href="#" data-bs-toggle="dropdown" class="dropdown item-nav">
-                            {{-- <div class="icon-round" title="View Profile">
+                        <a href="#" data-bs-toggle="dropdown" class="dropdown item-nav d-flex align-items-center justify-content-center p-0 overflow-hidden">
+                            @if(Auth::user()->profile_image)
+                                <img src="{{ asset('storage/' . Auth::user()->profile_image) }}"
+                                    alt="Profile"
+                                    style="width: 100%; height: 100%; object-fit: cover;">
+                            @else
                                 <i class="fa-solid fa-user"></i>
-                            </div> --}}
-                            <div class="icon-round" title="View Profile" style="padding:0; overflow:hidden; background:transparent;">
-                                @if(Auth::user()->profile_image)
-                                    <img src="{{ asset('storage/' . Auth::user()->profile_image) }}"
-                                        alt="Profile"
-                                        style="width:50px; height:50px; object-fit:cover; border-radius:50%;">
-                                @else
-                                    <i class="fa-solid fa-user"></i>
-                                @endif
-                            </div>
+                            @endif
                         </a>
 
                         <ul class="dropdown-menu dropdown-menu-end shadow" style="width: 220px; border-radius: 10px;">
@@ -111,7 +106,7 @@
                                             alt="Profile"
                                             style="width:35px; height:35px; object-fit:cover; border-radius:50%; margin-right:12px;">
                                     @else
-                                        <i class="fas fa-user-circle me-3 text-primary"></i>
+                                        <i class="fas fa-user-circle text-primary" style="font-size: 24px; width: 35px; text-align: center; margin-right: 12px;"></i>
                                     @endif
                                     <span>View Profile</span>
                                 </a>
