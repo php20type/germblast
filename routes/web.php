@@ -105,6 +105,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('employee/{id}/driver-log/store',[EmployeeController::class, 'storeDriverLog'])->name('employee.driver-log.store');
     Route::post('employee/{id}/driver-suspension/store',[EmployeeController::class, 'storeDriverSuspension'])->name('employee.driver-suspension.store');
     Route::post('employee/{id}/availability/store', [EmployeeController::class, 'storeAvailability'])->name('employee.availability.store');
+    Route::get('operations/workforce-coverage', [EmployeeController::class, 'workforceCoverage'])->name('operations.workforce-coverage');
 
     // Expense Reports
     Route::get('expense-report/index', [ExpenseReportController::class, 'index'])->name('expense-report.index');

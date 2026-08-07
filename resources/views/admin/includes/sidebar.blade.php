@@ -121,7 +121,8 @@
                     'admin.training-categories.*',
                     'admin.training-tests.*',
                     'admin.training-questions.*',
-                    'admin.training-report.*'
+                    'admin.training-report.*',
+                    'admin.operations.workforce-coverage'
                 ]);
 
                 $user = auth()->user();
