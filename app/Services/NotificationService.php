@@ -47,6 +47,31 @@ class NotificationService
         ]);
     }
 
+    public function employeeCreated($employee)
+    {
+        if ($this->sendEmail && $employee->email) {
+            SendEmailJob::dispatch(
+                $employee->email,
+                'employee_created',
+                [
+                    'name' => $employee->name,
+                    'email' => $employee->email,
+                    'role' => $employee->role,
+                ]
+            );
+        }
+
+        $this->sendInApp(
+            $employee,
+            'Welcome to GermBlast',
+            'Your account has been created successfully.',
+            'employees',
+            $employee->id,
+            'employee_created',
+            get_class($employee)
+        );
+    }
+
     public function companyCreated($company)
     {
         $salesManagers = \App\Models\User::all()->filter(fn($u) => $u->isSalesManager());

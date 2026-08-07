@@ -26,6 +26,7 @@ class ActionEmail extends Mailable
     {
         return new Envelope(
             subject: match ($this->type) {
+                'employee_created' => 'Welcome to Germblast!',
                 'company_created' => 'New Company Added',
                 'lead_created' => 'New Lead Created',
                 'lead_status_changed' => 'Lead Status Changed',

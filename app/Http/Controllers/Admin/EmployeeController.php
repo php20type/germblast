@@ -96,6 +96,13 @@ class EmployeeController extends Controller implements HasMiddleware
         // Assign Spatie role
         $user->assignRole($validated['role']);
 
+        // Dispatch welcome email and in-app notification via NotificationService
+        try {
+            (new \App\Services\NotificationService())->employeeCreated($user);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to dispatch welcome notification for new employee: ' . $e->getMessage());
+        }
+
         return response()->json([
             'status' => true,
             'message' => 'Employee created successfully.',
