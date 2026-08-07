@@ -2454,8 +2454,8 @@
             // Reset fields
             $('#add-company-location')[0].reset();
             
-            // Reset Select2 fields explicitly
-            $('#country_select').val('').trigger('change.select2');
+            // Preselect US (233) and trigger change to load states
+            $('#country_select').val('233').trigger('change');
             
             // Re-disable state and city
             $('#state_select').empty().append('<option value="">Select State</option>').prop('disabled', true).trigger('change.select2');
@@ -3396,6 +3396,9 @@
                             `<option value="${state.state_id}">${state.name}</option>`
                         );
                     });
+                    if (countryId == 233) {
+                        $('#state_select').val('1407').trigger('change');
+                    }
                 });
             });
 

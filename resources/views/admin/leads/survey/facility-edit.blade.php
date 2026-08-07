@@ -175,7 +175,7 @@
                                                             <option value="">Select Country</option>
                                                             @foreach ($countries as $country)
                                                                 <option value="{{ $country->id }}"
-                                                                    {{ $facility->country_id == $country->id ? 'selected' : '' }}>
+                                                                    {{ ($facility->country_id ?? 233) == $country->id ? 'selected' : '' }}>
                                                                     {{ $country->name }}
                                                                 </option>
                                                             @endforeach
@@ -735,6 +735,11 @@
                             `<option value="${state.state_id}">${state.name}</option>`
                         );
                     });
+                    
+                    // If no state was previously selected, default to Texas when US is selected
+                    if (countryId == 233 && !$('#facility_state').data('preselected')) {
+                        $('#facility_state').val('1407').trigger('change');
+                    }
                 });
             });
 

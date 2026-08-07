@@ -170,7 +170,7 @@
                                                         <select name="country_id" class="form-select select2" id="facility_country">
                                                             <option value="">Select Country</option>
                                                             @foreach ($countries as $country)
-                                                                <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                                                <option value="{{ $country->id }}" {{ $country->id == 233 ? 'selected' : '' }}>{{ $country->name }}</option>
                                                             @endforeach
                                                         </select>
                                                     </td>
@@ -675,8 +675,12 @@
                             `<option value="${state.state_id}">${state.name}</option>`
                         );
                     });
+                    if (countryId == 233) {
+                        $('#facility_state').val('1407').trigger('change');
+                    }
                 });
             });
+            $('#facility_country').trigger('change');
 
 
             // State → Cities
