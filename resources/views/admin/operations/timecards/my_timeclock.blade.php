@@ -142,45 +142,6 @@
                             </div>
 
                             <div class="px-4 pb-4">
-                                <div class="table-responsive mt-3">
-                                    <table class="table table-hover w-100 equipment-report-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Employee</th>
-                                                <th>Reg</th>
-                                                <th>Drive</th>
-                                                <th>Ride</th>
-                                                <th>OT</th>
-                                                <th>Train</th>
-                                                <th>Floor</th>
-                                                <th>Covid</th>
-                                                <th>mRGB</th>
-                                                <th>WH</th>
-                                                <th class="text-primary">Total</th>
-                                                <th>Break</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    {{ Auth::user()->name }}
-                                                </td>
-                                                <td>{{ isset($employee->totals['reg']) && $employee->totals['reg'] > 0 ? number_format($employee->totals['reg'], 2) : '-' }}</td>
-                                                <td>{{ isset($employee->totals['drive']) && $employee->totals['drive'] > 0 ? number_format($employee->totals['drive'], 2) : '-' }}</td>
-                                                <td>{{ isset($employee->totals['ride']) && $employee->totals['ride'] > 0 ? number_format($employee->totals['ride'], 2) : '-' }}</td>
-                                                <td>{{ isset($employee->totals['ot']) && $employee->totals['ot'] > 0 ? number_format($employee->totals['ot'], 2) : '-' }}</td>
-                                                <td>{{ isset($employee->totals['train']) && $employee->totals['train'] > 0 ? number_format($employee->totals['train'], 2) : '-' }}</td>
-                                                <td>{{ isset($employee->totals['floor']) && $employee->totals['floor'] > 0 ? number_format($employee->totals['floor'], 2) : '-' }}</td>
-                                                <td>{{ isset($employee->totals['covid']) && $employee->totals['covid'] > 0 ? number_format($employee->totals['covid'], 2) : '-' }}</td>
-                                                <td>{{ isset($employee->totals['mrgb']) && $employee->totals['mrgb'] > 0 ? number_format($employee->totals['mrgb'], 2) : '-' }}</td>
-                                                <td>{{ isset($employee->totals['wh']) && $employee->totals['wh'] > 0 ? number_format($employee->totals['wh'], 2) : '-' }}</td>
-                                                <td class="text-primary fw-bold">{{ isset($employee->totals['total']) && $employee->totals['total'] > 0 ? number_format($employee->totals['total'], 2) : '-' }}</td>
-                                                <td>{{ isset($employee->totals['break']) && $employee->totals['break'] > 0 ? number_format($employee->totals['break'], 2) : '-' }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
                                 <!-- Detailed Timecard Punches Table -->
                                 <div class="table-responsive mt-4">
                                     <table class="table table-hover w-100 equipment-report-table">
@@ -191,18 +152,7 @@
                                                 <th>In</th>
                                                 <th>Out</th>
                                                 <th>Type</th>
-                                                <th>Reg</th>
-                                                <th>Drive</th>
-                                                <th>Ride</th>
-                                                <th>OT</th>
-                                                <th>Floor</th>
-                                                <th>Covid</th>
-                                                <th>mRGB</th>
-                                                <th>WH</th>
-                                                <th>Train</th>
-                                                <th class="text-primary">Total</th>
-                                                <th>Break</th>
-                                                <th>Action</th>
+                                                <th class="text-primary">Total Hours</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -217,38 +167,14 @@
                                                 <td>{{ $timecard->clock_in ? \Carbon\Carbon::parse($timecard->clock_in)->format('h:iA') : '-' }}</td>
                                                 <td>{{ $timecard->clock_out ? \Carbon\Carbon::parse($timecard->clock_out)->format('h:iA') : '-' }}</td>
                                                 <td>{{ $timecard->clock_type_label }}</td>
-                                                <td>{{ in_array($timecard->clock_type, [2, 4]) ? $formattedHrs : '-' }}</td>
-                                                <td>-</td>
-                                                <td>{{ $timecard->clock_type == 1 ? $formattedHrs : '-' }}</td>
-                                                <td>-</td>
-                                                <td>{{ $timecard->clock_type == 7 ? $formattedHrs : '-' }}</td>
-                                                <td>{{ $timecard->clock_type == 8 ? $formattedHrs : '-' }}</td>
-                                                <td>-</td>
-                                                <td>{{ $timecard->clock_type == 5 ? $formattedHrs : '-' }}</td>
-                                                <td>{{ $timecard->clock_type == 6 ? $formattedHrs : '-' }}</td>
                                                 <td class="text-primary fw-semibold">{{ $formattedHrs }}</td>
-                                                <td>{{ $timecard->clock_type == 3 ? $formattedHrs : '-' }}</td>
-                                                <td>
-                                                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editPunchModal{{ $timecard->id }}">Edit</button>
-                                                </td>
                                             </tr>
                                             @endforeach
                                         </tbody>
                                         <tfoot>
                                             <tr class="bg-light fw-bold">
                                                 <td class="text-start" colspan="5">Grand Totals</td>
-                                                <td>{{ isset($employee->totals['reg']) && $employee->totals['reg'] > 0 ? number_format($employee->totals['reg'], 2) : '-' }}</td>
-                                                <td>{{ isset($employee->totals['drive']) && $employee->totals['drive'] > 0 ? number_format($employee->totals['drive'], 2) : '-' }}</td>
-                                                <td>{{ isset($employee->totals['ride']) && $employee->totals['ride'] > 0 ? number_format($employee->totals['ride'], 2) : '-' }}</td>
-                                                <td>{{ isset($employee->totals['ot']) && $employee->totals['ot'] > 0 ? number_format($employee->totals['ot'], 2) : '-' }}</td>
-                                                <td>{{ isset($employee->totals['floor']) && $employee->totals['floor'] > 0 ? number_format($employee->totals['floor'], 2) : '-' }}</td>
-                                                <td>{{ isset($employee->totals['covid']) && $employee->totals['covid'] > 0 ? number_format($employee->totals['covid'], 2) : '-' }}</td>
-                                                <td>{{ isset($employee->totals['mrgb']) && $employee->totals['mrgb'] > 0 ? number_format($employee->totals['mrgb'], 2) : '-' }}</td>
-                                                <td>{{ isset($employee->totals['wh']) && $employee->totals['wh'] > 0 ? number_format($employee->totals['wh'], 2) : '-' }}</td>
-                                                <td>{{ isset($employee->totals['train']) && $employee->totals['train'] > 0 ? number_format($employee->totals['train'], 2) : '-' }}</td>
                                                 <td class="text-primary">{{ isset($employee->totals['total']) && $employee->totals['total'] > 0 ? number_format($employee->totals['total'], 2) : '-' }}</td>
-                                                <td>{{ isset($employee->totals['break']) && $employee->totals['break'] > 0 ? number_format($employee->totals['break'], 2) : '-' }}</td>
-                                                <td>-</td>
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -331,75 +257,29 @@
 </div>
 <!-- Add Punch Modal End -->
 
-@foreach($employee->timecards as $timecard)
-<!-- Edit Punch Modal Start -->
-<div class="modal fade" id="editPunchModal{{ $timecard->id }}" tabindex="-1" aria-labelledby="editPunchModalLabel{{ $timecard->id }}" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title" id="editPunchModalLabel{{ $timecard->id }}">Edit Punch</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form action="{{ route('admin.timecards.update', $timecard->id) }}" method="POST" class="punch-form">
-                    @csrf
-                    @method('PUT')
-                    <input type="hidden" name="employee_id" value="{{ $employee->id }}">
-                    <div class="row mx-0">
-                        <div class="col-lg-12">
-                            <div class="form-group">
-                                <label class="form-label">Customer</label>
-                                <span class="text-danger">*</span>
-                                <select name="customer" class="form-select">
-                                    <option value="">-- Please Select --</option>
-                                    @foreach($companies as $company)
-                                        <option value="{{ $company->id }}" {{ $timecard->company_id == $company->id ? 'selected' : '' }}>{{ $company->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="form-group">
-                                <label class="form-label">Work Date</label>
-                                <span class="text-danger">*</span>
-                                <input type="date" name="work_date" class="form-control" value="{{ \Carbon\Carbon::parse($timecard->work_date)->format('Y-m-d') }}">
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label class="form-label">Clock In</label>
-                                <span class="text-danger">*</span>
-                                <input type="time" name="clock_in" class="form-control" value="{{ $timecard->clock_in ? \Carbon\Carbon::parse($timecard->clock_in)->format('H:i') : '' }}">
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label class="form-label">Clock Out</label>
-                                <span class="text-danger">*</span>
-                                <input type="time" name="clock_out" class="form-control" value="{{ $timecard->clock_out ? \Carbon\Carbon::parse($timecard->clock_out)->format('H:i') : '' }}">
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <div class="form-group">
-                                <label class="form-label">Clock Type</label>
-                                <span class="text-danger">*</span>
-                                <select name="clock_type" class="form-select">
-                                    @foreach($clock_types as $key => $label)
-                                        <option value="{{ $key }}" {{ $timecard->clock_type == $key ? 'selected' : '' }}>{{ $label }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Edit Punch Modal End -->
-@endforeach
-@endsection
+    @endsection
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+            @if(session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '{{ session('success') }}',
+                    confirmButtonColor: '#ffb400'
+                });
+            @endif
+
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: '{{ session('error') }}',
+                    confirmButtonColor: '#ffb400'
+                });
+            @endif
+        });
+    </script>
+@endpush

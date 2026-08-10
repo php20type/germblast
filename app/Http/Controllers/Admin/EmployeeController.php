@@ -680,6 +680,39 @@ class EmployeeController extends Controller implements HasMiddleware
             'employee_id' => 'nullable|exists:users,id'
         ]);
 
+        $userId = $request->employee_id ?? auth()->id();
+        $clockIn = $request->clock_in;
+        if ($clockIn && strlen($clockIn) === 5) $clockIn .= ':00';
+        
+        $clockOut = $request->clock_out;
+        if ($clockOut && strlen($clockOut) === 5) $clockOut .= ':00';
+        
+        $workDate = $request->work_date;
+
+        if ($clockIn && $clockOut && $clockIn >= $clockOut) {
+            return redirect()->back()->withInput()->with('error', 'Clock Out time must be after Clock In time.');
+        }
+
+        $overlap = Timecard::where('user_id', $userId)
+            ->where('work_date', $workDate)
+            ->where(function ($q) use ($clockIn, $clockOut) {
+                if ($clockOut) {
+                    $q->where('clock_in', '<', $clockOut)
+                      ->where(function ($subQ) use ($clockIn) {
+                          $subQ->whereNull('clock_out')
+                               ->orWhere('clock_out', '>', $clockIn);
+                      });
+                } else {
+                    $q->whereNull('clock_out')
+                      ->orWhere('clock_out', '>', $clockIn);
+                }
+            })
+            ->exists();
+
+        if ($overlap) {
+            return redirect()->back()->withInput()->with('error', 'The time entered conflicts or overlaps with an existing punch for this date.');
+        }
+
         Timecard::create([
             'user_id' => $request->employee_id ?? auth()->id(),
             'company_id' => $request->customer,
@@ -705,6 +738,40 @@ class EmployeeController extends Controller implements HasMiddleware
 
         $timecard = Timecard::findOrFail($id);
         
+        $userId = $request->employee_id ?? $timecard->user_id;
+        $clockIn = $request->clock_in;
+        if ($clockIn && strlen($clockIn) === 5) $clockIn .= ':00';
+        
+        $clockOut = $request->clock_out;
+        if ($clockOut && strlen($clockOut) === 5) $clockOut .= ':00';
+        
+        $workDate = $request->work_date;
+
+        if ($clockIn && $clockOut && $clockIn >= $clockOut) {
+            return redirect()->back()->withInput()->with('error', 'Clock Out time must be after Clock In time.');
+        }
+
+        $overlap = \App\Models\Timecard::where('user_id', $userId)
+            ->where('id', '!=', $id)
+            ->where('work_date', $workDate)
+            ->where(function ($q) use ($clockIn, $clockOut) {
+                if ($clockOut) {
+                    $q->where('clock_in', '<', $clockOut)
+                      ->where(function ($subQ) use ($clockIn) {
+                          $subQ->whereNull('clock_out')
+                               ->orWhere('clock_out', '>', $clockIn);
+                      });
+                } else {
+                    $q->whereNull('clock_out')
+                      ->orWhere('clock_out', '>', $clockIn);
+                }
+            })
+            ->exists();
+
+        if ($overlap) {
+            return redirect()->back()->withInput()->with('error', 'The time entered conflicts or overlaps with an existing punch for this date.');
+        }
+
         $timecard->update([
             'company_id' => $request->customer,
             'work_date' => $request->work_date,
