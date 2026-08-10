@@ -85,4 +85,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     Route::get('/all-schedules', [ServiceController::class, 'all_schedules'])->name('all_schedules.index');
     Route::get('/my-jobs', [ServiceController::class, 'myJobs'])->name('my-jobs.index');
+
+    Route::get('/labor-analysis', [ServiceController::class, 'labor_analysis'])->name('service.labor_analysis');
 });

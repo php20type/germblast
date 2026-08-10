@@ -2484,6 +2484,75 @@ class ServiceController extends Controller implements HasMiddleware
 
         return redirect()->back()->with('success', 'Clean patch record deleted successfully.');
     }
+
+    public function labor_analysis(Request $request)
+    {
+        $selectedMonth = $request->input('month', now()->format('Y-m'));
+        $startOfMonth = \Carbon\Carbon::parse($selectedMonth)->startOfMonth();
+        $endOfMonth = \Carbon\Carbon::parse($selectedMonth)->endOfMonth();
+
+        $selectedOfficeId = $request->input('office');
+        $allTerritories = Territory::orderBy('name')->get();
+
+        if (empty($selectedOfficeId) && $allTerritories->count() > 0) {
+            $selectedOfficeId = $allTerritories->first()->id;
+        }
+
+        $slotsQuery = ServiceOrderSlot::with(['staff', 'serviceOrder.service.lead.company', 'office'])
+            ->whereBetween('scheduled_start_time', [$startOfMonth, $endOfMonth]);
+
+        if ($selectedOfficeId && $selectedOfficeId !== 'all') {
+            $slotsQuery->where('scheduled_office', $selectedOfficeId);
+        }
+
+        $slots = $slotsQuery->get();
+
+        $laborData = [];
+
+        foreach ($slots as $slot) {
+            $officeName = $slot->office ? $slot->office->name : 'Unassigned Office';
+            $officeId = $slot->office ? $slot->office->id : 'unassigned';
+
+            if (!isset($laborData[$officeId])) {
+                $laborData[$officeId] = [
+                    'office_name' => $officeName,
+                    'orders' => collect(),
+                    'total_orders' => 0,
+                    'total_scheduled_hours' => 0,
+                    'unique_staff' => [],
+                ];
+            }
+
+            // Group orders
+            if ($slot->serviceOrder && !$laborData[$officeId]['orders']->contains('id', $slot->serviceOrder->id)) {
+                $laborData[$officeId]['orders']->push($slot->serviceOrder);
+                $laborData[$officeId]['total_orders']++;
+            }
+
+            // Total hours
+            $laborData[$officeId]['total_scheduled_hours'] += $slot->scheduled_hours ?? 0;
+
+            // Unique staff
+            foreach ($slot->staff as $staffMember) {
+                if (!in_array($staffMember->user_id, $laborData[$officeId]['unique_staff'])) {
+                    $laborData[$officeId]['unique_staff'][] = $staffMember->user_id;
+                }
+            }
+        }
+
+        foreach ($laborData as &$data) {
+            $data['unique_staff_count'] = count($data['unique_staff']);
+        }
+
+        // Generate months for toggle
+        $months = [];
+        for ($i = 0; $i < 12; $i++) {
+            $date = now()->subMonths($i);
+            $months[$date->format('Y-m')] = $date->format('F Y');
+        }
+
+        return view('admin.service.labor_analysis', compact('laborData', 'selectedMonth', 'startOfMonth', 'months', 'allTerritories', 'selectedOfficeId'));
+    }
 }
 
 

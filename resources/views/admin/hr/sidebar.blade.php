@@ -20,6 +20,10 @@
                 Timecards
             </a>
 
+            <a class="nav-link {{ request()->routeIs('admin.service.labor_analysis') ? 'active' : '' }}" href="{{ route('admin.service.labor_analysis') }}">
+                Labor Analysis
+            </a>
+
 
             @can('time_off_request.view')
             <a class="nav-link {{ request()->routeIs('admin.hr.time-off.*') ? 'active' : '' }}" href="{{ route('admin.hr.time-off.index') }}">

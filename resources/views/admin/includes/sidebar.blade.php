@@ -208,7 +208,8 @@
                     'admin.hr.time-off.*',
                     'admin.hr.praise.*',
                     'admin.hr.rewards.*',
-                    'admin.hr.feedback.*'
+                    'admin.hr.feedback.*',
+                    'admin.service.labor_analysis'
                 ]);
 
                 $user = auth()->user();
