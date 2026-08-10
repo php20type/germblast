@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ActivityType;
 use App\Models\Company;
 use App\Models\Competitor;
+use App\Models\Country;
 use App\Models\Industry;
 use App\Models\Lead;
 use App\Models\People;
@@ -23,6 +24,7 @@ use App\Models\Source;
 use App\Models\Tag;
 use App\Models\Territory;
 use App\Models\Timeline;
+use App\Models\CompanyType;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -37,6 +39,7 @@ class PeopleController extends Controller
 
         $peoples = People::with(['companies', 'tags', 'user'])->get();
         $myPeopleCount = $peoples->where('user_id', $user->id)->count();
+        $assignedPeopleCount = $peoples->where('assignee_id', $user->id)->count();
         $totalPeoples = $peoples->count();
 
         // Conditional formatting
@@ -47,8 +50,12 @@ class PeopleController extends Controller
         $formattedMyPeopleCount = $myPeopleCount >= 1000
             ? number_format($myPeopleCount / 1000, 1).'K'
             : $myPeopleCount;
+            
+        $formattedAssignedPeopleCount = $assignedPeopleCount >= 1000
+            ? number_format($assignedPeopleCount / 1000, 1).'K'
+            : $assignedPeopleCount;
 
-        return compact('myPeopleCount', 'formattedMyPeopleCount', 'totalPeoples', 'formattedTotalPeoples');
+        return compact('formattedTotalPeoples', 'formattedMyPeopleCount', 'formattedAssignedPeopleCount');
     }
 
     private function applyPeopleFilters($query, Request $request)
@@ -101,6 +108,8 @@ class PeopleController extends Controller
             'territories' => Territory::all(),
             'competitors' => Competitor::all(),
             'peopletags' => Tag::where('tag_id', 3)->get(),
+            'persontags' => Tag::where('tag_id', 3)->get(),
+            'countries' => Country::all(),
         ];
     }
 
@@ -158,9 +167,38 @@ class PeopleController extends Controller
             ]);
         }
 
-        // Full page load
         return view('admin.peoples.my-peoples', array_merge(
             compact('peoples', 'myPeoplesCount'),
+            $this->getPeopleSharedData(),
+            $this->getSidebarStats()
+        ));
+    }
+
+    public function assigned_peoples(Request $request, $id)
+    {
+        $query = People::with([
+            'companies', 'tags', 'user',
+            'peopleEmail', 'peoplePhone', 'peopleAddress',
+            'peopleUrl', 'companyPeople',
+        ])->where('assignee_id', $id);
+
+        // Apply shared filters
+        $this->applyPeopleFilters($query, $request);
+
+        $peoples = $query->paginate(10)->appends($request->query());
+        $assignedPeoplesCount = $peoples->total();
+
+        // AJAX response
+        if ($request->ajax()) {
+            return response()->json([
+                'table' => view('admin.peoples.partials.people-table-row', compact('peoples'))->render(),
+                'count' => $assignedPeoplesCount,
+                'pagination' => (string) $peoples->links(),
+            ]);
+        }
+
+        return view('admin.peoples.assigned-peoples', array_merge(
+            compact('peoples', 'assignedPeoplesCount'),
             $this->getPeopleSharedData(),
             $this->getSidebarStats()
         ));
@@ -518,6 +556,10 @@ class PeopleController extends Controller
             }
         }
 
+        $companytags = Tag::where('tag_id', 2)->get();
+        $company_types = CompanyType::all();
+        $countries = Country::all();
+
         return view('admin.peoples.edit', compact(
             'peoples',
             'peopleFiles',
@@ -554,7 +596,10 @@ class PeopleController extends Controller
             'phones',
             'phoneTypes',
             'urls',
-            'urlTypes'
+            'urlTypes',
+            'companytags',
+            'company_types',
+            'countries'
         ));
     }
 
@@ -964,6 +1009,36 @@ class PeopleController extends Controller
                 ]);
             }
 
+            // Step 6.5: Store lead relationship if present
+            if ($request->lead_id) {
+                LeadPeople::create([
+                    'people_id' => $people->id,
+                    'lead_id' => $request->lead_id,
+                ]);
+
+                // Attach all companies associated with this lead to the newly created person
+                $lead = Lead::with(['companies'])->find($request->lead_id);
+                if ($lead) {
+                    $companyIds = [];
+                    if ($lead->company_id) {
+                        $companyIds[] = $lead->company_id;
+                    }
+                    if ($lead->companies) {
+                        foreach ($lead->companies as $comp) {
+                            $companyIds[] = $comp->id;
+                        }
+                    }
+                    $companyIds = array_unique($companyIds);
+
+                    foreach ($companyIds as $cId) {
+                        CompanyPeople::firstOrCreate([
+                            'people_id' => $people->id,
+                            'company_id' => $cId,
+                        ]);
+                    }
+                }
+            }
+
             // Step 7: Store tags
             if ($request->tag_id) {
                 PeopleTag::create([
@@ -972,11 +1047,26 @@ class PeopleController extends Controller
                 ]);
             }
 
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Person created successfully!',
+                    'data' => $people
+                ]);
+            }
+
             return redirect()
                 ->back()
                 ->with('success', 'Person created successfully!');
 
         } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Something went wrong: ' . $e->getMessage()
+                ], 500);
+            }
+
             return redirect()
                 ->back()
                 ->with('error', 'Something went wrong!');

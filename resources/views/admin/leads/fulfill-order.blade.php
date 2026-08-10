@@ -277,7 +277,11 @@
                                 </div>
                             </div>
                             <div class="right-part-sec">
-                                <div>
+                                <div class="d-flex gap-2">
+                                    <a class="btn btn-outline-dark"
+                                        href="javascript:history.back()">
+                                        <i class="fas fa-arrow-left me-1"></i> Back
+                                    </a>
                                     <a class="btn btn-export"
                                         href="{{ route('admin.lead.service.service_dashboard', $order->id) }}">
                                         SERVICE VIEW 
@@ -464,68 +468,70 @@
                                                 <h5 class="section-title">Scheduled Slots</h5>
                                             </div>
 
-                                            <table class="table table-hover equipment-report-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>#</th>
-                                                        <th>Start Time</th>
-                                                        <th>End Time</th>
-                                                        <th>Arrival Time</th>
-                                                        <th>Office</th>
-                                                        <th>Hours</th>
-                                                        <th>Meet</th>
-                                                        <th>Overnight</th>
-                                                        <th>Recurrence</th>
-                                                        <th>Clock In</th>
-                                                        <th>Clock Out</th>
-                                                        {{-- <th>Status</th> --}}
-                                                        {{-- <th>Action</th> --}}
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @forelse($order->orderSlots as $slot)
+                                            <div class="table-responsive">
+                                                <table class="table table-hover equipment-report-table mb-0">
+                                                    <thead>
                                                         <tr>
-                                                            <td>{{ $loop->iteration }}</td>
-                                                            <td>{{ $slot->scheduled_start_time }}</td>
-                                                            <td>{{ $slot->scheduled_end_time }}</td>
-                                                            <td>{{ $slot->scheduled_arrival_time }}</td>
-                                                            {{-- <td>{{ $slot->scheduled_office }}</td> --}}
-                                                            <td>{{ $slot->office->name ?? 'N/A' }}</td>
-                                                            <td>{{ $slot->scheduled_hours }}</td>
-                                                            <td>{{ ucfirst($slot->meet) }}</td>
-                                                            <td>{{ $slot->overnight ? 'Yes' : 'No' }}</td>
-                                                            <td>{{ $slot->scheduled_recurrence_rule }}</td>
-                                                            <td>{{ $slot->clocked_in_at ?? '-' }}</td>
-                                                            <td>{{ $slot->clocked_out_at ?? '-' }}</td>
-                                                            {{--
-                                                            <td>
-                                                                <span class="status-pill status-pill-{{ $slot->status ?? 'scheduled' }}">
-                                                                    {{ ucfirst(str_replace('_', ' ', $slot->status ?? 'scheduled')) }}
-                                                                </span>
-                                                            </td>
-                                                            --}}
-                                                            {{--
-                                                            <td>
-                                                                <form action="{{ route('admin.lead.service.slot.update_status', $slot->id) }}" method="POST" class="d-flex align-items-center gap-1 mb-0">
-                                                                    @csrf
-                                                                    <select name="status" class="status-select" onchange="this.form.submit()" style="width: auto; min-width: 120px;">
-                                                                        <option value="pending" {{ $slot->status === 'pending' ? 'selected' : '' }}>Pending</option>
-                                                                        <option value="scheduled" {{ $slot->status === 'scheduled' ? 'selected' : '' }}>Scheduled</option>
-                                                                        <option value="confirmed" {{ $slot->status === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                                                                        <option value="completed" {{ $slot->status === 'completed' ? 'selected' : '' }}>Completed</option>
-                                                                        <option value="cancelled" {{ $slot->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                                                                    </select>
-                                                                </form>
-                                                            </td>
-                                                            --}}
+                                                            <th>#</th>
+                                                            <th>Start Time</th>
+                                                            <th>End Time</th>
+                                                            <th>Arrival Time</th>
+                                                            <th>Office</th>
+                                                            <th>Hours</th>
+                                                            <th>Meet</th>
+                                                            <th>Overnight</th>
+                                                            <th>Recurrence</th>
+                                                            <!-- <th>Clock In</th>
+                                                            <th>Clock Out</th> -->
+                                                            {{-- <th>Status</th> --}}
+                                                            {{-- <th>Action</th> --}}
                                                         </tr>
-                                                    @empty
-                                                        <tr>
-                                                            <td colspan="13" class="text-center text-muted">No slots booked yet.</td>
-                                                        </tr>
-                                                    @endforelse
-                                                </tbody>
-                                            </table>
+                                                    </thead>
+                                                    <tbody>
+                                                        @forelse($order->orderSlots as $slot)
+                                                            <tr>
+                                                                <td>{{ $loop->iteration }}</td>
+                                                                <td>{{ $slot->scheduled_start_time }}</td>
+                                                                <td>{{ $slot->scheduled_end_time }}</td>
+                                                                <td>{{ $slot->scheduled_arrival_time }}</td>
+                                                                {{-- <td>{{ $slot->scheduled_office }}</td> --}}
+                                                                <td>{{ $slot->office->name ?? 'N/A' }}</td>
+                                                                <td>{{ $slot->scheduled_hours }}</td>
+                                                                <td>{{ ucfirst($slot->meet) }}</td>
+                                                                <td>{{ $slot->overnight ? 'Yes' : 'No' }}</td>
+                                                                <td>{{ $slot->scheduled_recurrence_rule }}</td>
+                                                                <!-- <td>{{ $slot->clocked_in_at ?? '-' }}</td>
+                                                                <td>{{ $slot->clocked_out_at ?? '-' }}</td> -->
+                                                                {{--
+                                                                <td>
+                                                                    <span class="status-pill status-pill-{{ $slot->status ?? 'scheduled' }}">
+                                                                        {{ ucfirst(str_replace('_', ' ', $slot->status ?? 'scheduled')) }}
+                                                                    </span>
+                                                                </td>
+                                                                --}}
+                                                                {{--
+                                                                <td>
+                                                                    <form action="{{ route('admin.lead.service.slot.update_status', $slot->id) }}" method="POST" class="d-flex align-items-center gap-1 mb-0">
+                                                                        @csrf
+                                                                        <select name="status" class="status-select" onchange="this.form.submit()" style="width: auto; min-width: 120px;">
+                                                                            <option value="pending" {{ $slot->status === 'pending' ? 'selected' : '' }}>Pending</option>
+                                                                            <option value="scheduled" {{ $slot->status === 'scheduled' ? 'selected' : '' }}>Scheduled</option>
+                                                                            <option value="confirmed" {{ $slot->status === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
+                                                                            <option value="completed" {{ $slot->status === 'completed' ? 'selected' : '' }}>Completed</option>
+                                                                            <option value="cancelled" {{ $slot->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                                                        </select>
+                                                                    </form>
+                                                                </td>
+                                                                --}}
+                                                            </tr>
+                                                        @empty
+                                                            <tr>
+                                                                <td colspan="11" class="text-center text-muted">No slots booked yet.</td>
+                                                            </tr>
+                                                        @endforelse
+                                                    </tbody>
+                                                </table>
+                                            </div>
 
                                         </div>
                                     </div>
@@ -3557,3 +3563,6 @@
 
 </script>
 @endpush
+
+
+

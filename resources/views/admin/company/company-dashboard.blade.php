@@ -181,6 +181,11 @@
                                     Overview of IAQ, Biological Response, Services and Surveys
                                 </p>
                             </div>
+                            <div class="right-part-sec">
+                                <a href="{{ route('admin.company.show', $company->id) }}" class="btn btn-outline-dark">
+                                    <i class="fas fa-arrow-left me-1"></i> Back to Company
+                                </a>
+                            </div>
                         </div>
 
                         <div class="my-4"></div>
@@ -1356,3 +1361,6 @@
         });
     </script>
 @endpush
+
+
+

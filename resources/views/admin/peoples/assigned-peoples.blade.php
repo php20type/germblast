@@ -1,6 +1,6 @@
 @extends('admin.includes.layout')
 
-@section('title', 'Peoples')
+@section('title', 'Assigned peoples')
 
 @section('content')
 
@@ -21,19 +21,14 @@
                             <!-- Header -->
                             <div class="heading-area-sec">
                                 <div class="left-part-sec">
-                                    <h3 class="mb-1">All people <span style="font-size: 24px;">📌</span></h3>
-                                    <p class="text-muted mb-0">All contacts (or the individuals) you do business with
+                                    <h3 class="mb-1">Assigned PEOPLE <span style="font-size: 24px;">📌</span></h3>
+                                    <p class="text-muted mb-0">Contacts (or the individuals) assigned to you
                                     </p>
                                 </div>
-                                <!-- <div class="d-none right-part">
-                                    <button class="btn btn-email">Email</button>
-                                    <button class="btn btn-export">EXPORT</button>
-                                </div> -->
                                 @can('people.create')
                                 <div class="right-part">
                                     <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#AddPerson">
-                                        <i class="fa-solid fa-plus"></i> 
-                                        Add People
+                                        <i class="fa-solid fa-plus"></i> Add Person
                                     </button>
                                 </div>
                                 @endcan
@@ -53,7 +48,7 @@
                                                         <input type="search" class="form-control" placeholder=""
                                                             aria-label="Search" id="people-search">
                                                     </div>
-                                                    <span class="company-count">{{ $peoplesCount }} People Found</span>
+                                                    <span class="company-count">{{ $assignedPeoplesCount }} People Found</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -69,7 +64,7 @@
                                                         </select>
                                                     </div>
                                                     <div class="me-2">
-                                                            <select class="form-select" aria-label="Default select example"
+                                                        <select class="form-select" aria-label="Default select example"
                                                             name="assignee_id">
                                                             <option value="">Assingee</option>
                                                             @foreach ($users as $user)
@@ -83,7 +78,7 @@
                                                         onclick="addFilter()">
                                                         <img src="{{ asset('img/icons/filter.svg') }}" alt="" />
 
-                                                        <!-- Filter Count Badge -->
+                                                        <!-- Active Filter Count -->
                                                         <span id="filterCount"
                                                             class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
                                                             0
@@ -123,6 +118,7 @@
                                                             </td>
                                                             <td>
                                                                 <div class="person-name">
+
                                                                     @can('people.detail.view')
                                                                         <a href="{{ route('admin.people.show', $people->id) }}"
                                                                             class="text-decoration-none text-dark">
@@ -133,6 +129,7 @@
                                                                             {{ $people->name ?? 'N/A' }}
                                                                         </span>
                                                                     @endcan
+
                                                                 </div>
                                                                 <div class="company-name">
                                                                     {{ $people->companies->first()?->name ?? 'N/A' }}
@@ -176,22 +173,15 @@
                                                         </tr>
                                                     @endforelse
 
-
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
-
-                                    <!-- Pagination -->
-                                    <div class="row m-3">
-                                        <div id="people-pagination" class="col-12 mt-3">
-                                            {{ $peoples->links() }}
-                                        </div>
-                                    </div>
-
                                 </div>
 
+
                             </div>
+
 
                             <!-- Action Bar -->
                             <div class="action-bar" id="actionBar">
@@ -219,9 +209,7 @@
                 </div>
 
                 <!-- All Companies Section End  -->
-
     </main>
-
 
     <!-- Add Lead Modal Start -->
     <div class="modal fade" id="AddLead" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -315,6 +303,14 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Pagination -->
+                                <div class="row m-3">
+                                    <div id="people-pagination" class="col-12 mt-3">
+                                        {{ $peoples->links() }}
+                                    </div>
+                                </div>
+
                             </div>
                             <!-- Add New Product Button -->
                             <button type="button" id="addProductRow"
@@ -428,7 +424,6 @@
         </div>
     </div>
 
-    <!-- Extended Filters Modal Start -->
     <div class="modal fade" id="AddFilter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-fullscreen">
             <div class="modal-content">
@@ -522,11 +517,9 @@
                 </div>
             </div>
         </div>
-    </div>
+
+        </div>
         @include('admin.peoples.partials.add-person-modal')
-
-
-
     @endsection
     @push('scripts')
         <script>
@@ -562,6 +555,7 @@
             }
 
 
+            const userId = {{ auth()->id() }};
             $(document).ready(function() {
                 function fetchPeoples() {
                     let search = $('#people-search').val();
@@ -590,7 +584,7 @@
                     });
 
                     $.ajax({
-                        url: "{{ route('admin.people.index') }}",
+                        url: `/admin/people/my-peoples/${userId}`,
                         method: "GET",
                         data: {
                             search: search,
@@ -621,8 +615,7 @@
                 $('#people-search').on('input', function () {
                     fetchPeoples();
                 });
-                $('#checkDefault,select[name="assignee_id"], select[name="company_id"]').on(
-                    'change',
+                $('#checkDefault, select[name="assignee_id"], select[name="company_id"]').on('change',
                     fetchPeoples);
                 // catch all checkbox changes
                 // $('#filter-section input[type="checkbox"]').on('change', fetchPeoples);
@@ -852,7 +845,6 @@
 
             });
         </script>
-
-    @include('admin.peoples.partials.add-person-scripts')
+        @include('admin.peoples.partials.add-person-scripts')
     @endpush
 

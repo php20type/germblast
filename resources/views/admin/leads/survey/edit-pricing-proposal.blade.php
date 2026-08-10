@@ -125,9 +125,9 @@
                                     </p>
                                 </div>
                                 <div class="right-part d-flex align-items-center gap-2">
-                                    <button type="button" id="updatePricingBtn" class="btn btn-success">
-                                        Update Pricing Proposal
-                                    </button>
+                                    <a class="btn btn-outline-dark" href="{{ route('admin.lead.survey.proposal', $pricingProposal->surveyProposal->lead_id) }}">
+                                        <i class="fas fa-arrow-left me-1"></i> Back
+                                    </a>
                                 </div>
                             </div>
 
@@ -385,8 +385,14 @@
                                         </table>
 
                                     </div>
+
+                                <div class="row mt-4">
+                                    <div class="col-12 d-flex justify-content-end gap-2">
+                                        <button type="button" id="updatePricingBtn" class="btn btn-success">
+                                            Update Pricing Proposal
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
 
                             </div>
                         </div>
@@ -539,3 +545,6 @@
         });
     </script>
 @endpush
+
+
+

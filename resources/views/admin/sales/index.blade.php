@@ -278,7 +278,7 @@
                                         <li class="nav-item" role="presentation">
                                             <button class="nav-link" id="todo-tab" data-bs-toggle="tab"
                                                 data-bs-target="#todo" type="button" role="tab"
-                                                aria-controls="todo" aria-selected="false">T  O DO</button>
+                                                aria-controls="todo" aria-selected="false">TO DO</button>
                                         </li>
                                         <li class="nav-item" role="presentation">
                                             <button class="nav-link" id="timeline-tab" data-bs-toggle="tab"
@@ -1427,11 +1427,17 @@
                     url: "{{ route('admin.sales.index') }}",
                     method: "GET",
                     data: filters,
+                    beforeSend: function() {
+                        AppLoader.show();
+                    },
                     success: function(response) {
                         $('#allActivitiesContainer').html(response.activity_html);
                     },
                     error: function() {
                         alert('Error fetching filtered activities.');
+                    },
+                    complete: function() {
+                        AppLoader.hide();
                     }
                 });
             }
@@ -1453,11 +1459,17 @@
                     url: "{{ route('admin.sales.index') }}",
                     method: "GET",
                     data: filters,
+                    beforeSend: function() {
+                        AppLoader.show();
+                    },
                     success: function(response) {
                         $('#timelineContainer').html(response.timeline_html);
                     },
                     error: function() {
                         alert('Error fetching filtered timeline.');
+                    },
+                    complete: function() {
+                        AppLoader.hide();
                     }
                 });
             }
@@ -1478,11 +1490,17 @@
                     url: "{{ route('admin.sales.index') }}", // confirm this route hits your main controller
                     method: "GET",
                     data: filters,
+                    beforeSend: function() {
+                        AppLoader.show();
+                    },
                     success: function(response) {
                         $('#pendingTasksContainer').html(response.task_html);
                     },
                     error: function() {
                         alert('Error fetching filtered task.');
+                    },
+                    complete: function() {
+                        AppLoader.hide();
                     }
                 });
             }

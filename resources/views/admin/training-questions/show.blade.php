@@ -65,7 +65,7 @@
                                 <p class="text-muted mb-0">Manage test questions and options.</p>
                             </div>
                             <div class="right-part-sec d-flex gap-2">
-                                <a href="{{ route('admin.training-questions.index') }}" class="btn btn-outline-secondary d-flex align-items-center">
+                                <a href="{{ route('admin.training-questions.index') }}" class="btn btn-outline-dark d-flex align-items-center">
                                     <i class="fa-solid fa-arrow-left me-1"></i> Back to Tests
                                 </a>
                                 @can('training.add')
@@ -388,3 +388,6 @@
     });
 </script>
 @endpush
+
+
+

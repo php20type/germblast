@@ -37,6 +37,7 @@
 <body>
     <main class="app-wrapper">
 
+        @include('admin.includes.loader')
         @include('admin.includes.sidebar')
 
         <div class="main-content app-content">

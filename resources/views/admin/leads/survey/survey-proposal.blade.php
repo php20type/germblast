@@ -198,19 +198,9 @@
                                     </p>
                                 </div>
                                 <div class="right-part d-flex align-items-center gap-2">
-                                    @if ($isEditable)
-                                        <button type="submit" class="btn btn-success">
-                                            Save Survey Proposal
-                                        </button>
-                                    @elseif ( (auth()->user()->isSuperAdmin() || (auth()->user()->isSalesManager() && $lead->stage_id == 3)) && !$isEditable && $surveyProposal->status !== 'approved')
-                                        <button type="button" class="btn btn-success" id="approveProposalBtn">
-                                            <i class="ti ti-check me-1"></i> Approve
-                                        </button>
-                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                                            data-bs-target="#rejectModal">
-                                            <i class="ti ti-x me-1"></i> Reject
-                                        </button>
-                                    @endif
+                                    <a class="btn btn-outline-dark" href="{{ route('admin.lead.show', $surveyProposal->lead_id) }}">
+                                        <i class="fas fa-arrow-left me-1"></i> Back
+                                    </a>
                                 </div>
                             </div>
 
@@ -730,6 +720,23 @@
                                             </div>
 
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-4 mb-4">
+                                    <div class="col-12 d-flex justify-content-end gap-2">
+                                        @if ($isEditable)
+                                            <button type="submit" class="btn btn-success">
+                                                Save Survey Proposal
+                                            </button>
+                                        @elseif ( (auth()->user()->isSuperAdmin() || (auth()->user()->isSalesManager() && $lead->stage_id == 3)) && !$isEditable && $surveyProposal->status !== 'approved')
+                                            <button type="button" class="btn btn-success" id="approveProposalBtn">
+                                                <i class="ti ti-check me-1"></i> Approve
+                                            </button>
+                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                                data-bs-target="#rejectModal">
+                                                <i class="ti ti-x me-1"></i> Reject
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
 

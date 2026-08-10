@@ -29,6 +29,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
             ->middleware('permission:people.list.my.view')
             ->name('my_peoples');
 
+        Route::get('assigned_peoples/{id}', [PeopleController::class, 'assigned_peoples'])
+            ->middleware('permission:people.list.all.view')
+            ->name('assigned_peoples');
+
         Route::get('animal-care', [PeopleController::class, 'animal_care'])
             ->middleware('permission:people.list.animal_care.view')
             ->name('animal_care');

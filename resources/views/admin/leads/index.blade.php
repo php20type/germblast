@@ -19,12 +19,20 @@
                             <div class="heading-area-sec">
                                 <div class="left-part-sec">
                                     <h3 class="mb-1">ALL LEADS <span style="font-size: 24px;">📌</span></h3>
-                                    <p class="text-muted mb-0">Business deals with your companies and people</p>
+                                    <p class="text-muted mb-0">All business deals with your companies and people</p>
                                 </div>
-                                <div class="d-none right-part">
+                                <!-- <div class="d-none right-part">
                                     <button class="btn btn-email">Email</button>
                                     <button class="btn btn-export">EXPORT</button>
+                                </div> -->
+                                @can('lead.create')
+                                <div class="right-part">
+                                    <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#AddLead">
+                                        <i class="fa-solid fa-plus"></i> 
+                                        Add Lead
+                                    </button>
                                 </div>
+                                @endcan
                             </div>
 
                             <!-- Filter Section -->
@@ -44,7 +52,7 @@
                                             <div class="me-2 form-check">
                                                 <input class="form-check-input" type="checkbox" value="hot"
                                                     id="checkDefault" name="hot">
-                                                <label class="form-check-label" for="checkDefault">Only Hot</label>
+                                                <label class="form-check-label text-nowrap" for="checkDefault">Only Hot</label>
                                             </div>
                                             <div class="me-2">
                                                 <select class="form-select" name="status" aria-label="Status select">
@@ -86,24 +94,24 @@
 
                             <div class="filter-value">
                                 <div class="row">
-                                    <div class="col-lg-3 col-md-6">
+                                    <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
                                         <div class="filter-card">
-                                            <h5 id="total-value">Total value:<span>${{ $formattedTotalValue }}</span></h5>
+                                            <h5 id="total-value" class="text-nowrap">Total value: <span>${{ $formattedTotalValue }}</span></h5>
                                         </div>
                                     </div>
-                                    <div class="col-lg-3 col-md-6">
+                                    <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
                                         <div class="filter-card">
-                                            <h5 id="avg-value">Avg value:<span>${{ $formattedAvgValue }}</span></h5>
+                                            <h5 id="avg-value" class="text-nowrap">Avg value: <span>${{ $formattedAvgValue }}</span></h5>
                                         </div>
                                     </div>
-                                    <div class="col-lg-3 col-md-6">
+                                    <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
                                         <div class="filter-card">
-                                            <h5>Avg time open:<span>16 Days</span></h5>
+                                            <h5 class="text-nowrap">Avg time open: <span>16 Days</span></h5>
                                         </div>
                                     </div>
-                                    <div class="col-lg-3 col-md-6">
+                                    <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
                                         <div class="filter-card">
-                                            <h5 id="confidence-value">Win rate:<span>{{ $avgConfidence }}%</span></h5>
+                                            <h5 id="confidence-value" class="text-nowrap">Win rate: <span>{{ $avgConfidence }}%</span></h5>
                                         </div>
                                     </div>
                                 </div>
@@ -172,7 +180,7 @@
                             </div>
 
                             <!-- Pagination -->
-                            <div class="row">
+                            <div class="row m-3">
                                 <div id="lead-pagination" class="col-12 mt-3">
                                     {{ $paginator->links() }}
                                 </div>
@@ -310,6 +318,9 @@
         </div>
     </div>
 
+    <!-- Add Lead Modal Start -->
+    @include('admin.leads.partials.add-lead-modal')
+
 
 @endsection
 
@@ -420,6 +431,9 @@
                         activity_type_filter_id: activity_type_filter_id,
                         month_to_date: month_to_date,
                     },
+                    beforeSend: function() {
+                        AppLoader.show();
+                    },
                     success: function(response) {
                         $('table tbody').html(response.table);
                         $('.company-count').text(response.count + ' Lead Found');
@@ -430,6 +444,9 @@
                     },
                     error: function() {
                         console.error('Error fetching lead data');
+                    },
+                    complete: function() {
+                        AppLoader.hide();
                     }
                 });
             }
@@ -496,4 +513,9 @@
 
         });
     </script>
+
+    @include('admin.leads.partials.add-lead-scripts')
+
+    
 @endpush
+

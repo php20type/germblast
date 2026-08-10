@@ -622,16 +622,13 @@
                                                     <th>Friday</th>
                                                     <th>Saturday</th>
                                                     <th>Sunday</th>
+                                                    <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 @forelse($employee->availabilities as $availability)
                                                     <tr>
-                                                        <td>
-                                                            <a href="javascript:void(0)" class="edit-availability-link fw-semibold text-primary" data-id="{{ $availability->id }}" data-data="{{ json_encode($availability) }}">
-                                                                {{ $availability->id }}
-                                                            </a>
-                                                        </td>
+                                                        <td>{{ $availability->id }}</td>
                                                         <td>{{ $availability->start_date ? \Carbon\Carbon::parse($availability->start_date)->format('m/d/y') : '' }} - {{ $availability->end_date ? \Carbon\Carbon::parse($availability->end_date)->format('m/d/y') : '' }}</td>
                                                         <td>{{ $availability->avg_hours }}</td>
                                                         <td>{{ $availability->max_hours }}</td>
@@ -642,10 +639,15 @@
                                                         <td>{{ $availability->fri_start }} - {{ $availability->fri_end }}</td>
                                                         <td>{{ $availability->sat_start }} - {{ $availability->sat_end }}</td>
                                                         <td>{{ $availability->sun_start }} - {{ $availability->sun_end }}</td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-sm btn-outline-primary edit-availability-link" data-id="{{ $availability->id }}" data-data="{{ json_encode($availability) }}" title="Edit Availability">
+                                                                <i class="fa-solid fa-pencil"></i>
+                                                            </button>
+                                                        </td>
                                                     </tr>
                                                 @empty
                                                     <tr>
-                                                        <td colspan="11" class="text-center">No availability records found</td>
+                                                        <td colspan="12" class="text-center">No availability records found</td>
                                                     </tr>
                                                 @endforelse
                                             </tbody>

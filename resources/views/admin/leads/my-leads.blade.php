@@ -19,12 +19,15 @@
                             <div class="heading-area-sec">
                                 <div class="left-part-sec">
                                     <h3 class="mb-1">MY LEADS <span style="font-size: 24px;">📌</span></h3>
-                                    <p class="text-muted mb-0">Business deals with your companies and people</p>
+                                    <p class="text-muted mb-0">Business deals created by you</p>
                                 </div>
-                                <div class="d-none right-part">
-                                    <button class="btn btn-email">Email</button>
-                                    <button class="btn btn-export">EXPORT</button>
-                                </div>
+                                @can('lead.create')
+                            <div class="right-part">
+                                <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#AddLead">
+                                        <i class="fa-solid fa-plus"></i> Add Lead
+                                    </button>
+                            </div>
+                            @endcan
                             </div>
 
                             <!-- Filter Section -->
@@ -169,7 +172,7 @@
                             </div>
 
                             <!-- Pagination -->
-                            <div class="row">
+                            <div class="row m-3">
                                 <div id="lead-pagination" class="col-12 mt-3">
                                     {{ $paginator->links() }}
                                 </div>
@@ -304,6 +307,12 @@
             </div>
         </div>
 
+        </div>
+
+
+        @include('admin.leads.partials.add-lead-modal')
+
+
     @endsection
 
     @push('scripts')
@@ -369,6 +378,9 @@
                             activity_type_filter_id: activity_type_filter_id,
                             month_to_date: month_to_date,
                         },
+                        beforeSend: function() {
+                            AppLoader.show();
+                        },
                         success: function(response) {
                             $('table tbody').html(response.table);
                             $('.company-count').text(response.count + ' Lead Found');
@@ -379,6 +391,9 @@
                         },
                         error: function() {
                             console.error('Error fetching lead data');
+                        },
+                        complete: function() {
+                            AppLoader.hide();
                         }
                     });
                 }
@@ -443,4 +458,8 @@
 
             });
         </script>
+        @include('admin.leads.partials.add-lead-scripts')
+
     @endpush
+
+

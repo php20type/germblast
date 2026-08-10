@@ -22,13 +22,16 @@
                             <div class="heading-area-sec">
                                 <div class="left-part-sec">
                                     <h3 class="mb-1">MY PEOPLE <span style="font-size: 24px;">📌</span></h3>
-                                    <p class="text-muted mb-0">Contacts (or the individuals) you do business with
+                                    <p class="text-muted mb-0">Contacts (or the individuals) created by you
                                     </p>
                                 </div>
-                                <div class="d-none right-part">
-                                    <button class="btn btn-email">Email</button>
-                                    <button class="btn btn-export">EXPORT</button>
+                                @can('people.create')
+                                <div class="right-part">
+                                    <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#AddPerson">
+                                        <i class="fa-solid fa-plus"></i> Add Person
+                                    </button>
                                 </div>
+                                @endcan
                             </div>
 
                             <!-- Tabs Content -->
@@ -99,7 +102,7 @@
                                                             <input type="checkbox" class="form-check-input" id="selectAll">
                                                         </th>
                                                         <th>People name</th>
-                                                        <th>Last contact</th>
+                                                        <th>Created at</th>
                                                         <th>Email</th>
                                                         <th>Phone</th>
                                                         <th>Address</th>
@@ -302,7 +305,7 @@
                                 </div>
 
                                 <!-- Pagination -->
-                                <div class="row">
+                                <div class="row m-3">
                                     <div id="people-pagination" class="col-12 mt-3">
                                         {{ $peoples->links() }}
                                     </div>
@@ -515,6 +518,8 @@
             </div>
         </div>
 
+        </div>
+        @include('admin.peoples.partials.add-person-modal')
     @endsection
     @push('scripts')
         <script>
@@ -590,6 +595,9 @@
                             leads_status: leads_status,
                             activity_type_filter_id: activity_type_filter_id,
                         },
+                        beforeSend: function() {
+                            AppLoader.show();
+                        },
                         success: function(response) {
                             $('table tbody').html(response.table);
                             $('.company-count').text(response.count + ' People Found');
@@ -597,6 +605,9 @@
                         },
                         error: function(err) {
                             console.error('Error fetching people data', err);
+                        },
+                        complete: function() {
+                            AppLoader.hide();
                         }
                     });
                 }
@@ -834,4 +845,6 @@
 
             });
         </script>
+        @include('admin.peoples.partials.add-person-scripts')
     @endpush
+

@@ -98,6 +98,13 @@ class EmployeeController extends Controller implements HasMiddleware
         // Assign Spatie role
         $user->assignRole($validated['role']);
 
+        // Dispatch welcome email and in-app notification via NotificationService
+        try {
+            (new \App\Services\NotificationService())->employeeCreated($user);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to dispatch welcome notification for new employee: ' . $e->getMessage());
+        }
+
         return response()->json([
             'status' => true,
             'message' => 'Employee created successfully.',
@@ -751,5 +758,68 @@ class EmployeeController extends Controller implements HasMiddleware
         }
 
         return view('admin.hr.timecards.index', compact('users', 'start', 'end'));
+    }
+
+    public function workforceCoverage(Request $request)
+    {
+        // Parse date from request or default to now
+        $selectedDate = $request->filled('date') ? \Carbon\Carbon::parse($request->date)->startOfMonth() : now()->startOfMonth();
+        $startOfMonth = $selectedDate->copy()->startOfMonth()->toDateString();
+        $endOfMonth = $selectedDate->copy()->endOfMonth()->toDateString();
+
+        $employees = User::withoutRole('customer')
+            ->with(['availabilities' => function ($query) use ($startOfMonth, $endOfMonth) {
+                $query->where('start_date', '<=', $endOfMonth)
+                      ->where('end_date', '>=', $startOfMonth)
+                      ->orderBy('start_date', 'desc');
+            }])->get();
+
+        $coverage = array_fill_keys(
+            ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'], 
+            array_fill(0, 24, [])
+        );
+
+        foreach ($employees as $employee) {
+            $availability = $employee->availabilities->first();
+            if (!$availability) continue;
+
+            $name = $employee->name;
+
+            foreach ($coverage as $day => &$hoursArray) {
+                $startTime = $availability->{$day . '_start'};
+                $endTime = $availability->{$day . '_end'};
+
+                if ($startTime && $endTime) {
+                    $startHour = (int) substr($startTime, 0, 2);
+                    $endHour = (int) substr($endTime, 0, 2);
+                    
+                    $endHourLimit = $endHour;
+                    // Check if it ends exactly on the hour (e.g. 17:00:00)
+                    if (substr($endTime, 3, 2) === '00' && substr($endTime, 6, 2) === '00') {
+                        $endHourLimit = $endHour - 1;
+                    }
+                    
+                    $timeString = substr($startTime, 0, 5) . ' - ' . substr($endTime, 0, 5);
+                    $employeeData = ['name' => $name, 'time' => $timeString];
+                    
+                    if ($startTime <= $endTime) {
+                        for ($h = $startHour; $h <= $endHourLimit; $h++) {
+                            $hoursArray[$h][] = $employeeData;
+                        }
+                    } else {
+                        // Overnight shift
+                        for ($h = $startHour; $h <= 23; $h++) {
+                            $hoursArray[$h][] = $employeeData;
+                        }
+                        for ($h = 0; $h <= $endHourLimit; $h++) {
+                            $hoursArray[$h][] = $employeeData;
+                        }
+                    }
+                }
+            }
+        }
+        unset($hoursArray); // break reference
+
+        return view('admin.operations.workforce-coverage', compact('coverage', 'selectedDate'));
     }
 }

@@ -38,94 +38,71 @@
                                         <h3 class="section-title">Basic Information</h3>
                                     </div>
 
-                                    <table class="table table-bordered align-middle">
-                                        <tbody>
-                                            <tr>
-                                                <th>Name</th>
-                                                <td>
-                                                    <input type="text" name="name" class="form-control" required>
-                                                </td>
-                                            </tr>
+                                    <div class="row g-3 mt-1 mb-3 mx-2">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Name <span class="text-danger">*</span></label>
+                                            <input type="text" name="name" class="form-control" required>
+                                        </div>
 
-                                            <tr>
-                                                <th>Email</th>
-                                                <td>
-                                                    <input type="email" name="email" class="form-control" required>
-                                                </td>
-                                            </tr>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Email <span class="text-danger">*</span></label>
+                                            <input type="email" name="email" class="form-control" required>
+                                        </div>
 
-                                            <tr>
-                                                <th>Password</th>
-                                                <td>
-                                                    <div class="input-group">
-                                                        <input type="password" name="password" id="password"
-                                                            class="form-control" required>
-                                                        <button type="button"
-                                                            class="btn btn-outline-secondary toggle-password"
-                                                            data-target="password">
-                                                            <i class="fas fa-eye"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Password <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <input type="password" name="password" id="password" class="form-control" required>
+                                                <button type="button" class="btn btn-outline-secondary toggle-password" data-target="password">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </div>
 
-                                            <tr>
-                                                <th>Confirm Password</th>
-                                                <td>
-                                                    <div class="input-group">
-                                                        <input type="password" name="password_confirmation"
-                                                            id="password_confirmation" class="form-control" required>
-                                                        <button type="button"
-                                                            class="btn btn-outline-secondary toggle-password"
-                                                            data-target="password_confirmation">
-                                                            <i class="fas fa-eye"></i>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" required>
+                                                <button type="button" class="btn btn-outline-secondary toggle-password" data-target="password_confirmation">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </div>
 
-                                            <tr>
-                                                <th>Role</th>
-                                                <td>
-                                                    <select name="role" class="form-select" required>
-                                                        <option value="">Select Role</option>
-                                                        @foreach ($roles as $role)
-                                                            <option value="{{ $role->name }}">
-                                                                {{ strtoupper(str_replace('_', ' ', $role->name)) }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </td>
-                                            </tr>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Role <span class="text-danger">*</span></label>
+                                            <select name="role" class="form-select" required>
+                                                <option value="">Select Role</option>
+                                                @foreach ($roles as $role)
+                                                    <option value="{{ $role->name }}">
+                                                        {{ strtoupper(str_replace('_', ' ', $role->name)) }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
 
-                                            <tr>
-                                                <th>Staff Type</th>
-                                                <td>
-                                                    <select name="staff_type" class="form-select" required>
-                                                        <option value="">Select Staff Type</option>
-                                                        <option value="leader">Leader</option>
-                                                        <option value="technician">Technician</option>
-                                                        <option value="corporate">Corporate</option>
-                                                    </select>
-                                                </td>
-                                            </tr>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Staff Type <span class="text-danger">*</span></label>
+                                            <select name="staff_type" class="form-select" required>
+                                                <option value="">Select Staff Type</option>
+                                                <option value="leader">Leader</option>
+                                                <option value="technician">Technician</option>
+                                                <option value="corporate">Corporate</option>
+                                            </select>
+                                        </div>
 
-                                            <tr>
-                                                <th>Territory</th>
-                                                <td>
-                                                    <select name="territory_id" class="form-select">
-                                                        <option value="">Select Territory</option>
-                                                        @foreach ($territories as $territory)
-                                                            <option value="{{ $territory->id }}">
-                                                                {{ $territory->name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </td>
-                                            </tr>
-
-                                        </tbody>
-                                    </table>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Territory</label>
+                                            <select name="territory_id" class="form-select">
+                                                <option value="">Select Territory</option>
+                                                @foreach ($territories as $territory)
+                                                    <option value="{{ $territory->id }}">
+                                                        {{ $territory->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

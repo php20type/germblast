@@ -291,12 +291,110 @@
                                 <div id="addCompanyForm" class="mt-3" style="display: none;">
                                     <div class="mb-3">
                                         <select class="form-select company-update" data-field="" id="companiesSelect">
-                                            <option selected>Add Company</option>
+                                            <option selected>Select Company</option>
                                             @foreach ($availableCompanies as $company)
                                                 <option value="{{ $company->id }}">{{ $company->name }}</option>
                                             @endforeach
                                         </select>
+                                        <div class="mt-2">
+                                            <a href="javascript:void(0)" id="toggleCreateCompanyForm" class="text-warning"><i class="fas fa-plus"></i> Create Company</a>
+                                        </div>
                                     </div>
+                                </div>
+                                <div id="createCompanyForm" class="my-3" style="display: none;">
+                                    <form id="addCompanyAjaxForm" action="{{ route('admin.company.store') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="people_id" value="{{ $peoples->id }}">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="mb-2">
+                                                    <input type="text" name="name" class="form-control" placeholder="Company Name" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <input type="email" name="email" class="form-control" placeholder="Email" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <input type="text" name="phone" class="form-control" placeholder="Phone Number" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <input type="text" name="address_1" class="form-control" placeholder="Address Line 1" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <select name="country_id" class="form-select" id="company_country_select" required>
+                                                        <option value="">Select Country</option>
+                                                        @foreach ($countries as $country)
+                                                            <option value="{{ $country->id }}" {{ $country->name === 'United States' ? 'selected' : '' }}>{{ $country->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <select name="state_id" class="form-select" id="company_state_select" disabled required>
+                                                        <option value="">Select State</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <select name="city_id" class="form-select" id="company_city_select" disabled required>
+                                                        <option value="">Select City</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <input type="text" name="zip" class="form-control" placeholder="Zip Code" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <select class="form-select" name="tag_id" required>
+                                                        <option value="">Select Tag</option>
+                                                        @foreach ($companytags as $tag)
+                                                            <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <select class="form-select" name="company_type_id" required>
+                                                        <option value="">Select Company Type</option>
+                                                        @foreach ($company_types as $type)
+                                                            <option value="{{ $type->id }}">{{ $type->type }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-2">
+                                                    <select class="form-select" name="assignee_id" required>
+                                                        <option value="">Select Assignee</option>
+                                                        @foreach ($users as $user)
+                                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="mb-2">
+                                                    <textarea name="description" class="form-control" placeholder="Description" rows="2" required></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <button type="submit" class="btn btn-warning btn-sm">Save Company</button>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
                             @endcan
 
@@ -1165,8 +1263,7 @@
                                 <h6>KEEP IN TOUCH</h6>
                                 <a href="#" class="text-warning d-none">Remind me to follow up</a>
                             </div>
-                            <p class="small text-muted">Last Contacted 3 Years Ago<br>
-                                You've Never Contacted This Company</p>
+                            <p class="small text-muted">Created {{ $peoples->created_at->diffForHumans() }}</p>
                         </div>
                         <div id="people-details-container" data-people-id="{{ $peoples->id }}">
                             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -1877,7 +1974,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-12">
+                            <div class="col-lg-12 d-none">
                                 <div class="form-group">
                                     <label class="form-label">Select Person</label>
                                     <span class="text-danger">*</span>
@@ -2165,7 +2262,7 @@
                                 </div>
                                 <div class="d-flex align-items-center gap-3">
                                     <div title="Total Value">
-                                        ${{ \App\Helpers\Helper::calculateTotalValue($related_lead) }}
+                                        ${{ number_format(\App\Helpers\Helper::calculateTotalValue($related_lead)) }}
                                     </div>
                                     @can('people.detail.edit')
                                         <button class="btn btn-sm btn-outline-secondary remove-lead-btn"
@@ -2554,6 +2651,12 @@
                 });
             }
 
+            // Toggle Create Company Form
+            $('#toggleCreateCompanyForm').click(function(e) {
+                e.preventDefault();
+                $('#createCompanyForm').slideToggle();
+            });
+
             // Toggle Add Lead
             if (toggleLeadBtn && formLeadDiv) {
                 toggleLeadBtn.addEventListener('click', function(e) {
@@ -2646,11 +2749,147 @@
                         });
                     } else {
                         // Reset dropdown back to default if cancelled
-                        $('#companiesSelect').val("Add Company");
+                        $('#companiesSelect').val("Select Company");
                     }
                 });
             });
 
+            // ==============================
+            // Create Company ajax form validation and submission
+            // ==============================
+
+            // Country → States
+            $('#company_country_select').on('change', function() {
+                let countryId = $(this).val();
+                let $stateSelect = $('#company_state_select');
+                let $citySelect = $('#company_city_select');
+
+                $stateSelect.empty().append('<option value="">Select State</option>').prop('disabled', true);
+                $citySelect.empty().append('<option value="">Select City</option>').prop('disabled', true);
+
+                if (!countryId) return;
+
+                $.get(`/states/${countryId}`, function(states) {
+                    let texasFound = false;
+                    states.forEach(function(state) {
+                        let isTexas = (state.name === 'Texas' || state.name === 'Texas ') ? 'selected' : '';
+                        if (isTexas) texasFound = true;
+                        $stateSelect.append(`<option value="${state.id}" ${isTexas}>${state.name}</option>`);
+                    });
+                    $stateSelect.prop('disabled', false);
+                    
+                    // If Texas (or any state) was automatically selected, trigger its change event to fetch cities
+                    if (texasFound) {
+                        $stateSelect.trigger('change');
+                    }
+                });
+            });
+
+            // Trigger country change on load to fetch states for the default selected country
+            $('#company_country_select').trigger('change');
+
+            // State → Cities
+            $('#company_state_select').on('change', function() {
+                let stateId = $(this).val();
+                let $citySelect = $('#company_city_select');
+
+                $citySelect.empty().append('<option value="">Select City</option>').prop('disabled', true);
+
+                if (!stateId) return;
+
+                $.get(`/cities/${stateId}`, function(cities) {
+                    cities.forEach(function(city) {
+                        $citySelect.append(new Option(city.name, city.id));
+                    });
+                    $citySelect.prop('disabled', false);
+                });
+            });
+
+            $("#addCompanyAjaxForm").validate({
+                ignore: [],
+                rules: {
+                    name: { required: true },
+                    email: { required: true, email: true },
+                    phone: { required: true },
+                    address_1: { required: true },
+                    country_id: { required: true },
+                    state_id: { required: true },
+                    city_id: { required: true },
+                    zip: { required: true },
+                    tag_id: { required: true },
+                    company_type_id: { required: true },
+                    assignee_id: { required: true },
+                    description: { required: true }
+                },
+                messages: {
+                    name: { required: "Please enter the company's name." },
+                    email: { required: "Please enter an email address.", email: "Please enter a valid email." },
+                    phone: { required: "Please enter a phone number." },
+                    address_1: { required: "Please enter an address." },
+                    country_id: { required: "Please select a country." },
+                    state_id: { required: "Please select a state." },
+                    city_id: { required: "Please select a city." },
+                    zip: { required: "Please enter a zip code." },
+                    tag_id: { required: "Please select a tag." },
+                    company_type_id: { required: "Please select a company type." },
+                    assignee_id: { required: "Please select an assignee." },
+                    description: { required: "Please enter a description." }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.hasClass('select2') && element.next('.select2-container').length) {
+                        error.insertAfter(element.next('.select2-container'));
+                    } else if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
+
+            $('#addCompanyAjaxForm').submit(function(e) {
+                e.preventDefault();
+
+                if (!$('#addCompanyAjaxForm').valid()) {
+                    return;
+                }
+
+                let form = $(this);
+                let actionUrl = form.attr('action');
+                let method = form.attr('method');
+                let formData = form.serialize();
+
+                $.ajax({
+                    url: actionUrl,
+                    method: method,
+                    data: formData,
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message || 'Company created successfully!',
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => {
+                            location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: xhr.responseJSON?.message || 'Something went wrong.'
+                        });
+                    }
+                });
+            });
 
             // ==============================
             // Remove person from the company

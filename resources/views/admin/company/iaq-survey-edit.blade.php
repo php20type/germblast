@@ -56,10 +56,10 @@
                                         Edit Indoor Air Quality Survey
                                     </p>
                                 </div>
-                                <div class="right-part-sec">
-                                    <button type="submit" class="btn btn-export">
-                                        Update Survey
-                                    </button>
+                                <div class="right-part-sec d-flex align-items-center gap-2">
+                                    <a class="btn btn-outline-dark" href="{{ route('admin.company.dashboard', $company->id) }}">
+                                        <i class="fas fa-arrow-left me-1"></i> Back
+                                    </a>
                                 </div>
                             </div>
 
@@ -782,8 +782,15 @@
                                     </div>
                                 </div>
                             </div>
-
+                            <div class="row mt-4">
+                                <div class="col-12 d-flex justify-content-end gap-2">
+                                    <button type="submit" class="btn btn-success">
+                                        Update Survey
+                                    </button>
+                                </div>
+                            </div>
                         </div>
+                    </div>
                     </form>
 
                 </div>
@@ -971,3 +978,6 @@
         });
     </script>
 @endpush
+
+
+

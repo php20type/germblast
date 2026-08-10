@@ -129,9 +129,9 @@
                                     </p>
                                 </div>
                                 <div class="right-part d-flex align-items-center gap-2">
-                                    <button type="submit" class="btn btn-success">
-                                        Save Facility
-                                    </button>
+                                    <a class="btn btn-outline-dark" href="{{ route('admin.lead.survey.proposal', $facility->surveyProposal->lead_id) }}">
+                                        <i class="fas fa-arrow-left me-1"></i> Back
+                                    </a>
                                 </div>
                             </div>
 
@@ -175,7 +175,7 @@
                                                             <option value="">Select Country</option>
                                                             @foreach ($countries as $country)
                                                                 <option value="{{ $country->id }}"
-                                                                    {{ $facility->country_id == $country->id ? 'selected' : '' }}>
+                                                                    {{ ($facility->country_id ?? 233) == $country->id ? 'selected' : '' }}>
                                                                     {{ $country->name }}
                                                                 </option>
                                                             @endforeach
@@ -510,6 +510,17 @@
                                 </div>
                             </div>
 
+                                    <!-- </div>
+                                </div> -->
+
+                                <div class="row mt-4">
+                                    <div class="col-12 d-flex justify-content-end gap-2">
+                                        <button type="submit" class="btn btn-success">
+                                            Save Facility
+                                        </button>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </form>
@@ -724,6 +735,11 @@
                             `<option value="${state.state_id}">${state.name}</option>`
                         );
                     });
+                    
+                    // If no state was previously selected, default to Texas when US is selected
+                    if (countryId == 233 && !$('#facility_state').data('preselected')) {
+                        $('#facility_state').val('1407').trigger('change');
+                    }
                 });
             });
 
@@ -834,3 +850,6 @@
         });
     </script>
 @endpush
+
+
+

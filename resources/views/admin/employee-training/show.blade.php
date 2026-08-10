@@ -29,7 +29,7 @@
                                 </p>
                             </div>
                             <div class="right-part-sec d-flex gap-2">
-                                <a href="{{ route('admin.employee-training.index') }}" class="btn btn-outline-secondary d-flex align-items-center">
+                                <a href="{{ route('admin.employee-training.index') }}" class="btn btn-outline-dark d-flex align-items-center">
                                     <i class="fa-solid fa-arrow-left me-1"></i> Back to Training List
                                 </a>
                             </div>

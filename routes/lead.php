@@ -34,6 +34,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
             ->middleware('permission:lead.list.my.view')
             ->name('my_leads');
 
+        Route::get('assigned_leads/{id}', [LeadController::class, 'assigned_leads'])
+            ->middleware('permission:lead.list.all.view')
+            ->name('assigned_leads');
+
         Route::get('open-leads/{id}', [LeadController::class, 'open_leads'])
             ->middleware('permission:lead.list.open.view')
             ->name('open_leads');

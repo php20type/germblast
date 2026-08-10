@@ -777,9 +777,15 @@
                         search: search,
                         meeting_type: meeting_type
                     },
+                    beforeSend: function() {
+                        AppLoader.show();
+                    },
                     success: function(response) {
                         $('table tbody').html(response.table);
                         $('.company-count').text(response.count + ' Meetings Found');
+                    },
+                    complete: function() {
+                        AppLoader.hide();
                     }
                 });
             }

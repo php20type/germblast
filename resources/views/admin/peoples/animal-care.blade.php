@@ -26,7 +26,13 @@
                                     <p class="text-muted mb-0">Contacts (or the individuals) you do business with
                                     </p>
                                 </div>
-                                <button class="btn btn-export">EXPORT</button>
+                                @can('people.create')
+                                <div class="right-part">
+                                    <a href="{{ route('admin.people.index', ['create' => 1]) }}" class="btn btn-export">
+                                        <i class="fa-solid fa-plus"></i> Add Person
+                                    </a>
+                                </div>
+                                @endcan
                             </div>
 
                             <!-- Filter Section -->
@@ -73,7 +79,7 @@
                                                     <img src="img/icons/down-vector.svg" alt="" /> Person name </i>
                                                 </th>
                                                 <th>
-                                                    <img src="img/icons/down-vector.svg" alt="" /> Last contact </i>
+                                                    <img src="img/icons/down-vector.svg" alt="" /> Created at </i>
                                                 </th>
                                                 <th>
                                                     <img src="img/icons/down-vector.svg" alt="" /> Email </i>

@@ -59,6 +59,11 @@
             </a>
             @endcan
 
+            <a class="nav-link {{ request()->routeIs('admin.operations.workforce-coverage') ? 'active' : '' }}"
+                href="{{ route('admin.operations.workforce-coverage') }}">
+                Workforce Coverage
+            </a>
+
             @can('vehicle_planning.view')
             <a class="nav-link {{ request()->routeIs('admin.vehicle.planning') ? 'active' : '' }}"
                 href="{{ route('admin.vehicle.planning') }}">

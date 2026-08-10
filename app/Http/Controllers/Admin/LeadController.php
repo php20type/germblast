@@ -27,6 +27,7 @@ use App\Models\Source;
 use App\Models\SurveyProposal;
 use App\Models\Tag;
 use App\Models\Task;
+use App\Models\Territory;
 use App\Models\Timeline;
 use App\Models\User;
 use App\Services\NotificationService;
@@ -60,7 +61,8 @@ class LeadController extends Controller
                 : $count;
         };
 
-        $myLeads = $leads->where('assignee_id', $user->id);
+        $myLeads = $leads->where('creator_id', $user->id);
+        $assignedLeads = $leads->where('assignee_id', $user->id);
         $now = Carbon::now();
         $startOfWeek = $now->copy()->startOfWeek();
         $endOfWeek = $now->copy()->endOfWeek();
@@ -68,15 +70,17 @@ class LeadController extends Controller
         // Counts
         $totalLeads = $leads->count();
         $myLeadsCount = $myLeads->count();
+        $assignedLeadsCount = $assignedLeads->count();
         $addedThisWeekCount = Lead::whereBetween('created_at', [$startOfWeek, $endOfWeek])->count();
         $closingThisWeekCount = Lead::whereBetween('close_date', [$startOfWeek, $endOfWeek])->count();
-        $myLeadOpenStatusCount = Lead::where('lead_status', 'open')->where('assignee_id', $user->id)->count();
-        $myWatchingLeadsCount = Lead::where('is_watching', 1)->where('assignee_id', $user->id)->count();
+        $myLeadOpenStatusCount = Lead::where('lead_status', 'open')->where('creator_id', $user->id)->count();
+        $myWatchingLeadsCount = Lead::where('is_watching', 1)->where('creator_id', $user->id)->count();
         $hotLeadsCount = Lead::where('is_hot', 1)->count();
 
         return [
             'totalLeads' => $formatCount($totalLeads),
             'myLeadsCount' => $formatCount($myLeadsCount),
+            'assignedLeadsCount' => $formatCount($assignedLeadsCount),
             'addedThisWeekCount' => $formatCount($addedThisWeekCount),
             'closingThisWeekCount' => $formatCount($closingThisWeekCount),
             'myLeadOpenStatusCount' => $formatCount($myLeadOpenStatusCount),
@@ -195,6 +199,10 @@ class LeadController extends Controller
             'activity_types' => ActivityType::all(),
             'lead_stages' => LeadStage::all(),
             'leadtags' => Tag::where('tag_id', 1)->get(),
+            'products' => Product::all(),
+            'companies' => Company::all(),
+            'sources' => Source::all(),
+            'competitors' => Competitor::all(),
         ];
     }
 
@@ -232,7 +240,7 @@ class LeadController extends Controller
     public function my_leads(Request $request, $id)
     {
         $query = $this->applyFilters(
-            $this->baseLeadQuery()->where('assignee_id', $id),
+            $this->baseLeadQuery()->where('creator_id', $id),
             $request
         );
 
@@ -252,15 +260,42 @@ class LeadController extends Controller
             ]);
         }
 
-        return view(
-            'admin.leads.my-leads',
-            array_merge(
-                compact('groupedLeads', 'paginator'),
-                $stats,
-                $this->sharedViewData(),
-                $this->getSidebarStats()
-            )
+        return view('admin.leads.my-leads', array_merge(
+            compact('leads', 'paginator', 'groupedLeads'),
+            $stats,
+            $this->sharedViewData(),
+            $this->getSidebarStats()
+        ));
+    }
+
+    public function assigned_leads(Request $request, $id)
+    {
+        $query = $this->applyFilters(
+            $this->baseLeadQuery()->where('assignee_id', $id),
+            $request
         );
+
+        $paginator = $query->paginate(10)->appends($request->query());
+        $leads = $paginator->getCollection();
+        $groupedLeads = $this->groupLeads($leads);
+        $stats = $this->calculateStats($leads);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'table' => view('admin.leads.partials.lead-table-rows', compact('groupedLeads'))->render(),
+                'count' => $stats['formattedTotalLeads'],
+                'total_value' => $stats['formattedTotalValue'],
+                'avg_value' => $stats['formattedAvgValue'],
+                'avg_confidence' => $stats['avgConfidence'],
+                'pagination' => (string) $paginator->links(),
+            ]);
+        }
+        return view('admin.leads.assigned-leads', array_merge(
+            compact('leads', 'paginator', 'groupedLeads'),
+            $stats,
+            $this->sharedViewData(),
+            $this->getSidebarStats()
+        ));
     }
 
     public function open_leads(Request $request, $id)
@@ -446,8 +481,6 @@ class LeadController extends Controller
             'quantity' => 'nullable|array',
             'price' => 'nullable|array',
 
-            // 'company_id' => 'nullable|array',
-            // 'company_id.*' => 'exists:companies,id',
             'company_id' => 'required|exists:companies,id',
 
             'person_id' => 'nullable|array',
@@ -485,10 +518,6 @@ class LeadController extends Controller
                 'lead_id' => $lead->id,
                 'company_id' => $lead->company_id,
             ]);
-
-            // if ($request->filled('company_id')) {
-            //     $lead->companies()->attach($request->company_id);
-            // }
 
             if ($request->filled('person_id')) {
                 $personIds = array_unique((array) $request->person_id);
@@ -682,6 +711,8 @@ class LeadController extends Controller
         $lost_outcomes = Outcome::where('type', 'Lost')->get();
         $cancelled_outcomes = Outcome::where('type', 'Cancelled')->get();
         $markets = Market::all();
+        $persontags = Tag::where('tag_id', 3)->get();
+        $territories = Territory::all();
         $stage = $leads->leadStageProcess;
 
         return view('admin.leads.edit', compact(
@@ -710,11 +741,13 @@ class LeadController extends Controller
             'tags',
             'markets',
             'lost_outcomes',
-            'cancelled_outcomes'
+            'cancelled_outcomes',
+            'persontags',
+            'territories'
         ));
     }
 
-    public function ajax_update(Request $request)
+    public function ajax_update(Request $request, NotificationService $notify)
     {
         $request->validate([
             'lead_id' => 'required|exists:leads,id',
@@ -728,6 +761,7 @@ class LeadController extends Controller
         $leadName = $lead->name ?? 'Unnamed Lead';
         $description = null;
         $actionType = null;
+        $oldStatus = $lead->lead_status;
 
         if ($request->filled('lead_status')) {
             $lead->lead_status = $request->lead_status;
@@ -761,6 +795,10 @@ class LeadController extends Controller
         }
 
         $lead->save();
+
+        if ($request->filled('lead_status') && $request->lead_status !== $oldStatus) {
+            $notify->leadStatusChanged($lead, $oldStatus, $request->lead_status);
+        }
 
         // Save timeline entry if any change occurred
         if ($description && $actionType) {

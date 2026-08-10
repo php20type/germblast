@@ -57,10 +57,10 @@
                                         Edit Water Management Phase
                                     </p>
                                 </div>
-                                <div class="right-part-sec">
-                                    <button type="submit" class="btn btn-export">
-                                        Update Survey
-                                    </button>
+                                <div class="right-part-sec d-flex align-items-center gap-2">
+                                    <a class="btn btn-outline-dark" href="{{ route('admin.company.dashboard', $company->id) }}">
+                                        <i class="fas fa-arrow-left me-1"></i> Back
+                                    </a>
                                 </div>
                             </div>
 
@@ -356,7 +356,15 @@
                                     <textarea name="current_monitoring_activities" class="form-control" rows="5">{{ $waterManagement->current_monitoring_activities }}</textarea>
                                 </div>
 
-                    </div>
+                                <div class="row mt-4">
+                                    <div class="col-12 d-flex justify-content-end gap-2">
+                                        <button type="submit" class="btn btn-success">
+                                            Update Survey
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
                     </form>
 
                 </div>
@@ -563,3 +571,6 @@
         });
     </script>
 @endpush
+
+
+

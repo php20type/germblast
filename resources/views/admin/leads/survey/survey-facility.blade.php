@@ -127,9 +127,9 @@
                                     </p>
                                 </div>
                                 <div class="right-part d-flex align-items-center gap-2">
-                                    <button type="submit" class="btn btn-success">
-                                        Save Facility
-                                    </button>
+                                    <a class="btn btn-outline-dark" href="{{ route('admin.lead.survey.proposal', $surveyProposal->lead_id) }}">
+                                        <i class="fas fa-arrow-left me-1"></i> Back
+                                    </a>
                                 </div>
                             </div>
 
@@ -170,7 +170,7 @@
                                                         <select name="country_id" class="form-select select2" id="facility_country">
                                                             <option value="">Select Country</option>
                                                             @foreach ($countries as $country)
-                                                                <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                                                <option value="{{ $country->id }}" {{ $country->id == 233 ? 'selected' : '' }}>{{ $country->name }}</option>
                                                             @endforeach
                                                         </select>
                                                     </td>
@@ -399,6 +399,13 @@
                                     </div>
                                 </div>
                             </div>
+                                <div class="row my-4">
+                                    <div class="col-12 d-flex justify-content-end gap-2">
+                                        <button type="submit" class="btn btn-success">
+                                            Save Facility
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -668,8 +675,12 @@
                             `<option value="${state.state_id}">${state.name}</option>`
                         );
                     });
+                    if (countryId == 233) {
+                        $('#facility_state').val('1407').trigger('change');
+                    }
                 });
             });
+            $('#facility_country').trigger('change');
 
 
             // State → Cities
@@ -690,3 +701,6 @@
 
     </script>
 @endpush
+
+
+

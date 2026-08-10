@@ -10,25 +10,30 @@
         <div class="my-3">
             <input type="text" class="form-control search-box" placeholder="🔍">
         </div>
-        <hr>
+        <!-- <hr>
         <div class="mt-4">
-            <h6 class="text-uppercase text-light mb-1">YOUR
-                LISTS
-                🔒</h6>
+            <h6 class="text-uppercase text-light mb-1">YOUR LISTS</h6>
             <p class="text-light mb-1" style="opacity: 0.8;">You haven't saved any
                 lists.</p>
-        </div>
+        </div> -->
         <hr>
 
         <div id="shared-lists">
             <div class="mt-4">
-                <h6 class="text-uppercase text-light mb-2">SHARED
-                    LISTS ⚙️</h6>
+                <h6 class="text-uppercase text-light mb-2 text-nowrap">SHARED LISTS ⚙️</h6>
                 @can('company.list.my.view')
                 <a class="nav-link company-filter {{ request()->routeIs('admin.company.my_companies') ? 'active' : '' }}"
                     href="{{ route('admin.company.my_companies', auth()->id()) }}">
                     My companies
                     <span class="badge bg-light text-dark">{{ $formattedMyCompanies }}</span>
+                </a>
+                @endcan
+
+                @can('company.list.all.view')
+                <a class="nav-link company-filter {{ request()->routeIs('admin.company.assigned_companies') ? 'active' : '' }}"
+                    href="{{ route('admin.company.assigned_companies', auth()->id()) }}">
+                    Assigned companies
+                    <span class="badge bg-light text-dark">{{ $formattedAssignedCompanies }}</span>
                 </a>
                 @endcan
 
