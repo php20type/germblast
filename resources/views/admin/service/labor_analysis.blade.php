@@ -331,6 +331,10 @@
                                                         <td class="fw-bold text-primary text-end">{{ $officeData['total_orders'] }}</td>
                                                     </tr>
                                                     <tr>
+                                                        <td class="text-start fw-bold">Grand Total of Orders</td>
+                                                        <td class="fw-bold text-primary text-end">${{ number_format($officeData['total_price'], 2) }}</td>
+                                                    </tr>
+                                                    <tr>
                                                         <td class="text-start fw-bold">Total Scheduled Service Hours</td>
                                                         <td class="fw-bold text-primary text-end">{{ number_format($officeData['total_scheduled_hours'], 2) }}</td>
                                                     </tr>

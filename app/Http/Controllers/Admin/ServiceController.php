@@ -2518,6 +2518,7 @@ class ServiceController extends Controller implements HasMiddleware
                     'office_name' => $officeName,
                     'orders' => collect(),
                     'total_orders' => 0,
+                    'total_price' => 0,
                     'total_scheduled_hours' => 0,
                     'unique_staff' => [],
                 ];
@@ -2527,6 +2528,9 @@ class ServiceController extends Controller implements HasMiddleware
             if ($slot->serviceOrder && !$laborData[$officeId]['orders']->contains('id', $slot->serviceOrder->id)) {
                 $laborData[$officeId]['orders']->push($slot->serviceOrder);
                 $laborData[$officeId]['total_orders']++;
+                if ($slot->serviceOrder->service) {
+                    $laborData[$officeId]['total_price'] += (float)($slot->serviceOrder->service->total_price ?? 0);
+                }
             }
 
             // Total hours
