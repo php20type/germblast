@@ -10,11 +10,16 @@
         <hr>
 
         <div id="operations-tools-list">
+            
             @can('all_schedules.view')
             <a class="nav-link {{ request()->routeIs('admin.all_schedules.*') ? 'active' : '' }}" href="{{ route('admin.all_schedules.index') }}">
                 All Schedules
             </a>
             @endcan
+
+            <a class="nav-link {{ request()->routeIs('admin.operations.action-plan') ? 'active' : '' }}" href="{{ route('admin.operations.action-plan') }}">
+                Action Plan Overview
+            </a>
 
             <a class="nav-link {{ request()->routeIs('admin.timecards.*') ? 'active' : '' }}" href="{{ route('admin.timecards.index') }}">
                 Time Sheets
@@ -37,6 +42,10 @@
                 Driver Report
             </a>
             @endcan
+
+            <a class="nav-link {{ request()->routeIs('admin.employee-performance') ? 'active' : '' }}" href="{{ route('admin.employee-performance') }}">
+                Employee Performance
+            </a>
 
             @can('equipment_manager.view')
             <a class="nav-link {{ request()->routeIs('admin.equipment-management.*') ? 'active' : '' }}"
@@ -106,6 +115,19 @@
                 Training Report
             </a>
             @endcan
+
+            <a class="nav-link {{ request()->routeIs('admin.operations.audits*') ? 'active' : '' }}" href="{{ route('admin.operations.audits') }}">
+                Audits
+            </a>
+
+            <a class="nav-link {{ request()->routeIs('admin.operations.audit-calendar') ? 'active' : '' }}" href="{{ route('admin.operations.audit-calendar') }}">
+                Audit Calendar
+            </a>
+
+            <a class="nav-link {{ request()->routeIs('admin.operations.evaluations') ? 'active' : '' }}" href="{{ route('admin.operations.evaluations') }}">
+                Evaluations
+            </a>
+
 
             <div id="nothing-found" style="display:none; color: rgba(255,255,255,0.6); padding: 10px 0;">Nothing found.</div>
         </div>

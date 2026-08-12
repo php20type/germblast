@@ -123,7 +123,12 @@
                     'admin.training-tests.*',
                     'admin.training-questions.*',
                     'admin.training-report.*',
-                    'admin.operations.workforce-coverage'
+                    'admin.operations.workforce-coverage',
+                    'admin.operations.action-plan',
+                    'admin.operations.audit-calendar',
+                    'admin.operations.audits*',
+                    'admin.employee-performance',
+                    'admin.operations.evaluations'
                 ]);
 
                 $user = auth()->user();

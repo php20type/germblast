@@ -148,32 +148,43 @@
                                         <thead>
                                             <tr>
                                                 <th class="text-start">Customer</th>
-                                                <th>Date</th>
                                                 <th>In</th>
                                                 <th>Out</th>
                                                 <th>Type</th>
                                                 <th class="text-primary">Total Hours</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            @foreach($employee->timecards as $timecard)
                                             @php
-                                                $hrs = $timecard->calculated_hours ?? 0;
-                                                $formattedHrs = $hrs > 0 ? number_format($hrs, 2) : '-';
+                                                $groupedTimecards = $employee->timecards->sortBy('clock_in')->groupBy(function($item) {
+                                                    return \Carbon\Carbon::parse($item->work_date)->format('D M d, Y');
+                                                });
                                             @endphp
-                                            <tr>
-                                                <td class="text-start">{{ $timecard->company->name ?? 'No Job Associated' }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($timecard->work_date)->format('D m-d') }}</td>
-                                                <td>{{ $timecard->clock_in ? \Carbon\Carbon::parse($timecard->clock_in)->format('h:iA') : '-' }}</td>
-                                                <td>{{ $timecard->clock_out ? \Carbon\Carbon::parse($timecard->clock_out)->format('h:iA') : '-' }}</td>
-                                                <td>{{ $timecard->clock_type_label }}</td>
-                                                <td class="text-primary fw-semibold">{{ $formattedHrs }}</td>
-                                            </tr>
-                                            @endforeach
+                                            @forelse($groupedTimecards as $date => $timecards)
+                                                <tr class="bg-light border-bottom">
+                                                    <td colspan="5" class="text-start fw-bold text-dark py-3" style="font-size: 14px;">{{ $date }}</td>
+                                                </tr>
+                                                @foreach($timecards as $timecard)
+                                                @php
+                                                    $hrs = $timecard->calculated_hours ?? 0;
+                                                    $formattedHrs = $hrs > 0 ? number_format($hrs, 2) : '-';
+                                                @endphp
+                                                <tr>
+                                                    <td class="text-start">{{ $timecard->company->name ?? 'No Job Associated' }}</td>
+                                                    <td>{{ $timecard->clock_in ? \Carbon\Carbon::parse($timecard->clock_in)->format('h:iA') : '-' }}</td>
+                                                    <td>{{ $timecard->clock_out ? \Carbon\Carbon::parse($timecard->clock_out)->format('h:iA') : '-' }}</td>
+                                                    <td>{{ $timecard->clock_type_label }}</td>
+                                                    <td class="text-primary fw-semibold">{{ $formattedHrs }}</td>
+                                                </tr>
+                                                @endforeach
+                                            @empty
+                                                <tr>
+                                                    <td colspan="5" class="text-center py-4 text-muted">No time sheets found for this week.</td>
+                                                </tr>
+                                            @endforelse
                                         </tbody>
                                         <tfoot>
                                             <tr class="bg-light fw-bold">
-                                                <td class="text-start" colspan="5">Grand Totals</td>
+                                                <td class="text-start" colspan="4">Grand Totals</td>
                                                 <td class="text-primary">{{ isset($employee->totals['total']) && $employee->totals['total'] > 0 ? number_format($employee->totals['total'], 2) : '-' }}</td>
                                             </tr>
                                         </tfoot>
@@ -217,7 +228,7 @@
                             <div class="form-group">
                                 <label class="form-label">Work Date</label>
                                 <span class="text-danger">*</span>
-                                <input type="date" name="work_date" class="form-control" value="{{ $start->toDateString() }}">
+                                <input type="date" name="work_date" class="form-control" value="{{ now()->toDateString() }}">
                             </div>
                         </div>
                         <div class="col-lg-6">

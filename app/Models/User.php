@@ -451,4 +451,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(Timecard::class, 'user_id');
     }
+
+    public function disciplineRecords()
+    {
+        return $this->hasMany(EmployeePerformanceRecord::class, 'user_id');
+    }
+
+    public function actionPlans()
+    {
+        return $this->hasMany(ActionPlan::class, 'user_id');
+    }
+
+    public function resolvedActionPlans()
+    {
+        return $this->hasMany(ActionPlan::class, 'resolved_by');
+    }
 }

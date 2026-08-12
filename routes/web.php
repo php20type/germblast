@@ -4,6 +4,9 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\NoteController;
 use App\Http\Controllers\Admin\TaskController;
+use App\Http\Controllers\Admin\ActionPlanController;
+use App\Http\Controllers\Admin\AuditCalendarController;
+use App\Http\Controllers\Admin\AuditController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\ExpenseReportController;
 use App\Http\Controllers\Admin\RolePermissionController;
@@ -20,6 +23,7 @@ use App\Http\Controllers\Admin\TimeOffRequestController;
 use App\Http\Controllers\Admin\CoreValuePraiseController;
 use App\Http\Controllers\Admin\EmployeeRewardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\EmployeePerformanceController;
 use App\Http\Controllers\EquipmentManagementController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\Admin\TrainingCategoryController;
@@ -106,6 +110,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('employee/{id}/driver-suspension/store',[EmployeeController::class, 'storeDriverSuspension'])->name('employee.driver-suspension.store');
     Route::post('employee/{id}/availability/store', [EmployeeController::class, 'storeAvailability'])->name('employee.availability.store');
     Route::get('operations/workforce-coverage', [EmployeeController::class, 'workforceCoverage'])->name('operations.workforce-coverage');
+    Route::get('operations/action-plan', [ActionPlanController::class, 'index'])->name('operations.action-plan');
+    Route::post('operations/action-plan/store', [ActionPlanController::class, 'store'])->name('operations.action-plan.store');
+    Route::post('operations/action-plan/{id}/resolve', [ActionPlanController::class, 'markResolved'])->name('operations.action-plan.resolve');
+    Route::get('operations/audit-calendar', [AuditCalendarController::class, 'index'])->name('operations.audit-calendar');
+    Route::get('operations/audits', [AuditController::class, 'index'])->name('operations.audits');
+    Route::get('operations/audits/{id}', [AuditController::class, 'show'])->name('operations.audits.show');
+    Route::get('operations/evaluations', [App\Http\Controllers\Admin\EvaluationController::class, 'index'])->name('operations.evaluations');
 
     // Expense Reports
     Route::get('expense-report/index', [ExpenseReportController::class, 'index'])->name('expense-report.index');
@@ -210,6 +221,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     // Driver Reports
     Route::get('hr/driver-report', [EmployeeController::class, 'driverReport'])->name('hr.driver-report.index');
+    Route::get('employee-performance', [EmployeePerformanceController::class, 'index'])->name('employee-performance');
+    Route::post('employee-performance/store', [EmployeePerformanceController::class, 'store'])->name('employee-performance.store');
     Route::post('hr/driver-report/{userId}', [EmployeeController::class, 'updateDriverReport'])->name('hr.driver-report.update');
 
     // HR Timecards
