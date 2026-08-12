@@ -134,7 +134,15 @@
 
                                             <div class="d-flex justify-content-between mb-2 pb-2 border-bottom" style="font-size: 13px;">
                                                 <span class="text-muted">Employee Type</span>
-                                                <span class="fw-semibold text-dark">{{ $user->employee_type ? ucfirst(str_replace('_', ' ', $user->employee_type)) : 'N/A' }}</span>
+                                                <span class="fw-semibold text-dark">
+                                                    @if($user->employee_type === 1 || $user->employee_type === '1')
+                                                        Full Time
+                                                    @elseif($user->employee_type === 0 || $user->employee_type === '0')
+                                                        Part Time
+                                                    @else
+                                                        N/A
+                                                    @endif
+                                                </span>
                                             </div>
 
                                             <div class="d-flex justify-content-between" style="font-size: 13px;">
