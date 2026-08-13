@@ -1,0 +1,328 @@
+{
+  "sections": [
+    {
+      "id": 1,
+      "name": "Supervisor/Team Leads",
+      "questions": [
+        {
+          "question_id": "1.3",
+          "question": "Are they providing effective leadership and leading by example?"
+        },
+        {
+          "question_id": "1.4",
+          "question": "Are they exhibiting a high level of professionalism, and communicating well with client and team?"
+        },
+        {
+          "question_id": "1.6",
+          "question": "Do they have a positive attitude?"
+        },
+        {
+          "question_id": "1.9",
+          "question": "Are they doing quality checks?"
+        },
+        {
+          "question_id": "1.10",
+          "question": "Are they holding their team accountable/enforcing protocols?"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Service Techs",
+      "questions": [
+        {
+          "question_id": "2.3",
+          "question": "Are they communicating well with their team?"
+        },
+        {
+          "question_id": "2.4",
+          "question": "Are they showing respect to their team?"
+        },
+        {
+          "question_id": "2.5",
+          "question": "Do they have a positive attitude?"
+        },
+        {
+          "question_id": "2.6",
+          "question": "Are they exhibiting a high level of professionalism?"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Scheduling/Planning",
+      "questions": [
+        {
+          "question_id": "3.1",
+          "question": "Does the leader have a plan for the service?"
+        },
+        {
+          "question_id": "3.2",
+          "question": "Did the supervisor review pre-service notes?"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Equipment Preparation",
+      "questions": [
+        {
+          "question_id": "4.1",
+          "question": "Was the equipment cleaned, tested & entered onto the job?"
+        },
+        {
+          "question_id": "4.2",
+          "question": "Was the equipment checked and scanned back in before leaving the job site?"
+        },
+        {
+          "question_id": "4.3",
+          "question": "Is all the equipment functioning properly and intact?"
+        },
+        {
+          "question_id": "4.4",
+          "question": "Was the service checklist for consumable supplies filled out?"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Trailers",
+      "questions": [
+        {
+          "question_id": "5.1",
+          "question": "Does the outside of the trailer present positive impression of GermBlast?"
+        },
+        {
+          "question_id": "5.2",
+          "question": "Does the inside of the trailer present positive impression of GermBlast?"
+        },
+        {
+          "question_id": "5.3",
+          "question": "Is the trailer organized?"
+        },
+        {
+          "question_id": "5.4",
+          "question": "Is the trailer hooked up properly?"
+        },
+        {
+          "question_id": "5.5",
+          "question": "Do all of the trailer lights work?"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Service Vehicles",
+      "questions": [
+        {
+          "question_id": "6.1",
+          "question": "Does the outside of the service vehicle present a positive impression of GermBlast?"
+        },
+        {
+          "question_id": "6.2",
+          "question": "Does the inside of the service vehicle present a positive impression of GermBlast?"
+        },
+        {
+          "question_id": "6.3",
+          "question": "Is the vehicle fueled and ready to go?"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Team Arrival",
+      "questions": [
+        {
+          "question_id": "7.1",
+          "question": "Did everyone arrive on time?"
+        },
+        {
+          "question_id": "7.2",
+          "question": "Did everyone arrive ready to work?"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Pre-Service Team Huddle",
+      "questions": [
+        {
+          "question_id": "8.1",
+          "question": "Was there a team huddle?"
+        },
+        {
+          "question_id": "8.2",
+          "question": "Did leaders communicate necessary details about the service?"
+        },
+        {
+          "question_id": "8.3",
+          "question": "Were assignments communicated?"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Uniforms",
+      "questions": [
+        {
+          "question_id": "9.1",
+          "question": "Uniform Observations by Employee"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Travel",
+      "questions": [
+        {
+          "question_id": "10.1",
+          "question": "Travel Observations"
+        },
+        {
+          "question_id": "10.2",
+          "question": "Travel Clock Accuracy"
+        },
+        {
+          "question_id": "10.3",
+          "question": "Service Clock Accuracy"
+        },
+        {
+          "question_id": "10.4",
+          "question": "Break Clock Accuracy"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Service",
+      "questions": [
+        {
+          "question_id": "11.1",
+          "question": "Pretreatment"
+        },
+        {
+          "question_id": "11.2",
+          "question": "Spray"
+        },
+        {
+          "question_id": "11.3",
+          "question": "Restrooms"
+        },
+        {
+          "question_id": "11.4",
+          "question": "Dry Mist"
+        },
+        {
+          "question_id": "11.5",
+          "question": "Shield"
+        },
+        {
+          "question_id": "11.6",
+          "question": "Photocatalytic Oxidation"
+        },
+        {
+          "question_id": "11.7",
+          "question": "Ultraviolet Light"
+        },
+        {
+          "question_id": "11.8",
+          "question": "Wash"
+        },
+        {
+          "question_id": "11.9",
+          "question": "Knowledge of GermBlast Processes"
+        },
+        {
+          "question_id": "11.10",
+          "question": "ATP Sampling"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Equipment",
+      "questions": [
+        {
+          "question_id": "12.1",
+          "question": "Pre-Cleaning Before Entering Facility/Department"
+        },
+        {
+          "question_id": "12.2",
+          "question": "Safe Handling & Transport of Equipment"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Personal Protective Equipment",
+      "questions": [
+        {
+          "question_id": "13.1",
+          "question": "PPE Observations"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "name": "Chemicals",
+      "questions": [
+        {
+          "question_id": "14.1",
+          "question": "Proper Chemical Handling"
+        },
+        {
+          "question_id": "14.2",
+          "question": "Treating Around Client Staff"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "name": "Facility Shutdown",
+      "questions": [
+        {
+          "question_id": "15.1",
+          "question": "Were facilities shut down properly and left secure?"
+        },
+        {
+          "question_id": "15.2",
+          "question": "Was service contact notified of job completions and keys/access cards returned?"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "name": "Equipment",
+      "questions": [
+        {
+          "question_id": "16.1",
+          "question": "Equipment Removal and Loading"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "name": "Notes",
+      "questions": [
+        {
+          "question_id": "17.1",
+          "question": "Post Service Notes Documentation"
+        },
+        {
+          "question_id": "17.2",
+          "question": "Service Efficiency"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "name": "Photos of Service",
+      "questions": [
+        {
+          "question_id": "photo_uploads",
+          "question": "Photo Uploads"
+        }
+      ]
+    }
+  ]
+}

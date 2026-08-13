@@ -25,6 +25,8 @@ class ServiceOrderSlot extends Model
         'confirmed_at',
         'confirmation_notes',
         'status',
+        'is_audit',
+        'is_audit_finalized',
     ];
 
     protected $casts = [

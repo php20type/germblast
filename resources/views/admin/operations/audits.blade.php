@@ -8,60 +8,19 @@
             cursor: pointer !important;
         }
 
-        /* Equipment Report Table Boxed Styling from EQ */
-        .equipment-report-table {
+        /* Section Cards from Business Failures */
+        .section-card {
+            background: #ffffff !important;
             border: 1px solid #e5e7eb !important;
-            border-radius: 12px !important;
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
-            overflow: hidden !important;
-            background: #fff !important;
-            width: 100% !important;
-            margin-top: 10px !important;
+            border-radius: 16px !important;
+            padding: 25px !important;
+            margin-bottom: 25px !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
+            transition: all 0.3s ease !important;
         }
 
-        .equipment-report-table thead th {
-            background-color: rgba(255, 184, 28, 0.4) !important;
-            border-bottom: 1px solid #e5e7eb !important;
-            color: #374151 !important;
-            font-weight: 600 !important;
-            padding: 18px 20px !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-            white-space: nowrap;
-        }
-
-        .equipment-report-table thead th:first-child {
-            border-top-left-radius: 12px !important;
-        }
-
-        .equipment-report-table thead th:last-child {
-            border-top-right-radius: 12px !important;
-            border-right: none !important;
-        }
-
-        .equipment-report-table td {
-            padding: 15px 20px !important;
-            vertical-align: middle !important;
-            border-bottom: 1px solid #f3f4f6 !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-        }
-
-        .equipment-report-table td:last-child {
-            border-right: none !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td {
-            border-bottom: none !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td:first-child {
-            border-bottom-left-radius: 12px !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td:last-child {
-            border-bottom-right-radius: 12px !important;
+        .section-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
         }
     </style>
 @endpush
@@ -82,75 +41,30 @@
                             <div class="heading-area-sec mb-3">
                                 <div class="left-part-sec">
                                     <h3 class="mb-1 text-uppercase">AUDITS</h3>
-<p class="text-danger fw-bold mb-0" style="font-size: 13px;">(This is a static page, it's a work in progress)</p>
                                     <p class="text-muted mb-0">Overview of completed facility audits and their corresponding scores.</p>
                                 </div>
                             </div>
 
                             <div class="px-4 pb-4">
-                                <div class="table-responsive mt-3">
-                                    <table class="table table-hover w-100 equipment-report-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Office / Facility Name</th>
-                                                <th>Score</th>
-                                                <th>Date of Audit</th>
-                                                <th class="text-center">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td class="fw-bold text-dark">UTMB WIC Office - Livingston</td>
-                                                <td><span class="badge bg-success" style="font-size: 13px;">3.94</span></td>
-                                                <td class="text-secondary">03/23</td>
-                                                <td class="text-center">
-                                                    <a href="{{ route('admin.operations.audits.show', 1) }}" class="btn btn-sm btn-outline-primary py-1 px-3 fw-bold" style="border-radius: 6px; font-size: 12px;">
-                                                        Go To Audit <i class="fas fa-arrow-right ms-1"></i>
+                                <div class="mt-3">
+                                    @forelse($audits as $audit)
+                                        <div class="section-card">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h4 class="mb-1" style="font-size: 18px; font-weight: 600; color: #111827;">{{ $audit->serviceOrder->service->lead->company->name ?? 'testing' }}</h4>
+                                                    <div class="text-muted small mb-3">Score 3.94</div>
+                                                    <a href="{{ route('admin.operations.audits.show', $audit->id) }}" class="btn btn-sm btn-outline-warning py-2 px-4" style="border-radius: 6px; font-size: 13px;">
+                                                        Go To Audit
                                                     </a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="fw-bold text-dark">UTMB WIC Office - Pearland</td>
-                                                <td><span class="badge bg-warning text-dark" style="font-size: 13px;">3.46</span></td>
-                                                <td class="text-secondary">03/23</td>
-                                                <td class="text-center">
-                                                    <a href="{{ route('admin.operations.audits.show', 1) }}" class="btn btn-sm btn-outline-primary py-1 px-3 fw-bold" style="border-radius: 6px; font-size: 12px;">
-                                                        Go To Audit <i class="fas fa-arrow-right ms-1"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="fw-bold text-dark">Primrose School of Plano at Preston Meadow</td>
-                                                <td><span class="badge bg-info text-dark" style="font-size: 13px;">3.67</span></td>
-                                                <td class="text-secondary">01/23</td>
-                                                <td class="text-center">
-                                                    <a href="{{ route('admin.operations.audits.show', 1) }}" class="btn btn-sm btn-outline-primary py-1 px-3 fw-bold" style="border-radius: 6px; font-size: 12px;">
-                                                        Go To Audit <i class="fas fa-arrow-right ms-1"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="fw-bold text-dark">Lubbock ISD</td>
-                                                <td><span class="badge bg-success" style="font-size: 13px;">4.00</span></td>
-                                                <td class="text-secondary">11/22</td>
-                                                <td class="text-center">
-                                                    <a href="{{ route('admin.operations.audits.show', 1) }}" class="btn btn-sm btn-outline-primary py-1 px-3 fw-bold" style="border-radius: 6px; font-size: 12px;">
-                                                        Go To Audit <i class="fas fa-arrow-right ms-1"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="fw-bold text-dark">Trinidad ISD</td>
-                                                <td><span class="badge bg-success" style="font-size: 13px;">3.85</span></td>
-                                                <td class="text-secondary">11/22</td>
-                                                <td class="text-center">
-                                                    <a href="{{ route('admin.operations.audits.show', 1) }}" class="btn btn-sm btn-outline-primary py-1 px-3 fw-bold" style="border-radius: 6px; font-size: 12px;">
-                                                        Go To Audit <i class="fas fa-arrow-right ms-1"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                                </div>
+                                                <div class="text-muted small mt-1">
+                                                    Date of Audit {{ \Carbon\Carbon::parse($audit->scheduled_start_time)->format('m/d') }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="text-center py-4 text-muted">No finalized audits found.</div>
+                                    @endforelse
                                 </div>
                             </div>
                         </div>

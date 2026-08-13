@@ -17,6 +17,14 @@
             </a>
             @endcan
 
+            <a class="nav-link {{ request()->routeIs('admin.operations.audit-calendar') ? 'active' : '' }}" href="{{ route('admin.operations.audit-calendar') }}">
+                Audit Calendar
+            </a>
+
+            <a class="nav-link {{ request()->routeIs('admin.operations.audits*') ? 'active' : '' }}" href="{{ route('admin.operations.audits') }}">
+                Audits
+            </a>
+
             <a class="nav-link {{ request()->routeIs('admin.operations.action-plan') ? 'active' : '' }}" href="{{ route('admin.operations.action-plan') }}">
                 Action Plan Overview
             </a>
@@ -115,14 +123,6 @@
                 Training Report
             </a>
             @endcan
-
-            <a class="nav-link {{ request()->routeIs('admin.operations.audits*') ? 'active' : '' }}" href="{{ route('admin.operations.audits') }}">
-                Audits
-            </a>
-
-            <a class="nav-link {{ request()->routeIs('admin.operations.audit-calendar') ? 'active' : '' }}" href="{{ route('admin.operations.audit-calendar') }}">
-                Audit Calendar
-            </a>
 
             <a class="nav-link {{ request()->routeIs('admin.operations.evaluations') ? 'active' : '' }}" href="{{ route('admin.operations.evaluations') }}">
                 Evaluations

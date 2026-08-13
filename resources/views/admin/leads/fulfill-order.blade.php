@@ -1044,10 +1044,29 @@
                                                     role="tabpanel">
 
                                                     {{-- Time & Facility Info --}}
-                                                    <div class="border rounded p-3 mb-3 bg-light">
-                                                        <p class="mb-1"><strong>Office:</strong> {{ $slot->office->name ?? 'N/A' }}</p>
-                                                        <p class="mb-1"><strong>Schedule:</strong> {{ $slot->scheduled_start_time }} — {{ $slot->scheduled_end_time }}</p>
-                                                        <p class="mb-0"><strong>Arrival Time:</strong> {{ $slot->scheduled_arrival_time }}</p>
+                                                    <div class="border rounded p-3 mb-3 bg-light d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <p class="mb-1"><strong>Office:</strong> {{ $slot->office->name ?? 'N/A' }}</p>
+                                                            <p class="mb-1"><strong>Schedule:</strong> {{ $slot->scheduled_start_time }} — {{ $slot->scheduled_end_time }}</p>
+                                                            <p class="mb-0"><strong>Arrival Time:</strong> {{ $slot->scheduled_arrival_time }}</p>
+                                                        </div>
+                                                        <div class="audit-action-container">
+                                                            @if(!$slot->is_audit)
+                                                                <form action="{{ route('admin.operations.slots.audit-this', $slot->id) }}" method="POST" class="d-inline form-audit-this">
+                                                                    @csrf
+                                                                    <button type="submit" class="btn btn-export">
+                                                                        Audit this
+                                                                    </button>
+                                                                </form>
+                                                            @else
+                                                                <form action="{{ route('admin.operations.slots.cancel-audit', $slot->id) }}" method="POST" class="d-inline form-cancel-audit">
+                                                                    @csrf
+                                                                    <button type="submit" class="btn btn-export">
+                                                                        Cancel Audit
+                                                                    </button>
+                                                                </form>
+                                                            @endif
+                                                        </div>
                                                     </div>
 
                                                     {{-- Facilities --}}
@@ -1916,7 +1935,65 @@
                                     </div>
                                 </div>
 
-
+                                    {{-- Inventory Consumables --}}
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="section-card">
+                                                <div class="section-header mb-3">
+                                                    <h5 class="section-title">Inventory Consumables</h5>
+                                                </div>
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover equipment-report-table mb-0">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th>Item</th>
+                                                                <th>Quantity Used</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @php
+                                                                $consumablesList = [
+                                                                    'microfiber_bins' => 'Microfiber Bins',
+                                                                    'disposable_microfiber' => 'Disposable Microfiber',
+                                                                    'atp_swabs' => 'ATP Swabs',
+                                                                    'water' => 'Water',
+                                                                    'oxivir' => 'Oxivir',
+                                                                    'opticide' => 'Opticide',
+                                                                    'halomist' => 'Halomist',
+                                                                    'gloves' => 'Gloves',
+                                                                    'sterifab' => 'Sterifab',
+                                                                    'd2' => 'D2',
+                                                                    'shield' => 'Shield',
+                                                                    'rinse_aid' => 'Rinse Aid',
+                                                                    'wash_cleaner' => 'Wash Cleaner',
+                                                                    'rust_inhibitor' => 'Rust Inhibitor'
+                                                                ];
+                                                                $hasConsumables = false;
+                                                            @endphp
+                                                            
+                                                            @if(isset($order->consumables) && is_array($order->consumables))
+                                                                @foreach($consumablesList as $key => $label)
+                                                                    @if(isset($order->consumables[$key]) && floatval($order->consumables[$key]) > 0)
+                                                                        @php $hasConsumables = true; @endphp
+                                                                        <tr>
+                                                                            <td>{{ $label }}</td>
+                                                                            <td>{{ floatval($order->consumables[$key]) }}</td>
+                                                                        </tr>
+                                                                    @endif
+                                                                @endforeach
+                                                            @endif
+                                                            
+                                                            @if(!$hasConsumables)
+                                                                <tr>
+                                                                    <td colspan="2" class="text-muted text-center">No inventory consumables have been recorded.</td>
+                                                                </tr>
+                                                            @endif
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
                         </div>
 
@@ -3559,6 +3636,64 @@
 
     $(document).on('input', '.consumable-price', function() {
         calculateInventoryBreakdown();
+    });
+
+    $(document).on('submit', '.form-audit-this', function(e) {
+        e.preventDefault();
+
+        const $form = $(this);
+        const $submitBtn = $form.find('button[type="submit"]');
+
+        $.ajax({
+            url: $form.attr('action'),
+            method: 'POST',
+            data: $form.serialize(),
+
+            beforeSend: function() {
+                $submitBtn.prop('disabled', true).text('Saving...');
+            },
+
+            success: function(response) {
+                toastr.success(response.message || 'Slot marked for audit successfully!');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            },
+
+            error: function() {
+                toastr.error('Something went wrong while marking for audit.');
+                $submitBtn.prop('disabled', false).text('Audit this');
+            }
+        });
+    });
+
+    $(document).on('submit', '.form-cancel-audit', function(e) {
+        e.preventDefault();
+
+        const $form = $(this);
+        const $submitBtn = $form.find('button[type="submit"]');
+
+        $.ajax({
+            url: $form.attr('action'),
+            method: 'POST',
+            data: $form.serialize(),
+
+            beforeSend: function() {
+                $submitBtn.prop('disabled', true).text('Saving...');
+            },
+
+            success: function(response) {
+                toastr.success(response.message || 'Audit cancelled successfully!');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            },
+
+            error: function() {
+                toastr.error('Something went wrong while cancelling audit.');
+                $submitBtn.prop('disabled', false).text('Cancel Audit');
+            }
+        });
     });
 
 </script>

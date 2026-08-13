@@ -7,6 +7,11 @@ use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\Admin\ActionPlanController;
 use App\Http\Controllers\Admin\AuditCalendarController;
 use App\Http\Controllers\Admin\AuditController;
+use App\Http\Controllers\Admin\AuditSubmissionController;
+use App\Http\Controllers\Admin\EvaluationController;
+use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\TrainingReportController;
+use App\Http\Controllers\Admin\EmployeeTrainingController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\ExpenseReportController;
 use App\Http\Controllers\Admin\RolePermissionController;
@@ -114,9 +119,17 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('operations/action-plan/store', [ActionPlanController::class, 'store'])->name('operations.action-plan.store');
     Route::post('operations/action-plan/{id}/resolve', [ActionPlanController::class, 'markResolved'])->name('operations.action-plan.resolve');
     Route::get('operations/audit-calendar', [AuditCalendarController::class, 'index'])->name('operations.audit-calendar');
+    Route::get('operations/audit-calendar/orders', [AuditCalendarController::class, 'auditCalendarOrders'])->name('operations.audit-calendar.orders');
     Route::get('operations/audits', [AuditController::class, 'index'])->name('operations.audits');
     Route::get('operations/audits/{id}', [AuditController::class, 'show'])->name('operations.audits.show');
-    Route::get('operations/evaluations', [App\Http\Controllers\Admin\EvaluationController::class, 'index'])->name('operations.evaluations');
+    Route::post('operations/audits/{id}/finalize', [AuditController::class, 'finalize'])->name('operations.audits.finalize');
+    Route::post('operations/audits/{id}/reopen', [AuditController::class, 'reopen'])->name('operations.audits.reopen');
+    Route::post('operations/slots/{slot_id}/audit-this', [AuditController::class, 'auditThis'])->name('operations.slots.audit-this');
+    Route::post('operations/slots/{slot_id}/cancel-audit', [AuditController::class, 'cancelAudit'])->name('operations.slots.cancel-audit');
+    Route::post('operations/audits/submission', [AuditSubmissionController::class, 'store'])->name('operations.audits.submission.store');
+    Route::post('operations/audits/submission/{id}/delete', [AuditSubmissionController::class, 'destroy'])->name('operations.audits.submission.destroy');
+    Route::post('operations/audits/submission/{id}/update', [AuditSubmissionController::class, 'update'])->name('operations.audits.submission.update');
+    Route::get('operations/evaluations', [EvaluationController::class, 'index'])->name('operations.evaluations');
 
     // Expense Reports
     Route::get('expense-report/index', [ExpenseReportController::class, 'index'])->name('expense-report.index');
@@ -161,10 +174,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('/warehouse/tasks/delete/{id}', [WarehouseController::class, 'destroy'])->name('warehouse.tasks.destroy');
 
     // System Notifications
-    Route::get('notifications', [\App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('notifications/{id}/mark-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
-    Route::post('notifications/mark-all-read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
-    Route::get('notifications/latest', [\App\Http\Controllers\Admin\NotificationController::class, 'getLatest'])->name('notifications.latest');
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/{id}/mark-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::get('notifications/latest', [NotificationController::class, 'getLatest'])->name('notifications.latest');
 
     // Training Categories
     Route::get('training-categories/index', [TrainingCategoryController::class, 'index'])->name('training-categories.index');
@@ -187,13 +200,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('training-questions/update/{id}', [TrainingQuestionController::class, 'update'])->name('training-questions.update');
 
     // Training Report
-    Route::get('training-report/index', [\App\Http\Controllers\Admin\TrainingReportController::class, 'index'])->name('training-report.index');
+    Route::get('training-report/index', [TrainingReportController::class, 'index'])->name('training-report.index');
 
-    // Employee Training Module
-    Route::get('employee-training', [\App\Http\Controllers\Admin\EmployeeTrainingController::class, 'index'])->name('employee-training.index');
-    Route::get('employee-training/{test_id}/quiz', [\App\Http\Controllers\Admin\EmployeeTrainingController::class, 'show'])->name('employee-training.show');
-    Route::post('employee-training/{test_id}/submit', [\App\Http\Controllers\Admin\EmployeeTrainingController::class, 'submit'])->name('employee-training.submit');
-    Route::get('employee-training/certificate/{attempt_id}', [\App\Http\Controllers\Admin\EmployeeTrainingController::class, 'certificate'])->name('employee-training.certificate');
+    // Employee Training Portal
+    Route::get('employee-training', [EmployeeTrainingController::class, 'index'])->name('employee-training.index');
+    Route::get('employee-training/{test_id}/quiz', [EmployeeTrainingController::class, 'show'])->name('employee-training.show');
+    Route::post('employee-training/{test_id}/submit', [EmployeeTrainingController::class, 'submit'])->name('employee-training.submit');
+    Route::get('employee-training/certificate/{attempt_id}', [EmployeeTrainingController::class, 'certificate'])->name('employee-training.certificate');
 
     Route::get('/warehouse/calendar', [WarehouseController::class, 'calendar'])->name('warehouse.calendar');
     Route::post('/warehouse/calendar/store', [WarehouseController::class, 'storeSchedule'])->name('warehouse.calendar.store');
