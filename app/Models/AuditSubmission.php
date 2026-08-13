@@ -48,6 +48,6 @@ class AuditSubmission extends Model
             ->whereNotNull('score')
             ->avg('score');
 
-        return $avg !== null ? number_format($avg, 2) : 'N/A';
+        return $avg !== null ? number_format($avg, 2) : '0.00';
     }
 }
