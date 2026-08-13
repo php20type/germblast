@@ -38,4 +38,16 @@ class AuditSubmission extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public static function getAverageScore($slotId)
+    {
+        $avg = self::where('service_order_slot_id', $slotId)
+            ->whereHas('question', function ($query) {
+                $query->where('question_type', '!=', 'photo');
+            })
+            ->whereNotNull('score')
+            ->avg('score');
+
+        return $avg !== null ? number_format($avg, 2) : 'N/A';
+    }
 }

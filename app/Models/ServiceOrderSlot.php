@@ -92,4 +92,9 @@ class ServiceOrderSlot extends Model
                     ->withTimestamps();
     }
 
+    public function auditSubmissions()
+    {
+        return $this->hasMany(AuditSubmission::class, 'service_order_slot_id');
+    }
+
 }

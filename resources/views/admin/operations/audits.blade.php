@@ -52,7 +52,7 @@
                                             <div class="d-flex justify-content-between align-items-start">
                                                 <div>
                                                     <h4 class="mb-1" style="font-size: 18px; font-weight: 600; color: #111827;">{{ $audit->serviceOrder->service->lead->company->name ?? 'testing' }}</h4>
-                                                    <div class="text-muted small mb-3">Score 3.94</div>
+                                                    <div class="text-muted small mb-3">Score {{ \App\Models\AuditSubmission::getAverageScore($audit->id) }}</div>
                                                     <a href="{{ route('admin.operations.audits.show', $audit->id) }}" class="btn btn-sm btn-outline-warning py-2 px-4" style="border-radius: 6px; font-size: 13px;">
                                                         Go To Audit
                                                     </a>
