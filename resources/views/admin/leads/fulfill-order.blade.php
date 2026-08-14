@@ -369,7 +369,7 @@
 
 
                         <!-- Tab Content Section -->
-                        <div class="tab-content px-4" id="fulfillOrderTabContent">
+                        <div class="tab-content px-4 pb-4" id="fulfillOrderTabContent">
 
 
                             <!-- Scheduling Tab -->
@@ -531,6 +531,26 @@
                                                         @endforelse
                                                     </tbody>
                                                 </table>
+                                            </div>
+
+                                            {{-- Summary Footer --}}
+                                            @php
+                                                $totalOrderHours = 0;
+                                                foreach($order->orderSlots as $s) {
+                                                    $sStaffCount = $s->staff->count();
+                                                    $sScheduledHrs = $s->scheduled_hours ?? 0;
+                                                    $totalOrderHours += ($sScheduledHrs * $sStaffCount);
+                                                }
+                                                
+                                                $orderInvoiceAmount = $order->service->price_per_service ?? 0;
+                                                $orderTotalCost     = 28.78 * $totalOrderHours;
+                                                $orderPeoplePct     = $orderInvoiceAmount > 0 ? round(($orderTotalCost * 100) / $orderInvoiceAmount) : 0;
+                                            @endphp
+                                            <div class="mt-4 pt-3 border-top d-flex gap-4">
+                                                <small class="text-muted">People Percentage: <strong>{{ $orderPeoplePct }}%</strong></small>
+                                                <small class="text-muted">Invoice: <strong>${{ number_format($orderInvoiceAmount, 2) }}</strong></small>
+                                                <small class="text-muted">Hours: <strong>{{ number_format($totalOrderHours, 2) }}</strong></small>
+                                                <small class="text-muted">Cost: <strong>${{ number_format($orderTotalCost, 2) }}</strong></small>
                                             </div>
 
                                         </div>
