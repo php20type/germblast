@@ -381,8 +381,24 @@
                                     <div class="col-md-12">
                                         <div class="section-card">
 
-                                            <div class="section-header mb-3">
-                                                <h5 class="section-title">Schedule Service for the Following Time</h5>
+                                            <div class="section-header mb-3 d-flex justify-content-between align-items-center">
+                                                <h5 class="section-title mb-0">Schedule Service for the Following Time</h5>
+                                                <div>
+                                                    @php
+                                                        $displayStatus = strtolower($order->status ?? 'open');
+                                                    @endphp
+                                                    @if($displayStatus !== 'cancelled')
+                                                        <form action="{{ route('admin.lead.service.order.cancel', $order->id) }}" method="POST" class="d-inline form-cancel-order">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-outline-danger">Cancel Order</button>
+                                                        </form>
+                                                    @else
+                                                        <form action="{{ route('admin.lead.service.order.reopen', $order->id) }}" method="POST" class="d-inline form-reopen-order">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-outline-success">Re-Open Order</button>
+                                                        </form>
+                                                    @endif
+                                                </div>
                                             </div>
 
                                             <form action="{{ route('admin.lead.service.fulfill_order.book',$order->id) }}" method="POST">
@@ -1815,7 +1831,7 @@
                                                             <div class="col-md-12 mt-2">
                                                                 <textarea name="description"
                                                                     class="form-control"
-                                                                    placeholder="Add description..." readonly>{{ $outline->description ?? '' }}</textarea>
+                                                                    placeholder="Notes will be displayed here..." readonly>{{ $outline->description ?? '' }}</textarea>
                                                             </div>
                                                         </div>
                                                         <!-- <div class="row mt-2">
@@ -3714,6 +3730,56 @@
                 $submitBtn.prop('disabled', false).text('Cancel Audit');
             }
         });
+    });
+
+    $(document).on('submit', '.form-cancel-order', function(e) {
+        e.preventDefault();
+        let form = this;
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you really want to cancel this order?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, cancel it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+
+    $(document).on('submit', '.form-reopen-order', function(e) {
+        e.preventDefault();
+        let form = this;
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to re-open this order?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, re-open it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+
+    $(document).on('click', '#generate-invoice-form button[type="submit"]', function(e) {
+        var orderStatus = "{{ strtolower($order->status ?? 'open') }}";
+        if (orderStatus === 'cancelled') {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Order is Cancelled',
+                text: 'You must reopen the order before submitting an invoice.',
+                icon: 'error',
+                confirmButtonColor: '#3085d6',
+            });
+            return false;
+        }
     });
 
 </script>

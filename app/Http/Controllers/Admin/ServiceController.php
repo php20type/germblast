@@ -2156,6 +2156,9 @@ class ServiceController extends Controller implements HasMiddleware
         }
 
         $order->update(['status' => 'cancelled']);
+        
+        // Delete related invoices when order is cancelled
+        $order->invoices()->delete();
 
         return redirect()->back()->with('success', 'Order has been cancelled successfully.');
     }
@@ -2176,6 +2179,10 @@ class ServiceController extends Controller implements HasMiddleware
     public function generateInvoice(Request $request, $orderId)
     {
         $order = ServiceOrder::findOrFail($orderId);
+
+        if ($order->status === 'cancelled') {
+            return redirect()->back()->with('error', 'You must reopen the order before submitting an invoice.');
+        }
 
         $withInventory = $request->input('with_inventory') == 1;
 
