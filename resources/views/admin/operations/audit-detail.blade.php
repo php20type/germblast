@@ -544,7 +544,6 @@
                                 <div class="form-group">
                                     <label class="form-label">Score (1-5)</label>
                                     <select name="score" id="edit_score" class="form-select">
-                                        <option value="">Select Score</option>
                                         <option value="5">5 - Excellent</option>
                                         <option value="4">4 - Good</option>
                                         <option value="3">3 - Average</option>
