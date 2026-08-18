@@ -128,7 +128,8 @@
                     'admin.operations.audit-calendar',
                     'admin.operations.audits*',
                     'admin.employee-performance',
-                    'admin.operations.evaluations'
+                    'admin.operations.evaluations*',
+                    'admin.operations.evaluation_questions.*'
                 ]);
 
                 $user = auth()->user();

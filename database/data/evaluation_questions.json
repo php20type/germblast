@@ -1,0 +1,202 @@
+{
+  "questions": [
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "1) Accountability - Accepts responsibility for actions and their consequences.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "2) Punctuality & Attendance - Is rarely absent, arrives punctually, works required hours.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "3) Cooperation - Has ability to get along with coworkers and supervisors.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "4) Attitude/Respectfulness - Shows initiative, optimism, and politeness.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "5) Accepts Criticism - Has ability to learn from suggestions and change behavior.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "6) Flexibility - Has capacity to respond to changing situations and expectations.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "7) Policy & Procedures - Follows organization's policies and procedures.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "8) Completion of Assignments - Successfully completes tasks and meets all deadlines.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "9) Client Interaction - Ensures high-quality care, respects client's dignity and confidentiality.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "10) Quality of Work - Is excellent, thorough, and completed.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "11) Willingness to Develop Skills - Desires to take on challenges & develop their skill set.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "12) Communication Skills - Conveys information effectively and efficiently.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "13) Organizational Skills - Has capacity to stay on track and use time effectively.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "14) Confidentiality - Does not discuss internal events with coworkers.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "15) Appearance/Dress Code - Demonstrates a professional and well-kept appearance.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "16) Equipment - Keeps all equipment cleaned, operating correctly, and organized.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "17) Problem Resolution - Takes constructive approaches to resolving workplace issues.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "18) Safety - Contributes to a safe and secure environments by following established procedures.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "19) Job Knowledge - Demonstrates working knowledge of procedures and policies with minimal assistance from other supervisors.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "20) Resourceful - Has the ability to use supervisors for resources to execute services.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "21) Inventory - Has ability to keep a well-recorded stock of items used and needed.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "General",
+      "question_text": "22) Availability - Is available to work any shifts as needed by GermBlast.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "Front office",
+      "question_text": "23) Computer Skills - Effectively navigates all computer programs necessary to complete tasks.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "Front office",
+      "question_text": "24) Telephone Manners - Sounds professional & successfully uses scripts/techniques.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "Front office",
+      "question_text": "25) Client Flow - Has ability to keep clients scheduled services on time.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "Front office",
+      "question_text": "26) ATP - Has capacity to take, read, and record ATP in a timely manner.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "Front office",
+      "question_text": "27) Service Organization - Keeps up with reports in MATRIX.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "Front office",
+      "question_text": "28) Service Plan - Has ability to properly plan for successful service in Matrix.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "Front office",
+      "question_text": "29) Skills and Duties - Has mastery of skills and daily maintenance without supervision of Supervisor.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "Front office",
+      "question_text": "30) Service Preparation - Prepares for Services utilizing other supervisors and resources.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "Front office",
+      "question_text": "31) Client Interaction - Performs service with excellence and speaks to clients with professionalism.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "Front office",
+      "question_text": "32) Service Procedures - Provides pre and post service notes in Matrix to ensure the client experience when required is the utmost importance.",
+      "max_score": 5
+    },
+    {
+      "role": "technician",
+      "section": "Front office",
+      "question_text": "33) Matrix Information - Completes services with accuracy & urgency, does not need direction from Lead Supervisor.",
+      "max_score": 5
+    }
+  ]
+}

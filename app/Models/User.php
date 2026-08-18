@@ -466,4 +466,18 @@ class User extends Authenticatable
     {
         return $this->hasMany(ActionPlan::class, 'resolved_by');
     }
+    public function evaluationRequests()
+    {
+        return $this->hasMany(EvaluationRequest::class, 'target_user_id');
+    }
+
+    public function sitAttempts()
+    {
+        return $this->hasMany(SitEvaluationAttempt::class, 'technician_id');
+    }
+
+    public function evaluationScores()
+    {
+        return $this->hasMany(EvaluationScore::class, 'target_user_id');
+    }
 }

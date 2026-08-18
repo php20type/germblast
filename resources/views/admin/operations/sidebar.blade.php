@@ -124,8 +124,12 @@
             </a>
             @endcan
 
-            <a class="nav-link {{ request()->routeIs('admin.operations.evaluations') ? 'active' : '' }}" href="{{ route('admin.operations.evaluations') }}">
+            <a class="nav-link {{ request()->routeIs('admin.operations.evaluations*') ? 'active' : '' }}" href="{{ route('admin.operations.evaluations') }}">
                 Evaluations
+            </a>
+
+            <a class="nav-link {{ request()->routeIs('admin.operations.evaluation_questions.*') ? 'active' : '' }}" href="{{ route('admin.operations.evaluation_questions.index') }}">
+                Evaluation Questions
             </a>
 
 

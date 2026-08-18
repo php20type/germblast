@@ -6,9 +6,11 @@ use App\Http\Controllers\Admin\NoteController;
 use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\Admin\ActionPlanController;
 use App\Http\Controllers\Admin\AuditCalendarController;
+use App\Http\Controllers\Admin\AuditQuestionController;
 use App\Http\Controllers\Admin\AuditController;
 use App\Http\Controllers\Admin\AuditSubmissionController;
 use App\Http\Controllers\Admin\EvaluationController;
+use App\Http\Controllers\Admin\EvaluationQuestionController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\TrainingReportController;
 use App\Http\Controllers\Admin\EmployeeTrainingController;
@@ -130,6 +132,15 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('operations/audits/submission/{id}/delete', [AuditSubmissionController::class, 'destroy'])->name('operations.audits.submission.destroy');
     Route::post('operations/audits/submission/{id}/update', [AuditSubmissionController::class, 'update'])->name('operations.audits.submission.update');
     Route::get('operations/evaluations', [EvaluationController::class, 'index'])->name('operations.evaluations');
+    Route::get('operations/evaluations/create/{target_id}', [EvaluationController::class, 'create'])->name('operations.evaluations.create');
+    Route::post('operations/evaluations/store', [EvaluationController::class, 'store'])->name('operations.evaluations.store');
+    Route::get('operations/evaluations/user/{id}', [EvaluationController::class, 'show'])->name('operations.evaluations.show');
+    
+    // Evaluation Questions Management
+    Route::get('operations/evaluation-questions', [EvaluationQuestionController::class, 'index'])->name('operations.evaluation_questions.index');
+    Route::post('operations/evaluation-questions', [EvaluationQuestionController::class, 'store'])->name('operations.evaluation_questions.store');
+    Route::put('operations/evaluation-questions/{id}', [EvaluationQuestionController::class, 'update'])->name('operations.evaluation_questions.update');
+    Route::delete('operations/evaluation-questions/{id}', [EvaluationQuestionController::class, 'destroy'])->name('operations.evaluation_questions.destroy');
 
     // Expense Reports
     Route::get('expense-report/index', [ExpenseReportController::class, 'index'])->name('expense-report.index');
