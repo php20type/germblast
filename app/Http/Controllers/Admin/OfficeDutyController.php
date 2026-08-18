@@ -17,7 +17,7 @@ class OfficeDutyController extends Controller implements HasMiddleware
         return [
             new Middleware('permission:office_duties.view', only: ['index']),
             new Middleware('permission:office_duties.add', only: ['store']),
-            new Middleware('permission:office_duties.edit', only: ['update', 'complete']),
+            new Middleware('permission:office_duties.edit', only: ['update', 'complete', 'reopen']),
         ];
     }
     public function index()
