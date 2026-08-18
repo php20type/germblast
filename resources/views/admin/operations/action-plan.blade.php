@@ -169,7 +169,7 @@
                                                     <div>
                                                         <form action="{{ route('admin.operations.action-plan.resolve', $plan->id) }}" method="POST" class="resolve-action-plan-form">
                                                             @csrf
-                                                            <button type="submit" class="btn btn-sm btn-outline-success fw-bold py-2 px-3" style="border-radius: 8px;">Mark as Resolved</button>
+                                                            <button type="submit" class="btn btn-sm btn-outline-success py-2 px-3" style="border-radius: 8px;">Mark as Resolved</button>
                                                         </form>
                                                     </div>
                                                 </div>

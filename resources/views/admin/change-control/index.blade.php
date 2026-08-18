@@ -3,77 +3,21 @@
 @section('title', 'Change Control')
 
 @push('styles')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <style>
         .cursor-pointer {
             cursor: pointer !important;
         }
 
-        /* Equipment Report Table Boxed Styling from EQ / Driver Report */
-        .equipment-report-table {
-            border: 1px solid #e5e7eb !important;
-            border-radius: 12px !important;
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
-            overflow: hidden !important;
-            background: #fff !important;
-            width: 100% !important;
-            margin-top: 10px !important;
-        }
-
-        .equipment-report-table thead th {
-            background-color: rgba(255, 184, 28, 0.4) !important;
-            border-bottom: 1px solid #e5e7eb !important;
-            color: #374151 !important;
-            font-weight: 600 !important;
-            padding: 18px 20px !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-        }
-
-        .equipment-report-table thead th:first-child {
-            border-top-left-radius: 12px !important;
-        }
-
-        .equipment-report-table thead th:last-child {
-            border-top-right-radius: 12px !important;
-            border-right: none !important;
-        }
-
-        .equipment-report-table td {
-            padding: 15px 20px !important;
-            vertical-align: middle !important;
-            border-bottom: 1px solid #f3f4f6 !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-        }
-
-        .equipment-report-table td:last-child {
-            border-right: none !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td {
-            border-bottom: none !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td:first-child {
-            border-bottom-left-radius: 12px !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td:last-child {
-            border-bottom-right-radius: 12px !important;
-        }
-
-        /* Status Pills styling matching Fulfill Order */
+        /* Status Pills styling */
         .status-pill {
-            font-size: 12px !important;
-            font-weight: 600 !important;
-            padding: 6px 14px !important;
-            border-radius: 30px !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            padding: 4px 10px !important;
+            border-radius: 20px !important;
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 6px !important;
+            gap: 4px !important;
             text-transform: uppercase !important;
             letter-spacing: 0.5px !important;
             border: 1px solid transparent !important;
@@ -102,10 +46,31 @@
             color: #636363 !important;
             border-color: rgba(134, 134, 134, 0.2) !important;
         }
+
+
+
+        /* Section Cards */
+        .section-card {
+            background: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 16px !important;
+            padding: 25px !important;
+            margin-bottom: 25px !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .section-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
+        }
     </style>
 @endpush
 
 @section('content')
+@php
+    $sortedRequests = $requests->sortByDesc('created_at');
+@endphp
+
 <div class="companies-section my-4">
     <div class="container-fluid">
         <div class="row">
@@ -120,8 +85,8 @@
                         <!-- Header -->
                         <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-1">CHANGE CONTROL <span style="font-size: 24px;">🔄</span></h3>
-                                <p class="text-muted mb-0">Create and track change requests, status approvals, and task tasks.</p>
+                                <h3 class="mb-1 text-uppercase">CHANGE CONTROL <span style="font-size: 24px;">🔄</span></h3>
+                                <p class="text-muted mb-0">Create and track change requests, status approvals, and tasks.</p>
                             </div>
                             @can('change_control.add')
                             <div class="right-part-sec">
@@ -132,56 +97,49 @@
                             @endcan
                         </div>
 
-                        <!-- Table Card -->
-                        <div class="px-4 pb-4">
-                            <div class="table-responsive">
-                                <table id="changeControlTable" class="table table-hover w-100 equipment-report-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Change Request</th>
-                                            <th>Requester</th>
-                                            <th>Status</th>
-                                            <th>Date Created</th>
-                                            <th class="text-center" style="width: 150px;">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($requests as $request)
-                                            <tr>
-                                                <td>
-                                                    <a href="{{ route('admin.change-control.show', $request->id) }}" class="text-decoration-none text-dark fw-semibold">
-                                                        {{ $request->title }}
-                                                    </a>
-                                                    <div class="small text-muted" style="font-size: 12px;">
-                                                        {{ $request->description ?? 'No description provided.' }}
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <span class="fw-semibold text-dark">{{ $request->requester->name ?? 'System' }}</span>
-                                                    <div class="small text-muted" style="font-size: 12px;">{{ $request->requester->email ?? '' }}</div>
-                                                </td>
-                                                <td>
-                                                    <span class="status-pill status-pill-{{ strtolower($request->status) }}">
-                                                        {{ $request->status }}
-                                                    </span>
-                                                </td>
-                                                <td>{{ $request->created_at->format('M d, Y') }}</td>
-                                                <td class="text-center">
-                                                    @can('change_control.edit')
-                                                    <button type="button" class="btn btn-sm btn-outline-dark edit-request-btn" 
-                                                            style="border-radius: 6px; padding: 6px 14px;"
-                                                            data-id="{{ $request->id }}" 
-                                                            data-title="{{ $request->title }}" 
-                                                            data-description="{{ $request->description }}">
-                                                        Edit
-                                                    </button>
-                                                    @endcan
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
+                        <!-- Cards Content -->
+                        <div class="px-4 pb-4 text-start">
+                            @forelse ($sortedRequests as $request)
+                                <div class="section-card mt-3">
+                                    <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
+                                        <div class="d-flex flex-column align-items-start">
+                                            <div class="d-flex align-items-center gap-2 mb-1">
+                                                <span class="status-pill status-pill-{{ strtolower($request->status) }}">{{ $request->status }}</span>
+                                                <h4 class="mb-0" style="font-size: 18px; color: #111827;">
+                                                    {{ $request->title }}
+                                                </h4>
+                                            </div>
+                                            <div class="text-muted small mt-1">
+                                                Requested by <span class="fw-semibold text-dark">{{ $request->requester->name ?? 'System' }}</span> ({{ $request->requester->email ?? '' }}) on <span class="fw-semibold text-dark">{{ $request->created_at->format('M d, Y') }}</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="d-flex gap-2">
+                                                @can('change_control.edit')
+                                                <button type="button" class="btn btn-sm btn-outline-dark edit-request-btn py-1 px-3" 
+                                                        style="border-radius: 6px;"
+                                                        data-id="{{ $request->id }}" 
+                                                        data-title="{{ $request->title }}" 
+                                                        data-description="{{ $request->description }}">
+                                                    Edit
+                                                </button>
+                                                @endcan
+                                                <a href="{{ route('admin.change-control.show', $request->id) }}" class="btn btn-sm btn-outline-primary py-1 px-3" style="border-radius: 6px;">
+                                                    View Details
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <h6 class="text-uppercase text-secondary fw-bold mb-2" style="font-size: 11px; letter-spacing: 0.5px;">Description</h6>
+                                        <div class="text-dark" style="font-size: 16px; color: #374151; line-height: 1.5;">
+                                            {{ $request->description ?? 'No description provided.' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-center py-4 text-muted">No change requests found.</div>
+                            @endforelse
                         </div>
 
                     </div>
@@ -217,7 +175,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer mt-4">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Save changes</button>
                     </div>
@@ -253,7 +211,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer mt-4">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Save changes</button>
                     </div>
@@ -265,24 +223,8 @@
 @endsection
 
 @push('scripts')
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Initialize DataTable
-            $('#changeControlTable').DataTable({
-                pageLength: 25,
-                ordering: true,
-                dom: '<"d-flex justify-content-between align-items-center mb-3"l f>r<"table-responsive"t><"d-flex justify-content-between align-items-center mt-3"i p>',
-                language: {
-                    search: '',
-                    searchPlaceholder: 'Search requests...',
-                    lengthMenu: 'Show _MENU_ entries',
-                    info: 'Showing _START_ to _END_ of _TOTAL_ entries',
-                    paginate: { previous: 'Previous', next: 'Next' }
-                }
-            });
-
             // Form Submit (AJAX)
             $('#createRequestForm').on('submit', function(e) {
                 e.preventDefault();
@@ -300,7 +242,7 @@
                         toastr.success(response.message || 'Change request created successfully!');
                         $('#createRequestModal').modal('hide');
                         setTimeout(() => {
-                            window.location.href = response.redirect;
+                            window.location.reload();
                         }, 1000);
                     },
                     error: function(xhr) {

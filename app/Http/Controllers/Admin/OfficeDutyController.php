@@ -119,4 +119,32 @@ class OfficeDutyController extends Controller implements HasMiddleware
             return redirect()->back()->with('error', 'Something went wrong!');
         }
     }
+    public function reopen(Request $request, $id)
+    {
+        try {
+            $duty = OfficeDuty::findOrFail($id);
+            
+            OfficeDutyCompletion::where('office_duty_id', $duty->id)->delete();
+
+            // Clear the completion status on the duty itself
+            $duty->update([
+                'last_performed_by' => null,
+                'last_performed_on' => null,
+                'notes' => null,
+            ]);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'message' => 'Task reopened successfully.'
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Task reopened successfully.');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(['message' => 'Something went wrong!'], 500);
+            }
+            return redirect()->back()->with('error', 'Something went wrong!');
+        }
+    }
 }

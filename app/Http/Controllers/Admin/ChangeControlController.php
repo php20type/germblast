@@ -57,12 +57,11 @@ class ChangeControlController extends Controller implements HasMiddleware
 
             if ($request->ajax()) {
                 return response()->json([
-                    'message' => 'Change request created successfully.',
-                    'redirect' => route('admin.change-control.show', $changeRequest->id)
+                    'message' => 'Change request created successfully.'
                 ]);
             }
 
-            return redirect()->route('admin.change-control.show', $changeRequest->id)
+            return redirect()->back()
                 ->with('success', 'Change request created successfully.');
         } catch (\Exception $e) {
             if ($request->ajax()) {

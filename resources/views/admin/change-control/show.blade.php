@@ -332,7 +332,7 @@
                         </div>
                         <div class="right-part-sec">
                             <div>
-                                <a class="btn btn-export" href="{{ route('admin.change-control.index') }}">
+                                <a class="btn btn-outline-dark" href="{{ route('admin.change-control.index') }}">
                                     BACK TO LIST
                                 </a>
                             </div>

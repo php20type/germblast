@@ -5,65 +5,19 @@
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <style>
-        /* Equipment Report Table Boxed Styling from Consumable & Driver Reports */
-        .equipment-report-table {
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
-            border: 1px solid #f3f4f6 !important;
-            border-radius: 12px !important;
-            overflow: hidden !important;
-            background: #fff !important;
-            width: 100% !important;
-            margin-top: 10px !important;
-        }
-
-        .equipment-report-table thead th {
-            background-color: rgba(255, 184, 28, 0.4) !important;
-            color: #374151 !important;
-            font-weight: 600 !important;
-            padding: 18px 20px !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-        }
-
-        .equipment-report-table tbody td {
-            padding: 15px 20px !important;
-            vertical-align: middle !important;
-            border-bottom: 1px solid #f3f4f6 !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-        }
-
-        .equipment-report-table thead th:last-child,
-        .equipment-report-table tbody td:last-child {
-            border-right: none !important;
-        }
-
-        .equipment-report-table tr:last-child td {
-            border-bottom: none !important;
-        }
-
-        .equipment-report-table tr:last-child td:first-child {
-            border-bottom-left-radius: 12px !important;
-        }
-
-        .equipment-report-table tr:last-child td:last-child {
-            border-bottom-right-radius: 12px !important;
-        }
-
-        /* Action link color matching default system action links */
-        a.text-action {
-            color: #337ab7 !important;
-        }
-
-        /* Status Pills (matches project standard) */
+        /* Status Pills styling */
         .status-pill {
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 12px;
-            display: inline-block;
-            text-align: center;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            padding: 4px 10px !important;
+            border-radius: 20px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 4px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            border: 1px solid transparent !important;
         }
 
         .status-pill-due {
@@ -74,6 +28,21 @@
         .status-pill-completed {
             background: #d1fae5;
             color: #059669;
+        }
+
+        /* Section Cards */
+        .section-card {
+            background: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 16px !important;
+            padding: 25px !important;
+            margin-bottom: 25px !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .section-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
         }
     </style>
 @endpush
@@ -105,75 +74,83 @@
                             @endcan
                         </div>
 
-                        <!-- Table Card -->
-                        <div class="px-4 pb-4">
-                            <div class="table-responsive">
-                                <table id="officeChecklistTable" class="table table-hover w-100 equipment-report-table">
-                                    <thead>
-                                        <tr>
-                                            <th style="text-align: left !important;">Duty / Checklist</th>
-                                            <th style="text-align: center !important; width: 150px;">Status</th>
-                                            <th class="text-end" style="width: 150px; padding-right: 35px;">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="dutiesTableBody">
-                                        @foreach($duties as $duty)
-                                            @php
-                                                $isCompleted = !is_null($duty->last_performed_on);
-                                            @endphp
-                                            <tr>
-                                                <td style="text-align: left !important; padding: 20px !important; border-top: none;">
-                                                    <div style="font-size: 18px; color: #374151; margin-bottom: 5px; font-weight: 500;">
-                                                        {{ $duty->title }}
-                                                    </div>
-                                                    <div style="font-size: 13px; color: #6b7280; margin-bottom: 5px;">
-                                                        <span class="fw-bold">Service Frequency:</span> {{ $duty->frequency }} {{ $duty->description ? '- ' . $duty->description : '' }}
-                                                    </div>
-                                                    <div style="font-size: 13px; color: #6b7280; margin-bottom: 5px;">
-                                                        <span class="fw-bold">Description:</span> {{ $duty->description ?? '-' }}
-                                                    </div>
-                                                    @if($isCompleted)
-                                                        <div style="font-size: 13px; color: #6b7280;">
-                                                            <span class="fw-bold">Last performed by/on:</span> {{ $duty->lastPerformedBy ? ($duty->lastPerformedBy->name . ' ' . $duty->last_performed_on) : '' }} notes: {{ $duty->notes ?? '' }}
-                                                        </div>
-                                                    @endif
-                                                </td>
-                                                <td style="text-align: center !important; vertical-align: middle; border-top: none;">
-                                                    @if($isCompleted)
-                                                        <span class="status-pill status-pill-completed">Completed</span>
-                                                    @else
-                                                        <span class="status-pill status-pill-due">Due</span>
-                                                    @endif
-                                                </td>
-                                                <td style="text-align: right !important; padding: 20px !important; padding-right: 35px !important; border-top: none; vertical-align: middle;">
-                                                    @can('office_duties.edit')
-                                                    <div class="d-flex justify-content-end align-items-center gap-3">
-                                                        <a href="#" class="text-action btn-edit-task" 
-                                                           data-id="{{ $duty->id }}"
-                                                           data-title="{{ $duty->title }}"
-                                                           data-description="{{ $duty->description }}"
-                                                           data-frequency="{{ $duty->frequency }}"
-                                                           style="font-size: 18px;" 
-                                                           data-bs-toggle="modal" 
-                                                           data-bs-target="#createTaskModal">
-                                                            <i class="fa-solid fa-gear"></i>
-                                                        </a>
-                                                        <a href="#" class="text-action btn-complete-task" 
-                                                           data-id="{{ $duty->id }}"
-                                                           data-title="{{ $duty->title }}"
-                                                           style="font-size: 14px; font-weight: 500;" 
-                                                           data-bs-toggle="modal" 
-                                                           data-bs-target="#completeTaskModal">
-                                                            Mark Complete
-                                                        </a>
-                                                    </div>
-                                                    @endcan
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
+                        <!-- Cards Content -->
+                        <div class="px-4 pb-4 text-start">
+                            @forelse($duties as $duty)
+                                @php
+                                    $isCompleted = !is_null($duty->last_performed_on);
+                                    $statusClass = $isCompleted ? 'status-pill-completed' : 'status-pill-due';
+                                    $statusText = $isCompleted ? 'Completed' : 'Due';
+                                @endphp
+                                <div class="section-card mt-3">
+                                    <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
+                                        <div class="d-flex flex-column align-items-start">
+                                            <div class="d-flex align-items-center gap-2 mb-1">
+                                                <span class="status-pill {{ $statusClass }}">{{ $statusText }}</span>
+                                                <h4 class="mb-0" style="font-size: 18px; font-weight: 600; color: #111827;">
+                                                    {{ $duty->title }}
+                                                </h4>
+                                            </div>
+                                            <div class="text-muted small mt-1">
+                                                Service Frequency: <span class="fw-semibold text-dark">{{ $duty->frequency }}</span>
+                                            </div>
+                                            @if($isCompleted)
+                                            <div class="text-muted small mt-1">
+                                                Last Performed: By <span class="fw-semibold text-dark">{{ $duty->lastPerformedBy->name ?? 'System' }}</span> on <span class="fw-semibold text-dark">{{ \Carbon\Carbon::parse($duty->last_performed_on)->format('M d, Y g:i A') }}</span>
+                                            </div>
+                                            @endif
+                                        </div>
+                                        <div>
+                                            @can('office_duties.edit')
+                                            @if(!$isCompleted)
+                                            <div class="d-flex gap-2">
+                                                <button type="button" class="btn btn-sm btn-outline-dark btn-edit-task py-1 px-3" 
+                                                        style="border-radius: 6px;"
+                                                        data-id="{{ $duty->id }}"
+                                                        data-title="{{ $duty->title }}"
+                                                        data-description="{{ $duty->description }}"
+                                                        data-frequency="{{ $duty->frequency }}"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#createTaskModal">
+                                                     Edit
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-success btn-complete-task py-1 px-3" 
+                                                        style="border-radius: 6px;"
+                                                        data-id="{{ $duty->id }}"
+                                                        data-title="{{ $duty->title }}"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#completeTaskModal">
+                                                    Mark Complete
+                                                </button>
+                                            </div>
+                                            @else
+                                            <div class="d-flex gap-2">
+                                                <button type="button" class="btn btn-sm btn-outline-warning btn-reopen-task py-1 px-3" 
+                                                        style="border-radius: 6px;"
+                                                        data-id="{{ $duty->id }}">
+                                                    <i class="fa-solid fa-rotate-left"></i> Reopen
+                                                </button>
+                                            </div>
+                                            @endif
+                                            @endcan
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <h6 class="text-uppercase text-secondary fw-bold mb-2" style="font-size: 13px; letter-spacing: 0.5px;">Description</h6>
+                                        <div class="text-dark" style="font-size: 16px; color: #374151; line-height: 1.5;">
+                                            {{ $duty->description ?? 'No description provided.' }}
+                                        </div>
+                                        @if($isCompleted && $duty->notes)
+                                        <h6 class="text-uppercase text-secondary fw-bold mb-2 mt-3" style="font-size: 13px; letter-spacing: 0.5px;">Completion Note</h6>
+                                        <div class="text-dark" style="font-size: 16px; color: #374151; line-height: 1.5;">
+                                            {{ $duty->notes }}
+                                        </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-center py-4 text-muted">No office duties found.</div>
+                            @endforelse
                         </div>
 
                     </div>
@@ -236,7 +213,7 @@
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title" id="completeTaskModalLabel">Daily - Answer Phones</h1>
+                <h1 class="modal-title" id="completeTaskModalLabel">Mark as Completed</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -245,7 +222,13 @@
                     <div class="row mx-0">
                         <div class="col-lg-12">
                             <div class="form-group">
-                                <label class="form-label">Description</label>
+                                <label class="form-label">Title</label>
+                                <input type="text" class="form-control" id="completeTaskTitleDisplay" readonly>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Short Note</label>
                                 <span class="text-danger">*</span>
                                 <input type="text" class="form-control" name="description" id="completeTaskDescription" placeholder="Enter notes or description..." required>
                             </div>
@@ -321,7 +304,8 @@
             let id = $(this).data('id');
             let title = $(this).data('title');
             
-            $('#completeTaskModalLabel').text(title);
+            $('#completeTaskModalLabel').text('Mark as Completed');
+            $('#completeTaskTitleDisplay').val(title);
             $('#completeTaskForm').attr('action', '{{ url('admin/office-duties/complete') }}/' + id);
             $('#completeTaskDescription').val('');
         });
@@ -349,6 +333,45 @@
                 error: function(xhr) {
                     toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
                     submitBtn.prop('disabled', false).text('Save changes');
+                }
+            });
+        });
+
+        // Reopen button clicked
+        $(document).on('click', '.btn-reopen-task', function() {
+            let id = $(this).data('id');
+            let btn = $(this);
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You are about to reopen this task.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f59e0b',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, reopen it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ url('admin/office-duties/reopen') }}/' + id,
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        beforeSend: function() {
+                            btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i>');
+                        },
+                        success: function(response) {
+                            toastr.success(response.message || 'Task reopened successfully!');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        },
+                        error: function(xhr) {
+                            toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
+                            btn.prop('disabled', false).html('<i class="fa-solid fa-rotate-left"></i> Reopen');
+                        }
+                    });
                 }
             });
         });
