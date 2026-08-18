@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\OfficeDutyController;
 use App\Http\Controllers\Admin\InventoryReportController;
 use App\Http\Controllers\Admin\JobProfitabilityController;
 use App\Http\Controllers\Admin\ChangeControlController;
+use App\Http\Controllers\Admin\QuickBooksController;
 use App\Http\Controllers\Admin\BusinessFailureController;
 use App\Http\Controllers\Admin\IsdAttendanceController;
 use App\Http\Controllers\Admin\LoanEquipmentController;
@@ -282,6 +283,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('change-control/{id}/task', [ChangeControlController::class, 'storeTask'])->name('change-control.task.store');
     Route::post('change-control/{id}/task/{taskId}/status', [ChangeControlController::class, 'updateTaskStatus'])->name('change-control.task.status.update');
     Route::post('change-control/{id}/documentation', [ChangeControlController::class, 'storeDocumentation'])->name('change-control.documentation.store');
+
+    // QuickBooks Export
+    Route::get('quickbooks', [QuickBooksController::class, 'index'])->name('quickbooks.index');
+    Route::post('quickbooks/export-customers', [QuickBooksController::class, 'exportCustomers'])->name('quickbooks.export-customers');
+    Route::post('quickbooks/export-invoices', [QuickBooksController::class, 'exportInvoices'])->name('quickbooks.export-invoices');
 
     // Business Failures
     Route::get('business-failures', [BusinessFailureController::class, 'index'])->name('failures.index');

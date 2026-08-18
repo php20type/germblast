@@ -1,5 +1,7 @@
 @extends('admin.includes.layout')
 
+@section('title', 'Add Evaluation')
+
 @push('styles')
     <style>
         .equipment-report-table {
