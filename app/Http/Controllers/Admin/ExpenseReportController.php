@@ -23,7 +23,8 @@ class ExpenseReportController extends Controller implements HasMiddleware
         return [
             new Middleware('permission:expense_report.view', only: ['index']),
             new Middleware('permission:expense_report.add', only: ['personal_create', 'corporate_create']),
-            new Middleware('permission:expense_report.edit', only: ['edit', 'update', 'submit', 'approveItem', 'unsubmit', 'acceptAndFill']),
+            new Middleware('permission:expense_report.add|expense_report.edit', only: ['edit', 'update', 'submit']),
+            new Middleware('permission:expense_report.edit', only: ['approveItem', 'unsubmit', 'acceptAndFill']),
         ];
     }
     public function index(Request $request)
@@ -138,6 +139,7 @@ class ExpenseReportController extends Controller implements HasMiddleware
         $report = ExpenseReport::findOrFail($id);
 
         if ($report->status !== 'Open') {
+            if ($request->ajax()) return response()->json(['success' => false, 'message' => 'Report is not editable'], 403);
             return back()->with('error', 'Report is not editable');
         }
         switch ($request->action_type) {
@@ -164,7 +166,9 @@ class ExpenseReportController extends Controller implements HasMiddleware
 
             // REMOVE ITEM
             case 'remove':
-                $item = ExpenseReportItem::findOrFail($request->item_id);
+                $item = ExpenseReportItem::where('id', $request->item_id)
+                            ->where('expense_report_id', $report->id)
+                            ->firstOrFail();
                 if ($item->receipt_picture) {
                     Storage::disk('public')->delete($item->receipt_picture);
                 }
@@ -178,10 +182,11 @@ class ExpenseReportController extends Controller implements HasMiddleware
             'total_amount' => $total
         ]);
 
+        if ($request->ajax()) return response()->json(['success' => true, 'message' => 'Updated successfully']);
         return redirect()->back()->with('success', 'Updated successfully');
     }
 
-    public function submit($id)
+    public function submit(Request $request, $id)
     {
         $report = ExpenseReport::findOrFail($id);
         $report->update([
@@ -189,6 +194,7 @@ class ExpenseReportController extends Controller implements HasMiddleware
             'submitted_at' => now(),
         ]);
 
+        if ($request->ajax()) return response()->json(['success' => true, 'message' => 'Report submitted successfully']);
         return redirect()->back()->with('success', 'Report submitted successfully');
     }
 
@@ -198,6 +204,7 @@ class ExpenseReportController extends Controller implements HasMiddleware
 
         // Only allow when report is submitted
         if ($report->status !== 'Submitted') {
+            if ($request->ajax()) return response()->json(['success' => false, 'message' => 'Only submitted reports can be approved'], 403);
             return back()->with('error', 'Only submitted reports can be approved');
         }
 
@@ -207,38 +214,49 @@ class ExpenseReportController extends Controller implements HasMiddleware
             'reason_code' => 'required|exists:expense_item_reasons,id',
         ]);
 
-        $item = ExpenseReportItem::findOrFail($request->item_id);
+        $item = ExpenseReportItem::where('id', $request->item_id)
+                    ->where('expense_report_id', $report->id)
+                    ->firstOrFail();
 
         $item->update([
             'approved_amount' => $request->approved_amount,
             'reason_code' => $request->reason_code,
         ]);
 
+        if ($request->ajax()) return response()->json(['success' => true, 'message' => 'Item approved successfully']);
         return back()->with('success', 'Item approved successfully');
     }
 
 
-    public function unsubmit($id)
+    public function unsubmit(Request $request, $id)
     {
         $report = ExpenseReport::findOrFail($id);
 
         if ($report->status !== 'Submitted') {
+            if ($request->ajax()) return response()->json(['success' => false, 'message' => 'Only submitted reports can be unsubmitted.'], 403);
             return back()->with('error', 'Only submitted reports can be unsubmitted.');
         }
+
+        $report->items()->update([
+            'approved_amount' => 0,
+            'reason_code' => null,
+        ]);
 
         $report->update([
             'status'       => 'Open',
             'submitted_at' => null,
         ]);
 
+        if ($request->ajax()) return response()->json(['success' => true, 'message' => 'Report unsubmitted successfully.']);
         return back()->with('success', 'Report unsubmitted successfully.');
     }
 
-    public function acceptAndFill($id)
+    public function acceptAndFill(Request $request, $id)
     {
         $report = ExpenseReport::findOrFail($id);
 
         if ($report->status !== 'Submitted') {
+            if ($request->ajax()) return response()->json(['success' => false, 'message' => 'Only submitted reports can be accepted and filled.'], 403);
             return back()->with('error', 'Only submitted reports can be accepted and filled.');
         }
 
@@ -247,6 +265,7 @@ class ExpenseReportController extends Controller implements HasMiddleware
             'filled_at' => now(),
         ]);
 
+        if ($request->ajax()) return response()->json(['success' => true, 'message' => 'Report marked as accepted and filled.']);
         return back()->with('success', 'Report marked as accepted and filled.');
     }
 

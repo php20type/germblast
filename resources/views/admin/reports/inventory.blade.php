@@ -169,8 +169,7 @@
                                                     <div class="d-flex align-items-center">
                                                         @can('inventory_reporting.edit')
                                                         <button type="button"
-                                                            class="btn btn-outline-dark py-1 px-3 edit-btn me-2"
-                                                            style="border-radius: 6px; font-size: 12px; font-weight: 500;"
+                                                            class="btn btn-sm btn-outline-dark edit-btn me-2"
                                                             data-id="{{ $item->id }}" data-name="{{ $item->name }}"
                                                             data-unit="{{ $unit ?: '' }}"
                                                             data-inv="{{ $item->inventory_val !== null ? floatval($item->inventory_val) : '' }}"
@@ -180,13 +179,8 @@
                                                             data-date="{{ $item->report_date ? $item->report_date->format('Y-m-d') : '' }}"
                                                             data-actions="{{ $item->actions ?: '' }}"
                                                             data-notes="{{ $item->notes ?: '' }}">Edit</button>
-                                                        <form action="{{ route('admin.inventory-report.destroy', $item->id) }}"
-                                                            method="POST" class="d-inline"
-                                                            onsubmit="return confirm('Are you sure you want to delete this inventory item?');">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-outline-danger py-1 px-3"
-                                                                style="border-radius: 6px; font-size: 12px; font-weight: 500;">Del</button>
-                                                        </form>
+                                                        <button type="button" class="btn btn-sm btn-outline-danger delete-item-btn"
+                                                            data-url="{{ route('admin.inventory-report.destroy', $item->id) }}">Del</button>
                                                         @endcan
                                                     </div>
                                                 </td>
@@ -203,59 +197,47 @@
         </div>
     </div>
 
-    <!-- Kanban Card Modal (Serif style matching the image 2) -->
+    <!-- Kanban Card Modal -->
     <div class="modal fade" id="kanbanCardModal" tabindex="-1" aria-labelledby="kanbanCardModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content"
-                style="border-radius: 0; border: 2px solid #000; font-family: 'Times New Roman', Times, serif; color: #000; background-color: #fff;">
-                <div class="modal-header border-0 pb-0">
-                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close"
-                        style="filter: grayscale(1);"></button>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="kanbanCardModalLabel">Kanban Card</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body px-4 pb-4 pt-0">
-                    <div class="border border-dark p-2 bg-white mt-3">
-                        <h4 class="text-center fw-bold mb-4" style="font-size: 24px;">Kanban Card</h4>
+                <div class="modal-body p-4">
+                    <table class="table table-bordered table-striped mb-0">
+                        <tbody>
+                            <tr>
+                                <th style="width: 40%; background-color: #f8f9fa;">Office</th>
+                                <td id="kanban-office"></td>
+                            </tr>
+                            <tr>
+                                <th style="background-color: #f8f9fa;">Item</th>
+                                <td id="kanban-item"></td>
+                            </tr>
+                            <tr>
+                                <th style="background-color: #f8f9fa;">Supplier</th>
+                                <td id="kanban-supplier"></td>
+                            </tr>
+                            <tr>
+                                <th style="background-color: #f8f9fa;">Reorder Point</th>
+                                <td id="kanban-reorder-point"></td>
+                            </tr>
+                            <tr>
+                                <th style="background-color: #f8f9fa;">Reorder Quantity</th>
+                                <td id="kanban-reorder-qty"></td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                        <table class="table table-bordered border-dark mb-0 text-dark" style="font-size: 16px;">
-                            <tbody>
-                                <tr>
-                                    <td class="fw-bold" style="width: 45%; padding: 10px 12px; border-color: #000;">Office
-                                    </td>
-                                    <td id="kanban-office" style="padding: 10px 12px; border-color: #000;"></td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold" style="padding: 10px 12px; border-color: #000;">Item</td>
-                                    <td id="kanban-item" style="padding: 10px 12px; border-color: #000;"></td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold" style="padding: 10px 12px; border-color: #000;">Supplier</td>
-                                    <td id="kanban-supplier" style="padding: 10px 12px; border-color: #000;"></td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold" style="padding: 10px 12px; border-color: #000;">Reorder Point</td>
-                                    <td id="kanban-reorder-point" style="padding: 10px 12px; border-color: #000;"></td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold" style="padding: 10px 12px; border-color: #000;">Reorder Quantity
-                                    </td>
-                                    <td id="kanban-reorder-qty" style="padding: 10px 12px; border-color: #000;"></td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" class="text-center fw-bold py-3"
-                                        style="font-size: 18px; border-color: #000;">Details</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" class="text-center py-4" style="border-color: #000;">
-                                        <div class="fw-bold mb-2" style="font-size: 18px;">Misc. Notes</div>
-                                        <div id="kanban-notes" class="text-dark" style="font-size: 14px;">Write notes here
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-
+                    <div class="mt-4 pt-3 border-top">
+                        <h6 class="fw-bold mb-2">Misc. Notes</h6>
+                        <p id="kanban-notes" class="text-muted mb-0" style="white-space: pre-wrap; font-size: 14px;"></p>
                     </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -403,16 +385,12 @@
                 $('#kanban-item').text(activeItemData.name || '');
                 $('#kanban-supplier').text(activeItemData.supplier || 'N/A');
 
-                // Show reorder point and quantity
                 const pointText = activeItemData.reorder !== '' ? activeItemData.reorder : '0.00';
                 const unitText = activeItemData.unit || 'Eaches';
 
                 $('#kanban-reorder-point').text(pointText + ' ' + unitText);
                 $('#kanban-reorder-qty').text(unitText);
                 $('#kanban-notes').text(activeItemData.notes || 'Write notes here');
-
-                // Update delete form action
-                $('#delete-kanban-form').attr('action', `/admin/inventory-report/${activeItemData.id}/delete`);
 
                 $('#kanbanCardModal').modal('show');
             });
@@ -445,6 +423,90 @@
                 $('#item-notes').val(notes);
 
                 $('#inventoryItemModal').modal('show');
+            });
+
+            // ==========================================
+            // Validation & Form Submission (AJAX)
+            // ==========================================
+            $("#inventoryItemForm").validate({
+                rules: {
+                    name: { required: true },
+                    office: { required: true },
+                    report_date: { required: true }
+                },
+                messages: {
+                    name: { required: "Please enter item name." },
+                    office: { required: "Please enter office location." },
+                    report_date: { required: "Please enter report date." }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    error.insertAfter(element);
+                }
+            });
+
+            $('#inventoryItemForm').submit(function(e) {
+                e.preventDefault();
+
+                if (!$(this).valid()) {
+                    return;
+                }
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $('#inventoryItemModal').modal('hide');
+                        toastr.success(response.message || 'Saved successfully!');
+                        setTimeout(() => location.reload(), 1000);
+                    },
+                    error: function(xhr) {
+                        toastr.error(xhr.responseJSON?.message || 'Something went wrong while saving.');
+                    }
+                });
+            });
+
+            // ==========================================
+            // AJAX Delete with SweetAlert
+            // ==========================================
+            $(document).on('click', '.delete-item-btn', function() {
+                let url = $(this).data('url');
+
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "This action will permanently delete this inventory item.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete",
+                    cancelButtonText: "Cancel"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: url,
+                            type: "POST",
+                            data: {
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function(response) {
+                                toastr.success(response.message || 'Item deleted successfully.');
+                                setTimeout(() => location.reload(), 1000);
+                            },
+                            error: function(xhr) {
+                                toastr.error(xhr.responseJSON?.message || 'Something went wrong while deleting.');
+                            }
+                        });
+                    }
+                });
             });
         });
     </script>

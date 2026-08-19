@@ -156,52 +156,108 @@
                             <div class="left-part-sec">
                                 <h3 class="mb-1">Expense Report #{{ $report->id }}</h3>
                                 <p class="text-muted mb-0">Employee: <strong>{{ $report->user->name }}</strong> | Type: <strong>{{ $report->report_type }}</strong></p>
-                            </div>
-                            <div class="right-part-sec">
                                 @php
                                     $statusSlug = strtolower($report->status ?? 'open');
                                     $pillClass = 'status-pill-' . $statusSlug;
                                 @endphp
-                                <span class="status-pill {{ $pillClass }} fs-6">
+                                <div class="status-pill {{ $pillClass }} fs-6 mt-2">
                                     {{ $report->status ?? 'N/A' }}
-                                </span>
+                                </div>
+                            </div>
+                            <div class="right-part-sec d-flex align-items-center">
+                                <a href="{{ route('admin.expense-report.index') }}" class="btn btn-outline-dark me-3">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </a>
+                                
                             </div>
                         </div>
 
                         <div class="px-4 pb-2">
-                            <!-- SUMMARY -->
-                            <div class="section-card">
-                            <div class="section-header">
-                                <h3 class="section-title">Expense Report Summary</h3>
-                            </div>
+                            <!-- SUMMARY & APPROVED ITEMS ROW -->
+                            <div class="row">
+                                <!-- LEFT COLUMN: SUMMARY -->
+                                <div class="col-lg-6 col-12 mb-4">
+                                    <div class="section-card h-100">
+                                        <div class="section-header">
+                                            <h3 class="section-title">Expense Report Summary</h3>
+                                        </div>
 
-                            <div class="table-responsive">
-                                <table class="table table-hover w-100 equipment-report-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Category</th>
-                                            <th>Receipt Count</th>
-                                            <th>Amount</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($summary as $row)
-                                            <tr>
-                                                <td class="fw-semibold text-dark">{{ $row->expenseType->name ?? '-' }}</td>
-                                                <td><span class="badge bg-secondary text-white rounded-pill px-2 py-1">{{ $row->receipt_count }}</span></td>
-                                                <td><strong class="text-dark">${{ number_format($row->total_amount, 2) }}</strong></td>
-                                            </tr>
-                                        @endforeach
+                                        <div class="table-responsive">
+                                            <table class="table table-hover w-100 equipment-report-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Category</th>
+                                                        <th>Receipt Count</th>
+                                                        <th>Amount</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($summary as $row)
+                                                        <tr>
+                                                            <td class="fw-semibold text-dark">{{ $row->expenseType->name ?? '-' }}</td>
+                                                            <td><span class="badge bg-secondary text-white rounded-pill px-2 py-1">{{ $row->receipt_count }}</span></td>
+                                                            <td><strong class="text-dark">${{ number_format($row->total_amount, 2) }}</strong></td>
+                                                        </tr>
+                                                    @endforeach
 
-                                        <tr style="background-color: rgba(255, 184, 28, 0.05);">
-                                            <td><strong class="text-dark">Total</strong></td>
-                                            <td><span class="badge bg-dark text-white rounded-pill px-2 py-1">{{ $summary->sum('receipt_count') }}</span></td>
-                                            <td><strong class="text-dark">${{ number_format($summary->sum('total_amount'), 2) }}</strong></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                                    <tr style="background-color: rgba(255, 184, 28, 0.05);">
+                                                        <td><strong class="text-dark">Total</strong></td>
+                                                        <td><span class="badge bg-dark text-white rounded-pill px-2 py-1">{{ $summary->sum('receipt_count') }}</span></td>
+                                                        <td><strong class="text-dark">${{ number_format($summary->sum('total_amount'), 2) }}</strong></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- RIGHT COLUMN: APPROVED ITEMS -->
+                                <div class="col-lg-6 col-12 mb-4">
+                                    <div class="section-card h-100">
+                                        <div class="section-header">
+                                            <h3 class="section-title">Approved Items List</h3>
+                                        </div>
+
+                                        <div class="table-responsive">
+                                            <table class="table table-hover w-100 equipment-report-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Expense Type</th>
+                                                        <th>Description</th>
+                                                        <th>Approved Amount</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @php
+                                                        $approvedItems = $report->items->filter(function($item) {
+                                                            return $item->reason_code == 1;
+                                                        });
+                                                    @endphp
+
+                                                    @forelse($approvedItems as $item)
+                                                        <tr>
+                                                            <td class="fw-semibold text-dark">{{ $item->expenseType->name ?? '-' }}</td>
+                                                            <td class="text-wrap" style="max-width: 150px;">{{ $item->description }}</td>
+                                                            <td><strong class="text-success">${{ number_format($item->approved_amount, 2) }}</strong></td>
+                                                        </tr>
+                                                    @empty
+                                                        <tr>
+                                                            <td colspan="3" class="text-center text-muted py-3">No items have been approved yet.</td>
+                                                        </tr>
+                                                    @endforelse
+
+                                                    @if($approvedItems->isNotEmpty())
+                                                        <tr style="background-color: rgba(6, 150, 151, 0.05);">
+                                                            <td colspan="2"><strong class="text-dark text-end d-block pe-3">Total Approved</strong></td>
+                                                            <td><strong class="text-success">${{ number_format($approvedItems->sum('approved_amount'), 2) }}</strong></td>
+                                                        </tr>
+                                                    @endif
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
 
                         <!-- ITEMS -->
                         <div class="section-card">
@@ -217,7 +273,9 @@
                                             <th>Description</th>
                                             <th>Amount Requested</th>
                                             <th>Picture</th>
-                                            <th>Action</th>
+                                            @canany(['expense_report.edit', 'expense_report.add'])
+                                                <th>Action</th>
+                                            @endcanany
                                         </tr>
                                     </thead>
 
@@ -242,21 +300,16 @@
                                                     @endif
                                                 </td>
 
+                                                @canany(['expense_report.edit', 'expense_report.add'])
                                                 <td>
                                                     @if($report->status === 'Open')
-                                                        <form action="{{ route('admin.expense-report.update', $report->id) }}" method="POST" class="d-inline">
-                                                            @csrf
-
-                                                            <input type="hidden" name="action_type" value="remove">
-                                                            <input type="hidden" name="item_id" value="{{ $item->id }}">
-
-                                                            <button class="btn btn-sm btn-outline-danger" style="border-radius: 8px; font-weight: 600; padding: 6px 14px;">
-                                                                <i class="fas fa-trash-alt me-1"></i> Remove
-                                                            </button>
-                                                        </form>
+                                                        <button type="button" class="btn btn-sm btn-outline-danger btn-delete" data-item-id="{{ $item->id }}">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
                                                     @elseif($report->status === 'Submitted')
                                                         <div style="min-width: 200px;">
-                                                            <form action="{{ route('admin.expense-report.approve-item', $report->id) }}" method="POST">
+                                                            @can('expense_report.edit')
+                                                            <form action="{{ route('admin.expense-report.approve-item', $report->id) }}" method="POST" class="approve-item-form" id="approve-form-{{ $item->id }}">
                                                                 @csrf
 
                                                                 <input type="hidden" name="item_id" value="{{ $item->id }}">
@@ -284,7 +337,27 @@
                                                                     <i class="fas fa-check-circle me-1"></i> Update
                                                                 </button>
                                                             </form>
-
+                                                            @else
+                                                            <div class="text-start">
+                                                                <div class="mb-2">
+                                                                    <label class="form-label mb-1" style="font-size: 12px; font-weight: 600;">Approved Value</label>
+                                                                    <input type="number" step="0.01" class="form-control bg-light"
+                                                                        value="{{ ($item->approved_amount == 0 || is_null($item->approved_amount)) ? $item->amount_requested : $item->approved_amount }}" disabled>
+                                                                </div>
+                                                                <div class="mb-2">
+                                                                    <label class="form-label mb-1" style="font-size: 12px; font-weight: 600;">Reason</label>
+                                                                    <select class="form-select bg-light" disabled>
+                                                                        <option value="">Select reason</option>
+                                                                        @foreach($itemReasons as $reason)
+                                                                            <option value="{{ $reason->id }}"
+                                                                                {{ $item->reason_code == $reason->id ? 'selected' : '' }}>
+                                                                                {{ $reason->name }}
+                                                                            </option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            @endcan
                                                         </div>
                                                     @elseif($report->status === 'Filled')
                                                         <div style="min-width: 200px;" class="text-start">
@@ -311,6 +384,7 @@
 
                                                     @endif
                                                 </td>
+                                                @endcanany
                                             </tr>
                                         @empty
                                             <tr>
@@ -325,6 +399,7 @@
                         </div>
 
                         @if($report->status === 'Open')
+                            @canany(['expense_report.add', 'expense_report.edit'])
                             <!-- ADD EXPENSE -->
                             <div class="section-card">
                                 <div class="section-header">
@@ -335,7 +410,7 @@
                                     Enter in any expenses not related to a specific job here
                                 </p>
 
-                                <form action="{{ route('admin.expense-report.update', $report->id) }}" method="POST" enctype="multipart/form-data">
+                                <form action="{{ route('admin.expense-report.update', $report->id) }}" method="POST" enctype="multipart/form-data" id="add-expense-form">
                                     @csrf
 
                                     <input type="hidden" name="action_type" value="add">
@@ -368,7 +443,7 @@
                                         <!-- Receipt -->
                                         <div class="col-md-6">
                                             <label class="form-label">Receipt Picture</label>
-                                            <input type="file" class="form-control bg-light" name="receipt_picture" required>
+                                            <input type="file" class="form-control bg-light" name="receipt_picture" accept="image/*" required>
                                         </div>
 
                                     </div>
@@ -388,38 +463,39 @@
                             <div class="section-card">
                                 <h5 class="mb-3" style="font-weight: 500;">Submit Report</h5>
                                 <p class="text-muted mb-3">If you have entered all of your expenses above, click the button below to submit your report.</p>
-                                <form action="{{ route('admin.expense-report.submit', $report->id) }}" method="POST">
+                                <form action="{{ route('admin.expense-report.submit', $report->id) }}" method="POST" id="submit-report-form" data-item-count="{{ $report->items->count() }}">
                                     @csrf
-                                    <button class="btn btn-success px-4" style="border-radius: 8px; font-weight: 600;">
+                                    <button class="btn btn-success px-4">
                                         Submit for Reimbursement
                                     </button>
                                 </form>
                             </div>
+                            @endcanany
                         @endif
 
                         @if($report->status === 'Submitted')
+                            @can('expense_report.edit')
                             <div class="section-card">
                                 <h5 class="mb-3" style="font-weight: 500;">Admin Actions</h5>
                                 <div class="d-flex align-items-center gap-3">
 
-                                    <form action="{{ route('admin.expense-report.unsubmit', $report->id) }}" method="POST" class="mb-0">
+                                    <form action="{{ route('admin.expense-report.unsubmit', $report->id) }}" method="POST" class="mb-0" id="unsubmit-report-form">
                                         @csrf
-                                        <button type="submit" class="btn btn-warning text-dark px-4" style="border-radius: 8px; font-weight: 600;"
-                                            onclick="return confirm('Unsubmit this report and return it to Open?')">
+                                        <button type="submit" class="btn btn-warning text-dark px-4">
                                             <i class="fas fa-undo me-1"></i> Unsubmit Report
                                         </button>
                                     </form>
 
-                                    <form action="{{ route('admin.expense-report.accept-and-fill', $report->id) }}" method="POST" class="mb-0">
+                                    <form action="{{ route('admin.expense-report.accept-and-fill', $report->id) }}" method="POST" class="mb-0" id="accept-fill-form">
                                         @csrf
-                                        <button type="submit" class="btn btn-success px-4" style="border-radius: 8px; font-weight: 600;"
-                                            onclick="return confirm('Mark this report as accepted and filled?')">
+                                        <button type="submit" class="btn btn-success px-4">
                                             <i class="fas fa-check-double me-1"></i> Mark as Accepted and Filled
                                         </button>
                                     </form>
 
                                 </div>
                             </div>
+                            @endcan
                         @endif
 
                         @if($report->status === 'Filled')
@@ -445,5 +521,226 @@
         </div>
     </div>
 </div>
+
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+
+    // ==============================
+    // Add Expense Validation and Submission
+    // ==============================
+    $("#add-expense-form").validate({
+        ignore: [],
+        rules: {
+            description: { required: true },
+            expense_type_id: { required: true },
+            amount_requested: { required: true, number: true },
+            receipt_picture: { required: true }
+        },
+        messages: {
+            description: { required: "Please enter description." },
+            expense_type_id: { required: "Please select an expense type." },
+            amount_requested: { required: "Please enter the amount.", number: "Must be a valid number." },
+            receipt_picture: { required: "Please upload a receipt picture." }
+        },
+        errorElement: 'span',
+        errorClass: 'invalid-feedback d-block',
+        highlight: function(element) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('is-invalid');
+        },
+        errorPlacement: function(error, element) {
+            error.insertAfter(element);
+        }
+    });
+
+    $('#add-expense-form').submit(function(e) {
+        e.preventDefault();
+
+        if (!$('#add-expense-form').valid()) {
+            return;
+        }
+
+        let formData = new FormData(this);
+
+        $.ajax({
+            url: "{{ route('admin.expense-report.update', $report->id) }}",
+            method: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                toastr.success('Expense added successfully!');
+                setTimeout(() => location.reload(), 1000);
+            },
+            error: function(xhr) {
+                alert(xhr.responseText);
+                toastr.error('Something went wrong while adding expense.');
+            }
+        });
+    });
+
+    // ==============================
+    // Delete Expense Item
+    // ==============================
+    $(document).on('click', '.btn-delete', function() {
+        let itemId = $(this).data('item-id');
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "This action will permanently delete the selected item.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete",
+            cancelButtonText: "Cancel"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "{{ route('admin.expense-report.update', $report->id) }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        action_type: "remove",
+                        item_id: itemId
+                    },
+                    success: function(response) {
+                        toastr.success(response.message || 'Item deleted successfully.');
+                        setTimeout(() => location.reload(), 1000);
+                    },
+                    error: function(xhr) {
+                        toastr.error(xhr.responseJSON?.message || 'Something went wrong while deleting.');
+                    }
+                });
+            }
+        });
+    });
+
+    // ==============================
+    // Submit Report
+    // ==============================
+    $('#submit-report-form').submit(function(e) {
+        e.preventDefault();
+
+        let itemCount = parseInt($(this).data('item-count')) || 0;
+        if (itemCount === 0) {
+            toastr.error('You must add at least one expense item before submitting the report.');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Are you sure you want to submit this report for reimbursement?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, submit it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: $(this).attr('action'),
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        toastr.success('Report submitted successfully!');
+                        setTimeout(() => location.reload(), 1000);
+                    },
+                    error: function(xhr) {
+                        toastr.error('Something went wrong while submitting.');
+                    }
+                });
+            }
+        });
+    });
+
+    // ==============================
+    // Unsubmit Report
+    // ==============================
+    $('#unsubmit-report-form').submit(function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Unsubmit this report and return it to Open?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, unsubmit!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: $(this).attr('action'),
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        toastr.success('Report unsubmitted successfully!');
+                        setTimeout(() => location.reload(), 1000);
+                    },
+                    error: function(xhr) {
+                        toastr.error('Something went wrong.');
+                    }
+                });
+            }
+        });
+    });
+
+    // ==============================
+    // Accept and Fill Report
+    // ==============================
+    $('#accept-fill-form').submit(function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Mark this report as accepted and filled?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, proceed!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: $(this).attr('action'),
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        toastr.success('Report accepted and filled!');
+                        setTimeout(() => location.reload(), 1000);
+                    },
+                    error: function(xhr) {
+                        toastr.error('Something went wrong.');
+                    }
+                });
+            }
+        });
+    });
+
+    // ==============================
+    // Approve Item
+    // ==============================
+    $('.approve-item-form').submit(function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: $(this).attr('action'),
+            method: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                toastr.success('Updated successfully!');
+                setTimeout(() => location.reload(), 1000);
+            },
+            error: function(xhr) {
+                toastr.error('Something went wrong.');
+            }
+        });
+    });
+
+});
+</script>
+@endpush
 
 @endsection

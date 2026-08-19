@@ -64,6 +64,10 @@ class InventoryReportController extends Controller implements HasMiddleware
 
         InventoryItem::create($data);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Inventory item created successfully.']);
+        }
+
         return redirect()->route('admin.inventory-report.index')->with('success', 'Inventory item created successfully.');
     }
 
@@ -109,13 +113,21 @@ class InventoryReportController extends Controller implements HasMiddleware
 
         $item->update($data);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Inventory item updated successfully.']);
+        }
+
         return redirect()->route('admin.inventory-report.index')->with('success', 'Inventory item updated successfully.');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $item = InventoryItem::findOrFail($id);
         $item->delete();
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Inventory item deleted successfully.']);
+        }
 
         return redirect()->route('admin.inventory-report.index')->with('success', 'Inventory item deleted successfully.');
     }

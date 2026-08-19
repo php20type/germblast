@@ -22,13 +22,13 @@
 
     <!-- EMPLOYEE -->
     <td>
-        @can('expense_report.edit')
+        @canany(['expense_report.edit', 'expense_report.add'])
         <a href="{{ route('admin.expense-report.edit', $report->id) }}" class="text-decoration-none">
             {{ $report->user->name ?? 'N/A' }}
         </a>
         @else
         <span class="text-dark">{{ $report->user->name ?? 'N/A' }}</span>
-        @endcan
+        @endcanany
     </td>
 
     <!-- TYPE -->
