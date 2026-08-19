@@ -102,7 +102,22 @@
 
 @section('content')
 
-    <div class="companies-section my-4">
+@php
+    if (!function_exists('renderTrendArrow')) {
+        function renderTrendArrow($pre, $post) {
+            $pre = floatval($pre);
+            $post = floatval($post);
+            if ($post > $pre) {
+                return '<i class="fas fa-arrow-up text-success ms-1" style="font-size: 10px;" title="Increased"></i>';
+            } elseif ($post < $pre) {
+                return '<i class="fas fa-arrow-down text-danger ms-1" style="font-size: 10px;" title="Decreased"></i>';
+            }
+            return '';
+        }
+    }
+@endphp
+
+<div class="companies-section my-4">
         <div class="container-fluid">
             <div class="row">
                 <!-- Sidebar -->
@@ -113,7 +128,7 @@
 
                     <div class="main-content">
 
-                        <div class="sales-dashboard">
+                        <div class="sales-dashboard pb-4">
                             <!-- Header -->
                             <div class="heading-area-sec mb-3">
                                 <div class="left-part-sec">
@@ -156,27 +171,25 @@
                                     </thead>
                                     <tbody>
                                         @foreach($reports as $report)
-                                            <tr>
+                                            <tr class="{{ $report->status == 0 ? 'table-danger' : '' }}">
                                                 <td>{{ $report->company->name ?? 'Unknown' }}</td>
                                                 <td>{{ $report->reported_at ? $report->reported_at->format('y-m-d H:i') : '' }}
                                                 </td>
                                                 <td>{{ $report->leader->name ?? 'Unknown' }}</td>
-                                                <td>{{ floatval($report->micro_pre) }}, {{ floatval($report->micro_post) }}</td>
-                                                <td>{{ floatval($report->disp_micro_pre) }},
-                                                    {{ floatval($report->disp_micro_post) }}</td>
-                                                <td>{{ floatval($report->halo_pre) }}, {{ floatval($report->halo_post) }}</td>
-                                                <td>{{ floatval($report->opti_pre) }}, {{ floatval($report->opti_post) }}</td>
-                                                <td>{{ floatval($report->d2_pre) }}, {{ floatval($report->d2_post) }}</td>
-                                                <td>{{ floatval($report->oxi_pre) }}, {{ floatval($report->oxi_post) }}</td>
-                                                <td>{{ floatval($report->shld_pre) }}, {{ floatval($report->shld_post) }}</td>
-                                                <td>{{ floatval($report->sterl_pre) }}, {{ floatval($report->sterl_post) }}</td>
-                                                <td>{{ floatval($report->atp_pre) }}, {{ floatval($report->atp_post) }}</td>
-                                                <td>{{ floatval($report->gloves_pre) }}, {{ floatval($report->gloves_post) }}
-                                                </td>
-                                                <td>{{ floatval($report->water_pre) }}, {{ floatval($report->water_post) }}</td>
-                                                <td>{{ floatval($report->rinse_pre) }}, {{ floatval($report->rinse_post) }}</td>
-                                                <td>{{ floatval($report->wash_pre) }}, {{ floatval($report->wash_post) }}</td>
-                                                <td>{{ floatval($report->rust_pre) }}, {{ floatval($report->rust_post) }}</td>
+                                                <td>{{ floatval($report->micro_pre) }}, {{ floatval($report->micro_post) }} {!! renderTrendArrow($report->micro_pre, $report->micro_post) !!}</td>
+                                                <td>{{ floatval($report->disp_micro_pre) }}, {{ floatval($report->disp_micro_post) }} {!! renderTrendArrow($report->disp_micro_pre, $report->disp_micro_post) !!}</td>
+                                                <td>{{ floatval($report->halo_pre) }}, {{ floatval($report->halo_post) }} {!! renderTrendArrow($report->halo_pre, $report->halo_post) !!}</td>
+                                                <td>{{ floatval($report->opti_pre) }}, {{ floatval($report->opti_post) }} {!! renderTrendArrow($report->opti_pre, $report->opti_post) !!}</td>
+                                                <td>{{ floatval($report->d2_pre) }}, {{ floatval($report->d2_post) }} {!! renderTrendArrow($report->d2_pre, $report->d2_post) !!}</td>
+                                                <td>{{ floatval($report->oxi_pre) }}, {{ floatval($report->oxi_post) }} {!! renderTrendArrow($report->oxi_pre, $report->oxi_post) !!}</td>
+                                                <td>{{ floatval($report->shld_pre) }}, {{ floatval($report->shld_post) }} {!! renderTrendArrow($report->shld_pre, $report->shld_post) !!}</td>
+                                                <td>{{ floatval($report->sterl_pre) }}, {{ floatval($report->sterl_post) }} {!! renderTrendArrow($report->sterl_pre, $report->sterl_post) !!}</td>
+                                                <td>{{ floatval($report->atp_pre) }}, {{ floatval($report->atp_post) }} {!! renderTrendArrow($report->atp_pre, $report->atp_post) !!}</td>
+                                                <td>{{ floatval($report->gloves_pre) }}, {{ floatval($report->gloves_post) }} {!! renderTrendArrow($report->gloves_pre, $report->gloves_post) !!}</td>
+                                                <td>{{ floatval($report->water_pre) }}, {{ floatval($report->water_post) }} {!! renderTrendArrow($report->water_pre, $report->water_post) !!}</td>
+                                                <td>{{ floatval($report->rinse_pre) }}, {{ floatval($report->rinse_post) }} {!! renderTrendArrow($report->rinse_pre, $report->rinse_post) !!}</td>
+                                                <td>{{ floatval($report->wash_pre) }}, {{ floatval($report->wash_post) }} {!! renderTrendArrow($report->wash_pre, $report->wash_post) !!}</td>
+                                                <td>{{ floatval($report->rust_pre) }}, {{ floatval($report->rust_post) }} {!! renderTrendArrow($report->rust_pre, $report->rust_post) !!}</td>
                                                 <td>
                                                     <div class="d-flex align-items-center justify-content-center">
                                                         @can('consumable_report.edit')
@@ -213,8 +226,7 @@
                                                             data-rust_pre="{{ $report->rust_pre }}"
                                                             data-rust_post="{{ $report->rust_post }}">Edit</button>
                                                         <form action="{{ url('admin/consumable-reports/delete', $report->id) }}"
-                                                            method="POST" class="d-inline"
-                                                            onsubmit="return confirm('Are you sure?');">
+                                                            method="POST" class="d-inline delete-report-form">
                                                             @csrf
                                                             <button type="submit"
                                                                 class="btn btn-sm btn-outline-danger py-1 px-3"
@@ -292,7 +304,7 @@
                             <div class="form-group">
                                 <label class="form-label">Company</label>
                                 <span class="text-danger">*</span>
-                                <select name="company_id" id="company_id" class="form-control" required>
+                                <select name="company_id" id="company_id" class="form-select select2" required>
                                     <option value="">Select Company</option>
                                     @foreach($companies as $company)
                                         <option value="{{ $company->id }}">{{ $company->name }}</option>
@@ -304,8 +316,8 @@
                         {{-- Inventory Items Table --}}
                         <div class="col-lg-12 mt-3">
                             <div class="table-responsive">
-                                <table class="table table-bordered mb-0">
-                                    <thead>
+                                <table class="table table-striped table-bordered table-hover align-middle custom-table mb-0">
+                                    <thead class="table-light">
                                         <tr>
                                             <th>Item</th>
                                             <th>Pre Service</th>
@@ -315,73 +327,73 @@
                                     <tbody>
                                         <tr>
                                             <td>Microfiber Bins</td>
-                                            <td><input type="number" step="any" min="0" name="micro_pre" class="form-control" value="0"></td>
-                                            <td><input type="number" step="any" min="0" name="micro_post" class="form-control" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="micro_pre" class="form-control form-control-sm text-center" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="micro_post" class="form-control form-control-sm text-center" value="0"></td>
                                         </tr>
                                         <tr>
                                             <td>Disposable Microfiber Packs</td>
-                                            <td><input type="number" step="any" min="0" name="disp_micro_pre" class="form-control" value="0"></td>
-                                            <td><input type="number" step="any" min="0" name="disp_micro_post" class="form-control" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="disp_micro_pre" class="form-control form-control-sm text-center" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="disp_micro_post" class="form-control form-control-sm text-center" value="0"></td>
                                         </tr>
                                         <tr>
                                             <td>Halomist Gallons</td>
-                                            <td><input type="number" step="any" min="0" name="halo_pre" class="form-control" value="0.0"></td>
-                                            <td><input type="number" step="any" min="0" name="halo_post" class="form-control" value="0.0"></td>
+                                            <td><input type="number" step="any" min="0" name="halo_pre" class="form-control form-control-sm text-center" value="0.0"></td>
+                                            <td><input type="number" step="any" min="0" name="halo_post" class="form-control form-control-sm text-center" value="0.0"></td>
                                         </tr>
                                         <tr>
                                             <td>Opticide Gallons</td>
-                                            <td><input type="number" step="any" min="0" name="opti_pre" class="form-control" value="0.0"></td>
-                                            <td><input type="number" step="any" min="0" name="opti_post" class="form-control" value="0.0"></td>
+                                            <td><input type="number" step="any" min="0" name="opti_pre" class="form-control form-control-sm text-center" value="0.0"></td>
+                                            <td><input type="number" step="any" min="0" name="opti_post" class="form-control form-control-sm text-center" value="0.0"></td>
                                         </tr>
                                         <tr>
                                             <td>D2 Gallons</td>
-                                            <td><input type="number" step="any" min="0" name="d2_pre" class="form-control" value="0.0"></td>
-                                            <td><input type="number" step="any" min="0" name="d2_post" class="form-control" value="0.0"></td>
+                                            <td><input type="number" step="any" min="0" name="d2_pre" class="form-control form-control-sm text-center" value="0.0"></td>
+                                            <td><input type="number" step="any" min="0" name="d2_post" class="form-control form-control-sm text-center" value="0.0"></td>
                                         </tr>
                                         <tr>
                                             <td>Oxivir Bottles</td>
-                                            <td><input type="number" step="any" min="0" name="oxi_pre" class="form-control" value="0.0"></td>
-                                            <td><input type="number" step="any" min="0" name="oxi_post" class="form-control" value="0.0"></td>
+                                            <td><input type="number" step="any" min="0" name="oxi_pre" class="form-control form-control-sm text-center" value="0.0"></td>
+                                            <td><input type="number" step="any" min="0" name="oxi_post" class="form-control form-control-sm text-center" value="0.0"></td>
                                         </tr>
                                         <tr>
                                             <td>Shield Bottles</td>
-                                            <td><input type="number" step="any" min="0" name="shld_pre" class="form-control" value="0.0"></td>
-                                            <td><input type="number" step="any" min="0" name="shld_post" class="form-control" value="0.0"></td>
+                                            <td><input type="number" step="any" min="0" name="shld_pre" class="form-control form-control-sm text-center" value="0.0"></td>
+                                            <td><input type="number" step="any" min="0" name="shld_post" class="form-control form-control-sm text-center" value="0.0"></td>
                                         </tr>
                                         <tr>
                                             <td>Sterifab Gallons</td>
-                                            <td><input type="number" step="any" min="0" name="sterl_pre" class="form-control" value="0"></td>
-                                            <td><input type="number" step="any" min="0" name="sterl_post" class="form-control" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="sterl_pre" class="form-control form-control-sm text-center" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="sterl_post" class="form-control form-control-sm text-center" value="0"></td>
                                         </tr>
                                         <tr>
                                             <td>ATP Swabs</td>
-                                            <td><input type="number" step="any" min="0" name="atp_pre" class="form-control" value="0"></td>
-                                            <td><input type="number" step="any" min="0" name="atp_post" class="form-control" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="atp_pre" class="form-control form-control-sm text-center" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="atp_post" class="form-control form-control-sm text-center" value="0"></td>
                                         </tr>
                                         <tr>
                                             <td>Gloves (Boxes)</td>
-                                            <td><input type="number" step="any" min="0" name="gloves_pre" class="form-control" value="0"></td>
-                                            <td><input type="number" step="any" min="0" name="gloves_post" class="form-control" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="gloves_pre" class="form-control form-control-sm text-center" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="gloves_post" class="form-control form-control-sm text-center" value="0"></td>
                                         </tr>
                                         <tr>
                                             <td>Water Gallons</td>
-                                            <td><input type="number" step="any" min="0" name="water_pre" class="form-control" value="0"></td>
-                                            <td><input type="number" step="any" min="0" name="water_post" class="form-control" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="water_pre" class="form-control form-control-sm text-center" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="water_post" class="form-control form-control-sm text-center" value="0"></td>
                                         </tr>
                                         <tr>
                                             <td>Rinse Aid</td>
-                                            <td><input type="number" step="any" min="0" name="rinse_pre" class="form-control" value="0"></td>
-                                            <td><input type="number" step="any" min="0" name="rinse_post" class="form-control" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="rinse_pre" class="form-control form-control-sm text-center" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="rinse_post" class="form-control form-control-sm text-center" value="0"></td>
                                         </tr>
                                         <tr>
                                             <td>Wash Cleaner</td>
-                                            <td><input type="number" step="any" min="0" name="wash_pre" class="form-control" value="0"></td>
-                                            <td><input type="number" step="any" min="0" name="wash_post" class="form-control" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="wash_pre" class="form-control form-control-sm text-center" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="wash_post" class="form-control form-control-sm text-center" value="0"></td>
                                         </tr>
                                         <tr>
                                             <td>Rust Inhibitor</td>
-                                            <td><input type="number" step="any" min="0" name="rust_pre" class="form-control" value="0"></td>
-                                            <td><input type="number" step="any" min="0" name="rust_post" class="form-control" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="rust_pre" class="form-control form-control-sm text-center" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="rust_post" class="form-control form-control-sm text-center" value="0"></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -402,6 +414,145 @@
     </div>
 </div>
 
+{{-- ============================================================ --}}
+{{-- EDIT INVENTORY NUMBERS MODAL --}}
+{{-- ============================================================ --}}
+<div class="modal fade" id="editInventoryModal" tabindex="-1" aria-labelledby="editInventoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+
+            {{-- HEADER --}}
+            <div class="modal-header">
+                <h1 class="modal-title" id="editInventoryModalLabel">Edit Inventory Numbers</h1>
+                <div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+
+            {{-- BODY --}}
+            <div class="modal-body">
+
+                <form id="editInventoryForm" method="POST" action="">
+                    @csrf
+                    <input type="hidden" name="_method" value="PUT">
+
+                    <div class="row mx-0">
+
+                        {{-- Company Selection --}}
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Company</label>
+                                <span class="text-danger">*</span>
+                                <select name="company_id" id="edit_company_id" class="form-select select2" required>
+                                    <option value="">Select Company</option>
+                                    @foreach($companies as $company)
+                                        <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        {{-- Inventory Items Table --}}
+                        <div class="col-lg-12 mt-3">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered table-hover align-middle custom-table mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Pre Service</th>
+                                            <th>Post Service</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Microfiber Bins</td>
+                                            <td><input type="number" step="any" min="0" name="micro_pre" class="form-control form-control-sm text-center" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="micro_post" class="form-control form-control-sm text-center" value="0"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Disposable Microfiber Packs</td>
+                                            <td><input type="number" step="any" min="0" name="disp_micro_pre" class="form-control form-control-sm text-center" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="disp_micro_post" class="form-control form-control-sm text-center" value="0"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Halomist Gallons</td>
+                                            <td><input type="number" step="any" min="0" name="halo_pre" class="form-control form-control-sm text-center" value="0.0"></td>
+                                            <td><input type="number" step="any" min="0" name="halo_post" class="form-control form-control-sm text-center" value="0.0"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Opticide Gallons</td>
+                                            <td><input type="number" step="any" min="0" name="opti_pre" class="form-control form-control-sm text-center" value="0.0"></td>
+                                            <td><input type="number" step="any" min="0" name="opti_post" class="form-control form-control-sm text-center" value="0.0"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>D2 Gallons</td>
+                                            <td><input type="number" step="any" min="0" name="d2_pre" class="form-control form-control-sm text-center" value="0.0"></td>
+                                            <td><input type="number" step="any" min="0" name="d2_post" class="form-control form-control-sm text-center" value="0.0"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Oxivir Bottles</td>
+                                            <td><input type="number" step="any" min="0" name="oxi_pre" class="form-control form-control-sm text-center" value="0.0"></td>
+                                            <td><input type="number" step="any" min="0" name="oxi_post" class="form-control form-control-sm text-center" value="0.0"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Shield Bottles</td>
+                                            <td><input type="number" step="any" min="0" name="shld_pre" class="form-control form-control-sm text-center" value="0.0"></td>
+                                            <td><input type="number" step="any" min="0" name="shld_post" class="form-control form-control-sm text-center" value="0.0"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sterifab Gallons</td>
+                                            <td><input type="number" step="any" min="0" name="sterl_pre" class="form-control form-control-sm text-center" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="sterl_post" class="form-control form-control-sm text-center" value="0"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>ATP Swabs</td>
+                                            <td><input type="number" step="any" min="0" name="atp_pre" class="form-control form-control-sm text-center" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="atp_post" class="form-control form-control-sm text-center" value="0"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Gloves (Boxes)</td>
+                                            <td><input type="number" step="any" min="0" name="gloves_pre" class="form-control form-control-sm text-center" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="gloves_post" class="form-control form-control-sm text-center" value="0"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Water Gallons</td>
+                                            <td><input type="number" step="any" min="0" name="water_pre" class="form-control form-control-sm text-center" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="water_post" class="form-control form-control-sm text-center" value="0"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Rinse Aid</td>
+                                            <td><input type="number" step="any" min="0" name="rinse_pre" class="form-control form-control-sm text-center" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="rinse_post" class="form-control form-control-sm text-center" value="0"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Wash Cleaner</td>
+                                            <td><input type="number" step="any" min="0" name="wash_pre" class="form-control form-control-sm text-center" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="wash_post" class="form-control form-control-sm text-center" value="0"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Rust Inhibitor</td>
+                                            <td><input type="number" step="any" min="0" name="rust_pre" class="form-control form-control-sm text-center" value="0"></td>
+                                            <td><input type="number" step="any" min="0" name="rust_post" class="form-control form-control-sm text-center" value="0"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary px-4">Update</button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -409,7 +560,15 @@
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script>
         $(document).ready(function () {
-            $('#consumableTable').DataTable({
+    // Initialize Select2
+    $('#company_id, #edit_company_id').each(function() {
+        $(this).select2({
+            width: "100%",
+            dropdownParent: $(this).closest('.modal')
+        });
+    });
+
+    $('#consumableTable').DataTable({
                 pageLength: 10,
                 lengthMenu: [10, 25, 50, 100],
                 ordering: false,
@@ -432,33 +591,35 @@
             });
 
     // jQuery Validate for the inventory form
-    $("#inventoryForm").validate({
-        ignore: [],
-        rules: {
-            company_id: { required: true }
-        },
-        messages: {
-            company_id: { required: "Please select a Company." }
-        },
-        errorElement: 'span',
-        errorClass: 'invalid-feedback d-block',
-        highlight: function(element) {
-            $(element).addClass('is-invalid');
-        },
-        unhighlight: function(element) {
-            $(element).removeClass('is-invalid');
-        },
-        errorPlacement: function(error, element) {
-            if (element.parent('.input-group').length) {
-                error.insertAfter(element.parent()); // Inserts after the .input-group
-            } else {
-                error.insertAfter(element); // Default
+    $("#inventoryForm, #editInventoryForm").each(function() {
+        $(this).validate({
+            ignore: [],
+            rules: {
+                company_id: { required: true }
+            },
+            messages: {
+                company_id: { required: "Please select a Company." }
+            },
+            errorElement: 'span',
+            errorClass: 'invalid-feedback d-block',
+            highlight: function(element) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function(element) {
+                $(element).removeClass('is-invalid');
+            },
+            errorPlacement: function(error, element) {
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent()); // Inserts after the .input-group
+                } else {
+                    error.insertAfter(element); // Default
+                }
             }
-        }
+        });
     });
 
     // AJAX Submission
-    $('#inventoryForm').submit(function(e) {
+    $('#inventoryForm, #editInventoryForm').submit(function(e) {
         e.preventDefault();
 
         const $form = $(this);
@@ -478,7 +639,7 @@
             success: function(response) {
                 toastr.success(response.message || 'Report saved successfully!');
                 $form[0].reset();
-                $('#addInventoryModal').modal('hide');
+                $('#addInventoryModal, #editInventoryModal').modal('hide');
 
                 setTimeout(() => {
                     window.location.reload();
@@ -495,28 +656,63 @@
         let btn = $(this);
         let id = btn.data('id');
 
-        $('#inventoryForm').attr('action', '{{ url('admin/consumable-reports/update') }}/' + id);
-        $('#formMethod').val('PUT');
-        $('#addInventoryModalLabel').text('Edit Inventory Numbers');
+        $('#editInventoryForm').attr('action', '{{ url('admin/consumable-reports/update') }}/' + id);
 
-        $('#company_id').val(btn.data('company_id'));
+        $('#edit_company_id').val(btn.data('company_id')).trigger('change');
 
         const fields = ['micro', 'disp_micro', 'halo', 'opti', 'd2', 'oxi', 'shld', 'sterl', 'atp', 'gloves', 'water', 'rinse', 'wash', 'rust'];
 
         fields.forEach(field => {
-            $('input[name="'+field+'_pre"]').val(btn.data(field+'_pre'));
-            $('input[name="'+field+'_post"]').val(btn.data(field+'_post'));
+            $('#editInventoryForm input[name="'+field+'_pre"]').val(btn.data(field+'_pre'));
+            $('#editInventoryForm input[name="'+field+'_post"]').val(btn.data(field+'_post'));
         });
 
-        $('#addInventoryModal').modal('show');
+        $('#editInventoryModal').modal('show');
+    });
+
+    // Delete Report with Swal and AJAX
+    $('.delete-report-form').on('submit', function(e) {
+        e.preventDefault();
+        let form = $(this);
+        
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        toastr.success(response.message || 'Report has been deleted.');
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    },
+                    error: function(xhr) {
+                        toastr.error(xhr.responseJSON?.message || 'Failed to delete report.');
+                    }
+                });
+            }
+        });
+    });
+
+    // Reset modals on hidden
+    $('#addInventoryModal').on('hidden.bs.modal', function () {
+        $('#inventoryForm')[0].reset();
+        $('#company_id').val('').trigger('change');
+    });
+
+    $('#editInventoryModal').on('hidden.bs.modal', function () {
+        $('#editInventoryForm')[0].reset();
+        $('#edit_company_id').val('').trigger('change');
     });
 });
-
-function resetForm() {
-    $('#inventoryForm').attr('action', '{{ url('admin/consumable-reports/store') }}');
-    $('#formMethod').val('POST');
-    $('#addInventoryModalLabel').text('Add Inventory Numbers');
-    $('#inventoryForm')[0].reset();
-}
 </script>
 @endpush

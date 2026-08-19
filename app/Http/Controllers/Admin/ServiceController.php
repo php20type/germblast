@@ -2312,7 +2312,7 @@ class ServiceController extends Controller implements HasMiddleware
 
         $attachment = [
             'base64_data' => $pdfContent,
-            'name' => 'invoice-' . ($invoice->invoice_no ?? $order->id) . '.pdf',
+            'name' => ($invoice->invoice_no ?? $order->id) . '.pdf',
             'mime' => 'application/pdf',
         ];
 
@@ -2349,7 +2349,7 @@ class ServiceController extends Controller implements HasMiddleware
         ];
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.invoice', compact('order', 'invoiceDetails'));
-        return $pdf->download('invoice-' . ($invoice->invoice_no ?? $order->id) . '.pdf');
+        return $pdf->download(($invoice->invoice_no ?? $order->id) . '.pdf');
     }
 
     public function downloadInvoiceCsv($invoiceId)
@@ -2368,40 +2368,54 @@ class ServiceController extends Controller implements HasMiddleware
 
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="invoice-' . ($invoice->invoice_no ?? $order->id) . '.csv"',
+            'Content-Disposition' => 'attachment; filename="'.($invoice->invoice_no ?? $order->id) . '.csv"',
         ];
 
         $callback = function () use ($order, $invoiceDetails, $items) {
             $file = fopen('php://output', 'w');
 
-            // Metadata / Header info
-            fputcsv($file, ['Invoice Number', $invoiceDetails['invoice_no']]);
-            fputcsv($file, ['Order Number', $order->order_no ?? 'N/A']);
-            fputcsv($file, ['Invoice Date', $invoiceDetails['invoice_date'] ?? '']);
+            // CSV Header
+            fputcsv($file, [
+                'Invoice Number', 
+                'Order Number', 
+                'Invoice Date', 
+                'Customer Name', 
+                'Item Description', 
+                'Quantity', 
+                'Price', 
+                'Total', 
+                'Amount Due', 
+                'Notes'
+            ]);
 
-
-            fputcsv($file, ['Customer Name', $order->service->lead->company->name ?? 'N/A']);
-            fputcsv($file, []); // Empty row
-
-            // Line Items header
-            fputcsv($file, ['Item Description', 'Quantity', 'Price', 'Total']);
-
-            // Line Items data
-            foreach ($items as $item) {
+            // CSV Data Rows
+            if (empty($items)) {
+                // If there are no items, just print the invoice info once
                 fputcsv($file, [
-                    $item['type'] ?? '',
-                    $item['qty'] ?? 1,
-                    $item['price'] ?? 0.00,
-                    $item['total'] ?? 0.00,
+                    $invoiceDetails['invoice_no'],
+                    $order->order_no ?? 'N/A',
+                    $invoiceDetails['invoice_date'] ?? '',
+                    $order->service->lead->company->name ?? 'N/A',
+                    '', '', '', '',
+                    $invoiceDetails['total_amount'] ?? 0.00,
+                    $invoiceDetails['notes']
                 ]);
-            }
-
-            fputcsv($file, []); // Empty row
-            fputcsv($file, ['', '', 'Amount Due', $invoiceDetails['total_amount'] ?? 0.00]);
-            
-            if (!empty($invoiceDetails['notes'])) {
-                fputcsv($file, []);
-                fputcsv($file, ['Notes', $invoiceDetails['notes']]);
+            } else {
+                foreach ($items as $index => $item) {
+                    // We can either repeat notes/amount due on every row, or just the first row. Repeating is standard for flat files.
+                    fputcsv($file, [
+                        $invoiceDetails['invoice_no'],
+                        $order->order_no ?? 'N/A',
+                        $invoiceDetails['invoice_date'] ?? '',
+                        $order->service->lead->company->name ?? 'N/A',
+                        $item['type'] ?? '',
+                        $item['qty'] ?? 1,
+                        $item['price'] ?? 0.00,
+                        $item['total'] ?? 0.00,
+                        $invoiceDetails['total_amount'] ?? 0.00,
+                        $invoiceDetails['notes']
+                    ]);
+                }
             }
 
             fclose($file);
