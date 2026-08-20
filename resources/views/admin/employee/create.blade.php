@@ -25,9 +25,9 @@
                                 <p class="text-muted mb-0">Create and assign role-based access for an employee</p>
                             </div>
                             <div class="right-part-sec">
-                                <button type="submit" class="btn btn-success">
-                                    Save Employee
-                                </button>
+                                <a href="{{ route('admin.employee.index') }}" class="btn btn-outline-dark">
+                                    <i class="fas fa-arrow-left"></i> Back to Employees 
+                                </a>
                             </div>
                         </div>
 
@@ -101,6 +101,12 @@
                                                     </option>
                                                 @endforeach
                                             </select>
+                                        </div>
+
+                                        <div class="col-md-12 text-end mt-2">
+                                            <button type="submit" class="btn btn-success">
+                                                Save Employee
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
