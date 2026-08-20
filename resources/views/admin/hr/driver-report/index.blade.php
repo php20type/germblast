@@ -242,14 +242,39 @@
                 // Set action route dynamically
                 $('#editDriverForm').attr('action', '/admin/hr/driver-report/' + id);
 
+                // Reset validation state
+                const validator = $('#editDriverForm').validate();
+                if(validator) validator.resetForm();
+                $('#editDriverForm').find('.is-invalid').removeClass('is-invalid');
+
                 // Show Modal
                 $('#editDriverModal').modal('show');
+            });
+
+            $('#editDriverForm').validate({
+                rules: {
+                    status: { required: true },
+                    points: { required: true }
+                },
+                messages: {
+                    status: "Status is required.",
+                    points: "Points are required."
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                }
             });
 
             // Form Submit (AJAX)
             $('#editDriverForm').on('submit', function (e) {
                 e.preventDefault();
                 const form = $(this);
+                if (!form.valid()) return;
                 const btn = $('#saveDriverBtn');
 
                 $.ajax({
@@ -270,8 +295,13 @@
                         }, 1000);
                     },
                     error: function (xhr) {
-                        const errors = xhr.responseJSON?.errors;
-                        toastr.error(errors ? Object.values(errors)[0][0] : 'Something went wrong.');
+                        if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                            $.each(xhr.responseJSON.errors, function(field, messages) {
+                                messages.forEach(function(message) { toastr.error(message); });
+                            });
+                        } else {
+                            toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
+                        }
                         btn.prop('disabled', false).text('Save changes');
                     }
                 });

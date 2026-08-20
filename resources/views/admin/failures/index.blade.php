@@ -76,6 +76,12 @@
                                         </div>
                                         <div>
                                             @can('business_failures.add')
+                                            <button type="button" class="btn btn-outline-dark edit-failure-btn me-2"
+                                                    data-id="{{ $failure->id }}"
+                                                    data-title="{{ $failure->title }}"
+                                                    data-description="{{ $failure->description }}">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
                                             <button type="button" class="btn btn-outline-dark add-doc-btn"
                                                     data-id="{{ $failure->id }}"
                                                     data-title="{{ $failure->title }}">
@@ -107,9 +113,19 @@
                                                                 <div class="text-muted mt-1" style="font-size: 13px; white-space: pre-wrap; line-height: 1.4; color: #4b5563;">{{ $doc->notes }}</div>
                                                             </div>
                                                         </div>
-                                                        <span class="text-muted" style="font-size: 11.5px; white-space: nowrap;">
-                                                            {{ $doc->created_at->format('M j, Y g:i A') }}
-                                                        </span>
+                                                        <div class="d-flex align-items-center">
+                                                            <span class="text-muted me-3" style="font-size: 11.5px; white-space: nowrap;">
+                                                                {{ $doc->created_at->format('M j, Y g:i A') }}
+                                                            </span>
+                                                            @can('business_failures.add')
+                                                            <button type="button" class="btn btn-sm btn-link text-secondary p-0 edit-doc-btn"
+                                                                    data-id="{{ $doc->id }}"
+                                                                    data-notes="{{ $doc->notes }}"
+                                                                    title="Edit Documentation">
+                                                                <i class="fas fa-edit"></i>
+                                                            </button>
+                                                            @endcan
+                                                        </div>
                                                     </div>
                                                 @endforeach
                                             </div>
@@ -152,14 +168,14 @@
                             <div class="form-group">
                                 <label class="form-label">Client</label>
                                 <span class="text-danger">*</span>
-                                <input type="text" class="form-control" name="title" required>
+                                <input type="text" class="form-control" name="title" placeholder="e.g. Acme Corp" required>
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label class="form-label">Description</label>
                                 <span class="text-danger">*</span>
-                                <textarea class="form-control" name="description" rows="5" required></textarea>
+                                <textarea class="form-control" name="description" rows="5" placeholder="Describe the failure and initial report..." required></textarea>
                             </div>
                         </div>
                     </div>
@@ -189,7 +205,7 @@
                             <div class="form-group">
                                 <label class="form-label">Identify root cause and solutions to prevent recurrence when possible <span class="text-danger">*</span></label>
                                 
-                                <textarea class="form-control" name="notes" id="docNotes" rows="5" required></textarea>
+                                <textarea class="form-control" name="notes" id="docNotes" rows="5" placeholder="Describe root cause and solutions..." required></textarea>
                             </div>
                         </div>
                     </div>
@@ -202,15 +218,106 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Feedback Fullscreen Modal -->
+<div class="modal fade" id="editFeedbackModal" tabindex="-1" aria-labelledby="editFeedbackModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title" id="editFeedbackModalLabel">Edit Business Failure</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editFeedbackForm" action="" method="POST" class="company-form">
+                    @csrf
+                    <div class="row mx-0">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Client</label>
+                                <span class="text-danger">*</span>
+                                <input type="text" class="form-control" name="title" id="editFailureTitle" placeholder="e.g. Acme Corp" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Description</label>
+                                <span class="text-danger">*</span>
+                                <textarea class="form-control" name="description" id="editFailureDescription" rows="5" placeholder="Describe the failure and initial report..." required></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="editFeedbackSubmitBtn">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Documentation Modal -->
+<div class="modal fade" id="editDocModal" tabindex="-1" aria-labelledby="editDocModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title" id="editDocModalLabel">Edit documentation</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editDocForm" action="" method="POST" class="company-form">
+                @csrf
+                <div class="modal-body">
+                    <div class="row mx-0">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Identify root cause and solutions to prevent recurrence when possible <span class="text-danger">*</span></label>
+                                
+                                <textarea class="form-control" name="notes" id="editDocNotes" rows="5" placeholder="Describe root cause and solutions..." required></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="editDocSubmitBtn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
     <script>
         $(document).ready(function() {
+            const validationConfig = {
+                ignore: [],
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                }
+            };
+
+            $('#createFeedbackForm').validate($.extend(true, {}, validationConfig, {
+                rules: {
+                    title: { required: true },
+                    description: { required: true }
+                },
+                messages: {
+                    title: "Client name is required.",
+                    description: "Description is required."
+                }
+            }));
+
             // Create Feedback AJAX Submission
             $('#createFeedbackForm').on('submit', function(e) {
                 e.preventDefault();
                 const form = $(this);
+                if (!form.valid()) return;
                 const submitBtn = form.find('button[type="submit"]');
 
                 $.ajax({
@@ -228,8 +335,78 @@
                         }, 1000);
                     },
                     error: function(xhr) {
-                        toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
+                        if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                            $.each(xhr.responseJSON.errors, function(field, messages) {
+                                messages.forEach(function(message) { toastr.error(message); });
+                            });
+                        } else {
+                            toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
+                        }
                         submitBtn.prop('disabled', false).text('Submit');
+                    }
+                });
+            });
+
+            // Edit Feedback AJAX Submission
+            $('#editFeedbackForm').validate($.extend(true, {}, validationConfig, {
+                rules: {
+                    title: { required: true },
+                    description: { required: true }
+                },
+                messages: {
+                    title: "Client name is required.",
+                    description: "Description is required."
+                }
+            }));
+
+            $(document).on('click', '.edit-failure-btn', function() {
+                const id = $(this).data('id');
+                const title = $(this).data('title');
+                const description = $(this).data('description');
+
+                let actionUrl = "{{ route('admin.failures.update', ':id') }}";
+                actionUrl = actionUrl.replace(':id', id);
+                $('#editFeedbackForm').attr('action', actionUrl);
+                
+                $('#editFailureTitle').val(title);
+                $('#editFailureDescription').val(description);
+                
+                const validator = $('#editFeedbackForm').validate();
+                if(validator) validator.resetForm();
+                $('#editFeedbackForm').find('.is-invalid').removeClass('is-invalid');
+
+                $('#editFeedbackModal').modal('show');
+            });
+
+            $('#editFeedbackForm').on('submit', function(e) {
+                e.preventDefault();
+                const form = $(this);
+                if (!form.valid()) return;
+                const submitBtn = $('#editFeedbackSubmitBtn');
+
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'POST',
+                    data: form.serialize(),
+                    beforeSend: function() {
+                        submitBtn.prop('disabled', true).text('Saving...');
+                    },
+                    success: function(response) {
+                        toastr.success(response.message || 'Feedback updated successfully!');
+                        $('#editFeedbackModal').modal('hide');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                            $.each(xhr.responseJSON.errors, function(field, messages) {
+                                messages.forEach(function(message) { toastr.error(message); });
+                            });
+                        } else {
+                            toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
+                        }
+                        submitBtn.prop('disabled', false).text('Save Changes');
                     }
                 });
             });
@@ -246,13 +423,29 @@
                 $('#addDocForm').attr('action', actionUrl);
                 
                 $('#docNotes').val('');
+                
+                // reset validation state
+                const validator = $('#addDocForm').validate();
+                if(validator) validator.resetForm();
+                $('#addDocForm').find('.is-invalid').removeClass('is-invalid');
+
                 $('#addDocModal').modal('show');
             });
+
+            $('#addDocForm').validate($.extend(true, {}, validationConfig, {
+                rules: {
+                    notes: { required: true }
+                },
+                messages: {
+                    notes: "Documentation notes are required."
+                }
+            }));
 
             // Add Documentation AJAX Submission
             $('#addDocForm').on('submit', function(e) {
                 e.preventDefault();
                 const form = $(this);
+                if (!form.valid()) return;
                 const submitBtn = $('#addDocSubmitBtn');
 
                 $.ajax({
@@ -270,8 +463,74 @@
                         }, 1000);
                     },
                     error: function(xhr) {
-                        toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
+                        if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                            $.each(xhr.responseJSON.errors, function(field, messages) {
+                                messages.forEach(function(message) { toastr.error(message); });
+                            });
+                        } else {
+                            toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
+                        }
                         submitBtn.prop('disabled', false).text('Submit');
+                    }
+                });
+            });
+
+            // Edit Documentation Logic
+            $('#editDocForm').validate($.extend(true, {}, validationConfig, {
+                rules: {
+                    notes: { required: true }
+                },
+                messages: {
+                    notes: "Documentation notes are required."
+                }
+            }));
+
+            $(document).on('click', '.edit-doc-btn', function() {
+                const id = $(this).data('id');
+                const notes = $(this).data('notes');
+
+                let actionUrl = "{{ route('admin.failures.documentation.update', ':id') }}";
+                actionUrl = actionUrl.replace(':id', id);
+                $('#editDocForm').attr('action', actionUrl);
+                
+                $('#editDocNotes').val(notes);
+                
+                const validator = $('#editDocForm').validate();
+                if(validator) validator.resetForm();
+                $('#editDocForm').find('.is-invalid').removeClass('is-invalid');
+
+                $('#editDocModal').modal('show');
+            });
+
+            $('#editDocForm').on('submit', function(e) {
+                e.preventDefault();
+                const form = $(this);
+                if (!form.valid()) return;
+                const submitBtn = $('#editDocSubmitBtn');
+
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'POST',
+                    data: form.serialize(),
+                    beforeSend: function() {
+                        submitBtn.prop('disabled', true).text('Saving...');
+                    },
+                    success: function(response) {
+                        toastr.success(response.message || 'Documentation updated successfully!');
+                        $('#editDocModal').modal('hide');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                            $.each(xhr.responseJSON.errors, function(field, messages) {
+                                messages.forEach(function(message) { toastr.error(message); });
+                            });
+                        } else {
+                            toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
+                        }
+                        submitBtn.prop('disabled', false).text('Save Changes');
                     }
                 });
             });

@@ -17,7 +17,7 @@ class BusinessFailureController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('permission:business_failures.view', only: ['index']),
-            new Middleware('permission:business_failures.add', only: ['store', 'storeDocumentation']),
+            new Middleware('permission:business_failures.add', only: ['store', 'storeDocumentation', 'update', 'updateDocumentation']),
         ];
     }
     /**
@@ -51,11 +51,11 @@ class BusinessFailureController extends Controller implements HasMiddleware
             ]);
 
             // Add an initial documentation log
-            BusinessFailureDocumentation::create([
+            /* BusinessFailureDocumentation::create([
                 'business_failure_id' => $failure->id,
                 'user_id' => auth()->id(),
                 'notes' => 'Business Failure record opened.',
-            ]);
+            ]); */
 
             if ($request->ajax()) {
                 return response()->json([
@@ -99,6 +99,68 @@ class BusinessFailureController extends Controller implements HasMiddleware
             }
 
             return redirect()->back()->with('success', 'Documentation entry added successfully.');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(['message' => 'Something went wrong!'], 500);
+            }
+            return redirect()->back()->with('error', 'Something went wrong!');
+        }
+    }
+
+    /**
+     * Update an existing business failure.
+     */
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+        ]);
+
+        try {
+            $failure = BusinessFailure::findOrFail($id);
+            $failure->update([
+                'title' => $request->title,
+                'description' => $request->description,
+            ]);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'message' => 'Feedback updated successfully.'
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Feedback updated successfully.');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(['message' => 'Something went wrong!'], 500);
+            }
+            return redirect()->back()->with('error', 'Something went wrong!');
+        }
+    }
+
+    /**
+     * Update an existing documentation entry.
+     */
+    public function updateDocumentation(Request $request, $id)
+    {
+        $request->validate([
+            'notes' => 'required|string',
+        ]);
+
+        try {
+            $documentation = BusinessFailureDocumentation::findOrFail($id);
+            $documentation->update([
+                'notes' => $request->notes,
+            ]);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'message' => 'Documentation entry updated successfully.'
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Documentation entry updated successfully.');
         } catch (\Exception $e) {
             if ($request->ajax()) {
                 return response()->json(['message' => 'Something went wrong!'], 500);

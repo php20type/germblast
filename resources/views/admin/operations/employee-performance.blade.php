@@ -366,7 +366,6 @@
                         <div class="col-lg-12">
                             <div class="form-group">    
                                 <label class="form-label">Points</label>
-                                <span class="text-danger">*</span>
                                 <input type="number" class="form-control" name="points" placeholder="Points will auto-fill" readonly>
                             </div>
                         </div>
@@ -500,15 +499,13 @@
         $("#add-record-form").validate({
             ignore: [],
             rules: {
-                points: {
-                    required: true,
-                    number: true
+                category: {
+                    required: true
                 }
             },
             messages: {
-                points: {
-                    required: "Please enter points.",
-                    number: "Points must be a number."
+                category: {
+                    required: "Please select a category."
                 }
             },
             errorElement: 'span',
@@ -552,8 +549,14 @@
                         window.location.reload();
                     }, 1500);
                 },
-                error: function() {
-                    toastr.error('Something went wrong while adding the record.');
+                error: function(xhr) {
+                    if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                        $.each(xhr.responseJSON.errors, function(field, messages) {
+                            messages.forEach(function(message) { toastr.error(message); });
+                        });
+                    } else {
+                        toastr.error(xhr.responseJSON?.message || 'Something went wrong while adding the record.');
+                    }
                     $submitBtn.prop('disabled', false).text('Save changes');
                 }
             });

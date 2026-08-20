@@ -97,7 +97,7 @@
                                                 </select>
                                             </div>
                                             <div>
-                                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#AddSchool" style="border-radius: 8px; height: 43px; white-space: nowrap;">
+                                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#AddSchool" style="white-space: nowrap;">
                                                     + Add School
                                                 </button>
                                             </div>
@@ -359,21 +359,18 @@
                     $submitBtn.prop('disabled', true).text('Saving...');
                 },
                 success: function(response) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: response.message,
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(() => location.reload());
+                    toastr.success(response.message || 'School District created successfully.');
+                    setTimeout(() => location.reload(), 1500);
                 },
                 error: function(xhr) {
                     $submitBtn.prop('disabled', false).text('Save changes');
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: xhr.responseJSON?.message || 'Something went wrong while creating the school district.'
-                    });
+                    if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                        $.each(xhr.responseJSON.errors, function(field, messages) {
+                            messages.forEach(function(message) { toastr.error(message); });
+                        });
+                    } else {
+                        toastr.error(xhr.responseJSON?.message || 'Something went wrong while creating the school district.');
+                    }
                 }
             });
         });
@@ -402,21 +399,18 @@
                     $submitBtn.prop('disabled', true).text('Saving...');
                 },
                 success: function(response) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: response.message,
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(() => location.reload());
+                    toastr.success(response.message || 'Campus created successfully.');
+                    setTimeout(() => location.reload(), 1500);
                 },
                 error: function(xhr) {
                     $submitBtn.prop('disabled', false).text('Save changes');
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: xhr.responseJSON?.message || 'Something went wrong while creating the campus.'
-                    });
+                    if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                        $.each(xhr.responseJSON.errors, function(field, messages) {
+                            messages.forEach(function(message) { toastr.error(message); });
+                        });
+                    } else {
+                        toastr.error(xhr.responseJSON?.message || 'Something went wrong while creating the campus.');
+                    }
                 }
             });
         });
@@ -446,21 +440,18 @@
                     $submitBtn.prop('disabled', true).text('Saving...');
                 },
                 success: function(response) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: response.message,
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(() => location.reload());
+                    toastr.success(response.message || 'School District updated successfully.');
+                    setTimeout(() => location.reload(), 1500);
                 },
                 error: function(xhr) {
                     $submitBtn.prop('disabled', false).text('Save changes');
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: xhr.responseJSON?.message || 'Something went wrong while updating the school district.'
-                    });
+                    if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                        $.each(xhr.responseJSON.errors, function(field, messages) {
+                            messages.forEach(function(message) { toastr.error(message); });
+                        });
+                    } else {
+                        toastr.error(xhr.responseJSON?.message || 'Something went wrong while updating the school district.');
+                    }
                 }
             });
         });
@@ -484,22 +475,11 @@
                         method: 'POST',
                         data: $form.serialize(),
                         success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Deleted',
-                                text: response.message,
-                                showConfirmButton: false,
-                                timer: 2000
-                            }).then(() => {
-                                window.location.href = "{{ route('admin.isd-attendance.index') }}";
-                            });
+                            toastr.success(response.message || 'School District deleted successfully.');
+                            setTimeout(() => window.location.href = "{{ route('admin.isd-attendance.index') }}", 1500);
                         },
                         error: function(xhr) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: xhr.responseJSON?.message || 'Something went wrong while deleting.'
-                            });
+                            toastr.error(xhr.responseJSON?.message || 'Something went wrong while deleting.');
                         }
                     });
                 }
@@ -535,21 +515,18 @@
                             $submitBtn.prop('disabled', true).text('Saving...');
                         },
                         success: function(response) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success',
-                                text: response.message,
-                                showConfirmButton: false,
-                                timer: 2000
-                            }).then(() => location.reload());
+                            toastr.success(response.message || 'Campus updated successfully.');
+                            setTimeout(() => location.reload(), 1500);
                         },
                         error: function(xhr) {
                             $submitBtn.prop('disabled', false).text('Save changes');
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: xhr.responseJSON?.message || 'Something went wrong while updating the campus.'
-                            });
+                            if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                                $.each(xhr.responseJSON.errors, function(field, messages) {
+                                    messages.forEach(function(message) { toastr.error(message); });
+                                });
+                            } else {
+                                toastr.error(xhr.responseJSON?.message || 'Something went wrong while updating the campus.');
+                            }
                         }
                     });
                 });
@@ -573,20 +550,11 @@
                                 method: 'POST',
                                 data: $form.serialize(),
                                 success: function(response) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Deleted',
-                                        text: response.message,
-                                        showConfirmButton: false,
-                                        timer: 2000
-                                    }).then(() => location.reload());
+                                    toastr.success(response.message || 'Campus deleted successfully.');
+                                    setTimeout(() => location.reload(), 1500);
                                 },
                                 error: function(xhr) {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: xhr.responseJSON?.message || 'Something went wrong while deleting.'
-                                    });
+                                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while deleting.');
                                 }
                             });
                         }

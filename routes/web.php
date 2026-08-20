@@ -292,7 +292,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Business Failures
     Route::get('business-failures', [BusinessFailureController::class, 'index'])->name('failures.index');
     Route::post('business-failures', [BusinessFailureController::class, 'store'])->name('failures.store');
+    Route::post('business-failures/{id}/update', [BusinessFailureController::class, 'update'])->name('failures.update');
     Route::post('business-failures/{id}/documentation', [BusinessFailureController::class, 'storeDocumentation'])->name('failures.documentation.store');
+    Route::post('business-failures/documentation/{id}/update', [BusinessFailureController::class, 'updateDocumentation'])->name('failures.documentation.update');
 
     // ISD Attendance Module
     Route::get('isd-attendance', [IsdAttendanceController::class, 'index'])->name('isd-attendance.index');
