@@ -84,6 +84,9 @@
                                     <p class="text-muted mb-0">Update employee details and role</p>
                                 </div>
                                 <div class="right-part-sec">
+                                    <a href="{{ route('admin.employee.index') }}" class="btn btn-outline-dark">
+                                        <i class="fa-solid fa-arrow-left me-1"></i> Back to Employees
+                                    </a>
                                     <button type="submit" class="btn btn-success">
                                         Update Employee
                                     </button>
@@ -976,6 +979,19 @@
             } else {
                 error.insertAfter(element);
             }
+        }
+    });
+
+    /* ===============================
+       Auto-fill Overtime Rate
+    =============================== */
+    $('input[name="hourly_rate"]').on('input', function() {
+        let hourlyRate = parseFloat($(this).val());
+        if (!isNaN(hourlyRate) && hourlyRate >= 0) {
+            let overtimeRate = (hourlyRate * 1.5).toFixed(2);
+            $('input[name="overtime_rate"]').val(overtimeRate);
+        } else {
+            $('input[name="overtime_rate"]').val('');
         }
     });
 

@@ -295,7 +295,7 @@
                             <div class="section-card">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <div>
-                                        <p class="section-subtitle text-muted mb-0" style="font-size: 13px;">Metrics - Year {{ $selectedYear }}</p>
+                                        <p class="section-subtitle text-muted mb-0" style="font-size: 13px;">My Requests Metrics - Year {{ $selectedYear }}</p>
                                     </div>
                                 </div>
 
@@ -475,7 +475,8 @@
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label class="form-label">Reason / Notes</label>
-                                <textarea class="form-control" id="reason" name="reason" rows="6" placeholder="Enter reason for time off..."></textarea>
+                                <span class="text-danger">*</span>
+                                <textarea class="form-control" id="reason" name="reason" rows="6" placeholder="Enter reason for time off..." required></textarea>
                             </div>
                         </div>
                     </div>
@@ -531,19 +532,104 @@ $(document).ready(function () {
         $('#end_date').attr('min', startDate);
     });
 
+    /* ===============================
+       Validation & AJAX Submission
+    =============================== */
+    $('#request-time-off-form').validate({
+        rules: {
+            start_date: "required",
+            end_date: "required",
+            reason: "required"
+        },
+        messages: {
+            start_date: "Please select a start date.",
+            end_date: "Please select an end date.",
+            reason: "Please provide a reason for your time off."
+        },
+        errorElement: 'span',
+        errorClass: 'invalid-feedback d-block',
+        highlight: function(element) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('is-invalid');
+        },
+        errorPlacement: function(error, element) {
+            error.insertAfter(element);
+        }
+    });
+
+    $('#request-time-off-form').on('submit', function(e) {
+        e.preventDefault();
+
+        let form = $(this);
+
+        if (!form.valid()) {
+            return;
+        }
+
+        $.ajax({
+            url: form.attr('action'),
+            type: form.attr('method'),
+            data: form.serialize(),
+            success: function(response) {
+                toastr.success(response.message || 'Time off request submitted successfully.');
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1000);
+            },
+            error: function(xhr) {
+                if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                    $.each(xhr.responseJSON.errors, function(field, messages) {
+                        messages.forEach(function(message) {
+                            toastr.error(message);
+                        });
+                    });
+                    return;
+                }
+
+                toastr.error(
+                    xhr.responseJSON?.message ||
+                    'Something went wrong while submitting the request.'
+                );
+            }
+        });
+    });
+
     // Inline Approve Button Click Action
     $(document).on('click', '.inline-approve-btn', function () {
         var id = $(this).data('id');
         var notes = $('#notes-input-' + id).val();
 
-        var form = $('<form>', {
-            method: 'POST',
-            action: '/admin/hr/time-off/' + id + '/approve'
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You are about to approve this time off request.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, approve it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/admin/hr/time-off/' + id + '/approve',
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        admin_notes: notes
+                    },
+                    success: function(response) {
+                        toastr.success(response.message || 'Time off request approved successfully.');
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1000);
+                    },
+                    error: function(xhr) {
+                        toastr.error(xhr.responseJSON?.message || 'Failed to approve request.');
+                    }
+                });
+            }
         });
-        form.append($('<input>', { type: 'hidden', name: '_token', value: '{{ csrf_token() }}' }));
-        form.append($('<input>', { type: 'hidden', name: 'admin_notes', value: notes }));
-        $('body').append(form);
-        form.submit();
     });
 
     // Inline Reject Button Click Action
@@ -551,14 +637,35 @@ $(document).ready(function () {
         var id = $(this).data('id');
         var notes = $('#notes-input-' + id).val();
 
-        var form = $('<form>', {
-            method: 'POST',
-            action: '/admin/hr/time-off/' + id + '/reject'
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You are about to reject this time off request.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, reject it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/admin/hr/time-off/' + id + '/reject',
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        admin_notes: notes
+                    },
+                    success: function(response) {
+                        toastr.success(response.message || 'Time off request rejected successfully.');
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1000);
+                    },
+                    error: function(xhr) {
+                        toastr.error(xhr.responseJSON?.message || 'Failed to reject request.');
+                    }
+                });
+            }
         });
-        form.append($('<input>', { type: 'hidden', name: '_token', value: '{{ csrf_token() }}' }));
-        form.append($('<input>', { type: 'hidden', name: 'admin_notes', value: notes }));
-        $('body').append(form);
-        form.submit();
     });
 
 });

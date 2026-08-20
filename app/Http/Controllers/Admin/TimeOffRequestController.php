@@ -48,21 +48,16 @@ class TimeOffRequestController extends Controller implements HasMiddleware
         $adminQuery->whereYear('start_date', $selectedYear);
         $employeeQuery->whereYear('start_date', $selectedYear);
 
+        // Calculate stats for the current user only (personal requests)
+        $approvedCount = $employeeQuery->clone()->where('status', 'approved')->count();
+        $pendingCount = $employeeQuery->clone()->where('status', 'submitted')->count();
+        $rejectedCount = $employeeQuery->clone()->where('status', 'rejected')->count();
+
         if ($user->can('time_off_request.edit')) {
             $companyRequests = TimeOffRequest::with(['user', 'manager'])
                 ->whereYear('start_date', $selectedYear)
                 ->latest()
                 ->get();
-
-            // Stats for Manager/Admin (Company-wide)
-            $approvedCount = $adminQuery->clone()->where('status', 'approved')->count();
-            $pendingCount = $adminQuery->clone()->where('status', 'submitted')->count();
-            $rejectedCount = $adminQuery->clone()->where('status', 'rejected')->count();
-        } else {
-            // Stats for regular employee (personal requests)
-            $approvedCount = $employeeQuery->clone()->where('status', 'approved')->count();
-            $pendingCount = $employeeQuery->clone()->where('status', 'submitted')->count();
-            $rejectedCount = $employeeQuery->clone()->where('status', 'rejected')->count();
         }
 
         // Generate dynamic years for the toggle starting from 2026 up to the current year
@@ -88,7 +83,7 @@ class TimeOffRequestController extends Controller implements HasMiddleware
         $request->validate([
             'start_date' => 'required|date|after_or_equal:today',
             'end_date'   => 'required|date|after_or_equal:start_date',
-            'reason'     => 'nullable|string|max:1000',
+            'reason'     => 'required|string|max:1000',
         ]);
 
         try {
@@ -120,10 +115,14 @@ class TimeOffRequestController extends Controller implements HasMiddleware
      */
     public function approve(Request $request, $id)
     {
+        $request->validate([
+            'admin_notes' => 'nullable|string|max:1000',
+        ]);
+
         $user = auth()->user();
 
         try {
-            $timeOffRequest = TimeOffRequest::findOrFail($id);
+            $timeOffRequest = TimeOffRequest::where('id', $id)->where('status', 'submitted')->firstOrFail();
             $timeOffRequest->update([
                 'status'      => 'approved',
                 'actioned_by' => $user->id,
@@ -151,10 +150,14 @@ class TimeOffRequestController extends Controller implements HasMiddleware
      */
     public function reject(Request $request, $id)
     {
+        $request->validate([
+            'admin_notes' => 'nullable|string|max:1000',
+        ]);
+
         $user = auth()->user();
 
         try {
-            $timeOffRequest = TimeOffRequest::findOrFail($id);
+            $timeOffRequest = TimeOffRequest::where('id', $id)->where('status', 'submitted')->firstOrFail();
             $timeOffRequest->update([
                 'status'      => 'rejected',
                 'actioned_by' => $user->id,

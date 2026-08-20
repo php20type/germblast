@@ -285,21 +285,22 @@
                                                         <th>Order ID</th>
                                                         <th>Customer Name</th>
                                                         <th>Price</th>
+                                                        <th style="width: 1%; white-space: nowrap;" class="text-center">Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     @forelse($officeData['orders'] as $order)
                                                         <tr>
                                                             <td>
-                                                                <a href="{{ route('admin.lead.service.service_dashboard', $order->id) }}" class="text-primary fw-bold text-decoration-none">
+                                                                <span class="text-dark fw-bold">
                                                                     {{ $order->order_no ?? 'ORD-'.$order->id }}
-                                                                </a>
+                                                                </span>
                                                             </td>
                                                             <td>
                                                                 @if($order->service && $order->service->lead && $order->service->lead->company_id)
-                                                                    <a href="{{ route('admin.company.show', $order->service->lead->company_id) }}" class="fw-bold text-decoration-none">
+                                                                    <span class="fw-bold text-dark">
                                                                         {{ $order->service->lead->company->name ?? 'Unknown Customer' }}
-                                                                    </a>
+                                                                    </span>
                                                                 @else
                                                                     Unknown Customer
                                                                 @endif
@@ -311,10 +312,22 @@
                                                                     -
                                                                 @endif
                                                             </td>
+                                                            <td style="white-space: nowrap;">
+                                                                <div class="d-flex gap-2">
+                                                                    <a href="{{ route('admin.lead.service.service_dashboard', $order->id) }}" class="btn btn-outline-primary">
+                                                                        Go to Order
+                                                                    </a>
+                                                                    @if($order->service && $order->service->lead && $order->service->lead->company_id)
+                                                                        <a href="{{ route('admin.company.show', $order->service->lead->company_id) }}" class="btn btn-outline-secondary">
+                                                                            Go to Customer
+                                                                        </a>
+                                                                    @endif
+                                                                </div>
+                                                            </td>
                                                         </tr>
                                                     @empty
                                                         <tr>
-                                                            <td colspan="3" class="text-center py-4 text-muted">No orders assigned to this office.</td>
+                                                            <td colspan="4" class="text-center py-4 text-muted">No orders assigned to this office.</td>
                                                         </tr>
                                                     @endforelse
                                                 </tbody>
@@ -328,19 +341,19 @@
                                                 <tbody>
                                                     <tr>
                                                         <td class="text-start fw-bold">Total Orders</td>
-                                                        <td class="fw-bold text-primary text-end">{{ $officeData['total_orders'] }}</td>
+                                                        <td class="fw-bold text-end">{{ $officeData['total_orders'] }}</td>
                                                     </tr>
                                                     <tr>
                                                         <td class="text-start fw-bold">Grand Total of Orders</td>
-                                                        <td class="fw-bold text-primary text-end">${{ number_format($officeData['total_price'], 2) }}</td>
+                                                        <td class="fw-bold text-end">${{ number_format($officeData['total_price'], 2) }}</td>
                                                     </tr>
                                                     <tr>
                                                         <td class="text-start fw-bold">Total Scheduled Service Hours</td>
-                                                        <td class="fw-bold text-primary text-end">{{ number_format($officeData['total_scheduled_hours'], 2) }}</td>
+                                                        <td class="fw-bold text-end">{{ number_format($officeData['total_scheduled_hours'], 2) }}</td>
                                                     </tr>
                                                     <tr>
                                                         <td class="text-start fw-bold">Total Unique Staff Assigned</td>
-                                                        <td class="fw-bold text-primary text-end">{{ $officeData['unique_staff_count'] }}</td>
+                                                        <td class="fw-bold text-end">{{ $officeData['unique_staff_count'] }}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>

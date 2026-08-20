@@ -215,7 +215,6 @@
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label class="form-label">Customer</label>
-                                <span class="text-danger">*</span>
                                 <select name="customer" class="form-select">
                                     <option value="">-- Please Select --</option>
                                     @foreach($companies as $company)

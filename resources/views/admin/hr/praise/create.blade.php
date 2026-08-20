@@ -104,7 +104,7 @@
                                 <div class="section-card">
                                     
                                     <div class="form-group-praise">
-                                        <label for="recipient_id" class="form-label-praise">Who do you want to praise?</label>
+                                        <label for="recipient_id" class="form-label-praise">Who do you want to praise? <span class="text-danger">*</span></label>
                                         <select 
                                             name="recipient_id" 
                                             id="recipient_id" 
@@ -124,7 +124,7 @@
                                     </div>
 
                                     <div class="form-group-praise">
-                                        <label for="reason" class="form-label-praise">Tell us in as many words as you'd like what this person has done</label>
+                                        <label for="reason" class="form-label-praise">Tell us in as many words as you'd like what this person has done <span class="text-danger">*</span></label>
                                         <textarea
                                             name="reason"
                                             id="reason"
@@ -137,7 +137,7 @@
                                     </div>
 
                                     <div class="form-group-praise mb-0">
-                                        <label for="core_value" class="form-label-praise">What core value did this person exemplify?</label>
+                                        <label for="core_value" class="form-label-praise">What core value did this person exemplify? <span class="text-danger">*</span></label>
                                         <select name="core_value" id="core_value" class="input-praise form-select @error('core_value') is-invalid @enderror" required>
                                             <option value="Excellence" {{ old('core_value') == 'Excellence' ? 'selected' : '' }}>Excellence</option>
                                             <option value="Extraordinary" {{ old('core_value') == 'Extraordinary' ? 'selected' : '' }}>Extraordinary</option>
@@ -169,24 +169,65 @@
 @push('scripts')
 <script>
 $(document).ready(function () {
+    /* ===============================
+       Validation & AJAX Submission
+    =============================== */
+    $('#praiseForm').validate({
+        rules: {
+            recipient_id: "required",
+            reason: "required",
+            core_value: "required"
+        },
+        messages: {
+            recipient_id: "Please select an employee.",
+            reason: "Please provide a reason for the praise.",
+            core_value: "Please select a core value."
+        },
+        errorElement: 'span',
+        errorClass: 'invalid-feedback d-block',
+        highlight: function(element) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('is-invalid');
+        },
+        errorPlacement: function(error, element) {
+            error.insertAfter(element);
+        }
+    });
+
     $('#praiseForm').on('submit', function (e) {
         e.preventDefault();
         const $form = $(this);
         const $btn  = $('#submitBtn');
 
+        if (!$form.valid()) {
+            return;
+        }
+
         $.ajax({
             url: $form.attr('action'),
             method: 'POST',
             data: $form.serialize(),
-            beforeSend: function () { $btn.prop('disabled', true).text('Submitting...'); },
+            beforeSend: function () { 
+                $btn.prop('disabled', true).text('Submitting...'); 
+            },
             success: function (res) {
                 toastr.success(res.message || 'Praise submitted successfully!');
-                $form[0].reset();
-                $btn.prop('disabled', false).text('Submit Praise');
+                setTimeout(function() {
+                    window.location.href = "{{ route('admin.hr.praise.index') }}";
+                }, 1000);
             },
             error: function (xhr) {
-                const errors = xhr.responseJSON?.errors;
-                toastr.error(errors ? Object.values(errors)[0][0] : 'Something went wrong.');
+                if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                    $.each(xhr.responseJSON.errors, function(field, messages) {
+                        messages.forEach(function(message) {
+                            toastr.error(message);
+                        });
+                    });
+                } else {
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while submitting.');
+                }
                 $btn.prop('disabled', false).text('Submit Praise');
             }
         });

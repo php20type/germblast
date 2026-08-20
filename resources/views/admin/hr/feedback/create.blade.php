@@ -87,7 +87,7 @@
                             <form id="feedbackForm" method="POST" action="{{ route('admin.hr.feedback.store') }}">
                                 @csrf
                                 <div class="section-card">
-                                    <div class="section-title">Write Your Feedback</div>
+                                    <div class="section-title">Write Your Feedback <span class="text-danger">*</span></div>
                                     <textarea
                                         name="description"
                                         id="description"
@@ -116,24 +116,60 @@
 @push('scripts')
 <script>
 $(document).ready(function () {
+    /* ===============================
+       Validation & AJAX Submission
+    =============================== */
+    $('#feedbackForm').validate({
+        rules: {
+            description: "required"
+        },
+        messages: {
+            description: "Please enter your feedback."
+        },
+        errorElement: 'span',
+        errorClass: 'invalid-feedback d-block',
+        highlight: function(element) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('is-invalid');
+        },
+        errorPlacement: function(error, element) {
+            error.insertAfter(element);
+        }
+    });
+
     $('#feedbackForm').on('submit', function (e) {
         e.preventDefault();
         const $form = $(this);
         const $btn  = $('#submitBtn');
 
+        if (!$form.valid()) {
+            return;
+        }
+
         $.ajax({
             url: $form.attr('action'),
             method: 'POST',
             data: $form.serialize(),
-            beforeSend: function () { $btn.prop('disabled', true).text('Submitting...'); },
+            beforeSend: function () { 
+                $btn.prop('disabled', true).text('Submitting...'); 
+            },
             success: function (res) {
                 toastr.success(res.message || 'Feedback submitted successfully!');
                 $form[0].reset();
                 $btn.prop('disabled', false).text('Submit Feedback');
             },
             error: function (xhr) {
-                const errors = xhr.responseJSON?.errors;
-                toastr.error(errors ? Object.values(errors)[0][0] : 'Something went wrong.');
+                if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                    $.each(xhr.responseJSON.errors, function(field, messages) {
+                        messages.forEach(function(message) {
+                            toastr.error(message);
+                        });
+                    });
+                } else {
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while submitting.');
+                }
                 $btn.prop('disabled', false).text('Submit Feedback');
             }
         });

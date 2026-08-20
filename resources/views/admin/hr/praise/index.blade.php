@@ -2,6 +2,79 @@
 
 @section('title', 'Core Value Praise Submissions')
 
+@push('styles')
+<style>
+    /* Modern Reward Cards Grid (Adopted for Praise) */
+    .reward-card {
+        background: #ffffff !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 16px !important;
+        padding: 24px !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.01) !important;
+    }
+
+    .reward-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05) !important;
+        border-color: rgba(255, 184, 28, 0.4) !important;
+    }
+
+    .reward-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: #ffb81c;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .reward-card:hover::before {
+        opacity: 1;
+    }
+
+    .reward-badge-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: rgba(255, 184, 28, 0.12);
+        color: #ffb81c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+
+    .reward-card:hover .reward-badge-circle {
+        background: #ffb81c;
+        color: #ffffff;
+        transform: scale(1.05);
+    }
+
+    .avatar-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #ffb81c;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 12px;
+        border: 2px solid #ffffff;
+        box-shadow: 0 0 0 1px #e5e7eb;
+    }
+</style>
+@endpush
+
 @section('content')
     <div class="companies-section my-4">
         <div class="container-fluid">
@@ -14,76 +87,81 @@
                 <div class="main-content">
                     <div class="sales-dashboard">
 
-                        {{-- Header --}}
+                        <!-- Header -->
                         <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-1">Core Value Praise Submissions</h3>
-                                <p class="text-muted mb-0">
-                                    Review praise submissions and core values recognition.
-                                </p>
+                                <h3 class="mb-1 text-uppercase">CORE VALUE PRAISE <span style="font-size: 24px;">🌟</span></h3>
+                                <p class="text-muted mb-0">Review praise submissions and core values recognition.</p>
                             </div>
                             <div class="right-part-sec">
-                                <a href="{{ route('admin.hr.praise.create') }}" class="btn btn-export">+ Submit Praise</a>
+                                <a href="{{ route('admin.hr.praise.create') }}" class="btn btn-export">
+                                    + SUBMIT PRAISE
+                                </a>
                             </div>
                         </div>
 
-                            @if(session('success'))
-                                <div class="px-4">
-                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                        {{ session('success') }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                    </div>
-                                </div>
-                            @endif
-
-                            {{-- Timeline --}}
-                            <div class="px-4 pb-4 company-details-section">
-                                <div class="section-card">
-
-                                    <div class="timeline-container">
-                                        <div class="timeline position-relative">
-
-                                            @forelse($praises as $praise)
-                                                <div class="timeline-item">
-                                                    <div class="timeline-icon">
-                                                        <i class="fas fa-angle-double-right"></i>
-                                                    </div>
-                                                    <div class="timeline-content">
-                                                        <div class="timeline-header d-flex justify-content-between align-items-center">
-                                                            <div class="timestamp text-muted small">
-                                                                {{ $praise->created_at->format('g:i A \o\n M j, Y') }}
-                                                            </div>
-                                                            <span class="badge bg-info text-white">{{ $praise->core_value }}</span>
-                                                        </div>
-                                                        <div class="timeline-body mt-2">
-                                                            <div class="activity-details">
-                                                                <div class="activity-description">
-                                                                    <div class="mb-2" style="font-size: 15px;">
-                                                                        <strong class="text-dark">{{ $praise->sender->name ?? 'Unknown' }}</strong> 
-                                                                        praised 
-                                                                        <strong class="text-primary">{{ $praise->recipient_name }}</strong>
-                                                                    </div>
-                                                                    <div class="text-muted" style="white-space: pre-line;">
-                                                                        {{ $praise->reason }}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @empty
-                                                <div class="text-center py-4">
-                                                    <h6>NO PRAISES YET</h6>
-                                                    <p class="text-muted mb-0">No core value praise has been submitted yet.</p>
-                                                </div>
-                                            @endforelse
-
-                                        </div>
-                                    </div>
-
+                        @if(session('success'))
+                            <div class="px-4">
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    {{ session('success') }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                                 </div>
                             </div>
+                        @endif
 
+                        <!-- Cards Content -->
+                        <div class="px-4 pb-4">
+                            @if($praises->isEmpty())
+                                <div class="section-card text-center py-5">
+                                    <div class="mb-3" style="font-size: 40px;">🌟</div>
+                                    <h5 class="fw-semibold text-dark">No Praises Found</h5>
+                                    <p class="text-muted mb-0">
+                                        No core value praise has been submitted yet.
+                                    </p>
+                                </div>
+                            @else
+                                <div class="row mx-0">
+                                    @foreach($praises as $praise)
+                                        <div class="col-12 mb-4 px-2">
+                                            <div class="reward-card h-100 d-flex flex-column">
+                                                
+                                                <div class="d-flex align-items-start justify-content-between mb-3">
+                                                    <div class="d-flex align-items-center gap-3">
+                                                        <div class="reward-badge-circle">
+                                                            🌟
+                                                        </div>
+                                                        <div>
+                                                            <h4 class="mb-1 text-dark" style="font-size: 16px; line-height: 1.3;">
+                                                                {{ strtoupper($praise->core_value) }} Praise for <span class="fw-bold">{{ $praise->recipient_name }}</span>
+                                                            </h4>
+                                                            <span class="text-muted" style="font-size: 12px;">
+                                                                {{ $praise->created_at->format('M j, Y') }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="reward-description text-muted flex-grow-1" style="font-size: 14px; line-height: 1.6;">
+                                                    {{ $praise->reason ?: 'No reason provided.' }}
+                                                </div>
+
+                                                <div class="mt-3 pt-3 border-top d-flex align-items-center gap-2" style="border-color: #f3f4f6 !important;">
+                                                    <div class="avatar-circle">
+                                                        {{ strtoupper(substr($praise->sender->name ?? 'U', 0, 1)) }}
+                                                    </div>
+                                                    <div>
+                                                        <span class="fw-semibold text-dark d-block" style="font-size: 13px; line-height: 1.2;">
+                                                            {{ $praise->sender->name ?? 'Unknown' }}
+                                                        </span>
+                                                        <span class="text-muted" style="font-size: 11px;">Submitted By</span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>

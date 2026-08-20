@@ -239,7 +239,8 @@
                                 <div class="col-lg-12">
                                     <div class="form-group">
                                         <label class="form-label">Description</label>
-                                        <textarea name="description" id="description" placeholder="Describe why this reward was given..." class="form-control" rows="6"></textarea>
+                                        <span class="text-danger">*</span>
+                                        <textarea name="description" id="description" placeholder="Describe why this reward was given..." class="form-control" rows="6" required></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -260,26 +261,66 @@
     @if(auth()->user()->isSuperAdmin())
         <script>
             $(document).ready(function () {
+                /* ===============================
+                   Validation & AJAX Submission
+                =============================== */
+                $('#rewardForm').validate({
+                    rules: {
+                        user_id: "required",
+                        name: "required",
+                        description: "required"
+                    },
+                    messages: {
+                        user_id: "Please select an employee.",
+                        name: "Please enter a reward name.",
+                        description: "Please enter a description for this reward."
+                    },
+                    errorElement: 'span',
+                    errorClass: 'invalid-feedback d-block',
+                    highlight: function(element) {
+                        $(element).addClass('is-invalid');
+                    },
+                    unhighlight: function(element) {
+                        $(element).removeClass('is-invalid');
+                    },
+                    errorPlacement: function(error, element) {
+                        error.insertAfter(element);
+                    }
+                });
+
                 $('#rewardForm').on('submit', function (e) {
                     e.preventDefault();
                     const $form = $(this);
                     const $btn  = $('#submitBtn');
 
+                    if (!$form.valid()) {
+                        return;
+                    }
+
                     $.ajax({
                         url: $form.attr('action'),
                         method: 'POST',
                         data: $form.serialize(),
-                        beforeSend: function () { $btn.prop('disabled', true).text('Saving...'); },
+                        beforeSend: function () { 
+                            $btn.prop('disabled', true).text('Saving...'); 
+                        },
                         success: function (res) {
-                            alert(res.message || 'Reward assigned successfully!');
-                            $form[0].reset();
-                            $btn.prop('disabled', false).text('Save changes');
+                            toastr.success(res.message || 'Reward assigned successfully!');
                             $('#AddReward').modal('hide');
-                            location.reload();
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1000);
                         },
                         error: function (xhr) {
-                            const errors = xhr.responseJSON?.errors;
-                            alert(errors ? Object.values(errors)[0][0] : 'Something went wrong.');
+                            if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                                $.each(xhr.responseJSON.errors, function(field, messages) {
+                                    messages.forEach(function(message) {
+                                        toastr.error(message);
+                                    });
+                                });
+                            } else {
+                                toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
+                            }
                             $btn.prop('disabled', false).text('Save changes');
                         }
                     });
