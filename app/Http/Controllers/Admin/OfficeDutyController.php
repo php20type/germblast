@@ -17,12 +17,12 @@ class OfficeDutyController extends Controller implements HasMiddleware
         return [
             new Middleware('permission:office_duties.view', only: ['index']),
             new Middleware('permission:office_duties.add', only: ['store']),
-            new Middleware('permission:office_duties.edit', only: ['update', 'complete', 'reopen']),
+            new Middleware('permission:office_duties.edit', only: ['update', 'complete']),
         ];
     }
     public function index()
     {
-        $duties = OfficeDuty::with('lastPerformedBy')->get();
+        $duties = OfficeDuty::with(['lastPerformedBy', 'completions.user'])->get();
 
         return view('admin.office-duties.index', compact('duties'));
     }
@@ -119,32 +119,5 @@ class OfficeDutyController extends Controller implements HasMiddleware
             return redirect()->back()->with('error', 'Something went wrong!');
         }
     }
-    public function reopen(Request $request, $id)
-    {
-        try {
-            $duty = OfficeDuty::findOrFail($id);
-            
-            OfficeDutyCompletion::where('office_duty_id', $duty->id)->delete();
 
-            // Clear the completion status on the duty itself
-            $duty->update([
-                'last_performed_by' => null,
-                'last_performed_on' => null,
-                'notes' => null,
-            ]);
-
-            if ($request->ajax()) {
-                return response()->json([
-                    'message' => 'Task reopened successfully.'
-                ]);
-            }
-
-            return redirect()->back()->with('success', 'Task reopened successfully.');
-        } catch (\Exception $e) {
-            if ($request->ajax()) {
-                return response()->json(['message' => 'Something went wrong!'], 500);
-            }
-            return redirect()->back()->with('error', 'Something went wrong!');
-        }
-    }
 }

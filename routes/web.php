@@ -170,7 +170,6 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('office-duties/store', [OfficeDutyController::class, 'store'])->name('office-duties.store');
     Route::put('office-duties/update/{id}', [OfficeDutyController::class, 'update'])->name('office-duties.update');
     Route::post('office-duties/complete/{id}', [OfficeDutyController::class, 'complete'])->name('office-duties.complete');
-    Route::post('office-duties/reopen/{id}', [OfficeDutyController::class, 'reopen'])->name('office-duties.reopen');
 
     // Equipment Loan System
     Route::get('equipment-loan/index', [LoanEquipmentController::class, 'index'])->name('equipment-loan.index');

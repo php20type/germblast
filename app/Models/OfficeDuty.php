@@ -32,4 +32,27 @@ class OfficeDuty extends Model
     {
         return $this->belongsTo(User::class, 'last_performed_by');
     }
+
+    /**
+     * Dynamically determine if the task is completed for the current period based on frequency.
+     */
+    public function getIsCompletedAttribute()
+    {
+        $now = now();
+        $completions = $this->completions();
+
+        switch (strtolower($this->frequency)) {
+            case 'daily':
+                return $completions->where('completed_at', '>=', $now->copy()->startOfDay())->exists();
+            case 'weekly':
+                return $completions->where('completed_at', '>=', $now->copy()->startOfWeek())->exists();
+            case 'monthly':
+                return $completions->where('completed_at', '>=', $now->copy()->startOfMonth())->exists();
+            case 'as needed':
+            case 'one-off':
+            default:
+                // For a one-off task, if it has any completion record, it's complete.
+                return $completions->exists();
+        }
+    }
 }

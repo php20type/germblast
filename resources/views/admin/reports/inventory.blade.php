@@ -243,17 +243,17 @@
         </div>
     </div>
 
-    <!-- Add/Edit Inventory Item Modal -->
-    <div class="modal fade" id="inventoryItemModal" tabindex="-1" aria-labelledby="inventoryItemModalLabel"
+    <!-- Add Inventory Item Modal -->
+    <div class="modal fade" id="addInventoryItemModal" tabindex="-1" aria-labelledby="addInventoryItemModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-fullscreen">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title" id="inventoryItemModalLabel">Create Inventory Item</h1>
+                    <h1 class="modal-title" id="addInventoryItemModalLabel">Create Inventory Item</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="inventoryItemForm" method="POST" action="{{ route('admin.inventory-report.store') }}"
+                    <form id="addInventoryItemForm" method="POST" action="{{ route('admin.inventory-report.store') }}"
                         class="company-form">
                         @csrf
                         <div class="row mx-0">
@@ -261,7 +261,7 @@
                                 <div class="form-group">
                                     <label class="form-label">Item name</label>
                                     <span class="text-danger">*</span>
-                                    <input type="text" name="name" id="item-name" placeholder="Name" class="form-control"
+                                    <input type="text" name="name" id="add-item-name" placeholder="Name" class="form-control"
                                         required />
                                 </div>
                             </div>
@@ -269,7 +269,7 @@
                                 <div class="form-group">
                                     <label class="form-label">Office Location</label>
                                     <span class="text-danger">*</span>
-                                    <input type="text" name="office" id="item-office" value="Lubbock, TX"
+                                    <input type="text" name="office" id="add-item-office" value="Lubbock, TX"
                                         placeholder="Office location" class="form-control" required />
                                 </div>
                             </div>
@@ -277,14 +277,14 @@
                                 <div class="form-group">
                                     <label class="form-label">Report Date</label>
                                     <span class="text-danger">*</span>
-                                    <input type="date" name="report_date" id="item-report-date" class="form-control"
+                                    <input type="date" name="report_date" id="add-item-report-date" class="form-control"
                                         value="{{ date('Y-m-d') }}" required />
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label class="form-label">Inventory Level</label>
-                                    <input type="number" step="any" min="0" name="inventory_val" id="item-inventory-val"
+                                    <input type="number" step="any" min="0" name="inventory_val" id="add-item-inventory-val"
                                         placeholder="0.00" class="form-control" />
                                 </div>
                             </div>
@@ -292,34 +292,124 @@
                                 <div class="form-group">
                                     <label class="form-label">Reorder Point</label>
                                     <input type="number" step="any" min="0" name="reorder_point_val"
-                                        id="item-reorder-point-val" placeholder="0.00" class="form-control" />
+                                        id="add-item-reorder-point-val" placeholder="0.00" class="form-control" />
                                 </div>
                             </div>
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Unit</label>
-                                    <input type="text" name="unit" id="item-unit" placeholder="e.g. Eaches"
+                                    <input type="text" name="unit" id="add-item-unit" placeholder="e.g. Eaches"
                                         class="form-control" />
                                 </div>
                             </div>
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Supplier</label>
-                                    <input type="text" name="supplier" id="item-supplier" placeholder="Supplier name"
+                                    <input type="text" name="supplier" id="add-item-supplier" placeholder="Supplier name"
                                         class="form-control" />
                                 </div>
                             </div>
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Actions Needed (Custom Alert Text)</label>
-                                    <input type="text" name="actions" id="item-actions"
+                                    <input type="text" name="actions" id="add-item-actions"
                                         placeholder="Leave blank for auto-generated warning message" class="form-control" />
                                 </div>
                             </div>
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Notes</label>
-                                    <textarea name="notes" id="item-notes" class="form-control" rows="3"
+                                    <textarea name="notes" id="add-item-notes" class="form-control" rows="3"
+                                        placeholder="Write any notes here..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Inventory Item Modal -->
+    <div class="modal fade" id="editInventoryItemModal" tabindex="-1" aria-labelledby="editInventoryItemModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="editInventoryItemModalLabel">Edit Inventory Item</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editInventoryItemForm" method="POST" action="" class="company-form">
+                        @csrf
+                        <div class="row mx-0">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Item name</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="text" name="name" id="edit-item-name" placeholder="Name" class="form-control"
+                                        required />
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Office Location</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="text" name="office" id="edit-item-office" value="Lubbock, TX"
+                                        placeholder="Office location" class="form-control" required />
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Report Date</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="date" name="report_date" id="edit-item-report-date" class="form-control"
+                                        value="{{ date('Y-m-d') }}" required />
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-label">Inventory Level</label>
+                                    <input type="number" step="any" min="0" name="inventory_val" id="edit-item-inventory-val"
+                                        placeholder="0.00" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-label">Reorder Point</label>
+                                    <input type="number" step="any" min="0" name="reorder_point_val"
+                                        id="edit-item-reorder-point-val" placeholder="0.00" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Unit</label>
+                                    <input type="text" name="unit" id="edit-item-unit" placeholder="e.g. Eaches"
+                                        class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Supplier</label>
+                                    <input type="text" name="supplier" id="edit-item-supplier" placeholder="Supplier name"
+                                        class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Actions Needed (Custom Alert Text)</label>
+                                    <input type="text" name="actions" id="edit-item-actions"
+                                        placeholder="Leave blank for auto-generated warning message" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Notes</label>
+                                    <textarea name="notes" id="edit-item-notes" class="form-control" rows="3"
                                         placeholder="Write any notes here..."></textarea>
                                 </div>
                             </div>
@@ -343,12 +433,10 @@
         let activeItemData = {};
 
         function openCreateModal() {
-            $('#inventoryItemModalLabel').text('Create Inventory Item');
-            $('#inventoryItemForm').attr('action', "{{ route('admin.inventory-report.store') }}");
-            $('#inventoryItemForm')[0].reset();
-            $('#item-report-date').val("{{ date('Y-m-d') }}");
-            $('#item-office').val('Lubbock, TX');
-            $('#inventoryItemModal').modal('show');
+            $('#addInventoryItemForm')[0].reset();
+            $('#add-item-report-date').val("{{ date('Y-m-d') }}");
+            $('#add-item-office').val('Lubbock, TX');
+            $('#addInventoryItemModal').modal('show');
         }
 
         $(document).ready(function () {
@@ -408,27 +496,26 @@
                 const actions = $(this).data('actions');
                 const notes = $(this).data('notes');
 
-                $('#inventoryItemModalLabel').text('Edit Inventory Item');
-                $('#inventoryItemForm').attr('action', `/admin/inventory-report/${id}/update`);
+                $('#editInventoryItemForm').attr('action', `/admin/inventory-report/${id}/update`);
 
                 // Fill fields
-                $('#item-name').val(name);
-                $('#item-office').val(office);
-                $('#item-report-date').val(date);
-                $('#item-inventory-val').val(inv);
-                $('#item-reorder-point-val').val(reorder);
-                $('#item-unit').val(unit);
-                $('#item-supplier').val(supplier);
-                $('#item-actions').val(actions);
-                $('#item-notes').val(notes);
+                $('#edit-item-name').val(name);
+                $('#edit-item-office').val(office);
+                $('#edit-item-report-date').val(date);
+                $('#edit-item-inventory-val').val(inv);
+                $('#edit-item-reorder-point-val').val(reorder);
+                $('#edit-item-unit').val(unit);
+                $('#edit-item-supplier').val(supplier);
+                $('#edit-item-actions').val(actions);
+                $('#edit-item-notes').val(notes);
 
-                $('#inventoryItemModal').modal('show');
+                $('#editInventoryItemModal').modal('show');
             });
 
             // ==========================================
             // Validation & Form Submission (AJAX)
             // ==========================================
-            $("#inventoryItemForm").validate({
+            let validationConfig = {
                 rules: {
                     name: { required: true },
                     office: { required: true },
@@ -450,21 +537,26 @@
                 errorPlacement: function(error, element) {
                     error.insertAfter(element);
                 }
-            });
+            };
 
-            $('#inventoryItemForm').submit(function(e) {
+            $("#addInventoryItemForm").validate(validationConfig);
+            $("#editInventoryItemForm").validate(validationConfig);
+
+            $('#addInventoryItemForm, #editInventoryItemForm').submit(function(e) {
                 e.preventDefault();
 
                 if (!$(this).valid()) {
                     return;
                 }
 
+                const modalId = $(this).closest('.modal').attr('id');
+
                 $.ajax({
                     url: $(this).attr('action'),
                     method: 'POST',
                     data: $(this).serialize(),
                     success: function(response) {
-                        $('#inventoryItemModal').modal('hide');
+                        $('#' + modalId).modal('hide');
                         toastr.success(response.message || 'Saved successfully!');
                         setTimeout(() => location.reload(), 1000);
                     },
