@@ -4,6 +4,48 @@
 
 @push('styles')
     <style>
+        /* Section Cards */
+        .section-card {
+            background: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 16px !important;
+            padding: 25px !important;
+            margin-bottom: 25px !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .section-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
+        }
+
+        /* Status Pills styling */
+        .status-pill {
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            padding: 4px 10px !important;
+            border-radius: 20px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 4px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            border: 1px solid transparent !important;
+        }
+
+        .status-pill-due {
+            background-color: rgba(234, 61, 47, 0.12) !important;
+            color: #ea3d2f !important;
+            border-color: rgba(234, 61, 47, 0.2) !important;
+        }
+
+        .status-pill-completed {
+            background-color: rgba(111, 66, 193, 0.12) !important;
+            color: #6f42c1 !important;
+            border-color: rgba(111, 66, 193, 0.2) !important;
+        }
+
         .cursor-pointer {
             cursor: pointer !important;
         }
@@ -84,79 +126,6 @@
             vertical-align: middle;
         }
 
-        /* Equipment Report Table Boxed Styling (from Equipment Report page) */
-        .equipment-report-table {
-            border: 1px solid #e5e7eb !important;
-            border-radius: 12px !important;
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
-            overflow: hidden !important;
-            background: #fff !important;
-            width: 100% !important;
-            margin-top: 10px !important;
-        }
-
-        .equipment-report-table thead th {
-            background-color: rgba(255, 184, 28, 0.4) !important;
-            border-bottom: 1px solid #e5e7eb !important;
-            color: #374151 !important;
-            font-weight: 600 !important;
-            padding: 18px 20px !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-        }
-
-        .equipment-report-table thead th:first-child {
-            border-top-left-radius: 12px !important;
-        }
-
-        .equipment-report-table thead th:last-child {
-            border-top-right-radius: 12px !important;
-            border-right: none !important;
-        }
-
-        .equipment-report-table td {
-            padding: 15px 20px !important;
-            vertical-align: middle !important;
-            border-bottom: 1px solid #f3f4f6 !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-        }
-
-        .equipment-report-table td:last-child {
-            border-right: none !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td {
-            border-bottom: none !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td:first-child {
-            border-bottom-left-radius: 12px !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td:last-child {
-            border-bottom-right-radius: 12px !important;
-        }
-
-        /* Status Badge (from Equipment Report page) */
-        .status-pill {
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 12px;
-            display: inline-block;
-        }
-
-        .status-pill-due {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        .status-pill-completed {
-            background: #eef2ff;
-            color: #4f46e5;
-        }
 
         /* ============================================================ */
         /* Timeline History Styles (from index.blade.php) */
@@ -356,6 +325,13 @@
                             @endcan
                         </div>
 
+                        <div class="alert alert-info d-flex align-items-center mb-4 mx-4" role="alert" style="border-radius: 12px; font-size: 14px; background-color: #e0f2fe; border-color: #bae6fd; color: #0369a1;">
+                            <i class="fas fa-info-circle me-3" style="font-size: 20px;"></i>
+                            <div>
+                                <strong>How it works:</strong> The "Complete" button will automatically reappear when the task is due again, based on its <strong>Service Frequency</strong> (e.g., Daily tasks will become due again at midnight).
+                            </div>
+                        </div>
+
                         <!-- TABS (matching Equipment Report layouts) -->
                         <div class="navbar-tabs px-4">
                             <nav class="nav nav-tabs mb-0 w-100 nav-fill" role="tablist">
@@ -384,406 +360,631 @@
 
                             <!-- GENERAL TAB -->
                             <div class="tab-pane fade show active" id="general">
-                                <div class="table-responsive">
-                                    <table id="generalTable" class="table table-hover w-100 equipment-report-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Duty / Activity</th>
-                                                <th>Frequency</th>
-                                                <th>Last Performed</th>
-                                                <th>Notes</th>
-                                                <th>Status</th>
-                                                <th class="text-center" style="width: 250px;"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($generalTasks as $duty)
-                                                <tr data-id="{{ $duty->id }}"
-                                                    data-title="{{ $duty->title }}"
-                                                    data-description="{{ $duty->description }}"
-                                                    data-supplier="{{ $duty->supplier }}"
-                                                    data-unit-of-measure="{{ $duty->unit_of_measure }}"
-                                                    data-reorder-point="{{ $duty->reorder_point }}"
-                                                    data-reorder-quantity="{{ $duty->reorder_quantity }}"
-                                                    data-frequency="{{ $duty->frequency }}"
-                                                    data-frequency-text="{{ $duty->frequency_text }}"
-                                                    data-form-type="{{ $duty->form_type }}"
-                                                    data-form-type-text="{{ $duty->form_type_text }}"
-                                                    data-vehicle-id="{{ $duty->vehicle_id }}"
-                                                    data-last-performed-by="{{ $duty->last_performed_by }}"
-                                                    data-last-performed-on="{{ $duty->last_performed_on }}"
-                                                    data-notes="{{ $duty->notes }}"
-                                                    data-due="{{ $duty->due ? 'true' : 'false' }}">
-                                                    <td class="align-middle">
-                                                        <span class="fw-semibold text-dark" style="font-size: 15px;">{{ $duty->title }}</span>
-                                                    </td>
-                                                    <td class="align-middle">{{ $duty->frequency_text }}</td>
-                                                    <td class="align-middle">
-                                                        {{ $duty->last_performed_by ? $duty->last_performed_by . ' (' . $duty->last_performed_on . ')' : '-' }}
-                                                    </td>
-                                                    <td class="align-middle text-start">
-                                                        <button class="btn btn-sm btn-outline-dark btn-view-notes" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}">
-                                                            View Notes
-                                                        </button>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        @can('warehouse.add')
-                                                            @if($duty->due)
-                                                                <span class="status-pill status-pill-due cursor-pointer btn-duty-complete" data-id="{{ $duty->id }}">Due</span>
-                                                            @else
-                                                                <span class="status-pill status-pill-completed cursor-pointer btn-duty-reset" data-id="{{ $duty->id }}">Completed</span>
-                                                            @endif
+                                <div class="pb-4 text-start">
+                                    @forelse($generalTasks as $duty)
+                                        <div class="section-card mt-3 duty-card"
+                                            data-id="{{ $duty->id }}"
+                                            data-title="{{ $duty->title }}"
+                                            data-description="{{ $duty->description }}"
+                                            data-supplier="{{ $duty->supplier }}"
+                                            data-unit-of-measure="{{ $duty->unit_of_measure }}"
+                                            data-reorder-point="{{ $duty->reorder_point }}"
+                                            data-reorder-quantity="{{ $duty->reorder_quantity }}"
+                                            data-frequency="{{ $duty->frequency }}"
+                                            data-frequency-text="{{ $duty->frequency_text }}"
+                                            data-form-type="{{ $duty->form_type }}"
+                                            data-form-type-text="{{ $duty->form_type_text }}"
+                                            data-vehicle-id="{{ $duty->vehicle_id }}"
+                                            data-last-performed-by="{{ $duty->last_performed_by }}"
+                                            data-last-performed-on="{{ $duty->last_performed_on }}"
+                                            data-notes="{{ $duty->notes }}"
+                                            data-due="{{ $duty->due ? 'true' : 'false' }}">
+                                            
+                                            <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
+                                                <div class="d-flex flex-column align-items-start">
+                                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                                        @if($duty->due)
+                                                            <span class="status-pill status-pill-due">Due</span>
                                                         @else
-                                                            @if($duty->due)
-                                                                <span class="status-pill status-pill-due">Due</span>
-                                                            @else
-                                                                <span class="status-pill status-pill-completed">Completed</span>
-                                                            @endif
-                                                        @endcan
-                                                    </td>
-                                                    <td class="text-center align-middle">
-                                                        <button class="btn btn-sm btn-outline-dark me-2 btn-duty-complete-btn" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ $duty->due && auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
-                                                            {{ $duty->due ? 'Complete' : 'Done' }}
+                                                            <span class="status-pill status-pill-completed">Completed</span>
+                                                        @endif
+                                                        <h4 class="mb-0" style="font-size: 18px; color: #111827;">
+                                                            {{ $duty->title }}
+                                                        </h4>
+                                                    </div>
+                                                    <div class="text-muted small mt-1">
+                                                        Frequency: <span class="fw-semibold text-dark">{{ $duty->frequency_text }}</span> | 
+                                                        Last Performed: <span class="fw-semibold text-dark">{{ $duty->last_performed_by ? $duty->last_performed_by . ' (' . $duty->last_performed_on . ')' : '-' }}</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-outline-primary view-more-btn py-1 px-3" style="border-radius: 6px;" data-target="details-duty-{{ $duty->id }}">
+                                                            View More
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-dark btn-duty-settings" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
-                                                            Settings
+                                                        @if($duty->due)
+                                                        <button class="btn btn-outline-success btn-duty-complete-btn py-1 px-3" style="border-radius: 6px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
+                                                            Complete
                                                         </button>
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center text-muted py-5">
-                                                        <i class="fas fa-clipboard-list fa-2x mb-2 text-secondary d-block"></i>
-                                                        No duties registered in this category.
-                                                    </td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
+                                                        @endif
+                                                        <button class="btn btn-outline-warning btn-duty-settings py-1 px-3" style="border-radius: 6px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
+                                                            Edit
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <h6 class="text-uppercase text-secondary fw-bold mb-2" style="font-size: 11px; letter-spacing: 0.5px;">Description</h6>
+                                                <div class="text-dark" style="font-size: 16px; color: #374151; line-height: 1.5;">
+                                                    {{ $duty->description ?? 'No description provided.' }}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row g-3">
+                                                @if($duty->supplier)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Supplier</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->supplier }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->unit_of_measure)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Unit of Measure</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->unit_of_measure }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->reorder_point)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Reorder Point</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->reorder_point }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->reorder_quantity)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Reorder Quantity</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->reorder_quantity }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->vehicle_id && $duty->vehicle)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Vehicle</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->vehicle->name ?? 'N/A' }}</div>
+                                                </div>
+                                                @endif
+                                            </div>
+
+                                            <!-- Expandable History Details -->
+                                            <div id="details-duty-{{ $duty->id }}" class="mt-4 pt-3 border-top" style="display: none;">
+                                                <h6 class="fw-bold mb-3" style="font-size: 14px; color: #4b5563;">Completion History:</h6>
+                                                @if($duty->completions->isEmpty())
+                                                    <p class="text-muted mb-0" style="font-size: 14px;">No completion records found.</p>
+                                                @else
+                                                    <ul class="list-group list-group-flush border rounded bg-white">
+                                                        @foreach($duty->completions as $record)
+                                                            <li class="list-group-item p-3 border-0 border-bottom">
+                                                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                                                    <span class="fw-bold text-dark" style="font-size: 14px;">{{ $record->user->name ?? 'Unknown User' }}</span>
+                                                                    <span class="badge bg-light text-secondary rounded-pill px-2 py-1" style="font-size: 12px; border: 1px solid #e5e7eb;">{{ $record->completed_at->format('M d, Y h:i A') }}</span>
+                                                                </div>
+                                                                @if($record->notes)
+                                                                    <div class="text-muted mt-2" style="font-size: 13px;">{{ $record->notes }}</div>
+                                                                @endif
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="text-center py-4 text-muted">
+                                            <i class="fas fa-clipboard-list fa-2x mb-2 text-secondary d-block"></i>
+                                            No duties registered in this category.
+                                        </div>
+                                    @endforelse
                                 </div>
                             </div>
 
                             <!-- DATA TAB -->
                             <div class="tab-pane fade" id="data">
-                                <div class="table-responsive">
-                                    <table id="dataTable" class="table table-hover w-100 equipment-report-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Duty / Activity</th>
-                                                <th>Frequency</th>
-                                                <th>Last Performed</th>
-                                                <th>Notes</th>
-                                                <th>Status</th>
-                                                <th class="text-center" style="width: 250px;"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($dataTasks as $duty)
-                                                <tr data-id="{{ $duty->id }}"
-                                                    data-title="{{ $duty->title }}"
-                                                    data-description="{{ $duty->description }}"
-                                                    data-supplier="{{ $duty->supplier }}"
-                                                    data-unit-of-measure="{{ $duty->unit_of_measure }}"
-                                                    data-reorder-point="{{ $duty->reorder_point }}"
-                                                    data-reorder-quantity="{{ $duty->reorder_quantity }}"
-                                                    data-frequency="{{ $duty->frequency }}"
-                                                    data-frequency-text="{{ $duty->frequency_text }}"
-                                                    data-form-type="{{ $duty->form_type }}"
-                                                    data-form-type-text="{{ $duty->form_type_text }}"
-                                                    data-vehicle-id="{{ $duty->vehicle_id }}"
-                                                    data-last-performed-by="{{ $duty->last_performed_by }}"
-                                                    data-last-performed-on="{{ $duty->last_performed_on }}"
-                                                    data-notes="{{ $duty->notes }}"
-                                                    data-due="{{ $duty->due ? 'true' : 'false' }}">
-                                                    <td class="align-middle">
-                                                        <span class="fw-semibold text-dark" style="font-size: 15px;">{{ $duty->title }}</span>
-                                                    </td>
-                                                    <td class="align-middle">{{ $duty->frequency_text }}</td>
-                                                    <td class="align-middle">
-                                                        {{ $duty->last_performed_by ? $duty->last_performed_by . ' (' . $duty->last_performed_on . ')' : '-' }}
-                                                    </td>
-                                                    <td class="align-middle text-start">
-                                                        <button class="btn btn-sm btn-outline-dark btn-view-notes" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}">
-                                                            View Notes
-                                                        </button>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        @can('warehouse.add')
-                                                            @if($duty->due)
-                                                                <span class="status-pill status-pill-due cursor-pointer btn-duty-complete" data-id="{{ $duty->id }}">Due</span>
-                                                            @else
-                                                                <span class="status-pill status-pill-completed cursor-pointer btn-duty-reset" data-id="{{ $duty->id }}">Completed</span>
-                                                            @endif
+                                <div class="pb-4 text-start">
+                                    @forelse($dataTasks as $duty)
+                                        <div class="section-card mt-3 duty-card"
+                                            data-id="{{ $duty->id }}"
+                                            data-title="{{ $duty->title }}"
+                                            data-description="{{ $duty->description }}"
+                                            data-supplier="{{ $duty->supplier }}"
+                                            data-unit-of-measure="{{ $duty->unit_of_measure }}"
+                                            data-reorder-point="{{ $duty->reorder_point }}"
+                                            data-reorder-quantity="{{ $duty->reorder_quantity }}"
+                                            data-frequency="{{ $duty->frequency }}"
+                                            data-frequency-text="{{ $duty->frequency_text }}"
+                                            data-form-type="{{ $duty->form_type }}"
+                                            data-form-type-text="{{ $duty->form_type_text }}"
+                                            data-vehicle-id="{{ $duty->vehicle_id }}"
+                                            data-last-performed-by="{{ $duty->last_performed_by }}"
+                                            data-last-performed-on="{{ $duty->last_performed_on }}"
+                                            data-notes="{{ $duty->notes }}"
+                                            data-due="{{ $duty->due ? 'true' : 'false' }}">
+                                            
+                                            <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
+                                                <div class="d-flex flex-column align-items-start">
+                                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                                        @if($duty->due)
+                                                            <span class="status-pill status-pill-due">Due</span>
                                                         @else
-                                                            @if($duty->due)
-                                                                <span class="status-pill status-pill-due">Due</span>
-                                                            @else
-                                                                <span class="status-pill status-pill-completed">Completed</span>
-                                                            @endif
-                                                        @endcan
-                                                    </td>
-                                                    <td class="text-center align-middle">
-                                                        <button class="btn btn-sm btn-outline-dark me-2 btn-duty-complete-btn" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ $duty->due && auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
-                                                            {{ $duty->due ? 'Complete' : 'Done' }}
+                                                            <span class="status-pill status-pill-completed">Completed</span>
+                                                        @endif
+                                                        <h4 class="mb-0" style="font-size: 18px; color: #111827;">
+                                                            {{ $duty->title }}
+                                                        </h4>
+                                                    </div>
+                                                    <div class="text-muted small mt-1">
+                                                        Frequency: <span class="fw-semibold text-dark">{{ $duty->frequency_text }}</span> | 
+                                                        Last Performed: <span class="fw-semibold text-dark">{{ $duty->last_performed_by ? $duty->last_performed_by . ' (' . $duty->last_performed_on . ')' : '-' }}</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-outline-primary view-more-btn py-1 px-3" style="border-radius: 6px;" data-target="details-duty-{{ $duty->id }}">
+                                                            View More
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-dark btn-duty-settings" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
-                                                            Settings
+                                                        @if($duty->due)
+                                                        <button class="btn btn-outline-success btn-duty-complete-btn py-1 px-3" style="border-radius: 6px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
+                                                            Complete
                                                         </button>
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center text-muted py-5">
-                                                        <i class="fas fa-clipboard-list fa-2x mb-2 text-secondary d-block"></i>
-                                                        No duties registered in this category.
-                                                    </td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
+                                                        @endif
+                                                        <button class="btn btn-outline-warning btn-duty-settings py-1 px-3" style="border-radius: 6px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
+                                                            Edit
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <h6 class="text-uppercase text-secondary fw-bold mb-2" style="font-size: 11px; letter-spacing: 0.5px;">Description</h6>
+                                                <div class="text-dark" style="font-size: 16px; color: #374151; line-height: 1.5;">
+                                                    {{ $duty->description ?? 'No description provided.' }}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row g-3">
+                                                @if($duty->supplier)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Supplier</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->supplier }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->unit_of_measure)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Unit of Measure</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->unit_of_measure }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->reorder_point)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Reorder Point</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->reorder_point }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->reorder_quantity)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Reorder Quantity</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->reorder_quantity }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->vehicle_id && $duty->vehicle)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Vehicle</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->vehicle->name ?? 'N/A' }}</div>
+                                                </div>
+                                                @endif
+                                            </div>
+
+                                            <!-- Expandable History Details -->
+                                            <div id="details-duty-{{ $duty->id }}" class="mt-4 pt-3 border-top" style="display: none;">
+                                                <h6 class="fw-bold mb-3" style="font-size: 14px; color: #4b5563;">Completion History:</h6>
+                                                @if($duty->completions->isEmpty())
+                                                    <p class="text-muted mb-0" style="font-size: 14px;">No completion records found.</p>
+                                                @else
+                                                    <ul class="list-group list-group-flush border rounded bg-white">
+                                                        @foreach($duty->completions as $record)
+                                                            <li class="list-group-item p-3 border-0 border-bottom">
+                                                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                                                    <span class="fw-bold text-dark" style="font-size: 14px;">{{ $record->user->name ?? 'Unknown User' }}</span>
+                                                                    <span class="badge bg-light text-secondary rounded-pill px-2 py-1" style="font-size: 12px; border: 1px solid #e5e7eb;">{{ $record->completed_at->format('M d, Y h:i A') }}</span>
+                                                                </div>
+                                                                @if($record->notes)
+                                                                    <div class="text-muted mt-2" style="font-size: 13px;">{{ $record->notes }}</div>
+                                                                @endif
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="text-center py-4 text-muted">
+                                            <i class="fas fa-clipboard-list fa-2x mb-2 text-secondary d-block"></i>
+                                            No duties registered in this category.
+                                        </div>
+                                    @endforelse
                                 </div>
                             </div>
 
                             <!-- VEHICLE TAB -->
                             <div class="tab-pane fade" id="vehicle">
-                                <div class="table-responsive">
-                                    <table id="vehicleTable" class="table table-hover w-100 equipment-report-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Duty / Activity</th>
-                                                <th>Frequency</th>
-                                                <th>Last Performed</th>
-                                                <th>Notes</th>
-                                                <th>Status</th>
-                                                <th class="text-center" style="width: 250px;"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($vehicleTasks as $duty)
-                                                <tr data-id="{{ $duty->id }}"
-                                                    data-title="{{ $duty->title }}"
-                                                    data-description="{{ $duty->description }}"
-                                                    data-supplier="{{ $duty->supplier }}"
-                                                    data-unit-of-measure="{{ $duty->unit_of_measure }}"
-                                                    data-reorder-point="{{ $duty->reorder_point }}"
-                                                    data-reorder-quantity="{{ $duty->reorder_quantity }}"
-                                                    data-frequency="{{ $duty->frequency }}"
-                                                    data-frequency-text="{{ $duty->frequency_text }}"
-                                                    data-form-type="{{ $duty->form_type }}"
-                                                    data-form-type-text="{{ $duty->form_type_text }}"
-                                                    data-vehicle-id="{{ $duty->vehicle_id }}"
-                                                    data-last-performed-by="{{ $duty->last_performed_by }}"
-                                                    data-last-performed-on="{{ $duty->last_performed_on }}"
-                                                    data-notes="{{ $duty->notes }}"
-                                                    data-due="{{ $duty->due ? 'true' : 'false' }}">
-                                                    <td class="align-middle">
-                                                        <span class="fw-semibold text-dark" style="font-size: 15px;">{{ $duty->title }}</span>
-                                                    </td>
-                                                    <td class="align-middle">{{ $duty->frequency_text }}</td>
-                                                    <td class="align-middle">
-                                                        {{ $duty->last_performed_by ? $duty->last_performed_by . ' (' . $duty->last_performed_on . ')' : '-' }}
-                                                    </td>
-                                                    <td class="align-middle text-start">
-                                                        <button class="btn btn-sm btn-outline-dark btn-view-notes" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}">
-                                                            View Notes
-                                                        </button>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        @can('warehouse.add')
-                                                            @if($duty->due)
-                                                                <span class="status-pill status-pill-due cursor-pointer btn-duty-complete" data-id="{{ $duty->id }}">Due</span>
-                                                            @else
-                                                                <span class="status-pill status-pill-completed cursor-pointer btn-duty-reset" data-id="{{ $duty->id }}">Completed</span>
-                                                            @endif
+                                <div class="pb-4 text-start">
+                                    @forelse($vehicleTasks as $duty)
+                                        <div class="section-card mt-3 duty-card"
+                                            data-id="{{ $duty->id }}"
+                                            data-title="{{ $duty->title }}"
+                                            data-description="{{ $duty->description }}"
+                                            data-supplier="{{ $duty->supplier }}"
+                                            data-unit-of-measure="{{ $duty->unit_of_measure }}"
+                                            data-reorder-point="{{ $duty->reorder_point }}"
+                                            data-reorder-quantity="{{ $duty->reorder_quantity }}"
+                                            data-frequency="{{ $duty->frequency }}"
+                                            data-frequency-text="{{ $duty->frequency_text }}"
+                                            data-form-type="{{ $duty->form_type }}"
+                                            data-form-type-text="{{ $duty->form_type_text }}"
+                                            data-vehicle-id="{{ $duty->vehicle_id }}"
+                                            data-last-performed-by="{{ $duty->last_performed_by }}"
+                                            data-last-performed-on="{{ $duty->last_performed_on }}"
+                                            data-notes="{{ $duty->notes }}"
+                                            data-due="{{ $duty->due ? 'true' : 'false' }}">
+                                            
+                                            <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
+                                                <div class="d-flex flex-column align-items-start">
+                                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                                        @if($duty->due)
+                                                            <span class="status-pill status-pill-due">Due</span>
                                                         @else
-                                                            @if($duty->due)
-                                                                <span class="status-pill status-pill-due">Due</span>
-                                                            @else
-                                                                <span class="status-pill status-pill-completed">Completed</span>
-                                                            @endif
-                                                        @endcan
-                                                    </td>
-                                                    <td class="text-center align-middle">
-                                                        <button class="btn btn-sm btn-outline-dark me-2 btn-duty-complete-btn" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ $duty->due && auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
-                                                            {{ $duty->due ? 'Complete' : 'Done' }}
+                                                            <span class="status-pill status-pill-completed">Completed</span>
+                                                        @endif
+                                                        <h4 class="mb-0" style="font-size: 18px; color: #111827;">
+                                                            {{ $duty->title }}
+                                                        </h4>
+                                                    </div>
+                                                    <div class="text-muted small mt-1">
+                                                        Frequency: <span class="fw-semibold text-dark">{{ $duty->frequency_text }}</span> | 
+                                                        Last Performed: <span class="fw-semibold text-dark">{{ $duty->last_performed_by ? $duty->last_performed_by . ' (' . $duty->last_performed_on . ')' : '-' }}</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-outline-primary view-more-btn py-1 px-3" style="border-radius: 6px;" data-target="details-duty-{{ $duty->id }}">
+                                                            View More
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-dark btn-duty-settings" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
-                                                            Settings
+                                                        @if($duty->due)
+                                                        <button class="btn btn-outline-success btn-duty-complete-btn py-1 px-3" style="border-radius: 6px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
+                                                            Complete
                                                         </button>
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center text-muted py-5">
-                                                        <i class="fas fa-clipboard-list fa-2x mb-2 text-secondary d-block"></i>
-                                                        No duties registered in this category.
-                                                    </td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
+                                                        @endif
+                                                        <button class="btn btn-outline-warning btn-duty-settings py-1 px-3" style="border-radius: 6px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
+                                                            Edit
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <h6 class="text-uppercase text-secondary fw-bold mb-2" style="font-size: 11px; letter-spacing: 0.5px;">Description</h6>
+                                                <div class="text-dark" style="font-size: 16px; color: #374151; line-height: 1.5;">
+                                                    {{ $duty->description ?? 'No description provided.' }}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row g-3">
+                                                @if($duty->supplier)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Supplier</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->supplier }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->unit_of_measure)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Unit of Measure</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->unit_of_measure }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->reorder_point)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Reorder Point</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->reorder_point }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->reorder_quantity)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Reorder Quantity</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->reorder_quantity }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->vehicle_id && $duty->vehicle)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Vehicle</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->vehicle->name ?? 'N/A' }}</div>
+                                                </div>
+                                                @endif
+                                            </div>
+
+                                            <!-- Expandable History Details -->
+                                            <div id="details-duty-{{ $duty->id }}" class="mt-4 pt-3 border-top" style="display: none;">
+                                                <h6 class="fw-bold mb-3" style="font-size: 14px; color: #4b5563;">Completion History:</h6>
+                                                @if($duty->completions->isEmpty())
+                                                    <p class="text-muted mb-0" style="font-size: 14px;">No completion records found.</p>
+                                                @else
+                                                    <ul class="list-group list-group-flush border rounded bg-white">
+                                                        @foreach($duty->completions as $record)
+                                                            <li class="list-group-item p-3 border-0 border-bottom">
+                                                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                                                    <span class="fw-bold text-dark" style="font-size: 14px;">{{ $record->user->name ?? 'Unknown User' }}</span>
+                                                                    <span class="badge bg-light text-secondary rounded-pill px-2 py-1" style="font-size: 12px; border: 1px solid #e5e7eb;">{{ $record->completed_at->format('M d, Y h:i A') }}</span>
+                                                                </div>
+                                                                @if($record->notes)
+                                                                    <div class="text-muted mt-2" style="font-size: 13px;">{{ $record->notes }}</div>
+                                                                @endif
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="text-center py-4 text-muted">
+                                            <i class="fas fa-clipboard-list fa-2x mb-2 text-secondary d-block"></i>
+                                            No duties registered in this category.
+                                        </div>
+                                    @endforelse
                                 </div>
                             </div>
 
                             <!-- TRAILER TAB -->
                             <div class="tab-pane fade" id="trailer">
-                                <div class="table-responsive">
-                                    <table id="trailerTable" class="table table-hover w-100 equipment-report-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Duty / Activity</th>
-                                                <th>Frequency</th>
-                                                <th>Last Performed</th>
-                                                <th>Notes</th>
-                                                <th>Status</th>
-                                                <th class="text-center" style="width: 250px;"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($trailerTasks as $duty)
-                                                <tr data-id="{{ $duty->id }}"
-                                                    data-title="{{ $duty->title }}"
-                                                    data-description="{{ $duty->description }}"
-                                                    data-supplier="{{ $duty->supplier }}"
-                                                    data-unit-of-measure="{{ $duty->unit_of_measure }}"
-                                                    data-reorder-point="{{ $duty->reorder_point }}"
-                                                    data-reorder-quantity="{{ $duty->reorder_quantity }}"
-                                                    data-frequency="{{ $duty->frequency }}"
-                                                    data-frequency-text="{{ $duty->frequency_text }}"
-                                                    data-form-type="{{ $duty->form_type }}"
-                                                    data-form-type-text="{{ $duty->form_type_text }}"
-                                                    data-vehicle-id="{{ $duty->vehicle_id }}"
-                                                    data-last-performed-by="{{ $duty->last_performed_by }}"
-                                                    data-last-performed-on="{{ $duty->last_performed_on }}"
-                                                    data-notes="{{ $duty->notes }}"
-                                                    data-due="{{ $duty->due ? 'true' : 'false' }}">
-                                                    <td class="align-middle">
-                                                        <span class="fw-semibold text-dark" style="font-size: 15px;">{{ $duty->title }}</span>
-                                                    </td>
-                                                    <td class="align-middle">{{ $duty->frequency_text }}</td>
-                                                    <td class="align-middle">
-                                                        {{ $duty->last_performed_by ? $duty->last_performed_by . ' (' . $duty->last_performed_on . ')' : '-' }}
-                                                    </td>
-                                                    <td class="align-middle text-start">
-                                                        <button class="btn btn-sm btn-outline-dark btn-view-notes" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}">
-                                                            View Notes
-                                                        </button>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        @can('warehouse.add')
-                                                            @if($duty->due)
-                                                                <span class="status-pill status-pill-due cursor-pointer btn-duty-complete" data-id="{{ $duty->id }}">Due</span>
-                                                            @else
-                                                                <span class="status-pill status-pill-completed cursor-pointer btn-duty-reset" data-id="{{ $duty->id }}">Completed</span>
-                                                            @endif
+                                <div class="pb-4 text-start">
+                                    @forelse($trailerTasks as $duty)
+                                        <div class="section-card mt-3 duty-card"
+                                            data-id="{{ $duty->id }}"
+                                            data-title="{{ $duty->title }}"
+                                            data-description="{{ $duty->description }}"
+                                            data-supplier="{{ $duty->supplier }}"
+                                            data-unit-of-measure="{{ $duty->unit_of_measure }}"
+                                            data-reorder-point="{{ $duty->reorder_point }}"
+                                            data-reorder-quantity="{{ $duty->reorder_quantity }}"
+                                            data-frequency="{{ $duty->frequency }}"
+                                            data-frequency-text="{{ $duty->frequency_text }}"
+                                            data-form-type="{{ $duty->form_type }}"
+                                            data-form-type-text="{{ $duty->form_type_text }}"
+                                            data-vehicle-id="{{ $duty->vehicle_id }}"
+                                            data-last-performed-by="{{ $duty->last_performed_by }}"
+                                            data-last-performed-on="{{ $duty->last_performed_on }}"
+                                            data-notes="{{ $duty->notes }}"
+                                            data-due="{{ $duty->due ? 'true' : 'false' }}">
+                                            
+                                            <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
+                                                <div class="d-flex flex-column align-items-start">
+                                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                                        @if($duty->due)
+                                                            <span class="status-pill status-pill-due">Due</span>
                                                         @else
-                                                            @if($duty->due)
-                                                                <span class="status-pill status-pill-due">Due</span>
-                                                            @else
-                                                                <span class="status-pill status-pill-completed">Completed</span>
-                                                            @endif
-                                                        @endcan
-                                                    </td>
-                                                    <td class="text-center align-middle">
-                                                        <button class="btn btn-sm btn-outline-dark me-2 btn-duty-complete-btn" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ $duty->due && auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
-                                                            {{ $duty->due ? 'Complete' : 'Done' }}
+                                                            <span class="status-pill status-pill-completed">Completed</span>
+                                                        @endif
+                                                        <h4 class="mb-0" style="font-size: 18px; color: #111827;">
+                                                            {{ $duty->title }}
+                                                        </h4>
+                                                    </div>
+                                                    <div class="text-muted small mt-1">
+                                                        Frequency: <span class="fw-semibold text-dark">{{ $duty->frequency_text }}</span> | 
+                                                        Last Performed: <span class="fw-semibold text-dark">{{ $duty->last_performed_by ? $duty->last_performed_by . ' (' . $duty->last_performed_on . ')' : '-' }}</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-outline-primary view-more-btn py-1 px-3" style="border-radius: 6px;" data-target="details-duty-{{ $duty->id }}">
+                                                            View More
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-dark btn-duty-settings" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
-                                                            Settings
+                                                        @if($duty->due)
+                                                        <button class="btn btn-outline-success btn-duty-complete-btn py-1 px-3" style="border-radius: 6px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
+                                                            Complete
                                                         </button>
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center text-muted py-5">
-                                                        <i class="fas fa-clipboard-list fa-2x mb-2 text-secondary d-block"></i>
-                                                        No duties registered in this category.
-                                                    </td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
+                                                        @endif
+                                                        <button class="btn btn-outline-warning btn-duty-settings py-1 px-3" style="border-radius: 6px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
+                                                            Edit
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <h6 class="text-uppercase text-secondary fw-bold mb-2" style="font-size: 11px; letter-spacing: 0.5px;">Description</h6>
+                                                <div class="text-dark" style="font-size: 16px; color: #374151; line-height: 1.5;">
+                                                    {{ $duty->description ?? 'No description provided.' }}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row g-3">
+                                                @if($duty->supplier)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Supplier</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->supplier }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->unit_of_measure)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Unit of Measure</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->unit_of_measure }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->reorder_point)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Reorder Point</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->reorder_point }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->reorder_quantity)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Reorder Quantity</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->reorder_quantity }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->vehicle_id && $duty->vehicle)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Vehicle</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->vehicle->name ?? 'N/A' }}</div>
+                                                </div>
+                                                @endif
+                                            </div>
+
+                                            <!-- Expandable History Details -->
+                                            <div id="details-duty-{{ $duty->id }}" class="mt-4 pt-3 border-top" style="display: none;">
+                                                <h6 class="fw-bold mb-3" style="font-size: 14px; color: #4b5563;">Completion History:</h6>
+                                                @if($duty->completions->isEmpty())
+                                                    <p class="text-muted mb-0" style="font-size: 14px;">No completion records found.</p>
+                                                @else
+                                                    <ul class="list-group list-group-flush border rounded bg-white">
+                                                        @foreach($duty->completions as $record)
+                                                            <li class="list-group-item p-3 border-0 border-bottom">   
+                                                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                                                    <span class="fw-bold text-dark" style="font-size: 14px;">{{ $record->user->name ?? 'Unknown User' }}</span>
+                                                                    <span class="badge bg-light text-secondary rounded-pill px-2 py-1" style="font-size: 12px; border: 1px solid #e5e7eb;">{{ $record->completed_at->format('M d, Y h:i A') }}</span>
+                                                                </div>
+                                                                @if($record->notes)
+                                                                    <div class="text-muted mt-2" style="font-size: 13px;">{{ $record->notes }}</div>
+                                                                @endif
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="text-center py-4 text-muted">
+                                            <i class="fas fa-clipboard-list fa-2x mb-2 text-secondary d-block"></i>
+                                            No duties registered in this category.
+                                        </div>
+                                    @endforelse
                                 </div>
                             </div>
 
                             <!-- INVENTORY TAB -->
                             <div class="tab-pane fade" id="inventory">
-                                <div class="table-responsive">
-                                    <table id="inventoryTable" class="table table-hover w-100 equipment-report-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Duty / Activity</th>
-                                                <th>Frequency</th>
-                                                <th>Last Performed</th>
-                                                <th>Notes</th>
-                                                <th>Status</th>
-                                                <th class="text-center" style="width: 250px;"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($inventoryTasks as $duty)
-                                                <tr data-id="{{ $duty->id }}"
-                                                    data-title="{{ $duty->title }}"
-                                                    data-description="{{ $duty->description }}"
-                                                    data-supplier="{{ $duty->supplier }}"
-                                                    data-unit-of-measure="{{ $duty->unit_of_measure }}"
-                                                    data-reorder-point="{{ $duty->reorder_point }}"
-                                                    data-reorder-quantity="{{ $duty->reorder_quantity }}"
-                                                    data-frequency="{{ $duty->frequency }}"
-                                                    data-frequency-text="{{ $duty->frequency_text }}"
-                                                    data-form-type="{{ $duty->form_type }}"
-                                                    data-form-type-text="{{ $duty->form_type_text }}"
-                                                    data-vehicle-id="{{ $duty->vehicle_id }}"
-                                                    data-last-performed-by="{{ $duty->last_performed_by }}"
-                                                    data-last-performed-on="{{ $duty->last_performed_on }}"
-                                                    data-notes="{{ $duty->notes }}"
-                                                    data-due="{{ $duty->due ? 'true' : 'false' }}">
-                                                    <td class="align-middle">
-                                                        <span class="fw-semibold text-dark" style="font-size: 15px;">{{ $duty->title }}</span>
-                                                    </td>
-                                                    <td class="align-middle">{{ $duty->frequency_text }}</td>
-                                                    <td class="align-middle">
-                                                        {{ $duty->last_performed_by ? $duty->last_performed_by . ' (' . $duty->last_performed_on . ')' : '-' }}
-                                                    </td>
-                                                    <td class="align-middle text-start">
-                                                        <button class="btn btn-sm btn-outline-dark btn-view-notes" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}">
-                                                            View Notes
-                                                        </button>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        @can('warehouse.add')
-                                                            @if($duty->due)
-                                                                <span class="status-pill status-pill-due cursor-pointer btn-duty-complete" data-id="{{ $duty->id }}">Due</span>
-                                                            @else
-                                                                <span class="status-pill status-pill-completed cursor-pointer btn-duty-reset" data-id="{{ $duty->id }}">Completed</span>
-                                                            @endif
+                                <div class="pb-4 text-start">
+                                    @forelse($inventoryTasks as $duty)
+                                        <div class="section-card mt-3 duty-card"
+                                            data-id="{{ $duty->id }}"
+                                            data-title="{{ $duty->title }}"
+                                            data-description="{{ $duty->description }}"
+                                            data-supplier="{{ $duty->supplier }}"
+                                            data-unit-of-measure="{{ $duty->unit_of_measure }}"
+                                            data-reorder-point="{{ $duty->reorder_point }}"
+                                            data-reorder-quantity="{{ $duty->reorder_quantity }}"
+                                            data-frequency="{{ $duty->frequency }}"
+                                            data-frequency-text="{{ $duty->frequency_text }}"
+                                            data-form-type="{{ $duty->form_type }}"
+                                            data-form-type-text="{{ $duty->form_type_text }}"
+                                            data-vehicle-id="{{ $duty->vehicle_id }}"
+                                            data-last-performed-by="{{ $duty->last_performed_by }}"
+                                            data-last-performed-on="{{ $duty->last_performed_on }}"
+                                            data-notes="{{ $duty->notes }}"
+                                            data-due="{{ $duty->due ? 'true' : 'false' }}">
+                                            
+                                            <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
+                                                <div class="d-flex flex-column align-items-start">
+                                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                                        @if($duty->due)
+                                                            <span class="status-pill status-pill-due">Due</span>
                                                         @else
-                                                            @if($duty->due)
-                                                                <span class="status-pill status-pill-due">Due</span>
-                                                            @else
-                                                                <span class="status-pill status-pill-completed">Completed</span>
-                                                            @endif
-                                                        @endcan
-                                                    </td>
-                                                    <td class="text-center align-middle">
-                                                        <button class="btn btn-sm btn-outline-dark me-2 btn-duty-complete-btn" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ $duty->due && auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
-                                                            {{ $duty->due ? 'Complete' : 'Done' }}
+                                                            <span class="status-pill status-pill-completed">Completed</span>
+                                                        @endif
+                                                        <h4 class="mb-0" style="font-size: 18px; color: #111827;">
+                                                            {{ $duty->title }}
+                                                        </h4>
+                                                    </div>
+                                                    <div class="text-muted small mt-1">
+                                                        Frequency: <span class="fw-semibold text-dark">{{ $duty->frequency_text }}</span> | 
+                                                        Last Performed: <span class="fw-semibold text-dark">{{ $duty->last_performed_by ? $duty->last_performed_by . ' (' . $duty->last_performed_on . ')' : '-' }}</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-outline-primary view-more-btn py-1 px-3" style="border-radius: 6px;" data-target="details-duty-{{ $duty->id }}">
+                                                            View More
                                                         </button>
-                                                        <button class="btn btn-sm btn-outline-dark btn-duty-settings" style="border-radius: 6px; padding: 6px 14px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
-                                                            Settings
+                                                        @if($duty->due)
+                                                        <button class="btn btn-outline-success btn-duty-complete-btn py-1 px-3" style="border-radius: 6px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
+                                                            Complete
                                                         </button>
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center text-muted py-5">
-                                                        <i class="fas fa-clipboard-list fa-2x mb-2 text-secondary d-block"></i>
-                                                        No duties registered in this category.
-                                                    </td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
+                                                        @endif
+                                                        <button class="btn btn-outline-warning btn-duty-settings py-1 px-3" style="border-radius: 6px;" data-id="{{ $duty->id }}" {{ auth()->user()->can('warehouse.add') ? '' : 'disabled' }}>
+                                                            Edit
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <h6 class="text-uppercase text-secondary fw-bold mb-2" style="font-size: 11px; letter-spacing: 0.5px;">Description</h6>
+                                                <div class="text-dark" style="font-size: 16px; color: #374151; line-height: 1.5;">
+                                                    {{ $duty->description ?? 'No description provided.' }}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row g-3">
+                                                @if($duty->supplier)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Supplier</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->supplier }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->unit_of_measure)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Unit of Measure</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->unit_of_measure }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->reorder_point)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Reorder Point</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->reorder_point }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->reorder_quantity)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Reorder Quantity</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->reorder_quantity }}</div>
+                                                </div>
+                                                @endif
+                                                @if($duty->vehicle_id && $duty->vehicle)
+                                                <div class="col-md-3">
+                                                    <div class="text-uppercase text-secondary fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">Vehicle</div>
+                                                    <div class="text-dark" style="font-size: 16px;">{{ $duty->vehicle->name ?? 'N/A' }}</div>
+                                                </div>
+                                                @endif
+                                            </div>
+
+                                            <!-- Expandable History Details -->
+                                            <div id="details-duty-{{ $duty->id }}" class="mt-4 pt-3 border-top" style="display: none;">
+                                                <h6 class="fw-bold mb-3" style="font-size: 14px; color: #4b5563;">Completion History:</h6>
+                                                @if($duty->completions->isEmpty())
+                                                    <p class="text-muted mb-0" style="font-size: 14px;">No completion records found.</p>
+                                                @else
+                                                    <ul class="list-group list-group-flush border rounded bg-white">
+                                                        @foreach($duty->completions as $record)
+                                                            <li class="list-group-item p-3 border-0 border-bottom">
+                                                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                                                    <span class="fw-bold text-dark" style="font-size: 14px;">{{ $record->user->name ?? 'Unknown User' }}</span>
+                                                                    <span class="badge bg-light text-secondary rounded-pill px-2 py-1" style="font-size: 12px; border: 1px solid #e5e7eb;">{{ $record->completed_at->format('M d, Y h:i A') }}</span>
+                                                                </div>
+                                                                @if($record->notes)
+                                                                    <div class="text-muted mt-2" style="font-size: 13px;">{{ $record->notes }}</div>
+                                                                @endif
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="text-center py-4 text-muted">
+                                            <i class="fas fa-clipboard-list fa-2x mb-2 text-secondary d-block"></i>
+                                            No duties registered in this category.
+                                        </div>
+                                    @endforelse
                                 </div>
                             </div>
 
@@ -849,48 +1050,6 @@
                         </div>
                     </form>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================================ -->
-    <!-- MODAL: VIEW NOTES (Equipment Status History Modal Structure) -->
-    <!-- ============================================================ -->
-    <div class="modal fade" id="viewNotesModal" tabindex="-1" aria-labelledby="viewNotesModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content">
-
-                <div class="modal-header d-flex justify-content-between align-items-start">
-                    <div>
-                        <h5 class="modal-title fw-bold text-dark" id="viewNotesModalLabel" style="font-size: 22px;">Duty Description & Notes</h5>
-                        <div id="viewNotesModalSubtitle"></div>
-                    </div>
-                    <button type="button" class="btn-close-circle" data-bs-dismiss="modal">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-
-                <div class="history-labels d-flex">
-                    <div style="width: 55px; margin-right: 25px;"></div> <!-- Icon Spacer -->
-                    <div style="width: 90px;">Date</div>
-                    <div class="flex-grow-1" style="padding: 0 25px;">Note / Status Change</div>
-                    <div style="width: 140px;" class="text-center">Category</div>
-                    <div style="width: 150px;" class="text-end">Performed By</div>
-                </div>
-
-                <div class="modal-body p-0">
-                    <div class="history-timeline-container">
-                        <div class="history-timeline-line"></div>
-                        <div id="viewNotesTimelineBody">
-                            <!-- Dynamically populated -->
-                        </div>
-                    </div>
-                </div>
-
-                <div class="modal-footer border-0">
-                    <button type="button" class="btn-yellow-rounded" data-bs-dismiss="modal">Close</button>
-                </div>
-
             </div>
         </div>
     </div>
@@ -1105,7 +1264,7 @@
                         </div>
 
                         <div class="modal-footer d-flex justify-content-between">
-                            <button type="button" class="btn btn-danger" id="btn-delete-duty">Delete Task</button>
+                            <button type="button" class="btn btn-danger" id="btn-delete-duty">Delete</button>
                             <div>
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                 <button type="submit" class="btn btn-primary">Save changes</button>
@@ -1121,6 +1280,31 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
+            // Handle active tab based on URL query parameter ?tab=...
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
+            
+            if (tabParam) {
+                const targetTab = $('.nav-tabs button[data-bs-target="#' + tabParam + '"]');
+                if (targetTab.length) {
+                    $('.nav-tabs button').removeClass('active');
+                    $('.tab-pane').removeClass('show active');
+                    targetTab.addClass('active');
+                    $('#' + tabParam).addClass('show active');
+                }
+            } 
+            
+            $('button[data-bs-toggle="tab"]').on("click", function() {
+                const targetId = $(this).data("bs-target").substring(1); // remove '#'
+                let newUrl = new URL(window.location.href);
+                if(targetId === "general") {
+                    newUrl.searchParams.delete('tab');
+                } else {
+                    newUrl.searchParams.set('tab', targetId);
+                }
+                history.replaceState(null, null, newUrl.toString());
+            });
+
             // Duties are now read directly from HTML5 data-* attributes on the table rows!
 
             // Simple HTML sanitizer to prevent XSS
@@ -1291,7 +1475,7 @@
             // ==========================================
             $(document).on('click', '.btn-duty-complete, .btn-duty-complete-btn', function() {
                 const id = $(this).data('id');
-                const row = $(`tr[data-id="${id}"]`).first();
+                const row = $(`.duty-card[data-id="${id}"]`).first();
 
                 if (row.length && (row.data('due') === true || row.data('due') === 'true')) {
                     $('#complete-duty-id').val(id);
@@ -1359,97 +1543,12 @@
             });
 
             // ==========================================
-            // ACTION: TRIGGER VIEW NOTES MODAL
+            // ACTION: TOGGLE VIEW MORE DETAILS
             // ==========================================
-            $(document).on('click', '.btn-view-notes', function() {
-                const id = $(this).data('id');
-                const row = $(`tr[data-id="${id}"]`).first();
-
-                if (row.length) {
-                    const title = row.data('title');
-                    const description = row.data('description') || '';
-                    const supplier = row.data('supplier') || '';
-                    const frequencyText = row.data('frequency-text') || '';
-                    const formTypeText = row.data('form-type-text') || '';
-                    const lastPerformedBy = row.data('last-performed-by') || '';
-                    const lastPerformedOn = row.data('last-performed-on') || '';
-                    const notes = row.data('notes') || '';
-                    const formTypeVal = row.data('form-type');
-
-                    // Map category dynamically based on formTypeVal (1=general, 2=data, 3=vehicle, 4=trailer, 5=inventory)
-                    let category = 'General';
-                    if (formTypeVal == 2) category = 'Data';
-                    else if (formTypeVal == 3) category = 'Vehicle';
-                    else if (formTypeVal == 4) category = 'Trailer';
-                    else if (formTypeVal == 5) category = 'Inventory';
-
-                    const descText = description ? `  ·  Description: ${description}` : '';
-                    $('#viewNotesModalSubtitle').html(
-                        `Frequency: ${escapeHtml(frequencyText)}  ·  Form Type: ${escapeHtml(formTypeText)}${escapeHtml(descText)}`
-                    );
-
-                    // Rebuild Timeline Body based on Equipment history timeline architecture
-                    let timelineHtml = '';
-
-                    if (!lastPerformedBy) {
-                        // Empty/unperformed state timeline
-                        timelineHtml = `
-                            <div class="timeline-item">
-                                <div class="timeline-icon" style="background-color: #dc2626;">
-                                    <i class="fas fa-sync-alt"></i>
-                                </div>
-                                <div class="history-card">
-                                    <div class="history-date">
-                                        <div class="text-dark">-</div>
-                                    </div>
-                                    <div class="history-content">
-                                        <div class="history-note text-muted fst-italic">No history records or completion notes logged for this duty yet.</div>
-                                        <div class="history-status-change">
-                                            <span class="status-pill status-pill-due">Due</span>
-                                        </div>
-                                    </div>
-                                    <div class="history-category">
-                                        ${escapeHtml(category)}
-                                    </div>
-                                    <div class="history-user">
-                                        -
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        // Performed state timeline
-                        timelineHtml = `
-                            <div class="timeline-item">
-                                <div class="timeline-icon">
-                                    <i class="fas fa-calendar-check"></i>
-                                </div>
-                                <div class="history-card">
-                                    <div class="history-date">
-                                        <div class="text-dark">${escapeHtml(lastPerformedOn)}</div>
-                                    </div>
-                                    <div class="history-content">
-                                        <div class="history-note" style="white-space: pre-wrap;">${escapeHtml(notes)}</div>
-                                        <div class="history-status-change">
-                                            <span class="status-pill status-pill-due">Due</span>
-                                            <i class="fas fa-long-arrow-alt-right mx-1"></i>
-                                            <span class="status-pill status-pill-completed">Completed</span>
-                                        </div>
-                                    </div>
-                                    <div class="history-category">
-                                        ${escapeHtml(category)}
-                                    </div>
-                                    <div class="history-user">
-                                        ${escapeHtml(lastPerformedBy)}
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    }
-
-                    $('#viewNotesTimelineBody').html(timelineHtml);
-                    $('#viewNotesModal').modal('show');
-                }
+            $(document).on('click', '.view-more-btn', function(e) {
+                e.preventDefault();
+                const targetId = $(this).data('target');
+                $('#' + targetId).slideToggle(200);
             });
 
             // ==========================================
@@ -1563,7 +1662,7 @@
             // ==========================================
             $(document).on('click', '.btn-duty-settings', function() {
                 const id = $(this).data('id');
-                const row = $(`tr[data-id="${id}"]`).first();
+                const row = $(`.duty-card[data-id="${id}"]`).first();
 
                 if (row.length) {
                     $('#edit-duty-id').val(id);

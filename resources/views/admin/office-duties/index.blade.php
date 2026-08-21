@@ -245,7 +245,7 @@
                                         <div class="d-flex flex-column align-items-start">
                                             <div class="d-flex align-items-center gap-2 mb-1">
                                                 <span class="status-pill {{ $statusClass }}">{{ $statusText }}</span>
-                                                <h4 class="mb-0" style="font-size: 18px; font-weight: 600; color: #111827;">
+                                                <h4 class="mb-0" style="font-size: 18px;">
                                                     {{ $duty->title }}
                                                 </h4>
                                             </div>

@@ -163,7 +163,7 @@
                                         <div class="col-lg-7 border-end pe-lg-5">
                                             <form id="createScheduleForm" class="company-form">
                                                 <div class="form-group mb-4">
-                                                    <label for="employee_select" class="form-label">Employee</label>
+                                                    <label for="employee_select" class="form-label">Employee <span class="text-danger">*</span></label>
                                                     <select id="employee_select" name="employee" class="form-select" required>
                                                         <option value="" disabled selected>Select Employee</option>
                                                         @foreach($employees as $emp)
@@ -175,20 +175,20 @@
                                                 <div class="row">
                                                     <div class="col-md-6 mb-4">
                                                         <div class="form-group">
-                                                            <label for="start_time_input" class="form-label">Start Time</label>
+                                                            <label for="start_time_input" class="form-label">Start Time <span class="text-danger">*</span></label>
                                                             <input type="datetime-local" id="start_time_input" name="start_time" class="form-control" required>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6 mb-4">
                                                         <div class="form-group">
-                                                            <label for="end_time_input" class="form-label">End Time</label>
+                                                            <label for="end_time_input" class="form-label">End Time <span class="text-danger">*</span></label>
                                                             <input type="datetime-local" id="end_time_input" name="end_time" class="form-control" required>
                                                         </div>
                                                     </div>
                                                 </div>
 
                                                 <div class="form-group mb-4">
-                                                    <label for="duty_type_select" class="form-label">Type</label>
+                                                    <label for="duty_type_select" class="form-label">Type <span class="text-danger">*</span></label>
                                                     <select id="duty_type_select" name="type" class="form-select" required>
                                                         <option value="1">Regular Service</option>
                                                         <option value="2">Call</option>
@@ -256,6 +256,33 @@
 
                     </div>
 
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Details Modal -->
+    <div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel"
+        data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border: none; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                <div class="modal-header" style="background-color: #fafafa; border-bottom: 1px solid #e5e7eb; padding: 20px 24px;">
+                    <h6 class="modal-title fw-bold text-dark" id="scheduleModalLabel" style="font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px;">
+                        <i class="fa-regular fa-calendar-check me-2 text-warning"></i>
+                        Schedule Details
+                    </h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="scheduleModalBody" style="padding: 24px; font-size: 14px;">
+                    <!-- Loaded dynamically -->
+                </div>
+                <div class="modal-footer d-flex justify-content-between" style="background-color: #fafafa; border-top: 1px solid #e5e7eb; padding: 15px 24px;">
+                    @can('warehouse_calendar.edit')
+                    <button type="button" class="btn btn-outline-danger py-2 px-4 fw-semibold" id="btnDeleteScheduleModal" style="border-radius: 40px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Delete</button>
+                    @else
+                    <div></div>
+                    @endcan
+                    <button type="button" class="btn btn-secondary py-2 px-4 fw-semibold" style="border-radius: 40px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -357,8 +384,43 @@
                     successCallback(fcEvents);
                 },
                 eventClick: function (info) {
-                    // Let user delete schedule instantly by clicking on the calendar event!
-                    deleteSchedule(info.event.id);
+                    const id = info.event.id;
+                    const index = schedules.findIndex(s => s.id == id);
+                    if (index === -1) return;
+                    const scheduleItem = schedules[index];
+
+                    const startObj = new Date(scheduleItem.start);
+                    const endObj = new Date(scheduleItem.end);
+                    const formatStart = startObj.toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+                    const formatEnd = endObj.toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+
+                    const html = `
+                        <div class="mb-3">
+                            <span class="text-muted text-uppercase" style="font-size: 11px; letter-spacing: 0.5px; font-weight: 600;">Employee</span>
+                            <div class="fw-bold text-dark" style="font-size: 16px;">${scheduleItem.employee}</div>
+                        </div>
+                        <div class="mb-3">
+                            <span class="text-muted text-uppercase" style="font-size: 11px; letter-spacing: 0.5px; font-weight: 600;">Type</span>
+                            <div class="text-dark">${scheduleItem.type}</div>
+                        </div>
+                        <div class="mb-3">
+                            <span class="text-muted text-uppercase" style="font-size: 11px; letter-spacing: 0.5px; font-weight: 600;">Start Time</span>
+                            <div class="text-dark">${formatStart}</div>
+                        </div>
+                        <div class="mb-0">
+                            <span class="text-muted text-uppercase" style="font-size: 11px; letter-spacing: 0.5px; font-weight: 600;">End Time</span>
+                            <div class="text-dark">${formatEnd}</div>
+                        </div>
+                    `;
+
+                    $('#scheduleModalBody').html(html);
+
+                    $('#btnDeleteScheduleModal').off('click').on('click', function() {
+                        $('#scheduleModal').modal('hide');
+                        deleteSchedule(id);
+                    });
+
+                    $('#scheduleModal').modal('show');
                 },
                 height: 'auto',
                 aspectRatio: 1.6
@@ -402,7 +464,7 @@
                             dataType: "json",
                             success: function (response) {
                                 if (response.success) {
-                                    toastr.error(`Schedule #${id} has been successfully deleted.`);
+                                    toastr.success(`Schedule #${id} has been successfully deleted.`);
                                     setTimeout(function () {
                                         location.reload();
                                     }, 1000);
@@ -429,9 +491,9 @@
                 }
 
                 const employee = $('#employee_select').val();
-                const startTimeVal = $('#start_time').val();
-                const endTimeVal = $('#end_time').val();
-                const type = $('#schedule_type').val();
+                const startTimeVal = $('#start_time_input').val();
+                const endTimeVal = $('#end_time_input').val();
+                const type = $('#duty_type_select').val();
 
                 if (new Date(startTimeVal) > new Date(endTimeVal)) {
                     toastr.error('Start time must be prior to or equal to end time!');

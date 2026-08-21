@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\WarehouseTask;
+use App\Models\WarehouseTaskCompletion;
 use App\Models\Vehicle;
 use App\Models\WarehouseSchedule;
 use App\Models\User;
@@ -29,11 +30,11 @@ class WarehouseController extends Controller implements HasMiddleware
      */
     public function maintenance()
     {
-        $generalTasks = WarehouseTask::with('vehicle')->where('form_type', 1)->get();
-        $dataTasks = WarehouseTask::with('vehicle')->where('form_type', 2)->get();
-        $vehicleTasks = WarehouseTask::with('vehicle')->where('form_type', 3)->get();
-        $trailerTasks = WarehouseTask::with('vehicle')->where('form_type', 4)->get();
-        $inventoryTasks = WarehouseTask::with('vehicle')->where('form_type', 5)->get();
+        $generalTasks = WarehouseTask::with(['vehicle', 'completions' => fn($q) => $q->with('user')->latest('completed_at')])->where('form_type', 1)->get();
+        $dataTasks = WarehouseTask::with(['vehicle', 'completions' => fn($q) => $q->with('user')->latest('completed_at')])->where('form_type', 2)->get();
+        $vehicleTasks = WarehouseTask::with(['vehicle', 'completions' => fn($q) => $q->with('user')->latest('completed_at')])->where('form_type', 3)->get();
+        $trailerTasks = WarehouseTask::with(['vehicle', 'completions' => fn($q) => $q->with('user')->latest('completed_at')])->where('form_type', 4)->get();
+        $inventoryTasks = WarehouseTask::with(['vehicle', 'completions' => fn($q) => $q->with('user')->latest('completed_at')])->where('form_type', 5)->get();
 
         // Load active vehicles to dynamically populate selection options in Blade form
         $vehicles = Vehicle::where('is_retired', 0)->orderBy('name')->get();
@@ -133,8 +134,14 @@ class WarehouseController extends Controller implements HasMiddleware
         ]);
 
         try {
+            WarehouseTaskCompletion::create([
+                'warehouse_task_id' => $task->id,
+                'user_id' => auth()->id(),
+                'notes' => $validated['notes'],
+                'completed_at' => now(),
+            ]);
+
             $task->update([
-                'due' => false,
                 'last_performed_by' => $validated['last_performed_by'],
                 'last_performed_on' => $validated['last_performed_on'],
                 'notes' => $validated['notes'],
@@ -155,7 +162,11 @@ class WarehouseController extends Controller implements HasMiddleware
     {
         try {
             $task = WarehouseTask::findOrFail($id);
-            $task->update(['due' => true]);
+            
+            $latestCompletion = $task->completions()->latest('completed_at')->first();
+            if ($latestCompletion) {
+                $latestCompletion->delete();
+            }
             
             return response()->json(['success' => true]);
         } catch (\Exception $e) {

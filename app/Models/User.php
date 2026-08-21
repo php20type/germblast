@@ -480,4 +480,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(EvaluationScore::class, 'target_user_id');
     }
+
+    public function warehouseTaskCompletions()
+    {
+        return $this->hasMany(WarehouseTaskCompletion::class, 'user_id');
+    }
 }
