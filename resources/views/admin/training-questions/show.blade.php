@@ -117,7 +117,7 @@
                                                 <td style="text-align: right !important; padding: 20px !important; padding-right: 35px !important;">
                                                     <div class="d-flex justify-content-end align-items-center gap-3">
                                                         @can('training.edit')
-                                                        <a href="#" class="text-action btn-edit" 
+                                                        <a href="#" class="btn btn-outline-primary btn-edit" 
                                                            data-id="{{ $q->id }}"
                                                            data-question="{{ $q->question }}"
                                                            data-question_type="{{ $q->question_type }}"
@@ -126,10 +126,9 @@
                                                            data-marks="{{ $q->marks }}"
                                                            data-sort_order="{{ $q->sort_order }}"
                                                            data-status="{{ $q->status }}"
-                                                           style="font-size: 16px;" 
                                                            data-bs-toggle="modal" 
-                                                           data-bs-target="#createModal">
-                                                            <i class="fa-solid fa-gear"></i>
+                                                           data-bs-target="#editModal">
+                                                            Edit
                                                         </a>
                                                         @endcan
 
@@ -155,8 +154,8 @@
     </div>
 </div>
 
-<!-- Create / Edit Modal -->
-<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content">
             <div class="modal-header">
@@ -171,8 +170,7 @@
                     <div class="row mx-0">
                         <div class="col-lg-12">
                             <div class="form-group">
-                                <label class="form-label">Question Type</label>
-                                <span class="text-danger">*</span>
+                                <label class="form-label">Question Type <span class="text-danger">*</span></label>
                                 <select class="form-select" name="question_type" id="formType" required>
                                     <option value="Single Choice">Single Choice</option>
                                     <option value="Multiple Choice">Multiple Choice</option>
@@ -182,9 +180,8 @@
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group">
-                                <label class="form-label">Question</label>
-                                <span class="text-danger">*</span>
-                                <textarea class="form-control" name="question" id="formQuestion" rows="3" required></textarea>
+                                <label class="form-label">Question <span class="text-danger">*</span></label>
+                                <textarea class="form-control" name="question" id="formQuestion" rows="3" placeholder="e.g. What is the primary purpose of..." required></textarea>
                             </div>
                         </div>
                         
@@ -193,34 +190,34 @@
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <h6 class="mb-0">Options & Correct Answer</h6>
-                                        <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddOption">+ Add Option</button>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddOptionCreate">+ Add Option</button>
                                     </div>
                                     <small class="text-muted d-block mb-3">Select the radio button next to the correct answer.</small>
                                     
-                                    <div id="optionsContainer">
+                                    <div id="createOptionsContainer">
                                         <!-- Dynamic options injected here -->
                                     </div>
-                                    <input type="hidden" name="correct_answer" id="formCorrectAnswer" required>
+                                    <input type="hidden" name="correct_answer" id="formCorrectAnswer">
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label class="form-label">Marks</label>
-                                <input type="number" class="form-control" name="marks" id="formMarks" value="1" min="1" required>
+                                <label class="form-label">Marks <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="marks" id="formMarks" value="1" min="1" placeholder="e.g. 1" required>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label class="form-label">Sort Order</label>
-                                <input type="number" class="form-control" name="sort_order" id="formSortOrder" value="0" required>
+                                <label class="form-label">Sort Order <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="sort_order" id="formSortOrder" value="0" placeholder="e.g. 1" required>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label class="form-label">Status</label>
-                                <select class="form-select" name="status" id="formStatus">
+                                <label class="form-label">Status <span class="text-danger">*</span></label>
+                                <select class="form-select" name="status" id="formStatus" required>
                                     <option value="Active">Active</option>
                                     <option value="Inactive">Inactive</option>
                                 </select>
@@ -229,7 +226,87 @@
                     </div>
                     <div class="modal-footer mt-3">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary" id="btnSave">Save changes</button>
+                        <button type="submit" class="btn btn-primary" id="btnSaveCreate">Save Question</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title" id="editModalLabel">Edit Question</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm" class="company-form" action="" method="POST">
+                    @csrf
+                    <input type="hidden" name="test_id" value="{{ $test->id }}">
+                    
+                    <div class="row mx-0">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Question Type <span class="text-danger">*</span></label>
+                                <select class="form-select" name="question_type" id="editType" required>
+                                    <option value="Single Choice">Single Choice</option>
+                                    <option value="Multiple Choice">Multiple Choice</option>
+                                    <option value="True/False">True/False</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Question <span class="text-danger">*</span></label>
+                                <textarea class="form-control" name="question" id="editQuestion" rows="3" placeholder="e.g. What is the primary purpose of..." required></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-12">
+                            <div class="card bg-light mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0">Options & Correct Answer</h6>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddOptionEdit">+ Add Option</button>
+                                    </div>
+                                    <small class="text-muted d-block mb-3">Select the radio button next to the correct answer.</small>
+                                    
+                                    <div id="editOptionsContainer">
+                                        <!-- Dynamic options injected here -->
+                                    </div>
+                                    <input type="hidden" name="correct_answer" id="editCorrectAnswer">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-label">Marks <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="marks" id="editMarks" value="1" min="1" placeholder="e.g. 1" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-label">Sort Order <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="sort_order" id="editSortOrder" value="0" placeholder="e.g. 1" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-label">Status <span class="text-danger">*</span></label>
+                                <select class="form-select" name="status" id="editStatus" required>
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer mt-3">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="btnSaveEdit">Update Question</button>
                     </div>
                 </form>
             </div>
@@ -242,54 +319,109 @@
 <script>
     $(document).ready(function() {
         
-        function renderOptions(type, options = [], correctAnswer = '') {
-            let container = $('#optionsContainer');
+        const validationConfig = {
+            ignore: [],
+            rules: {
+                question_type: { required: true },
+                question: { required: true },
+                marks: { required: true, min: 1 },
+                sort_order: { required: true },
+                status: { required: true }
+            },
+            messages: {
+                question_type: { required: "Please select a question type." },
+                question: { required: "Please enter the question text." },
+                marks: { required: "Please enter marks.", min: "Marks must be at least 1." },
+                sort_order: { required: "Please enter sort order." },
+                status: { required: "Please select a status." }
+            },
+            errorElement: 'span',
+            errorClass: 'invalid-feedback d-block',
+            highlight: function (element) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function (element) {
+                $(element).removeClass('is-invalid');
+            },
+            errorPlacement: function (error, element) {
+                if (element.closest('.input-group').length) {
+                    error.insertAfter(element.closest('.input-group'));
+                } else if (element.closest('.option-row').length) {
+                    error.insertAfter(element.closest('.option-row'));
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        };
+
+        $("#createForm").validate(validationConfig);
+        $("#editForm").validate(validationConfig);
+
+        function renderOptions(mode, type, options = [], correctAnswer = '') {
+            let container = mode === 'create' ? $('#createOptionsContainer') : $('#editOptionsContainer');
+            let btnAdd = mode === 'create' ? $('#btnAddOptionCreate') : $('#btnAddOptionEdit');
+            
             container.empty();
             
             if (type === 'True/False') {
-                $('#btnAddOption').hide();
+                btnAdd.hide();
                 let opts = ['True', 'False'];
                 opts.forEach(function(opt, index) {
                     let isChecked = (correctAnswer === opt) ? 'checked' : '';
                     let html = `
                     <div class="option-row">
-                        <input class="form-check-input correct-radio" type="radio" name="correct_radio" value="${opt}" ${isChecked} required>
-                        <input type="text" class="form-control" name="options[]" value="${opt}" readonly>
+                        <input class="form-check-input correct-radio" type="radio" name="correct_radio_${mode}" value="${opt}" ${isChecked}>
+                        <input type="text" class="form-control" name="options[${index}]" value="${opt}" readonly>
                     </div>`;
                     container.append(html);
                 });
             } else {
-                $('#btnAddOption').show();
-                if(options.length === 0) options = ['', '']; // Default 2 empty options
+                btnAdd.show();
+                if(options.length === 0) options = ['', ''];
                 
                 options.forEach(function(opt, index) {
                     let isChecked = (correctAnswer === opt && opt !== '') ? 'checked' : '';
                     let html = `
                     <div class="option-row">
-                        <input class="form-check-input correct-radio" type="radio" name="correct_radio" value="${opt}" ${isChecked} required>
-                        <input type="text" class="form-control option-input" name="options[]" value="${opt}" required>
+                        <input class="form-check-input correct-radio" type="radio" name="correct_radio_${mode}" value="${opt}" ${isChecked}>
+                        <input type="text" class="form-control option-input" name="options[${index}]" value="${opt}" placeholder="e.g. Option text" required>
                         <button type="button" class="btn btn-sm btn-outline-danger btn-remove-option"><i class="fa-solid fa-xmark"></i></button>
                     </div>`;
                     container.append(html);
                 });
             }
-            updateCorrectAnswer();
+            updateCorrectAnswer(mode);
         }
 
-        $('#btnAddOption').click(function() {
+        $('#btnAddOptionCreate').click(function() {
+            let uniqueId = Date.now() + Math.floor(Math.random() * 1000);
             let html = `
             <div class="option-row">
-                <input class="form-check-input correct-radio" type="radio" name="correct_radio" value="" required>
-                <input type="text" class="form-control option-input" name="options[]" value="" required>
+                <input class="form-check-input correct-radio" type="radio" name="correct_radio_create" value="">
+                <input type="text" class="form-control option-input" name="options[${uniqueId}]" value="" placeholder="e.g. Option text" required>
                 <button type="button" class="btn btn-sm btn-outline-danger btn-remove-option"><i class="fa-solid fa-xmark"></i></button>
             </div>`;
-            $('#optionsContainer').append(html);
+            $('#createOptionsContainer').append(html);
+        });
+        
+        $('#btnAddOptionEdit').click(function() {
+            let uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+            let html = `
+            <div class="option-row">
+                <input class="form-check-input correct-radio" type="radio" name="correct_radio_edit" value="">
+                <input type="text" class="form-control option-input" name="options[${uniqueId}]" value="" placeholder="e.g. Option text" required>
+                <button type="button" class="btn btn-sm btn-outline-danger btn-remove-option"><i class="fa-solid fa-xmark"></i></button>
+            </div>`;
+            $('#editOptionsContainer').append(html);
         });
 
         $(document).on('click', '.btn-remove-option', function() {
-            if ($('.option-row').length > 2) {
+            let container = $(this).closest('.option-row').parent();
+            let mode = container.attr('id') === 'createOptionsContainer' ? 'create' : 'edit';
+            
+            if (container.find('.option-row').length > 2) {
                 $(this).closest('.option-row').remove();
-                updateCorrectAnswer();
+                updateCorrectAnswer(mode);
             } else {
                 alert('At least two options are required.');
             }
@@ -297,66 +429,88 @@
 
         $(document).on('input', '.option-input', function() {
             let val = $(this).val();
+            let mode = $(this).closest('form').attr('id') === 'createForm' ? 'create' : 'edit';
+            let correctInput = mode === 'create' ? $('#formCorrectAnswer') : $('#editCorrectAnswer');
+            
             $(this).siblings('.correct-radio').val(val);
             if($(this).siblings('.correct-radio').is(':checked')) {
-                $('#formCorrectAnswer').val(val);
+                correctInput.val(val);
             }
         });
 
         $(document).on('change', '.correct-radio', function() {
-            updateCorrectAnswer();
+            let mode = $(this).closest('form').attr('id') === 'createForm' ? 'create' : 'edit';
+            updateCorrectAnswer(mode);
         });
 
-        function updateCorrectAnswer() {
-            let selected = $('.correct-radio:checked').val();
-            $('#formCorrectAnswer').val(selected || '');
+        function updateCorrectAnswer(mode) {
+            let container = mode === 'create' ? $('#createOptionsContainer') : $('#editOptionsContainer');
+            let correctInput = mode === 'create' ? $('#formCorrectAnswer') : $('#editCorrectAnswer');
+            let selected = container.find('.correct-radio:checked').val();
+            correctInput.val(selected || '');
         }
 
         $('#formType').change(function() {
-            renderOptions($(this).val(), [], '');
+            renderOptions('create', $(this).val(), [], '');
+        });
+        
+        $('#editType').change(function() {
+            renderOptions('edit', $(this).val(), [], '');
+        });
+
+        $('#createModal').on('hidden.bs.modal', function () {
+            const validator = $("#createForm").validate();
+            if(validator) validator.resetForm();
+            $('#createForm')[0].reset();
+            $('#createForm .is-invalid').removeClass('is-invalid');
+            $('#createOptionsContainer').empty();
+        });
+
+        $('#editModal').on('hidden.bs.modal', function () {
+            const validator = $("#editForm").validate();
+            if(validator) validator.resetForm();
+            $('#editForm')[0].reset();
+            $('#editForm .is-invalid').removeClass('is-invalid');
+            $('#editOptionsContainer').empty();
         });
 
         $('.btn-create-trigger').on('click', function() {
-            $('#createModalLabel').text('Create New Question');
-            $('#createForm')[0].reset();
-            $('#createForm').attr('action', '{{ route('admin.training-questions.store') }}');
-            renderOptions('Single Choice', [], '');
+            renderOptions('create', 'Single Choice', [], '');
         });
 
         $(document).on('click', '.btn-edit', function() {
             let id = $(this).data('id');
-            $('#createModalLabel').text('Edit Question');
-            $('#formType').val($(this).data('question_type'));
-            $('#formQuestion').val($(this).data('question'));
-            $('#formMarks').val($(this).data('marks'));
-            $('#formSortOrder').val($(this).data('sort_order'));
-            $('#formStatus').val($(this).data('status'));
+            $('#editType').val($(this).data('question_type'));
+            $('#editQuestion').val($(this).data('question'));
+            $('#editMarks').val($(this).data('marks'));
+            $('#editSortOrder').val($(this).data('sort_order'));
+            $('#editStatus').val($(this).data('status'));
             
             let options = $(this).data('options');
             if (typeof options === 'string') {
                 try { options = JSON.parse(options); } catch(e) { options = []; }
             }
             
-            renderOptions($(this).data('question_type'), options, $(this).data('correct_answer'));
+            renderOptions('edit', $(this).data('question_type'), options, $(this).data('correct_answer'));
             
-            $('#createForm').attr('action', '{{ url('admin/training-questions/update') }}/' + id);
+            $('#editForm').attr('action', '{{ url('admin/training-questions/update') }}/' + id);
         });
-        
 
-
-        $('#createForm').on('submit', function(e) {
+        function handleAjaxSubmit(e) {
             e.preventDefault();
-            updateCorrectAnswer();
-            
             const form = $(this);
+            const mode = form.attr('id') === 'createForm' ? 'create' : 'edit';
+            updateCorrectAnswer(mode);
+            
             const submitBtn = form.find('button[type="submit"]');
+            const originalText = submitBtn.text();
 
-            if (!form[0].checkValidity()) {
-                form[0].reportValidity();
+            if (!form.valid()) {
                 return;
             }
 
-            if(!$('#formCorrectAnswer').val()) {
+            let correctInput = mode === 'create' ? $('#formCorrectAnswer') : $('#editCorrectAnswer');
+            if(!correctInput.val()) {
                 toastr.error('Please select a correct answer by checking one of the radio buttons.');
                 return;
             }
@@ -371,20 +525,23 @@
                 success: function(response) {
                     if(response.success) {
                         toastr.success(response.message);
-                        $('#createModal').modal('hide');
+                        form.closest('.modal').modal('hide');
                         setTimeout(() => window.location.reload(), 1000);
                     } else {
                         toastr.error(response.message);
-                        submitBtn.prop('disabled', false).text('Save changes');
+                        submitBtn.prop('disabled', false).text(originalText);
                     }
                 },
                 error: function(xhr) {
                     let msg = xhr.responseJSON?.message || 'Something went wrong.';
                     toastr.error(msg);
-                    submitBtn.prop('disabled', false).text('Save changes');
+                    submitBtn.prop('disabled', false).text(originalText);
                 }
             });
-        });
+        }
+
+        $('#createForm').on('submit', handleAjaxSubmit);
+        $('#editForm').on('submit', handleAjaxSubmit);
     });
 </script>
 @endpush

@@ -98,16 +98,15 @@
                                                 <td style="text-align: right !important; padding: 20px !important; padding-right: 35px !important;">
                                                     <div class="d-flex justify-content-end align-items-center gap-3">
                                                         @can('training.edit')
-                                                        <a href="#" class="text-action btn-edit" 
+                                                        <a href="#" class="btn btn-outline-primary btn-edit" 
                                                            data-id="{{ $category->id }}"
                                                            data-name="{{ $category->name }}"
                                                            data-description="{{ $category->description }}"
                                                            data-sort_order="{{ $category->sort_order }}"
                                                            data-status="{{ $category->status }}"
-                                                           style="font-size: 16px;" 
                                                            data-bs-toggle="modal" 
-                                                           data-bs-target="#createModal">
-                                                            <i class="fa-solid fa-gear"></i>
+                                                           data-bs-target="#editModal">
+                                                            Edit
                                                         </a>
                                                         @endcan
 
@@ -127,7 +126,7 @@
     </div>
 </div>
 
-<!-- Create / Edit Modal -->
+<!-- Create Modal -->
 <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content">
@@ -141,27 +140,26 @@
                     <div class="row mx-0">
                         <div class="col-lg-12">
                             <div class="form-group">
-                                <label class="form-label">Name</label>
-                                <span class="text-danger">*</span>
-                                <input type="text" class="form-control" name="name" id="formName" required>
+                                <label class="form-label">Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="name" id="formName" placeholder="e.g. Safety Training, Orientation" required>
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group">
-                                <label class="form-label">Description</label>
-                                <textarea class="form-control" name="description" id="formDescription" rows="4"></textarea>
+                                <label class="form-label">Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" name="description" id="formDescription" rows="4" placeholder="e.g. Mandatory safety protocols for new employees..." required></textarea>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
-                                <label class="form-label">Sort Order</label>
-                                <input type="number" class="form-control" name="sort_order" id="formSortOrder" value="0">
+                                <label class="form-label">Sort Order <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="sort_order" id="formSortOrder" value="0" placeholder="e.g. 1" required>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
-                                <label class="form-label">Status</label>
-                                <select class="form-select" name="status" id="formStatus">
+                                <label class="form-label">Status <span class="text-danger">*</span></label>
+                                <select class="form-select" name="status" id="formStatus" required>
                                     <option value="Active">Active</option>
                                     <option value="Inactive">Inactive</option>
                                 </select>
@@ -170,7 +168,58 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <button type="submit" class="btn btn-primary">Save Category</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title" id="editModalLabel">Edit Category</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm" class="company-form" action="" method="POST">
+                    @csrf
+                    <!-- For editing in laravel normally we use PUT but the backend accepts POST as per previous setup -->
+                    <div class="row mx-0">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="name" id="editName" placeholder="e.g. Safety Training, Orientation" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" name="description" id="editDescription" rows="4" placeholder="e.g. Mandatory safety protocols for new employees..." required></textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label">Sort Order <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="sort_order" id="editSortOrder" value="0" placeholder="e.g. 1" required>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label class="form-label">Status <span class="text-danger">*</span></label>
+                                <select class="form-select" name="status" id="editStatus" required>
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Update Category</button>
                     </div>
                 </form>
             </div>
@@ -183,29 +232,75 @@
 <script>
     $(document).ready(function() {
         $('.btn-create-trigger').on('click', function() {
-            $('#createModalLabel').text('Create New Category');
+            // Optional: reset happens on modal hide now
+        });
+
+        $('#createModal').on('hidden.bs.modal', function () {
+            const validator = $("#createForm").validate();
+            if(validator) validator.resetForm();
             $('#createForm')[0].reset();
-            $('#createForm').attr('action', '{{ route('admin.training-categories.store') }}');
+            $('#createForm .is-invalid').removeClass('is-invalid');
+        });
+
+        $('#editModal').on('hidden.bs.modal', function () {
+            const validator = $("#editForm").validate();
+            if(validator) validator.resetForm();
+            $('#editForm')[0].reset();
+            $('#editForm .is-invalid').removeClass('is-invalid');
         });
 
         $(document).on('click', '.btn-edit', function() {
             let id = $(this).data('id');
-            $('#createModalLabel').text('Edit Category');
-            $('#formName').val($(this).data('name'));
-            $('#formDescription').val($(this).data('description'));
-            $('#formSortOrder').val($(this).data('sort_order'));
-            $('#formStatus').val($(this).data('status'));
+            $('#editName').val($(this).data('name'));
+            $('#editDescription').val($(this).data('description'));
+            $('#editSortOrder').val($(this).data('sort_order'));
+            $('#editStatus').val($(this).data('status'));
             
-            $('#createForm').attr('action', '{{ url('admin/training-categories/update') }}/' + id);
+            $('#editForm').attr('action', '{{ url('admin/training-categories/update') }}/' + id);
         });
 
-        $('#createForm').on('submit', function(e) {
+        const validationConfig = {
+            ignore: [],
+            rules: {
+                name: { required: true, maxlength: 255 },
+                description: { required: true },
+                sort_order: { required: true },
+                status: { required: true }
+            },
+            messages: {
+                name: { required: "Please enter a category name." },
+                description: { required: "Please enter a description." },
+                sort_order: { required: "Please enter a sort order." },
+                status: { required: "Please select a status." }
+            },
+            errorElement: 'span',
+            errorClass: 'invalid-feedback d-block',
+            highlight: function (element) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function (element) {
+                $(element).removeClass('is-invalid');
+            },
+            errorPlacement: function (error, element) {
+                if (element.closest('.input-group').length) {
+                    error.insertAfter(element.closest('.input-group'));
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        };
+
+        // Initialize jQuery Validation for both forms
+        $("#createForm").validate(validationConfig);
+        $("#editForm").validate(validationConfig);
+
+        function handleAjaxSubmit(e) {
             e.preventDefault();
             const form = $(this);
             const submitBtn = form.find('button[type="submit"]');
+            const originalText = submitBtn.text();
 
-            if (!form[0].checkValidity()) {
-                form[0].reportValidity();
+            if (!form.valid()) {
                 return;
             }
 
@@ -219,20 +314,23 @@
                 success: function(response) {
                     if(response.success) {
                         toastr.success(response.message);
-                        $('#createModal').modal('hide');
+                        form.closest('.modal').modal('hide');
                         setTimeout(() => window.location.reload(), 1000);
                     } else {
                         toastr.error(response.message);
-                        submitBtn.prop('disabled', false).text('Save changes');
+                        submitBtn.prop('disabled', false).text(originalText);
                     }
                 },
                 error: function(xhr) {
                     let msg = xhr.responseJSON?.message || 'Something went wrong.';
                     toastr.error(msg);
-                    submitBtn.prop('disabled', false).text('Save changes');
+                    submitBtn.prop('disabled', false).text(originalText);
                 }
             });
-        });
+        }
+
+        $('#createForm').on('submit', handleAjaxSubmit);
+        $('#editForm').on('submit', handleAjaxSubmit);
 
 
     });

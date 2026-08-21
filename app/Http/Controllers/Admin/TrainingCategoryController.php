@@ -35,9 +35,9 @@ class TrainingCategoryController extends Controller implements HasMiddleware
         try {
             $request->validate([
                 'name' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'sort_order' => 'nullable|integer',
-                'status' => 'nullable|string',
+                'description' => 'required|string',
+                'sort_order' => 'required|integer',
+                'status' => 'required|string',
             ]);
 
             TrainingCategory::create($request->all());
@@ -70,9 +70,9 @@ class TrainingCategoryController extends Controller implements HasMiddleware
         try {
             $request->validate([
                 'name' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'sort_order' => 'nullable|integer',
-                'status' => 'nullable|string',
+                'description' => 'required|string',
+                'sort_order' => 'required|integer',
+                'status' => 'required|string',
             ]);
 
             $category = TrainingCategory::findOrFail($id);

@@ -42,7 +42,7 @@ class TrainingTestController extends Controller implements HasMiddleware
                 'description' => 'nullable|string',
                 'video_url' => 'nullable|url|max:255',
                 'passing_percentage' => 'required|integer|min:0|max:100',
-                'status' => 'nullable|string',
+                'status' => 'required|string',
             ]);
 
             TrainingTest::create($request->all());
@@ -80,7 +80,7 @@ class TrainingTestController extends Controller implements HasMiddleware
                 'description' => 'nullable|string',
                 'video_url' => 'nullable|url|max:255',
                 'passing_percentage' => 'required|integer|min:0|max:100',
-                'status' => 'nullable|string',
+                'status' => 'required|string',
             ]);
 
             $test = TrainingTest::findOrFail($id);
