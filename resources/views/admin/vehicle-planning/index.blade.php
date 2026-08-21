@@ -223,7 +223,7 @@
                                                                 @can('vehicle_planning.add')
                                                                 <form
                                                                     action="{{ route('admin.lead.slot.vehicle.remove', [$slot->id, $vehicle->id]) }}"
-                                                                    method="POST" class="m-0">
+                                                                    method="POST" class="m-0 remove-vehicle-form">
                                                                     @csrf
                                                                     <button type="submit"
                                                                         class="btn btn-sm btn-link text-danger p-0 border-0 ms-1"
@@ -241,7 +241,7 @@
                                                     <div class="mt-2 pt-2 border-top"
                                                         style="border-top: 1px dashed #bfdbfe !important;">
                                                         <form action="{{ route('admin.lead.slot.vehicle.assign', $slot->id) }}"
-                                                            method="POST" class="m-0">
+                                                            method="POST" class="m-0 assign-vehicle-form">
                                                             @csrf
                                                             <div class="mb-1">
                                                                 <select name="vehicle_ids[]"
@@ -309,6 +309,63 @@
             @if(session('info'))
                 toastr.info("{{ session('info') }}");
             @endif
+
+            // AJAX Submission for Assigning Vehicles
+            $('.assign-vehicle-form').on('submit', function(e) {
+                e.preventDefault();
+                const $form = $(this);
+                const $btn = $form.find('button[type="submit"]');
+
+                if (!$form.find('select').val()) {
+                    toastr.warning('Please select a vehicle to assign.');
+                    return;
+                }
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    method: 'POST',
+                    data: $form.serialize(),
+                    beforeSend: function () {
+                        $btn.prop('disabled', true).text('...');
+                    },
+                    success: function (res) {
+                        toastr.success(res.message || 'Vehicles assigned successfully!');
+                        setTimeout(function() {
+                            location.reload();
+                        }, 500);
+                    },
+                    error: function (xhr) {
+                        toastr.error(xhr.responseJSON?.message || 'Something went wrong while assigning.');
+                        $btn.prop('disabled', false).text('Add');
+                    }
                 });
+            });
+
+            // AJAX Submission for Removing Vehicles
+            $('.remove-vehicle-form').on('submit', function(e) {
+                e.preventDefault();
+                const $form = $(this);
+                const $btn = $form.find('button[type="submit"]');
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    method: 'POST',
+                    data: $form.serialize(),
+                    beforeSend: function () {
+                        $btn.prop('disabled', true).css('opacity', '0.5');
+                    },
+                    success: function (res) {
+                        toastr.success(res.message || 'Vehicle removed!');
+                        setTimeout(function() {
+                            location.reload();
+                        }, 500);
+                    },
+                    error: function (xhr) {
+                        toastr.error(xhr.responseJSON?.message || 'Something went wrong while removing.');
+                        $btn.prop('disabled', false).css('opacity', '1');
+                    }
+                });
+            });
+        });
     </script>
 @endpush

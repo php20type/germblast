@@ -98,6 +98,10 @@
                                 </div>
                                 <div class="right-part-sec">
                                     <div>
+                                        <a class="btn btn-outline-dark" href="javascript:history.back()">
+                                            <i class="fas fa-arrow-left me-1"></i> Back
+                                        </a>
+
                                         <a class="btn btn-export"
                                             href="{{ route('admin.lead.service.service_dashboard', $order->id) }}">
                                             SERVICE VIEW 

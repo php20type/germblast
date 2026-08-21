@@ -1001,7 +1001,11 @@ class ServiceController extends Controller implements HasMiddleware
                             $bufferStart = $existingOccupiedStart->format('h:i A');
                             $bufferEnd = $existingOccupiedEnd->format('h:i A');
                             
-                            return back()->with('error', "Vehicle '{$vehicleName}' is already booked on this day from {$formattedStart} to {$formattedEnd} (Occupied buffer: {$bufferStart} to {$bufferEnd}).");
+                            $errorMsg = "Vehicle '{$vehicleName}' is already booked on this day from {$formattedStart} to {$formattedEnd} (Occupied buffer: {$bufferStart} to {$bufferEnd}).";
+                            if ($request->ajax()) {
+                                return response()->json(['message' => $errorMsg], 400);
+                            }
+                            return back()->with('error', $errorMsg);
                         }
                     }
                 }
@@ -1014,6 +1018,9 @@ class ServiceController extends Controller implements HasMiddleware
             }
         }
 
+        if ($request->ajax()) {
+            return response()->json(['message' => 'Vehicles assigned successfully.']);
+        }
         return back()->with('success', 'Vehicles assigned successfully.');
     }
 
@@ -1022,6 +1029,9 @@ class ServiceController extends Controller implements HasMiddleware
         $slot = ServiceOrderSlot::findOrFail($slotId);
         $slot->vehicles()->detach($vehicleId);
 
+        if (request()->ajax()) {
+            return response()->json(['message' => 'Vehicle removed.']);
+        }
         return back()->with('success', 'Vehicle removed.');
     }
 

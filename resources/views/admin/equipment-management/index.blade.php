@@ -543,7 +543,7 @@
                 {{-- BODY --}}
                 <div class="modal-body">
 
-                    <form action="{{ route('admin.equipment-management.store') }}" method="POST">
+                    <form id="addEquipmentForm" action="{{ route('admin.equipment-management.store') }}" method="POST">
                         @csrf
 
                         <div class="row mx-0">
@@ -765,6 +765,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Status</label>
+                    <span class="text-danger">*</span>
                     <select name="status" class="form-control" required>
                         <option value="">Select Status</option>
             `;
@@ -961,6 +962,123 @@
                     $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
                 }
             });
+
+            // ------------------------------------------------------------------
+            // FORM VALIDATION & AJAX SUBMISSION
+            // ------------------------------------------------------------------
+            
+            // Common Validation Config
+            const validationConfig = {
+                ignore: [],
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                }
+            };
+
+            // 1. Add Equipment Form Validation
+            $('#addEquipmentForm').validate($.extend(true, {}, validationConfig, {
+                rules: {
+                    barcode: { required: true },
+                    serial_number: { required: true },
+                    type_id: { required: true }
+                },
+                messages: {
+                    barcode: "Barcode is required.",
+                    serial_number: "Serial Number is required.",
+                    type_id: "Equipment Type is required."
+                }
+            }));
+
+            // Add Equipment AJAX Submit
+            $('#addEquipmentForm').on('submit', function (e) {
+                e.preventDefault();
+                const $form = $(this);
+                if (!$form.valid()) return;
+                
+                const $btn = $form.find('button[type="submit"]');
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    method: 'POST',
+                    data: $form.serialize(),
+                    beforeSend: function () {
+                        $btn.prop('disabled', true).text('Creating...');
+                    },
+                    success: function (res) {
+                        toastr.success(res.message || 'Equipment created successfully!');
+                        $('#addEquipmentModal').modal('hide');
+                        $btn.prop('disabled', false).text('Create');
+                        
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                            $.each(xhr.responseJSON.errors, function(field, messages) {
+                                messages.forEach(function(message) { toastr.error(message); });
+                            });
+                        } else {
+                            toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
+                        }
+                        $btn.prop('disabled', false).text('Create');
+                    }
+                });
+            });
+
+            // 2. Universal Status Form Validation (Dynamic)
+            // We just set up basic validation handling, rules will apply to rendered fields.
+            $('#universalStatusForm').validate($.extend(true, {}, validationConfig, {
+                rules: {
+                    status: { required: true }
+                },
+                messages: {
+                    status: "Status is required."
+                }
+            }));
+
+            // Universal Status AJAX Submit
+            $('#universalStatusForm').on('submit', function (e) {
+                e.preventDefault();
+                const $form = $(this);
+                if (!$form.valid()) return;
+                
+                const $btn = $form.find('button[type="submit"]');
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    method: 'POST',
+                    data: $form.serialize(),
+                    beforeSend: function () {
+                        $btn.prop('disabled', true).text('Submitting...');
+                    },
+                    success: function (res) {
+                        toastr.success(res.message || 'Status updated successfully!');
+                        $('#universalStatusModal').modal('hide');
+                        $btn.prop('disabled', false).text('Submit');
+                        
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                            $.each(xhr.responseJSON.errors, function(field, messages) {
+                                messages.forEach(function(message) { toastr.error(message); });
+                            });
+                        } else {
+                            toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
+                        }
+                        $btn.prop('disabled', false).text('Submit');
+                    }
+                });
+            });
+
         });
 
     </script>

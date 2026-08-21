@@ -87,6 +87,10 @@ class EquipmentManagementController extends Controller implements HasMiddleware
             'status' => Equipment::STATUS_DIRTY,
         ]);
 
+        if ($request->ajax()) {
+            return response()->json(['message' => 'Equipment created successfully']);
+        }
+
         return redirect()->back()->with('success', 'Equipment created successfully');
     }
 
@@ -112,6 +116,9 @@ class EquipmentManagementController extends Controller implements HasMiddleware
         if ($newStatus === 'unassign') {
 
             if (!$equipment->isAssigned()) {
+                if ($request->ajax()) {
+                    return response()->json(['message' => 'This equipment is not currently assigned.'], 400);
+                }
                 return back()->with('error', 'This equipment is not currently assigned.');
             }
 
@@ -129,6 +136,9 @@ class EquipmentManagementController extends Controller implements HasMiddleware
 
             $equipment->update(['status' => Equipment::STATUS_DIRTY]);
 
+            if ($request->ajax()) {
+                return response()->json(['message' => 'Equipment has been unassigned successfully.']);
+            }
             return back()->with('success', 'Equipment has been unassigned successfully.');
         }
 
@@ -144,6 +154,9 @@ class EquipmentManagementController extends Controller implements HasMiddleware
         }
 
         if (!in_array((int)$integerStatus, Equipment::statuses(), true)) {
+            if ($request->ajax()) {
+                return response()->json(['message' => 'Unknown status value provided.'], 400);
+            }
             return back()->with('error', 'Unknown status value provided.');
         }
 
@@ -153,9 +166,12 @@ class EquipmentManagementController extends Controller implements HasMiddleware
         if (!$equipment->canTransitionTo($integerStatus)) {
             $currentStatusText = config("mapping.equipment_status.{$equipment->status}", $equipment->status);
             $newStatusText = config("mapping.equipment_status.{$integerStatus}", $newStatus);
-            return back()->with('error',
-                'Cannot transition from "' . ucfirst($currentStatusText) . '" to "' . ucfirst($newStatusText) . '".'
-            );
+            $errorMsg = 'Cannot transition from "' . ucfirst($currentStatusText) . '" to "' . ucfirst($newStatusText) . '".';
+            
+            if ($request->ajax()) {
+                return response()->json(['message' => $errorMsg], 400);
+            }
+            return back()->with('error', $errorMsg);
         }
 
         // ------------------------------------------------------------------
@@ -183,7 +199,12 @@ class EquipmentManagementController extends Controller implements HasMiddleware
         }
 
         $newStatusText = config("mapping.equipment_status.{$integerStatus}", $newStatus);
-        return back()->with('success', 'Equipment status updated to "' . ucfirst($newStatusText) . '" successfully.');
+        $successMsg = 'Equipment status updated to "' . ucfirst($newStatusText) . '" successfully.';
+        
+        if ($request->ajax()) {
+            return response()->json(['message' => $successMsg]);
+        }
+        return back()->with('success', $successMsg);
     }
 
     // ------------------------------------------------------------------
