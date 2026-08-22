@@ -449,20 +449,12 @@ class SettingController extends Controller
     public function tag()
     {
         $colors = [
-            '#000000',
-            '#f8d7da',
-            '#fce5cd',
-            '#fff2cc',
-            '#d9ead3',
-            '#d0e0e3',
-            '#d9d2e9',
-            '#cccccc',
-            '#ea9999',
-            '#f6b26b',
-            '#ffe599',
-            '#b6d7a8',
-            '#a2c4c9',
-            '#b4a7d6',
+            'rgb(235, 232, 232)', // Light Gray
+            'rgb(200, 200, 233)', // Light Purple/Blue
+            'rgb(196, 238, 204)', // Light Green
+            'rgb(192, 224, 242)', // Light Blue
+            'rgb(255, 204, 178)', // Light Orange/Peach
+            'rgb(255, 178, 187)'  // Light Red/Pink
         ];
         // $tags = Tag::with('user')->get();
         $leadtags = Tag::with('user')->where('tag_id', 1)->get();
