@@ -3,69 +3,121 @@
 @section('title', 'Competitors')
 
 @section('content')
+@push('styles')
+    <style>
+        .cursor-pointer {
+            cursor: pointer !important;
+        }
 
+        /* Boxed Table System from Equipment Management */
+        .equipment-report-table {
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            border: 1px solid #f3f4f6 !important;
+            border-radius: 12px !important;
+            overflow: hidden !important;
+            background: #fff !important;
+        }
+
+        .equipment-report-table thead th {
+            background-color: rgba(255, 184, 28, 0.4) !important;
+            color: #374151 !important;
+            font-weight: 600 !important;
+            padding: 18px 20px !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .equipment-report-table tbody td {
+            padding: 15px 20px !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid #f3f4f6 !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .equipment-report-table thead th:last-child,
+        .equipment-report-table tbody td:last-child {
+            border-right: none !important;
+        }
+
+        .equipment-report-table tr:last-child td {
+            border-bottom: none !important;
+        }
+    </style>
+@endpush
 
     <main class="app-wrapper">
         <!-- All Companies Section start  -->
-        <div class="profile-section my-4">
+        <div class="companies-section my-4">
             <div class="container-fluid">
                 <div class="row">
                     <!-- Sidebar -->
                     @include('admin.settings.sidebar')
 
                     <!-- Main Content -->
-                    <div class="col-lg-9 col-md-9 p-0">
-                        <div class="activity-type-content">
-                            <div class="heading-area-sec">
+                    <div class="col-md-10 p-0">
+                        <div class="main-content">
+                            <div class="heading-area-sec mb-3">
                                 <div class="left-part-sec">
-                                    <h3 class="mb-1 fw-bold">COMPETITORS</h3>
+                                    <h3 class="mb-1">COMPETITORS</h3>
                                     <p class="text-muted mb-0">Track your competitors on each lead to compare win and loss rates.</p>
                                 </div>
-                                <hr>
+                                <div class="right-part-sec mt-1">
+                                    <a href="javascript:void(0);" class="btn btn-export" id="toggleAddCompetitor" onclick="addCompetitor()">Add Competitor</a>
+                                </div>
                             </div>
 
-                            <div class="table-container">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="fw-bold mb-0">COMPETITORS ({{ $totalCounts }})</h6>
-                                    <a href="javascript:void(0);" class="btn-add-activity" id="toggleAddCompetitor" onclick="addCompetitor()">Add Competitor</a>
-                                </div>
+                            <div class="px-4 pb-4">
+                                <div class="mb-5">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0 text-uppercase">COMPETITORS ({{ $totalCounts }})</h6>
+                                    </div>
 
-                                <div class="table-responsive">
-                                    <table class="table activity-table">
+                                    <table class="table w-100 equipment-report-table mb-0">
                                         <thead>
                                             <tr>
                                                 <th scope="col">Name</th>
-                                                <th scope="col"></th>
+                                                <th scope="col" class="text-end">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($competitors as $competitor)
                                                 <tr>
                                                     <td>{{ $competitor->name }}</td>
-                                                    <td style="text-align:right;"><a href="javascript:void(0);" class="report-link">Report</a></td>
+                                                    <td class="text-end">
+                                                        <a href="javascript:void(0);" 
+                                                           class="btn btn-outline-primary btn-sm btn-edit-competitor"
+                                                           data-id="{{ $competitor->id }}"
+                                                           data-name="{{ $competitor->name }}">
+                                                            Edit
+                                                        </a>
+                                                    </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
 
-                            <div class="info-section">
-                                <div class="info-cards">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6>WHY TRACK COMPETITORS?</h6>
+                                <div class="info-section bg-white p-4 rounded-3 border mt-4" style="border-color: #e5e7eb !important;">
+                                    <div class="info-cards mb-4">
+                                        <h6 class="fw-bold mb-2">WHY TRACK COMPETITORS?</h6>
+                                        <p class="text-muted mb-0">Tracking competitors with your leads makes it easy to see reports on your win rate against each competitor.</p>
                                     </div>
-                                    <p>Tracking competitors with your leads makes it easy to see reports on your win rate against each competitor.</p>
-                                </div>
-                                <div class="info-cards">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6>PROCESS TRIGGERS</h6>
-                                        <a href="javascript:void(0);" class="view-quotas-link">Edit Lead Distribution</a>
+                                    <hr class="my-4 text-muted opacity-25">
+                                    <div class="info-cards mb-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="fw-bold mb-0">PROCESS TRIGGERS</h6>
+                                        </div>
+                                        <p class="text-muted mb-0">In the Lead Distribution section you can configure a process to be automatically attached to a lead when competing with a specific competitor.</p>
                                     </div>
-                                    <p>In the Lead Distribution section you can configure a process to be automatically attached to a lead when competing with a specific competitor.</p>
                                 </div>
-                            </div>
 
+                            </div>
                         </div>
                     </div>
 
@@ -96,8 +148,8 @@
                         <div class="row mx-0">
                             <div class="col-lg-12">
                                 <div class="form-group">
-                                    <label class="form-label">Name</label>
-                                    <input type="text" placeholder="" name="name"
+                                    <label class="form-label">Name <span class="text-danger">*</span></label>
+                                    <input type="text" placeholder="e.g. Acme Corp" name="name"
                                         class="form-control" />
                                 </div>
                             </div>
@@ -106,6 +158,37 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-success" id="AddCompetitor">New Competitor</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- Edit Competitor modal --}}
+    <div class="modal fade" id="edit_competitor" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="editModalLabel">Edit Competitor</h1>
+                    <div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-body ps-0">
+                    <form class="company-form" action="" method="post" id="update_competitor">
+                        @csrf
+                        <div class="row mx-0">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Name <span class="text-danger">*</span></label>
+                                    <input type="text" placeholder="e.g. Acme Corp" name="name" id="editCompetitorName" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btnUpdateCompetitor">Save Changes</button>
                 </div>
                 </form>
             </div>
@@ -151,6 +234,14 @@
         });
 
 
+        // Reset form and validation on modal close
+        $('#add_competitor').on('hidden.bs.modal', function () {
+            const validator = $("#store_competitor").validate();
+            if(validator) validator.resetForm();
+            $('#store_competitor')[0].reset();
+            $('#store_competitor .is-invalid').removeClass('is-invalid');
+        });
+
         $('#store_competitor').submit(function(e) {
             e.preventDefault();
 
@@ -158,20 +249,88 @@
                 return; // Stop if validation fails
             }
 
+            const btn = $('#AddCompetitor');
+            btn.prop('disabled', true).text('Creating...');
+
             $.ajax({
                 url: "{{ route('admin.settings.competitor.store') }}",
                 method: "POST",
                 data: $(this).serialize(),
                 success: function(response) {
-                    alert('Competitor added successfully!');
+                    toastr.success('Competitor added successfully!');
                     $('#add_competitor').modal('hide');
-                    console.log(response);
-                    location.reload();
-
+                    setTimeout(() => location.reload(), 1000);
                 },
                 error: function(xhr) {
-                    alert('Error: ' + xhr.responseText);
-                    toastr.error('Something went wrong while adding new competitor.');
+                    btn.prop('disabled', false).text('New Competitor');
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while adding new competitor.');
+                }
+            });
+        });
+
+        // Edit form reset on close
+        $('#edit_competitor').on('hidden.bs.modal', function () {
+            const validator = $("#update_competitor").validate();
+            if(validator) validator.resetForm();
+            $('#update_competitor')[0].reset();
+            $('#update_competitor .is-invalid').removeClass('is-invalid');
+        });
+
+        // Edit button click
+        $(document).on('click', '.btn-edit-competitor', function(e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+            let name = $(this).data('name');
+
+            $('#editCompetitorName').val(name);
+
+            $('#update_competitor').attr('action', "{{ url('admin/settings/competitor/update') }}/" + id);
+            $('#edit_competitor').modal('show');
+        });
+
+        $("#update_competitor").validate({
+            ignore: [],
+            rules: {
+                name: { required: true }
+            },
+            messages: {
+                name: { required: "Please enter the competitor name." }
+            },
+            errorElement: 'span',
+            errorClass: 'invalid-feedback d-block',
+            highlight: function(element) { $(element).addClass('is-invalid'); },
+            unhighlight: function(element) { $(element).removeClass('is-invalid'); },
+            errorPlacement: function(error, element) {
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent());
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+
+        $('#update_competitor').submit(function(e) {
+            e.preventDefault();
+
+            if (!$('#update_competitor').valid()) {
+                return;
+            }
+
+            const btn = $('#btnUpdateCompetitor');
+            btn.prop('disabled', true).text('Saving...');
+
+            $.ajax({
+                url: $(this).attr('action'),
+                method: "POST",
+                data: $(this).serialize(),
+                success: function(response) {
+                    toastr.success('Competitor updated successfully!');
+                    $('#edit_competitor').modal('hide');
+                    setTimeout(() => location.reload(), 1000);
+                },
+                error: function(xhr) {
+                    btn.prop('disabled', false).text('Save Changes');
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while updating the competitor.');
                 }
             });
         });

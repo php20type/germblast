@@ -2,204 +2,137 @@
 
 @section('title', 'Activity Type')
 
+@push('styles')
+    <style>
+        .cursor-pointer {
+            cursor: pointer !important;
+        }
+
+        /* Boxed Table System from Equipment Management */
+        .equipment-report-table {
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            border: 1px solid #f3f4f6 !important;
+            border-radius: 12px !important;
+            overflow: hidden !important;
+            background: #fff !important;
+        }
+
+        .equipment-report-table thead th {
+            background-color: rgba(255, 184, 28, 0.4) !important;
+            color: #374151 !important;
+            font-weight: 600 !important;
+            padding: 18px 20px !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .equipment-report-table tbody td {
+            padding: 15px 20px !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid #f3f4f6 !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .equipment-report-table thead th:last-child,
+        .equipment-report-table tbody td:last-child {
+            border-right: none !important;
+        }
+
+        .equipment-report-table tr:last-child td {
+            border-bottom: none !important;
+        }
+    </style>
+@endpush
+
 @section('content')
 
 
     <main class="app-wrapper">
         <!-- All Companies Section start  -->
-        <div class="profile-section my-4">
-            <div class="container-fluid">
-                <div class="row">
-                    <!-- Sidebar -->
-                    @include('admin.settings.sidebar')
+        <div class="companies-section my-4">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            @include('admin.settings.sidebar')
 
-                    <!-- Main Content -->
-                    <div class="col-lg-9 col-md-9 p-0">
-                        <div class="defaults-card">
-                            <div class="heading-area-sec">
+            <!-- Main Content -->
+            <div class="col-md-10 p-0">
+                <div class="main-content">
+                    <!-- Header -->
+                    <div class="heading-area-sec mb-3 d-flex justify-content-between align-items-start">
                                 <div class="left-part-sec">
-                                    <h3 class="mb-1 fw-bold">Defaults</h3>
+                                    <h3 class="mb-1">ACTIVITY TYPES <span style="font-size: 24px;">📌</span></h3>
+                                    <p class="text-muted mb-0">Customize the activities that your team uses to communicate with contacts.</p>
                                 </div>
-                                <hr>
-                            </div>
-                            <div class="form-row mb-3">
-                                <label for="newActivities" class="form-label">
-                                    New activities
-                                    <span class="info-icon" data-bs-toggle="tooltip" data-bs-placement="top"
-                                        data-bs-title="The activity type that will be selected by default when creating a new activity."><i
-                                            class="fa-regular fa-circle-info"></i></span>
-                                </label>
-                                <select class="form-select" id="newActivities">
-                                    @foreach ($activity_types as $activity_type)
-                                        <option value="{{ $activity_type->id }}">
-                                            <span class="activity-icon">👥</span>
-                                            {{ $activity_type->type }}
-                                        </option>
-                                    @endforeach
-                                    {{-- <option selected>
-                                            <span class="activity-icon">👥</span>
-                                            Sales - Initial Meeting/Prospecting
-                                        </option> --}}
-                                </select>
+                                <div class="right-part-sec mt-1">
+                                    <a href="javascript:void(0);" class="btn btn-export" id="toggleAddActivityType" onclick="addActivityType()">Add Activity Type</a>
+                                </div>
                             </div>
 
-                            <div class="form-row mb-3">
-                                <label for="schedulerMeetings" class="form-label">
-                                    Scheduler meetings
-                                    <span class="info-icon" data-bs-toggle="tooltip" data-bs-placement="top"
-                                        data-bs-title="The activity type that will be selected by default when creating a new scheduler meeting."><i
-                                            class="fa-regular fa-circle-info"></i></span>
-                                </label>
-                                <select class="form-select" id="schedulerMeetings">
-                                    @foreach ($activity_types as $activity_type)
-                                        <option value="{{ $activity_type->id }}">
-                                            <span class="activity-icon">📅</span>
-                                            {{ $activity_type->type }}
-                                        </option>
-                                    @endforeach
-                                    {{-- <option selected>
-                                            <span class="activity-icon">📅</span>
-                                            Sales - Renewal Contract Delivered
-                                        </option> --}}
-                                </select>
+                    <!-- Content Body -->
+                    <div class="px-4 pb-4">
+                        <table class="table w-100 equipment-report-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Icon</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Activities in the last 12 months</th>
+                                    <th scope="col">Last activity time</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($activity_types as $activity_type)
+                                    <tr>
+                                        <td>
+                                            <i class="{{ $activity_type->icon }} fa-2x"></i></td>
+                                        <td>{{ $activity_type->type }}</td>
+                                        <td class="activity-count">
+                                            {{ $activityCounts[$activity_type->id] ?? 0 }}</td>
+                                        <td class="last-activity">
+                                            {{ \Carbon\Carbon::parse($activity_type->created_at)->format('d M Y, H:i') }}
+                                        </td>
+                                        <td>
+                                            <a href="#" class="btn btn-outline-primary btn-sm btn-edit" 
+                                               data-id="{{ $activity_type->id }}"
+                                               data-type="{{ $activity_type->type }}"
+                                               data-icon="{{ $activity_type->icon }}">
+                                                Edit
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+
+                        <div class="info-section mt-4 bg-white p-4 rounded-3 border" style="border-color: #e5e7eb !important;">
+                            <div class="info-cards">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6>WHY TRACK ACTIVITY TYPES?</h6>
+                                </div>
+                                <p>Every activity has an activity type. You can define different benchmarks
+                                    per activity type, for example, a sales rep should log 15 cold calls per
+                                    week and 5 follow-up calls.</p>
                             </div>
 
-                            <div class="form-row mb-3">
-                                <label for="clickToCallCalls" class="form-label">
-                                    Click-to-call calls
-                                    <span class="info-icon" data-bs-toggle="tooltip" data-bs-placement="top"
-                                        data-bs-title="The activity type that will be used when activities are created for click-to-call events."><i
-                                            class="fa-regular fa-circle-info"></i></span>
-                                </label>
-                                <select class="form-select" id="clickToCallCalls">
-                                    @foreach ($activity_types as $activity_type)
-                                        <option value="{{ $activity_type->id }}">
-                                            <span class="activity-icon">📅</span>
-                                            {{ $activity_type->type }}
-                                        </option>
-                                    @endforeach
-                                    {{-- <option selected>
-                                            <span class="activity-icon">📅</span>
-                                            Account Maintenance Visit
-                                        </option> --}}
-                                </select>
-                            </div>
+                            <hr>
 
-                            <div class="form-row mb-3">
-                                <label for="clickToCallVoicemails" class="form-label">
-                                    Click-to-call voicemails
-                                    <span class="info-icon" data-bs-toggle="tooltip" data-bs-placement="top"
-                                        data-bs-title="The activity type that will be used when activities are created for click-to-call voicemails."><i
-                                            class="fa-regular fa-circle-info"></i></span>
-                                </label>
-                                <select class="form-select" id="clickToCallVoicemails">
-                                    @foreach ($activity_types as $activity_type)
-                                        <option value="{{ $activity_type->id }}">
-                                            <span class="activity-icon">📞</span>
-                                            {{ $activity_type->type }}
-                                        </option>
-                                    @endforeach
-                                    {{-- <option selected>
-                                        <span class="activity-icon">📞</span>
-                                        Voicemail
-                                    </option> --}}
-                                </select>
-                            </div>
-
-                            <div class="form-row mb-3">
-                                <label for="virtualMeetings" class="form-label">
-                                    Virtual meetings
-                                    <span class="info-icon" data-bs-toggle="tooltip" data-bs-placement="top"
-                                        data-bs-title="The activity type that will be selected by default when logging virtual meetings."><i
-                                            class="fa-regular fa-circle-info"></i></span>
-                                </label>
-                                <select class="form-select" id="virtualMeetings">
-                                    @foreach ($activity_types as $activity_type)
-                                        <option value="{{ $activity_type->id }}">
-                                            <span class="activity-icon">📅</span>
-                                            {{ $activity_type->type }}
-                                        </option>
-                                    @endforeach
-                                    {{-- <option selected>
-                                        <span class="activity-icon">📅</span>
-                                        Account Maintenance Visit
-                                    </option> --}}
-                                </select>
+                            <div class="info-cards mt-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6>REPORTING ON ACTIVITY TYPES</h6>
+                                </div>
+                                <p>The activity report helps you see what team members have been up to and
+                                    how your team is performing against their quotas.</p>
                             </div>
                         </div>
-                        <div class="activity-type-content">
-                            <div class="heading-area-sec">
-                                <div class="left-part-sec">
-                                    <h3 class="mb-1 fw-bold">Activity types</h3>
-                                    <p class="text-muted mb-0">Customize the activities that your team uses to
-                                        communicate with contacts.</p>
-                                </div>
-                                <hr>
-                            </div>
-
-                            <div class="table-container">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="fw-bold mb-0">ACTIVITY TYPES ({{ $totalCounts }})</h6>
-                                    <a href="javascript:void(0);" class="btn-add-activity" id="toggleAddActivityType"
-                                        onclick="addActivityType()">Add Activity Type</a>
-                                </div>
-
-                                <div class="table-responsive">
-                                    <table class="table activity-table">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">Icon</th>
-                                                <th scope="col">Name</th>
-                                                <th scope="col">Activities in the last 12 months</th>
-                                                <th scope="col">Last activity time</th>
-                                                <th scope="col"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {{-- <tr>
-                                                <td>Phone Call</td>
-                                                <td class="activity-count">690</td>
-                                                <td class="last-activity">17 May 2025, 01:03</td>
-                                                <td><a href="#" class="report-link">Report</a></td>
-                                            </tr> --}}
-                                            @foreach ($activity_types as $activity_type)
-                                                <tr>
-                                                    <td>
-                                                        <i class="{{ $activity_type->icon }} fa-2x"></i></td>
-                                                    <td>{{ $activity_type->type }}</td>
-                                                    <td class="activity-count">
-                                                        {{ $activityCounts[$activity_type->id] ?? 0 }}</td>
-                                                    <td class="last-activity">
-                                                        {{ \Carbon\Carbon::parse($activity_type->created_at)->format('d M Y, H:i') }}
-                                                    </td>
-                                                    <td><a href="#" class="report-link">Report</a></td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div class="info-section">
-                                <div class="info-cards">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6>WHY TRACK ACTIVITY TYPES?</h6>
-                                        <a href="#" class="view-quotas-link">View activity quotas</a>
-                                    </div>
-                                    <p>Every activity has an activity type. You can define different benchmarks
-                                        per activity type, for example, a sales rep should log 15 cold calls per
-                                        week and 5 follow-up calls.</p>
-                                </div>
-                                <div class="info-cards">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6>REPORTING ON ACTIVITY TYPES</h6>
-                                        <a href="#" class="view-quotas-link">View activity quotas</a>
-                                    </div>
-                                    <p>The activity report helps you see what team members have been up to and
-                                        how your team is performing against their quotas.</p>
-                                </div>
-                            </div>
-
+                    </div>
+                        </div>
                         </div>
                     </div>
 
@@ -230,7 +163,7 @@
                         <div class="row mx-0">
                             <div class="col-lg-12">
                                 <div class="form-group">
-                                    <label class="form-label">Name</label>
+                                    <label class="form-label">Name <span class="text-danger">*</span></label>
                                     <input type="text" placeholder="Phone Call" name="name"
                                         class="form-control" />
                                 </div>
@@ -238,7 +171,7 @@
 
                             <div class="col-lg-12">
                                 <div class="form-group">
-                                    <label class="form-label">Icon</label>
+                                    <label class="form-label">Icon <span class="text-danger">*</span></label>
                                     <input type="hidden" name="icon" id="selectedIcon">
                                     <div class="d-flex flex-wrap gap-2 mt-2" id="iconOptions">
                                         @foreach ($icons as $icon)
@@ -261,24 +194,81 @@
         </div>
     </div>
 
+    {{-- Edit Activity type modal --}}
+    <div class="modal fade" id="edit_activity_type" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="editModalLabel">Edit Activity Type</h1>
+                    <div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-body ps-0">
+                    <form class="company-form" action="" method="post" id="update_activity_type">
+                        @csrf
+                        <div class="row mx-0">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Name <span class="text-danger">*</span></label>
+                                    <input type="text" placeholder="Phone Call" name="name" id="editName" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Icon <span class="text-danger">*</span></label>
+                                    <input type="hidden" name="icon" id="editSelectedIcon">
+                                    <div class="d-flex flex-wrap gap-2 mt-2" id="editIconOptions">
+                                        @foreach ($icons as $icon)
+                                            <div class="activity-icon-circle edit-icon-circle" data-icon="{{ $icon }}">
+                                                <i class="{{ $icon }} fa-2x"></i>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btnUpdateActivityType">Save Changes</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @push('scripts')
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const iconOptions = document.querySelectorAll('.activity-icon-circle');
+            const iconOptions = document.querySelectorAll('#iconOptions .activity-icon-circle');
             const iconInput = document.getElementById('selectedIcon');
 
             iconOptions.forEach(option => {
                 option.addEventListener('click', function() {
-                    // Remove 'selected' class from all
                     iconOptions.forEach(o => o.classList.remove('selected'));
-
-                    // Add 'selected' class to clicked one
                     this.classList.add('selected');
-
-                    // Set value to hidden input
                     iconInput.value = this.dataset.icon;
+                    // Trigger validation if needed
+                    if($("#store_activity_type").data('validator')) {
+                        $("#store_activity_type").valid();
+                    }
+                });
+            });
+
+            const editIconOptions = document.querySelectorAll('.edit-icon-circle');
+            const editIconInput = document.getElementById('editSelectedIcon');
+
+            editIconOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    editIconOptions.forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+                    editIconInput.value = this.dataset.icon;
+                    if($("#update_activity_type").data('validator')) {
+                        $("#update_activity_type").valid();
+                    }
                 });
             });
         });
@@ -327,23 +317,102 @@
             e.preventDefault();
 
             if (!$('#store_activity_type').valid()) {
-                return; // Stop if validation fails
+                return;
             }
+
+            const btn = $('#AddActivityType');
+            btn.prop('disabled', true).text('Creating...');
 
             $.ajax({
                 url: "{{ route('admin.settings.activity_type.store') }}",
                 method: "POST",
                 data: $(this).serialize(),
                 success: function(response) {
-                    alert('Activity Type added successfully!');
+                    toastr.success('Activity Type added successfully!');
                     $('#add_activity_type').modal('hide');
-                    console.log(response);
-                    location.reload();
-
+                    setTimeout(() => location.reload(), 1000);
                 },
                 error: function(xhr) {
-                    alert('Error: ' + xhr.responseText);
-                    toastr.error('Something went wrong while adding the activity type.');
+                    btn.prop('disabled', false).text('Create activity type');
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while adding the activity type.');
+                }
+            });
+        });
+
+        // Edit functionality
+        $('.btn-edit').click(function(e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+            let name = $(this).data('type');
+            let icon = $(this).data('icon');
+
+            $('#editName').val(name);
+            $('#editSelectedIcon').val(icon);
+            
+            // Highlight selected icon
+            $('.edit-icon-circle').removeClass('selected');
+            $(`.edit-icon-circle[data-icon="${icon}"]`).addClass('selected');
+
+            $('#update_activity_type').attr('action', "{{ url('admin/settings/activity_type/update') }}/" + id);
+            $('#edit_activity_type').modal('show');
+        });
+
+        // Edit form reset on close
+        $('#edit_activity_type').on('hidden.bs.modal', function () {
+            const validator = $("#update_activity_type").validate();
+            if(validator) validator.resetForm();
+            $('#update_activity_type')[0].reset();
+            $('#update_activity_type .is-invalid').removeClass('is-invalid');
+            $('.edit-icon-circle').removeClass('selected');
+        });
+
+        $("#update_activity_type").validate({
+            ignore: [],
+            rules: {
+                name: { required: true },
+                icon: { required: true },
+            },
+            messages: {
+                name: { required: "Please enter the activity type name." },
+                icon: { required: "Please select an icon." },
+            },
+            errorElement: 'span',
+            errorClass: 'invalid-feedback d-block',
+            highlight: function(element) { $(element).addClass('is-invalid'); },
+            unhighlight: function(element) { $(element).removeClass('is-invalid'); },
+            errorPlacement: function(error, element) {
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent());
+                } else if (element.attr('name') === 'icon') {
+                    error.insertAfter('#editIconOptions');
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+
+        $('#update_activity_type').submit(function(e) {
+            e.preventDefault();
+
+            if (!$('#update_activity_type').valid()) {
+                return;
+            }
+
+            const btn = $('#btnUpdateActivityType');
+            btn.prop('disabled', true).text('Saving...');
+
+            $.ajax({
+                url: $(this).attr('action'),
+                method: "POST",
+                data: $(this).serialize(),
+                success: function(response) {
+                    toastr.success('Activity Type updated successfully!');
+                    $('#edit_activity_type').modal('hide');
+                    setTimeout(() => location.reload(), 1000);
+                },
+                error: function(xhr) {
+                    btn.prop('disabled', false).text('Save Changes');
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while updating the activity type.');
                 }
             });
         });

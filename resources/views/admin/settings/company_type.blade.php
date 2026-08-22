@@ -3,68 +3,119 @@
 @section('title', 'Company Types')
 
 @section('content')
+@push('styles')
+    <style>
+        .cursor-pointer {
+            cursor: pointer !important;
+        }
 
+        /* Boxed Table System from Equipment Management */
+        .equipment-report-table {
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            border: 1px solid #f3f4f6 !important;
+            border-radius: 12px !important;
+            overflow: hidden !important;
+            background: #fff !important;
+        }
+
+        .equipment-report-table thead th {
+            background-color: rgba(255, 184, 28, 0.4) !important;
+            color: #374151 !important;
+            font-weight: 600 !important;
+            padding: 18px 20px !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .equipment-report-table tbody td {
+            padding: 15px 20px !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid #f3f4f6 !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .equipment-report-table thead th:last-child,
+        .equipment-report-table tbody td:last-child {
+            border-right: none !important;
+        }
+
+        .equipment-report-table tr:last-child td {
+            border-bottom: none !important;
+        }
+    </style>
+@endpush
 
     <main class="app-wrapper">
         <!-- All Companies Section start  -->
-        <div class="profile-section my-4">
+        <div class="companies-section my-4">
             <div class="container-fluid">
                 <div class="row">
                     <!-- Sidebar -->
                     @include('admin.settings.sidebar')
 
                     <!-- Main Content -->
-                    <div class="col-lg-9 col-md-9 p-0">
-                        <div class="activity-type-content">
-                            <div class="heading-area-sec">
+                    <div class="col-md-10 p-0">
+                        <div class="main-content">
+                            <div class="heading-area-sec mb-3">
                                 <div class="left-part-sec">
-                                    <h3 class="mb-1 fw-bold">COMPANY TYPES</h3>
+                                    <h3 class="mb-1">COMPANY TYPES</h3>
                                     <p class="text-muted mb-0">Categorize the companies you work with, i.e. “Partner,” “Vendor,” “Potential customer”.</p>
                                 </div>
-                                <hr>
+                                <div class="right-part-sec mt-1">
+                                    <a href="javascript:void(0);" class="btn btn-export" id="toggleAddCompany" onclick="addCompanyType()">Add Company type</a>
+                                </div>
                             </div>
 
-                            <div class="table-container">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="fw-bold mb-0">COMPANY TYPES ({{ $totalCounts }})</h6>
-                                    <a href="javascript:void(0);" class="btn-add-activity" id="toggleAddCompany" onclick="addCompanyType()">Add Company type</a>
-                                </div>
+                            <div class="px-4 pb-4">
+                                <div class="mb-5">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0 text-uppercase">COMPANY TYPES ({{ $totalCounts }})</h6>
+                                    </div>
 
-                                <div class="table-responsive">
-                                    <table class="table activity-table">
+                                    <table class="table w-100 equipment-report-table mb-0">
                                         <thead>
                                             <tr>
                                                 <th scope="col">Name</th>
-                                                <th scope="col"></th>
+                                                <th scope="col" class="text-end">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($company_types as $company_type)
                                                 <tr>
                                                     <td>{{ $company_type->type }}</td>
-                                                    <td style="text-align:right;"><a href="javascript:void(0);" class="report-link">Report</a></td>
+                                                    <td class="text-end">
+                                                        <a href="javascript:void(0);" 
+                                                           class="btn btn-outline-primary btn-edit-company-type"
+                                                           data-id="{{ $company_type->id }}"
+                                                           data-name="{{ $company_type->type }}">
+                                                            Edit
+                                                        </a>
+                                                    </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
 
-                            <div class="info-section">
-                                <div class="info-cards">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6>WHAT IS A COMPANY TYPE?</h6>
+                                <div class="info-section bg-white p-4 rounded-3 border mt-4" style="border-color: #e5e7eb !important;">
+                                    <div class="info-cards mb-4">
+                                        <h6 class="fw-bold mb-2">WHAT IS A COMPANY TYPE?</h6>
+                                        <p class="text-muted mb-0">Every company has a company type. This allows you to choose between Customers, Potential Customers, Partners, etc. The first listed type is the default.</p>
                                     </div>
-                                    <p>Every company has a company type. This allows you to choose between Customers, Potential Customers, Partners, etc. The first listed type is the default.</p>
-                                </div>
-                                <div class="info-cards">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6>CONVERT "PROSPECTS" TO "CUSTOMERS" WHEN LEADS ARE WON</h6>
+                                    <hr class="my-4 text-muted opacity-25">
+                                    <div class="info-cards mb-4">
+                                        <h6 class="fw-bold mb-2">CONVERT "PROSPECTS" TO "CUSTOMERS" WHEN LEADS ARE WON</h6>
+                                        <p class="text-muted mb-0">Use our <a href="javascript:void(0);" class="view-quotas-link">Sales Automation</a> to automatically change a company’s type to "Customer" (or any company type!) when its lead is closed.</p>
                                     </div>
-                                    <p>Use our <a href="javascript:void(0);" class="view-quotas-link">Sales Automation</a> to automatically change a company’s type to "Customer" (or any company type!) when its lead is closed.</p>
                                 </div>
-                            </div>
 
+                            </div>
                         </div>
                     </div>
 
@@ -95,8 +146,8 @@
                         <div class="row mx-0">
                             <div class="col-lg-12">
                                 <div class="form-group">
-                                    <label class="form-label">Name</label>
-                                    <input type="text" placeholder="" name="name"
+                                    <label class="form-label">Name <span class="text-danger">*</span></label>
+                                    <input type="text" placeholder="e.g. Vendor" name="name"
                                         class="form-control" />
                                 </div>
                             </div>
@@ -105,6 +156,36 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-success" id="AddCompetitor">New Company Type</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {{-- Edit Company Type modal --}}
+    <div class="modal fade" id="edit_company_type" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="editModalLabel">Edit Company Type</h1>
+                    <div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-body ps-0">
+                    <form class="company-form" action="" method="post" id="update_company_type">
+                        @csrf
+                        <div class="row mx-0">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Name <span class="text-danger">*</span></label>
+                                    <input type="text" placeholder="e.g. Vendor" name="name" id="editCompanyTypeName" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btnUpdateCompanyType">Save Changes</button>
                 </div>
                 </form>
             </div>
@@ -150,6 +231,14 @@
         });
 
 
+        // Reset form and validation on modal close
+        $('#add_company_type').on('hidden.bs.modal', function () {
+            const validator = $("#store_company_type").validate();
+            if(validator) validator.resetForm();
+            $('#store_company_type')[0].reset();
+            $('#store_company_type .is-invalid').removeClass('is-invalid');
+        });
+
         $('#store_company_type').submit(function(e) {
             e.preventDefault();
 
@@ -157,20 +246,88 @@
                 return; // Stop if validation fails
             }
 
+            const btn = $('#AddCompetitor');
+            btn.prop('disabled', true).text('Creating...');
+
             $.ajax({
                 url: "{{ route('admin.settings.company_type.store') }}",
                 method: "POST",
                 data: $(this).serialize(),
                 success: function(response) {
-                    alert('Company type added successfully!');
+                    toastr.success('Company type added successfully!');
                     $('#add_company_type').modal('hide');
-                    console.log(response);
-                    location.reload();
-
+                    setTimeout(() => location.reload(), 1000);
                 },
                 error: function(xhr) {
-                    alert('Error: ' + xhr.responseText);
-                    toastr.error('Something went wrong while adding new company type.');
+                    btn.prop('disabled', false).text('New Company Type');
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while adding new company type.');
+                }
+            });
+        });
+
+        // Edit form reset on close
+        $('#edit_company_type').on('hidden.bs.modal', function () {
+            const validator = $("#update_company_type").validate();
+            if(validator) validator.resetForm();
+            $('#update_company_type')[0].reset();
+            $('#update_company_type .is-invalid').removeClass('is-invalid');
+        });
+
+        // Edit button click
+        $(document).on('click', '.btn-edit-company-type', function(e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+            let name = $(this).data('name');
+
+            $('#editCompanyTypeName').val(name);
+
+            $('#update_company_type').attr('action', "{{ url('admin/settings/company_type/update') }}/" + id);
+            $('#edit_company_type').modal('show');
+        });
+
+        $("#update_company_type").validate({
+            ignore: [],
+            rules: {
+                name: { required: true }
+            },
+            messages: {
+                name: { required: "Please enter the company type name." }
+            },
+            errorElement: 'span',
+            errorClass: 'invalid-feedback d-block',
+            highlight: function(element) { $(element).addClass('is-invalid'); },
+            unhighlight: function(element) { $(element).removeClass('is-invalid'); },
+            errorPlacement: function(error, element) {
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent());
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+
+        $('#update_company_type').submit(function(e) {
+            e.preventDefault();
+
+            if (!$('#update_company_type').valid()) {
+                return;
+            }
+
+            const btn = $('#btnUpdateCompanyType');
+            btn.prop('disabled', true).text('Saving...');
+
+            $.ajax({
+                url: $(this).attr('action'),
+                method: "POST",
+                data: $(this).serialize(),
+                success: function(response) {
+                    toastr.success('Company type updated successfully!');
+                    $('#edit_company_type').modal('hide');
+                    setTimeout(() => location.reload(), 1000);
+                },
+                error: function(xhr) {
+                    btn.prop('disabled', false).text('Save Changes');
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while updating the company type.');
                 }
             });
         });

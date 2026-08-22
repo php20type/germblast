@@ -2,47 +2,94 @@
 
 @section('title', 'Channel And Sources')
 
+@push('styles')
+    <style>
+        .cursor-pointer {
+            cursor: pointer !important;
+        }
+
+        /* Boxed Table System from Equipment Management */
+        .equipment-report-table {
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            border: 1px solid #f3f4f6 !important;
+            border-radius: 12px !important;
+            overflow: hidden !important;
+            background: #fff !important;
+        }
+
+        .equipment-report-table thead th {
+            background-color: rgba(255, 184, 28, 0.4) !important;
+            color: #374151 !important;
+            font-weight: 600 !important;
+            padding: 18px 20px !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .equipment-report-table tbody td {
+            padding: 15px 20px !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid #f3f4f6 !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .equipment-report-table thead th:last-child,
+        .equipment-report-table tbody td:last-child {
+            border-right: none !important;
+        }
+
+        .equipment-report-table tr:last-child td {
+            border-bottom: none !important;
+        }
+    </style>
+@endpush
+
 @section('content')
 
 
     <main class="app-wrapper">
         <!-- All Companies Section start  -->
-        <div class="profile-section my-4">
+        <div class="companies-section my-4">
             <div class="container-fluid">
                 <div class="row">
                     <!-- Sidebar -->
                     @include('admin.settings.sidebar')
 
                     <!-- Main Content -->
-                    <div class="col-lg-9 col-md-9 p-0">
-                        <div class="activity-type-content">
-                            <div class="heading-area-sec">
+                    <div class="col-md-10 p-0">
+                        <div class="main-content">
+                            <div class="heading-area-sec mb-3">
                                 <div class="left-part-sec">
-                                    <h3 class="mb-1 fw-bold">Channels & sources </h3>
+                                    <h3 class="mb-1">CHANNELS & SOURCES</h3>
                                     <p class="text-muted mb-0">Identify where your leads come from with sources.</p>
                                 </div>
-                                <hr>
                             </div>
+                            
+                            <div class="px-4 pb-4">
 
                             <!-- No channel Table Start -->
-                            <div class="table-container">
+                            <div class="mb-5">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h6 class="fw-bold mb-0 text-uppercase">No channel ({{ $no_channel_count }}) <span
+                                    <h6 class="mb-0 text-uppercase">No channel ({{ $no_channel_count }}) <span
                                             class="info-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top"
                                             data-bs-title="Sources in this table have not yet been added to a channel. Click each source to edit."><i
-                                                class="fa-regular fa-circle-info"></i></span></h6>
+                                                class="fas fa-info-circle"></i></span></h6>
                                     <a href="#" class="btn-add-activity" data-bs-toggle="modal"
                                         data-bs-target="#add_source">Add source</a>
                                 </div>
 
-                                <div class="table-responsive position-relative">
-                                    <table class="table activity-table">
+                                    <table class="table w-100 equipment-report-table mb-0">
                                         <thead>
                                             <tr>
                                                 <th scope="col">Source</th>
-                                                <th scope="col">Last used</th>
                                                 <th scope="col">Created time</th>
-                                                <th scope="col"></th>
+                                                <th scope="col">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -51,53 +98,31 @@
                                                 <tr>
                                                     <td>{{ $no_channel->name ?? 'N/A' }}</td>
                                                     <td class="last-activity">
-                                                        N/A
-                                                    </td>
-                                                    <td class="last-activity">
                                                         {{ \Carbon\Carbon::parse($no_channel->created_at)->format('d M Y, H:i') }}
                                                     </td>
-                                                    <td class="position-relative">
-                                                        <a class="text-dark" href="javascript:void(0)"
-                                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                    <td class="text-left">
+                                                        <a href="#" class="btn btn-outline-primary btn-sm btn-edit-source" 
+                                                           data-id="{{ $no_channel->id }}"
+                                                           data-name="{{ $no_channel->name }}"
+                                                           data-channel-id="{{ $no_channel->channel_id }}">
+                                                            Edit
                                                         </a>
-                                                        <ul class="dropdown-menu dropdown-menu-end">
-                                                            <li>
-                                                                <button class="dropdown-item" type="button"
-                                                                    onclick="viewReport('Cloned Lead')">
-                                                                    <i class="fa-solid fa-chart-bar"></i>
-                                                                    View report
-                                                                </button>
-                                                            </li>
-
-                                                            <li>
-                                                                <hr class="dropdown-divider">
-                                                            </li>
-                                                            <li>
-                                                                <button class="dropdown-item text-danger" type="button"
-                                                                    onclick="deleteItem('Cloned Lead')">
-                                                                    <i class="fa-solid fa-trash"></i>
-                                                                    Delete
-                                                                </button>
-                                                            </li>
-                                                        </ul>
                                                     </td>
                                                 </tr>
                                             @endforeach
 
                                         </tbody>
                                     </table>
-                                </div>
                             </div>
 
                             <!-- Organic search Table Start -->
-                            <div class="table-container">
+                            <div class="mb-5">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <div>
-                                        <h6 class="fw-bold mb-0 text-uppercase">Organic search ({{ $organic_search_count }})
+                                        <h6 class="mb-0 text-uppercase">Organic search ({{ $organic_search_count }})
                                             <span class="info-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top"
                                                 data-bs-title="Leads in the organic search channel are tracked automatically with Nutshell Analytics."><i
-                                                    class="fa-regular fa-circle-info"></i></span>
+                                                    class="fas fa-info-circle"></i></span>
                                         </h6>
                                         <p>Searched Google or other search engine</p>
                                     </div>
@@ -109,48 +134,28 @@
                                     </div>
                                 </div>
 
-                                <div class="table-responsive position-relative">
-                                    <table class="table activity-table">
+                                    <table class="table w-100 equipment-report-table mb-0">
                                         <thead>
                                             <tr>
                                                 <th scope="col">Source</th>
-                                                <th scope="col">Last used</th>
                                                 <th scope="col">Created time</th>
-                                                <th scope="col"></th>
+                                                <th scope="col">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($organic_searches as $organic_search)
                                                 <tr>
                                                     <td>{{ $organic_search->name ?? 'N/A' }}</td>
-                                                    <td class="last-activity">N/A</td>
                                                     <td class="last-activity">
                                                         {{ \Carbon\Carbon::parse($organic_search->created_at)->format('d M Y, H:i') }}
                                                     </td>
-                                                    <td class="position-relative">
-                                                        <a class="text-dark" href="javascript:void(0)"
-                                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                    <td class="text-left">
+                                                        <a href="#" class="btn btn-outline-primary btn-sm btn-edit-source" 
+                                                           data-id="{{ $organic_search->id }}"
+                                                           data-name="{{ $organic_search->name }}"
+                                                           data-channel-id="{{ $organic_search->channel_id }}">
+                                                            Edit
                                                         </a>
-                                                        <ul class="dropdown-menu dropdown-menu-end">
-                                                            <li>
-                                                                <button class="dropdown-item" type="button"
-                                                                    onclick="viewReport('Cloned Lead')">
-                                                                    <i class="fa-solid fa-chart-bar"></i>
-                                                                    View report
-                                                                </button>
-                                                            </li>
-                                                            <li>
-                                                                <hr class="dropdown-divider">
-                                                            </li>
-                                                            <li>
-                                                                <button class="dropdown-item text-danger" type="button"
-                                                                    onclick="deleteItem('Cloned Lead')">
-                                                                    <i class="fa-solid fa-trash"></i>
-                                                                    Delete
-                                                                </button>
-                                                            </li>
-                                                        </ul>
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -158,17 +163,16 @@
 
                                         </tbody>
                                     </table>
-                                </div>
                             </div>
 
                             <!-- Paid search Table Start -->
-                            <div class="table-container">
+                            <div class="mb-5">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <div>
-                                        <h6 class="fw-bold mb-0 text-uppercase">Paid search ({{ $paid_search_count }}) <span
+                                        <h6 class="mb-0 text-uppercase">Paid search ({{ $paid_search_count }}) <span
                                                 class="info-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top"
                                                 data-bs-title="Leads in the paid search channel are tracked automatically with Nutshell Analytics."><i
-                                                    class="fa-regular fa-circle-info"></i></span></h6>
+                                                    class="fas fa-info-circle"></i></span></h6>
                                         <p>Clicked your ad on Google or other search engines</p>
                                     </div>
                                     <div>
@@ -178,66 +182,45 @@
                                     </div>
                                 </div>
 
-                                <div class="table-responsive position-relative">
-                                    <table class="table activity-table">
+                                    <table class="table w-100 equipment-report-table mb-0">
                                         <thead>
                                             <tr>
                                                 <th scope="col">Source</th>
-                                                <th scope="col">Last used</th>
                                                 <th scope="col">Created time</th>
-                                                <th scope="col"></th>
+                                                <th scope="col">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($paid_searches as $paid_search)
                                                 <tr>
                                                     <td>{{ $paid_search->name ?? 'N/A' }}</td>
-                                                    <td class="last-activity">N/A</td>
                                                     <td class="last-activity">
                                                         {{ \Carbon\Carbon::parse($paid_search->created_at)->format('d M Y, H:i') }}
                                                     </td>
-                                                    <td class="position-relative">
-                                                        <a class="text-dark" href="javascript:void(0)"
-                                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                    <td class="text-left">
+                                                        <a href="#" class="btn btn-outline-primary btn-sm btn-edit-source" 
+                                                           data-id="{{ $paid_search->id }}"
+                                                           data-name="{{ $paid_search->name }}"
+                                                           data-channel-id="{{ $paid_search->channel_id }}">
+                                                            Edit
                                                         </a>
-                                                        <ul class="dropdown-menu dropdown-menu-end">
-                                                            <li>
-                                                                <button class="dropdown-item" type="button"
-                                                                    onclick="viewReport('Cloned Lead')">
-                                                                    <i class="fa-solid fa-chart-bar"></i>
-                                                                    View report
-                                                                </button>
-                                                            </li>
-                                                            <li>
-                                                                <hr class="dropdown-divider">
-                                                            </li>
-                                                            <li>
-                                                                <button class="dropdown-item text-danger" type="button"
-                                                                    onclick="deleteItem('Cloned Lead')">
-                                                                    <i class="fa-solid fa-trash"></i>
-                                                                    Delete
-                                                                </button>
-                                                            </li>
-                                                        </ul>
                                                     </td>
                                                 </tr>
                                             @endforeach
 
                                         </tbody>
                                     </table>
-                                </div>
                             </div>
 
                             <!-- Organic social Table Start -->
-                            <div class="table-container">
+                            <div class="mb-5">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <div>
-                                        <h6 class="fw-bold mb-0 text-uppercase">Organic social
+                                        <h6 class="mb-0 text-uppercase">Organic social
                                             ({{ $organic_social_count }}) <span class="info-icon ms-2"
                                                 data-bs-toggle="tooltip" data-bs-placement="top"
                                                 data-bs-title="Leads in the organic social channel are tracked automatically with Nutshell Analytics."><i
-                                                    class="fa-regular fa-circle-info"></i></span></h6>
+                                                    class="fas fa-info-circle"></i></span></h6>
                                         <p>Visited your site from Twitter, Facebook, etc.</p>
                                     </div>
                                     <div>
@@ -247,65 +230,44 @@
                                     </div>
                                 </div>
 
-                                <div class="table-responsive position-relative">
-                                    <table class="table activity-table">
+                                    <table class="table w-100 equipment-report-table mb-0">
                                         <thead>
                                             <tr>
                                                 <th scope="col">Source</th>
-                                                <th scope="col">Last used</th>
                                                 <th scope="col">Created time</th>
-                                                <th scope="col"></th>
+                                                <th scope="col">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($organic_socials as $organic_social)
                                                 <tr>
                                                     <td>{{ $organic_social->name ?? 'N/A' }}</td>
-                                                    <td class="last-activity">N/A</td>
                                                     <td class="last-activity">
                                                         {{ \Carbon\Carbon::parse($organic_social->created_at)->format('d M Y, H:i') }}
                                                     </td>
-                                                    <td class="position-relative">
-                                                        <a class="text-dark" href="javascript:void(0)"
-                                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                    <td class="text-left">
+                                                        <a href="#" class="btn btn-outline-primary btn-sm btn-edit-source" 
+                                                           data-id="{{ $organic_social->id }}"
+                                                           data-name="{{ $organic_social->name }}"
+                                                           data-channel-id="{{ $organic_social->channel_id }}">
+                                                            Edit
                                                         </a>
-                                                        <ul class="dropdown-menu dropdown-menu-end">
-                                                            <li>
-                                                                <button class="dropdown-item" type="button"
-                                                                    onclick="viewReport('Cloned Lead')">
-                                                                    <i class="fa-solid fa-chart-bar"></i>
-                                                                    View report
-                                                                </button>
-                                                            </li>
-                                                            <li>
-                                                                <hr class="dropdown-divider">
-                                                            </li>
-                                                            <li>
-                                                                <button class="dropdown-item text-danger" type="button"
-                                                                    onclick="deleteItem('Cloned Lead')">
-                                                                    <i class="fa-solid fa-trash"></i>
-                                                                    Delete
-                                                                </button>
-                                                            </li>
-                                                        </ul>
                                                     </td>
                                                 </tr>
                                             @endforeach
 
                                         </tbody>
                                     </table>
-                                </div>
                             </div>
 
                             <!-- Paid social Table Start -->
-                            <div class="table-container">
+                            <div class="mb-5">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <div>
-                                        <h6 class="fw-bold mb-0 text-uppercase">Paid social ({{ $paid_social_count }})
+                                        <h6 class="mb-0 text-uppercase">Paid social ({{ $paid_social_count }})
                                             <span class="info-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top"
                                                 data-bs-title="Leads in the paid social channel are tracked automatically with Nutshell Analytics."><i
-                                                    class="fa-regular fa-circle-info"></i></span>
+                                                    class="fas fa-info-circle"></i></span>
                                         </h6>
                                         <p>Clicked your ad on Twitter, Facebook, etc.</p>
                                     </div>
@@ -316,65 +278,44 @@
                                     </div>
                                 </div>
 
-                                <div class="table-responsive position-relative">
-                                    <table class="table activity-table">
+                                    <table class="table w-100 equipment-report-table mb-0">
                                         <thead>
                                             <tr>
                                                 <th scope="col">Source</th>
-                                                <th scope="col">Last used</th>
                                                 <th scope="col">Created time</th>
-                                                <th scope="col"></th>
+                                                <th scope="col">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($paid_socials as $paid_social)
                                                 <tr>
                                                     <td>{{ $paid_social->name ?? 'N/A' }}</td>
-                                                    <td class="last-activity">N/A</td>
                                                     <td class="last-activity">
                                                         {{ \Carbon\Carbon::parse($paid_social->created_at)->format('d M Y, H:i') }}
                                                     </td>
-                                                    <td class="position-relative">
-                                                        <a class="text-dark" href="javascript:void(0)"
-                                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                    <td class="text-left">
+                                                        <a href="#" class="btn btn-outline-primary btn-sm btn-edit-source" 
+                                                           data-id="{{ $paid_social->id }}"
+                                                           data-name="{{ $paid_social->name }}"
+                                                           data-channel-id="{{ $paid_social->channel_id }}">
+                                                            Edit
                                                         </a>
-                                                        <ul class="dropdown-menu dropdown-menu-end">
-                                                            <li>
-                                                                <button class="dropdown-item" type="button"
-                                                                    onclick="viewReport('Cloned Lead')">
-                                                                    <i class="fa-solid fa-chart-bar"></i>
-                                                                    View report
-                                                                </button>
-                                                            </li>
-                                                            <li>
-                                                                <hr class="dropdown-divider">
-                                                            </li>
-                                                            <li>
-                                                                <button class="dropdown-item text-danger" type="button"
-                                                                    onclick="deleteItem('Cloned Lead')">
-                                                                    <i class="fa-solid fa-trash"></i>
-                                                                    Delete
-                                                                </button>
-                                                            </li>
-                                                        </ul>
                                                     </td>
                                                 </tr>
                                             @endforeach
 
                                         </tbody>
                                     </table>
-                                </div>
                             </div>
 
                             <!-- Email Table Start -->
-                            <div class="table-container">
+                            <div class="mb-5">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <div>
-                                        <h6 class="fw-bold mb-0 text-uppercase">Email social ({{ $email_count }})
+                                        <h6 class="mb-0 text-uppercase">Email social ({{ $email_count }})
                                             <span class="info-icon ms-2" data-bs-toggle="tooltip" data-bs-placement="top"
                                                 data-bs-title="Leads in the email channel are tracked automatically with Nutshell Analytics."><i
-                                                    class="fa-regular fa-circle-info"></i></span>
+                                                    class="fas fa-info-circle"></i></span>
                                         </h6>
                                         <p>Clicked a link in your email campaign</p>
                                     </div>
@@ -385,66 +326,45 @@
                                     </div>
                                 </div>
 
-                                <div class="table-responsive position-relative">
-                                    <table class="table activity-table">
+                                    <table class="table w-100 equipment-report-table mb-0">
                                         <thead>
                                             <tr>
                                                 <th scope="col">Source</th>
-                                                <th scope="col">Last used</th>
                                                 <th scope="col">Created time</th>
-                                                <th scope="col"></th>
+                                                <th scope="col">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($emails as $email)
                                                 <tr>
                                                     <td>{{ $email->name ?? 'N/A' }}</td>
-                                                    <td class="last-activity">N/A</td>
                                                     <td class="last-activity">
                                                         {{ \Carbon\Carbon::parse($email->created_at)->format('d M Y, H:i') }}
                                                     </td>
-                                                    <td class="position-relative">
-                                                        <a class="text-dark" href="javascript:void(0)"
-                                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                    <td class="text-left">
+                                                        <a href="#" class="btn btn-outline-primary btn-sm btn-edit-source" 
+                                                           data-id="{{ $email->id }}"
+                                                           data-name="{{ $email->name }}"
+                                                           data-channel-id="{{ $email->channel_id }}">
+                                                            Edit
                                                         </a>
-                                                        <ul class="dropdown-menu dropdown-menu-end">
-                                                            <li>
-                                                                <button class="dropdown-item" type="button"
-                                                                    onclick="viewReport('Cloned Lead')">
-                                                                    <i class="fa-solid fa-chart-bar"></i>
-                                                                    View report
-                                                                </button>
-                                                            </li>
-                                                            <li>
-                                                                <hr class="dropdown-divider">
-                                                            </li>
-                                                            <li>
-                                                                <button class="dropdown-item text-danger" type="button"
-                                                                    onclick="deleteItem('Cloned Lead')">
-                                                                    <i class="fa-solid fa-trash"></i>
-                                                                    Delete
-                                                                </button>
-                                                            </li>
-                                                        </ul>
                                                     </td>
                                                 </tr>
                                             @endforeach
 
                                         </tbody>
                                     </table>
-                                </div>
                             </div>
 
                             <!-- Direct traffic Table Start -->
-                            <div class="table-container">
+                            <div class="mb-5">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <div>
-                                        <h6 class="fw-bold mb-0 text-uppercase">Direct traffic
+                                        <h6 class="mb-0 text-uppercase">Direct traffic
                                             ({{ $direct_traffic_count }}) <span class="info-icon ms-2"
                                                 data-bs-toggle="tooltip" data-bs-placement="top"
                                                 data-bs-title="Leads in the direct traffic channel are tracked automatically with Nutshell Analytics."><i
-                                                    class="fa-regular fa-circle-info"></i></span></h6>
+                                                    class="fas fa-info-circle"></i></span></h6>
                                         <p>Navigated directly to your website</p>
                                     </div>
                                     <div>
@@ -454,48 +374,28 @@
                                     </div>
                                 </div>
 
-                                <div class="table-responsive position-relative">
-                                    <table class="table activity-table">
+                                    <table class="table w-100 equipment-report-table mb-0">
                                         <thead>
                                             <tr>
                                                 <th scope="col">Source</th>
-                                                <th scope="col">Last used</th>
                                                 <th scope="col">Created time</th>
-                                                <th scope="col"></th>
+                                                <th scope="col">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($direct_traffics as $direct_traffic)
                                                 <tr>
                                                     <td>{{ $direct_traffic->name ?? 'N/A' }}</td>
-                                                    <td class="last-activity">N/A</td>
                                                     <td class="last-activity">
                                                         {{ \Carbon\Carbon::parse($direct_traffic->created_at)->format('d M Y, H:i') }}
                                                     </td>
-                                                    <td class="position-relative">
-                                                        <a class="text-dark" href="javascript:void(0)"
-                                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                    <td class="text-left">
+                                                        <a href="#" class="btn btn-outline-primary btn-sm btn-edit-source" 
+                                                           data-id="{{ $direct_traffic->id }}"
+                                                           data-name="{{ $direct_traffic->name }}"
+                                                           data-channel-id="{{ $direct_traffic->channel_id }}">
+                                                            Edit
                                                         </a>
-                                                        <ul class="dropdown-menu dropdown-menu-end">
-                                                            <li>
-                                                                <button class="dropdown-item" type="button"
-                                                                    onclick="viewReport('Cloned Lead')">
-                                                                    <i class="fa-solid fa-chart-bar"></i>
-                                                                    View report
-                                                                </button>
-                                                            </li>
-                                                            <li>
-                                                                <hr class="dropdown-divider">
-                                                            </li>
-                                                            <li>
-                                                                <button class="dropdown-item text-danger" type="button"
-                                                                    onclick="deleteItem('Cloned Lead')">
-                                                                    <i class="fa-solid fa-trash"></i>
-                                                                    Delete
-                                                                </button>
-                                                            </li>
-                                                        </ul>
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -503,18 +403,17 @@
 
                                         </tbody>
                                     </table>
-                                </div>
                             </div>
 
                             <!-- Referral traffic Table Start -->
-                            <div class="table-container">
+                            <div class="mb-5">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <div>
-                                        <h6 class="fw-bold mb-0 text-uppercase">Referral traffic
+                                        <h6 class="mb-0 text-uppercase">Referral traffic
                                             ({{ $referral_traffic_count }})<span class="info-icon ms-2"
                                                 data-bs-toggle="tooltip" data-bs-placement="top"
                                                 data-bs-title="Leads in the referral traffic channel are tracked automatically with manually added sources."><i
-                                                    class="fa-regular fa-circle-info"></i></span></h6>
+                                                    class="fas fa-info-circle"></i></span></h6>
                                         <p>Arrived from a third-party website</p>
                                     </div>
                                     <div>
@@ -525,66 +424,45 @@
                                     </div>
                                 </div>
 
-                                <div class="table-responsive position-relative">
-                                    <table class="table activity-table">
+                                    <table class="table w-100 equipment-report-table mb-0">
                                         <thead>
                                             <tr>
                                                 <th scope="col">Source</th>
-                                                <th scope="col">Last used</th>
                                                 <th scope="col">Created time</th>
-                                                <th scope="col"></th>
+                                                <th scope="col">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($referral_traffics as $referral_traffic)
                                                 <tr>
                                                     <td>{{ $referral_traffic->name ?? 'N/A' }}</td>
-                                                    <td class="last-activity">N/A</td>
                                                     <td class="last-activity">
                                                         {{ \Carbon\Carbon::parse($referral_traffic->created_at)->format('d M Y, H:i') }}
                                                     </td>
-                                                    <td class="position-relative">
-                                                        <a class="text-dark" href="javascript:void(0)"
-                                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                    <td class="text-left">
+                                                        <a href="#" class="btn btn-outline-primary btn-sm btn-edit-source" 
+                                                           data-id="{{ $referral_traffic->id }}"
+                                                           data-name="{{ $referral_traffic->name }}"
+                                                           data-channel-id="{{ $referral_traffic->channel_id }}">
+                                                            Edit
                                                         </a>
-                                                        <ul class="dropdown-menu dropdown-menu-end">
-                                                            <li>
-                                                                <button class="dropdown-item" type="button"
-                                                                    onclick="viewReport('Cloned Lead')">
-                                                                    <i class="fa-solid fa-chart-bar"></i>
-                                                                    View report
-                                                                </button>
-                                                            </li>
-                                                            <li>
-                                                                <hr class="dropdown-divider">
-                                                            </li>
-                                                            <li>
-                                                                <button class="dropdown-item text-danger" type="button"
-                                                                    onclick="deleteItem('Cloned Lead')">
-                                                                    <i class="fa-solid fa-trash"></i>
-                                                                    Delete
-                                                                </button>
-                                                            </li>
-                                                        </ul>
                                                     </td>
                                                 </tr>
                                             @endforeach
 
                                         </tbody>
                                     </table>
-                                </div>
                             </div>
 
                             <!-- Traditional Table Start -->
-                            <div class="table-container">
+                            <div class="mb-5">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <div>
-                                        <h6 class="fw-bold mb-0 text-uppercase">Traditional
+                                        <h6 class="mb-0 text-uppercase">Traditional
                                             ({{ $traditional_count }})<span class="info-icon ms-2"
                                                 data-bs-toggle="tooltip" data-bs-placement="top"
                                                 data-bs-title="Leads in the traditional channel are tracked automatically with manually added sources."><i
-                                                    class="fa-regular fa-circle-info"></i></span></h6>
+                                                    class="fas fa-info-circle"></i></span></h6>
                                         <p>Saw a billboard, connected at a tradeshow, etc.</p>
                                     </div>
                                     <div>
@@ -594,92 +472,63 @@
                                     </div>
                                 </div>
 
-                                <div class="table-responsive position-relative">
-                                    <table class="table activity-table">
+                                    <table class="table w-100 equipment-report-table mb-0">
                                         <thead>
                                             <tr>
                                                 <th scope="col">Source</th>
-                                                <th scope="col">Last used</th>
                                                 <th scope="col">Created time</th>
-                                                <th scope="col"></th>
+                                                <th scope="col">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($traditionals as $traditional)
                                                 <tr>
                                                     <td>{{ $traditional->name ?? 'N/A' }}</td>
-                                                    <td class="last-activity">N/A</td>
                                                     <td class="last-activity">
                                                         {{ \Carbon\Carbon::parse($traditional->created_at)->format('d M Y, H:i') }}
                                                     </td>
-                                                    <td class="position-relative">
-                                                        <a class="text-dark" href="javascript:void(0)"
-                                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                    <td class="text-left">
+                                                        <a href="#" class="btn btn-outline-primary btn-sm btn-edit-source" 
+                                                           data-id="{{ $traditional->id }}"
+                                                           data-name="{{ $traditional->name }}"
+                                                           data-channel-id="{{ $traditional->channel_id }}">
+                                                            Edit
                                                         </a>
-                                                        <ul class="dropdown-menu dropdown-menu-end">
-                                                            <li>
-                                                                <button class="dropdown-item" type="button"
-                                                                    onclick="viewReport('Cloned Lead')">
-                                                                    <i class="fa-solid fa-chart-bar"></i>
-                                                                    View report
-                                                                </button>
-                                                            </li>
-                                                            <li>
-                                                                <hr class="dropdown-divider">
-                                                            </li>
-                                                            <li>
-                                                                <button class="dropdown-item text-danger" type="button"
-                                                                    onclick="deleteItem('Cloned Lead')">
-                                                                    <i class="fa-solid fa-trash"></i>
-                                                                    Delete
-                                                                </button>
-                                                            </li>
-                                                        </ul>
                                                     </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
-                                </div>
                             </div>
 
-                            <div class="info-section">
-                                <div class="info-cards">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6>Getting started with channels and sources</h6>
-                                    </div>
-                                    <p>Existing sources can now be grouped into channels. These broad, predetermined
+                            <div class="info-section bg-white p-4 rounded-3 border mt-4" style="border-color: #e5e7eb !important;">
+                                <div class="info-cards mb-4">
+                                    <h6 class="fw-bold mb-2">Getting started with channels and sources</h6>
+                                    <p class="text-muted mb-2">Existing sources can now be grouped into channels. These broad, predetermined
                                         categories describe where a lead comes from.</p>
-                                    <a href="#"><svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                            viewBox="0 0 13 13" width="13" height="13">
-                                            <path fill="currentColor"
-                                                d="M0 2.438C0 1.54.729.812 1.625.812h9.75c.896 0 1.625.73 1.625 1.625v8.126c0 .896-.729 1.624-1.625 1.624h-9.75A1.626 1.626 0 0 1 0 10.563V2.437Zm6.5 0v8.124h4.875V2.438H6.5Z">
-                                            </path>
-                                        </svg> Learn more</a>
                                 </div>
-                                <div class="info-cards">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6>What is a source?</h6>
-                                    </div>
-                                    <p>Sources track how leads arrive at your website and learn about your business. Leads
+                                <hr class="my-4 text-muted opacity-25">
+                                <div class="info-cards mb-4">
+                                    <h6 class="fw-bold mb-2">What is a source?</h6>
+                                    <p class="text-muted mb-0">Sources track how leads arrive at your website and learn about your business. Leads
                                         can be associated with one or more sources (e.g., ‘direct,’ ‘google,’ ‘web beta
                                         signup,’ etc.).</p>
                                 </div>
-                                <div class="info-cards">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6>What is a channel?</h6>
-                                    </div>
-                                    <p>Channels group your sources into broader categories. Report on these channels to
+                                <hr class="my-4 text-muted opacity-25">
+                                <div class="info-cards mb-4">
+                                    <h6 class="fw-bold mb-2">What is a channel?</h6>
+                                    <p class="text-muted mb-0">Channels group your sources into broader categories. Report on these channels to
                                         understand where your traffic comes from and identify opportunities for growth.</p>
                                 </div>
+                                <hr class="my-4 text-muted opacity-25">
                                 <div class="info-cards">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6>Where do sources come from?</h6>
-                                    </div>
-                                    <p>Sources can be added manually to ‘Traditional’ or ‘Referral traffic’ while sources in
+                                    <h6 class="fw-bold mb-2">Where do sources come from?</h6>
+                                    <p class="text-muted mb-0">Sources can be added manually to ‘Traditional’ or ‘Referral traffic’ while sources in
                                         all other channels are tracked automatically with Nutshell Analytics.</p>
                                 </div>
+                            </div>
+
+                            </div>
                             </div>
 
                         </div>
@@ -745,8 +594,8 @@
                         <div class="row mx-0">
                             <div class="col-lg-12">
                                 <div class="form-group">
-                                    <label class="form-label">Name</label>
-                                    <input type="text" placeholder="" name="name" class="form-control" />
+                                    <label class="form-label">Name <span class="text-danger">*</span></label>
+                                    <input type="text" placeholder="Enter source name" name="name" class="form-control" />
                                 </div>
                             </div>
                         </div>
@@ -773,7 +622,52 @@
             </div>
         </div>
     </div>
+    </div>
     <!-- Add a new source Modal End -->
+
+    <div class="modal fade" id="edit_source" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="editModalLabel">Edit source</h1>
+                    <div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-body ps-0">
+                    <form class="company-form" action="" method="post" id="update_source">
+                        @csrf
+                        <div class="row mx-0">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Name <span class="text-danger">*</span></label>
+                                    <input type="text" placeholder="Enter source name" name="name" id="editSourceName" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mx-0">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Channel</label>
+                                    <select name="channel_id" id="editSourceChannel" class="form-select">
+                                        <option value="">-- Select Channel --</option>
+                                        @foreach ($all_channels as $all_channel)
+                                            <option value="{{ $all_channel->id }}">{{ $all_channel->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btnUpdateSource">Save Changes</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 
@@ -847,17 +741,25 @@
             });
         });
 
+        // Reset form and validation on modal close
+        $('#add_source').on('hidden.bs.modal', function () {
+            const validator = $("#store_source").validate();
+            if(validator) validator.resetForm();
+            $('#store_source')[0].reset();
+            $('#store_source .is-invalid').removeClass('is-invalid');
+        });
+
          $("#store_source").validate({
             ignore: [],
             rules: {
                 name: {
                     required: true
-                },
+                }
             },
             messages: {
                 name: {
                     required: "Please enter the source name."
-                },
+                }
             },
             errorElement: 'span',
             errorClass: 'invalid-feedback d-block',
@@ -884,25 +786,95 @@
                 return; // Stop if validation fails
             }
 
+            const btn = $('#AddSource');
+            btn.prop('disabled', true).text('Creating...');
+
             $.ajax({
                 url: "{{ route('admin.settings.source.store') }}",
                 method: "POST",
                 data: $(this).serialize(),
                 success: function(response) {
-                    alert('Source added successfully!');
+                    toastr.success('Source added successfully!');
                     $('#add_source').modal('hide');
-                    console.log(response);
-                    location.reload();
-
+                    setTimeout(() => location.reload(), 1000);
                 },
                 error: function(xhr) {
-                    alert('Error: ' + xhr.responseText);
-                    toastr.error('Something went wrong while adding new source.');
+                    btn.prop('disabled', false).text('New Source');
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while adding new source.');
                 }
             });
         });
 
 
+
+        // Edit form reset on close
+        $('#edit_source').on('hidden.bs.modal', function () {
+            const validator = $("#update_source").validate();
+            if(validator) validator.resetForm();
+            $('#update_source')[0].reset();
+            $('#update_source .is-invalid').removeClass('is-invalid');
+        });
+
+        // Edit button click
+        $(document).on('click', '.btn-edit-source', function(e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+            let name = $(this).data('name');
+            let channel_id = $(this).data('channel-id');
+
+            $('#editSourceName').val(name);
+            $('#editSourceChannel').val(channel_id);
+
+            $('#update_source').attr('action', "{{ url('admin/settings/channel_source/update') }}/" + id);
+            $('#edit_source').modal('show');
+        });
+
+        $("#update_source").validate({
+            ignore: [],
+            rules: {
+                name: { required: true }
+            },
+            messages: {
+                name: { required: "Please enter the source name." }
+            },
+            errorElement: 'span',
+            errorClass: 'invalid-feedback d-block',
+            highlight: function(element) { $(element).addClass('is-invalid'); },
+            unhighlight: function(element) { $(element).removeClass('is-invalid'); },
+            errorPlacement: function(error, element) {
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent());
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+
+        $('#update_source').submit(function(e) {
+            e.preventDefault();
+
+            if (!$('#update_source').valid()) {
+                return;
+            }
+
+            const btn = $('#btnUpdateSource');
+            btn.prop('disabled', true).text('Saving...');
+
+            $.ajax({
+                url: $(this).attr('action'),
+                method: "POST",
+                data: $(this).serialize(),
+                success: function(response) {
+                    toastr.success('Source updated successfully!');
+                    $('#edit_source').modal('hide');
+                    setTimeout(() => location.reload(), 1000);
+                },
+                error: function(xhr) {
+                    btn.prop('disabled', false).text('Save Changes');
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while updating the source.');
+                }
+            });
+        });
 
     </script>
 @endpush

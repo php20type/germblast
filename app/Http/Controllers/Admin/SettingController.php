@@ -16,6 +16,7 @@ use App\Models\Product;
 use App\Models\Source;
 use App\Models\Tag;
 use App\Models\Territory;
+use App\Models\TerritoryLocation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -24,7 +25,7 @@ class SettingController extends Controller
     public function index()
     {
 
-        return view('admin.settings.index');
+        return redirect()->route('admin.settings.activity_type');
 
     }
 
@@ -86,6 +87,30 @@ class SettingController extends Controller
         return redirect()->back()->with('success', 'Activity type added successfully.');
     }
 
+    public function activity_type_update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required',
+            'icon' => 'required',
+        ]);
+
+        $activity_type = ActivityType::findOrFail($id);
+        $activity_type->update([
+            'type' => $validated['name'],
+            'icon' => $validated['icon'],
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Activity type updated successfully.',
+                'company' => $activity_type,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Activity type updated successfully.');
+    }
+
     public function competitor()
     {
 
@@ -121,6 +146,28 @@ class SettingController extends Controller
 
     }
 
+    public function competitor_update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required',
+        ]);
+
+        $competitor = Competitor::findOrFail($id);
+        $competitor->update([
+            'name' => $validated['name'],
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Competitor updated successfully.',
+                'company' => $competitor,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Competitor updated successfully.');
+    }
+
     public function industry()
     {
 
@@ -154,6 +201,28 @@ class SettingController extends Controller
 
         return redirect()->back()->with('success', 'Industry added successfully.');
 
+    }
+
+    public function industry_update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required',
+        ]);
+
+        $industry = Industry::findOrFail($id);
+        $industry->update([
+            'name' => $validated['name'],
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Industry updated successfully.',
+                'company' => $industry,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Industry updated successfully.');
     }
 
     public function channel_source()
@@ -237,6 +306,29 @@ class SettingController extends Controller
 
     }
 
+    public function source_update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required',
+        ]);
+
+        $source = Source::findOrFail($id);
+        $source->update([
+            'name' => $validated['name'],
+            'channel_id' => $request->input('channel_id') ?: null,
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Source updated successfully.',
+                'company' => $source,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Source updated successfully.');
+    }
+
     public function company_type()
     {
 
@@ -268,6 +360,28 @@ class SettingController extends Controller
         }
 
         return redirect()->back()->with('success', 'Company type added successfully.');
+    }
+
+    public function company_type_update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required',
+        ]);
+
+        $company_type = CompanyType::findOrFail($id);
+        $company_type->update([
+            'type' => $validated['name'],
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Company type updated successfully.',
+                'company' => $company_type,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Company type updated successfully.');
     }
 
     public function market()
@@ -305,6 +419,31 @@ class SettingController extends Controller
         }
 
         return redirect()->back()->with('success', 'Market added successfully.');
+
+    }
+
+    public function market_update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required',
+            'currency_id' => 'required',
+        ]);
+
+        $market = Market::findOrFail($id);
+        $market->update([
+            'name' => $validated['name'],
+            'currency_id' => $validated['currency_id'],
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Market updated successfully.',
+                'market' => $market,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Market updated successfully.');
     }
 
     public function tag()
@@ -365,6 +504,33 @@ class SettingController extends Controller
         return redirect()->back()->with('success', 'Tag added successfully.');
     }
 
+    public function tag_update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required',
+            'color' => 'required',
+            'tag_id' => 'required',
+        ]);
+
+        $tag = Tag::findOrFail($id);
+        
+        $tag->update([
+            'name' => $validated['name'],
+            'color' => $validated['color'],
+            'tag_id' => $validated['tag_id'],
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Tag updated successfully.',
+                'tag' => $tag,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Tag updated successfully.');
+    }
+
     public function product()
     {
         $products = Product::all();
@@ -407,16 +573,115 @@ class SettingController extends Controller
         return redirect()->back()->with('success', 'Product added successfully.');
     }
 
+    public function product_update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required',
+            'product_type' => 'required',
+            'sku' => 'required',
+            'us_price' => 'required',
+        ]);
+
+        $product = Product::findOrFail($id);
+        $product->update([
+            'name' => $validated['name'],
+            'product_type' => $validated['product_type'],
+            'sku' => $validated['sku'],
+            'price' => $validated['us_price'],
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Product updated successfully.',
+                'product' => $product,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Product updated successfully.');
+    }
+
     public function territory()
     {
         $territories = Territory::with('locations')->get();
+        foreach ($territories as $territory) {
+            foreach ($territory->locations as $loc) {
+                if ($loc->state) {
+                    $state = \App\Models\State::find($loc->state);
+                    $loc->state_name = $state ? $state->name : 'Unknown';
+                }
+                if ($loc->city) {
+                    $city = \App\Models\City::find($loc->city);
+                    $loc->city_name = $city ? $city->name : 'Unknown';
+                }
+            }
+        }
 
-        return view('admin.settings.territory');
+        return view('admin.settings.territory', compact('territories'));
     }
 
     public function territory_store(Request $request)
     {
-        return 'stored successfully';
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'franchise_name' => 'required|string|max:255',
+        ]);
+
+        $territory = Territory::create([
+            'name' => $request->name,
+            'franchise_name' => $request->franchise_name,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Territory added successfully!']);
+    }
+
+    public function territory_update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'franchise_name' => 'required|string|max:255',
+        ]);
+
+        $territory = Territory::findOrFail($id);
+        $territory->update([
+            'name' => $request->name,
+            'franchise_name' => $request->franchise_name,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Territory updated successfully!']);
+    }
+
+    public function territory_update_locations(Request $request, $id)
+    {
+        $request->validate([
+            'locations' => 'required|array|min:1',
+        ]);
+
+        $territory = Territory::findOrFail($id);
+        
+        // Delete old locations and insert new ones
+        $territory->locations()->delete();
+
+        foreach ($request->locations as $loc) {
+            $type = 'country'; // default
+            if (!empty($loc['city'])) $type = 'city';
+            elseif (!empty($loc['state_province'])) $type = 'state';
+            elseif (!empty($loc['postal_code'])) $type = 'postal';
+            elseif (!empty($loc['area_code'])) $type = 'area';
+
+            TerritoryLocation::create([
+                'territory_id' => $territory->id,
+                'type' => $type,
+                'country' => $loc['country'] ?? null,
+                'state' => $loc['state_province'] ?? null,
+                'city' => $loc['city'] ?? null,
+                'postal_code' => $loc['postal_code'] ?? null,
+                'area_code' => $loc['area_code'] ?? null,
+                'range' => $loc['range'] ?? null,
+            ]);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Location rules updated successfully!']);
     }
 
     public function getStatesByCountry($countryId)

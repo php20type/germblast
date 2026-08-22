@@ -12,6 +12,16 @@
                     <div class="row">
                         <!-- Sidebar -->
                         @include('admin.settings.sidebar')
+
+                        <!-- Main Content -->
+                        <div class="col-md-9 px-0">
+                            <div class="d-flex align-items-center justify-content-center h-100 bg-white" style="min-height: 500px; border-left: 1px solid #dee2e6;">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-cog fa-3x mb-3 text-light"></i>
+                                    <h5>Select a setting from the sidebar</h5>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
