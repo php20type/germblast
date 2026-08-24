@@ -1403,8 +1403,13 @@
                                 @endcan
                             </div>
 
+                            <hr class="my-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="mb-0">ASSIGNMENTS & COMMISSIONS</h6>
+                            </div>
+
                             <div class="form-group mb-3">
-                                <label class="form-label"><b>ASSIGNEE</b></label>
+                                <label class="form-label"><b>ASSIGNEE (SALES REP)</b></label>
                                 @can('company.detail.edit')
                                     <select class="form-select company-update" data-field-name="Assignee"
                                         data-field="assignee_id">
@@ -1428,6 +1433,45 @@
                                     </select>
                                 @endcan
                             </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label"><b>SALES REP COMMISSION RATE (%)</b></label>
+                                @can('company.detail.edit')
+                                    <input type="number" step="0.01" min="0" max="100" class="form-control company-update" 
+                                        data-field-name="Sales Rep Commission Rate" data-field="assignee_commission_rate" 
+                                        value="{{ $company->assignee_commission_rate }}" placeholder="e.g. 5.5">
+                                @else
+                                    <input type="number" class="form-control" value="{{ $company->assignee_commission_rate }}" disabled>
+                                @endcan
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="form-label"><b>ACCOUNT MANAGER</b></label>
+                                @can('company.detail.edit')
+                                    <select class="form-select company-update" data-field-name="Account Manager"
+                                        data-field="account_manager_id">
+                                        <option value="">Please Select</option>
+                                        @foreach ($users as $user)
+                                            <option value="{{ $user->id }}"
+                                                    {{ $company->account_manager_id == $user->id ? 'selected' : '' }}>
+                                                    {{ $user->name }}
+                                                </option>
+                                        @endforeach
+                                    </select>
+                                @else
+                                    <select class="form-select" disabled>
+                                        <option value="">Please Select</option>
+                                        @foreach ($users as $user)
+                                            <option value="{{ $user->id }}"
+                                                    {{ $company->account_manager_id == $user->id ? 'selected' : '' }}>
+                                                    {{ $user->name }}
+                                                </option>
+                                        @endforeach
+                                    </select>
+                                @endcan
+                            </div>
+
+                            <hr class="my-4">
 
                              <div class="form-group mb-3">
                                 <label class="form-label"><b>TERRITORY</b></label>

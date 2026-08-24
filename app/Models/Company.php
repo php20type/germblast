@@ -14,6 +14,7 @@ class Company extends Model
     protected $fillable = [
         'user_id',
         'assignee_id',
+        'assignee_commission_rate',
         'sales_rep_id',
         'account_manager_id',
         'name',

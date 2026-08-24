@@ -910,6 +910,41 @@ class CompanyController extends Controller
                 }
                 break;
 
+            case 'account_manager_id':
+                $company->update([
+                    'account_manager_id' => $request->value,
+                ]);
+
+                $newManager = User::find($request->value)->name ?? 'Unassigned';
+
+                Timeline::create([
+                    'user_id' => auth()->id(),
+                    'owner_type' => 'company',
+                    'owner_id' => $company->id,
+                    'action_type' => 'updated_account_manager',
+                    'description' => "assigned {$newManager} as Account Manager for {$companyName}",
+                ]);
+                
+                if ($request->value) {
+                    $notify = app(\App\Services\NotificationService::class);
+                    $notify->sendInApp(
+                        $request->value,
+                        'Account Manager Assigned',
+                        "You have been assigned as the Account Manager for company {$companyName}.",
+                        'companies',
+                        $company->id,
+                        'company_assigned',
+                        get_class($company)
+                    );
+                }
+                break;
+
+            case 'assignee_commission_rate':
+                $company->update([
+                    'assignee_commission_rate' => $request->value,
+                ]);
+                break;
+
             case 'industry_id':
                 $company->update([
                     'industry_id' => $request->value,
