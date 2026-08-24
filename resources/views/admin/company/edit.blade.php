@@ -1434,6 +1434,7 @@
                                 @endcan
                             </div>
 
+                            @if(auth()->check() && (auth()->user()->isSuperAdmin() || auth()->user()->isSalesManager() || auth()->user()->isSalesRepresentative()))
                             <div class="form-group mb-3">
                                 <label class="form-label"><b>SALES REP COMMISSION RATE (%)</b></label>
                                 @can('company.detail.edit')
@@ -1444,6 +1445,7 @@
                                     <input type="number" class="form-control" value="{{ $company->assignee_commission_rate }}" disabled>
                                 @endcan
                             </div>
+                            @endif
 
                             <div class="form-group mb-3">
                                 <label class="form-label"><b>ACCOUNT MANAGER</b></label>
