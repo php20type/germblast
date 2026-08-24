@@ -62,6 +62,11 @@ class CompanyLocation extends Model
         return $this->hasMany(ServiceOrderSlotFacility::class, 'company_location_id');
     }
 
+    public function atpSamples()
+    {
+        return $this->hasMany(ServiceOrderAtpSample::class, 'facility_id');
+    }
+
     public function getFullAddressAttribute()
     {
         $parts = [];

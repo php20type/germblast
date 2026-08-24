@@ -1174,7 +1174,7 @@
                                                      <h5 class="section-title">ATP Results</h5>
                                                  </div>
                                                  @php 
-                                                     $atpDetails = $order->atp_details ?? []; 
+                                                     $atpDetails = $order->atpSamples; 
                                                      $totalSamples = count($atpDetails);
                                                      $preSamples = collect($atpDetails)->where('atp_type', 'pre')->count();
                                                      $postSamples = collect($atpDetails)->where('atp_type', 'post')->count();
@@ -1630,6 +1630,66 @@
                                                 <p class="text-muted">No contract details found.</p>
                                             @endforelse
 
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Inventory Consumables --}}
+                                    <div class="row mt-4">
+                                        <div class="col-md-12">
+                                            <div class="section-card">
+                                                <div class="section-header mb-3">
+                                                    <h5 class="section-title">Inventory Consumables</h5>
+                                                </div>
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover equipment-report-table mb-0">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th>Item</th>
+                                                                <th>Quantity Used</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @php
+                                                                $consumablesList = [
+                                                                    'microfiber_bins' => 'Microfiber Bins',
+                                                                    'disposable_microfiber' => 'Disposable Microfiber',
+                                                                    'atp_swabs' => 'ATP Swabs',
+                                                                    'water' => 'Water',
+                                                                    'oxivir' => 'Oxivir',
+                                                                    'opticide' => 'Opticide',
+                                                                    'halomist' => 'Halomist',
+                                                                    'gloves' => 'Gloves',
+                                                                    'sterifab' => 'Sterifab',
+                                                                    'd2' => 'D2',
+                                                                    'shield' => 'Shield',
+                                                                    'rinse_aid' => 'Rinse Aid',
+                                                                    'wash_cleaner' => 'Wash Cleaner',
+                                                                    'rust_inhibitor' => 'Rust Inhibitor'
+                                                                ];
+                                                                $hasConsumables = false;
+                                                            @endphp
+                                                            
+                                                            @if(isset($order->consumables) && is_array($order->consumables))
+                                                                @foreach($consumablesList as $key => $label)
+                                                                    @if(isset($order->consumables[$key]) && floatval($order->consumables[$key]) > 0)
+                                                                        @php $hasConsumables = true; @endphp
+                                                                        <tr>
+                                                                            <td>{{ $label }}</td>
+                                                                            <td>{{ floatval($order->consumables[$key]) }}</td>
+                                                                        </tr>
+                                                                    @endif
+                                                                @endforeach
+                                                            @endif
+                                                            
+                                                            @if(!$hasConsumables)
+                                                                <tr>
+                                                                    <td colspan="2" class="text-muted text-center">No inventory consumables have been recorded.</td>
+                                                                </tr>
+                                                            @endif
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

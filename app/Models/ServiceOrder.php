@@ -23,13 +23,11 @@ class ServiceOrder extends Model
         // Checklist consumables
         'consumables',
         'hotel_details',
-        'atp_details',
     ];
 
     protected $casts = [
         'consumables' => 'array',
         'hotel_details' => 'array',
-        'atp_details' => 'array',
     ];
 
     public function service()
@@ -80,5 +78,10 @@ class ServiceOrder extends Model
     public function cleanPatches()
     {
         return $this->hasMany(ServiceOrderCleanPatch::class, 'service_order_id');
+    }
+
+    public function atpSamples()
+    {
+        return $this->hasMany(ServiceOrderAtpSample::class, 'service_order_id');
     }
 }

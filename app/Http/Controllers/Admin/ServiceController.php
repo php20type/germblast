@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Lead;
 use App\Models\Service;
 use App\Models\ServiceOrder;
+use App\Models\ServiceOrderAtpSample;
 use App\Models\ServiceOrderInvoice;
 use App\Models\ServiceOrderSlot;
 use App\Models\ServiceOutline;
@@ -2024,22 +2025,16 @@ class ServiceController extends Controller implements HasMiddleware
         ]);
 
         $order = ServiceOrder::findOrFail($orderId);
-        $atpRecords = $order->atp_details ?? [];
 
-        $newRecord = [
-            'id'          => uniqid(),
+        ServiceOrderAtpSample::create([
+            'service_order_id' => $orderId,
             'atp_type'    => $request->input('atp_type'),
             'facility_id' => $request->input('facility_id'),
             'result'      => $request->input('result'),
             'description' => $request->input('description'),
-            'created_at'  => now()->toDateTimeString(),
-        ];
-
-        $atpRecords[] = $newRecord;
-
-        $order->update([
-            'atp_details' => $atpRecords
         ]);
+
+        $atpRecords = $order->atpSamples()->get();
 
         if ($request->ajax()) {
             return response()->json([
@@ -2058,23 +2053,18 @@ class ServiceController extends Controller implements HasMiddleware
     public function deleteAtpDetail(Request $request, $orderId)
     {
         $request->validate([
-            'atp_entry_id' => 'required|string',
+            'atp_entry_id' => 'required',
         ]);
 
         $order = ServiceOrder::findOrFail($orderId);
-        $atpRecords = $order->atp_details ?? [];
+        
+        $atpSample = ServiceOrderAtpSample::where('service_order_id', $orderId)
+            ->where('id', $request->input('atp_entry_id'))
+            ->firstOrFail();
+            
+        $atpSample->delete();
 
-        // Filter out the requested ATP ID
-        $updatedRecords = array_filter($atpRecords, function ($record) use ($request) {
-            return ($record['id'] ?? '') !== $request->input('atp_entry_id');
-        });
-
-        // Reindex array keys
-        $updatedRecords = array_values($updatedRecords);
-
-        $order->update([
-            'atp_details' => $updatedRecords
-        ]);
+        $updatedRecords = $order->atpSamples()->get();
 
         if ($request->ajax()) {
             return response()->json([
