@@ -108,7 +108,9 @@
                         <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
                                 <h3 class="mb-1">Employee Work Report</h3>
-                                <p class="text-muted mb-0">Track and analyze employee hours and monthly payroll statistics.</p>
+                                <p class="text-danger mb-0 fw-semibold" style="font-size: 15px;">
+                                    * Note: This report calculates actual hours worked based strictly on time clock punches linked to scheduled Service Order jobs.
+                                </p>
                             </div>
                         </div>
 

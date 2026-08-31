@@ -109,7 +109,7 @@
                                     <p class="text-muted mb-0">This page displays time sheets for {{ $employee->name }}</p>
                             </div>
                             <div class="right-part-sec d-flex align-items-center gap-2">
-                                <a href="{{ route('admin.timecards.index') }}" class="btn btn-secondary">
+                                <a href="{{ route('admin.timecards.index') }}" class="btn btn-outline-dark">
                                     <i class="fas fa-arrow-left me-1"></i> BACK
                                 </a>
                                 <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#addPunchModal">
