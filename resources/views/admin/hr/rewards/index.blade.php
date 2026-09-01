@@ -4,59 +4,7 @@
 
 @push('styles')
     <style>
-        /* Modern Reward Cards Grid */
-        .reward-card {
-            background: #ffffff !important;
-            border: 1px solid #e5e7eb !important;
-            border-radius: 16px !important;
-            padding: 24px !important;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.01) !important;
-        }
 
-        .reward-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05) !important;
-            border-color: rgba(255, 184, 28, 0.4) !important;
-        }
-
-        .reward-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: #ffb81c;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .reward-card:hover::before {
-            opacity: 1;
-        }
-
-        .reward-badge-circle {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: rgba(255, 184, 28, 0.12);
-            color: #ffb81c;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-            transition: all 0.3s ease;
-        }
-
-        .reward-card:hover .reward-badge-circle {
-            background: #ffb81c;
-            color: #ffffff;
-            transform: scale(1.05);
-        }
 
         .btn-delete-reward {
             background: none;
@@ -71,20 +19,7 @@
             color: #ef4444;
         }
 
-        .avatar-circle {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #ffb81c;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 12px;
-            border: 2px solid #ffffff;
-            box-shadow: 0 0 0 1px #e5e7eb;
-        }
+
     </style>
 @endpush
 

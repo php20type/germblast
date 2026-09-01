@@ -4338,7 +4338,459 @@ div[contenteditable="true"]:focus {
 .dashboard-body .section-card .equipment-report-table tbody tr th:first-child:nth-last-child(2) {
     width: 35%;
 }
-.dashboard-body .section-card .table tbody tr td:nth-child(2):last-child,
 .dashboard-body .section-card .equipment-report-table tbody tr td:nth-child(2):last-child {
     width: 65%;
 }
+
+/* Responsive Activity/Note Log Form Styling */
+.activity-form {
+    background-color: #fdfdfd !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    padding: 24px !important;
+}
+
+.activity-form textarea.form-textarea {
+    border: 1px solid #d1d5db !important;
+    border-radius: 8px !important;
+    padding: 14px !important;
+    font-size: 14px !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+    background-color: #ffffff !important;
+}
+
+.activity-form textarea.form-textarea:focus {
+    border-color: #ffb81c !important;
+    box-shadow: 0 0 0 3px rgba(255, 184, 28, 0.15) !important;
+    outline: none !important;
+}
+
+.activity-form .form-label {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    color: #4b5563 !important;
+    margin-bottom: 6px !important;
+    text-transform: uppercase !important;
+    display: block !important;
+}
+
+.activity-form .form-select-custom,
+.activity-form .activity-date,
+.activity-form input[type="text"] {
+    width: 100% !important;
+    height: 42px !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    padding: 8px 14px !important;
+    font-size: 14px !important;
+    background-color: #ffffff !important;
+    color: #374151 !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+
+.activity-form .form-select-custom:focus,
+.activity-form .activity-date:focus,
+.activity-form input[type="text"]:focus {
+    border-color: #ffb81c !important;
+    box-shadow: 0 0 0 3px rgba(255, 184, 28, 0.15) !important;
+    outline: none !important;
+}
+
+.activity-form .btn-login {
+    background-color: #28a745 !important;
+    border: none !important;
+    color: white !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    padding: 12px 24px !important;
+    border-radius: 6px !important;
+    transition: background-color 0.2s, transform 0.1s !important;
+    cursor: pointer !important;
+    display: inline-block !important;
+    width: auto !important;
+}
+
+.activity-form .btn-login:hover {
+    background-color: #218838 !important;
+}
+
+/* Specific styling for select2 or custom participant selects inside activity form */
+.activity-form select[multiple].form-select-custom,
+.activity-form .select2-container {
+    width: 100% !important;
+}
+
+.activity-form .select2-container--default .select2-selection--multiple {
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    min-height: 42px !important;
+    padding: 4px 8px !important;
+}
+
+/* --- Added Subtle Hover Effects for Edit Pages --- */
+.people-card,
+.company-list,
+.timeline-content {
+    transition: all 0.2s ease-in-out !important;
+}
+
+.people-card {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+}
+
+.timeline-content {
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+}
+
+.people-card:hover,
+.company-list:hover,
+.timeline-content:hover {
+    background-color: #fdfdfd !important;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06) !important;
+    transform: translateY(-2px) !important;
+    border-color: #ffb81c !important; 
+}
+/* ------------------------------------------------ */
+
+/* Unified Equipment Report Table */
+.equipment-report-table {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    overflow: hidden !important;
+    background: #fff !important;
+    width: 100% !important;
+    margin-top: 10px !important;
+}
+.equipment-report-table thead th {
+    background-color: rgba(255, 184, 28, 0.4) !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    color: #374151 !important;
+    font-weight: 600 !important;
+    padding: 16px 20px !important;
+    border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+    font-size: 14px !important;
+}
+.equipment-report-table thead th:first-child {
+    border-top-left-radius: 12px !important;
+}
+.equipment-report-table thead th:last-child {
+    border-top-right-radius: 12px !important;
+    border-right: none !important;
+}
+.equipment-report-table td {
+    padding: 14px 20px !important;
+    vertical-align: middle !important;
+    border-bottom: 1px solid #f3f4f6 !important;
+    border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+    font-size: 14px !important;
+}
+.equipment-report-table td:last-child {
+    border-right: none !important;
+}
+.equipment-report-table tbody tr:last-child td {
+    border-bottom: none !important;
+}
+.equipment-report-table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 12px !important;
+}
+.equipment-report-table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 12px !important;
+}
+
+.cursor-pointer {
+    cursor: pointer !important;
+}
+
+/* Unified Reward Cards */
+.reward-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 16px !important;
+    padding: 24px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.01) !important;
+}
+.reward-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05) !important;
+    border-color: rgba(255, 184, 28, 0.4) !important;
+}
+.reward-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: #ffb81c;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.reward-card:hover::before {
+    opacity: 1;
+}
+.reward-badge-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 184, 28, 0.12);
+    color: #ffb81c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+.reward-card:hover .reward-badge-circle {
+    background: #ffb81c;
+    color: #ffffff;
+    transform: scale(1.05);
+}
+.avatar-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #ffb81c;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 1px #e5e7eb;
+}
+
+/* Unified Form Components (Section Card, Feedback Area) */
+.section-card {
+    background: #fff;
+    border: 1px solid #f0f0f0;
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 20px;
+}
+.section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+textarea.feedback-area {
+    resize: vertical;
+    min-height: 160px;
+    border-radius: 8px;
+    border: 1.5px solid #e5e7eb;
+    padding: 14px;
+    font-size: 14px;
+    width: 100%;
+    outline: none;
+    transition: border-color .15s;
+}
+textarea.feedback-area:focus {
+    border-color: #ffb81c;
+}
+
+/* Corporate Tools Unified Styles */
+.status-pill {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    padding: 4px 10px !important;
+    border-radius: 20px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    border: 1px solid transparent !important;
+}
+.status-pill-open {
+    background-color: rgba(13, 110, 253, 0.12) !important;
+    color: #0d6efd !important;
+    border-color: rgba(13, 110, 253, 0.2) !important;
+}
+.status-pill-approved {
+    background-color: rgba(6, 150, 151, 0.12) !important;
+    color: #069697 !important;
+    border-color: rgba(6, 150, 151, 0.25) !important;
+}
+.status-pill-rejected {
+    background-color: rgba(234, 61, 47, 0.12) !important;
+    color: #ea3d2f !important;
+    border-color: rgba(234, 61, 47, 0.2) !important;
+}
+.status-pill-closed {
+    background-color: rgba(134, 134, 134, 0.12) !important;
+    color: #636363 !important;
+    border-color: rgba(134, 134, 134, 0.2) !important;
+}
+.status-pill-due {
+    background: #fee2e2;
+    color: #dc2626;
+}
+.status-pill-completed {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.corp-section-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 16px !important;
+    padding: 25px !important;
+    margin-bottom: 25px !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
+    transition: all 0.3s ease !important;
+}
+.corp-section-card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
+}
+
+.navbar-tabs {
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 5px;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+}
+.navbar-tabs .nav-tabs {
+    border-bottom: none !important;
+}
+.navbar-tabs .nav-link {
+    border: none !important;
+    color: #6b7280 !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 13px;
+    padding: 12px 20px 20px 20px !important;
+    white-space: nowrap !important;
+    background: transparent !important;
+    position: relative;
+    transition: all 0.2s ease;
+}
+.navbar-tabs .nav-link.active {
+    color: #111827 !important;
+    background-color: #fff8e8 !important;
+    border-radius: 10px 10px 0 0;
+}
+.navbar-tabs .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: #ffb400;
+}
+.navbar-tabs .badge {
+    background-color: #6b7280 !important;
+    font-weight: 500;
+    padding: 4px 8px;
+    font-size: 11px;
+    vertical-align: middle;
+}
+
+/* Operations - Shared Calendar and Badges */
+.calendar-nav-btn {
+    color: #4b5563 !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 16px !important;
+    border-radius: 6px !important;
+    transition: all 0.15s ease;
+    text-decoration: none !important;
+    display: inline-flex;
+    align-items: center;
+}
+
+.calendar-nav-btn:hover {
+    background-color: #f3f4f6 !important;
+    color: #1f2937 !important;
+}
+
+.calendar-nav-btn.btn-today {
+    background-color: #ffb400 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(255, 180, 0, 0.15) !important;
+}
+
+.calendar-nav-btn.btn-today:hover {
+    background-color: #e6a200 !important;
+    color: #ffffff !important;
+}
+
+.badge-territory {
+    font-size: 0.75rem !important;
+    background-color: rgba(255, 184, 28, 0.15) !important;
+    color: #d39100 !important;
+    padding: 4px 10px !important;
+    border-radius: 20px !important;
+    font-weight: 600 !important;
+    border: 1px solid rgba(255, 184, 28, 0.25) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.bg-today-light {
+    background-color: rgba(255, 180, 0, 0.02) !important;
+}
+
+.border-today-accent {
+    border-top: 3px solid #ffb400 !important;
+}
+
+.calendar-week-grid {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    overflow: hidden;
+    background: #ffffff;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.calendar-day-col {
+    border-right: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 1200px) {
+    .calendar-week-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .calendar-week-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .calendar-week-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.calendar-day-header {
+    background-color: #fafafa;
+    border-bottom: 1px solid #e5e7eb !important;
+}
+

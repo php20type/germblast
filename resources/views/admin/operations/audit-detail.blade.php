@@ -8,64 +8,7 @@
             cursor: pointer !important;
         }
 
-        /* Equipment Report Table Boxed Styling from EQ */
-        .equipment-report-table {
-            border: 1px solid #e5e7eb !important;
-            border-radius: 12px !important;
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
-            overflow: hidden !important;
-            background: #fff !important;
-            width: 100% !important;
-            margin-top: 10px !important;
-        }
-
-        .equipment-report-table thead th {
-            background-color: rgba(255, 184, 28, 0.4) !important;
-            border-bottom: 1px solid #e5e7eb !important;
-            color: #374151 !important;
-            font-weight: 600 !important;
-            padding: 18px 20px !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-            white-space: nowrap;
-        }
-
-        .equipment-report-table thead th:first-child {
-            border-top-left-radius: 12px !important;
-        }
-
-        .equipment-report-table thead th:last-child {
-            border-top-right-radius: 12px !important;
-            border-right: none !important;
-        }
-
-        .equipment-report-table td {
-            padding: 15px 20px !important;
-            vertical-align: middle !important;
-            border-bottom: 1px solid #f3f4f6 !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-        }
-
-        .equipment-report-table td:last-child {
-            border-right: none !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td {
-            border-bottom: none !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td:first-child {
-            border-bottom-left-radius: 12px !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td:last-child {
-            border-bottom-right-radius: 12px !important;
-        }
-
-        /* Section Card Refinement */
-        .section-card {
+        .corp-section-card {
             background: #ffffff !important;
             border: 1px solid #e5e7eb !important;
             border-radius: 16px !important;
@@ -75,68 +18,8 @@
             transition: all 0.3s ease !important;
         }
 
-        .section-card:hover {
+        .corp-section-card:hover {
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
-        }
-
-        .section-title {
-            font-size: 18px !important;
-            font-weight: 600 !important;
-            color: #374151 !important;
-            margin-bottom: 0 !important;
-        }
-
-        .section-header {
-            border-bottom: 1px solid #f3f4f6 !important;
-            padding-bottom: 15px !important;
-            margin-bottom: 20px !important;
-        }
-        
-        /* Navbar Tabs Refinement */
-        .navbar-tabs {
-            background-color: transparent;
-        }
-
-        .navbar-tabs .nav-tabs {
-            border-bottom: none !important;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE and Edge */
-        }
-        
-        .navbar-tabs .nav-tabs::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
-        }
-
-        .navbar-tabs .nav-link {
-            border: none !important;
-            color: #6b7280 !important;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 13px;
-            padding: 12px 20px 20px 20px !important;
-            white-space: nowrap !important;
-            background: transparent !important;
-            position: relative;
-            transition: all 0.2s ease;
-        }
-
-        .navbar-tabs .nav-link.active {
-            color: #111827 !important;
-            background-color: #fff8e8 !important;
-            border-radius: 10px 10px 0 0;
-        }
-
-        .navbar-tabs .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background-color: #ffb400;
         }
         
         .question-header {
@@ -306,7 +189,7 @@
                                 
                                 <hr class="mb-4 mt-0" style="opacity: 0.1;">
 
-                                <div class="section-card">
+                                <div class="corp-section-card">
                                     <div class="tab-content" id="auditTabContent">
                                         @php
                                             $tabGroups = [

@@ -3,53 +3,7 @@
 @section('title', 'Industries')
 
 @section('content')
-@push('styles')
-    <style>
-        .cursor-pointer {
-            cursor: pointer !important;
-        }
 
-        /* Boxed Table System from Equipment Management */
-        .equipment-report-table {
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
-            border: 1px solid #f3f4f6 !important;
-            border-radius: 12px !important;
-            overflow: hidden !important;
-            background: #fff !important;
-        }
-
-        .equipment-report-table thead th {
-            background-color: rgba(255, 184, 28, 0.4) !important;
-            color: #374151 !important;
-            font-weight: 600 !important;
-            padding: 18px 20px !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-            text-align: left;
-            white-space: nowrap;
-        }
-
-        .equipment-report-table tbody td {
-            padding: 15px 20px !important;
-            vertical-align: middle !important;
-            border-bottom: 1px solid #f3f4f6 !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-            text-align: left;
-            white-space: nowrap;
-        }
-
-        .equipment-report-table thead th:last-child,
-        .equipment-report-table tbody td:last-child {
-            border-right: none !important;
-        }
-
-        .equipment-report-table tr:last-child td {
-            border-bottom: none !important;
-        }
-    </style>
-@endpush
 
 
     <main class="app-wrapper">
@@ -65,7 +19,7 @@
                         <div class="main-content">
                             <div class="heading-area-sec mb-3">
                                 <div class="left-part-sec">
-                                    <h3 class="mb-1">INDUSTRIES</h3>
+                                    <h3 class="mb-1">INDUSTRIES <span style="font-size: 24px;">📌</span></h3>
                                     <p class="text-muted mb-0">Organize your companies by their industry.</p>
                                 </div>
                                 <div class="right-part-sec mt-1">

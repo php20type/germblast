@@ -5,52 +5,7 @@
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <style>
-        /* Equipment Report Table Boxed Styling */
-        .equipment-report-table {
-            border: 1px solid #e5e7eb !important;
-            border-radius: 12px !important;
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
-            overflow: hidden !important;
-            background: #fff !important;
-            width: 100% !important;
-            margin-top: 10px !important;
-        }
 
-        .equipment-report-table thead th {
-            background-color: rgba(255, 184, 28, 0.4) !important;
-            border-bottom: 1px solid #e5e7eb !important;
-            color: #374151 !important;
-            font-weight: 600 !important;
-            padding: 12px 15px !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 13px !important;
-            text-align: center;
-            white-space: nowrap;
-        }
-
-        .equipment-report-table td {
-            padding: 12px 15px !important;
-            vertical-align: middle !important;
-            border-bottom: 1px solid #f3f4f6 !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 13px !important;
-            text-align: center;
-            white-space: nowrap;
-        }
-
-        .equipment-report-table td:first-child,
-        .equipment-report-table thead th:first-child {
-            text-align: left !important;
-        }
-
-        .equipment-report-table td:last-child {
-            border-right: none !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td {
-            border-bottom: none !important;
-        }
 
         /* Pastel Row Colors */
         .row-green {

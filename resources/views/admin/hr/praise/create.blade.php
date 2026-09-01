@@ -4,13 +4,7 @@
 
 @push('styles')
 <style>
-    .section-card {
-        background: #fff;
-        border: 1px solid #f0f0f0;
-        border-radius: 12px;
-        padding: 28px;
-        margin-bottom: 20px;
-    }
+
     .form-group-praise {
         margin-bottom: 24px;
     }
@@ -33,20 +27,7 @@
     .input-praise:focus {
         border-color: #3b82f6;
     }
-    textarea.feedback-area {
-        resize: vertical;
-        min-height: 160px;
-        border-radius: 6px;
-        border: 1px solid #d1d5db;
-        padding: 14px;
-        font-size: 14px;
-        width: 100%;
-        outline: none;
-        transition: border-color .15s;
-    }
-    textarea.feedback-area:focus {
-        border-color: #3b82f6;
-    }
+
     .btn-submit-praise {
         background: #ffb81c;
         color: #fff;

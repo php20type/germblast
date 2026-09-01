@@ -41,7 +41,8 @@
                             <div class="heading-area-sec mb-3">
                                 <div class="left-part-sec">
                                     <h3 class="mb-1 text-uppercase">AUDITS</h3>
-                                    <p class="text-muted mb-0">Overview of completed facility audits and their corresponding scores.</p>
+                                    <p class="text-muted mb-1">Overview of completed facility audits and their corresponding scores.</p>
+                                    <p class="text-danger mb-0" style="font-size: 0.9rem;"><strong>Note:</strong> This page displays the list of finalized audits.</p>
                                 </div>
                             </div>
 

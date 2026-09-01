@@ -8,61 +8,6 @@
             cursor: pointer !important;
         }
 
-        /* Status Pills styling */
-        .status-pill {
-            font-size: 11px !important;
-            font-weight: 700 !important;
-            padding: 4px 10px !important;
-            border-radius: 20px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 4px !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.5px !important;
-            border: 1px solid transparent !important;
-        }
-
-        .status-pill-open {
-            background-color: rgba(13, 110, 253, 0.12) !important;
-            color: #0d6efd !important;
-            border-color: rgba(13, 110, 253, 0.2) !important;
-        }
-
-        .status-pill-approved {
-            background-color: rgba(6, 150, 151, 0.12) !important;
-            color: #069697 !important;
-            border-color: rgba(6, 150, 151, 0.25) !important;
-        }
-
-        .status-pill-rejected {
-            background-color: rgba(234, 61, 47, 0.12) !important;
-            color: #ea3d2f !important;
-            border-color: rgba(234, 61, 47, 0.2) !important;
-        }
-
-        .status-pill-closed {
-            background-color: rgba(134, 134, 134, 0.12) !important;
-            color: #636363 !important;
-            border-color: rgba(134, 134, 134, 0.2) !important;
-        }
-
-
-
-        /* Section Cards */
-        .section-card {
-            background: #ffffff !important;
-            border: 1px solid #e5e7eb !important;
-            border-radius: 16px !important;
-            padding: 25px !important;
-            margin-bottom: 25px !important;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
-            transition: all 0.3s ease !important;
-        }
-
-        .section-card:hover {
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
-        }
     </style>
 @endpush
 
@@ -100,7 +45,7 @@
                         <!-- Cards Content -->
                         <div class="px-4 pb-4 text-start">
                             @forelse ($sortedRequests as $request)
-                                <div class="section-card mt-3">
+                                <div class="corp-section-card mt-3">
                                     <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
                                         <div class="d-flex flex-column align-items-start">
                                             <div class="d-flex align-items-center gap-2 mb-1">

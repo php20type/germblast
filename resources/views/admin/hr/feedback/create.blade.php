@@ -4,34 +4,7 @@
 
 @push('styles')
 <style>
-    .section-card {
-        background: #fff;
-        border: 1px solid #f0f0f0;
-        border-radius: 12px;
-        padding: 28px;
-        margin-bottom: 20px;
-    }
-    .section-title {
-        font-size: 13px;
-        font-weight: 700;
-        color: #6b7280;
-        text-transform: uppercase;
-        letter-spacing: .6px;
-        padding-bottom: 10px;
-        margin-bottom: 20px;
-    }
-    textarea.feedback-area {
-        resize: vertical;
-        min-height: 160px;
-        border-radius: 8px;
-        border: 1.5px solid #e5e7eb;
-        padding: 14px;
-        font-size: 14px;
-        width: 100%;
-        outline: none;
-        transition: border-color .15s;
-    }
-    textarea.feedback-area:focus { border-color: #ffb81c; }
+
     .btn-submit-feedback {
         background: #ffb81c;
         color: #fff;

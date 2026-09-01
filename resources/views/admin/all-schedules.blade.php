@@ -4,129 +4,14 @@
 
 @push('styles')
     <style>
-        /* Calendar Navigation Button from Vehicle Planning */
-        .calendar-nav-btn {
-            color: #4b5563 !important;
-            font-size: 11px !important;
-            font-weight: 700 !important;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 8px 16px !important;
-            border-radius: 6px !important;
-            transition: all 0.15s ease;
-            text-decoration: none !important;
-            display: inline-flex;
-            align-items: center;
-        }
 
-        .calendar-nav-btn:hover {
-            background-color: #f3f4f6 !important;
-            color: #1f2937 !important;
-        }
-
-        .calendar-nav-btn.btn-today {
-            background-color: #ffb400 !important;
-            color: #ffffff !important;
-            box-shadow: 0 2px 4px rgba(255, 180, 0, 0.15) !important;
-        }
-
-        .calendar-nav-btn.btn-today:hover {
-            background-color: #e6a200 !important;
-            color: #ffffff !important;
-        }
-
-        /* Modern Soft Badges */
-        .badge-territory {
-            font-size: 0.75rem !important;
-            background-color: rgba(255, 184, 28, 0.15) !important;
-            color: #d39100 !important;
-            padding: 4px 10px !important;
-            border-radius: 20px !important;
-            font-weight: 600 !important;
-            border: 1px solid rgba(255, 184, 28, 0.25) !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.5px !important;
-        }
-
-        /* Boxed Table System from Equipment Management */
-        .equipment-report-table {
-            border: 1px solid #e5e7eb !important;
-            border-radius: 12px !important;
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
-            overflow: hidden !important;
-            background: #fff !important;
-            width: 100% !important;
-            margin-top: 10px !important;
-        }
-
-        .equipment-report-table thead th {
-            background-color: rgba(255, 184, 28, 0.4) !important;
-            border-bottom: 1px solid #e5e7eb !important;
-            color: #374151 !important;
-            font-weight: 600 !important;
-            padding: 18px 20px !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-            text-align: center;
-            white-space: nowrap;
-        }
-
-        .equipment-report-table thead th:first-child {
-            border-top-left-radius: 12px !important;
-        }
-
-        .equipment-report-table thead th:last-child {
-            border-top-right-radius: 12px !important;
-            border-right: none !important;
-        }
-
-        .equipment-report-table td {
-            padding: 15px 20px !important;
-            vertical-align: middle !important;
-            border-bottom: 1px solid #f3f4f6 !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-            text-align: center;
-            white-space: nowrap;
-        }
-
-        .equipment-report-table td:last-child {
-            border-right: none !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td {
-            border-bottom: none !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td:first-child {
-            border-bottom-left-radius: 12px !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td:last-child {
-            border-bottom-right-radius: 12px !important;
-        }
-
-        /* Section Card Refinement */
-        .section-card {
-            background: #ffffff !important;
-            border: 1px solid #e5e7eb !important;
-            border-radius: 16px !important;
-            padding: 25px !important;
-            margin-bottom: 25px !important;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
-            transition: all 0.3s ease !important;
-        }
-
-        .section-card:hover {
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
-        }
 
         .section-title {
             font-size: 18px !important;
             font-weight: 600 !important;
             color: #374151 !important;
             margin-bottom: 0 !important;
+            text-transform: none !important;
         }
 
         .section-header {
@@ -214,7 +99,7 @@
                                 $totalHours = $employeeSlots->sum(fn($e) => $e['slot']->scheduled_hours ?? 0);
                             @endphp
 
-                            <div class="section-card">
+                            <div class="corp-section-card">
 
                                 {{-- Header --}}
                                 <div class="section-header d-flex align-items-center gap-3">
@@ -227,7 +112,7 @@
                                     @endif
 
                                     <div>
-                                        <h3 class="section-title mb-1">{{ $employee->name }}</h3>
+                                        <h3 class="section-title mb-1">{{ ucwords(strtolower($employee->name)) }}</h3>
                                         <div class="d-flex align-items-center gap-2">
                                             @if ($employee->territory)
                                                 <span class="badge-territory">{{ $employee->territory->name }}</span>

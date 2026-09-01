@@ -9,130 +9,7 @@
             cursor: pointer !important;
         }
 
-        /* Modern Tabs styling matching Fulfill Order */
-        .navbar-tabs {
-            border-bottom: 1px solid #dee2e6;
-            padding-bottom: 5px;
-            overflow-x: auto !important;
-            overflow-y: hidden !important;
-        }
 
-        .navbar-tabs .nav-tabs {
-            border-bottom: none !important;
-        }
-
-        .navbar-tabs .nav-link {
-            border: none !important;
-            color: #6b7280 !important;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 13px;
-            padding: 12px 20px 20px 20px !important;
-            white-space: nowrap !important;
-            background: transparent !important;
-            position: relative;
-            transition: all 0.2s ease;
-        }
-
-        .navbar-tabs .nav-link.active {
-            color: #111827 !important;
-            background-color: #fff8e8 !important;
-            border-radius: 10px 10px 0 0;
-        }
-
-        .navbar-tabs .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background-color: #ffb400;
-        }
-
-        /* Boxed Table System */
-        .equipment-report-table {
-            border: 1px solid #e5e7eb !important;
-            border-radius: 12px !important;
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
-            overflow: hidden !important;
-            background: #fff !important;
-            width: 100% !important;
-            margin-top: 10px !important;
-        }
-
-        .equipment-report-table thead th {
-            background-color: rgba(255, 184, 28, 0.4) !important;
-            border-bottom: 1px solid #e5e7eb !important;
-            color: #374151 !important;
-            font-weight: 600 !important;
-            padding: 18px 20px !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-        }
-
-        .equipment-report-table thead th:first-child {
-            border-top-left-radius: 12px !important;
-        }
-
-        .equipment-report-table thead th:last-child {
-            border-top-right-radius: 12px !important;
-            border-right: none !important;
-        }
-
-        .equipment-report-table td {
-            padding: 15px 20px !important;
-            vertical-align: middle !important;
-            border-bottom: 1px solid #f3f4f6 !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-        }
-
-        .equipment-report-table tbody th {
-            background-color: #fff !important;
-            border-bottom: 1px solid #f3f4f6 !important;
-            color: #374151 !important;
-            font-weight: 600 !important;
-            padding: 15px 20px !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-            text-align: left !important;
-        }
-
-        .equipment-report-table td:last-child {
-            border-right: none !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td,
-        .equipment-report-table tbody tr:last-child th {
-            border-bottom: none !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td:first-child,
-        .equipment-report-table tbody tr:last-child th:first-child {
-            border-bottom-left-radius: 12px !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td:last-child,
-        .equipment-report-table tbody tr:last-child th:last-child {
-            border-bottom-right-radius: 12px !important;
-        }
-
-        /* Section Cards */
-        .section-card {
-            background: #ffffff !important;
-            border: 1px solid #e5e7eb !important;
-            border-radius: 16px !important;
-            padding: 25px !important;
-            margin-bottom: 25px !important;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
-            transition: all 0.3s ease !important;
-        }
-
-        .section-card:hover {
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
-        }
 
         .section-title {
             font-size: 18px !important;
@@ -367,7 +244,7 @@
                         <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div class="section-card">
+                                    <div class="corp-section-card">
                                         <div class="section-header mb-3">
                                             <h5 class="section-title">Change Request Information</h5>
                                         </div>
@@ -404,7 +281,7 @@
                         <div class="tab-pane fade" id="tasks" role="tabpanel" aria-labelledby="tasks-tab">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div class="section-card">
+                                    <div class="corp-section-card">
                                         <div class="section-header d-flex justify-content-between align-items-center mb-3">
                                             <h5 class="section-title">Associated Tasks Checklist</h5>
                                             @can('change_control.edit')
@@ -466,7 +343,7 @@
                                     
                                     <!-- Add Entry -->
                                     @can('change_control.edit')
-                                    <div class="section-card">
+                                    <div class="corp-section-card">
                                         <div class="section-header mb-3">
                                             <h5 class="section-title">Add Documentation / Log Entry</h5>
                                         </div>
@@ -483,7 +360,7 @@
                                     @endcan
 
                                     <!-- History & Timeline Logs -->
-                                    <div class="section-card">
+                                    <div class="corp-section-card">
                                         <div class="section-header mb-3">
                                             <h5 class="section-title">History & Timeline Logs</h5>
                                         </div>

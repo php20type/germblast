@@ -5,46 +5,6 @@
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <style>
-        /* Status Pills styling */
-        .status-pill {
-            font-size: 11px !important;
-            font-weight: 700 !important;
-            padding: 4px 10px !important;
-            border-radius: 20px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 4px !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.5px !important;
-            border: 1px solid transparent !important;
-        }
-
-        .status-pill-due {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        .status-pill-completed {
-            background: #d1fae5;
-            color: #059669;
-        }
-
-        /* Section Cards */
-        .section-card {
-            background: #ffffff !important;
-            border: 1px solid #e5e7eb !important;
-            border-radius: 16px !important;
-            padding: 25px !important;
-            margin-bottom: 25px !important;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
-            transition: all 0.3s ease !important;
-        }
-
-        .section-card:hover {
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
-        }
-
         /* Timeline History Styles */
         .history-timeline-container {
             position: relative;
@@ -240,7 +200,7 @@
                                     $statusClass = $isCompleted ? 'status-pill-completed' : 'status-pill-due';
                                     $statusText = $isCompleted ? 'Completed' : 'Due';
                                 @endphp
-                                <div class="section-card mt-3">
+                                <div class="corp-section-card mt-3">
                                     <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
                                         <div class="d-flex flex-column align-items-start">
                                             <div class="d-flex align-items-center gap-2 mb-1">
