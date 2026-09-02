@@ -183,11 +183,22 @@ class LeadController extends Controller
         $totalValue = Helper::calculateTotalValue($leads);
         $count = $leads->count();
 
+        $totalTimeOpen = 0;
+        $openLeadsCount = 0;
+        foreach ($leads as $lead) {
+            $end = $lead->close_date ? Carbon::parse($lead->close_date) : now();
+            $start = Carbon::parse($lead->created_at);
+            $totalTimeOpen += abs($start->diffInDays($end, false));
+            $openLeadsCount++;
+        }
+        $avgTimeOpen = $openLeadsCount > 0 ? round($totalTimeOpen / $openLeadsCount) : 0;
+
         return [
             'formattedTotalLeads' => $format($count),
             'formattedTotalValue' => $format(round($totalValue)),
             'formattedAvgValue' => $format(round($count ? $totalValue / $count : 0)),
             'avgConfidence' => number_format($leads->avg('confidence'), 2),
+            'avgTimeOpen' => $avgTimeOpen,
         ];
     }
 
@@ -209,11 +220,14 @@ class LeadController extends Controller
     public function index(Request $request)
     {
         $query = $this->applyFilters($this->baseLeadQuery(), $request);
+        $allLeadsQuery = clone $query;
 
         $paginator = $query->paginate(10)->appends($request->query());
         $leads = $paginator->getCollection();
         $groupedLeads = $this->groupLeads($leads);
-        $stats = $this->calculateStats($leads);
+        
+        $allLeads = $allLeadsQuery->get();
+        $stats = $this->calculateStats($allLeads);
 
         if ($request->ajax()) {
             return response()->json([
@@ -222,6 +236,7 @@ class LeadController extends Controller
                 'total_value' => $stats['formattedTotalValue'],
                 'avg_value' => $stats['formattedAvgValue'],
                 'avg_confidence' => $stats['avgConfidence'],
+                'avg_time_open' => $stats['avgTimeOpen'],
                 'pagination' => (string) $paginator->links(),
             ]);
         }
@@ -243,11 +258,14 @@ class LeadController extends Controller
             $this->baseLeadQuery()->where('creator_id', $id),
             $request
         );
+        $allLeadsQuery = clone $query;
 
         $paginator = $query->paginate(10)->appends($request->query());
         $leads = $paginator->getCollection();
         $groupedLeads = $this->groupLeads($leads);
-        $stats = $this->calculateStats($leads);
+        
+        $allLeads = $allLeadsQuery->get();
+        $stats = $this->calculateStats($allLeads);
 
         if ($request->ajax()) {
             return response()->json([
@@ -256,6 +274,7 @@ class LeadController extends Controller
                 'total_value' => $stats['formattedTotalValue'],
                 'avg_value' => $stats['formattedAvgValue'],
                 'avg_confidence' => $stats['avgConfidence'],
+                'avg_time_open' => $stats['avgTimeOpen'],
                 'pagination' => (string) $paginator->links(),
             ]);
         }
@@ -274,11 +293,14 @@ class LeadController extends Controller
             $this->baseLeadQuery()->where('assignee_id', $id),
             $request
         );
+        $allLeadsQuery = clone $query;
 
         $paginator = $query->paginate(10)->appends($request->query());
         $leads = $paginator->getCollection();
         $groupedLeads = $this->groupLeads($leads);
-        $stats = $this->calculateStats($leads);
+        
+        $allLeads = $allLeadsQuery->get();
+        $stats = $this->calculateStats($allLeads);
 
         if ($request->ajax()) {
             return response()->json([
@@ -287,6 +309,7 @@ class LeadController extends Controller
                 'total_value' => $stats['formattedTotalValue'],
                 'avg_value' => $stats['formattedAvgValue'],
                 'avg_confidence' => $stats['avgConfidence'],
+                'avg_time_open' => $stats['avgTimeOpen'],
                 'pagination' => (string) $paginator->links(),
             ]);
         }
@@ -307,10 +330,14 @@ class LeadController extends Controller
             $request
         );
 
+        $allLeadsQuery = clone $query;
+
         $paginator = $query->paginate(10)->appends($request->query());
         $leads = $paginator->getCollection();
         $groupedLeads = $this->groupLeads($leads);
-        $stats = $this->calculateStats($leads);
+        
+        $allLeads = $allLeadsQuery->get();
+        $stats = $this->calculateStats($allLeads);
 
         if ($request->ajax()) {
             return response()->json([
@@ -319,6 +346,7 @@ class LeadController extends Controller
                 'total_value' => $stats['formattedTotalValue'],
                 'avg_value' => $stats['formattedAvgValue'],
                 'avg_confidence' => $stats['avgConfidence'],
+                'avg_time_open' => $stats['avgTimeOpen'],
                 'pagination' => (string) $paginator->links(),
             ]);
         }
@@ -341,10 +369,14 @@ class LeadController extends Controller
             $request
         );
 
+        $allLeadsQuery = clone $query;
+
         $paginator = $query->paginate(10)->appends($request->query());
         $leads = $paginator->getCollection();
         $groupedLeads = $this->groupLeads($leads);
-        $stats = $this->calculateStats($leads);
+        
+        $allLeads = $allLeadsQuery->get();
+        $stats = $this->calculateStats($allLeads);
 
         if ($request->ajax()) {
             return response()->json([
@@ -353,6 +385,7 @@ class LeadController extends Controller
                 'total_value' => $stats['formattedTotalValue'],
                 'avg_value' => $stats['formattedAvgValue'],
                 'avg_confidence' => $stats['avgConfidence'],
+                'avg_time_open' => $stats['avgTimeOpen'],
                 'pagination' => (string) $paginator->links(),
             ]);
         }
@@ -374,10 +407,14 @@ class LeadController extends Controller
             $request
         );
 
+        $allLeadsQuery = clone $query;
+
         $paginator = $query->paginate(10)->appends($request->query());
         $leads = $paginator->getCollection();
         $groupedLeads = $this->groupLeads($leads);
-        $stats = $this->calculateStats($leads);
+        
+        $allLeads = $allLeadsQuery->get();
+        $stats = $this->calculateStats($allLeads);
 
         if ($request->ajax()) {
             return response()->json([
@@ -386,6 +423,7 @@ class LeadController extends Controller
                 'total_value' => $stats['formattedTotalValue'],
                 'avg_value' => $stats['formattedAvgValue'],
                 'avg_confidence' => $stats['avgConfidence'],
+                'avg_time_open' => $stats['avgTimeOpen'],
                 'pagination' => (string) $paginator->links(),
             ]);
         }
@@ -409,10 +447,14 @@ class LeadController extends Controller
             $request
         );
 
+        $allLeadsQuery = clone $query;
+
         $paginator = $query->paginate(10)->appends($request->query());
         $leads = $paginator->getCollection();
         $groupedLeads = $this->groupLeads($leads);
-        $stats = $this->calculateStats($leads);
+        
+        $allLeads = $allLeadsQuery->get();
+        $stats = $this->calculateStats($allLeads);
 
         if ($request->ajax()) {
             return response()->json([
@@ -421,6 +463,7 @@ class LeadController extends Controller
                 'total_value' => $stats['formattedTotalValue'],
                 'avg_value' => $stats['formattedAvgValue'],
                 'avg_confidence' => $stats['avgConfidence'],
+                'avg_time_open' => $stats['avgTimeOpen'],
                 'pagination' => (string) $paginator->links(),
             ]);
         }
@@ -444,10 +487,14 @@ class LeadController extends Controller
             $request
         );
 
+        $allLeadsQuery = clone $query;
+
         $paginator = $query->paginate(10)->appends($request->query());
         $leads = $paginator->getCollection();
         $groupedLeads = $this->groupLeads($leads);
-        $stats = $this->calculateStats($leads);
+        
+        $allLeads = $allLeadsQuery->get();
+        $stats = $this->calculateStats($allLeads);
 
         if ($request->ajax()) {
             return response()->json([
@@ -456,6 +503,7 @@ class LeadController extends Controller
                 'total_value' => $stats['formattedTotalValue'],
                 'avg_value' => $stats['formattedAvgValue'],
                 'avg_confidence' => $stats['avgConfidence'],
+                'avg_time_open' => $stats['avgTimeOpen'],
                 'pagination' => (string) $paginator->links(),
             ]);
         }

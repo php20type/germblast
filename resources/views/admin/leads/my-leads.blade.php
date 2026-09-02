@@ -99,7 +99,7 @@
                                     </div>
                                     <div class="col-lg-3 col-md-6">
                                         <div class="filter-card">
-                                            <h5>Avg time open:<span>16 Days</span></h5>
+                                            <h5 id="avg-time-open-value">Avg time open:<span>{{ $avgTimeOpen ?? 0 }} Days</span></h5>
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-6">
@@ -386,6 +386,7 @@
                             $('.company-count').text(response.count + ' Lead Found');
                             $('#total-value span').text('$' + response.total_value);
                             $('#avg-value span').text('$' + response.avg_value);
+                            $('#avg-time-open-value span').text(response.avg_time_open + ' Days');
                             $('#confidence-value span').text(response.avg_confidence + '%');
                             $('#lead-pagination').html(response.pagination);
                         },
