@@ -238,7 +238,10 @@
                                                             <div class="text-upload col-6">
                                                                 <a href="{{ asset('storage/' . $img->file_path) }}"
                                                                     download>
-                                                                    <p class="mb-1 fw-semibold">{{ $img->file_name }}</p>
+                                                                    @if($img->description)
+                                                                        <p class="mb-0 text-dark text-break">{{ $img->description }}</p>
+                                                                    @endif
+                                                                    <p class="mb-1 fw-semibold text-break">{{ $img->file_name }}</p>
                                                                     <p class="text-muted mb-0 small">
                                                                         {{ number_format(Storage::disk('public')->size($img->file_path) / 1024, 2) }}
                                                                         KB

@@ -326,10 +326,10 @@
                                             <textarea class="form-control mb-2" name="specialist_narrative" rows="6"
                                                 placeholder="Enter narrative here..." {{ !$isEditable ? 'readonly' : '' }}>{{ $surveyProposal->specialist_narrative ?? '' }}</textarea>
 
-                                            <p class="text-muted small mb-0 mt-2">
+                                            {{-- <p class="text-muted small mb-0 mt-2">
                                                 Last Updated By:
                                                 <strong>Chance Brown</strong>
-                                            </p>
+                                            </p> --}}
 
                                         </div>
                                     </div>

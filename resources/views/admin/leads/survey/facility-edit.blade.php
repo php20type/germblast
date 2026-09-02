@@ -317,6 +317,9 @@
                                                             <div class="text-upload col-6">
                                                                 <a href="{{ asset('storage/' . $map->file_path) }}"
                                                                     download>
+                                                                    @if($map->map_name)
+                                                                        <p class="mb-0 text-dark text-break">{{ $map->map_name }}</p>
+                                                                    @endif
                                                                     <p class="mb-1 fw-semibold text-break">{{ $map->file_name }}</p>
                                                                     <p class="text-muted mb-0 small">
                                                                         {{ number_format(Storage::disk('public')->size($map->file_path) / 1024, 2) }}
