@@ -153,7 +153,7 @@ class LeadController extends Controller
         return $query;
     }
 
-    private function groupLeads($leads)
+    public function groupLeads($leads)
     {
         return $leads->groupBy('name')->map(function ($group) {
             $lead = $group->first();

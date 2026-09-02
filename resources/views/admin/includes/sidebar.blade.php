@@ -73,8 +73,8 @@
                     </div>
                 </a>
             </li>
-            <!-- <li class="">
-                <a href="#">
+            <li class="{{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.reports.new_leads') }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon19.svg") }} alt="icon" />
                     </div>
@@ -82,7 +82,7 @@
                         Reports
                     </div>
                 </a>
-            </li> -->
+            </li>
             <li class="{{ request()->routeIs('admin.calendar.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.calendar.index') }}">
                     <div class="icon-round">
