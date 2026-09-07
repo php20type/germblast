@@ -6,8 +6,17 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ServiceOrderSlot;
 
-class AuditCalendarController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class AuditCalendarController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:operations.view'),
+        ];
+    }
     public function index()
     {
         return view('admin.operations.audit-calendar');

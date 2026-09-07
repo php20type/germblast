@@ -8,8 +8,17 @@ use App\Models\IsdCampus;
 use App\Models\IsdSchool;
 use Illuminate\Http\Request;
 
-class IsdAttendanceController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class IsdAttendanceController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:operations.view'),
+        ];
+    }
     /**
      * PAGE 1: School District & Campus Selection Page
      */

@@ -375,4 +375,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-
+// Global Modal Form Reset
+// Ensure any form inside a modal is reset when the modal is closed,
+// and any validation states are cleared.
+$(document).on('hidden.bs.modal', '.modal', function () {
+    const form = $(this).find('form');
+    if (form.length) {
+        // Standard form reset
+        form[0].reset();
+        
+        // Remove validation error classes and messages
+        form.find('.is-invalid').removeClass('is-invalid');
+        form.find('.invalid-feedback').remove();
+        form.find('.error').text(''); 
+        
+        // Reset select2 fields without triggering other change events
+        if ($.fn.select2) {
+            form.find('.select2, select').trigger('change.select2');
+        }
+    }
+});

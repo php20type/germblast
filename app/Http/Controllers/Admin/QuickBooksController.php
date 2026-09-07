@@ -7,8 +7,17 @@ use Illuminate\Http\Request;
 use App\Models\Company;
 use App\Models\ServiceOrderInvoice;
 
-class QuickBooksController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class QuickBooksController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:corporate_tools.view'),
+        ];
+    }
     /**
      * Display the QuickBooks export options.
      */

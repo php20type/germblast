@@ -7,8 +7,17 @@ use Illuminate\Http\Request;
 use App\Models\ActionPlan;
 use Illuminate\Support\Facades\Auth;
 
-class ActionPlanController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class ActionPlanController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:operations.view'),
+        ];
+    }
     public function index()
     {
         $unresolvedActionPlans = ActionPlan::where('is_resolved', false)->get();
