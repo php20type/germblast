@@ -7,8 +7,17 @@ use Illuminate\Http\Request;
 
 use App\Models\EvaluationQuestion;
 
-class EvaluationQuestionController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class EvaluationQuestionController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:operations.view'),
+        ];
+    }
     public function index()
     {
         $questions = EvaluationQuestion::orderBy('role')->orderBy('section')->get();

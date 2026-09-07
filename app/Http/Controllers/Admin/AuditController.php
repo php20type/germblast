@@ -8,8 +8,17 @@ use App\Models\ServiceOrderSlot;
 
 use App\Models\AuditSection;
 
-class AuditController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class AuditController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:operations.view'),
+        ];
+    }
     public function index()
     {
         $audits = ServiceOrderSlot::with('serviceOrder.service.lead.company', 'office', 'staff.user')

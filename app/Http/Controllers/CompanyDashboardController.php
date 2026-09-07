@@ -64,7 +64,10 @@ class CompanyDashboardController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'company_location_id' => 'required|exists:company_locations,id',
+            'company_location_id' => [
+                'required',
+                \Illuminate\Validation\Rule::exists('company_locations', 'id')->where('company_id', $company->id),
+            ],
         ]);
 
         IAQZone::create([
@@ -99,7 +102,10 @@ class CompanyDashboardController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'company_location_id' => 'required|exists:company_locations,id',
+            'company_location_id' => [
+                'required',
+                \Illuminate\Validation\Rule::exists('company_locations', 'id')->where('company_id', $company->id),
+            ],
         ]);
 
         $zone->update($validated);
@@ -113,7 +119,14 @@ class CompanyDashboardController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'iaq_zone_id' => 'required|exists:iaq_zones,id',
+            'iaq_zone_id' => [
+                'required',
+                \Illuminate\Validation\Rule::exists('iaq_zones', 'id')->where(function ($query) use ($company) {
+                    $query->whereIn('company_location_id', function ($sub) use ($company) {
+                        $sub->select('id')->from('company_locations')->where('company_id', $company->id);
+                    });
+                }),
+            ],
             'node_id' => 'required|string|max:255',
         ]);
 
@@ -150,7 +163,14 @@ class CompanyDashboardController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'iaq_zone_id' => 'required|exists:iaq_zones,id',
+            'iaq_zone_id' => [
+                'required',
+                \Illuminate\Validation\Rule::exists('iaq_zones', 'id')->where(function ($query) use ($company) {
+                    $query->whereIn('company_location_id', function ($sub) use ($company) {
+                        $sub->select('id')->from('company_locations')->where('company_id', $company->id);
+                    });
+                }),
+            ],
             'node_id' => 'required|string|max:255',
         ]);
 

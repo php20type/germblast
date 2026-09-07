@@ -173,9 +173,9 @@ class SurveyProposalController extends Controller
         $request->validate([
             'facility_name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
-            'country_id' => 'required',
-            'state_id' => 'required',
-            'city_id' => 'required',
+            'country_id' => 'required|exists:countries,id',
+            'state_id' => 'required|exists:states,id',
+            'city_id' => 'required|exists:cities,id',
             'zip' => 'required|string|max:20',
             'facility_type' => 'required|string',
 
@@ -351,9 +351,9 @@ class SurveyProposalController extends Controller
         $request->validate([
             'facility_name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
-            'country_id' => 'required',
-            'state_id' => 'required',
-            'city_id' => 'required',
+            'country_id' => 'required|exists:countries,id',
+            'state_id' => 'required|exists:states,id',
+            'city_id' => 'required|exists:cities,id',
             'zip' => 'required|string|max:20',
             'facility_type' => 'required|string',
 

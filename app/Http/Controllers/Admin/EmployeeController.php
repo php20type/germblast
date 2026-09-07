@@ -33,6 +33,10 @@ class EmployeeController extends Controller implements HasMiddleware
                 'store',
                 'edit',
                 'update',
+                'storeMaskFitTest',
+                'storeDriverLog',
+                'storeDriverSuspension',
+                'storeAvailability',
             ]),
         ];
     }

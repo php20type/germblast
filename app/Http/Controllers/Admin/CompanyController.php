@@ -201,6 +201,27 @@ class CompanyController extends Controller
 
     public function store(Request $request, NotificationService $notify)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'assignee_id' => 'nullable|exists:users,id',
+            'description' => 'nullable|string',
+            'company_type_id' => 'nullable|exists:company_types,id',
+            'industry_id' => 'nullable|exists:industries,id',
+            'territory_id' => 'nullable|exists:territories,id',
+            'tax_rate' => 'nullable|string',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:50',
+            'address_1' => 'nullable|string|max:255',
+            'address_2' => 'nullable|string|max:255',
+            'country_id' => 'nullable|exists:countries,id',
+            'state_id' => 'nullable|exists:states,id',
+            'city_id' => 'nullable|exists:cities,id',
+            'zip' => 'nullable|string|max:20',
+            'url' => 'nullable|url|max:255',
+            'people_id' => 'nullable|exists:people,id',
+            'tag_id' => 'nullable|exists:tags,id',
+        ]);
+
         if ($request->filled('tax_rate') && !array_key_exists($request->tax_rate, config('mapping.tax_rates'))) {
             return redirect()->back()->with('error', 'Invalid tax rate selected.');
         }

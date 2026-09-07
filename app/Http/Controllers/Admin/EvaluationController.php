@@ -8,8 +8,17 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\EvaluationScore;
 
-class EvaluationController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+
+class EvaluationController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:operations.view'),
+        ];
+    }
     public function index()
     {
         $supervisors = User::role('supervisor')->with(['evaluationRequests', 'evaluationScores.question'])->get();
