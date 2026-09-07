@@ -3,6 +3,7 @@
 @section('title', 'Reports - New Leads')
 
 @push('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <style>
         .chart-container {
             position: relative;
@@ -45,21 +46,59 @@
             font-weight: 500;
         }
 
-        .report-table th {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #6b7280;
-            font-weight: 600;
-            border-bottom: 1px solid #e5e7eb;
-            padding: 12px 24px;
+        /* Equipment Report Table Boxed Styling */
+        .equipment-report-table {
+            border: 1px solid #e5e7eb !important;
+            border-radius: 12px !important;
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            overflow: hidden !important;
+            background: #fff !important;
+            width: 100% !important;
+            margin-top: 10px !important;
         }
-        .report-table td {
-            font-size: 14px;
-            color: #374151;
-            font-weight: 500;
-            padding: 12px 24px;
-            border-bottom: 1px solid #f3f4f6;
+
+        .equipment-report-table thead th {
+            background-color: rgba(255, 184, 28, 0.4) !important;
+            border-bottom: 1px solid #e5e7eb !important;
+            color: #374151 !important;
+            font-weight: 600 !important;
+            padding: 18px 20px !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+        }
+
+        .equipment-report-table thead th:first-child {
+            border-top-left-radius: 12px !important;
+        }
+
+        .equipment-report-table thead th:last-child {
+            border-top-right-radius: 12px !important;
+            border-right: none !important;
+        }
+
+        .equipment-report-table td {
+            padding: 15px 20px !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid #f3f4f6 !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+        }
+
+        .equipment-report-table td:last-child {
+            border-right: none !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td {
+            border-bottom: none !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 12px !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 12px !important;
         }
 
         .calendar-nav-btn {
@@ -110,7 +149,7 @@
                         <!-- HEADER (Standard GermBlast Layout) -->
                         <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-1 text-uppercase">SALES</h3>
+                                <h3 class="mb-1 text-uppercase">SALES <span style="font-size: 24px;">📌</span></h3>
                                 <p class="text-muted mb-0">How many sales did we make?</p>
                             </div>
                             <div class="right-part-sec mt-1 d-flex gap-2">
@@ -133,21 +172,21 @@
                                 <!-- Right Side: Unified Navigation Segment Control -->
                                 <div class="d-flex align-items-center gap-1 bg-light p-1 rounded-3 border"
                                     style="border-color: #e5e7eb !important;">
-                                    <a href="{{ route('admin.reports.sales', ['period' => request('period', 'week'), 'offset' => $offset - 1]) }}"
+                                    <a href="{{ route('admin.reports.sales', ['period' => request('period', 'year'), 'offset' => $offset - 1]) }}"
                                         class="calendar-nav-btn" title="Previous Period">
                                         <i class="fas fa-chevron-left me-1" style="font-size: 10px;"></i> Prev Period
                                     </a>
 
                                     <span class="text-muted opacity-25 px-1">|</span>
 
-                                    <a href="{{ route('admin.reports.sales', ['period' => request('period', 'week'), 'offset' => 0]) }}"
+                                    <a href="{{ route('admin.reports.sales', ['period' => request('period', 'year'), 'offset' => 0]) }}"
                                          class="calendar-nav-btn {{ $offset === 0 ? 'btn-today' : '' }}">
                                          Current Period
                                      </a>
 
                                     <span class="text-muted opacity-25 px-1">|</span>
 
-                                    <a href="{{ route('admin.reports.sales', ['period' => request('period', 'week'), 'offset' => $offset + 1]) }}"
+                                    <a href="{{ route('admin.reports.sales', ['period' => request('period', 'year'), 'offset' => $offset + 1]) }}"
                                         class="calendar-nav-btn {{ $offset >= 0 ? 'disabled text-muted' : '' }}" title="Next Period"
                                         style="{{ $offset >= 0 ? 'pointer-events: none;' : '' }}">
                                         Next Period <i class="fas fa-chevron-right ms-1" style="font-size: 10px;"></i>
@@ -170,10 +209,10 @@
                                     <div class="d-flex align-items-center gap-3">
                                         <div class="d-flex gap-3 text-muted fw-bold" style="font-size: 13px;">
                                             <a href="{{ route('admin.reports.sales', ['period' => 'day']) }}" class="text-decoration-none {{ request('period') === 'day' ? 'text-primary border-bottom border-primary border-2 pb-1' : 'text-muted pb-1 cursor-pointer' }}">Day</a>
-                                            <a href="{{ route('admin.reports.sales', ['period' => 'week']) }}" class="text-decoration-none {{ request('period', 'week') === 'week' ? 'text-primary border-bottom border-primary border-2 pb-1' : 'text-muted pb-1 cursor-pointer' }}">Week</a>
+                                            <a href="{{ route('admin.reports.sales', ['period' => 'week']) }}" class="text-decoration-none {{ request('period') === 'week' ? 'text-primary border-bottom border-primary border-2 pb-1' : 'text-muted pb-1 cursor-pointer' }}">Week</a>
                                             <a href="{{ route('admin.reports.sales', ['period' => 'month']) }}" class="text-decoration-none {{ request('period') === 'month' ? 'text-primary border-bottom border-primary border-2 pb-1' : 'text-muted pb-1 cursor-pointer' }}">Month</a>
                                             <a href="{{ route('admin.reports.sales', ['period' => 'quarter']) }}" class="text-decoration-none {{ request('period') === 'quarter' ? 'text-primary border-bottom border-primary border-2 pb-1' : 'text-muted pb-1 cursor-pointer' }}">Quarter</a>
-                                            <a href="{{ route('admin.reports.sales', ['period' => 'year']) }}" class="text-decoration-none {{ request('period') === 'year' ? 'text-primary border-bottom border-primary border-2 pb-1' : 'text-muted pb-1 cursor-pointer' }}">Year</a>
+                                            <a href="{{ route('admin.reports.sales', ['period' => 'year']) }}" class="text-decoration-none {{ request('period', 'year') === 'year' ? 'text-primary border-bottom border-primary border-2 pb-1' : 'text-muted pb-1 cursor-pointer' }}">Year</a>
                                         </div>
                                     </div>
                                 </div>
@@ -213,7 +252,7 @@
 
                             <!-- Details Table -->
                             <div class="corp-section-card p-0 mt-4" style="overflow: hidden;">
-                            <div class="navbar-tabs px-4 pt-3">
+                            <div class="navbar-tabs pt-3">
                                 <nav class="nav nav-tabs mb-0 w-100 nav-fill" id="reportTab" role="tablist">
                                     <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" style="text-transform: uppercase;">DETAILS</button>
                                     <button class="nav-link" id="leads-tab" data-bs-toggle="tab" data-bs-target="#leads" type="button" role="tab" style="text-transform: uppercase;">LEADS</button>
@@ -224,7 +263,7 @@
                                 <div class="tab-content" id="reportTabContent">
                                     <div class="tab-pane fade show active p-0" id="details" role="tabpanel">
                                         <div class="table-responsive">
-                                            <table class="table table-hover mb-0 equipment-report-table w-100">
+                                            <table class="table table-hover mb-0 equipment-report-table w-100" id="detailsTable">
                                                 <thead>
                                                     <tr>
                                                         <th style="width: 50%;">Date</th>
@@ -248,35 +287,43 @@
                                     </div>
                                     <div class="tab-pane fade p-4" id="leads" role="tabpanel">
                                         <div class="table-responsive">
-                                            <div class="table-container mt-3 p-0">
-                                                <table class="table table-hover">
-                                                    <thead>
+                                            <table class="table table-hover w-100 equipment-report-table" id="leadsTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Lead name</th>
+                                                        <th>Age</th>
+                                                        <th>Value</th>
+                                                        <th>Assignee</th>
+                                                        <th>Stage</th>
+                                                        <th>Confidence</th>
+                                                        <th>Close date</th>
+                                                        <th>Sources</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @forelse ($groupedLeads as $lead)
                                                         <tr>
-                                                            <th class="checkbox-cell">
-                                                                <input type="checkbox" class="form-check-input" id="selectAll">
-                                                            </th>
-                                                            <th>Lead name</th>
-                                                            <th>Age</th>
-                                                            <th>Value</th>
-                                                            <th>Assignee</th>
-                                                            <th>Stage</th>
-                                                            <th>Confidence</th>
-                                                            <th>Close date</th>
-                                                            <th>Sources</th>
+                                                            <td>
+                                                                @can('lead.detail.view')
+                                                                    <a href="{{ route('admin.lead.show', $lead['id']) }}" class="text-decoration-none text-dark fw-semibold">{{ $lead['name'] }}</a>
+                                                                @else
+                                                                    <span class="fw-semibold text-dark">{{ $lead['name'] }}</span>
+                                                                @endcan
+                                                                <div class="small text-muted" style="font-size: 12px;">{{ $lead['company_name'] }}</div>
+                                                            </td>
+                                                            <td>{{ $lead['created_at'] }}</td>
+                                                            <td>${{ number_format($lead['total_price'], 2) }}</td>
+                                                            <td>{{ $lead['assignee'] }}</td>
+                                                            <td>{{ $lead['stage_name'] }}</td>
+                                                            <td>{{ $lead['confidence'] }}%</td>
+                                                            <td>{{ $lead['close_date'] }}</td>
+                                                            <td>{{ $lead['sources'] }}</td>
                                                         </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @include('admin.leads.partials.lead-table-rows')
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Pagination -->
-                                        <div class="row m-3">
-                                            <div id="lead-pagination" class="col-12 mt-3">
-                                                {{ $paginatedLeads->links() }}
-                                            </div>
+                                                    @empty
+                                                        {{-- Handled by DataTables --}}
+                                                    @endforelse
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
@@ -293,18 +340,45 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // If paginating, switch to the Leads tab automatically
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('page')) {
-            const tabElement = document.getElementById('leads-tab');
+        let activeTab = urlParams.get('tab');
+        if (activeTab) {
+            const tabElement = document.getElementById(activeTab + '-tab');
             if (tabElement) {
                 const tab = new bootstrap.Tab(tabElement);
                 tab.show();
             }
         }
+
+        const tabElements = document.querySelectorAll('button[data-bs-toggle="tab"]');
+        tabElements.forEach(tab => {
+            tab.addEventListener('shown.bs.tab', function (event) {
+                const newTab = event.target.getAttribute('id').replace('-tab', '');
+                const newUrl = new URL(window.location.href);
+                newUrl.searchParams.set('tab', newTab);
+                window.history.replaceState(null, null, newUrl);
+            });
+        });
+
+        const dtConfig = {
+            pageLength: 25,
+            ordering: true,
+            dom: '<"d-flex justify-content-between align-items-center mb-3"l f>r<"table-responsive"t><"d-flex justify-content-between align-items-center mt-3"i p>',
+            language: {
+                search: '',
+                searchPlaceholder: 'Search...',
+                lengthMenu: 'Show _MENU_ entries',
+                info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+                paginate: { previous: 'Previous', next: 'Next' }
+            }
+        };
+        $('#detailsTable').DataTable(dtConfig);
+        $('#leadsTable').DataTable(dtConfig);
 
         const ctx = document.getElementById('newLeadsChart').getContext('2d');
         

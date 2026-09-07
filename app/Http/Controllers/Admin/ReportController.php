@@ -15,7 +15,7 @@ class ReportController extends Controller
      */
     public function newLeads(Request $request)
     {
-        $period = $request->query('period', 'week');
+        $period = $request->query('period', 'year');
         $offset = (int) $request->query('offset', 0);
 
         // Calculate date window based on selected period and offset
@@ -54,13 +54,12 @@ class ReportController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        $paginatedLeads = Lead::with(['products', 'assignee', 'stages', 'sources', 'company'])
+        $allLeads = Lead::with(['products', 'assignee', 'stages', 'sources', 'company'])
             ->whereBetween('created_at', [$startDate, $endDate])
             ->orderBy('created_at', 'desc')
-            ->paginate(10)
-            ->appends($request->query());
+            ->get();
 
-        $groupedLeads = app(\App\Http\Controllers\Admin\LeadController::class)->groupLeads($paginatedLeads->getCollection());
+        $groupedLeads = app(\App\Http\Controllers\Admin\LeadController::class)->groupLeads($allLeads);
 
         // 1. Calculate KPI: Total Value using Helper to match All Leads
         $totalValue = \App\Helpers\Helper::calculateTotalValue($leads);
@@ -131,14 +130,13 @@ class ReportController extends Controller
             'endDate',
             'offset',
             'period',
-            'paginatedLeads',
             'groupedLeads'
         ));
     }
 
     public function sales(Request $request)
     {
-        $period = $request->query('period', 'week');
+        $period = $request->query('period', 'year');
         $offset = (int) $request->query('offset', 0);
 
         // Calculate date window based on selected period and offset
@@ -177,14 +175,13 @@ class ReportController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        $paginatedLeads = Lead::with(['products', 'assignee', 'stages', 'sources', 'company'])
+        $allLeads = Lead::with(['products', 'assignee', 'stages', 'sources', 'company'])
             ->where('lead_status', 'won')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->orderBy('created_at', 'desc')
-            ->paginate(10)
-            ->appends($request->query());
+            ->get();
 
-        $groupedLeads = app(\App\Http\Controllers\Admin\LeadController::class)->groupLeads($paginatedLeads->getCollection());
+        $groupedLeads = app(\App\Http\Controllers\Admin\LeadController::class)->groupLeads($allLeads);
 
         // 1. Calculate KPI: Total Value using Helper to match All Leads
         $totalValue = \App\Helpers\Helper::calculateTotalValue($leads);
@@ -253,14 +250,13 @@ class ReportController extends Controller
             'endDate',
             'offset',
             'period',
-            'paginatedLeads',
             'groupedLeads'
         ));
     }
 
     public function lostLeads(Request $request)
     {
-        $period = $request->query('period', 'week');
+        $period = $request->query('period', 'year');
         $offset = (int) $request->query('offset', 0);
 
         // Calculate date window based on selected period and offset
@@ -299,14 +295,13 @@ class ReportController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        $paginatedLeads = Lead::with(['products', 'assignee', 'stages', 'sources', 'company'])
+        $allLeads = Lead::with(['products', 'assignee', 'stages', 'sources', 'company'])
             ->where('lead_status', 'lost')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->orderBy('created_at', 'desc')
-            ->paginate(10)
-            ->appends($request->query());
+            ->get();
 
-        $groupedLeads = app(\App\Http\Controllers\Admin\LeadController::class)->groupLeads($paginatedLeads->getCollection());
+        $groupedLeads = app(\App\Http\Controllers\Admin\LeadController::class)->groupLeads($allLeads);
 
         // 1. Calculate KPI: Total Value using Helper to match All Leads
         $totalValue = \App\Helpers\Helper::calculateTotalValue($leads);
@@ -375,7 +370,6 @@ class ReportController extends Controller
             'endDate',
             'offset',
             'period',
-            'paginatedLeads',
             'groupedLeads'
         ));
     }
@@ -489,36 +483,10 @@ class ReportController extends Controller
             ]
         ];
 
-        // Manual Pagination for array
-        $page = \Illuminate\Pagination\Paginator::resolveCurrentPage() ?: 1;
-        $perPage = 20;
-        $paginatedProducts = new \Illuminate\Pagination\LengthAwarePaginator(
-            $productStatsCollection->forPage($page, $perPage),
-            $productStatsCollection->count(),
-            $perPage,
-            $page,
-            ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath(), 'query' => $request->query()]
-        );
-
-        if ($request->ajax()) {
-            return view('admin.reports.partials.products_list', compact(
-                'paginatedProducts',
-                'chartData',
-                'totalQuantity',
-                'totalValue',
-                'uniqueProductsCount',
-                'totalLeadsCount',
-                'startDate',
-                'endDate',
-                'offset',
-                'period',
-                'sort',
-                'status'
-            ))->render();
-        }
+        $products = $productStatsCollection->values();
 
         return view('admin.reports.products', compact(
-            'paginatedProducts',
+            'products',
             'chartData',
             'totalQuantity',
             'totalValue',

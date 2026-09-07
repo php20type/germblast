@@ -3,6 +3,7 @@
 @section('title', 'Reports - Products')
 
 @push('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <style>
         .kpi-card {
             background: transparent;
@@ -27,19 +28,59 @@
             color: #6b7280;
             font-weight: 500;
         }
-        .report-table th {
-            font-size: 12px;
-            color: #6b7280;
-            font-weight: 600;
-            border-bottom: 1px solid #e5e7eb;
-            padding: 12px 24px;
+        /* Equipment Report Table Boxed Styling */
+        .equipment-report-table {
+            border: 1px solid #e5e7eb !important;
+            border-radius: 12px !important;
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            overflow: hidden !important;
+            background: #fff !important;
+            width: 100% !important;
+            margin-top: 10px !important;
         }
-        .report-table td {
-            font-size: 14px;
-            color: #374151;
-            font-weight: 500;
-            padding: 12px 24px;
-            border-bottom: 1px solid #f3f4f6;
+
+        .equipment-report-table thead th {
+            background-color: rgba(255, 184, 28, 0.4) !important;
+            border-bottom: 1px solid #e5e7eb !important;
+            color: #374151 !important;
+            font-weight: 600 !important;
+            padding: 18px 20px !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+        }
+
+        .equipment-report-table thead th:first-child {
+            border-top-left-radius: 12px !important;
+        }
+
+        .equipment-report-table thead th:last-child {
+            border-top-right-radius: 12px !important;
+            border-right: none !important;
+        }
+
+        .equipment-report-table td {
+            padding: 15px 20px !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid #f3f4f6 !important;
+            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+            font-size: 14px !important;
+        }
+
+        .equipment-report-table td:last-child {
+            border-right: none !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td {
+            border-bottom: none !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 12px !important;
+        }
+
+        .equipment-report-table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 12px !important;
         }
         .calendar-nav-btn {
             display: inline-flex;
@@ -113,10 +154,6 @@
             border-radius: 2px;
         }
         
-        /* Table overrides */
-        .product-table th, .product-table td {
-            font-size: 13px;
-        }
     </style>
 @endpush
 
@@ -136,7 +173,7 @@
                         <!-- HEADER -->
                         <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-1 text-uppercase">PRODUCTS</h3>
+                                <h3 class="mb-1 text-uppercase">PRODUCTS <span style="font-size: 24px;">📌</span></h3>
                                 <p class="text-muted mb-0">Which products are driving revenue?</p>
                             </div>
                         </div>
@@ -154,7 +191,7 @@
                                         </button>
                                         <ul class="dropdown-menu">
                                             @foreach(['open', 'won', 'lost', 'cancelled', 'pending'] as $st)
-                                                <li><a class="dropdown-item status-filter {{ $status === $st ? 'active' : '' }}" href="#" data-status="{{ $st }}">{{ ucfirst($st) }}</a></li>
+                                                <li><a class="dropdown-item status-filter {{ $status === $st ? 'active' : '' }}" href="{{ route('admin.reports.products', ['period' => request('period', 'year'), 'offset' => $offset, 'sort' => $sort, 'status' => $st]) }}">{{ ucfirst($st) }}</a></li>
                                             @endforeach
                                         </ul>
                                     </div>
@@ -191,7 +228,144 @@
                         </div>
 
                         <div class="px-4 pb-4" id="products-content">
-                            @include('admin.reports.partials.products_list')
+                            <!-- TOP PRODUCTS CHART SECTION -->
+                            <div class="corp-section-card mt-3 bg-white p-4 rounded border">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="fw-bold m-0" style="color: #1f2937;">Top products</h5>
+                                    
+                                    <!-- Toggle -->
+                                    <div class="d-flex bg-white rounded-pill border p-1">
+                                        <a href="{{ route('admin.reports.products', ['period' => request('period', 'year'), 'offset' => $offset, 'sort' => 'revenue', 'status' => $status]) }}" 
+                                            class="btn btn-sm px-3 rounded-pill text-decoration-none {{ $sort == 'revenue' ? 'text-primary fw-bold active-toggle' : 'text-muted fw-bold' }}" 
+                                            style="{{ $sort == 'revenue' ? 'background: rgba(255, 184, 28, 0.1);' : '' }}">
+                                            <i class="fas fa-dollar-sign me-1"></i> Value
+                                        </a>
+                                        <a href="{{ route('admin.reports.products', ['period' => request('period', 'year'), 'offset' => $offset, 'sort' => 'quantity', 'status' => $status]) }}" 
+                                            class="btn btn-sm px-3 rounded-pill text-decoration-none {{ $sort == 'quantity' ? 'text-primary fw-bold active-toggle' : 'text-muted fw-bold' }}"
+                                            style="{{ $sort == 'quantity' ? 'background: rgba(255, 184, 28, 0.1);' : '' }}">
+                                            <i class="fas fa-hashtag me-1"></i> Quantity
+                                        </a>
+                                    </div>
+                                </div>
+
+                                @php
+                                    $metric = $sort == 'revenue' ? 'revenue' : 'quantity';
+                                    $totalMetricValue = $sort == 'revenue' ? $totalValue : $totalQuantity;
+                                @endphp
+
+                                <!-- STACKED BAR -->
+                                <div class="stacked-bar-container">
+                                    @if($totalMetricValue > 0)
+                                        @foreach($chartData['top'] as $index => $item)
+                                            @php
+                                                $pct = ($item[$metric] / $totalMetricValue) * 100;
+                                            @endphp
+                                            @if($pct > 0)
+                                                <div class="stacked-segment segment-{{ $index }}" style="width: {{ $pct }}%;"
+                                                     data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top"
+                                                     title="<div class='text-start'><strong>{{ $item['name'] }}</strong><br>Revenue: US${{ number_format($item['revenue'], 0) }}<br>Quantity: {{ number_format($item['quantity']) }}<br>Leads: {{ $item['leads_count'] }}</div>">
+                                                    @if($pct > 5)
+                                                        <span>{{ number_format($pct, 0) }}%</span>
+                                                        <span>
+                                                            {{ $sort == 'revenue' ? 'US$' . number_format($item['revenue'] / 1000, 1) . 'k' : number_format($item['quantity']) }}
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            @endif
+                                        @endforeach
+
+                                        @if($chartData['other']['count'] > 0 && $chartData['other'][$metric] > 0)
+                                            @php
+                                                $otherPct = ($chartData['other'][$metric] / $totalMetricValue) * 100;
+                                            @endphp
+                                            <div class="stacked-segment segment-other" style="width: {{ $otherPct }}%;"
+                                                 data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top"
+                                                 title="<div class='text-start'><strong>Other ({{ $chartData['other']['count'] }} products)</strong><br>Revenue: US${{ number_format($chartData['other']['revenue'], 0) }}<br>Quantity: {{ number_format($chartData['other']['quantity']) }}</div>">
+                                                @if($otherPct > 5)
+                                                    <span>{{ number_format($otherPct, 0) }}%</span>
+                                                    <span>
+                                                        {{ $sort == 'revenue' ? 'US$' . number_format($chartData['other']['revenue'] / 1000, 1) . 'k' : number_format($chartData['other']['quantity']) }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    @else
+                                        <div class="stacked-segment segment-other w-100 text-muted">No data available</div>
+                                    @endif
+                                </div>
+
+                                <!-- LEGEND -->
+                                <div class="legend-container">
+                                    @foreach($chartData['top'] as $index => $item)
+                                        <div class="legend-item">
+                                            <div class="legend-color segment-{{ $index }}"></div>
+                                            <span>{{ $item['name'] }}</span>
+                                        </div>
+                                    @endforeach
+                                    @if($chartData['other']['count'] > 0)
+                                        <div class="legend-item">
+                                            <div class="legend-color segment-other"></div>
+                                            <span>Other ({{ $chartData['other']['count'] }} products)</span>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <!-- KPI Row -->
+                                <div class="row mt-4 pt-4 border-top mx-0">
+                                    <div class="col-md-3 kpi-card">
+                                        <div class="kpi-label mb-1">Total quantity</div>
+                                        <div class="kpi-value">{{ number_format($totalQuantity) }}</div>
+                                    </div>
+                                    <div class="col-md-3 kpi-card">
+                                        <div class="kpi-label mb-1">Unique products</div>
+                                        <div class="kpi-value">{{ $uniqueProductsCount }}</div>
+                                    </div>
+                                    <div class="col-md-3 kpi-card">
+                                        <div class="kpi-label mb-1">Total value</div>
+                                        <div class="kpi-value">US${{ number_format($totalValue, 0) }}</div>
+                                    </div>
+                                    <div class="col-md-3 kpi-card border-0">
+                                        <div class="kpi-label mb-1">Number of leads</div>
+                                        <div class="kpi-value">{{ number_format($totalLeadsCount) }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PRODUCTS TABLE -->
+                            <div class="table-responsive mt-4">
+                                <table id="productsTable" class="table table-hover mb-0 equipment-report-table w-100">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 30%;">Product</th>
+                                            <th style="width: 20%;">Category</th>
+                                            <th style="width: 15%;">SKU</th>
+                                            <th class="text-end" style="width: 15%;">
+                                                @if($sort == 'revenue') <i class="fas fa-arrow-down text-primary me-1"></i> @endif Revenue
+                                            </th>
+                                            <th class="text-end" style="width: 10%;">
+                                                @if($sort == 'quantity') <i class="fas fa-arrow-down text-primary me-1"></i> @endif Quantity
+                                            </th>
+                                            <th class="text-end" style="width: 10%;">Leads</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($products as $product)
+                                        <tr>
+                                            <td class="text-dark fw-semibold">{{ $product['name'] }}</td>
+                                            <td><div class="small text-muted" style="font-size: 12px;">{{ $product['category'] }}</div></td>
+                                            <td><div class="small text-muted" style="font-size: 12px;">{{ $product['sku'] }}</div></td>
+                                            <td class="text-end text-muted fw-semibold">US${{ number_format($product['revenue'], 0) }}</td>
+                                            <td class="text-end text-muted">{{ number_format($product['quantity']) }}</td>
+                                            <td class="text-end">
+                                                <a href="#" class="text-primary text-decoration-none fw-semibold">{{ $product['leads_count'] }} leads</a>
+                                            </td>
+                                        </tr>
+                                        @empty
+                                            {{-- Handled by DataTables --}}
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
                     </div>
@@ -204,6 +378,8 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script>
     function initTooltips() {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
@@ -215,63 +391,16 @@
     document.addEventListener('DOMContentLoaded', function () {
         initTooltips();
 
-        // Handle AJAX status filtering
-        $(document).on('click', '.status-filter', function(e) {
-            e.preventDefault();
-            var status = $(this).data('status');
-            var url = new URL(window.location.href);
-            url.searchParams.set('status', status);
-            
-            // Update the button text
-            var btn = $(this).closest('.dropdown').find('button');
-            btn.html('<i class="fas fa-filter text-primary"></i> ' + status.charAt(0).toUpperCase() + status.slice(1) + ' <i class="fas fa-chevron-down ms-1" style="font-size: 10px;"></i>');
-            
-            // Update active state in dropdown
-            $('.status-filter').removeClass('active');
-            $(this).addClass('active');
-
-            // Fetch partial via AJAX
-            $.ajax({
-                url: url.toString(),
-                type: 'GET',
-                success: function(response) {
-                    $('#products-content').html(response);
-                    initTooltips();
-                    window.history.pushState({}, '', url);
-                }
-            });
-        });
-        
-        // Ensure pagination clicks use AJAX too
-        $(document).on('click', '.pagination a', function(e) {
-            e.preventDefault();
-            var url = $(this).attr('href');
-            $.ajax({
-                url: url,
-                type: 'GET',
-                success: function(response) {
-                    $('#products-content').html(response);
-                    initTooltips();
-                    window.history.pushState({}, '', url);
-                }
-            });
-        });
-        
-        // Ensure Value/Quantity toggles use AJAX too
-        $(document).on('click', '.active-toggle, .text-muted.fw-bold', function(e) {
-            // Check if it's our value/qty toggle links inside #products-content
-            if ($(this).closest('.rounded-pill.border').length) {
-                e.preventDefault();
-                var url = $(this).attr('href');
-                $.ajax({
-                    url: url,
-                    type: 'GET',
-                    success: function(response) {
-                        $('#products-content').html(response);
-                        initTooltips();
-                        window.history.pushState({}, '', url);
-                    }
-                });
+        $('#productsTable').DataTable({
+            pageLength: 25,
+            ordering: true,
+            dom: '<"d-flex justify-content-between align-items-center mb-3"l f>r<"table-responsive"t><"d-flex justify-content-between align-items-center mt-3"i p>',
+            language: {
+                search: '',
+                searchPlaceholder: 'Search...',
+                lengthMenu: 'Show _MENU_ entries',
+                info: 'Showing _START_ to _END_ of _TOTAL_ entries',
+                paginate: { previous: 'Previous', next: 'Next' }
             }
         });
     });

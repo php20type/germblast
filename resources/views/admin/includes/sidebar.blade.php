@@ -73,8 +73,9 @@
                     </div>
                 </a>
             </li>
+            @if(auth()->user()->isSalesManager() || auth()->user()->isSuperAdmin())
             <li class="{{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
-                <a href="{{ route('admin.reports.new_leads') }}">
+                <a href="{{ route('admin.reports.sales') }}">
                     <div class="icon-round">
                         <img src={{ asset("img/icons/menu-icon19.svg") }} alt="icon" />
                     </div>
@@ -83,6 +84,7 @@
                     </div>
                 </a>
             </li>
+            @endif
             <li class="{{ request()->routeIs('admin.calendar.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.calendar.index') }}">
                     <div class="icon-round">
