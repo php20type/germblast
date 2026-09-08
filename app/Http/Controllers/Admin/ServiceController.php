@@ -696,8 +696,6 @@ class ServiceController extends Controller implements HasMiddleware
             'status'                   => 'scheduled',
         ]);
 
-        $order->update(['status' => 'scheduled']);
-
         return redirect()->route('admin.lead.service.fulfill_order', $orderId)
             ->with('success', 'Slot booked successfully.');
     }
@@ -2182,6 +2180,11 @@ class ServiceController extends Controller implements HasMiddleware
 
         if ($order->status === 'cancelled') {
             return redirect()->back()->with('error', 'You must reopen the order before submitting an invoice.');
+        }
+
+        $hasUnconfirmedSlots = $order->orderSlots()->where('is_confirmed', false)->exists();
+        if ($hasUnconfirmedSlots) {
+            return redirect()->back()->with('error', 'You cannot generate an invoice until all service slots are confirmed.');
         }
 
         $withInventory = $request->input('with_inventory') == 1;
