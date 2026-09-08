@@ -2,6 +2,10 @@
 
 @section('title', 'Activity Type')
 
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+@endpush
+
 
 
 @section('content')
@@ -31,7 +35,7 @@
 
                     <!-- Content Body -->
                     <div class="px-4 pb-4">
-                        <table class="table w-100 equipment-report-table mb-0">
+                        <table id="settingsTable" class="table w-100 equipment-report-table mb-0">
                             <thead>
                                 <tr>
                                     <th scope="col">Icon</th>
@@ -195,7 +199,22 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script>
+        $(document).ready(function() {
+            $('.equipment-report-table').each(function() {
+                if (!$.fn.DataTable.isDataTable(this)) {
+                    $(this).DataTable({
+                        "pageLength": 10,
+                        "ordering": true,
+                        "info": true,
+                        "searching": true,
+                        "dom": '<"d-flex justify-content-between align-items-center mb-3"l f>r<"table-responsive"t><"d-flex justify-content-between align-items-center mt-3"i p>'
+                    });
+                }
+            });
+        });
         document.addEventListener("DOMContentLoaded", function() {
             const iconOptions = document.querySelectorAll('#iconOptions .activity-icon-circle');
             const iconInput = document.getElementById('selectedIcon');

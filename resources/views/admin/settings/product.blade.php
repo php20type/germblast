@@ -2,6 +2,10 @@
 
 @section('title', 'Products')
 
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+@endpush
+
 @section('content')
 
 
@@ -248,7 +252,22 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script>
+        $(document).ready(function() {
+            $('.equipment-report-table').each(function() {
+                if (!$.fn.DataTable.isDataTable(this)) {
+                    $(this).DataTable({
+                        "pageLength": 10,
+                        "ordering": true,
+                        "info": true,
+                        "searching": true,
+                        "dom": '<"d-flex justify-content-between align-items-center mb-3"l f>r<"table-responsive"t><"d-flex justify-content-between align-items-center mt-3"i p>'
+                    });
+                }
+            });
+        });
         // Reset form and validation on modal close
         $('#add_product').on('hidden.bs.modal', function () {
             const validator = $("#store_product").validate();
