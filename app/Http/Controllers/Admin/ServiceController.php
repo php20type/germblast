@@ -605,6 +605,11 @@ class ServiceController extends Controller implements HasMiddleware
 
         $slot = ServiceOrderSlot::with('serviceOrder')->findOrFail($slotId);
 
+        if ($slot && $slot->serviceOrder && in_array($slot->serviceOrder->status, ['completed', 'cancelled'])) {
+            $msg = 'You cannot modify a slot on a ' . $slot->serviceOrder->status . ' order.';
+            return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
+        }
+
         // Find the equipment by barcode
         $equipment = Equipment::where('barcode', $request->barcode)->first();
 
@@ -645,6 +650,12 @@ class ServiceController extends Controller implements HasMiddleware
     public function removeEquipment(Request $request, $slotId, $equipmentId)
     {
         $slot = ServiceOrderSlot::with('serviceOrder')->findOrFail($slotId);
+
+        if ($slot && $slot->serviceOrder && in_array($slot->serviceOrder->status, ['completed', 'cancelled'])) {
+            $msg = 'You cannot modify a slot on a ' . $slot->serviceOrder->status . ' order.';
+            return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
+        }
+
         $equipment = Equipment::findOrFail($equipmentId);
 
         // Create status log
@@ -684,7 +695,11 @@ class ServiceController extends Controller implements HasMiddleware
 
         $order = ServiceOrder::findOrFail($orderId);
 
-        $order->orderSlots()->create([
+        if (in_array($order->status, ['completed', 'cancelled'])) {
+            return redirect()->back()->with('error', 'You cannot book a new slot on a ' . $order->status . ' order.');
+        }
+
+        $slotData = [
             'scheduled_start_time'     => $request->scheduled_start_time,
             'scheduled_end_time'       => $request->scheduled_end_time,
             'scheduled_arrival_time'   => $request->scheduled_arrival_time,
@@ -694,15 +709,60 @@ class ServiceController extends Controller implements HasMiddleware
             'overnight'                => $request->overnight,
             'scheduled_hours'          => $scheduledHours,
             'status'                   => 'scheduled',
-        ]);
+        ];
+
+        $order->orderSlots()->create($slotData);
+
+        // If recurrence is "Same Day of Week for the Month"
+        if ($request->scheduled_recurrence_rule === 'Same Day of Week for the Month') {
+            $month = $start->month;
+            $year = $start->year;
+
+            $nextStart = $start->copy()->addWeek();
+            $nextEnd = $end->copy()->addWeek();
+
+            while ($nextStart->month === $month && $nextStart->year === $year) {
+                $slotData['scheduled_start_time'] = $nextStart->format('Y-m-d H:i:s');
+                $slotData['scheduled_end_time']   = $nextEnd->format('Y-m-d H:i:s');
+
+                $order->orderSlots()->create($slotData);
+
+                $nextStart->addWeek();
+                $nextEnd->addWeek();
+            }
+        }
 
         return redirect()->route('admin.lead.service.fulfill_order', $orderId)
             ->with('success', 'Slot booked successfully.');
     }
 
+    public function updateIntendedData(Request $request, $orderId)
+    {
+        $order = ServiceOrder::findOrFail($orderId);
+
+        if (in_array($order->status, ['completed', 'cancelled'])) {
+            return redirect()->back()->with('error', 'You cannot update intended data on a ' . $order->status . ' order.');
+        }
+
+        $request->validate([
+            'intended_date' => 'required|date',
+        ]);
+
+        $order->update([
+            'intended_date' => $request->intended_date,
+        ]);
+
+        return redirect()->back()->with('success', 'Intended order data updated successfully.');
+    }
+
     public function confirmSlot(Request $request, $slotId)
     {
         $slot = ServiceOrderSlot::findOrFail($slotId);
+
+        if ($slot && $slot->serviceOrder && in_array($slot->serviceOrder->status, ['completed', 'cancelled'])) {
+            $msg = 'You cannot modify a slot on a ' . $slot->serviceOrder->status . ' order.';
+            return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
+        }
 
         $slot->update([
             'is_confirmed' => true,
@@ -723,12 +783,16 @@ class ServiceController extends Controller implements HasMiddleware
             'scheduled_end_time'       => 'required',
             'scheduled_arrival_time'   => 'required',
             'scheduled_office' => 'required|exists:territories,id',
-            'scheduled_recurrence_rule'=> 'required|string',
             'meet'                     => 'required|in:office,facility',
             'overnight'                => 'required|boolean',
         ]);
 
         $slot = ServiceOrderSlot::findOrFail($slotId);
+
+        if ($slot && $slot->serviceOrder && in_array($slot->serviceOrder->status, ['completed', 'cancelled'])) {
+            $msg = 'You cannot modify a slot on a ' . $slot->serviceOrder->status . ' order.';
+            return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
+        }
 
         $start = \Carbon\Carbon::parse($request->scheduled_start_time);
         $end   = \Carbon\Carbon::parse($request->scheduled_end_time);
@@ -739,7 +803,6 @@ class ServiceController extends Controller implements HasMiddleware
             'scheduled_end_time'       => $request->scheduled_end_time,
             'scheduled_arrival_time'   => $request->scheduled_arrival_time,
             'scheduled_office'         => $request->scheduled_office,
-            'scheduled_recurrence_rule'=> $request->scheduled_recurrence_rule,
             'meet'                     => $request->meet,
             'overnight'                => $request->overnight,
             'scheduled_hours'          => $scheduledHours,
@@ -762,6 +825,11 @@ class ServiceController extends Controller implements HasMiddleware
 
         $slot = ServiceOrderSlot::findOrFail($slotId);
 
+        if ($slot && $slot->serviceOrder && in_array($slot->serviceOrder->status, ['completed', 'cancelled'])) {
+            $msg = 'You cannot modify a slot on a ' . $slot->serviceOrder->status . ' order.';
+            return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
+        }
+
         // Prevent duplicate
         $alreadyAdded = $slot->facilities()
             ->where('company_location_id', $location->id)
@@ -780,7 +848,14 @@ class ServiceController extends Controller implements HasMiddleware
 
     public function removeFacility(Request $request, $facilityId)
     {
-        ServiceOrderSlotFacility::findOrFail($facilityId)->delete();
+        $facility = ServiceOrderSlotFacility::with('slot.serviceOrder')->findOrFail($facilityId);
+
+        if ($facility->slot && $facility->slot->serviceOrder && in_array($facility->slot->serviceOrder->status, ['completed', 'cancelled'])) {
+            $msg = 'You cannot modify a slot on a ' . $facility->slot->serviceOrder->status . ' order.';
+            return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
+        }
+
+        $facility->delete();
 
         return redirect()->back()->with('success', 'Facility removed.');
     }
@@ -837,6 +912,12 @@ class ServiceController extends Controller implements HasMiddleware
         ]);
 
         $slot = ServiceOrderSlot::with('serviceOrder.service')->findOrFail($slotId);
+
+        if ($slot && $slot->serviceOrder && in_array($slot->serviceOrder->status, ['completed', 'cancelled'])) {
+            $msg = 'You cannot modify a slot on a ' . $slot->serviceOrder->status . ' order.';
+            return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
+        }
+
         $slotHours = $slot->scheduled_hours ?? 0;
         $slotStart = $slot->scheduled_start_time;
         $slotEnd = $slot->scheduled_end_time;
@@ -922,6 +1003,12 @@ class ServiceController extends Controller implements HasMiddleware
     public function removeStaff(Request $request, $staffId)
     {
         $staff = ServiceOrderSlotStaff::with(['user', 'slot.serviceOrder.service'])->findOrFail($staffId);
+
+        if ($staff->slot && $staff->slot->serviceOrder && in_array($staff->slot->serviceOrder->status, ['completed', 'cancelled'])) {
+            $msg = 'You cannot modify a slot on a ' . $staff->slot->serviceOrder->status . ' order.';
+            return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
+        }
+
         $user = $staff->user;
         $slot = $staff->slot;
 
@@ -937,6 +1024,12 @@ class ServiceController extends Controller implements HasMiddleware
     public function toggleLeader(Request $request, $staffId)
     {
         $staff = ServiceOrderSlotStaff::with(['user', 'slot.serviceOrder.service'])->findOrFail($staffId);
+
+        if ($staff->slot && $staff->slot->serviceOrder && in_array($staff->slot->serviceOrder->status, ['completed', 'cancelled'])) {
+            $msg = 'You cannot modify a slot on a ' . $staff->slot->serviceOrder->status . ' order.';
+            return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
+        }
+
         $staff->is_leader = !$staff->is_leader;
         $staff->save();
 
@@ -962,6 +1055,11 @@ class ServiceController extends Controller implements HasMiddleware
         ]);
 
         $slot = ServiceOrderSlot::findOrFail($slotId);
+
+        if ($slot && $slot->serviceOrder && in_array($slot->serviceOrder->status, ['completed', 'cancelled'])) {
+            $msg = 'You cannot modify a slot on a ' . $slot->serviceOrder->status . ' order.';
+            return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
+        }
 
         $start = $slot->scheduled_start_time;
         $end   = $slot->scheduled_end_time;
@@ -1026,6 +1124,12 @@ class ServiceController extends Controller implements HasMiddleware
     public function removeVehicle($slotId, $vehicleId)
     {
         $slot = ServiceOrderSlot::findOrFail($slotId);
+
+        if ($slot && $slot->serviceOrder && in_array($slot->serviceOrder->status, ['completed', 'cancelled'])) {
+            $msg = 'You cannot modify a slot on a ' . $slot->serviceOrder->status . ' order.';
+            return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
+        }
+
         $slot->vehicles()->detach($vehicleId);
 
         if (request()->ajax()) {
@@ -1130,6 +1234,11 @@ class ServiceController extends Controller implements HasMiddleware
 
         $slot = ServiceOrderSlot::findOrFail($request->slot_id);
 
+        if ($slot && $slot->serviceOrder && in_array($slot->serviceOrder->status, ['completed', 'cancelled'])) {
+            $msg = 'You cannot modify a slot on a ' . $slot->serviceOrder->status . ' order.';
+            return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
+        }
+
         // Prevent the slot from having two active clocks of the same type simultaneously
         $activeClock = $slot->clocks()
             ->where('type', $request->type)
@@ -1173,6 +1282,11 @@ class ServiceController extends Controller implements HasMiddleware
 
         $slot = ServiceOrderSlot::findOrFail($request->slot_id);
 
+        if ($slot && $slot->serviceOrder && in_array($slot->serviceOrder->status, ['completed', 'cancelled'])) {
+            $msg = 'You cannot modify a slot on a ' . $slot->serviceOrder->status . ' order.';
+            return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
+        }
+
         $activeClock = $slot->clocks()
             ->where('type', $request->type)
             ->whereNull('clocked_out_at')
@@ -1203,7 +1317,12 @@ class ServiceController extends Controller implements HasMiddleware
             'clocked_out_at' => 'nullable|date|after_or_equal:clocked_in_at',
         ]);
 
-        $clock = \App\Models\ServiceOrderSlotClock::findOrFail($clockId);
+        $clock = ServiceOrderSlotClock::with('slot.serviceOrder')->findOrFail($clockId);
+
+        if ($clock->slot && $clock->slot->serviceOrder && in_array($clock->slot->serviceOrder->status, ['completed', 'cancelled'])) {
+            $msg = 'You cannot modify a slot on a ' . $clock->slot->serviceOrder->status . ' order.';
+            return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
+        }
 
         // Store original values for audit logging
         $oldType = $clock->type;
@@ -1242,7 +1361,12 @@ class ServiceController extends Controller implements HasMiddleware
 
     public function deleteClock($clockId)
     {
-        $clock = \App\Models\ServiceOrderSlotClock::findOrFail($clockId);
+        $clock = \App\Models\ServiceOrderSlotClock::with('slot.serviceOrder')->findOrFail($clockId);
+
+        if ($clock->slot && $clock->slot->serviceOrder && in_array($clock->slot->serviceOrder->status, ['completed', 'cancelled'])) {
+            $msg = 'You cannot modify a slot on a ' . $clock->slot->serviceOrder->status . ' order.';
+            return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
+        }
 
         // Record audit log BEFORE deleting
         \App\Models\JobClockAuditLog::create([
@@ -2075,35 +2199,45 @@ class ServiceController extends Controller implements HasMiddleware
         return redirect()->back()->with('success', 'ATP detail removed successfully.');
     }
 
-    /*
     public function updateOrderStatus(Request $request, $orderId)
     {
         $request->validate([
-            'status' => 'required|string|in:pending,scheduled,confirmed,completed,cancelled',
+            'status' => 'required|string|in:open,completed,cancelled',
         ]);
 
         $order = ServiceOrder::findOrFail($orderId);
         $newStatus = $request->input('status');
 
         if ($newStatus === 'completed') {
-            $nonCompletedSlots = $order->orderSlots->filter(function ($slot) {
-                return $slot->status !== 'completed';
-            });
+            $hasUnconfirmedSlots = $order->orderSlots()->where('is_confirmed', false)->exists();
 
-            if ($nonCompletedSlots->isNotEmpty()) {
+            if ($hasUnconfirmedSlots) {
                 if ($request->ajax()) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Cannot mark Service Order as Completed because there are ' . $nonCompletedSlots->count() . ' slot(s) not yet marked as Completed.'
+                        'message' => 'Cannot mark Service Order as Completed because there are unconfirmed slots.'
                     ], 422);
                 }
-                return redirect()->back()->with('error', 'Cannot mark Service Order as Completed because there are ' . $nonCompletedSlots->count() . ' slot(s) not yet marked as Completed.');
+                return redirect()->back()->with('error', 'Cannot mark Service Order as Completed because there are unconfirmed slots.');
             }
         }
 
         $order->update([
             'status' => $newStatus
         ]);
+
+        if ($newStatus === 'completed') {
+            $order->orderSlots()->update(['status' => 'completed']);
+        } elseif ($newStatus === 'cancelled') {
+            $order->orderSlots()->update(['status' => 'cancelled']);
+        } elseif ($newStatus === 'open') {
+            $order->orderSlots()->update([
+                'status' => 'scheduled',
+                'is_confirmed' => false,
+                'confirmed_at' => null,
+                'confirmed_by' => null,
+            ]);
+        }
 
         if ($request->ajax()) {
             return response()->json([
@@ -2116,35 +2250,6 @@ class ServiceController extends Controller implements HasMiddleware
         return redirect()->back()->with('success', 'Service Order status updated to ' . ucfirst($newStatus) . ' successfully.');
     }
 
-    public function updateSlotStatus(Request $request, $slotId)
-    {
-        $request->validate([
-            'status' => 'required|string|in:pending,scheduled,confirmed,completed,cancelled',
-        ]);
-
-        $slot = ServiceOrderSlot::findOrFail($slotId);
-        $newStatus = $request->input('status');
-
-        $slot->update([
-            'status' => $newStatus
-        ]);
-
-        if ($newStatus === 'confirmed') {
-            $this->notify->dayOfService($slot);
-        }
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Slot status updated to ' . ucfirst($newStatus) . ' successfully.',
-                'status' => $newStatus
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Slot status updated to ' . ucfirst($newStatus) . ' successfully.');
-    }
-    */
-
     public function cancelOrder(Request $request, $orderId)
     {
         $order = ServiceOrder::findOrFail($orderId);
@@ -2154,6 +2259,8 @@ class ServiceController extends Controller implements HasMiddleware
         }
 
         $order->update(['status' => 'cancelled']);
+        
+        $order->orderSlots()->update(['status' => 'cancelled']);
         
         // Delete related invoices when order is cancelled
         $order->invoices()->delete();
@@ -2171,6 +2278,13 @@ class ServiceController extends Controller implements HasMiddleware
 
         $order->update(['status' => 'open']);
 
+        $order->orderSlots()->update([
+            'status' => 'scheduled',
+            'is_confirmed' => false,
+            'confirmed_at' => null,
+            'confirmed_by' => null,
+        ]);
+
         return redirect()->back()->with('success', 'Order has been reopened successfully.');
     }
 
@@ -2180,6 +2294,10 @@ class ServiceController extends Controller implements HasMiddleware
 
         if ($order->status === 'cancelled') {
             return redirect()->back()->with('error', 'You must reopen the order before submitting an invoice.');
+        }
+
+        if ($order->status === 'completed' || $order->invoice()->exists()) {
+            return redirect()->back()->with('error', 'This order is already completed and invoiced.');
         }
 
         $hasUnconfirmedSlots = $order->orderSlots()->where('is_confirmed', false)->exists();

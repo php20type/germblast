@@ -74,7 +74,7 @@ class NotificationService
 
     public function companyCreated($company)
     {
-        $salesManagers = \App\Models\User::all()->filter(fn($u) => $u->isSalesManager());
+        $salesManagers = \App\Models\User::role('sales_manager')->get();
 
         foreach ($salesManagers as $manager) {
             if ($this->sendEmail && $manager->email) {
@@ -127,7 +127,7 @@ class NotificationService
     {
         $recipients = collect();
 
-        $users = \App\Models\User::all()->filter(fn($u) => $u->isSalesManager() || $u->isSuperAdmin());
+        $users = \App\Models\User::role(['sales_manager', 'super_admin'])->get();
         foreach ($users as $user) {
             $recipients->push($user);
         }
@@ -179,7 +179,7 @@ class NotificationService
     {
         $recipients = collect();
 
-        $salesManagers = \App\Models\User::all()->filter(fn($u) => $u->isSalesManager());
+        $salesManagers = \App\Models\User::role('sales_manager')->get();
         foreach ($salesManagers as $manager) {
             $recipients->push($manager);
         }
@@ -601,7 +601,7 @@ class NotificationService
             $recipients->push($lead->assignee);
         }
 
-        $salesManagers = \App\Models\User::all()->filter(fn($u) => $u->isSalesManager());
+        $salesManagers = \App\Models\User::role('sales_manager')->get();
         foreach ($salesManagers as $manager) {
             $recipients->push($manager);
         }
@@ -767,7 +767,7 @@ class NotificationService
         $service = $order->service ?? null;
 
         // Fetch sales managers and sales reps
-        $salesTeam = \App\Models\User::all()->filter(fn($u) => $u->isSalesManager() || $u->isSalesRepresentative());
+        $salesTeam = \App\Models\User::role(['sales_manager', 'sales_representative'])->get();
 
         foreach ($salesTeam as $member) {
             if ($this->sendEmail && $member->email) {
@@ -917,37 +917,6 @@ class NotificationService
         );
     }
 
-    // =======================
-    // THIS IS FOR SENDING TO USER ROLE (e.g., all Sales Managers)
-    // =======================
-    // public function companyCreated($company)
-    // {
-    //     // Fetch all Sales Managers
-    //     $salesManagers = \App\Models\User::role('Sales Manager')->get();
-
-    //     foreach ($salesManagers as $manager) {
-
-    //         // EMAIL
-    //         SendEmailJob::dispatch(
-    //             $manager->email,
-    //             'company_created',
-    //             [
-    //                 'name' => $company->name,
-    //                 'description' => $company->description,
-    //                 'company_type' => $company->companyType->type ?? 'N/A',
-    //                 'industry' => $company->industry->name ?? 'N/A',
-    //                 'territory' => $company->territory->name ?? 'N/A',
-    //             ]
-    //         );
-
-    //         // SMS
-    //         SendSMSJob::dispatch(
-    //             env('TWILIO_FROM'), // or $manager->phone if available
-    //             "New company created: {$company->name}"
-    //         );
-    //     }
-    // }
-
     public function shareInvoice($email, $order, $invoiceDetails, $attachment = null)
     {
         if ($this->sendEmail) {
@@ -974,7 +943,7 @@ class NotificationService
     public function timeOffSubmitted($timeOffRequest)
     {
         $employee = $timeOffRequest->user;
-        $superAdmins = \App\Models\User::all()->filter(fn($u) => $u->isSuperAdmin());
+        $superAdmins = \App\Models\User::role('super_admin')->get();
 
         foreach ($superAdmins as $admin) {
             if ($this->sendEmail) {

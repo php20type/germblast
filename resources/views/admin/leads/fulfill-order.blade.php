@@ -434,11 +434,7 @@
                                                             <td>
                                                                 <select class="form-select" name="scheduled_recurrence_rule" {{ !$canEdit ? 'disabled' : '' }}>
                                                                     <option value="N/A">N/A</option>
-                                                                    <option>Daily</option>
-                                                                    <option>Weekly</option>
-                                                                    <option>Monthly</option>
-                                                                    <option>Quarterly</option>
-                                                                    <option>Annually</option>
+                                                                    <option value="Same Day of Week for the Month">Same Day of Week for the Month</option>
                                                                 </select>
                                                             </td>
                                                         </tr>
@@ -496,7 +492,7 @@
                                                             <th>Hours</th>
                                                             <th>Meet</th>
                                                             <th>Overnight</th>
-                                                            <th>Recurrence</th>
+                                                            <!-- <th>Recurrence</th> -->
                                                             <!-- <th>Clock In</th>
                                                             <th>Clock Out</th> -->
                                                             {{-- <th>Status</th> --}}
@@ -515,7 +511,7 @@
                                                                 <td>{{ $slot->scheduled_hours }}</td>
                                                                 <td>{{ ucfirst($slot->meet) }}</td>
                                                                 <td>{{ $slot->overnight ? 'Yes' : 'No' }}</td>
-                                                                <td>{{ $slot->scheduled_recurrence_rule }}</td>
+                                                                <!-- <td>{{ $slot->scheduled_recurrence_rule }}</td> -->
                                                                 <!-- <td>{{ $slot->clocked_in_at ?? '-' }}</td>
                                                                 <td>{{ $slot->clocked_out_at ?? '-' }}</td> -->
                                                                 {{--
@@ -550,7 +546,7 @@
                                             </div>
 
                                             {{-- Summary Footer --}}
-                                            @php
+                                            <!-- @php
                                                 $totalOrderHours = 0;
                                                 foreach($order->orderSlots as $s) {
                                                     $sStaffCount = $s->staff->count();
@@ -567,8 +563,40 @@
                                                 <small class="text-muted">Invoice: <strong>${{ number_format($orderInvoiceAmount, 2) }}</strong></small>
                                                 <small class="text-muted">Hours: <strong>{{ number_format($totalOrderHours, 2) }}</strong></small>
                                                 <small class="text-muted">Cost: <strong>${{ number_format($orderTotalCost, 2) }}</strong></small>
+                                            </div> -->
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Intended Order Data -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="section-card">
+                                            <div class="section-header mb-3">
+                                                <h5 class="section-title">Change Planning Date</h5>
                                             </div>
 
+                                            <form action="{{ route('admin.lead.service.order.update_intended_data', $order->id) }}" method="POST">
+                                                @csrf
+                                                <table class="table table-hover equipment-report-table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th style="width: 25%;">Planning Date</th>
+                                                            <td>
+                                                                <input type="date" class="form-control" name="intended_date" value="{{ $order->intended_date ? \Carbon\Carbon::parse($order->intended_date)->format('Y-m-d') : '' }}" {{ !$canEdit ? 'disabled' : '' }} required>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="2" class="text-end">
+                                                                @if($canEdit)
+                                                                    <button type="submit" class="btn btn-success">Update</button>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -625,15 +653,17 @@
                                                         <tr>
                                                             <th>Overnight</th>
                                                             <td>{{ $slot->overnight ? 'Yes' : 'No' }}</td>
-                                                            <th>Recurrence</th>
-                                                            <td>{{ $slot->scheduled_recurrence_rule }}</td>
+                                                            @if($slot->is_confirmed)
+                                                                <th>Confirmed At</th>
+                                                                <td>{{ $slot->confirmed_at }}</td>
+                                                            @else
+                                                                <td colspan="2"></td>
+                                                            @endif
                                                         </tr>
                                                         @if($slot->is_confirmed)
                                                             <tr>
-                                                                <th>Confirmed At</th>
-                                                                <td>{{ $slot->confirmed_at }}</td>
                                                                 <th>Confirmed By</th>
-                                                                <td>{{ $slot->confirmedBy->name ?? '-' }}</td>
+                                                                <td colspan="3">{{ $slot->confirmedBy->name ?? '-' }}</td>
                                                             </tr>
                                                         @endif
                                                     </tbody>
@@ -697,16 +727,7 @@
                                                                         </select>
                                                                     </td>
                                                                 </tr>
-                                                                <tr>
-                                                                    <th>Recurrence</th>
-                                                                    <td>
-                                                                        <select class="form-select" name="scheduled_recurrence_rule">
-                                                                            @foreach(['N/A', 'Daily', 'Weekly', 'Monthly', 'Quarterly', 'Annually'] as $rule)
-                                                                                <option {{ $slot->scheduled_recurrence_rule == $rule ? 'selected' : '' }}>{{ $rule }}</option>
-                                                                            @endforeach
-                                                                        </select>
-                                                                    </td>
-                                                                </tr>
+
                                                                 <tr>
                                                                     <th>Meet</th>
                                                                     <td>

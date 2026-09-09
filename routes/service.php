@@ -46,6 +46,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
         Route::get('service/fulfill-order/{orderId}', [ServiceController::class, 'fulfillOrder'])->name('service.fulfill_order')->middleware('permission:service.fulfill_order.view');
         Route::post('service/fulfill-order/{orderId}/book', [ServiceController::class, 'fulfillOrder_book'])->name('service.fulfill_order.book');
+        Route::post('order/{orderId}/update-intended-data', [ServiceController::class, 'updateIntendedData'])->name('service.order.update_intended_data');
         Route::post('order/{orderId}/update-checklist', [ServiceController::class, 'updateChecklist'])->name('service.order.update_checklist');
         Route::post('order/{orderId}/update-consumables', [ServiceController::class, 'updateConsumables'])->name('service.order.update_consumables');
         Route::post('order/{orderId}/employee-performance/store', [ServiceController::class, 'storeEmployeePerformance'])->name('service.order.employee_performance.store');
@@ -70,7 +71,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
         Route::post('order/{orderId}/cancel', [ServiceController::class, 'cancelOrder'])->name('service.order.cancel');
         Route::post('order/{orderId}/reopen', [ServiceController::class, 'reopenOrder'])->name('service.order.reopen');
-        // Route::post('order/{orderId}/status', [ServiceController::class, 'updateOrderStatus'])->name('service.order.update_status');
+        Route::post('order/{orderId}/status', [ServiceController::class, 'updateOrderStatus'])->name('service.order.update_status');
         // Route::post('service/slot/{slotId}/status', [ServiceController::class, 'updateSlotStatus'])->name('service.slot.update_status');
     });
 
