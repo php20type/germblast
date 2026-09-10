@@ -841,7 +841,7 @@
                                 <!-- Schedule Tab -->
                                 <div class="tab-pane fade" id="schedule" role="tabpanel" aria-labelledby="schedule-tab">
 
-                                    @php $confirmedSlots = $order->orderSlots->where('is_confirmed', true); @endphp
+                                    @php $confirmedSlots = $order->orderSlots; @endphp
 
                                     @if($confirmedSlots->count())
 

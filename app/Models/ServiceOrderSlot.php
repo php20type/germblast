@@ -20,9 +20,8 @@ class ServiceOrderSlot extends Model
         'meet',
         'overnight',
 
-        'confirmed_by',
+        'last_updated_by',
         'is_confirmed',
-        'confirmed_at',
         'confirmation_notes',
         'status',
         'is_audit',
@@ -55,9 +54,9 @@ class ServiceOrderSlot extends Model
         return $this->belongsTo(ServiceOrder::class, 'service_order_id');
     }
 
-    public function confirmedBy()
+    public function lastUpdatedBy()
     {
-        return $this->belongsTo(User::class, 'confirmed_by');
+        return $this->belongsTo(User::class, 'last_updated_by');
     }
 
     public function facilities()

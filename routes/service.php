@@ -14,7 +14,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::post('service/add-recurrence', [ServiceController::class, 'addRecurrenceSchedule'])->name('service.add_recurrence');
 
         Route::post('service/slot/{slotId}/confirm', [ServiceController::class, 'confirmSlot'])->name('service.slot.confirm');
+        Route::post('service/slot/{slotId}/unconfirm', [ServiceController::class, 'unconfirmSlot'])->name('service.slot.unconfirm');
         Route::post('service/slot/{slotId}/update', [ServiceController::class, 'updateSlot'])->name('service.slot.update');
+        Route::delete('service/slot/{slotId}/delete', [ServiceController::class, 'deleteSlot'])->name('service.slot.delete');
 
         Route::post('service/slot/{slotId}/facility/add', [ServiceController::class, 'addFacility'])->name('service.slot.facility.add');
         Route::post('service/slot/facility/{facilityId}/remove', [ServiceController::class, 'removeFacility'])->name('service.slot.facility.remove');

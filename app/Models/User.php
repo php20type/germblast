@@ -366,10 +366,6 @@ class User extends Authenticatable
         return $this->hasMany(ServiceOrderSlotClock::class, 'clocked_by');
     }
 
-    public function serviceOrderConfirmedBy()
-    {
-        return $this->hasMany(ServiceOrderSlot::class, 'confirmed_by');
-    }
 
     public function serviceNoteUser()
     {
@@ -484,5 +480,10 @@ class User extends Authenticatable
     public function warehouseTaskCompletions()
     {
         return $this->hasMany(WarehouseTaskCompletion::class, 'user_id');
+    }
+
+    public function updatedServiceSlots()
+    {
+        return $this->hasMany(ServiceOrderSlot::class, 'last_updated_by');
     }
 }

@@ -135,6 +135,9 @@ class ServiceController extends Controller implements HasMiddleware
             }
         }
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Service details added successfully.']);
+        }
         return redirect()->route('admin.lead.service.details', $leadId)
             ->with('success', 'Service details added successfully.');
     }
@@ -162,6 +165,9 @@ class ServiceController extends Controller implements HasMiddleware
             'order_no' => $this->orderService->generateOrderNo($order->id),
         ]);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Intended date added.']);
+        }
         return redirect()->route('admin.lead.service.details', $service->lead_id)
             ->with('success', 'Intended date added.');
     }
@@ -170,14 +176,14 @@ class ServiceController extends Controller implements HasMiddleware
     {
         $request->validate([
             'service_id' => 'required|exists:services,id',
-            'scheduled_start_time' => 'nullable|string',
-            'scheduled_end_time' => 'nullable|string',
-            'scheduled_arrival_time' => 'nullable|string',
-            'scheduled_office' => 'nullable|string',
+            'scheduled_start_time' => 'required|string',
+            'scheduled_end_time' => 'required|string|after:scheduled_start_time',
+            'scheduled_arrival_time' => 'required|string',
+            'scheduled_office' => 'required|string',
             'scheduled_recurrence_count' => 'required|integer|min:1',
-            'recurrence_rule_1' => 'nullable|string',
-            'recurrence_rule_2' => 'nullable|string',
-            'recurrence_rule_3' => 'nullable|string',
+            'recurrence_rule_1' => 'required|string',
+            'recurrence_rule_2' => 'required|string',
+            'recurrence_rule_3' => 'required|string',
         ]);
 
         $service = Service::findOrFail($request->service_id);
@@ -249,6 +255,9 @@ class ServiceController extends Controller implements HasMiddleware
             ]);
         }
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Recurring service orders generated successfully.']);
+        }
         return redirect()->route('admin.lead.service.details', $service->lead_id)
             ->with('success', 'Recurring service orders generated successfully.');
     }
@@ -350,7 +359,7 @@ class ServiceController extends Controller implements HasMiddleware
             'invoices.updater',
             'invoices.sender',
             'orderSlots.clocks.clockedBy',
-            'orderSlots.confirmedBy',
+            'orderSlots.lastUpdatedBy',
             'orderSlots.facilities.companyLocation',
             'orderSlots.office',
             'orderSlots.staff.user',
@@ -542,7 +551,7 @@ class ServiceController extends Controller implements HasMiddleware
         $order->load([
             'invoice',
             'orderSlots.clocks.clockedBy',
-            'orderSlots.confirmedBy',
+            'orderSlots.lastUpdatedBy',
             'orderSlots.facilities.companyLocation',
             'orderSlots.office',
             'orderSlots.staff.user',
@@ -680,8 +689,8 @@ class ServiceController extends Controller implements HasMiddleware
     public function fulfillOrder_book(Request $request, $orderId)
     {
         $request->validate([
-            'scheduled_start_time'     => 'required',
-            'scheduled_end_time'       => 'required',
+            'scheduled_start_time'     => 'required|date',
+            'scheduled_end_time'       => 'required|date|after:scheduled_start_time',
             'scheduled_arrival_time'   => 'required',
             'scheduled_office' => 'required|exists:territories,id',
             'scheduled_recurrence_rule'=> 'required|string',
@@ -736,6 +745,29 @@ class ServiceController extends Controller implements HasMiddleware
             ->with('success', 'Slot booked successfully.');
     }
 
+    public function deleteSlot(Request $request, $slotId)
+    {
+        $slot = ServiceOrderSlot::findOrFail($slotId);
+
+        // Detach M-M relationships
+        $slot->vehicles()->detach();
+        $slot->equipments()->detach();
+
+        // Delete Has-Many child records
+        $slot->facilities()->delete();
+        $slot->clocks()->delete();
+        $slot->staff()->delete();
+        $slot->auditSubmissions()->delete();
+
+        // Delete the slot itself
+        $slot->delete();
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Slot deleted successfully.']);
+        }
+        return redirect()->back()->with('success', 'Slot deleted successfully.');
+    }
+
     public function updateIntendedData(Request $request, $orderId)
     {
         $order = ServiceOrder::findOrFail($orderId);
@@ -766,23 +798,56 @@ class ServiceController extends Controller implements HasMiddleware
 
         $slot->update([
             'is_confirmed' => true,
-            'confirmed_at' => now(),
-            'confirmed_by' => auth()->id(),
+            'last_updated_by' => auth()->id(),
             'status' => 'confirmed',
+            'confirmation_notes' => $request->confirmation_notes
         ]);
 
         $this->notify->dayOfService($slot);
 
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Slot confirmed successfully.'
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Slot confirmed successfully.');
+    }
+
+    public function unconfirmSlot(Request $request, $slotId)
+    {
+        $slot = ServiceOrderSlot::findOrFail($slotId);
+
+        if ($slot && $slot->serviceOrder && in_array($slot->serviceOrder->status, ['completed', 'cancelled'])) {
+            $msg = 'You cannot modify a slot on a ' . $slot->serviceOrder->status . ' order.';
+            return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
+        }
+
+        $slot->update([
+            'is_confirmed' => false,
+            'last_updated_by' => auth()->id(),
+            'status' => 'scheduled',
+            'confirmation_notes' => null,
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Slot unconfirmed successfully.'
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Slot unconfirmed successfully.');
     }
 
     public function updateSlot(Request $request, $slotId)
     {
         $request->validate([
-            'scheduled_start_time'     => 'required',
-            'scheduled_end_time'       => 'required',
+            'scheduled_start_time'     => 'required|date',
+            'scheduled_end_time'       => 'required|date|after:scheduled_start_time',
             'scheduled_arrival_time'   => 'required',
-            'scheduled_office' => 'required|exists:territories,id',
+            'scheduled_office'         => 'required|exists:territories,id',
             'meet'                     => 'required|in:office,facility',
             'overnight'                => 'required|boolean',
         ]);
@@ -806,12 +871,11 @@ class ServiceController extends Controller implements HasMiddleware
             'meet'                     => $request->meet,
             'overnight'                => $request->overnight,
             'scheduled_hours'          => $scheduledHours,
-            'is_confirmed'             => false, // reset confirmation on edit
-            'confirmed_at'             => null,
-            'confirmed_by'             => null,
-            'status'                   => 'scheduled',
         ]);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Slot updated successfully.']);
+        }
         return redirect()->back()->with('success', 'Slot updated successfully.');
     }
 
@@ -836,12 +900,19 @@ class ServiceController extends Controller implements HasMiddleware
             ->exists();
 
         if ($alreadyAdded) {
-            return redirect()->back()->with('error', 'This facility is already added.');
+            return request()->ajax() ? response()->json(['message' => 'This facility is already added.'], 400) : redirect()->back()->with('error', 'This facility is already added.');
         }
 
         $slot->facilities()->create([
             'company_location_id' => $location->id,
         ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Facility added successfully.'
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Facility added successfully.');
     }
@@ -856,6 +927,13 @@ class ServiceController extends Controller implements HasMiddleware
         }
 
         $facility->delete();
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Facility removed successfully.'
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Facility removed.');
     }
@@ -939,7 +1017,8 @@ class ServiceController extends Controller implements HasMiddleware
                 ->first();
 
             if (!$availability) {
-                return redirect()->back()->with('error', "{$userName} has no availability records configured for this date ({$slotStart->format('M d, Y')}).");
+                $msg = "{$userName} has no availability records configured for this date ({$slotStart->format('M d, Y')}).";
+                return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
             }
             
             $availStartStr = $availability->{$dayOfWeek . '_start'} ?? '00:00';
@@ -963,7 +1042,8 @@ class ServiceController extends Controller implements HasMiddleware
             
             if ($slotStartParsed->lessThan($availStart) || $slotEndParsed->greaterThan($availEnd)) {
                 $timeframeRange = $availability->start_date->format('m/d/y') . ' - ' . $availability->end_date->format('m/d/y');
-                return redirect()->back()->with('error', "{$userName} is not available during the scheduled slot ({$slotStart->format('h:i A')} - {$slotEnd->format('h:i A')}). Available time for {$slotStart->format('l')}: {$availStartStr} - {$availEndStr} (within timeframe {$timeframeRange}).");
+                $msg = "{$userName} is not available during the scheduled slot ({$slotStart->format('h:i A')} - {$slotEnd->format('h:i A')}). Available time for {$slotStart->format('l')}: {$availStartStr} - {$availEndStr} (within timeframe {$timeframeRange}).";
+                return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
             }
 
             // Check for overlapping assignments
@@ -982,7 +1062,8 @@ class ServiceController extends Controller implements HasMiddleware
                 $overlapStart = $overlappingAssignment->slot->scheduled_start_time->format('h:i A');
                 $overlapEnd = $overlappingAssignment->slot->scheduled_end_time->format('h:i A');
                 $overlapDate = $overlappingAssignment->slot->scheduled_start_time->format('M d, Y');
-                return redirect()->back()->with('error', "{$userName} is already booked for that same date and time ({$overlapDate} from {$overlapStart} to {$overlapEnd}).");
+                $msg = "{$userName} is already booked for that same date and time ({$overlapDate} from {$overlapStart} to {$overlapEnd}).";
+                return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
             }
 
             $user = User::findOrFail($userId);
@@ -995,6 +1076,13 @@ class ServiceController extends Controller implements HasMiddleware
             ]);
 
             $this->notify->staffAssignedToOrder($user, $slot);
+        }
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Staff assigned successfully.'
+            ]);
         }
 
         return redirect()->back()->with('success', 'Staff assigned successfully.');
@@ -1016,6 +1104,13 @@ class ServiceController extends Controller implements HasMiddleware
 
         if ($user && $slot) {
             $this->notify->staffUnassignedFromOrder($user, $slot);
+        }
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Staff removed from slot successfully.'
+            ]);
         }
 
         return redirect()->back()->with('success', 'Staff removed from slot.');
@@ -1042,6 +1137,13 @@ class ServiceController extends Controller implements HasMiddleware
             } else {
                 $this->notify->staffUnmarkedAsLeader($user, $slot);
             }
+        }
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Staff leadership status updated successfully.'
+            ]);
         }
 
         return redirect()->back()->with('success', 'Staff leadership status updated.');
@@ -1162,6 +1264,13 @@ class ServiceController extends Controller implements HasMiddleware
             $this->notify->serviceNoteAdded($note);
         }
 
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Note added successfully.'
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Note added successfully.');
     }
 
@@ -1216,6 +1325,13 @@ class ServiceController extends Controller implements HasMiddleware
             'outline_name' => $request->outline_name,
             'range'        => 0,
         ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Department added successfully.'
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Department added successfully.');
     }
@@ -1536,7 +1652,6 @@ class ServiceController extends Controller implements HasMiddleware
                 'serviceOrder.service.lead.company',
                 'vehicles'
             ])
-            ->where('is_confirmed', true)
             ->whereBetween('scheduled_start_time', [$start, $end])
             ->orderBy('scheduled_start_time')
             ->get()
@@ -1563,7 +1678,6 @@ class ServiceController extends Controller implements HasMiddleware
                 'serviceOrder.service.lead.company',
                 'staff.user'
             ])
-            ->where('is_confirmed', true)
             ->whereBetween('scheduled_start_time', [$start, $end])
             ->orderBy('scheduled_start_time')
             ->get();
@@ -1579,8 +1693,7 @@ class ServiceController extends Controller implements HasMiddleware
 
         // 3. Fetch all slot staff assignments for the week
         $allWeeklyAssignments = ServiceOrderSlotStaff::whereHas('slot', function ($query) use ($startOfWeek, $endOfWeek) {
-                $query->where('is_confirmed', true)
-                      ->whereBetween('scheduled_start_time', [$startOfWeek, $endOfWeek]);
+                $query->whereBetween('scheduled_start_time', [$startOfWeek, $endOfWeek]);
             })
             ->with('slot')
             ->get()
@@ -2002,7 +2115,6 @@ class ServiceController extends Controller implements HasMiddleware
                 'serviceOrder.service.lead.company',
                 'vehicles'
             ])
-            ->where('is_confirmed', true)
             ->whereBetween('scheduled_start_time', [$start, $end])
             ->orderBy('scheduled_start_time')
             ->get()
@@ -2036,7 +2148,6 @@ class ServiceController extends Controller implements HasMiddleware
                 'staff.user'
             ])
             ->whereDate('scheduled_start_time', $date)
-            ->where('is_confirmed', true)
             ->whereHas('staff', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })

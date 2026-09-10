@@ -272,7 +272,7 @@
                                         <!-- Single Date Schedule -->
                                         <div class="col-md-6 border-end">
                                             <h6 class="fw-bold text-dark mb-3">Add Single Date</h6>
-                                            <form action="{{ route('admin.lead.service.add_date') }}" method="POST">
+                                            <form action="{{ route('admin.lead.service.add_date') }}" method="POST" class="ajax-add-date-form">
                                                 @csrf
                                                 <input type="hidden" name="service_id" value="{{ $service->id }}">
                                                 
@@ -290,29 +290,30 @@
                                         <!-- Recurring Schedule -->
                                         <div class="col-md-6">
                                             <h6 class="fw-bold text-dark mb-3">Configure Recurring Schedule</h6>
-                                            <form action="{{ route('admin.lead.service.add_recurrence') }}" method="POST">
+                                            <form action="{{ route('admin.lead.service.add_recurrence') }}" method="POST" class="ajax-add-recurrence-form">
                                                 @csrf
                                                 <input type="hidden" name="service_id" value="{{ $service->id }}">
 
                                                 <div class="row g-2 mb-2">
                                                     <div class="col-6">
                                                         <label class="form-label text-muted mb-1" style="font-size:0.75rem;">Start Time</label>
-                                                        <input type="time" class="form-control" name="scheduled_start_time">
+                                                        <input type="time" class="form-control" name="scheduled_start_time" required>
                                                     </div>
                                                     <div class="col-6">
                                                         <label class="form-label text-muted mb-1" style="font-size:0.75rem;">End Time</label>
-                                                        <input type="time" class="form-control" name="scheduled_end_time">
+                                                        <input type="time" class="form-control" name="scheduled_end_time" required>
                                                     </div>
                                                 </div>
 
                                                 <div class="row g-2 mb-2">
                                                     <div class="col-6">
                                                         <label class="form-label text-muted mb-1" style="font-size:0.75rem;">Arrival Time</label>
-                                                        <input type="time" class="form-control" name="scheduled_arrival_time">
+                                                        <input type="time" class="form-control" name="scheduled_arrival_time" required>
                                                     </div>
                                                     <div class="col-6">
                                                         <label class="form-label text-muted mb-1" style="font-size:0.75rem;">Office</label>
-                                                        <select class="form-select" name="scheduled_office">
+                                                        <select class="form-select" name="scheduled_office" required>
+                                                            <option value="">Select Office...</option>
                                                             @foreach($offices as $office)
                                                                 <option value="{{ $office->name }}" {{ $office->name === 'Lubbock, TX' ? 'selected' : '' }}>{{ $office->name }}</option>
                                                             @endforeach
@@ -328,7 +329,8 @@
                                                 <div class="mb-3">
                                                     <label class="form-label text-muted mb-1" style="font-size:0.75rem;">Recurrence Rules</label>
                                                     <div class="d-flex align-items-center gap-1">
-                                                        <select class="form-select" name="recurrence_rule_1">
+                                                        <select class="form-select" name="recurrence_rule_1" required>
+                                                            <option value="">Select...</option>
                                                             <option value="N/A">N/A</option>
                                                             <option value="First">First</option>
                                                             <option value="Second">Second</option>
@@ -337,7 +339,8 @@
                                                             <option value="Last">Last</option>
                                                         </select>
 
-                                                        <select class="form-select" name="recurrence_rule_2">
+                                                        <select class="form-select" name="recurrence_rule_2" required>
+                                                            <option value="">Select...</option>
                                                             <option value="N/A">N/A</option>
                                                             <option value="Sunday">Sunday</option>
                                                             <option value="Monday">Monday</option>
@@ -350,7 +353,8 @@
 
                                                         <span class="text-muted mx-1" style="font-size: 0.8rem;">of</span>
 
-                                                        <select class="form-select" name="recurrence_rule_3">
+                                                        <select class="form-select" name="recurrence_rule_3" required>
+                                                            <option value="">Select...</option>
                                                             <option value="N/A">N/A</option>
                                                             <option value="Week">Week</option>
                                                             <option value="Month">Month</option>
@@ -531,6 +535,14 @@
 
                         $('#proposal-summary-placeholder').addClass('d-none');
                         $('#proposal-summary-card').removeClass('d-none');
+
+                        // Revalidate auto-filled fields to remove error messages
+                        setTimeout(() => {
+                            if ($('#service_name').val()) $('#service_name').valid();
+                            if ($('#price_per_service').val()) $('#price_per_service').valid();
+                            if ($('#number_of_services').val()) $('#number_of_services').valid();
+                            if ($('#outlines').val()) $('#outlines').valid();
+                        }, 100);
                     }
                 },
                 error: function(xhr) {
@@ -538,6 +550,177 @@
                 }
             });
         });
+    });
+    // Initialize Validation for Add Service Form
+    $('#add-service-details-form').validate({
+        rules: {
+            service_name: { required: true, maxlength: 255 },
+            price_per_service: { required: true, number: true, min: 0 },
+            number_of_services: { required: true, digits: true, min: 1 },
+            outlines: { required: true }
+        },
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback text-danger d-block mt-1').css('font-size', '12px');
+            element.closest('td').append(error);
+        },
+        highlight: function (element) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element) {
+            $(element).removeClass('is-invalid');
+        }
+    });
+
+    $(document).on('submit', '#add-service-details-form', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        
+        if (form.valid()) {
+            const btn = form.find('button[type="submit"]');
+            const originalText = btn.html();
+
+            $.ajax({
+                url: form.attr('action'),
+                method: 'POST',
+                data: form.serialize(),
+                beforeSend: function() {
+                    btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Adding...');
+                },
+                success: function(response) {
+                    toastr.success(response.message || 'Service added successfully.');
+                    setTimeout(() => location.reload(), 1000);
+                },
+                error: function(xhr) {
+                    btn.prop('disabled', false).html(originalText);
+                    toastr.error(xhr.responseJSON?.message || 'Failed to add service.');
+                },
+                complete: function() {
+                    btn.prop('disabled', false).html(originalText);
+                }
+            });
+        }
+    });
+
+    // Initialize Validation for Add Single Date Forms
+    $('.ajax-add-date-form').each(function() {
+        $(this).validate({
+            rules: {
+                intended_date: { required: true, date: true }
+            },
+            errorElement: 'span',
+            errorPlacement: function (error, element) {
+                error.addClass('invalid-feedback text-danger d-block mt-1').css('font-size', '12px');
+                element.closest('.mb-3').append(error);
+            },
+            highlight: function (element) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function (element) {
+                $(element).removeClass('is-invalid');
+            }
+        });
+    });
+
+    $(document).on('submit', '.ajax-add-date-form', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        
+        if (form.valid()) {
+            const btn = form.find('button[type="submit"]');
+            const originalText = btn.html();
+
+            $.ajax({
+                url: form.attr('action'),
+                method: 'POST',
+                data: form.serialize(),
+                beforeSend: function() {
+                    btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Adding...');
+                },
+                success: function(response) {
+                    toastr.success(response.message || 'Date added successfully.');
+                    setTimeout(() => location.reload(), 1000);
+                },
+                error: function(xhr) {
+                    btn.prop('disabled', false).html(originalText);
+                    toastr.error(xhr.responseJSON?.message || 'Failed to add date.');
+                },
+                complete: function() {
+                    btn.prop('disabled', false).html(originalText);
+                }
+            });
+        }
+    });
+
+    // Custom Time Validation Method
+    $.validator.addMethod("timeGreaterThan", function(value, element, params) {
+        var targetValue = $(element).closest('form').find("input[name='" + params + "']").val();
+        if (!value || !targetValue) return true; // Allow empty
+        return value > targetValue;
+    }, "End time must be after start time.");
+
+    // Initialize Validation for Recurring Schedule Forms
+    $('.ajax-add-recurrence-form').each(function() {
+        $(this).validate({
+            rules: {
+                scheduled_start_time: { required: true },
+                scheduled_end_time: { required: true, timeGreaterThan: "scheduled_start_time" },
+                scheduled_arrival_time: { required: true },
+                scheduled_office: { required: true },
+                scheduled_recurrence_count: { required: true, digits: true, min: 1 },
+                recurrence_rule_1: { required: true },
+                recurrence_rule_2: { required: true },
+                recurrence_rule_3: { required: true }
+            },
+            errorElement: 'span',
+            errorPlacement: function (error, element) {
+                error.addClass('invalid-feedback text-danger d-block mt-1').css('font-size', '12px');
+                if (element.attr("name").startsWith("recurrence_rule_")) {
+                    var parent = element.closest('.mb-3');
+                    if (parent.find('.invalid-feedback').length === 0) {
+                        parent.append(error);
+                    }
+                } else {
+                    element.closest('div').append(error);
+                }
+            },
+            highlight: function (element) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function (element) {
+                $(element).removeClass('is-invalid');
+            }
+        });
+    });
+
+    $(document).on('submit', '.ajax-add-recurrence-form', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        
+        if (form.valid()) {
+            const btn = form.find('button[type="submit"]');
+            const originalText = btn.html();
+
+            $.ajax({
+                url: form.attr('action'),
+                method: 'POST',
+                data: form.serialize(),
+                beforeSend: function() {
+                    btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Generating...');
+                },
+                success: function(response) {
+                    toastr.success(response.message || 'Recurring orders generated successfully.');
+                    setTimeout(() => location.reload(), 1000);
+                },
+                error: function(xhr) {
+                    btn.prop('disabled', false).html(originalText);
+                    toastr.error(xhr.responseJSON?.message || 'Failed to generate recurring orders.');
+                },
+                complete: function() {
+                    btn.prop('disabled', false).html(originalText);
+                }
+            });
+        }
     });
 </script>
 

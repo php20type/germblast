@@ -401,7 +401,7 @@
                                                 </div>
                                             </div>
 
-                                            <form action="{{ route('admin.lead.service.fulfill_order.book',$order->id) }}" method="POST">
+                                            <form id="fulfill-order-form" action="{{ route('admin.lead.service.fulfill_order.book',$order->id) }}" method="POST">
                                                 @csrf
                                                 <input type="hidden" name="service_order_id" value="{{ $order->id }}">
 
@@ -496,7 +496,7 @@
                                                             <!-- <th>Clock In</th>
                                                             <th>Clock Out</th> -->
                                                             {{-- <th>Status</th> --}}
-                                                            {{-- <th>Action</th> --}}
+                                                            <th>Action</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -514,27 +514,23 @@
                                                                 <!-- <td>{{ $slot->scheduled_recurrence_rule }}</td> -->
                                                                 <!-- <td>{{ $slot->clocked_in_at ?? '-' }}</td>
                                                                 <td>{{ $slot->clocked_out_at ?? '-' }}</td> -->
-                                                                {{--
                                                                 <td>
-                                                                    <span class="status-pill status-pill-{{ $slot->status ?? 'scheduled' }}">
-                                                                        {{ ucfirst(str_replace('_', ' ', $slot->status ?? 'scheduled')) }}
-                                                                    </span>
+                                                                    <div class="d-flex gap-2">
+                                                                        <button type="button" class="btn btn-sm btn-outline-primary btn-edit-slot" title="Edit Slot"
+                                                                            data-slot-id="{{ $slot->id }}"
+                                                                            data-start-time="{{ \Carbon\Carbon::parse($slot->scheduled_start_time)->format('Y-m-d\TH:i') }}"
+                                                                            data-end-time="{{ \Carbon\Carbon::parse($slot->scheduled_end_time)->format('Y-m-d\TH:i') }}"
+                                                                            data-arrival-time="{{ \Carbon\Carbon::parse($slot->scheduled_arrival_time)->format('H:i') }}"
+                                                                            data-office="{{ $slot->scheduled_office }}"
+                                                                            data-meet="{{ $slot->meet }}"
+                                                                            data-overnight="{{ $slot->overnight }}">
+                                                                            <i class="fas fa-edit"></i>
+                                                                        </button>
+                                                                        <button type="button" class="btn btn-sm btn-outline-danger btn-delete-slot" title="Delete Slot" data-slot-id="{{ $slot->id }}">
+                                                                            <i class="fas fa-trash"></i>
+                                                                        </button>
+                                                                    </div>
                                                                 </td>
-                                                                --}}
-                                                                {{--
-                                                                <td>
-                                                                    <form action="{{ route('admin.lead.service.slot.update_status', $slot->id) }}" method="POST" class="d-flex align-items-center gap-1 mb-0">
-                                                                        @csrf
-                                                                        <select name="status" class="status-select" onchange="this.form.submit()" style="width: auto; min-width: 120px;">
-                                                                            <option value="pending" {{ $slot->status === 'pending' ? 'selected' : '' }}>Pending</option>
-                                                                            <option value="scheduled" {{ $slot->status === 'scheduled' ? 'selected' : '' }}>Scheduled</option>
-                                                                            <option value="confirmed" {{ $slot->status === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                                                                            <option value="completed" {{ $slot->status === 'completed' ? 'selected' : '' }}>Completed</option>
-                                                                            <option value="cancelled" {{ $slot->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                                                                        </select>
-                                                                    </form>
-                                                                </td>
-                                                                --}}
                                                             </tr>
                                                         @empty
                                                             <tr>
@@ -615,17 +611,29 @@
                                                 <div class="section-header d-flex justify-content-between align-items-center mb-3">
                                                     <div class="d-flex align-items-center gap-2">
                                                         <h5 class="section-title mb-0">Slot #{{ $loop->iteration }}</h5>
-                                                        <span class="status-pill status-pill-{{ $slot->status ?? 'scheduled' }}" style="font-size: 11px !important; padding: 4px 10px !important;">
+                                                        <span id="status-pill-{{ $slot->id }}" class="status-pill status-pill-{{ $slot->status ?? 'scheduled' }}" style="font-size: 11px !important; padding: 4px 10px !important;">
                                                             {{ ucfirst(str_replace('_', ' ', $slot->status ?? 'scheduled')) }}
                                                         </span>
                                                     </div>
-                                                    @if($slot->status === 'confirmed' || $slot->is_confirmed)
-                                                        <span class="badge bg-success fs-6 px-3 py-2">
-                                                            <i class="fas fa-check-circle me-1"></i> Confirmed
-                                                        </span>
-                                                    @else
-                                                        <span class="badge bg-secondary fs-6 px-3 py-2">Not Confirmed</span>
-                                                    @endif
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        @if($canEdit)
+                                                            @if($slot->status === 'confirmed' || $slot->is_confirmed)
+                                                                <form action="{{ route('admin.lead.service.slot.unconfirm', $slot->id) }}" method="POST" class="m-0 ajax-unconfirm-form">
+                                                                    @csrf
+                                                                    <button type="submit" class="btn btn-warning">
+                                                                        <i class="fas fa-times me-1"></i> Unconfirm
+                                                                    </button>
+                                                                </form>
+                                                            @else
+                                                                <form action="{{ route('admin.lead.service.slot.confirm', $slot->id) }}" method="POST" class="m-0 ajax-confirm-form">
+                                                                    @csrf
+                                                                    <button type="submit" class="btn btn-success">
+                                                                        <i class="fas fa-check me-1"></i> Confirm Slot
+                                                                    </button>
+                                                                </form>
+                                                            @endif
+                                                        @endif
+                                                    </div>
                                                 </div>
 
                                                 {{-- Slot Details --}}
@@ -653,111 +661,24 @@
                                                         <tr>
                                                             <th>Overnight</th>
                                                             <td>{{ $slot->overnight ? 'Yes' : 'No' }}</td>
-                                                            @if($slot->is_confirmed)
-                                                                <th>Confirmed At</th>
-                                                                <td>{{ $slot->confirmed_at }}</td>
+                                                            @if($slot->lastUpdatedBy)
+                                                                <th>Last Updated By</th>
+                                                                <td>{{ $slot->lastUpdatedBy->name ?? '-' }}</td>
                                                             @else
                                                                 <td colspan="2"></td>
                                                             @endif
                                                         </tr>
-                                                        @if($slot->is_confirmed)
-                                                            <tr>
-                                                                <th>Confirmed By</th>
-                                                                <td colspan="3">{{ $slot->confirmedBy->name ?? '-' }}</td>
-                                                            </tr>
+                                                        @if($slot->confirmation_notes)
+                                                        <tr>
+                                                            <th>Confirmation Notes</th>
+                                                            <td colspan="3">{{ $slot->confirmation_notes }}</td>
+                                                        </tr>
                                                         @endif
                                                     </tbody>
                                                 </table>
 
-                                                {{-- Action Buttons --}}
-                                                <div class="d-flex gap-2 justify-content-end">
 
-                                                    {{-- Confirm Button --}}
-                                                    @if($slot->status !== 'confirmed' && !$slot->is_confirmed)
-                                                        @if($canEdit)
-                                                            <form action="{{ route('admin.lead.service.slot.confirm', $slot->id) }}" method="POST">
-                                                                @csrf
-                                                                <button type="submit" class="btn btn-success">
-                                                                    <i class="fas fa-check me-1"></i> Confirm Slot
-                                                                </button>
-                                                            </form>
-                                                        @endif
-                                                    @endif
-
-                                                    {{-- Edit Button --}}
-                                                    @if($canEdit)
-                                                        <button type="button" class="btn btn-outline-primary"
-                                                            data-bs-toggle="collapse"
-                                                            data-bs-target="#editSlot{{ $slot->id }}">
-                                                            <i class="fas fa-edit me-1"></i> Edit Slot
-                                                        </button>
-                                                    @endif
-
-                                                </div>
-
-                                                {{-- Edit Form (collapsible) --}}
-                                                <div class="collapse mt-3" id="editSlot{{ $slot->id }}">
-                                                    <form action="{{ route('admin.lead.service.slot.update', $slot->id) }}" method="POST">
-                                                        @csrf
-                                                        <table class="table table-hover equipment-report-table">
-                                                            <tbody>
-                                                                <tr>
-                                                                    <th>Start Time</th>
-                                                                    <td><input type="datetime-local" class="form-control" name="scheduled_start_time" value="{{ $slot->scheduled_start_time }}"></td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <th>End Time</th>
-                                                                    <td><input type="datetime-local" class="form-control" name="scheduled_end_time" value="{{ $slot->scheduled_end_time }}"></td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <th>Arrival Time</th>
-                                                                    <td><input type="time" class="form-control" name="scheduled_arrival_time" value="{{ $slot->scheduled_arrival_time }}"></td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <th>Office</th>
-                                                                    <td>
-                                                                        <select class="form-select" name="scheduled_office">
-                                                                            <option value="">Select Office</option>
-                                                                            @foreach($territories as $territory)
-                                                                                <option value="{{ $territory->id }}"
-                                                                                    {{ $slot->scheduled_office == $territory->id ? 'selected' : '' }}>
-                                                                                    {{ $territory->name }}
-                                                                                </option>
-                                                                            @endforeach
-                                                                        </select>
-                                                                    </td>
-                                                                </tr>
-
-                                                                <tr>
-                                                                    <th>Meet</th>
-                                                                    <td>
-                                                                        <select class="form-select" name="meet">
-                                                                            <option value="office" {{ $slot->meet == 'office' ? 'selected' : '' }}>Meet @ Office</option>
-                                                                            <option value="facility" {{ $slot->meet == 'facility' ? 'selected' : '' }}>Meet @ Facility</option>
-                                                                        </select>
-                                                                    </td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <th>Overnight</th>
-                                                                    <td>
-                                                                        <select class="form-select" name="overnight">
-                                                                            <option value="0" {{ !$slot->overnight ? 'selected' : '' }}>Not Overnight</option>
-                                                                            <option value="1" {{ $slot->overnight ? 'selected' : '' }}>Overnight</option>
-                                                                        </select>
-                                                                    </td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td colspan="2" class="text-end">
-                                                                        <button type="submit" class="btn btn-primary">
-                                                                            <i class="fas fa-save me-1"></i> Update Slot
-                                                                        </button>
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </form>
-                                                </div>
-
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -994,7 +915,7 @@
                             <!-- Facilities Tab -->
                             <div class="tab-pane fade" id="facilities" role="tabpanel" aria-labelledby="facilities-tab">
 
-                                @forelse($order->orderSlots->where('is_confirmed', true) as $slot)
+                                @forelse($order->orderSlots as $slot)
                                     <div class="row mt-3">
                                         <div class="col-md-12">
                                             <div class="section-card">
@@ -1019,7 +940,7 @@
                                                                     @endif
                                                                 </span>
                                                                 @if($canEdit)
-                                                                    <form action="{{ route('admin.lead.service.slot.facility.remove', $facility->id) }}" method="POST" class="d-inline">
+                                                                    <form action="{{ route('admin.lead.service.slot.facility.remove', $facility->id) }}" method="POST" class="d-inline ajax-remove-facility-form">
                                                                         @csrf
                                                                         <button type="submit" class="btn btn-sm btn-outline-danger">
                                                                             <i class="fas fa-times"></i>
@@ -1034,7 +955,7 @@
                                                 @endif
 
                                                 {{-- Add Facility Form --}}
-                                                <form action="{{ route('admin.lead.service.slot.facility.add', $slot->id) }}" method="POST">
+                                                <form action="{{ route('admin.lead.service.slot.facility.add', $slot->id) }}" method="POST" class="ajax-add-facility-form">
                                                     @csrf
                                                     <div class="d-flex gap-2">
                                                             <select class="form-select" name="company_location_id" required {{ !$canEdit ? 'disabled' : '' }}>
@@ -1072,7 +993,7 @@
                             <!-- Staffing Tab -->
                             <div class="tab-pane fade" id="staffing" role="tabpanel" aria-labelledby="staffing-tab">
 
-                                @php $confirmedSlots = $order->orderSlots->where('is_confirmed', true); @endphp
+                                @php $confirmedSlots = $order->orderSlots; @endphp
 
                                 @if($confirmedSlots->count())
 
@@ -1217,7 +1138,7 @@
                                                                             </button>
                                                                             {{-- Toggle Leader Button --}}
                                                                             @if($canEdit)
-                                                                                <form action="{{ route('admin.lead.service.slot.staff.toggle_leader', $staffMember->id) }}" method="POST" class="d-inline">
+                                                                                <form action="{{ route('admin.lead.service.slot.staff.toggle_leader', $staffMember->id) }}" method="POST" class="d-inline ajax-toggle-leader-form">
                                                                                     @csrf
                                                                                     <button type="submit" class="btn btn-sm {{ $isLeader ? 'btn-warning text-dark' : 'btn-outline-warning border-0' }}" title="{{ $isLeader ? 'Remove Leader Designation' : 'Designate as Leader' }}" style="padding: 4px 6px; line-height: 1;">
                                                                                         <svg viewBox="0 0 100 100" style="width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; display: inline-block;">
@@ -1245,7 +1166,7 @@
                                                                                 </form>
 
                                                                                 {{-- Remove Staff Button --}}
-                                                                                <form action="{{ route('admin.lead.service.slot.staff.remove', $staffMember->id) }}" method="POST" class="d-inline">
+                                                                                <form action="{{ route('admin.lead.service.slot.staff.remove', $staffMember->id) }}" method="POST" class="d-inline ajax-remove-staff-form">
                                                                                     @csrf
                                                                                     <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Remove Staff Member">
                                                                                         <i class="fas fa-times"></i>
@@ -1275,7 +1196,7 @@
                                                                 @if($staffForTerritory->isEmpty())
                                                                     <p class="text-muted small">No technicians found for this office.</p>
                                                                 @else
-                                                                    <form action="{{ route('admin.lead.service.slot.staff.assign', $slot->id) }}" method="POST">
+                                                                    <form action="{{ route('admin.lead.service.slot.staff.assign', $slot->id) }}" method="POST" class="ajax-assign-staff-form">
                                                                         @csrf
 
                                                                         {{-- Leaders --}}
@@ -1882,7 +1803,7 @@
 
                                             {{-- Add Department Form --}}
                                             @if($canEdit)
-                                                <form action="{{ route('admin.lead.service.outline.add', $order->service->id) }}" method="POST">
+                                                <form action="{{ route('admin.lead.service.outline.add', $order->service->id) }}" method="POST" class="ajax-add-department-form">
                                                     @csrf
                                                     <table class="table table-hover equipment-report-table">
                                                         <tbody>
@@ -1943,7 +1864,7 @@
                                         {{-- Add Note Form --}}
                                         @if($canEdit)
                                             <form action="{{ route('admin.lead.service.order.notes.add', $order->id) }}"
-                                                method="POST" enctype="multipart/form-data">
+                                                method="POST" enctype="multipart/form-data" class="ajax-add-note-form">
                                                 @csrf
                                                 <table class="table table-hover equipment-report-table">
                                                     <tbody>
@@ -2333,7 +2254,7 @@
                         <div class="tab-pane fade" id="schedule-view" role="tabpanel"
                             aria-labelledby="schedule-view-tab">
 
-                            @php $confirmedSlots = $order->orderSlots->where('is_confirmed', true); @endphp
+                            @php $confirmedSlots = $order->orderSlots; @endphp
 
                             @if($confirmedSlots->count())
 
@@ -3099,6 +3020,89 @@
     </div>
 </div>
 
+    <!-- Edit Slot Modal Start -->
+    <div class="modal fade" id="EditSlotModal" tabindex="-1" aria-labelledby="EditSlotModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="EditSlotModalLabel">Edit Slot</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="edit-slot-form" class="company-form" method="POST">
+                        @csrf
+                        <input type="hidden" id="edit_slot_id" name="slot_id">
+                        
+                        <div class="row mx-0">
+                            <div class="col-lg-12 mb-3">
+                                <div class="form-group">
+                                    <label class="form-label">Start Time</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="datetime-local" class="form-control" name="scheduled_start_time" id="edit_scheduled_start_time" {{ !$canEdit ? 'disabled' : '' }}>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 mb-3">
+                                <div class="form-group">
+                                    <label class="form-label">End Time</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="datetime-local" class="form-control" name="scheduled_end_time" id="edit_scheduled_end_time" {{ !$canEdit ? 'disabled' : '' }}>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-12 mb-3">
+                                <div class="form-group">
+                                    <label class="form-label">Arrival Time</label>
+                                    <span class="text-danger">*</span>
+                                    <input type="time" class="form-control" name="scheduled_arrival_time" id="edit_scheduled_arrival_time" {{ !$canEdit ? 'disabled' : '' }}>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 mb-3">
+                                <div class="form-group">
+                                    <label class="form-label">Office</label>
+                                    <span class="text-danger">*</span>
+                                    <select class="form-select" name="scheduled_office" id="edit_scheduled_office" {{ !$canEdit ? 'disabled' : '' }}>
+                                        @foreach($territories as $territory)
+                                            <option value="{{ $territory->id }}">{{ $territory->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 mb-3">
+                                <div class="form-group">
+                                    <label class="form-label">Meet</label>
+                                    <span class="text-danger">*</span>
+                                    <select class="form-select" name="meet" id="edit_meet" {{ !$canEdit ? 'disabled' : '' }}>
+                                        <option value="office">Meet @ Office</option>
+                                        <option value="facility">Meet @ Facility</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 mb-3">
+                                <div class="form-group">
+                                    <label class="form-label">Overnight</label>
+                                    <span class="text-danger">*</span>
+                                    <select class="form-select" name="overnight" id="edit_overnight" {{ !$canEdit ? 'disabled' : '' }}>
+                                        <option value="0">Not Overnight</option>
+                                        <option value="1">Overnight</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            @if($canEdit)
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                            @endif
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Slot Modal End -->
+
 
 
 @endsection
@@ -3803,6 +3807,546 @@
         }
     });
 
+
+    // ==============================
+    // Fulfill Order Form Validation and AJAX Submission
+    // ==============================
+    $.validator.addMethod("greaterThan", function(value, element, param) {
+        var startDate = $(param).val();
+        if (!value || !startDate) {
+            return true;
+        }
+        return new Date(value) > new Date(startDate);
+    }, "End time must be greater than start time.");
+
+    $("#fulfill-order-form").validate({
+        rules: {
+            scheduled_start_time: {
+                required: true
+            },
+            scheduled_end_time: {
+                required: true,
+                greaterThan: "[name='scheduled_start_time']"
+            },
+            scheduled_arrival_time: {
+                required: true
+            },
+            scheduled_office: {
+                required: true
+            },
+            scheduled_recurrence_rule: {
+                required: true
+            },
+            meet: {
+                required: true
+            },
+            overnight: {
+                required: true
+            }
+        },
+        messages: {
+            scheduled_start_time: {
+                required: "Please select start time."
+            },
+            scheduled_end_time: {
+                required: "Please select end time.",
+                greaterThan: "End time must be greater than start time."
+            },
+            scheduled_arrival_time: {
+                required: "Please select arrival time."
+            },
+            scheduled_office: {
+                required: "Please select office."
+            },
+            scheduled_recurrence_rule: {
+                required: "Please select recurrence rule."
+            },
+            meet: {
+                required: "Please select meeting preference."
+            },
+            overnight: {
+                required: "Please select overnight preference."
+            }
+        },
+        errorElement: 'span',
+        errorClass: 'invalid-feedback d-block',
+        highlight: function(element) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('is-invalid');
+        },
+        errorPlacement: function(error, element) {
+            if (element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            } else {
+                error.insertAfter(element);
+            }
+        }
+    });
+
+    $('#fulfill-order-form').submit(function(e) {
+        e.preventDefault();
+
+        if (!$(this).valid()) {
+            return; // Stop if validation fails
+        }
+
+        const btn = $(this).find('button[type="submit"]');
+        const originalText = btn.html();
+        
+        $.ajax({
+            url: $(this).attr('action'),
+            method: 'POST',
+            data: $(this).serialize(),
+            beforeSend: function() {
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Booking...');
+            },
+            success: function(response) {
+                toastr.success('Slot booked successfully!');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).html(originalText);
+                let errMsg = 'Something went wrong while booking the slot.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errMsg = xhr.responseJSON.message;
+                }
+                toastr.error(errMsg);
+            }
+        });
+    });
+
+    // ==============================
+    // Edit Slot Action
+    // ==============================
+    $(document).on('click', '.btn-edit-slot', function() {
+        const btn = $(this);
+        
+        // Populate modal with existing data
+        $('#edit_slot_id').val(btn.data('slot-id'));
+        $('#edit_scheduled_start_time').val(btn.data('start-time'));
+        $('#edit_scheduled_end_time').val(btn.data('end-time'));
+        $('#edit_scheduled_arrival_time').val(btn.data('arrival-time'));
+        $('#edit_scheduled_office').val(btn.data('office'));
+        $('#edit_meet').val(btn.data('meet'));
+        $('#edit_overnight').val(btn.data('overnight'));
+        
+        // Update form action URL dynamically
+        const updateUrlTemplate = "{{ route('admin.lead.service.slot.update', ':id') }}";
+        $('#edit-slot-form').attr('action', updateUrlTemplate.replace(':id', btn.data('slot-id')));
+        
+        $('#EditSlotModal').modal('show');
+    });
+
+    $("#edit-slot-form").validate({
+        rules: {
+            scheduled_start_time: { required: true },
+            scheduled_end_time: { required: true, greaterThan: "#edit_scheduled_start_time" },
+            scheduled_arrival_time: { required: true },
+            scheduled_office: { required: true },
+            meet: { required: true },
+            overnight: { required: true }
+        },
+        messages: {
+            scheduled_start_time: { required: "Please select start time." },
+            scheduled_end_time: { required: "Please select end time.", greaterThan: "End time must be greater than start time." },
+            scheduled_arrival_time: { required: "Please select arrival time." },
+            scheduled_office: { required: "Please select office." },
+            meet: { required: "Please select meeting preference." },
+            overnight: { required: "Please select overnight preference." }
+        },
+        errorElement: 'span',
+        errorClass: 'invalid-feedback d-block',
+        highlight: function(element) { $(element).addClass('is-invalid'); },
+        unhighlight: function(element) { $(element).removeClass('is-invalid'); },
+        errorPlacement: function(error, element) {
+            if (element.parent('.input-group').length) { error.insertAfter(element.parent()); } else { error.insertAfter(element); }
+        }
+    });
+
+    $('#edit-slot-form').submit(function(e) {
+        e.preventDefault();
+
+        if (!$(this).valid()) {
+            return;
+        }
+
+        const btn = $(this).find('button[type="submit"]');
+        const originalText = btn.html();
+        
+        $.ajax({
+            url: $(this).attr('action'),
+            method: 'POST',
+            data: $(this).serialize(),
+            beforeSend: function() {
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Updating...');
+            },
+            success: function(response) {
+                toastr.success('Slot updated successfully!');
+                $('#EditSlotModal').modal('hide');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).html(originalText);
+                let errMsg = 'Something went wrong while updating the slot.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errMsg = xhr.responseJSON.message;
+                }
+                toastr.error(errMsg);
+            }
+        });
+    });
+
+    // ==============================
+    // Delete Slot Action
+    // ==============================
+    $(document).on('click', '.btn-delete-slot', function() {
+        const slotId = $(this).data('slot-id');
+        const deleteUrlTemplate = "{{ route('admin.lead.service.slot.delete', ':id') }}";
+        const deleteUrl = deleteUrlTemplate.replace(':id', slotId);
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "This action will permanently delete this scheduled slot, and all assigned facility records and related/attached records.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete",
+            cancelButtonText: "Cancel"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: deleteUrl,
+                    type: "DELETE",
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
+                    beforeSend: function() {
+                        AppLoader.show();
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Deleted!',
+                            text: response.message || 'Slot deleted successfully.',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                        setTimeout(() => location.reload(), 2000);
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: xhr.responseJSON?.message || 'Something went wrong while deleting the slot.',
+                        });
+                    },
+                    complete: function() {
+                        AppLoader.hide();
+                    }
+                });
+            }
+        });
+    });
+
+    // ==============================
+    // AJAX Confirm Slot
+    // ==============================
+    $(document).on('submit', '.ajax-confirm-form', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const slotId = form.data('slot-id');
+        const btn = form.find('button[type="submit"]');
+        const originalText = btn.html();
+
+        Swal.fire({
+            title: 'Confirm Slot',
+            text: "Would you like to add any confirmation notes?",
+            input: 'textarea',
+            inputPlaceholder: 'Type your confirmation notes here (optional)...',
+            inputAttributes: {
+                'aria-label': 'Type your confirmation notes here'
+            },
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, confirm it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const notes = result.value || '';
+                if(form.find('input[name="confirmation_notes"]').length === 0) {
+                    form.append(`<input type="hidden" name="confirmation_notes">`);
+                }
+                form.find('input[name="confirmation_notes"]').val(notes);
+
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'POST',
+                    data: form.serialize(),
+                    beforeSend: function() {
+                        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Confirming...');
+                    },
+                    success: function(response) {
+                        toastr.success(response.message || 'Slot confirmed successfully!');
+                        setTimeout(() => location.reload(), 500);
+                    },
+                    error: function(xhr) {
+                        btn.prop('disabled', false).html(originalText);
+                        toastr.error(xhr.responseJSON?.message || 'Failed to confirm slot.');
+                    },
+                    complete: function() {
+                        btn.prop('disabled', false).html(originalText);
+                    }
+                });
+            }
+        });
+    });
+
+    // ==============================
+    // AJAX Unconfirm Slot
+    // ==============================
+    $(document).on('submit', '.ajax-unconfirm-form', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const slotId = form.data('slot-id');
+        const btn = form.find('button[type="submit"]');
+        const originalText = btn.html();
+
+        $.ajax({
+            url: form.attr('action'),
+            method: 'POST',
+            data: form.serialize(),
+            beforeSend: function() {
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Unconfirming...');
+            },
+            success: function(response) {
+                toastr.success(response.message || 'Slot unconfirmed successfully!');
+                setTimeout(() => location.reload(), 500);
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).html(originalText);
+                toastr.error(xhr.responseJSON?.message || 'Failed to unconfirm slot.');
+            },
+            complete: function() {
+                btn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+
+    // ==============================
+    // AJAX Add Facility
+    // ==============================
+    $(document).on('submit', '.ajax-add-facility-form', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const btn = form.find('button[type="submit"]');
+        const originalText = btn.html();
+
+        $.ajax({
+            url: form.attr('action'),
+            method: 'POST',
+            data: form.serialize(),
+            beforeSend: function() {
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Adding...');
+            },
+            success: function(response) {
+                toastr.success(response.message || 'Facility added successfully!');
+                setTimeout(() => location.reload(), 500);
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).html(originalText);
+                toastr.error(xhr.responseJSON?.message || 'Failed to add facility.');
+            },
+            complete: function() {
+                btn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+
+    // ==============================
+    // AJAX Remove Facility
+    // ==============================
+    $(document).on('submit', '.ajax-remove-facility-form', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const btn = form.find('button[type="submit"]');
+        const originalText = btn.html();
+
+        $.ajax({
+            url: form.attr('action'),
+            method: 'POST',
+            data: form.serialize(),
+            beforeSend: function() {
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Removing...');
+            },
+            success: function(response) {
+                toastr.success(response.message || 'Facility removed successfully!');
+                setTimeout(() => location.reload(), 500);
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).html(originalText);
+                toastr.error(xhr.responseJSON?.message || 'Failed to remove facility.');
+            },
+            complete: function() {
+                btn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+    // ==============================
+    // AJAX Assign Staff
+    // ==============================
+    $(document).on('submit', '.ajax-assign-staff-form', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const btn = form.find('button[type="submit"]');
+        const originalText = btn.html();
+
+        $.ajax({
+            url: form.attr('action'),
+            method: 'POST',
+            data: form.serialize(),
+            beforeSend: function() {
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Assigning...');
+            },
+            success: function(response) {
+                toastr.success(response.message || 'Staff assigned successfully!');
+                setTimeout(() => location.reload(), 500);
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).html(originalText);
+                toastr.error(xhr.responseJSON?.message || 'Failed to assign staff.');
+            },
+            complete: function() {
+                btn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+
+    // ==============================
+    // AJAX Remove Staff
+    // ==============================
+    $(document).on('submit', '.ajax-remove-staff-form', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const btn = form.find('button[type="submit"]');
+        const originalText = btn.html();
+
+        $.ajax({
+            url: form.attr('action'),
+            method: 'POST',
+            data: form.serialize(),
+            beforeSend: function() {
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Removing...');
+            },
+            success: function(response) {
+                toastr.success(response.message || 'Staff removed successfully!');
+                setTimeout(() => location.reload(), 500);
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).html(originalText);
+                toastr.error(xhr.responseJSON?.message || 'Failed to remove staff.');
+            },
+            complete: function() {
+                btn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+
+    // ==============================
+    // AJAX Toggle Leader
+    // ==============================
+    $(document).on('submit', '.ajax-toggle-leader-form', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const btn = form.find('button[type="submit"]');
+        const originalText = btn.html();
+
+        $.ajax({
+            url: form.attr('action'),
+            method: 'POST',
+            data: form.serialize(),
+            success: function(response) {
+                toastr.success(response.message || 'Leadership status updated successfully!');
+                setTimeout(() => location.reload(), 500);
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).html(originalText);
+                toastr.error(xhr.responseJSON?.message || 'Failed to update leadership status.');
+            },
+            complete: function() {
+                btn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+    // ==============================
+    // AJAX Add Note
+    // ==============================
+    $(document).on('submit', '.ajax-add-note-form', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const btn = form.find('button[type="submit"]');
+        const originalText = btn.html();
+
+        let formData = new FormData(this);
+
+        $.ajax({
+            url: form.attr('action'),
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function() {
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Adding...');
+            },
+            success: function(response) {
+                toastr.success(response.message || 'Note added successfully!');
+                setTimeout(() => location.reload(), 500);
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).html(originalText);
+                toastr.error(xhr.responseJSON?.message || 'Failed to add note.');
+            },
+            complete: function() {
+                btn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+    // ==============================
+    // AJAX Add Department
+    // ==============================
+    $(document).on('submit', '.ajax-add-department-form', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const btn = form.find('button[type="submit"]');
+        const originalText = btn.html();
+
+        $.ajax({
+            url: form.attr('action'),
+            method: 'POST',
+            data: form.serialize(),
+            beforeSend: function() {
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Adding...');
+            },
+            success: function(response) {
+                toastr.success(response.message || 'Department added successfully!');
+                setTimeout(() => location.reload(), 500);
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).html(originalText);
+                toastr.error(xhr.responseJSON?.message || 'Failed to add department.');
+            },
+            complete: function() {
+                btn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
 </script>
 @endpush
 
