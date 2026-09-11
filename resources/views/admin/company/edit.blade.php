@@ -758,21 +758,16 @@
                                                     </select>
                                                 </div>
 
-                                                <div class="col-md-3 col-sm-6 col-12">
-                                                    <label class="form-label">DURATION</label>
-                                                    <input type="hidden" name="start_time" id="start_time">
-                                                    <input type="hidden" name="end_time" id="end_time">
-
-                                                    <select class="form-select-custom form-select" name="duration" id="duration">
-                                                        <option value="">-- Select --</option>
-                                                        <option value="15">15 Min</option>
-                                                        <option value="30">30 Min</option>
-                                                        <option value="60">1 Hour</option>
-                                                        <option value="120">2 Hours</option>
-                                                    </select>
+                                                <div class="col-md-2 col-sm-6 col-12">
+                                                    <label class="form-label">START TIME</label>
+                                                    <input type="time" name="start_time" id="start_time" class="form-select-custom form-control">
+                                                </div>
+                                                <div class="col-md-2 col-sm-6 col-12">
+                                                    <label class="form-label">END TIME</label>
+                                                    <input type="time" name="end_time" id="end_time" class="form-select-custom form-control">
                                                 </div>
 
-                                                <div class="col-md-3 col-sm-6 col-12">
+                                                <div class="col-md-2 col-sm-6 col-12">
                                                     <label class="form-label">DATE</label>
                                                     <input type="date" name="date" id="date"
                                                         class="activity-date form-control">
@@ -4104,7 +4099,16 @@
             });
 
 
-            $("#store_activity").validate({
+                    // Add custom validation method for time comparison
+        $.validator.addMethod("greaterThanStart", function(value, element) {
+            var startTime = $('#start_time').val();
+            if (!value || !startTime) return true; // Skip if either is empty (handled by required)
+            
+            // Compare times (format is HH:mm)
+            return value > startTime;
+        }, "End time must be after start time.");
+
+        $("#store_activity").validate({
                 ignore: [],
                 rules: {
                     note: {
@@ -4259,8 +4263,12 @@
                     activity_type: {
                         required: true
                     },
-                    duration: {
+                    start_time: {
                         required: true
+                    },
+                    end_time: {
+                        required: true,
+                        greaterThanStart: true
                     },
                     date: {
                         required: true
@@ -4283,8 +4291,11 @@
                     activity_type: {
                         required: "Please select the activity."
                     },
-                    duration: {
-                        required: "Please select the duration."
+                    start_time: {
+                        required: "Please select start time."
+                    },
+                    end_time: {
+                        required: "Please select end time."
                     },
                     date: {
                         required: "Please select the date."
@@ -4759,27 +4770,7 @@
             });
 
 
-            const durationSelect = document.getElementById('duration');
-            const startInput = document.getElementById('start_time');
-            const endInput = document.getElementById('end_time');
-
-            if (durationSelect && startInput && endInput) {
-                durationSelect.addEventListener('change', function() {
-                    const durationMinutes = parseInt(this.value);
-                    const now = new Date();
-
-                    const pad = n => String(n).padStart(2, '0');
-                    const formatTime = date => `${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
-
-                    const end = new Date(now.getTime() + durationMinutes * 60000);
-
-                    startInput.value = formatTime(now);
-                    endInput.value = formatTime(end);
-                });
-
-                // Trigger default duration on load (optional)
-                durationSelect.dispatchEvent(new Event('change'));
-            }
+            
 
         });
     </script>
