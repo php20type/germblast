@@ -905,12 +905,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <div class="col-2">
-                                                                    <div class="activity-badges">
-                                                                        <span class="activity-badge badge-cc">JB</span>
-                                                                        <span class="activity-badge badge-cc">TC</span>
-                                                                    </div>
-                                                                </div>
+                                                                
                                                             </div>
 
                                                         </div>
@@ -1019,12 +1014,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <div class="col-2">
-                                                                    <div class="activity-badges">
-                                                                        <span class="activity-badge badge-cc">JB</span>
-                                                                        <span class="activity-badge badge-cc">TC</span>
-                                                                    </div>
-                                                                </div>
+                                                                
                                                             </div>
 
                                                         </div>
@@ -2221,12 +2211,12 @@
             // ==============================
             // Activity and note Comment box toggle functionality
             // ==============================
-            $('.add-comment-btn').click(function() {
+            $(document).on('click', '.add-comment-btn', function() {
                 // Find the nearest comment box relative to this button
                 $(this).closest('.timeline-item').find('.add-comment').toggleClass('d-none');
             });
 
-            $('.comment-cancel').click(function() {
+            $(document).on('click', '.comment-cancel', function() {
                 const $commentBox = $(this).closest('.add-comment');
                 $commentBox.addClass('d-none');
                 $commentBox.find('textarea').val(''); // Clear the textarea content

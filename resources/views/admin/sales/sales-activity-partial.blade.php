@@ -57,12 +57,7 @@
                                  </div>
                              </div>
                          </div>
-                         <div class="col-2">
-                             <div class="activity-badges">
-                                 <span class="activity-badge badge-cc">JB</span>
-                                 <span class="activity-badge badge-cc">TC</span>
-                             </div>
-                         </div>
+                         
                      </div>
 
                  </div>
