@@ -1882,7 +1882,7 @@
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
                                     <select id="person_select" name="person_id[]" class="form-select" multiple>
-                                        <option value="">-- Select Person --</option>
+                                        
                                         @foreach ($allpeoples as $allpeople)
                                             <option value="{{ $allpeople->id }}"
                                                 {{ $allpeople->id == $peoples->id ? 'selected' : '' }}>
@@ -1903,7 +1903,7 @@
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
                                     <select id="source_select" name="source_id[]" class="form-select mt-2" multiple>
-                                        <option value="">Choose...</option>
+                                        
                                         @foreach ($sources as $source)
                                             <option value="{{ $source->id }}">
                                                 {{ $source->name }}
@@ -1921,7 +1921,7 @@
                                     @enderror
                                     <select id="competitor_select" name="competitors_id[]" class="form-select mt-2"
                                         multiple>
-                                        <option value="">Choose...</option>
+                                        
                                         @foreach ($competitors as $competitor)
                                             <option value="{{ $competitor->id }}">
                                                 {{ $competitor->name }}
@@ -4648,3 +4648,4 @@
         });
     </script>
 @endpush
+

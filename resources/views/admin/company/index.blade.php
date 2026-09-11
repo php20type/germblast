@@ -320,7 +320,7 @@
                                             <span class="text-danger">* {{ $message }}</span>
                                         @enderror
                                         <select name="company_id[]" id="companySelect" class="form-select" multiple>
-                                            <option value="">Choose Company</option>
+                                            
                                             @foreach ($allCompanies as $company)
                                                 <option value="{{ $company->id }}">
                                                     {{ $company->name }}
@@ -337,7 +337,7 @@
                                             <span class="text-danger">* {{ $message }}</span>
                                         @enderror
                                         <select id="person_select" name="person_id[]" class="form-select" multiple>
-                                            <option value="">-- Select Person --</option>
+                                            
                                             @foreach ($peoples as $people)
                                                 <option value="{{ $people->id }}">
                                                     {{ $people->name }}
@@ -355,7 +355,7 @@
                                             <span class="text-danger">* {{ $message }}</span>
                                         @enderror
                                         <select id="source_select" name="source_id[]" class="form-select mt-2" multiple>
-                                            <option value="">Choose...</option>
+                                            
                                             @foreach ($sources as $source)
                                                 <option value="{{ $source->id }}">
                                                     {{ $source->name }}
@@ -372,7 +372,7 @@
                                         @enderror
                                         <select id="competitor_select" name="competitors_id[]" class="form-select mt-2"
                                             multiple>
-                                            <option value="">Choose...</option>
+                                            
                                             @foreach ($competitors as $competitor)
                                                 <option value="{{ $competitor->id }}">
                                                     {{ $competitor->name }}
@@ -863,4 +863,5 @@
 
             @include('admin.company.partials.add-company-scripts')
         @endpush
+
 
