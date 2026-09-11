@@ -80,18 +80,6 @@
         $('#menu-toggle').click(function() {
             $('body').toggleClass('sidebar-open');
         });
-
-        // Global fix for Select2 multiple returning [""] when cleared
-        $(document).on('change', 'select.select2[multiple]', function(e) {
-            var val = $(this).val();
-            if (val && val.length === 1 && val[0] === "") {
-                $(this).val(null).trigger('change.select2');
-            }
-            // Trigger jQuery Validation if the form is being validated
-            if ($.validator && $(this).closest('form').length && $(this).closest('form').data('validator')) {
-                $(this).valid();
-            }
-        });
     </script>
     @stack('scripts')
 </body>
