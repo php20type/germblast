@@ -4,6 +4,20 @@
 
 
 
+
+@section('styles')
+    <style>
+        .field-row-actions .field-action-btn {
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        .row:hover .field-row-actions .field-action-btn {
+            opacity: 1;
+        }
+    </style>
+@endsection
+
 @section('content')
 
     <!-- company details start -->
@@ -1278,13 +1292,23 @@
                         <hr>
 
                         {{-- Add Email Option --}}
+                        @php
+                            $usedEmailTypes = collect($emails)->pluck('selected')->toArray();
+                            $availableEmailTypes = array_filter($emailTypes, fn($k) => !in_array($k, $usedEmailTypes), ARRAY_FILTER_USE_KEY);
+                        @endphp
                         <div class="sidebar-section" id="email">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <h6 class="form-label">EMAIL</h6>
                                 @can('people.detail.edit')
-                                    <div class="text-warning small toggle-inline-email" style="cursor: pointer;">
-                                        Add/Update Email
-                                    </div>
+                                    @if(count($availableEmailTypes) > 0)
+                                        <div class="text-warning small toggle-inline-email" style="cursor: pointer;">
+                                            Add Email
+                                        </div>
+                                    @else
+                                        <div class="text-muted small" style="font-style: italic;">
+                                            All types added
+                                        </div>
+                                    @endif
                                 @endcan
                             </div>
 
@@ -1312,12 +1336,22 @@
                                                         disabled>
 
                                                     @can('people.detail.edit')
-                                                        <button class="btn btn-sm btn-outline-secondary delete-field-btn"
-                                                            data-people-id="{{ $peoples->id }}"
-                                                            data-type="{{ $email['selected'] }}" data-category="email"
-                                                            {{ $email['selected'] === 'email' ? 'disabled' : '' }}>
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
+                                                        <div class="field-row-actions d-flex align-items-center gap-1">
+                                                            <button class="btn btn-outline-success btn-sm btn-save-field d-none" title="Save"><i class="fas fa-check fa-sm"></i></button>
+                                                            <button class="btn btn-outline-secondary btn-sm btn-cancel-field d-none" title="Cancel"><i class="fas fa-times fa-sm"></i></button>
+                                                            <button class="btn btn-outline-primary btn-sm btn-edit-field field-action-btn" title="Edit"
+                                                                data-people-id="{{ $peoples->id }}"
+                                                                data-type="{{ $email['selected'] }}"
+                                                                data-category="email">
+                                                                <i class="fas fa-pencil-alt fa-sm"></i>
+                                                            </button>
+                                                            <button class="btn btn-outline-danger btn-sm delete-field-btn field-action-btn"
+                                                                data-people-id="{{ $peoples->id }}"
+                                                                data-type="{{ $email['selected'] }}" data-category="email"
+                                                                title="Delete" {{ $email['selected'] === 'email' ? 'disabled' : '' }}>
+                                                                <i class="fas fa-trash fa-sm"></i>
+                                                            </button>
+                                                        </div>
                                                     @endcan
 
 
@@ -1330,15 +1364,16 @@
                                 </div>
                             </div>
 
+                            @if(count($availableEmailTypes) > 0)
                             <div class="col-12 inline-detail-email" style="display: none;"
                                 data-people-id="{{ $peoples->id }}">
                                 <div class="row g-2">
                                     <!-- Type Selector -->
                                     <div class="col-md-4">
                                         <select name="detail_type" class="form-select" id="new-email-type">
-                                            <option value="email">Email</option>
-                                            <option value="personal_email">Personal Email</option>
-                                            <option value="support_email">Support Email</option>
+                                            @foreach($availableEmailTypes as $field => $label)
+                                                <option value="{{ $field }}">{{ $label }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
 
@@ -1361,19 +1396,30 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
 
                         </div>
 
                         <hr>
 
                         {{-- Add Address Option --}}
+                        @php
+                            $usedAddressTypes = collect($addresses)->pluck('selected')->toArray();
+                            $availableAddressTypes = array_filter($addressTypes, fn($k) => !in_array($k, $usedAddressTypes), ARRAY_FILTER_USE_KEY);
+                        @endphp
                         <div class="sidebar-section" id="address">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <h6 class="form-label">ADDRESS</h6>
                                 @can('people.detail.edit')
-                                    <div class="text-warning small toggle-inline-address" style="cursor: pointer;">
-                                        Add/Update Address
-                                    </div>
+                                    @if(count($availableAddressTypes) > 0)
+                                        <div class="text-warning small toggle-inline-address" style="cursor: pointer;">
+                                            Add Address
+                                        </div>
+                                    @else
+                                        <div class="text-muted small" style="font-style: italic;">
+                                            All types added
+                                        </div>
+                                    @endif
                                 @endcan
                             </div>
 
@@ -1401,12 +1447,22 @@
                                                         disabled>
 
                                                     @can('people.detail.edit')
-                                                        <button class="btn btn-sm btn-outline-secondary delete-field-btn"
-                                                            data-people-id="{{ $peoples->id }}"
-                                                            data-type="{{ $address['selected'] }}" data-category="address"
-                                                            {{ $address['selected'] === 'address' ? 'disabled' : '' }}>
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
+                                                        <div class="field-row-actions d-flex align-items-center gap-1">
+                                                            <button class="btn btn-outline-success btn-sm btn-save-field d-none" title="Save"><i class="fas fa-check fa-sm"></i></button>
+                                                            <button class="btn btn-outline-secondary btn-sm btn-cancel-field d-none" title="Cancel"><i class="fas fa-times fa-sm"></i></button>
+                                                            <button class="btn btn-outline-primary btn-sm btn-edit-field field-action-btn" title="Edit"
+                                                                data-people-id="{{ $peoples->id }}"
+                                                                data-type="{{ $address['selected'] }}"
+                                                                data-category="address">
+                                                                <i class="fas fa-pencil-alt fa-sm"></i>
+                                                            </button>
+                                                            <button class="btn btn-outline-danger btn-sm delete-field-btn field-action-btn"
+                                                                data-people-id="{{ $peoples->id }}"
+                                                                data-type="{{ $address['selected'] }}" data-category="address"
+                                                                title="Delete" {{ $address['selected'] === 'address' ? 'disabled' : '' }}>
+                                                                <i class="fas fa-trash fa-sm"></i>
+                                                            </button>
+                                                        </div>
                                                     @endcan
 
                                                 </div>
@@ -1418,18 +1474,16 @@
                                 </div>
                             </div>
 
+                            @if(count($availableAddressTypes) > 0)
                             <div class="col-12 inline-detail-address" style="display: none;"
                                 data-people-id="{{ $peoples->id }}">
                                 <div class="row g-2">
                                     <!-- Type Selector -->
                                     <div class="col-md-4">
                                         <select name="address_type" class="form-select" id="new-address-type">
-                                            <option value="address">Address</option>
-                                            <option value="main_address">Main Address</option>
-                                            <option value="work_address">Work Address</option>
-                                            <option value="home_address">Home Address</option>
-                                            <option value="billing_address">Billing Address</option>
-                                            <option value="mailing_address">Mailing Address</option>
+                                            @foreach($availableAddressTypes as $field => $label)
+                                                <option value="{{ $field }}">{{ $label }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
 
@@ -1452,19 +1506,30 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
 
                         </div>
 
                         <hr>
 
                         {{-- Add Phone Option --}}
+                        @php
+                            $usedPhoneTypes = collect($phones)->pluck('selected')->toArray();
+                            $availablePhoneTypes = array_filter($phoneTypes, fn($k) => !in_array($k, $usedPhoneTypes), ARRAY_FILTER_USE_KEY);
+                        @endphp
                         <div class="sidebar-section" id="phone">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <h6 class="form-label">PHONE</h6>
                                 @can('people.detail.edit')
-                                    <div class="text-warning small toggle-inline-phone" style="cursor: pointer;">
-                                        Add/Update Phone
-                                    </div>
+                                    @if(count($availablePhoneTypes) > 0)
+                                        <div class="text-warning small toggle-inline-phone" style="cursor: pointer;">
+                                            Add Phone
+                                        </div>
+                                    @else
+                                        <div class="text-muted small" style="font-style: italic;">
+                                            All types added
+                                        </div>
+                                    @endif
                                 @endcan
                             </div>
 
@@ -1492,12 +1557,22 @@
                                                         disabled>
 
                                                     @can('people.detail.edit')
-                                                        <button class="btn btn-sm btn-outline-secondary delete-field-btn"
-                                                            data-people-id="{{ $peoples->id }}"
-                                                            data-type="{{ $phone['selected'] }}" data-category="phone"
-                                                            {{ $phone['selected'] === 'phone' ? 'disabled' : '' }}>
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
+                                                        <div class="field-row-actions d-flex align-items-center gap-1">
+                                                            <button class="btn btn-outline-success btn-sm btn-save-field d-none" title="Save"><i class="fas fa-check fa-sm"></i></button>
+                                                            <button class="btn btn-outline-secondary btn-sm btn-cancel-field d-none" title="Cancel"><i class="fas fa-times fa-sm"></i></button>
+                                                            <button class="btn btn-outline-primary btn-sm btn-edit-field field-action-btn" title="Edit"
+                                                                data-people-id="{{ $peoples->id }}"
+                                                                data-type="{{ $phone['selected'] }}"
+                                                                data-category="phone">
+                                                                <i class="fas fa-pencil-alt fa-sm"></i>
+                                                            </button>
+                                                            <button class="btn btn-outline-danger btn-sm delete-field-btn field-action-btn"
+                                                                data-people-id="{{ $peoples->id }}"
+                                                                data-type="{{ $phone['selected'] }}" data-category="phone"
+                                                                title="Delete" {{ $phone['selected'] === 'phone' ? 'disabled' : '' }}>
+                                                                <i class="fas fa-trash fa-sm"></i>
+                                                            </button>
+                                                        </div>
                                                     @endcan
 
                                                 </div>
@@ -1509,17 +1584,16 @@
                                 </div>
                             </div>
 
+                            @if(count($availablePhoneTypes) > 0)
                             <div class="col-12 inline-detail-phone" style="display: none;"
                                 data-people-id="{{ $peoples->id }}">
                                 <div class="row g-2">
                                     <!-- Type Selector -->
                                     <div class="col-md-4">
                                         <select name="phone_type" class="form-select" id="new-phone-type">
-                                            <option value="phone">Phone</option>
-                                            <option value="home_phones">Home Phone</option>
-                                            <option value="mobile_phones">Mobile Phone</option>
-                                            <option value="work_phones">Work Phone</option>
-                                            <option value="fax_phones">Fax Phone</option>
+                                            @foreach($availablePhoneTypes as $field => $label)
+                                                <option value="{{ $field }}">{{ $label }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
 
@@ -1542,19 +1616,30 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
 
                         </div>
 
                         <hr>
 
                         {{-- Add URL Option --}}
+                        @php
+                            $usedUrlTypes = collect($urls)->pluck('selected')->toArray();
+                            $availableUrlTypes = array_filter($urlTypes, fn($k) => !in_array($k, $usedUrlTypes), ARRAY_FILTER_USE_KEY);
+                        @endphp
                         <div class="sidebar-section" id="url">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <h6 class="form-label">URL</h6>
                                 @can('people.detail.edit')
-                                    <div class="text-warning small toggle-inline-url" style="cursor: pointer;">
-                                        Add/Update URL
-                                    </div>
+                                    @if(count($availableUrlTypes) > 0)
+                                        <div class="text-warning small toggle-inline-url" style="cursor: pointer;">
+                                            Add URL
+                                        </div>
+                                    @else
+                                        <div class="text-muted small" style="font-style: italic;">
+                                            All types added
+                                        </div>
+                                    @endif
                                 @endcan
                             </div>
 
@@ -1581,12 +1666,22 @@
                                                         value="{{ $url['value'] }}" placeholder="Enter URL" disabled>
 
                                                     @can('people.detail.edit')
-                                                        <button class="btn btn-sm btn-outline-secondary delete-field-btn"
-                                                            data-people-id="{{ $peoples->id }}"
-                                                            data-type="{{ $url['selected'] }}" data-category="url"
-                                                            {{ $url['selected'] === 'url' ? 'disabled' : '' }}>
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
+                                                        <div class="field-row-actions d-flex align-items-center gap-1">
+                                                            <button class="btn btn-outline-success btn-sm btn-save-field d-none" title="Save"><i class="fas fa-check fa-sm"></i></button>
+                                                            <button class="btn btn-outline-secondary btn-sm btn-cancel-field d-none" title="Cancel"><i class="fas fa-times fa-sm"></i></button>
+                                                            <button class="btn btn-outline-primary btn-sm btn-edit-field field-action-btn" title="Edit"
+                                                                data-people-id="{{ $peoples->id }}"
+                                                                data-type="{{ $url['selected'] }}"
+                                                                data-category="url">
+                                                                <i class="fas fa-pencil-alt fa-sm"></i>
+                                                            </button>
+                                                            <button class="btn btn-outline-danger btn-sm delete-field-btn field-action-btn"
+                                                                data-people-id="{{ $peoples->id }}"
+                                                                data-type="{{ $url['selected'] }}" data-category="url"
+                                                                title="Delete" {{ $url['selected'] === 'url' ? 'disabled' : '' }}>
+                                                                <i class="fas fa-trash fa-sm"></i>
+                                                            </button>
+                                                        </div>
                                                     @endcan
 
                                                 </div>
@@ -1598,15 +1693,16 @@
                                 </div>
                             </div>
 
+                            @if(count($availableUrlTypes) > 0)
                             <div class="col-12 inline-detail-url" style="display: none;"
                                 data-people-id="{{ $peoples->id }}">
                                 <div class="row g-2">
                                     <!-- Type Selector -->
                                     <div class="col-md-4">
                                         <select name="url_type" class="form-select" id="new-url-type">
-                                            <option value="url">URL</option>
-                                            <option value="blog_url">Blog URL</option>
-                                            <option value="twitter_url">Twitter URL</option>
+                                            @foreach($availableUrlTypes as $field => $label)
+                                                <option value="{{ $field }}">{{ $label }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
 
@@ -1629,6 +1725,7 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
 
                         </div>
 
@@ -3631,6 +3728,74 @@
             handleUpdateClick('#url-submit', '.inline-detail-url', 'url', "{{ csrf_token() }}");
 
             // ==============================
+                        // ==============================
+            // Inline editing of email, phone, address, url
+            // ==============================
+            $(document).on('click', '.btn-edit-field', function() {
+                let row = $(this).closest('.row');
+                let input = row.find('input[type="text"]');
+                input.prop('disabled', false).focus();
+                
+                let actions = $(this).closest('.field-row-actions');
+                actions.find('.field-action-btn').addClass('d-none');
+                actions.find('.btn-save-field, .btn-cancel-field').removeClass('d-none');
+            });
+            
+            $(document).on('click', '.btn-cancel-field', function() {
+                let row = $(this).closest('.row');
+                let input = row.find('input[type="text"]');
+                input.val(input.attr('value')).prop('disabled', true);
+                
+                let actions = $(this).closest('.field-row-actions');
+                actions.find('.btn-save-field, .btn-cancel-field').addClass('d-none');
+                actions.find('.field-action-btn').removeClass('d-none');
+            });
+            
+            $(document).on('click', '.btn-save-field', function() {
+                let btn = $(this);
+                let row = btn.closest('.row');
+                let input = row.find('input[type="text"]');
+                let select = row.find('select');
+                let actions = btn.closest('.field-row-actions');
+                
+                let editBtn = actions.find('.btn-edit-field');
+                let category = editBtn.data('category');
+                let entityId = editBtn.data('people-id');
+                let type = select.val();
+                let value = input.val();
+
+                $.ajax({
+                    url: "{{ route('admin.update.people.field') }}",
+                    type: "POST",
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        people_id: entityId,
+                        category: category,
+                        type: type,
+                        value: value
+                    },
+                    success: function(res) {
+                        input.attr('value', value).prop('disabled', true);
+                        actions.find('.btn-save-field, .btn-cancel-field').addClass('d-none');
+                        actions.find('.field-action-btn').removeClass('d-none');
+                        toastr.success(res.message || 'Updated successfully');
+                    },
+                    error: function(xhr) {
+                        toastr.error('Failed to update.');
+                    }
+                });
+            });
+
+            $(document).on('keydown', '.row input[type="text"]', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    $(this).closest('.row').find('.btn-save-field').click();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    $(this).closest('.row').find('.btn-cancel-field').click();
+                }
+            });
+            
             // Delete email, address, phone and url of company
             // ==============================
             $(document).on('click', '.delete-field-btn', function() {
