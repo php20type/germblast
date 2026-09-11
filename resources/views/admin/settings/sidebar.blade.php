@@ -64,6 +64,7 @@
             <a class="nav-link {{ request()->routeIs('admin.settings.product') ? 'active' : '' }}" href="{{ route('admin.settings.product') }}">Products</a>
             <a class="nav-link {{ request()->routeIs('admin.settings.tag') ? 'active' : '' }}" href="{{ route('admin.settings.tag') }}">Tags</a>
             <a class="nav-link {{ request()->routeIs('admin.settings.territory') ? 'active' : '' }}" href="{{ route('admin.settings.territory') }}">Territories</a>
+            <a class="nav-link {{ request()->routeIs('admin.settings.vehicle') ? 'active' : '' }}" href="{{ route('admin.settings.vehicle') }}">Vehicles</a>
 
             <!-- <div class="mt-4 mb-2">
                 <small class="text-uppercase" style="font-size: 14px">Connections</small>

@@ -17,6 +17,7 @@ use App\Models\Source;
 use App\Models\Tag;
 use App\Models\Territory;
 use App\Models\TerritoryLocation;
+use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -697,5 +698,64 @@ class SettingController extends Controller implements HasMiddleware
         $cities = Helper::getCitiesByStateId($stateId);
 
         return response()->json($cities);
+    }
+
+    public function vehicle()
+    {
+        $vehicles = Vehicle::all();
+        $totalCounts = Vehicle::count();
+
+        return view('admin.settings.vehicles', compact('vehicles', 'totalCounts'));
+    }
+
+    public function vehicle_store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required',
+            'number_available' => 'nullable|integer',
+        ]);
+
+        $data = [
+            'name' => $validated['name'],
+            'number_available' => $validated['number_available'] ?? null,
+            'is_retired' => $request->has('is_retired'),
+        ];
+
+        $vehicle = Vehicle::create($data);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Vehicle added successfully.',
+                'company' => $vehicle,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Vehicle added successfully.');
+    }
+
+    public function vehicle_update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required',
+            'number_available' => 'nullable|integer',
+        ]);
+
+        $vehicle = Vehicle::findOrFail($id);
+        $vehicle->update([
+            'name' => $validated['name'],
+            'number_available' => $validated['number_available'] ?? null,
+            'is_retired' => $request->has('is_retired'),
+        ]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Vehicle updated successfully.',
+                'company' => $vehicle,
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Vehicle updated successfully.');
     }
 }

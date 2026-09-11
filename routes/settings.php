@@ -96,6 +96,15 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::post('territory/update/{id}', [SettingController::class, 'territory_update'])->name('territory.update');
         Route::post('territory/update-locations/{id}', [SettingController::class, 'territory_update_locations'])->name('territory.update_locations');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Vehicle Routes
+        |--------------------------------------------------------------------------
+        */
+        Route::get('vehicle', [SettingController::class, 'vehicle'])->name('vehicle');
+        Route::post('vehicle', [SettingController::class, 'vehicle_store'])->name('vehicle.store');
+        Route::post('vehicle/update/{id}', [SettingController::class, 'vehicle_update'])->name('vehicle.update');
+
     });
 
 

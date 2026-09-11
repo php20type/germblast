@@ -1,0 +1,400 @@
+@extends('admin.includes.layout')
+
+@section('title', 'vehicles')
+
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+@endpush
+
+@section('content')
+
+
+    <main class="app-wrapper">
+        <!-- All Companies Section start  -->
+        <div class="companies-section my-4">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- Sidebar -->
+                    @include('admin.settings.sidebar')
+
+                    <!-- Main Content -->
+                    <div class="col-md-10 p-0">
+                        <div class="main-content">
+                            <div class="heading-area-sec mb-3">
+                                <div class="left-part-sec">
+                                    <h3 class="mb-1">Vehicles <span style="font-size: 24px;">📌</span></h3>
+                                    <p class="text-muted mb-0">Track your Vehicles on each lead to compare win and loss rates.</p>
+                                </div>
+                                <div class="right-part-sec mt-1">
+                                    <a href="javascript:void(0);" class="btn btn-export" id="toggleAddVehicle" onclick="addVehicle()">Add Vehicle</a>
+                                </div>
+                            </div>
+
+                            <div class="px-4 pb-4">
+                                <div class="mb-5">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0 text-uppercase">Vehicles ({{ $totalCounts }})</h6>
+                                    </div>
+
+                                    <table class="table w-100 equipment-report-table mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Name</th>
+<th scope="col">Number Available</th>
+<th scope="col">Retired</th>
+                                                <th scope="col" class="text-end">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($vehicles as $vehicle)
+                                                <tr>
+                                                    <td>{{ $vehicle->name }}</td>
+                                                    <td>{{ $vehicle->number_available }}</td>
+                                                    <td>
+                                                        @if($vehicle->is_retired)
+                                                            <span class="badge bg-danger">Yes</span>
+                                                        @else
+                                                            <span class="badge bg-success">No</span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <a href="javascript:void(0);" 
+                                                           class="btn btn-outline-primary btn-sm btn-edit-Vehicle"
+                                                           data-id="{{ $vehicle->id }}"
+                                                           data-name="{{ $vehicle->name }}"
+                                                           data-number="{{ $vehicle->number_available }}"
+                                                           data-retired="{{ $vehicle->is_retired ? '1' : '0' }}">
+                                                            Edit
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="info-section bg-white p-4 rounded-3 border mt-4" style="border-color: #e5e7eb !important;">
+                                    <div class="info-cards mb-4">
+                                        <h6 class="fw-bold mb-2">WHY TRACK Vehicles?</h6>
+                                        <p class="text-muted mb-0">Tracking Vehicles with your leads makes it easy to see reports on your win rate against each Vehicle.</p>
+                                    </div>
+                                    <hr class="my-4 text-muted opacity-25">
+                                    <div class="info-cards mb-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="fw-bold mb-0">PROCESS TRIGGERS</h6>
+                                        </div>
+                                        <p class="text-muted mb-0">In the Lead Distribution section you can configure a process to be automatically attached to a lead when competing with a specific Vehicle.</p>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- All Companies Section End  -->
+    </main>
+
+    {{-- Vehicle modal --}}
+    <div class="modal fade" id="add_Vehicle" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        {{-- Just remove modal-fullscreen from below class , to get a popup instead of full modal --}}
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="exampleModalLabel">New Vehicle</h1>
+                    <div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-body ps-0">
+
+                    <form class="company-form" action="{{ route('admin.settings.vehicle.store') }}" method="post" id="store_Vehicle">
+                        @csrf
+
+
+                        <div class="row mx-0">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Name <span class="text-danger">*</span></label>
+                                    <input type="text" placeholder="e.g. Acme Corp" name="name"
+                                        class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-lg-12 mt-3">
+                                <div class="form-group">
+                                    <label class="form-label">Number Available</label>
+                                    <input type="number" name="number_available" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-lg-12 mt-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="is_retired" id="addVehicleRetired" value="1">
+                                    <label class="form-check-label" for="addVehicleRetired">Is Retired?</label>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success" id="AddVehicle">New Vehicle</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- Edit Vehicle modal --}}
+    <div class="modal fade" id="edit_Vehicle" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title" id="editModalLabel">Edit Vehicle</h1>
+                    <div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                <div class="modal-body ps-0">
+                    <form class="company-form" action="" method="post" id="update_Vehicle">
+                        @csrf
+                        <div class="row mx-0">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-label">Name <span class="text-danger">*</span></label>
+                                    <input type="text" placeholder="e.g. Acme Corp" name="name" id="editVehicleName" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-lg-12 mt-3">
+                                <div class="form-group">
+                                    <label class="form-label">Number Available</label>
+                                    <input type="number" name="number_available" id="editVehicleNumber" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="col-lg-12 mt-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="is_retired" id="editVehicleRetired" value="1">
+                                    <label class="form-check-label" for="editVehicleRetired">Is Retired?</label>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btnUpdateVehicle">Save Changes</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+@endsection
+
+@push('scripts')
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.equipment-report-table').each(function() {
+                if (!$.fn.DataTable.isDataTable(this)) {
+                    $(this).DataTable({
+                        "pageLength": 10,
+                        "ordering": true,
+                        "info": true,
+                        "searching": true,
+                        "dom": '<"d-flex justify-content-between align-items-center mb-3"l f>r<"table-responsive"t><"d-flex justify-content-between align-items-center mt-3"i p>'
+                    });
+                }
+            });
+        });
+
+        function addVehicle() {
+            $('#add_Vehicle').modal('show');
+        }
+
+         $("#store_Vehicle").validate({
+            ignore: [],
+            rules: {
+                name: {
+                    required: true
+                },
+            },
+            messages: {
+                name: {
+                    required: "Please enter the Vehicle name."
+                },
+            },
+            errorElement: 'span',
+            errorClass: 'invalid-feedback d-block',
+            highlight: function(element) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function(element) {
+                $(element).removeClass('is-invalid');
+            },
+            errorPlacement: function(error, element) {
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent()); // Inserts after the .input-group
+                } else {
+                    error.insertAfter(element); // Default
+                }
+            }
+        });
+
+
+        // Reset form and validation on modal close
+        $('#add_Vehicle').on('hidden.bs.modal', function () {
+            const validator = $("#store_Vehicle").validate();
+            if(validator) validator.resetForm();
+            $('#store_Vehicle')[0].reset();
+            $('#store_Vehicle .is-invalid').removeClass('is-invalid');
+        });
+
+        $('#store_Vehicle').submit(function(e) {
+            e.preventDefault();
+
+            if (!$('#store_Vehicle').valid()) {
+                return; // Stop if validation fails
+            }
+
+            const btn = $('#AddVehicle');
+            btn.prop('disabled', true).text('Creating...');
+
+            $.ajax({
+                url: "{{ route('admin.settings.vehicle.store') }}",
+                method: "POST",
+                data: $(this).serialize(),
+                success: function(response) {
+                    toastr.success('Vehicle added successfully!');
+                    $('#add_Vehicle').modal('hide');
+                    setTimeout(() => location.reload(), 1000);
+                },
+                error: function(xhr) {
+                    btn.prop('disabled', false).text('New Vehicle');
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while adding new Vehicle.');
+                }
+            });
+        });
+
+        // Edit form reset on close
+        $('#edit_Vehicle').on('hidden.bs.modal', function () {
+            const validator = $("#update_Vehicle").validate();
+            if(validator) validator.resetForm();
+            $('#update_Vehicle')[0].reset();
+            $('#update_Vehicle .is-invalid').removeClass('is-invalid');
+        });
+
+        // Edit button click
+        $(document).on('click', '.btn-edit-Vehicle', function(e) {
+            e.preventDefault();
+            let id = $(this).data('id');
+            let name = $(this).data('name');
+            let number = $(this).data('number');
+            let retired = $(this).data('retired');
+
+            $('#editVehicleName').val(name);
+            $('#editVehicleNumber').val(number);
+            $('#editVehicleRetired').prop('checked', retired == 1);
+
+            $('#update_Vehicle').attr('action', "{{ url('admin/settings/vehicle/update') }}/" + id);
+            $('#edit_Vehicle').modal('show');
+        });
+
+        $("#update_Vehicle").validate({
+            ignore: [],
+            rules: {
+                name: { required: true }
+            },
+            messages: {
+                name: { required: "Please enter the Vehicle name." }
+            },
+            errorElement: 'span',
+            errorClass: 'invalid-feedback d-block',
+            highlight: function(element) { $(element).addClass('is-invalid'); },
+            unhighlight: function(element) { $(element).removeClass('is-invalid'); },
+            errorPlacement: function(error, element) {
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent());
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+
+        $('#update_Vehicle').submit(function(e) {
+            e.preventDefault();
+
+            if (!$('#update_Vehicle').valid()) {
+                return;
+            }
+
+            const btn = $('#btnUpdateVehicle');
+            btn.prop('disabled', true).text('Saving...');
+
+            $.ajax({
+                url: $(this).attr('action'),
+                method: "POST",
+                data: $(this).serialize(),
+                success: function(response) {
+                    toastr.success('Vehicle updated successfully!');
+                    $('#edit_Vehicle').modal('hide');
+                    setTimeout(() => location.reload(), 1000);
+                },
+                error: function(xhr) {
+                    btn.prop('disabled', false).text('Save Changes');
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while updating the Vehicle.');
+                }
+            });
+        });
+
+
+        function toggleSettings() {
+            const settingsContent = document.getElementById('settingsContent');
+            const chevronIcon = document.getElementById('settingsChevron');
+
+            if (settingsContent.classList.contains('show')) {
+                settingsContent.classList.remove('show');
+                chevronIcon.classList.add('rotated');
+            } else {
+                settingsContent.classList.add('show');
+                chevronIcon.classList.remove('rotated');
+            }
+        }
+
+        function toggleDropdown(section) {
+            const sections = ['administration', 'sales', 'data', 'organization', 'connections'];
+
+            // Close all other dropdowns
+            sections.forEach(otherSection => {
+                if (otherSection !== section) {
+                    const otherContent = document.getElementById(otherSection + 'Content');
+                    const otherChevron = document.getElementById(otherSection + 'Chevron');
+                    otherContent.classList.remove('show');
+                    otherChevron.classList.remove('rotated');
+                }
+            });
+
+            // Toggle the clicked dropdown
+            const dropdownContent = document.getElementById(section + 'Content');
+            const chevronIcon = document.getElementById(section + 'Chevron');
+
+            if (dropdownContent.classList.contains('show')) {
+                dropdownContent.classList.remove('show');
+                chevronIcon.classList.remove('rotated');
+            } else {
+                dropdownContent.classList.add('show');
+                chevronIcon.classList.add('rotated');
+            }
+        }
+
+        // Initialize Bootstrap tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+@endpush
+
