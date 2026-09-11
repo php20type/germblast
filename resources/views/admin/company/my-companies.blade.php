@@ -254,8 +254,8 @@
                                     @error('close_date')
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
-                                    <input type="text" name="close_date" placeholder="04-Apr-2004"
-                                        pattern="\d{2}-[A-Za-z]{3}-\d{4}" class="form-control" />
+                                    <input type="date" name="close_date"
+                                        class="form-control" />
                                 </div>
                             </div>
 

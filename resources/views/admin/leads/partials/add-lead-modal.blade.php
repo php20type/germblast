@@ -50,7 +50,7 @@
                                     @error('close_date')
                                         {{ $message }}
                                     @enderror
-                                    <input type="text" name="close_date" placeholder="04-Apr-2004"
+                                    <input type="date" name="close_date"
                                         class="form-control" />
                                 </div>
                             </div>
