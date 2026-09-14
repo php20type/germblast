@@ -56,79 +56,23 @@
                             </div>
                         </div>
 
-                        <!-- Cards Content -->
-                        <div class="px-4 pb-4 text-start">
-                            @forelse ($orders as $order)
-                                <div class="section-card mt-3">
-                                    <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
-                                        <div class="d-flex flex-column align-items-start">
-                                            <div class="mb-2">
-                                                <span class="status-pill status-pill-info">{{ $order->status ?? 'Pending' }}</span>
-                                            </div>
-                                            <div class="text-muted small mt-1">
-                                                Created on <span class="fw-semibold text-dark">{{ $order->created_at->format('M d, Y') }}</span>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <a href="{{ route('admin.lead.service.service_dashboard', $order->id) }}" class="btn btn-outline-dark btn-sm fw-bold px-3">
-                                                View Dashboard
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-4 mb-2">
-                                            <h6 class="text-uppercase text-secondary fw-bold mb-2" style="font-size: 11px; letter-spacing: 0.5px;">Company</h6>
-                                            <div class="text-dark fw-bold" style="font-size: 15px; color: #374151;">
-                                                {{ $order->service?->lead?->company?->name ?? $order->service?->lead?->companies?->pluck('name')?->join(', ') ?: 'N/A' }}
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 mb-2">
-                                            <h6 class="text-uppercase text-secondary fw-bold mb-2" style="font-size: 11px; letter-spacing: 0.5px;">Service Name</h6>
-                                            <div class="text-dark fw-bold" style="font-size: 15px; color: #374151;">
-                                                {{ $order->service->service_name ?? 'N/A' }}
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4 mb-2">
-                                            <h6 class="text-uppercase text-secondary fw-bold mb-2" style="font-size: 11px; letter-spacing: 0.5px;">Order No</h6>
-                                            <div class="text-dark" style="font-size: 15px; color: #374151;">
-                                                {{ $order->order_no ?? 'N/A' }}
-                                            </div>
-                                        </div>
-                                    </div>
+                        <!-- Search and Filter -->
+                        <div class="px-4 mb-4">
+                            <form id="filter-form" method="GET" class="d-flex gap-3 align-items-center">
+                                <input type="text" name="search" class="form-control" placeholder="Search by Company Name..." value="{{ request('search') }}" style="max-width: 300px;">
+                                <select name="status" class="form-select" style="max-width: 200px;">
+                                    <option value="">All Statuses</option>
+                                    @foreach($statuses as $status)
+                                        <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>{{ ucfirst($status) }}</option>
+                                    @endforeach
+                                </select>
+                                <a href="{{ request()->url() }}" id="clear-filter" class="btn btn-outline-secondary px-4" style="{{ (request()->has('search') || request()->has('status')) ? '' : 'display: none;' }}">Clear</a>
+                            </form>
+                        </div>
 
-                                    @if($order->orderSlots && $order->orderSlots->count() > 0)
-                                        <div class="mt-4 pt-3 border-top">
-                                            <h6 class="text-uppercase text-secondary fw-bold mb-3" style="font-size: 11px; letter-spacing: 0.5px;">Associated Slots</h6>
-                                            <div class="table-responsive">
-                                                <table class="table table-hover w-100 equipment-report-table">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Start Date/Time</th>
-                                                            <th>End Date/Time</th>
-                                                            <th>Status</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach($order->orderSlots as $slot)
-                                                            <tr>
-                                                                <td>{{ $slot->scheduled_start_time ? \Carbon\Carbon::parse($slot->scheduled_start_time)->format('M d, Y h:i A') : 'N/A' }}</td>
-                                                                <td>{{ $slot->scheduled_end_time ? \Carbon\Carbon::parse($slot->scheduled_end_time)->format('M d, Y h:i A') : 'N/A' }}</td>
-                                                                <td>{{ $slot->status ?? 'Pending' }}</td>
-                                                            </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    @endif
-                                </div>
-                            @empty
-                                <div class="text-center py-5 text-muted">
-                                    <div class="mb-3" style="font-size: 40px;">📭</div>
-                                    <h5 class="fw-semibold text-dark">No Service Orders Found</h5>
-                                    <p>There are currently no active service orders.</p>
-                                </div>
-                            @endforelse
+                        <!-- Cards Content -->
+                        <div class="px-4 pb-4 text-start" id="orders-container">
+                            @include('admin.service_orders.partials.orders-list')
                         </div>
                     </div>
                 </div>
@@ -136,3 +80,79 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    function fetchOrders(url) {
+        $.ajax({
+            url: url,
+            type: 'GET',
+            global: false,
+            success: function(response) {
+                if (response.html) {
+                    $('#orders-container').html(response.html);
+                }
+            },
+            error: function(xhr) {
+                console.error("Error fetching orders", xhr);
+            }
+        });
+    }
+
+    // Handle form submission
+    $('#filter-form').on('submit', function(e) {
+        e.preventDefault();
+        var url = window.location.href.split('?')[0];
+        var params = $(this).serialize();
+        fetchOrders(url + '?' + params);
+        window.history.pushState(null, '', url + '?' + params);
+    });
+
+    // Handle clear button
+    $('#clear-filter').on('click', function(e) {
+        e.preventDefault();
+        $('#filter-form')[0].reset();
+        $('#filter-form input[name="search"]').val('');
+        $('#filter-form select[name="status"]').val('');
+        var url = window.location.href.split('?')[0];
+        fetchOrders(url);
+        window.history.pushState(null, '', url);
+        $(this).hide();
+    });
+
+    // Toggle clear button visibility and auto-submit
+    var timeout = null;
+    $('#filter-form input[name="search"]').on('input', function() {
+        var $form = $(this).closest('form');
+        clearTimeout(timeout);
+        timeout = setTimeout(function() {
+            $form.trigger('submit');
+        }, 500); // 500ms debounce
+        
+        toggleClearBtn();
+    });
+    
+    $('#filter-form select[name="status"]').on('change', function() {
+        $(this).closest('form').trigger('submit');
+        toggleClearBtn();
+    });
+
+    function toggleClearBtn() {
+        if ($('input[name="search"]').val() || $('select[name="status"]').val()) {
+            $('#clear-filter').show();
+        } else {
+            $('#clear-filter').hide();
+        }
+    }
+
+    // Handle pagination clicks
+    $(document).on('click', '.pagination a', function(e) {
+        e.preventDefault();
+        var url = $(this).attr('href');
+        fetchOrders(url);
+        window.history.pushState(null, '', url);
+    });
+});
+</script>
+@endpush

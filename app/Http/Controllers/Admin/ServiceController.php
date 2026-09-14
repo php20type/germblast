@@ -62,10 +62,35 @@ class ServiceController extends Controller implements HasMiddleware
         ];
     }
 
-    public function serviceOrdersIndex()
+    public function serviceOrdersIndex(Request $request)
     {
-        $orders = ServiceOrder::with(['service.lead.company', 'service.lead.companies', 'orderSlots.staff'])->orderBy('created_at', 'desc')->get();
-        return view('admin.service_orders.index', compact('orders'));
+        $query = ServiceOrder::with(['service.lead.company', 'service.lead.companies', 'orderSlots.staff']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('service.lead', function ($q) use ($search) {
+                $q->whereHas('company', function ($q2) use ($search) {
+                    $q2->where('name', 'like', "%{$search}%");
+                })->orWhereHas('companies', function ($q2) use ($search) {
+                    $q2->where('name', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $orders = $query->orderBy('created_at', 'desc')->paginate(10)->appends($request->query());
+        $statuses = ['open', 'completed', 'cancelled'];
+
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('admin.service_orders.partials.orders-list', compact('orders'))->render(),
+            ]);
+        }
+
+        return view('admin.service_orders.index', compact('orders', 'statuses'));
     }
     protected $orderService;
     protected $notify;
