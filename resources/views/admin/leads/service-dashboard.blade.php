@@ -378,7 +378,7 @@
 
                                         <!-- Barcode Assignment Form for this specific slot -->
                                         @if($canEdit)
-                                            <form action="{{ route('admin.lead.service.slot.assign_equipment', $slot->id) }}" method="POST" class="mb-0">
+                                            <form action="{{ route('admin.lead.service.slot.assign_equipment', $slot->id) }}" method="POST" class="mb-0 assign-equipment-form">
                                                 @csrf
                                                 <div class="row align-items-center">
                                                     <div class="col-md-5">
@@ -439,7 +439,7 @@
                                                                 </td>
                                                                 <td class="text-end">
                                                                     @if($canEdit)
-                                                                        <form action="{{ route('admin.lead.service.slot.remove_equipment', [$slot->id, $equipment->id]) }}" method="POST" class="d-inline">
+                                                                        <form action="{{ route('admin.lead.service.slot.remove_equipment', [$slot->id, $equipment->id]) }}" method="POST" class="d-inline remove-equipment-form">
                                                                             @csrf
                                                                             <button type="submit" class="btn btn-sm btn-outline-danger px-3" style="border-radius: 8px; font-weight: 600;">
                                                                                 <i class="fas fa-trash-alt me-1"></i> Remove
@@ -644,6 +644,40 @@
                                                     <h5 class="section-title">Facility Maps (if available)</h5>
                                                 </div>
                                                 <p class="text-muted" style="font-size: 13px;">No facility maps available for this order.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Contract Details Section -->
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="section-card">
+                                                <div class="section-header mb-3">
+                                                    <h5 class="section-title">Contract Details</h5>
+                                                </div>
+                                                <div class="table-responsive">
+                                                    <table class="table equipment-report-table mb-0">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Outline Name</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @php 
+                                                                $outlines = $order->service->outlines ?? collect(); 
+                                                            @endphp
+                                                            @forelse($outlines as $outline)
+                                                                <tr>
+                                                                    <td class="fw-semibold text-dark">{{ $outline->outline_name }}</td>
+                                                                </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td class="text-center text-muted py-3">No service outlines found for this contract.</td>
+                                                                </tr>
+                                                            @endforelse
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1013,7 +1047,7 @@
                                                                     </div>
                                                                     <div class="d-flex justify-content-end">
                                                                         @if($canEdit)
-                                                                        <form action="{{ route('admin.lead.service.clock_out') }}" method="POST">
+                                                                        <form action="{{ route('admin.lead.service.clock_out') }}" method="POST" class="clock-out-form">
                                                                             @csrf
                                                                             <input type="hidden" name="slot_id" value="{{ $slot->id }}">
                                                                             <input type="hidden" name="type" value="{{ $runningClock->type }}">
@@ -1341,7 +1375,7 @@
                                                       <h5 class="section-title">Equipment Barcode Record</h5>
                                                   </div>
                                                   @if($canEdit)
-                                                  <form action="{{ route('admin.lead.service.order.equipment_record.save', $order->id) }}" method="POST" class="mb-0">
+                                                  <form action="{{ route('admin.lead.service.order.equipment_record.save', $order->id) }}" method="POST" class="mb-0" id="equipment-record-form">
                                                       @csrf
                                                       <div class="d-flex flex-wrap gap-2 align-items-center">
                                                           <div style="flex: 2; min-width: 200px;">
@@ -1598,7 +1632,7 @@
 
                                                     {{-- Edit Form --}}
                                                     @if($canEdit)
-                                                    <form action="{{ route('admin.lead.service.outline.update', $outline->id) }}" method="POST" class="mt-2">
+                                                    <form action="{{ route('admin.lead.service.outline.update', $outline->id) }}" method="POST" class="mt-2 outline-update-form">
                                                         @csrf
                                                         <div class="row mt-2 g-2">
                                                             <div class="col-md-12">
@@ -1730,7 +1764,7 @@
 
                                             {{-- Add Note Form --}}
                                             @if($canEdit)
-                                            <form action="{{ route('admin.lead.service.order.notes.add', $order->id) }}"
+                                            <form action="{{ route('admin.lead.service.order.notes.add', $order->id) }}" id="service-notes-form"
                                                 method="POST" enctype="multipart/form-data">
                                                 @csrf
                                                 <table class="table table-hover equipment-report-table">
@@ -2241,6 +2275,9 @@
                     success: function (response) {
                         if (response.success) {
                             toastr.success('Service plan narrative saved successfully!');
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1000);
                         } else {
                             toastr.error(response.message || 'An error occurred');
                         }
@@ -2269,6 +2306,9 @@
                     success: function (response) {
                         if (response.success) {
                             toastr.success('Sales narrative saved successfully!');
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1000);
                         } else {
                             toastr.error(response.message || 'An error occurred');
                         }
@@ -2297,6 +2337,9 @@
                     success: function (response) {
                         if (response.success) {
                             toastr.success('Plan debrief saved successfully!');
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1000);
                         } else {
                             toastr.error(response.message || 'An error occurred');
                         }
@@ -2348,7 +2391,6 @@
                         console.log('Success response:', response);
                         if (response.success) {
                             toastr.success('Employee performance recorded successfully!');
-                            form[0].reset();
                             // Reload the page to show the new record
                             setTimeout(function () {
                                 location.reload();
@@ -2390,23 +2432,11 @@
                     },
                     success: function (response) {
                         if (response.success) {
-                            // Update badge
-                            const badgeClass = newStatus === 'REVIEWED' ? 'bg-success' : 'bg-warning';
-                            $('.badge-plan-review-status')
-                                .removeClass('bg-success bg-warning')
-                                .addClass(badgeClass)
-                                .text(newStatus);
-
-                            // Update button styling and text
-                            const btnHtml = newStatus === 'REVIEWED'
-                                ? '<i class="bi bi-arrow-counterclockwise"></i> Undo Review'
-                                : '<i class="bi bi-check-circle"></i> Review Done';
-
-                            btn.removeClass('btn-success btn-outline-success')
-                                .addClass(newStatus === 'REVIEWED' ? 'btn-success' : 'btn-outline-success')
-                                .html(btnHtml);
-
                             toastr.success(newStatus === 'REVIEWED' ? 'Plan marked as reviewed!' : 'Review status reset!');
+                            
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1000);
                         } else {
                             toastr.error(response.message || 'An error occurred');
                         }
@@ -2447,8 +2477,28 @@
             // ==============================
             // Hotel Details Form Submission
             // ==============================
+            $.validator.addMethod("greaterThanDate", function(value, element, param) {
+                var otherVal = $(param).val();
+                if (!value || !otherVal) return true; // Let required rule handle empty values if needed
+                return new Date(value) >= new Date(otherVal);
+            }, "Check Out date must be after or equal to Check In date.");
+
+            $("#hotel-details-form").validate({
+                rules: {
+                    hotel_name: { required: true },
+                    check_out: {
+                        greaterThanDate: "#hotel-details-form input[name='check_in']"
+                    }
+                },
+                errorElement: 'span', errorClass: 'invalid-feedback d-block',
+                highlight: function(element) { $(element).addClass('is-invalid'); },
+                unhighlight: function(element) { $(element).removeClass('is-invalid'); }
+            });
+
             $(document).on('submit', '#hotel-details-form', function (e) {
                 e.preventDefault();
+                if (!$(this).valid()) return;
+
                 const form = $(this);
                 const orderId = {{ $order->id }};
 
@@ -2559,7 +2609,479 @@
                     }
                 });
             });
+            // ==============================
+            // Room Record Form Validation & Submission
+            // ==============================
+            $("#room-record-form").validate({
+                rules: {
+                    barcode: {
+                        required: true
+                    }
+                },
+                messages: {
+                    barcode: {
+                        required: "Please enter a barcode."
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
+
+            $('#room-record-form').submit(function(e) {
+                e.preventDefault();
+
+                if (!$(this).valid()) {
+                    return; // Stop if validation fails
+                }
+
+                const form = $(this);
+                const btn = form.find('button[type="submit"]');
+                const originalText = btn.html();
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    beforeSend: function() {
+                        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Submitting...');
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success('Room record saved successfully!');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                            btn.prop('disabled', false).html(originalText);
+                        }
+                    },
+                    error: function (xhr) {
+                        let errMsg = 'Failed to save room record';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errMsg = xhr.responseJSON.message;
+                        }
+                        toastr.error(errMsg);
+                        btn.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
+
+            // ==============================
+            // Room Record Deletion
+            // ==============================
+            $(document).on('submit', '.room-delete-form', function (e) {
+                e.preventDefault();
+                if (!confirm('Are you sure you want to remove this room record?')) return;
+                
+                const form = $(this);
+                const btn = form.find('button[type="submit"]');
+                const originalHtml = btn.html();
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    beforeSend: function() {
+                        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success('Room record removed successfully!');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                            btn.prop('disabled', false).html(originalHtml);
+                        }
+                    },
+                    error: function (xhr) {
+                        toastr.error('Failed to delete room record');
+                        btn.prop('disabled', false).html(originalHtml);
+                    }
+                });
+            });
+
+            // ==============================
+            // Equipment Record Form Validation & Submission
+            // ==============================
+            $("#equipment-record-form").validate({
+                rules: { barcode: { required: true }, status: { required: true } },
+                errorElement: 'span', errorClass: 'invalid-feedback d-block',
+                highlight: function(element) { $(element).addClass('is-invalid'); },
+                unhighlight: function(element) { $(element).removeClass('is-invalid'); },
+                errorPlacement: function(error, element) { error.insertAfter(element.parent('.input-group').length ? element.parent() : element); }
+            });
+
+            $('#equipment-record-form').submit(function(e) {
+                e.preventDefault();
+                if (!$(this).valid()) return;
+
+                const form = $(this);
+                const btn = form.find('button[type="submit"]');
+                const originalText = btn.html();
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    beforeSend: function() {
+                        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Submitting...');
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success('Equipment saved!');
+                            setTimeout(() => { window.location.reload(); }, 1000);
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                            btn.prop('disabled', false).html(originalText);
+                        }
+                    },
+                    error: function (xhr) {
+                        let errMsg = 'Failed to save equipment.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) errMsg = xhr.responseJSON.message;
+                        toastr.error(errMsg);
+                        btn.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
+
+            // Equipment Deletion
+            $(document).on('submit', '.equipment-delete-form', function(e) {
+                e.preventDefault();
+                if (!confirm('Are you sure you want to remove this equipment record?')) return;
+                
+                const form = $(this);
+                const btn = form.find('button[type="submit"]');
+                const originalHtml = btn.html();
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    beforeSend: function() { btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>'); },
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success('Equipment deleted!');
+                            setTimeout(() => { window.location.reload(); }, 1000);
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                            btn.prop('disabled', false).html(originalHtml);
+                        }
+                    },
+                    error: function (xhr) {
+                        toastr.error('Failed to delete equipment.');
+                        btn.prop('disabled', false).html(originalHtml);
+                    }
+                });
+            });
+
+            // ==============================
+            // Clean Patch Record Form Validation & Submission
+            // ==============================
+            $("#clean-patch-form").validate({
+                rules: { barcode: { required: true }, patch_size: { required: true } },
+                errorElement: 'span', errorClass: 'invalid-feedback d-block',
+                highlight: function(element) { $(element).addClass('is-invalid'); },
+                unhighlight: function(element) { $(element).removeClass('is-invalid'); },
+                errorPlacement: function(error, element) { error.insertAfter(element.parent('.input-group').length ? element.parent() : element); }
+            });
+
+            $('#clean-patch-form').submit(function(e) {
+                e.preventDefault();
+                if (!$(this).valid()) return;
+
+                const form = $(this);
+                const btn = form.find('button[type="submit"]');
+                const originalText = btn.html();
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    beforeSend: function() { btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Submitting...'); },
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success('Clean patch saved!');
+                            setTimeout(() => { window.location.reload(); }, 1000);
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                            btn.prop('disabled', false).html(originalText);
+                        }
+                    },
+                    error: function (xhr) {
+                        let errMsg = 'Failed to save clean patch.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) errMsg = xhr.responseJSON.message;
+                        toastr.error(errMsg);
+                        btn.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
+
+            // Clean Patch Deletion
+            $(document).on('submit', '.patch-delete-form', function(e) {
+                e.preventDefault();
+                if (!confirm('Are you sure you want to remove this clean patch?')) return;
+                
+                const form = $(this);
+                const btn = form.find('button[type="submit"]');
+                const originalHtml = btn.html();
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    beforeSend: function() { btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>'); },
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success('Clean patch deleted!');
+                            setTimeout(() => { window.location.reload(); }, 1000);
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                            btn.prop('disabled', false).html(originalHtml);
+                        }
+                    },
+                    error: function (xhr) {
+                        toastr.error('Failed to delete clean patch.');
+                        btn.prop('disabled', false).html(originalHtml);
+                    }
+                });
+            });
+
+            // ==============================
+            // Service Outline Update
+            // ==============================
+            $(".outline-update-form").each(function() {
+                $(this).validate({
+                    rules: { actual_value: { required: true } },
+                    errorElement: 'span', errorClass: 'invalid-feedback d-block',
+                    highlight: function(element) { $(element).addClass('is-invalid'); },
+                    unhighlight: function(element) { $(element).removeClass('is-invalid'); }
+                });
+            });
+
+            $(document).on('submit', '.outline-update-form', function(e) {
+                e.preventDefault();
+                if (!$(this).valid()) return;
+
+                const form = $(this);
+                const btn = form.find('button[type="submit"]');
+                const originalText = btn.html();
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    beforeSend: function() { btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Submitting...'); },
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success('Outline updated!');
+                            setTimeout(() => { window.location.reload(); }, 1000);
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                            btn.prop('disabled', false).html(originalText);
+                        }
+                    },
+                    error: function (xhr) {
+                        let errMsg = 'Failed to update outline.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) errMsg = xhr.responseJSON.message;
+                        toastr.error(errMsg);
+                        btn.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
+
+            // ==============================
+            // Service Notes
+            // ==============================
+            $("#service-notes-form").validate({
+                rules: { notes: { required: true } },
+                errorElement: 'span', errorClass: 'invalid-feedback d-block',
+                highlight: function(element) { $(element).addClass('is-invalid'); },
+                unhighlight: function(element) { $(element).removeClass('is-invalid'); }
+            });
+
+            $('#service-notes-form').submit(function(e) {
+                e.preventDefault();
+                if (!$(this).valid()) return;
+
+                const form = $(this);
+                const btn = form.find('button[type="submit"]');
+                const originalText = btn.html();
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    beforeSend: function() { btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Submitting...'); },
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success('Note added!');
+                            setTimeout(() => { window.location.reload(); }, 1000);
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                            btn.prop('disabled', false).html(originalText);
+                        }
+                    },
+                    error: function (xhr) {
+                        let errMsg = 'Failed to add note.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) errMsg = xhr.responseJSON.message;
+                        toastr.error(errMsg);
+                        btn.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
+
+            // ==============================
+            // Assign / Remove Equipment (Slot)
+            // ==============================
+            $(".assign-equipment-form").each(function() {
+                $(this).validate({
+                    rules: { equipment_id: { required: true } },
+                    errorElement: 'span', errorClass: 'invalid-feedback d-block',
+                    highlight: function(element) { $(element).addClass('is-invalid'); },
+                    unhighlight: function(element) { $(element).removeClass('is-invalid'); }
+                });
+            });
+
+            $(document).on('submit', '.assign-equipment-form', function(e) {
+                e.preventDefault();
+                if (!$(this).valid()) return;
+
+                const form = $(this);
+                const btn = form.find('button[type="submit"]');
+                const originalText = btn.html();
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    beforeSend: function() { btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Submitting...'); },
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success('Equipment assigned!');
+                            setTimeout(() => { window.location.reload(); }, 1000);
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                            btn.prop('disabled', false).html(originalText);
+                        }
+                    },
+                    error: function (xhr) {
+                        let errMsg = 'Failed to assign equipment.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) errMsg = xhr.responseJSON.message;
+                        toastr.error(errMsg);
+                        btn.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
+
+            $(document).on('submit', '.remove-equipment-form', function(e) {
+                e.preventDefault();
+                if (!confirm('Are you sure you want to remove this equipment?')) return;
+
+                const form = $(this);
+                const btn = form.find('button[type="submit"]');
+                const originalText = btn.html();
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    beforeSend: function() { btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>'); },
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success('Equipment removed!');
+                            setTimeout(() => { window.location.reload(); }, 1000);
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                            btn.prop('disabled', false).html(originalText);
+                        }
+                    },
+                    error: function (xhr) {
+                        toastr.error('Failed to remove equipment.');
+                        btn.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
+
+            // ==============================
+            // Clock In / Clock Out
+            // ==============================
+            $(document).on('submit', '.clock-in-form', function(e) {
+                const selectedType = $(this).find('.clock-type-select').val();
+                if (selectedType !== 'travel') {
+                    e.preventDefault();
+                    
+                    const form = $(this);
+                    const btn = form.find('button[type="submit"]');
+                    const originalText = btn.html();
+                    
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: 'POST',
+                        data: form.serialize(),
+                        beforeSend: function() { btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Submitting...'); },
+                        success: function (response) {
+                            if (response.success) {
+                                toastr.success('Clocked in successfully!');
+                                setTimeout(() => { window.location.reload(); }, 1000);
+                            } else {
+                                toastr.error(response.message || 'An error occurred');
+                                btn.prop('disabled', false).html(originalText);
+                            }
+                        },
+                        error: function (xhr) {
+                            let errMsg = 'Failed to clock in.';
+                            if (xhr.responseJSON && xhr.responseJSON.message) errMsg = xhr.responseJSON.message;
+                            toastr.error(errMsg);
+                            btn.prop('disabled', false).html(originalText);
+                        }
+                    });
+                }
+            });
+
+            $(document).on('submit', '.clock-out-form', function(e) {
+                e.preventDefault();
+                
+                const form = $(this);
+                const btn = form.find('button[type="submit"]');
+                const originalText = btn.html();
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    beforeSend: function() { btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Submitting...'); },
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success('Clocked out successfully!');
+                            setTimeout(() => { window.location.reload(); }, 1000);
+                        } else {
+                            toastr.error(response.message || 'An error occurred');
+                            btn.prop('disabled', false).html(originalText);
+                        }
+                    },
+                    error: function (xhr) {
+                        let errMsg = 'Failed to clock out.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) errMsg = xhr.responseJSON.message;
+                        toastr.error(errMsg);
+                        btn.prop('disabled', false).html(originalText);
+                    }
+                });
+            });
         </script>
     @endpush
-
-

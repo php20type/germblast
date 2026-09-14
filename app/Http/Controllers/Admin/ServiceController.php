@@ -623,17 +623,22 @@ class ServiceController extends Controller implements HasMiddleware
         $equipment = Equipment::where('barcode', $request->barcode)->first();
 
         if (!$equipment) {
-            return redirect()->back()->with('error', 'Equipment barcode not found.');
+            $msg = 'Equipment barcode not found.';
+            return request()->ajax() ? response()->json(['success' => false, 'message' => $msg], 400) : redirect()->back()->with('error', $msg);
         }
 
         // Check if already assigned to this slot
         $alreadyAssignedToSlot = $slot->equipments()->where('equipment_id', $equipment->id)->exists();
         if ($alreadyAssignedToSlot) {
-            return redirect()->back()->with('error', 'This equipment is already assigned to this slot.');
+            $msg = 'This equipment is already assigned to this slot.';
+            return request()->ajax() ? response()->json(['success' => false, 'message' => $msg], 400) : redirect()->back()->with('error', $msg);
         }
 
         // Check if already assigned to any other slot
         if ($equipment->isAssigned()) {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'This equipment is already assigned to another active order/slot.']);
+            }
             return redirect()->back()->with('error', 'This equipment is already assigned to another active order/slot.');
         }
 
@@ -652,6 +657,10 @@ class ServiceController extends Controller implements HasMiddleware
 
         // Update equipment status to assigned
         $equipment->update(['status' => Equipment::STATUS_ASSIGNED]);
+
+        if (request()->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Equipment assigned successfully.']);
+        }
 
         return redirect()->back()->with('success', 'Equipment assigned successfully.');
     }
@@ -683,6 +692,10 @@ class ServiceController extends Controller implements HasMiddleware
         // Update equipment status
         $equipment->update(['status' => Equipment::STATUS_DIRTY]);
 
+        if (request()->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Equipment removed successfully.']);
+        }
+
         return redirect()->back()->with('success', 'Equipment removed successfully.');
     }
 
@@ -705,6 +718,9 @@ class ServiceController extends Controller implements HasMiddleware
         $order = ServiceOrder::findOrFail($orderId);
 
         if (in_array($order->status, ['completed', 'cancelled'])) {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'You cannot book a new slot on a ' . $order->status . ' order.']);
+            }
             return redirect()->back()->with('error', 'You cannot book a new slot on a ' . $order->status . ' order.');
         }
 
@@ -773,6 +789,9 @@ class ServiceController extends Controller implements HasMiddleware
         $order = ServiceOrder::findOrFail($orderId);
 
         if (in_array($order->status, ['completed', 'cancelled'])) {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'You cannot update intended data on a ' . $order->status . ' order.']);
+            }
             return redirect()->back()->with('error', 'You cannot update intended data on a ' . $order->status . ' order.');
         }
 
@@ -1271,6 +1290,10 @@ class ServiceController extends Controller implements HasMiddleware
             ]);
         }
 
+        if (request()->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Note added successfully.']);
+        }
+
         return redirect()->back()->with('success', 'Note added successfully.');
     }
 
@@ -1310,6 +1333,10 @@ class ServiceController extends Controller implements HasMiddleware
             'range'       => $request->range,
             'description' => $request->description,
         ]);
+
+        if (request()->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Outline updated successfully.']);
+        }
 
         return redirect()->back()->with('success', 'Outline updated successfully.');
     }
@@ -1362,6 +1389,9 @@ class ServiceController extends Controller implements HasMiddleware
             ->first();
 
         if ($activeClock) {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => ucfirst($request->type) . ' clock is already running for this slot.']);
+            }
             return redirect()->back()->with('error',
                 ucfirst($request->type) . ' clock is already running for this slot.'
             );
@@ -1380,6 +1410,10 @@ class ServiceController extends Controller implements HasMiddleware
 
         $slot->clocks()->create($clockData);
 
+
+        if (request()->ajax()) {
+            return response()->json(['success' => true, 'message' => ucfirst($request->type) . ' clock started.']);
+        }
 
         return redirect()->back()->with('success',
             ucfirst($request->type) . ' clock started.'
@@ -1410,6 +1444,9 @@ class ServiceController extends Controller implements HasMiddleware
             ->first();
 
         if (!$activeClock) {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'No active ' . $request->type . ' clock found for this slot.']);
+            }
             return redirect()->back()->with('error',
                 'No active ' . $request->type . ' clock found for this slot.'
             );
@@ -1419,6 +1456,10 @@ class ServiceController extends Controller implements HasMiddleware
             'clocked_out_at' => now(),
             'clocked_hours'  => $activeClock->calculateHours(),
         ]);
+
+        if (request()->ajax()) {
+            return response()->json(['success' => true, 'message' => ucfirst($request->type) . ' clock stopped.']);
+        }
 
         return redirect()->back()->with('success',
             ucfirst($request->type) . ' clock stopped.'
@@ -2098,6 +2139,9 @@ class ServiceController extends Controller implements HasMiddleware
                 ], 500);
             }
 
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Failed to record employee performance: ' . $e->getMessage()]);
+            }
             return redirect()->back()->with('error', 'Failed to record employee performance: ' . $e->getMessage());
         }
     }
@@ -2175,7 +2219,7 @@ class ServiceController extends Controller implements HasMiddleware
             'full_address'       => 'nullable|string|max:500',
             'confirmation_no'    => 'nullable|string|max:255',
             'check_in'           => 'nullable|date',
-            'check_out'          => 'nullable|date',
+            'check_out'          => 'nullable|date|after_or_equal:check_in',
         ]);
 
         $order = ServiceOrder::findOrFail($orderId);
@@ -2329,7 +2373,10 @@ class ServiceController extends Controller implements HasMiddleware
                         'message' => 'Cannot mark Service Order as Completed because there are unconfirmed slots.'
                     ], 422);
                 }
-                return redirect()->back()->with('error', 'Cannot mark Service Order as Completed because there are unconfirmed slots.');
+                if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Cannot mark Service Order as Completed because there are unconfirmed slots.']);
+            }
+            return redirect()->back()->with('error', 'Cannot mark Service Order as Completed because there are unconfirmed slots.');
             }
         }
 
@@ -2366,6 +2413,9 @@ class ServiceController extends Controller implements HasMiddleware
         $order = ServiceOrder::findOrFail($orderId);
 
         if ($order->status === 'cancelled') {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'This order is already cancelled.']);
+            }
             return redirect()->back()->with('error', 'This order is already cancelled.');
         }
 
@@ -2384,6 +2434,9 @@ class ServiceController extends Controller implements HasMiddleware
         $order = ServiceOrder::findOrFail($orderId);
 
         if ($order->status !== 'cancelled') {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'This order is not cancelled.']);
+            }
             return redirect()->back()->with('error', 'This order is not cancelled.');
         }
 
@@ -2404,15 +2457,24 @@ class ServiceController extends Controller implements HasMiddleware
         $order = ServiceOrder::findOrFail($orderId);
 
         if ($order->status === 'cancelled') {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'You must reopen the order before submitting an invoice.']);
+            }
             return redirect()->back()->with('error', 'You must reopen the order before submitting an invoice.');
         }
 
         if ($order->status === 'completed' || $order->invoice()->exists()) {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'This order is already completed and invoiced.']);
+            }
             return redirect()->back()->with('error', 'This order is already completed and invoiced.');
         }
 
         $hasUnconfirmedSlots = $order->orderSlots()->where('is_confirmed', false)->exists();
         if ($hasUnconfirmedSlots) {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'You cannot generate an invoice until all service slots are confirmed.']);
+            }
             return redirect()->back()->with('error', 'You cannot generate an invoice until all service slots are confirmed.');
         }
 
@@ -2523,6 +2585,9 @@ class ServiceController extends Controller implements HasMiddleware
         $recipientEmail = $request->input('recipient_email') ?: ($order->service->lead->company->companyEmail->email ?? $order->service->lead->email ?? null);
         if (!$recipientEmail) {
             if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Customer does not have a valid email address.']);
+            }
+            if (request()->ajax()) {
                 return response()->json(['success' => false, 'message' => 'Customer does not have a valid email address.']);
             }
             return redirect()->back()->with('error', 'Customer does not have a valid email address.');
@@ -2670,6 +2735,10 @@ class ServiceController extends Controller implements HasMiddleware
             'created_by' => auth()->id(),
         ]);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Room barcode recorded successfully.']);
+        }
+
         return redirect()->back()->with('success', 'Room barcode recorded successfully.');
     }
 
@@ -2678,7 +2747,11 @@ class ServiceController extends Controller implements HasMiddleware
         $record = ServiceOrderRoomRecord::findOrFail($recordId);
         $record->delete();
 
-        return redirect()->back()->with('success', 'Room barcode record deleted successfully.');
+        if (request()->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Room record deleted successfully.']);
+        }
+
+        return redirect()->back()->with('success', 'Room record deleted successfully.');
     }
 
     public function saveEquipmentRecord(Request $request, $orderId)
@@ -2690,6 +2763,9 @@ class ServiceController extends Controller implements HasMiddleware
 
         $exists = Equipment::where('barcode', $request->barcode)->exists();
         if (!$exists) {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Warning: The entered barcode is not registered in the system.']);
+            }
             return redirect()->back()->with('error', 'Warning: The entered barcode is not registered in the system.')->withInput();
         }
 
@@ -2701,6 +2777,10 @@ class ServiceController extends Controller implements HasMiddleware
             'created_by' => auth()->id(),
         ]);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Equipment barcode record saved successfully.']);
+        }
+
         return redirect()->back()->with('success', 'Equipment barcode record saved successfully.');
     }
 
@@ -2708,6 +2788,10 @@ class ServiceController extends Controller implements HasMiddleware
     {
         $record = ServiceOrderEquipmentRecord::findOrFail($recordId);
         $record->delete();
+
+        if (request()->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Equipment barcode record deleted successfully.']);
+        }
 
         return redirect()->back()->with('success', 'Equipment barcode record deleted successfully.');
     }
@@ -2727,6 +2811,10 @@ class ServiceController extends Controller implements HasMiddleware
             'created_by' => auth()->id(),
         ]);
 
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Clean patch record saved successfully.']);
+        }
+
         return redirect()->back()->with('success', 'Clean patch record saved successfully.');
     }
 
@@ -2734,6 +2822,10 @@ class ServiceController extends Controller implements HasMiddleware
     {
         $patch = ServiceOrderCleanPatch::findOrFail($patchId);
         $patch->delete();
+
+        if (request()->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Clean patch record deleted successfully.']);
+        }
 
         return redirect()->back()->with('success', 'Clean patch record deleted successfully.');
     }

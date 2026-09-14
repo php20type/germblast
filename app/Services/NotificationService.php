@@ -247,7 +247,7 @@ class NotificationService
             )->delay(now()->addSeconds(12)); // same delay as email
         }
 
-        $companyName = $lead->companies->pluck('name')->join(', ') ?: 'Unknown Company';
+        $companyName = $lead->company->name ?? 'Unknown Company';
         $this->sendInApp(
             $assignee,
             'Lead Assigned',
@@ -291,7 +291,7 @@ class NotificationService
                 );
             }
 
-            $companyName = $lead->companies->pluck('name')->join(', ') ?: 'Unknown Company';
+            $companyName = $lead->company->name ?? 'Unknown Company';
             $this->sendInApp(
                 $recipient,
                 'Meeting Scheduled',
@@ -337,7 +337,7 @@ class NotificationService
                 );
             }
 
-            $companyName = $lead->companies->pluck('name')->join(', ') ?: 'Unknown Company';
+            $companyName = $lead->company->name ?? 'Unknown Company';
             $this->sendInApp(
                 $recipient,
                 'Meeting Completed',
@@ -386,7 +386,7 @@ class NotificationService
                 );
             }
 
-            $companyName = $lead->companies->pluck('name')->join(', ') ?: 'Unknown Company';
+            $companyName = $lead->company->name ?? 'Unknown Company';
             $this->sendInApp(
                 $recipient,
                 'Site Survey Scheduled',
@@ -436,7 +436,7 @@ class NotificationService
                 );
             }
 
-            $companyName = $lead->companies->pluck('name')->join(', ') ?: 'Unknown Company';
+            $companyName = $lead->company->name ?? 'Unknown Company';
             $this->sendInApp(
                 $recipient,
                 'Site Survey Completed',

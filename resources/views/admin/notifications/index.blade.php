@@ -4,67 +4,55 @@
 
 @push('styles')
     <style>
-        /* Modern Notification Cards Grid */
-        .notification-card {
+        /* Status Pills styling */
+        .status-pill {
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            padding: 4px 10px !important;
+            border-radius: 20px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 4px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            border: 1px solid transparent !important;
+        }
+
+        .status-pill-unread {
+            background-color: rgba(255, 184, 28, 0.12) !important;
+            color: #ffb81c !important;
+            border-color: rgba(255, 184, 28, 0.2) !important;
+        }
+
+        .status-pill-module {
+            background-color: rgba(107, 114, 128, 0.12) !important;
+            color: #4b5563 !important;
+            border-color: rgba(107, 114, 128, 0.2) !important;
+        }
+
+        /* Section Cards */
+        .section-card {
             background: #ffffff !important;
             border: 1px solid #e5e7eb !important;
             border-radius: 16px !important;
-            padding: 24px !important;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.01) !important;
+            padding: 25px !important;
+            margin-bottom: 25px !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
+            transition: all 0.3s ease !important;
         }
 
-        .notification-card.unread {
-            background-color: #f8f9fa !important;
+        .section-card.unread {
             border-left: 4px solid #ffb81c !important;
         }
 
-        .notification-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05) !important;
-            border-color: rgba(255, 184, 28, 0.4) !important;
+        .section-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
         }
-
-        .notification-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: #ffb81c;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .notification-card:hover::before {
-            opacity: 1;
-        }
-
-        .notification-badge-circle {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: rgba(255, 184, 28, 0.12);
-            color: #ffb81c;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-            transition: all 0.3s ease;
-        }
-
-        .notification-card:hover .notification-badge-circle {
-            background: #ffb81c;
-            color: #ffffff;
-            transform: scale(1.05);
-        }
-
+        
         .mark-read-btn {
-            white-space: nowrap;
+            font-size: 12px;
+            padding: 4px 12px;
         }
     </style>
 @endpush
@@ -79,7 +67,7 @@
                         <!-- Header -->
                         <div class="heading-area-sec mb-3">
                             <div class="left-part-sec">
-                                <h3 class="mb-1">Notifications 🔔</h3>
+                                <h3 class="mb-1 text-uppercase">NOTIFICATIONS <span style="font-size: 24px;">🔔</span></h3>
                                 <p class="text-muted mb-0">View and manage all your notifications.</p>
                             </div>
                             <div class="right-part-sec">
@@ -88,57 +76,45 @@
                         </div>
 
                         <!-- Cards Container -->
-                        <div class="px-4 pb-4">
+                        <div class="px-4 pb-4 text-start">
                             @if($notifications->isEmpty())
-                                <div class="section-card text-center py-5">
-                                    <div class="mb-3" style="font-size: 40px;">🔔</div>
+                                <div class="text-center py-5">
+                                    <div class="mb-3" style="font-size: 40px;">📭</div>
                                     <h5 class="fw-semibold text-dark">No Notifications Found</h5>
                                     <p class="text-muted mb-0">You're all caught up!</p>
                                 </div>
                             @else
-                                <div class="row mx-0">
-                                    @foreach($notifications as $notification)
-                                        <div class="col-12 mb-4 px-2">
-                                            <div class="notification-card h-100 d-flex flex-column {{ $notification->is_read ? '' : 'unread' }}">
-                                                
-                                                <div class="d-flex align-items-start justify-content-between mb-3">
-                                                    <div class="d-flex align-items-center gap-3">
-                                                        <div class="notification-badge-circle">
-                                                            <i class="fa-solid fa-bell"></i>
-                                                        </div>
-                                                        <div>
-                                                            <h4 class="mb-1 fw-bold text-dark" style="font-size: 16px; line-height: 1.3;">
-                                                                {{ $notification->title }}
-                                                                @if(!$notification->is_read)
-                                                                    <span class="badge bg-primary ms-2" style="font-size: 10px;">New</span>
-                                                                @endif
-                                                            </h4>
-                                                            <span class="text-muted" style="font-size: 12px;">
-                                                                {{ $notification->created_at->format('M j, Y h:i A') }} ({{ $notification->created_at->diffForHumans() }})
-                                                            </span>
-                                                        </div>
-                                                    </div>
+                                @foreach($notifications as $notification)
+                                    <div class="section-card mt-3 {{ $notification->is_read ? '' : 'unread' }}">
+                                        <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
+                                            <div class="d-flex flex-column align-items-start">
+                                                <div class="mb-2 d-flex gap-2">
+                                                    @if($notification->module)
+                                                        <span class="status-pill status-pill-module">{{ ucfirst($notification->module) }}</span>
+                                                    @endif
                                                     @if(!$notification->is_read)
-                                                        <button type="button" class="btn btn-sm btn-outline-dark mark-read-btn" data-id="{{ $notification->id }}">Mark Read</button>
+                                                        <span class="status-pill status-pill-unread">NEW</span>
                                                     @endif
                                                 </div>
-
-                                                <div class="notification-description text-muted flex-grow-1" style="font-size: 16px; line-height: 1.6;">
-                                                    {{ $notification->message }}
+                                                <div class="text-muted small mt-1">
+                                                    Received on <span class="fw-semibold text-dark">{{ $notification->created_at->format('M j, Y h:i A') }}</span> 
+                                                    ({{ $notification->created_at->diffForHumans() }})
                                                 </div>
-                                                
-                                                @if($notification->module)
-                                                    <div class="mt-3 pt-3 border-top d-flex align-items-center gap-2" style="border-color: #f3f4f6 !important;">
-                                                        <div>
-                                                            <span class="badge bg-secondary">{{ ucfirst($notification->module) }}</span>
-                                                        </div>
-                                                    </div>
-                                                @endif
-
+                                            </div>
+                                            @if(!$notification->is_read)
+                                                <button type="button" class="btn btn-outline-dark mark-read-btn" data-id="{{ $notification->id }}">
+                                                    <i class="fa-solid fa-check me-1"></i> Mark Read
+                                                </button>
+                                            @endif
+                                        </div>
+                                        <div class="mb-2">
+                                            <h6 class="text-uppercase text-secondary fw-bold mb-2" style="font-size: 11px; letter-spacing: 0.5px;">{{ $notification->title }}</h6>
+                                            <div class="text-dark" style="font-size: 15px; color: #374151; line-height: 1.5;">
+                                                {{ $notification->message }}
                                             </div>
                                         </div>
-                                    @endforeach
-                                </div>
+                                    </div>
+                                @endforeach
                             @endif
                         </div>
 
