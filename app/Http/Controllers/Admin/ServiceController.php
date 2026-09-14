@@ -61,6 +61,12 @@ class ServiceController extends Controller implements HasMiddleware
             ]),
         ];
     }
+
+    public function serviceOrdersIndex()
+    {
+        $orders = ServiceOrder::with(['service.lead.company', 'service.lead.companies', 'orderSlots.staff'])->orderBy('created_at', 'desc')->get();
+        return view('admin.service_orders.index', compact('orders'));
+    }
     protected $orderService;
     protected $notify;
 

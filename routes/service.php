@@ -77,6 +77,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         // Route::post('service/slot/{slotId}/status', [ServiceController::class, 'updateSlotStatus'])->name('service.slot.update_status');
     });
 
+    Route::get('service-orders', [ServiceController::class, 'serviceOrdersIndex'])->name('service-orders.index');
+
     Route::get('calendar', [ServiceController::class, 'calendar'])->name('calendar.index');
     Route::get('calendar/orders', [ServiceController::class, 'calendarOrders'])->name('calendar.orders');
 

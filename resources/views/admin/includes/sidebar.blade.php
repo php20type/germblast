@@ -73,6 +73,16 @@
                     </div>
                 </a>
             </li>
+            <li class="{{ request()->routeIs('admin.service-orders.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.service-orders.index') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon5.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Service Orders
+                    </div>
+                </a>
+            </li>
             @if(auth()->user()->isSalesManager() || auth()->user()->isSuperAdmin())
             <li class="{{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.reports.sales') }}">
