@@ -135,10 +135,12 @@ class EmployeeController extends Controller implements HasMiddleware
             $query->where('status', 'Active')->orderBy('name');
         }])->orderBy('name')->get();
         $userAttempts = \App\Models\TrainingAttempt::where('employee_id', $id)->get();
+        $performanceRecords = $employee->performanceRecords()->with(['serviceOrder', 'issue', 'user'])->latest()->get();
 
         return view('admin.employee.edit', compact(
             'employee', 'roles', 'territories', 'maskTypes', 'maskFitTestRecords',
-            'driverLogItems', 'driverLogs', 'driverSuspensions', 'categories', 'userAttempts'
+            'driverLogItems', 'driverLogs', 'driverSuspensions', 'categories', 'userAttempts',
+            'performanceRecords'
         ));
     }
 

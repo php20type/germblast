@@ -605,6 +605,52 @@
                         </div>
                     </div>
 
+                    {{-- EMPLOYEE PERFORMANCE RECORDS LISTING --}}
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="section-card">
+                                <div class="section-header d-flex justify-content-between align-items-center">
+                                    <h3 class="section-title">Employee Performance Records</h3>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <div class="table-container p-0">
+                                        <table class="table table-hover align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date Added</th>
+                                                    <th>Added By</th>
+                                                    <th>Issue/Topic</th>
+                                                    <th>Notes</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse($performanceRecords as $record)
+                                                    <tr>
+                                                        <td>{{ \Carbon\Carbon::parse($record->created_at)->format('m/d/Y h:i A') }}</td>
+                                                        <td>{{ $record->user->name ?? 'System' }}</td>
+                                                        <td>
+                                                            @if($record->issue)
+                                                                <span class="badge bg-secondary">{{ $record->issue->name }}</span>
+                                                            @else
+                                                                -
+                                                            @endif
+                                                        </td>
+                                                        <td>{{ $record->notes ?? '-' }}</td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="4" class="text-center">No performance records found</td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     {{-- AVAILABILITY MODAL --}}
                     <div class="modal fade" id="availabilityModal" tabindex="-1" aria-labelledby="availabilityModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-fullscreen">
