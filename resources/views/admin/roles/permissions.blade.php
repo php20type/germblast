@@ -205,6 +205,7 @@
                 'Inventory Reporting' => ['inventory_reporting.view', 'inventory_reporting.add', 'inventory_reporting.edit'],
                 'Job Profitability' => ['job_profitability.view'],
                 'Office Duties' => ['office_duties.view', 'office_duties.add', 'office_duties.edit'],
+                'QuickBooks Export' => ['quickbooks.access'],
             ],
             'Operations Module' => [
                 'General Module Access' => ['operations.view'],
@@ -306,6 +307,7 @@
             'office_duties.view' => 'View Office Duties',
             'office_duties.add' => 'Add Office Duties',
             'office_duties.edit' => 'Edit Office Duties',
+            'quickbooks.access' => 'QuickBooks Access',
 
             // Operations Module
             'operations.view' => 'View Operations Module',

@@ -155,6 +155,13 @@ class PermissionSeeder extends Seeder
             85 => 'training.view',
             86 => 'training.add',
             87 => 'training.edit',
+
+            /*
+            |--------------------------------------------------
+            | QuickBooks Access
+            |--------------------------------------------------
+            */
+            88 => 'quickbooks.access',
         ];
 
         foreach ($permissions as $id => $name) {

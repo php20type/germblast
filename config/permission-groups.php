@@ -92,6 +92,7 @@ return [
         'office_duties.view',
         'office_duties.add',
         'office_duties.edit',
+        'quickbooks.access',
     ],
 
     'Operations Module' => [

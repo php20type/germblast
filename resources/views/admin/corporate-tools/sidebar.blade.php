@@ -40,9 +40,11 @@
             </a>
             @endcan
 
+            @can('quickbooks.access')
             <a class="nav-link {{ request()->routeIs('admin.quickbooks.*') ? 'active' : '' }}" href="{{ route('admin.quickbooks.index') }}">
                 QuickBooks Export
             </a>
+            @endcan
 
             @can('office_duties.view')
             <a class="nav-link {{ request()->routeIs('admin.office-duties.*') ? 'active' : '' }}" href="{{ route('admin.office-duties.index') }}">
