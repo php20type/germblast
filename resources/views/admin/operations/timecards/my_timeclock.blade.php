@@ -26,11 +26,8 @@
 <div class="companies-section my-4">
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
-            @include('admin.operations.sidebar')
-
             <!-- Main Content -->
-            <div class="col-md-10 p-0">
+            <div class="col-md-12 p-0">
                 <div class="main-content">
                     <div class="sales-dashboard">
                         <!-- Header -->
