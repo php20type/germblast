@@ -187,7 +187,8 @@
                     'admin.expense-report.*',
                     'admin.inventory-report.*',
                     'admin.office-duties.*',
-                    'admin.job-profitability.*'
+                    'admin.job-profitability.*',
+                    'admin.corporate-tools.resource-library'
                 ]);
 
                 $user = auth()->user();

@@ -52,6 +52,10 @@
             </a>
             @endcan
 
+            <a class="nav-link {{ request()->routeIs('admin.corporate-tools.resource-library') ? 'active' : '' }}" href="{{ route('admin.corporate-tools.resource-library') }}">
+                Resource Library
+            </a>
+
 
             <div id="nothing-found" style="display:none; color: rgba(255,255,255,0.6); padding: 10px 0;">Nothing found.</div>
         </div>

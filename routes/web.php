@@ -159,6 +159,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('equipment-management/update-status/{id}', [EquipmentManagementController::class, 'updateStatus'])->name('equipment-management.update-status');
     Route::get('equipment-management/{id}/history', [EquipmentManagementController::class, 'history'])->name('equipment-management.history');
 
+    // Corporate Tools - Resource Library
+    Route::view('corporate-tools/resource-library', 'admin.corporate-tools.resource-library')->name('corporate-tools.resource-library');
+
     // Consumable Reports
     Route::get('consumable-reports/index', [ConsumableReportController::class, 'index'])->name('consumable-reports.index');
     Route::post('consumable-reports/store', [ConsumableReportController::class, 'store'])->name('consumable-reports.store');
