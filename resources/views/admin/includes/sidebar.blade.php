@@ -188,7 +188,8 @@
                     'admin.inventory-report.*',
                     'admin.office-duties.*',
                     'admin.job-profitability.*',
-                    'admin.corporate-tools.resource-library'
+                    'admin.corporate-tools.resource-library',
+                    'admin.corporate-tools.residential-report'
                 ]);
 
                 $user = auth()->user();

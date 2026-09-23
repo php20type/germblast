@@ -161,6 +161,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
 
     // Corporate Tools - Resource Library
     Route::view('corporate-tools/resource-library', 'admin.corporate-tools.resource-library')->name('corporate-tools.resource-library');
+    Route::view('corporate-tools/residential-report', 'admin.corporate-tools.residential-report')->name('corporate-tools.residential-report');
 
     // Consumable Reports
     Route::get('consumable-reports/index', [ConsumableReportController::class, 'index'])->name('consumable-reports.index');
