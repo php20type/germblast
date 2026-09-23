@@ -189,7 +189,8 @@
                     'admin.office-duties.*',
                     'admin.job-profitability.*',
                     'admin.corporate-tools.resource-library',
-                    'admin.corporate-tools.residential-report'
+                    'admin.corporate-tools.residential-report',
+                    'admin.corporate-tools.survey-configuration'
                 ]);
 
                 $user = auth()->user();
