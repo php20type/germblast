@@ -190,7 +190,8 @@
                     'admin.job-profitability.*',
                     'admin.corporate-tools.resource-library',
                     'admin.corporate-tools.residential-report',
-                    'admin.corporate-tools.survey-configuration'
+                    'admin.corporate-tools.survey-configuration',
+                    'admin.corporate-tools.revenue-report'
                 ]);
 
                 $user = auth()->user();
