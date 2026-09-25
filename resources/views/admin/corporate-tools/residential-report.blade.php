@@ -73,25 +73,25 @@
                             <!-- Left Side: Current Range Header -->
                             <div>
                                 <h4 class="mb-0 fw-bold text-dark" style="font-size: 18px;">
-                                    Month of: September 2026
+                                    Month of: {{ $date->format('F Y') }}
                                 </h4>
                             </div>
 
                             <!-- Right Side: Unified Navigation Segment Control -->
                             <div class="d-flex align-items-center gap-1 bg-light p-1 rounded-3 border" style="border-color: #e5e7eb !important;">
-                                <a href="#" class="calendar-nav-btn" title="Previous Month">
+                                <a href="{{ route('admin.corporate-tools.residential-report', ['date' => $date->copy()->subMonth()->toDateString()]) }}" class="calendar-nav-btn" title="Previous Month">
                                     <i class="fas fa-chevron-left me-1" style="font-size: 10px;"></i> Prev Month
                                 </a>
 
                                 <span class="text-muted opacity-25 px-1">|</span>
 
-                                <a href="#" class="calendar-nav-btn btn-today">
+                                <a href="{{ route('admin.corporate-tools.residential-report', ['date' => now()->toDateString()]) }}" class="calendar-nav-btn {{ $date->isCurrentMonth() ? 'btn-today' : '' }}">
                                     Current Month
                                 </a>
 
                                 <span class="text-muted opacity-25 px-1">|</span>
 
-                                <a href="#" class="calendar-nav-btn" title="Next Month">
+                                <a href="{{ route('admin.corporate-tools.residential-report', ['date' => $date->copy()->addMonth()->toDateString()]) }}" class="calendar-nav-btn" title="Next Month">
                                     Next Month <i class="fas fa-chevron-right ms-1" style="font-size: 10px;"></i>
                                 </a>
                             </div>
@@ -119,13 +119,21 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td><a href="#" class="client-link">Meredith Ross</a></td>
-                                        <td class="text-dark">Southlake</td>
-                                        <td class="text-dark"></td>
-                                        <td class="text-dark">09/09/26</td>
-                                        <td class="text-dark">$449.00</td>
-                                    </tr>
+                                    @foreach($records as $record)
+                                        <tr>
+                                            <td>
+                                                @can('service.fulfill_order.view')
+                                                    <a href="{{ route('admin.lead.service.fulfill_order', $record['id']) }}" class="client-link">{{ $record['client'] }}</a>
+                                                @else
+                                                    <span class="text-dark">{{ $record['client'] }}</span>
+                                                @endcan
+                                            </td>
+                                            <td class="text-dark">{{ $record['city'] }}</td>
+                                            <td class="text-dark">{{ $record['special'] }}</td>
+                                            <td class="text-dark">{{ $record['date'] }}</td>
+                                            <td class="text-dark">{{ $record['price'] }}</td>
+                                        </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
