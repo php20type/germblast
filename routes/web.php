@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\OfficeDutyController;
 use App\Http\Controllers\Admin\InventoryReportController;
 use App\Http\Controllers\Admin\JobProfitabilityController;
 use App\Http\Controllers\Admin\ResidentialReportController;
+use App\Http\Controllers\Admin\RevenueReportController;
 use App\Http\Controllers\Admin\ChangeControlController;
 use App\Http\Controllers\Admin\QuickBooksController;
 use App\Http\Controllers\Admin\BusinessFailureController;
@@ -164,7 +165,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::view('corporate-tools/resource-library', 'admin.corporate-tools.resource-library')->name('corporate-tools.resource-library');
     Route::get('corporate-tools/residential-report', [ResidentialReportController::class, 'index'])->name('corporate-tools.residential-report');
     Route::view('corporate-tools/survey-configuration', 'admin.corporate-tools.survey-configuration')->name('corporate-tools.survey-configuration');
-    Route::view('corporate-tools/revenue-report', 'admin.corporate-tools.revenue-report')->name('corporate-tools.revenue-report');
+    Route::get('corporate-tools/revenue-report', [RevenueReportController::class, 'index'])->name('corporate-tools.revenue-report');
 
     // Consumable Reports
     Route::get('consumable-reports/index', [ConsumableReportController::class, 'index'])->name('consumable-reports.index');
