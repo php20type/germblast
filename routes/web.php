@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\InventoryReportController;
 use App\Http\Controllers\Admin\JobProfitabilityController;
 use App\Http\Controllers\Admin\ResidentialReportController;
 use App\Http\Controllers\Admin\RevenueReportController;
+use App\Http\Controllers\Admin\SurveyConfigurationController;
 use App\Http\Controllers\Admin\ChangeControlController;
 use App\Http\Controllers\Admin\QuickBooksController;
 use App\Http\Controllers\Admin\BusinessFailureController;
@@ -164,7 +165,12 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Corporate Tools - Resource Library
     Route::view('corporate-tools/resource-library', 'admin.corporate-tools.resource-library')->name('corporate-tools.resource-library');
     Route::get('corporate-tools/residential-report', [ResidentialReportController::class, 'index'])->name('corporate-tools.residential-report');
-    Route::view('corporate-tools/survey-configuration', 'admin.corporate-tools.survey-configuration')->name('corporate-tools.survey-configuration');
+    
+    // Survey Configuration
+    Route::get('corporate-tools/survey-configuration', [SurveyConfigurationController::class, 'index'])->name('corporate-tools.survey-configuration');
+    Route::post('corporate-tools/survey-configuration/parameters', [SurveyConfigurationController::class, 'updateParameters'])->name('corporate-tools.survey-configuration.updateParameters');
+    Route::post('corporate-tools/survey-configuration/facilities', [SurveyConfigurationController::class, 'updateFacilities'])->name('corporate-tools.survey-configuration.updateFacilities');
+    Route::post('corporate-tools/survey-configuration/equipment', [SurveyConfigurationController::class, 'updateEquipment'])->name('corporate-tools.survey-configuration.updateEquipment');
     Route::get('corporate-tools/revenue-report', [RevenueReportController::class, 'index'])->name('corporate-tools.revenue-report');
 
     // Consumable Reports
