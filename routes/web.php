@@ -248,6 +248,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('hr/time-off/{id}/approve', [TimeOffRequestController::class, 'approve'])->name('hr.time-off.approve');
     Route::post('hr/time-off/{id}/reject', [TimeOffRequestController::class, 'reject'])->name('hr.time-off.reject');
 
+    // Nominations
+    Route::view('hr/nominations', 'admin.hr.nominations.index')->name('hr.nominations.index');
+
     // Core Value Praise
     Route::get('hr/praise', [CoreValuePraiseController::class, 'index'])->name('hr.praise.index');
     Route::get('hr/praise/create', [CoreValuePraiseController::class, 'create'])->name('hr.praise.create');

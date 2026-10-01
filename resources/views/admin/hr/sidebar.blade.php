@@ -49,6 +49,10 @@
             </a>
             @endcanany
 
+            <a class="nav-link {{ request()->routeIs('admin.hr.nominations.*') ? 'active' : '' }}" href="{{ route('admin.hr.nominations.index') ?? '#' }}">
+                Nominations Management
+            </a>
+
             <div id="nothing-found" style="display:none; color: rgba(255,255,255,0.6); padding: 10px 0;">Nothing found.</div>
         </div>
     </div>
