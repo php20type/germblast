@@ -141,7 +141,9 @@
                     'admin.operations.audits*',
                     'admin.employee-performance',
                     'admin.operations.evaluations*',
-                    'admin.operations.evaluation_questions.*'
+                    'admin.operations.evaluation_questions.*',
+                    'admin.operations.sit-program.*',
+                    'admin.operations.sit-progress.*'
                 ]);
 
                 $user = auth()->user();

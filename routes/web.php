@@ -146,6 +146,10 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::put('operations/evaluation-questions/{id}', [EvaluationQuestionController::class, 'update'])->name('operations.evaluation_questions.update');
     Route::delete('operations/evaluation-questions/{id}', [EvaluationQuestionController::class, 'destroy'])->name('operations.evaluation_questions.destroy');
 
+    // SIT Program
+    Route::get('operations/sit-program', [\App\Http\Controllers\Admin\Operations\SitProgramController::class, 'index'])->name('operations.sit-program.index');
+    Route::get('operations/sit-progress', [\App\Http\Controllers\Admin\Operations\SitProgressController::class, 'index'])->name('operations.sit-progress.index');
+
     // Expense Reports
     Route::get('expense-report/index', [ExpenseReportController::class, 'index'])->name('expense-report.index');
     Route::get('expense-report/personal/create', [ExpenseReportController::class, 'personal_create'])->name('expense-report.personal.create');

@@ -55,6 +55,14 @@
                 Employee Performance
             </a>
 
+            <a class="nav-link {{ request()->routeIs('admin.operations.sit-program.index') ? 'active' : '' }}" href="{{ route('admin.operations.sit-program.index') }}">
+                SIT Program
+            </a>
+
+            <a class="nav-link {{ request()->routeIs('admin.operations.sit-progress.index') ? 'active' : '' }}" href="{{ route('admin.operations.sit-progress.index') }}">
+                SIT Progress
+            </a>
+
             @can('equipment_manager.view')
             <a class="nav-link {{ request()->routeIs('admin.equipment-management.*') ? 'active' : '' }}"
                 href="{{ route('admin.equipment-management.index') }}">
