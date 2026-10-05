@@ -249,12 +249,17 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('hr/time-off/{id}/reject', [TimeOffRequestController::class, 'reject'])->name('hr.time-off.reject');
 
     // Nominations
-    Route::view('hr/nominations', 'admin.hr.nominations.index')->name('hr.nominations.index');
+    Route::get('hr/nominations', [\App\Http\Controllers\Admin\HR\NominationController::class, 'index'])->name('hr.nominations.index');
+    Route::post('hr/nominations/cycle/store', [\App\Http\Controllers\Admin\HR\NominationController::class, 'storeCycle'])->name('hr.nominations.cycle.store');
+    Route::post('hr/nominations/cycle/{id}/close', [\App\Http\Controllers\Admin\HR\NominationController::class, 'closeCycle'])->name('hr.nominations.cycle.close');
 
     // Core Value Praise
     Route::get('hr/praise', [CoreValuePraiseController::class, 'index'])->name('hr.praise.index');
     Route::get('hr/praise/create', [CoreValuePraiseController::class, 'create'])->name('hr.praise.create');
     Route::post('hr/praise/store', [CoreValuePraiseController::class, 'store'])->name('hr.praise.store');
+    
+    // Employee Voting
+    Route::post('employee/voting/submit', [\App\Http\Controllers\Employee\VotingController::class, 'submitVote'])->name('employee.voting.submit');
 
     // GB Rewards
     Route::get('hr/rewards', [EmployeeRewardController::class, 'index'])->name('hr.rewards.index');

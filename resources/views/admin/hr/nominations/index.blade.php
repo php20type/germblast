@@ -44,6 +44,7 @@
 
     .results-container {
         padding-left: 20px;
+        border-left: 2px solid #f3f4f6;
         margin-top: 20px;
     }
 
@@ -89,301 +90,114 @@
                             </div>
                         </div>
 
-                        {{-- Section 1: Technician --}}
+                        @foreach($categories as $catKey => $catTitle)
                         <div class="px-4 pb-2">
                             <div class="section-card">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <div>
-                                        <div class="section-title">Outstanding Technician of the Quarter Management</div>
-                                        <p class="text-muted mb-0" style="font-size: 14px;">Results from Previous Voting Sessions (last 3)</p>
+                                        <div class="section-title">{{ $catTitle }}</div>
+                                        <p class="text-muted mb-0" style="font-size: 14px;">Results from Previous Nomination Sessions (last 3)</p>
                                     </div>
-                                    <button class="btn btn-export">Initiate a New Vote</button>
+                                    @if(isset($activeCycles[$catKey]))
+                                        <button class="btn btn-danger btn-close-vote" data-id="{{ $activeCycles[$catKey]->id }}">Close Voting</button>
+                                    @else
+                                        <button class="btn btn-export btn-initiate" data-category="{{ $catKey }}" data-title="{{ $catTitle }}">Initiate a New Vote</button>
+                                    @endif
                                 </div>
 
                                 <div class="results-container">
-                                    <div class="survey-title">Voting Results for Survey from 9/2026</div>
-                                    
-                                    <div class="office-title">Nominations (in order of votes) for the Lubbock, TX office.</div>
-                                    <div class="no-votes">No votes on this one.</div>
-                                    
-                                    <div class="office-title">Nominations (in order of votes) for the Austin, TX office.</div>
-                                    <div class="no-votes">No votes on this one.</div>
-                                    
-                                    <div class="office-title">Nominations (in order of votes) for the El Paso, TX office.</div>
-                                    <div class="no-votes">No votes on this one.</div>
-                                    
-                                    <div class="office-title">Nominations (in order of votes) for the Dallas, TX office.</div>
-                                    <div class="no-votes">No votes on this one.</div>
+                                    @if(isset($activeCycles[$catKey]))
+                                        <div class="alert alert-info py-2 mb-4">
+                                            <strong>Active Cycle:</strong> {{ $activeCycles[$catKey]->title }} (Started on {{ $activeCycles[$catKey]->start_date->format('m/d/Y') }})
+                                        </div>
 
-                                    <div class="office-title">Nominations (in order of votes) for the Houston, TX office.</div>
-                                    <div class="no-votes">No votes on this one.</div>
+                                        @if(!in_array($activeCycles[$catKey]->id, $votedCycleIds))
+                                            <div class="card bg-light mb-4">
+                                                <div class="card-body">
+                                                    <h5 class="card-title" style="font-size: 15px;">Cast Your Vote</h5>
+                                                    <form class="vote-form" action="{{ route('admin.employee.voting.submit') }}" method="POST">
+                                                        @csrf
+                                                        <input type="hidden" name="nomination_cycle_id" value="{{ $activeCycles[$catKey]->id }}">
+                                                        
+                                                        <div class="row mb-3">
+                                                            <div class="col-md-12">
+                                                                <label class="form-label">Nominee</label>
+                                                                <select name="nominee_id" class="form-select select2" required>
+                                                                    <option value="">-- Select Nominee --</option>
+                                                                    @foreach($groupedUsers as $officeName => $users)
+                                                                        <optgroup label="{{ $officeName }}">
+                                                                            @foreach($users as $user)
+                                                                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                                                            @endforeach
+                                                                        </optgroup>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                        </div>
 
-                                    <div class="office-title">Nominations (in order of votes) for the Central America office.</div>
-                                    <div class="no-votes">No votes on this one.</div>
-                                    
-                                    <div class="office-title">Nominations (in order of votes) for the Fort Myers, FL office.</div>
-                                    <div class="no-votes">No votes on this one.</div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Reason for Nomination (Optional)</label>
+                                                            <textarea name="comments" class="form-control" rows="2" placeholder="Why are you nominating this person?"></textarea>
+                                                        </div>
 
-                                    <div class="office-title">Nominations (in order of votes) for the Anytown, USA office.</div>
-                                    <div class="no-votes">No votes on this one.</div>
+                                                        <button type="submit" class="btn btn-primary btn-sm">Submit Vote</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="alert alert-success mb-4 py-2">You have successfully cast your vote for this cycle!</div>
+                                        @endif
+                                    @endif
 
-                                    <div class="survey-title mt-4">Voting Results for Survey from 12/2021</div>
-                                    <div class="office-title">Nominations (in order of votes) for the Lubbock, TX office.</div>
-                                    <div class="table-responsive">
-                                        <table class="table w-100 equipment-report-table mb-4">
-                                            <thead>
-                                                <tr>
-                                                    <th>Technician</th>
-                                                    <th style="width: 150px;">Votes</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td><strong>John Smith</strong></td>
-                                                    <td>2</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                    @if(!empty($formattedPastCycles[$catKey]) && $formattedPastCycles[$catKey]->count() > 0)
+                                        @foreach($formattedPastCycles[$catKey] as $cycle)
+                                            <div class="survey-title">Nomination Results for {{ $cycle->title }}</div>
+                                            
+                                            @if($cycle->grouped_nominations->isEmpty())
+                                                <div class="no-votes">No votes recorded for this cycle.</div>
+                                            @else
+                                                @foreach($cycle->grouped_nominations as $officeName => $nominations)
+                                                    <div class="office-title">Nominations (in order of votes) for the {{ $officeName }} office.</div>
+                                                    
+                                                    @if($nominations->isEmpty())
+                                                        <div class="no-votes">No votes on this one.</div>
+                                                    @else
+                                                        <div class="table-responsive">
+                                                            <table class="table w-100 equipment-report-table mb-4">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th style="width: 150px;">Candidate</th>
+                                                                        <th>Nominations</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @foreach($nominations as $nom)
+                                                                        <tr>
+                                                                            <td class="align-top">
+                                                                                <strong>{!! nl2br(e(str_replace(' ', "\n", $nom['nominee']->name ?? 'Unknown'))) !!}</strong>
+                                                                            </td>
+                                                                            <td>
+                                                                                <div class="mb-1 text-muted">{{ $nom['count'] }} nominations</div>
+                                                                                @foreach($nom['comments'] as $comment)
+                                                                                    <div>{{ $nom['nominee']->name ?? 'Unknown' }} - {{ $comment }}</div>
+                                                                                @endforeach
+                                                                            </td>
+                                                                        </tr>
+                                                                    @endforeach
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                            @endif
+                                        @endforeach
+                                    @else
+                                        <div class="no-votes">No previous voting sessions available.</div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
-
-                        {{-- Section 2: Warehouse --}}
-                        <div class="px-4 pb-2">
-                            <div class="section-card">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <div>
-                                        <div class="section-title">Outstanding Warehouse Team Member of the Quarter Management</div>
-                                        <p class="text-muted mb-0" style="font-size: 14px;">Results from Previous Voting Sessions (last 3)</p>
-                                    </div>
-                                    <button class="btn btn-export">Initiate a New Vote</button>
-                                </div>
-
-                                <div class="results-container">
-                                    <div class="survey-title">Voting Results for Survey from 12/2021</div>
-                                    
-                                    <div class="office-title">Nominations (in order of votes) for the Lubbock, TX office.</div>
-                                    <div class="table-responsive">
-                                        <table class="table w-100 equipment-report-table mb-4">
-                                            <thead>
-                                                <tr>
-                                                    <th>Warehouse Technician</th>
-                                                    <th style="width: 150px;">Votes</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr><td><strong>Riley Loya</strong></td><td>4</td></tr>
-                                                <tr><td><strong>Irby Munoz</strong></td><td>2</td></tr>
-                                                <tr><td><strong>Cody Thurman</strong></td><td>1</td></tr>
-                                                <tr><td><strong>Larry Chavez</strong></td><td>1</td></tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-
-                                    <div class="office-title">Nominations (in order of votes) for the Austin, TX office.</div>
-                                    <div class="table-responsive">
-                                        <table class="table w-100 equipment-report-table mb-4">
-                                            <thead>
-                                                <tr>
-                                                    <th>Warehouse Technician</th>
-                                                    <th style="width: 150px;">Votes</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr><td><strong>Bradley Kozumplik</strong></td><td>1</td></tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    
-                                    <div class="office-title">Nominations (in order of votes) for the El Paso, TX office.</div>
-                                    <div class="table-responsive">
-                                        <table class="table w-100 equipment-report-table mb-4">
-                                            <thead>
-                                                <tr>
-                                                    <th>Warehouse Technician</th>
-                                                    <th style="width: 150px;">Votes</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr><td><strong>Jorge Cruz</strong></td><td>5</td></tr>
-                                                <tr><td><strong>Bobby Marc Quezada</strong></td><td>4</td></tr>
-                                                <tr><td><strong>Zachary Saucedo</strong></td><td>2</td></tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Section 3: Supervisor --}}
-                        <div class="px-4 pb-2">
-                            <div class="section-card">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <div>
-                                        <div class="section-title">Outstanding Supervisor Nomination System Management</div>
-                                        <p class="text-muted mb-0" style="font-size: 14px;">Results from Previous Nomination Sessions (last 1)</p>
-                                    </div>
-                                    <button class="btn btn-export">Initiate a New Vote</button>
-                                </div>
-
-                                <div class="results-container">
-                                    <div class="survey-title">Nomination Results for Survey from 12/2021</div>
-                                    
-                                    <div class="office-title">Supervisor Nominations (in order of votes) for the Lubbock, TX office.</div>
-                                    <div class="table-responsive">
-                                        <table class="table w-100 equipment-report-table mb-4">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 150px;">Supervisor</th>
-                                                    <th>Nominations</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td class="align-top"><strong>Justice<br>Delgado</strong></td>
-                                                    <td>
-                                                        <div class="mb-1 text-muted">6 nominations</div>
-                                                        <div>Jacob Porter - </div>
-                                                        <div>Jordan Olivas - </div>
-                                                        <div>Thomas Cantu - </div>
-                                                        <div>Justice Delgado - </div>
-                                                        <div>Greg Garcia - </div>
-                                                        <div>Cody Thurman - He always strives to do a thorough job. He communicates and handles issues during services well.</div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="align-top"><strong>Jacob Backus</strong></td>
-                                                    <td>
-                                                        <div class="mb-1 text-muted">5 nominations</div>
-                                                        <div>Joel Guerrero - </div>
-                                                        <div>Jessica Yates - </div>
-                                                        <div>Riley Loya - </div>
-                                                        <div>Irby Munoz - </div>
-                                                        <div>Josie Warner - </div>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    
-                                    <div class="office-title">Supervisor Nominations (in order of votes) for the Austin, TX office.</div>
-                                    <div class="table-responsive">
-                                        <table class="table w-100 equipment-report-table mb-4">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 150px;">Supervisor</th>
-                                                    <th>Nominations</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td class="align-top"><strong>Courtney Leath</strong></td>
-                                                    <td>
-                                                        <div class="mb-1 text-muted">4 nominations</div>
-                                                        <div>Benigno Avalos - </div>
-                                                        <div>Joshua Chavarria - Truly believes in the Germblast mission!</div>
-                                                        <div>Monica Scott - </div>
-                                                        <div>Jon Albrecht - Very supporting. Gives good guidance.</div>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-
-                                    <div class="office-title">Supervisor Nominations (in order of votes) for the El Paso, TX office.</div>
-                                    <div class="no-votes">No votes on this one.</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Section 4: Operations Manager --}}
-                        <div class="px-4 pb-4">
-                            <div class="section-card">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <div>
-                                        <div class="section-title">Outstanding Operations Manager Nomination System Management</div>
-                                        <p class="text-muted mb-0" style="font-size: 14px;">Results from Previous Nomination Sessions (last 1)</p>
-                                    </div>
-                                    <button class="btn btn-export">Initiate a New Vote</button>
-                                </div>
-
-                                <div class="results-container">
-                                    <div class="survey-title">Nomination Results for Survey from 12/2021</div>
-                                    
-                                    <div class="office-title">Supervisor Nominations (in order of votes) for the Lubbock, TX office.</div>
-                                    <div class="table-responsive">
-                                        <table class="table w-100 equipment-report-table mb-4">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 150px;">OM</th>
-                                                    <th>Nominations</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td class="align-top"><strong>Jacob Porter</strong></td>
-                                                    <td>
-                                                        <div class="mb-1 text-muted">8 nominations</div>
-                                                        <div>Jordan Olivas - </div>
-                                                        <div>Jacob Backus - Lead by example. Always listens to what I have to say</div>
-                                                        <div>Greg Garcia - </div>
-                                                        <div>Jessica Yates - </div>
-                                                        <div>Colin Veazey - </div>
-                                                        <div>Jorge Morales - </div>
-                                                        <div>Irby Munoz - </div>
-                                                        <div>Cody Thurman - He is always willing to work with his co-workers. He makes himself available to talk to and easy to reach.</div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="align-top"><strong>Jordan<br>Olivas</strong></td>
-                                                    <td>
-                                                        <div class="mb-1 text-muted">2 nominations</div>
-                                                        <div>Riley Loya - </div>
-                                                        <div>Josie Warner - </div>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    
-                                    <div class="office-title">Supervisor Nominations (in order of votes) for the Austin, TX office.</div>
-                                    <div class="table-responsive">
-                                        <table class="table w-100 equipment-report-table mb-4">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 150px;">OM</th>
-                                                    <th>Nominations</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td class="align-top"><strong>Monica Scott</strong></td>
-                                                    <td>
-                                                        <div class="mb-1 text-muted">1 nominations</div>
-                                                        <div>Joshua Chavarria - Always goes above and beyond</div>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-
-                                    <div class="office-title">Supervisor Nominations (in order of votes) for the El Paso, TX office.</div>
-                                    <div class="table-responsive">
-                                        <table class="table w-100 equipment-report-table mb-4">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 150px;">OM</th>
-                                                    <th>Nominations</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        @endforeach
 
                     </div>
                 </div>
@@ -391,4 +205,128 @@
         </div>
     </div>
 </div>
+
+<!-- Initiate Vote Modal -->
+<div class="modal fade" id="initiateVoteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="initiateVoteForm" action="{{ route('admin.hr.nominations.cycle.store') }}" method="POST">
+            @csrf
+            <input type="hidden" name="category" id="cycleCategory">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="initiateModalTitle">Initiate a New Vote</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Title / Survey Name</label>
+                        <input type="text" name="title" class="form-control" required placeholder="e.g. Survey from Q3 2026">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" name="start_date" class="form-control" required value="{{ date('Y-m-d') }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Initiate</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        $('.btn-initiate').click(function() {
+            var category = $(this).data('category');
+            var title = $(this).data('title');
+            $('#cycleCategory').val(category);
+            $('#initiateModalTitle').text('Initiate: ' + title);
+            $('#initiateVoteModal').modal('show');
+        });
+
+        $('#initiateVoteForm').on('submit', function(e) {
+            e.preventDefault();
+            var form = $(this);
+            var submitBtn = form.find('button[type="submit"]');
+            submitBtn.prop('disabled', true);
+            
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: form.serialize(),
+                success: function(response) {
+                    toastr.success(response.message);
+                    setTimeout(function() { location.reload(); }, 1000);
+                },
+                error: function(xhr) {
+                    submitBtn.prop('disabled', false);
+                    toastr.error(xhr.responseJSON?.message || 'Error initiating vote.');
+                }
+            });
+        });
+
+        $('.btn-close-vote').click(function() {
+            var id = $(this).data('id');
+            Swal.fire({
+                title: 'Close Voting Cycle?',
+                text: "Are you sure you want to close this voting cycle? Employees will no longer be able to vote.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, close it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/admin/hr/nominations/cycle/' + id + '/close',
+                        type: 'POST',
+                        data: { _token: '{{ csrf_token() }}' },
+                        success: function(response) {
+                            toastr.success(response.message);
+                            setTimeout(function() { location.reload(); }, 1000);
+                        },
+                        error: function(xhr) {
+                            toastr.error(xhr.responseJSON?.message || 'Error closing vote.');
+                        }
+                    });
+                }
+            });
+        });
+
+        // Initialize select2
+        if ($('.select2').length > 0) {
+            $('.select2').select2({
+                theme: 'bootstrap-5'
+            });
+        }
+
+        $('.vote-form').on('submit', function(e) {
+            e.preventDefault();
+            var form = $(this);
+            var submitBtn = form.find('button[type="submit"]');
+            submitBtn.prop('disabled', true);
+            
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: form.serialize(),
+                success: function(response) {
+                    toastr.success(response.message);
+                    form.find('input, select, textarea, button').prop('disabled', true);
+                    form.slideUp(500, function() {
+                        $(this).after('<div class="alert alert-success mt-3 py-2">You have successfully cast your vote for this cycle!</div>');
+                    });
+                },
+                error: function(xhr) {
+                    submitBtn.prop('disabled', false);
+                    toastr.error(xhr.responseJSON?.message || 'Error submitting vote.');
+                }
+            });
+        });
+    });
+</script>
+@endpush
