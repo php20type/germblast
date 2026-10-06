@@ -486,4 +486,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(ServiceOrderSlot::class, 'last_updated_by');
     }
+
+    public function currentSitProgram()
+    {
+        return $this->hasOne(SitProgram::class)->where('status', 'in_progress')->latestOfMany();
+    }
+
+    public function sitPrograms()
+    {
+        return $this->hasMany(SitProgram::class);
+    }
 }

@@ -63,6 +63,10 @@
                 SIT Progress
             </a>
 
+            <a class="nav-link {{ request()->routeIs('admin.operations.sit-modules.index') ? 'active' : '' }}" href="{{ route('admin.operations.sit-modules.index') }}">
+                SIT Modules
+            </a>
+
             @can('equipment_manager.view')
             <a class="nav-link {{ request()->routeIs('admin.equipment-management.*') ? 'active' : '' }}"
                 href="{{ route('admin.equipment-management.index') }}">

@@ -143,7 +143,8 @@
                     'admin.operations.evaluations*',
                     'admin.operations.evaluation_questions.*',
                     'admin.operations.sit-program.*',
-                    'admin.operations.sit-progress.*'
+                    'admin.operations.sit-progress.*',
+                    'admin.operations.sit-modules.*'
                 ]);
 
                 $user = auth()->user();

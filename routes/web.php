@@ -11,6 +11,9 @@ use App\Http\Controllers\Admin\AuditController;
 use App\Http\Controllers\Admin\AuditSubmissionController;
 use App\Http\Controllers\Admin\EvaluationController;
 use App\Http\Controllers\Admin\EvaluationQuestionController;
+use App\Http\Controllers\Admin\Operations\SitProgramController;
+use App\Http\Controllers\Admin\Operations\SitProgressController;
+use App\Http\Controllers\Admin\Operations\SitModuleController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\TrainingReportController;
 use App\Http\Controllers\Admin\EmployeeTrainingController;
@@ -147,8 +150,22 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::delete('operations/evaluation-questions/{id}', [EvaluationQuestionController::class, 'destroy'])->name('operations.evaluation_questions.destroy');
 
     // SIT Program
-    Route::get('operations/sit-program', [\App\Http\Controllers\Admin\Operations\SitProgramController::class, 'index'])->name('operations.sit-program.index');
-    Route::get('operations/sit-progress', [\App\Http\Controllers\Admin\Operations\SitProgressController::class, 'index'])->name('operations.sit-progress.index');
+    Route::get('operations/sit-program', [SitProgramController::class, 'index'])->name('operations.sit-program.index');
+    Route::post('operations/sit-program/store', [SitProgramController::class, 'store'])->name('operations.sit-program.store');
+
+    // SIT Progress
+    Route::get('operations/sit-progress', [SitProgressController::class, 'index'])->name('operations.sit-progress.index');
+    Route::post('operations/sit-progress/{id}/update', [SitProgressController::class, 'update'])->name('operations.sit-progress.update');
+    Route::post('operations/sit-progress/{id}/drop', [SitProgressController::class, 'drop'])->name('operations.sit-progress.drop');
+
+    // SIT Modules (CRUD)
+    Route::get('operations/sit-modules', [SitModuleController::class, 'index'])->name('operations.sit-modules.index');
+    Route::post('operations/sit-modules', [SitModuleController::class, 'store'])->name('operations.sit-modules.store');
+    Route::post('operations/sit-modules/reorder', [SitModuleController::class, 'reorder'])->name('operations.sit-modules.reorder');
+    Route::put('operations/sit-modules/{sitModule}', [SitModuleController::class, 'update'])->name('operations.sit-modules.update');
+    Route::post('operations/sit-modules/{sitModule}/toggle', [SitModuleController::class, 'toggleActive'])->name('operations.sit-modules.toggle');
+    Route::delete('operations/sit-modules/{sitModule}', [SitModuleController::class, 'destroy'])->name('operations.sit-modules.destroy');
+
 
     // Expense Reports
     Route::get('expense-report/index', [ExpenseReportController::class, 'index'])->name('expense-report.index');
