@@ -149,7 +149,7 @@
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title" id="confirmEnrollLabel">Confirm SIT Program Enrollment</h1>
+                <h1 class="modal-title" id="confirmEnrollLabel">SIT Program Enrollment</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -161,7 +161,7 @@
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label class="form-label fw-bold">Technician</label>
-                                <p class="mb-0" id="enrollUserName" style="font-size: 18px; color: #111827;"></p>
+                                <input type="text" class="form-control" id="enrollUserName" readonly>
                             </div>
                         </div>
                         <div class="col-lg-12">
@@ -170,13 +170,15 @@
                                 <p class="text-muted mb-2" style="font-size: 13px;">The following {{ $modules->count() }} active module(s) will be attached to this technician's program in sequence:</p>
                                 <ul class="list-group" style="max-width: 600px;">
                                     @foreach($modules as $module)
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            <span>
+                                        <li class="list-group-item">
+                                            <div class="d-flex align-items-center">
                                                 <span class="badge bg-secondary me-2">{{ $module->order_index }}</span>
-                                                {{ $module->name }}
-                                            </span>
+                                                <span>{{ $module->name }}</span>
+                                            </div>
                                             @if($module->description)
-                                                <small class="text-muted ms-2">{{ $module->description }}</small>
+                                                <div class="text-muted mt-1" style="font-size: 13px; padding-left: 32px;">
+                                                    {{ $module->description }}
+                                                </div>
                                             @endif
                                         </li>
                                     @endforeach
@@ -187,7 +189,7 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Confirm & Start Program</button>
+                        <button type="submit" class="btn btn-primary">Confirm</button>
                     </div>
                 </form>
             </div>
@@ -209,7 +211,7 @@
         $('#ConfirmEnrollModal').on('show.bs.modal', function (event) {
             const button = $(event.relatedTarget);
             $('#enrollUserId').val(button.data('user-id'));
-            $('#enrollUserName').text(button.data('user-name'));
+            $('#enrollUserName').val(button.data('user-name'));
         });
 
         $('#enroll-form').on('submit', function (e) {
@@ -236,7 +238,7 @@
                         errorMessage = xhr.responseJSON.message;
                     }
                     toastr.error(errorMessage);
-                    btn.prop('disabled', false).text('Confirm & Start Program');
+                    btn.prop('disabled', false).text('Confirm');
                 }
             });
         });

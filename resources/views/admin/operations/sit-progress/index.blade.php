@@ -230,10 +230,18 @@
                                                         <div class="modal-dialog modal-fullscreen">
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
-                                                                    <h1 class="modal-title" id="manageProgressLabel{{ $program->id }}">Manage SIT Progress — {{ $program->user->name }}</h1>
+                                                                    <h1 class="modal-title" id="manageProgressLabel{{ $program->id }}">Manage SIT Progress</h1>
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                 </div>
                                                                 <div class="modal-body">
+                                                                    <div class="row mx-0">
+                                                                        <div class="col-lg-12">
+                                                                            <div class="form-group">
+                                                                                <label class="form-label fw-bold">Technician</label>
+                                                                                <input type="text" class="form-control" value="{{ $program->user->name }}" readonly>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                     @php
                                                                         $sortedModules = $program->programModules->sortBy(fn($pm) => $pm->module?->order_index ?? 999);
                                                                     @endphp
@@ -242,10 +250,16 @@
                                                                             @foreach($sortedModules as $pm)
                                                                                 <li class="list-group-item d-flex justify-content-between align-items-center p-3 module-list-item">
                                                                                     <div>
-                                                                                        <span class="badge bg-secondary me-2">{{ $pm->module?->order_index ?? '-' }}</span>
-                                                                                        <strong class="text-dark">{{ $pm->module?->name ?? 'Unknown Module' }}</strong>
-                                                                                        <br>
-                                                                                        <small class="text-muted mt-1 d-block module-status-text">
+                                                                                        <div class="d-flex align-items-center">
+                                                                                            <span class="badge bg-secondary me-2">{{ $pm->module?->order_index ?? '-' }}</span>
+                                                                                            <strong class="text-dark">{{ $pm->module?->name ?? 'Unknown Module' }}</strong>
+                                                                                        </div>
+                                                                                        @if($pm->module?->description)
+                                                                                            <div class="text-muted mt-1" style="font-size: 13px; padding-left: 32px;">
+                                                                                                {{ $pm->module->description }}
+                                                                                            </div>
+                                                                                        @endif
+                                                                                        <small class="text-muted mt-1 d-block module-status-text" style="padding-left: 32px;">
                                                                                             @if($pm->status == 'completed')
                                                                                                 <span class="text-success fw-semibold">Completed:</span> {{ $pm->completed_at ? $pm->completed_at->format('M d, Y h:i A') : '—' }}
                                                                                                 | <strong>Signed off by:</strong> {{ $pm->completedBy?->name ?? '—' }}
@@ -254,13 +268,13 @@
                                                                                             @endif
                                                                                         </small>
                                                                                     </div>
-                                                                                    <div class="module-action-area">
+                                                                                    <div class="module-action-area text-end flex-shrink-0 ms-3">
                                                                                         @if($pm->status != 'completed')
-                                                                                            <button class="btn btn-sm btn-success sign-off-btn"
+                                                                                            <button class="btn btn-sm btn-success sign-off-btn text-nowrap"
                                                                                                 data-program-id="{{ $program->id }}"
                                                                                                 data-module-id="{{ $pm->id }}">Sign Off</button>
                                                                                         @else
-                                                                                            <span class="text-success fw-bold"><i class="fa-solid fa-check"></i> Signed Off</span>
+                                                                                            <span class="text-success fw-bold text-nowrap"><i class="fa-solid fa-check"></i> Signed Off</span>
                                                                                         @endif
                                                                                     </div>
                                                                                 </li>
@@ -426,7 +440,7 @@
                         toastr.success(response.message || 'Module signed off.');
                         
                         // Update DOM dynamically
-                        listItem.find('.module-action-area').html('<span class="text-success fw-bold"><i class="fa-solid fa-check"></i> Signed Off</span>');
+                        listItem.find('.module-action-area').html('<span class="text-success fw-bold text-nowrap"><i class="fa-solid fa-check"></i> Signed Off</span>');
                         
                         listItem.find('.module-status-text').html(
                             '<span class="text-success fw-semibold">Completed:</span> ' + response.completed_at_formatted + 
