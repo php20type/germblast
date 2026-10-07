@@ -108,15 +108,14 @@
                     <div class="row mx-0">
                         <div class="col-lg-12">
                             <div class="form-group">
-                                <label class="form-label">Title</label>
-                                <span class="text-danger">*</span>
+                                <label class="form-label">Title <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="requestTitle" name="title" required placeholder="e.g. Upgrade PHP Version to 8.2">
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group">
-                                <label class="form-label">Description</label>
-                                <textarea class="form-control" id="requestDescription" name="description" rows="6" placeholder="Explain the reasons and details of the proposed change..."></textarea>
+                                <label class="form-label">Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="requestDescription" name="description" rows="6" placeholder="Explain the reasons and details of the proposed change..." required></textarea>
                             </div>
                         </div>
                     </div>
@@ -144,15 +143,14 @@
                     <div class="row mx-0">
                         <div class="col-lg-12">
                             <div class="form-group">
-                                <label class="form-label">Title</label>
-                                <span class="text-danger">*</span>
+                                <label class="form-label">Title <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="editRequestTitle" name="title" required placeholder="e.g. Upgrade PHP Version to 8.2">
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group">
-                                <label class="form-label">Description</label>
-                                <textarea class="form-control" id="editRequestDescription" name="description" rows="6" placeholder="Explain the reasons and details of the proposed change..."></textarea>
+                                <label class="form-label">Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="editRequestDescription" name="description" rows="6" placeholder="Explain the reasons and details of the proposed change..." required></textarea>
                             </div>
                         </div>
                     </div>
@@ -170,29 +168,74 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-            // Form Submit (AJAX)
-            $('#createRequestForm').on('submit', function(e) {
+            // Validation Settings
+            const validationSettings = {
+                ignore: [],
+                rules: {
+                    title: {
+                        required: true
+                    },
+                    description: {
+                        required: true
+                    }
+                },
+                messages: {
+                    title: {
+                        required: "Please enter a title."
+                    },
+                    description: {
+                        required: "Please enter a description."
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            };
+
+            // Initialize Validation
+            $("#createRequestForm").validate(validationSettings);
+            $("#editRequestForm").validate(validationSettings);
+
+            // Form Submit (AJAX) - Create
+            $('#createRequestForm').submit(function(e) {
                 e.preventDefault();
-                const form = $(this);
-                const submitBtn = form.find('button[type="submit"]');
+
+                const $form = $(this);
+                const $submitBtn = $form.find('button[type="submit"]');
+
+                if (!$form.valid()) return;
 
                 $.ajax({
-                    url: form.attr('action'),
+                    url: $form.attr('action'),
                     method: 'POST',
-                    data: form.serialize(),
+                    data: $form.serialize(),
                     beforeSend: function() {
-                        submitBtn.prop('disabled', true).text('Creating...');
+                        $submitBtn.prop('disabled', true).text('Saving...');
                     },
                     success: function(response) {
-                        toastr.success(response.message || 'Change request created successfully!');
+                        toastr.success(response.message || 'Change request created successfully! Redirecting...');
+                        $form[0].reset();
                         $('#createRequestModal').modal('hide');
+
                         setTimeout(() => {
                             window.location.reload();
-                        }, 1000);
+                        }, 1500);
                     },
                     error: function(xhr) {
-                        toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
-                        submitBtn.prop('disabled', false).text('Save changes');
+                        toastr.error(xhr.responseJSON?.message || 'Something went wrong while creating the request.');
+                        $submitBtn.prop('disabled', false).text('Save changes');
                     }
                 });
             });
@@ -211,32 +254,41 @@
                 $('#editRequestTitle').val(title);
                 $('#editRequestDescription').val(description);
 
+                // Reset validation
+                let validator = form.validate();
+                if(validator) validator.resetForm();
+                form.find('.is-invalid').removeClass('is-invalid');
+
                 $('#editRequestModal').modal('show');
             });
 
             // Edit Form Submit (AJAX)
-            $('#editRequestForm').on('submit', function(e) {
+            $('#editRequestForm').submit(function(e) {
                 e.preventDefault();
-                const form = $(this);
-                const submitBtn = form.find('button[type="submit"]');
+
+                const $form = $(this);
+                const $submitBtn = $form.find('button[type="submit"]');
+
+                if (!$form.valid()) return;
 
                 $.ajax({
-                    url: form.attr('action'),
-                    method: 'POST',
-                    data: form.serialize(),
+                    url: $form.attr('action'),
+                    method: 'POST', // or PUT, but it uses POST right now according to original script
+                    data: $form.serialize(),
                     beforeSend: function() {
-                        submitBtn.prop('disabled', true).text('Saving...');
+                        $submitBtn.prop('disabled', true).text('Saving...');
                     },
                     success: function(response) {
-                        toastr.success(response.message || 'Change request updated successfully!');
+                        toastr.success(response.message || 'Change request updated successfully! Redirecting...');
                         $('#editRequestModal').modal('hide');
+
                         setTimeout(() => {
                             window.location.reload();
-                        }, 1000);
+                        }, 1500);
                     },
                     error: function(xhr) {
-                        toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
-                        submitBtn.prop('disabled', false).text('Save changes');
+                        toastr.error(xhr.responseJSON?.message || 'Something went wrong while updating the request.');
+                        $submitBtn.prop('disabled', false).text('Save changes');
                     }
                 });
             });

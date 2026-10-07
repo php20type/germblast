@@ -186,6 +186,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     // Corporate Tools - Resource Library
     Route::view('corporate-tools/resource-library', 'admin.corporate-tools.resource-library')->name('corporate-tools.resource-library');
     Route::get('corporate-tools/residential-report', [ResidentialReportController::class, 'index'])->name('corporate-tools.residential-report');
+    Route::get('corporate-tools/residential-report/export/pdf', [ResidentialReportController::class, 'exportPdf'])->name('corporate-tools.residential-report.pdf');
+    Route::get('corporate-tools/residential-report/export/csv', [ResidentialReportController::class, 'exportCsv'])->name('corporate-tools.residential-report.csv');
     
     // Survey Configuration
     Route::get('corporate-tools/survey-configuration', [SurveyConfigurationController::class, 'index'])->name('corporate-tools.survey-configuration');

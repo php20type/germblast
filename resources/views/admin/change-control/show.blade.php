@@ -350,6 +350,7 @@
                                         <form id="addDocumentationForm" action="{{ route('admin.change-control.documentation.store', $changeRequest->id) }}" method="POST">
                                             @csrf
                                             <div class="mb-3">
+                                                <label class="form-label">Documentation Notes <span class="text-danger">*</span></label>
                                                 <textarea class="form-control" name="notes" id="docNotes" rows="4" placeholder="Write documentation notes or logs here..." required></textarea>
                                             </div>
                                             <div class="text-end">
@@ -421,8 +422,7 @@
                     <div class="row mx-0">
                         <div class="col-lg-12">
                             <div class="form-group">
-                                <label class="form-label">Task Title</label>
-                                <span class="text-danger">*</span>
+                                <label class="form-label">Task Title <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="taskTitle" name="title" required placeholder="e.g. Run tests on staging environment">
                             </div>
                         </div>
@@ -514,55 +514,96 @@
                 });
             });
 
+            // Validation Settings
+            const validationSettings = {
+                ignore: [],
+                rules: {
+                    title: { required: true },
+                    notes: { required: true }
+                },
+                messages: {
+                    title: { required: "Please enter a task title." },
+                    notes: { required: "Please enter documentation notes." }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            };
+
+            $("#addTaskForm").validate(validationSettings);
+            $("#addDocumentationForm").validate(validationSettings);
+
             // Add Task Form Submit
-            $('#addTaskForm').on('submit', function(e) {
+            $('#addTaskForm').submit(function(e) {
                 e.preventDefault();
-                const form = $(this);
-                const submitBtn = form.find('button[type="submit"]');
+
+                const $form = $(this);
+                const $submitBtn = $form.find('button[type="submit"]');
+
+                if (!$form.valid()) return;
 
                 $.ajax({
-                    url: form.attr('action'),
+                    url: $form.attr('action'),
                     method: 'POST',
-                    data: form.serialize(),
+                    data: $form.serialize(),
                     beforeSend: function() {
-                        submitBtn.prop('disabled', true).text('Adding...');
+                        $submitBtn.prop('disabled', true).text('Saving...');
                     },
                     success: function(response) {
-                        toastr.success(response.message || 'Task added successfully!');
+                        toastr.success(response.message || 'Task added successfully! Redirecting...');
+                        $form[0].reset();
                         $('#addTaskModal').modal('hide');
+
                         setTimeout(() => {
                             window.location.reload();
-                        }, 1000);
+                        }, 1500);
                     },
                     error: function(xhr) {
-                        toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
-                        submitBtn.prop('disabled', false).text('Save changes');
+                        toastr.error(xhr.responseJSON?.message || 'Something went wrong while adding the task.');
+                        $submitBtn.prop('disabled', false).text('Save changes');
                     }
                 });
             });
 
             // Add Documentation Form Submit
-            $('#addDocumentationForm').on('submit', function(e) {
+            $('#addDocumentationForm').submit(function(e) {
                 e.preventDefault();
-                const form = $(this);
-                const submitBtn = form.find('button[type="submit"]');
+
+                const $form = $(this);
+                const $submitBtn = $form.find('button[type="submit"]');
+
+                if (!$form.valid()) return;
 
                 $.ajax({
-                    url: form.attr('action'),
+                    url: $form.attr('action'),
                     method: 'POST',
-                    data: form.serialize(),
+                    data: $form.serialize(),
                     beforeSend: function() {
-                        submitBtn.prop('disabled', true).text('Adding...');
+                        $submitBtn.prop('disabled', true).text('Saving...');
                     },
                     success: function(response) {
-                        toastr.success(response.message || 'Entry added successfully!');
+                        toastr.success(response.message || 'Entry added successfully! Redirecting...');
+                        $form[0].reset();
+
                         setTimeout(() => {
                             window.location.reload();
-                        }, 1000);
+                        }, 1500);
                     },
                     error: function(xhr) {
-                        toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
-                        submitBtn.prop('disabled', false).text('Add Entry');
+                        toastr.error(xhr.responseJSON?.message || 'Something went wrong while adding the entry.');
+                        $submitBtn.prop('disabled', false).text('Add Entry');
                     }
                 });
             });

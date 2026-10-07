@@ -101,8 +101,8 @@
                     
                     <!-- DataTables Exports and Actions Row -->
                     <div class="px-4 mb-2 d-flex align-items-center justify-content-center gap-2">
-                        <a href="#" class="btn btn-sm btn-outline-secondary px-3 py-1 fw-bold" style="border-radius: 4px;">PDF</a>
-                        <a href="#" class="btn btn-sm btn-outline-secondary px-3 py-1 fw-bold" style="border-radius: 4px;">CSV</a>
+                        <a href="{{ route('admin.corporate-tools.residential-report.pdf', ['date' => $date->toDateString()]) }}" class="btn btn-sm btn-outline-secondary px-3 py-1 fw-bold" style="border-radius: 4px;">PDF</a>
+                        <a href="{{ route('admin.corporate-tools.residential-report.csv', ['date' => $date->toDateString()]) }}" class="btn btn-sm btn-outline-secondary px-3 py-1 fw-bold" style="border-radius: 4px;">CSV</a>
                     </div>
                     
                     <!-- Table Container -->

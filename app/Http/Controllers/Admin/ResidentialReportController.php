@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ServiceOrder;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ResidentialReportController extends Controller
 {
@@ -17,6 +18,47 @@ class ResidentialReportController extends Controller
         $records = $this->getResidentialData($date);
 
         return view('admin.corporate-tools.residential-report', compact('date', 'records'));
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $date = $request->input('date') ? Carbon::parse($request->input('date')) : now();
+        $records = $this->getResidentialData($date);
+
+        $pdf = Pdf::loadView('admin.corporate-tools.residential-report-pdf', compact('date', 'records'));
+        return $pdf->download('residential_report_' . $date->format('Y_m') . '.pdf');
+    }
+
+    public function exportCsv(Request $request)
+    {
+        $date = $request->input('date') ? Carbon::parse($request->input('date')) : now();
+        $records = $this->getResidentialData($date);
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=residential_report_" . $date->format('Y_m') . ".csv",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $callback = function() use($records) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, ['Client', 'City', 'Special?', 'Date', 'Price']);
+
+            foreach ($records as $record) {
+                fputcsv($file, [
+                    $record['client'],
+                    $record['city'],
+                    $record['special'],
+                    $record['date'],
+                    $record['price']
+                ]);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     /**
