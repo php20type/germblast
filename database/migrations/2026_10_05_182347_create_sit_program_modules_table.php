@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('sit_program_modules', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sit_program_id')->constrained('sit_programs')->onDelete('cascade');
-            $table->foreignId('sit_module_id')->constrained('sit_modules')->onDelete('cascade');
+            $table->unsignedBigInteger('sit_program_id')->index();
+            $table->unsignedBigInteger('sit_module_id')->index();
             $table->string('status')->default('pending'); // pending, in_progress, completed
-            $table->foreignId('completed_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->unsignedBigInteger('completed_by')->nullable()->index();
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
         });

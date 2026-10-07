@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('sit_programs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->unsignedBigInteger('user_id')->index();
             $table->string('status')->default('in_progress'); // in_progress, completed, dropped
             $table->timestamp('started_at')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->text('notes')->nullable();
-            $table->foreignId('initiated_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->unsignedBigInteger('initiated_by')->nullable()->index();
             $table->timestamps();
         });
     }

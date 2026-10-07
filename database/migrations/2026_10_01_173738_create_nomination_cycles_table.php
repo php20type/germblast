@@ -18,10 +18,8 @@ return new class extends Migration
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable()->index();
             $table->timestamps();
-            
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
         });
     }
 
