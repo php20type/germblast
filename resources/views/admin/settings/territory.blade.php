@@ -225,7 +225,7 @@
                             <button type="button" class="btn btn-danger btn-sm remove-location-row"><i class="fas fa-times"></i></button>
                             <div class="row g-3">
                                 <div class="col-md-4" data-type="country">
-                                    <label class="form-label small text-muted mb-1">Country</label>
+                                    <label class="form-label small text-muted mb-1">Country <span class="text-danger">*</span></label>
                                     <select class="form-select country-select" data-name-template="locations[__INDEX__][country]">
                                         <option value="" disabled selected>Select Country</option>
                                         @foreach (App\Helpers\Helper::getCountries() as $country)
@@ -234,13 +234,13 @@
                                     </select>
                                 </div>
                                 <div class="col-md-4" data-type="state">
-                                    <label class="form-label small text-muted mb-1">State/Province</label>
+                                    <label class="form-label small text-muted mb-1">State/Province <span class="text-danger">*</span></label>
                                     <select class="form-select state-select" data-name-template="locations[__INDEX__][state_province]">
                                         <option value="">Select State</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4" data-type="city">
-                                    <label class="form-label small text-muted mb-1">City</label>
+                                    <label class="form-label small text-muted mb-1">City <span class="text-danger">*</span></label>
                                     <select class="form-select city-select" data-name-template="locations[__INDEX__][city]">
                                         <option value="">Select City</option>
                                     </select>
@@ -333,31 +333,85 @@
 
         $(document).ready(function() {
             
+            // Validate Store Territory Form
             $('#store_territory').validate({
                 ignore: [],
-                errorClass: 'text-danger',
                 rules: {
-                    name: { required: true },
-                    franchise_name: { required: true }
+                    name: {
+                        required: true,
+                        maxlength: 255
+                    },
+                    franchise_name: {
+                        required: true,
+                        maxlength: 255
+                    }
+                },
+                messages: {
+                    name: {
+                        required: "Please enter the territory name.",
+                        maxlength: "Territory name must not exceed 255 characters."
+                    },
+                    franchise_name: {
+                        required: "Please enter the franchise name.",
+                        maxlength: "Franchise name must not exceed 255 characters."
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
                 },
                 errorPlacement: function(error, element) {
-                    error.insertAfter(element);
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
                 }
             });
 
+            // Validate Update Territory Form
             $('#update_territory').validate({
                 ignore: [],
-                errorClass: 'text-danger',
                 rules: {
-                    name: { required: true },
-                    franchise_name: { required: true }
+                    name: {
+                        required: true,
+                        maxlength: 255
+                    },
+                    franchise_name: {
+                        required: true,
+                        maxlength: 255
+                    }
+                },
+                messages: {
+                    name: {
+                        required: "Please enter the territory name.",
+                        maxlength: "Territory name must not exceed 255 characters."
+                    },
+                    franchise_name: {
+                        required: "Please enter the franchise name.",
+                        maxlength: "Franchise name must not exceed 255 characters."
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
                 },
                 errorPlacement: function(error, element) {
-                    error.insertAfter(element);
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
                 }
             });
-
-            // Remove Add Modal automatic row generation
 
             // Remove Row
             $(document).on('click', '.remove-location-row', function() {
@@ -372,6 +426,7 @@
                 $(this).closest('.location-row').remove();
                 if($container.length) updateRowIndices($container.attr('id'), templateSelector);
             });
+
             // Helper functions for loading cascading dropdowns
             function loadStates($row, countryId, selectedStateId = null, callback = null) {
                 let $stateSelect = $row.find('.state-select');
@@ -438,23 +493,35 @@
             $('#store_territory').submit(function(e) {
                 e.preventDefault();
                 
-                if (!$(this).valid()) return false;
+                const $form = $(this);
+                const $submitBtn = $('#saveAddBtn');
 
-                var btn = $('#saveAddBtn');
-                btn.prop('disabled', true).text('Saving...');
-                
+                if (!$form.valid()) return;
+
                 $.ajax({
                     url: "{{ route('admin.settings.territory.store') }}",
                     method: "POST",
-                    data: $(this).serialize(),
+                    data: $form.serialize(),
+                    beforeSend: function() {
+                        $submitBtn.prop('disabled', true).text('Saving...');
+                    },
                     success: function(response) {
                         toastr.success(response.message || 'Territory added successfully!');
                         $('#add_territory').modal('hide');
-                        setTimeout(function(){ location.reload(); }, 1000);
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
                     },
                     error: function(xhr) {
-                        btn.prop('disabled', false).text('Save Territory');
-                        toastr.error('Please fill all required fields correctly.');
+                        $submitBtn.prop('disabled', false).text('Save Territory');
+                        let errorMessage = xhr.responseJSON?.message || 'Something went wrong while adding the territory.';
+                        if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                            const firstError = Object.values(xhr.responseJSON.errors)[0];
+                            if (Array.isArray(firstError) && firstError.length > 0) {
+                                errorMessage = firstError[0];
+                            }
+                        }
+                        toastr.error(errorMessage);
                     }
                 });
             });
@@ -517,71 +584,164 @@
             $('#update_territory').submit(function(e) {
                 e.preventDefault();
                 
-                if (!$(this).valid()) return false;
+                const $form = $(this);
+                const $submitBtn = $('#saveEditBtn');
+
+                if (!$form.valid()) return;
                 
                 var id = $('#edit_territory_id').val();
-
-                var btn = $('#saveEditBtn');
-                btn.prop('disabled', true).text('Updating...');
                 
                 $.ajax({
-                    url: "/admin/settings/territory/update/" + id,
+                    url: "{{ url('admin/settings/territory/update') }}/" + id,
                     method: "POST",
-                    data: $(this).serialize(),
+                    data: $form.serialize(),
+                    beforeSend: function() {
+                        $submitBtn.prop('disabled', true).text('Updating...');
+                    },
                     success: function(response) {
                         toastr.success(response.message || 'Territory updated successfully!');
                         $('#edit_territory').modal('hide');
-                        setTimeout(function(){ location.reload(); }, 1000);
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
                     },
                     error: function(xhr) {
-                        btn.prop('disabled', false).text('Update Territory');
-                        toastr.error('Please fill all required fields correctly.');
+                        $submitBtn.prop('disabled', false).text('Update Territory');
+                        let errorMessage = xhr.responseJSON?.message || 'Something went wrong while updating the territory.';
+                        if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                            const firstError = Object.values(xhr.responseJSON.errors)[0];
+                            if (Array.isArray(firstError) && firstError.length > 0) {
+                                errorMessage = firstError[0];
+                            }
+                        }
+                        toastr.error(errorMessage);
                     }
                 });
             });
+
+            // Validate Update Locations Form
+            $('#update_locations').validate({
+                ignore: [],
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
+
+            function applyLocationRulesValidation() {
+                $('#manageLocationRowContainer .location-row:not(.add-template-row)').each(function() {
+                    let $country = $(this).find('.country-select');
+                    let $state = $(this).find('.state-select');
+                    let $city = $(this).find('.city-select');
+
+                    if ($country.attr('name')) {
+                        $country.rules('add', {
+                            required: true,
+                            messages: {
+                                required: "Please select a country."
+                            }
+                        });
+                    }
+                    if ($state.attr('name')) {
+                        $state.rules('add', {
+                            required: true,
+                            messages: {
+                                required: "Please select a state."
+                            }
+                        });
+                    }
+                    if ($city.attr('name')) {
+                        $city.rules('add', {
+                            required: true,
+                            messages: {
+                                required: "Please select a city."
+                            }
+                        });
+                    }
+                });
+            }
 
             // AJAX Update Locations
             $('#update_locations').submit(function(e) {
                 e.preventDefault();
                 
+                const $form = $(this);
+                const $submitBtn = $('#saveLocationsBtn');
+
                 if($('#manageLocationRowContainer .location-row:not(.add-template-row)').length === 0) {
                     toastr.error('You must add at least one location rule.');
                     return;
                 }
+
+                applyLocationRulesValidation();
+
+                if (!$form.valid()) return;
                 
                 var id = $('#locations_territory_id').val();
                 
-                var btn = $('#saveLocationsBtn');
-                btn.prop('disabled', true).text('Updating...');
-                
                 $.ajax({
-                    url: "/admin/settings/territory/update-locations/" + id,
+                    url: "{{ url('admin/settings/territory/update-locations') }}/" + id,
                     method: "POST",
-                    data: $(this).serialize(),
+                    data: $form.serialize(),
+                    beforeSend: function() {
+                        $submitBtn.prop('disabled', true).text('Updating...');
+                    },
                     success: function(response) {
                         toastr.success(response.message || 'Rules updated successfully!');
                         $('#manage_locations').modal('hide');
-                        setTimeout(function(){ location.reload(); }, 1000);
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
                     },
                     error: function(xhr) {
-                        btn.prop('disabled', false).text('Update Rules');
-                        toastr.error('Please fill all required fields correctly.');
+                        $submitBtn.prop('disabled', false).text('Update Rules');
+                        let errorMessage = xhr.responseJSON?.message || 'Something went wrong while updating location rules.';
+                        if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                            const firstError = Object.values(xhr.responseJSON.errors)[0];
+                            if (Array.isArray(firstError) && firstError.length > 0) {
+                                errorMessage = firstError[0];
+                            }
+                        }
+                        toastr.error(errorMessage);
                     }
                 });
             });
 
             // Reset modals when closed
             $('#add_territory').on('hidden.bs.modal', function () {
+                const validator = $('#store_territory').validate();
+                if (validator) validator.resetForm();
                 $('#store_territory')[0].reset();
-                $('#store_territory').validate().resetForm();
+                $('#store_territory .is-invalid').removeClass('is-invalid');
+                $('#saveAddBtn').prop('disabled', false).text('Save Territory');
             });
+
             $('#edit_territory').on('hidden.bs.modal', function () {
+                const validator = $('#update_territory').validate();
+                if (validator) validator.resetForm();
                 $('#update_territory')[0].reset();
-                $('#update_territory').validate().resetForm();
+                $('#update_territory .is-invalid').removeClass('is-invalid');
+                $('#saveEditBtn').prop('disabled', false).text('Update Territory');
             });
+
             $('#manage_locations').on('hidden.bs.modal', function () {
+                const validator = $('#update_locations').validate();
+                if (validator) validator.resetForm();
                 $('#update_locations')[0].reset();
+                $('#update_locations .is-invalid').removeClass('is-invalid');
                 $('#manageLocationRowContainer').empty();
+                $('#saveLocationsBtn').prop('disabled', false).text('Update Rules');
             });
 
         });

@@ -657,6 +657,15 @@ class SettingController extends Controller implements HasMiddleware
     {
         $request->validate([
             'locations' => 'required|array|min:1',
+            'locations.*.country' => 'required',
+            'locations.*.state_province' => 'required',
+            'locations.*.city' => 'required',
+        ], [
+            'locations.required' => 'You must add at least one location rule.',
+            'locations.min' => 'You must add at least one location rule.',
+            'locations.*.country.required' => 'Country is required for all location rules.',
+            'locations.*.state_province.required' => 'State/Province is required for all location rules.',
+            'locations.*.city.required' => 'City is required for all location rules.',
         ]);
 
         $territory = Territory::findOrFail($id);
