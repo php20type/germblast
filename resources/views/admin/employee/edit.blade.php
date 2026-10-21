@@ -282,19 +282,20 @@
                                             <tbody>
 
                                                 <tr>
-                                                    <th>Date of Fit Test</th>
+                                                    <th>Date of Fit Test <span class="text-danger">*</span></th>
                                                     <td>
                                                         <input type="date"
                                                             name="fit_test_date"
                                                             class="form-control"
-                                                            value="{{ date('Y-m-d') }}">
+                                                            value="{{ date('Y-m-d') }}"
+                                                            required>
                                                     </td>
                                                 </tr>
 
                                                 <tr>
-                                                    <th>Mask Type/Size</th>
+                                                    <th>Mask Type/Size <span class="text-danger">*</span></th>
                                                     <td>
-                                                        <select name="mask_type_id" class="form-select">
+                                                        <select name="mask_type_id" class="form-select" required>
                                                             <option value="">Select Mask</option>
                                                             @foreach($maskTypes as $type)
                                                                 <option value="{{ $type->id }}">
@@ -379,9 +380,9 @@
                                         <tbody>
 
                                             <tr>
-                                                <th>Item</th>
+                                                <th>Item <span class="text-danger">*</span></th>
                                                 <td>
-                                                    <select name="driver_log_item_id" class="form-select">
+                                                    <select name="driver_log_item_id" class="form-select" required>
                                                         <option value="">Select Item</option>
                                                         @foreach($driverLogItems as $item)
                                                             <option value="{{ $item->id }}">
@@ -393,9 +394,9 @@
                                             </tr>
 
                                             <tr>
-                                                <th>Date</th>
+                                                <th>Date <span class="text-danger">*</span></th>
                                                 <td>
-                                                    <input type="date" name="log_date" class="form-control" value="{{ date('Y-m-d') }}">
+                                                    <input type="date" name="log_date" class="form-control" value="{{ date('Y-m-d') }}" required>
                                                 </td>
                                             </tr>
 
@@ -470,9 +471,9 @@
                                         <tbody>
 
                                             <tr>
-                                                <th>Suspended Until</th>
+                                                <th>Suspended Until <span class="text-danger">*</span></th>
                                                 <td>
-                                                    <input type="date" name="suspended_until" class="form-control">
+                                                    <input type="date" name="suspended_until" class="form-control" required>
                                                 </td>
                                             </tr>
 
@@ -1033,156 +1034,217 @@
     });
 
     /* ===============================
-       Mask Fit Test AJAX Submission
+       Mask Fit Test Form Validation & AJAX Submission
     =============================== */
-    $('#mask-fit-form').on('submit', function (e) {
-        e.preventDefault();
-
-        let form = $(this);
-        let fitTestDate = form.find('[name="fit_test_date"]').val();
-        let maskTypeId  = form.find('[name="mask_type_id"]').val();
-
-        if (!fitTestDate) {
-            toastr.error('Please select a date for the fit test.');
-            return;
-        }
-        if (!maskTypeId) {
-            toastr.error('Please select a mask type.');
-            return;
-        }
-
-        $.ajax({
-            url: form.attr('action'),
-            type: 'POST',
-            data: form.serialize(),
-
-            success: function (response) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Added',
-                    text: response.message || 'Mask fit test record added successfully.',
-                    showConfirmButton: false,
-                    timer: 2000
-                }).then(() => {
-                    location.reload();
-                });
-            },
-
-            error: function (xhr) {
-                if (xhr.status === 422 && xhr.responseJSON?.errors) {
-                    $.each(xhr.responseJSON.errors, function (field, messages) {
-                        messages.forEach(msg => toastr.error(msg));
-                    });
-                    return;
+    if ($('#mask-fit-form').length > 0) {
+        $("#mask-fit-form").validate({
+            ignore: [],
+            rules: {
+                fit_test_date: {
+                    required: true
+                },
+                mask_type_id: {
+                    required: true
                 }
-
-                toastr.error(
-                    xhr.responseJSON?.message ||
-                    'Something went wrong while adding mask fit test record.'
-                );
+            },
+            messages: {
+                fit_test_date: {
+                    required: "Please select a date for the fit test."
+                },
+                mask_type_id: {
+                    required: "Please select a mask type."
+                }
+            },
+            errorElement: 'span',
+            errorClass: 'invalid-feedback d-block',
+            highlight: function (element) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function (element) {
+                $(element).removeClass('is-invalid');
+            },
+            errorPlacement: function (error, element) {
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent());
+                } else {
+                    error.insertAfter(element);
+                }
             }
         });
-    });
+
+        $('#mask-fit-form').submit(function (e) {
+            e.preventDefault();
+
+            const $form = $(this);
+            const $submitBtn = $form.find('button[type="submit"]');
+
+            if (!$form.valid()) return;
+
+            $.ajax({
+                url: $form.attr('action'),
+                method: 'POST',
+                data: $form.serialize(),
+
+                beforeSend: function () {
+                    $submitBtn.prop('disabled', true).text('Saving...');
+                },
+
+                success: function (response) {
+                    toastr.success(response.message || 'Mask fit test record added successfully! Redirecting...');
+                    $form[0].reset();
+
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                },
+
+                error: function (xhr) {
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while adding mask fit test record.');
+                    $submitBtn.prop('disabled', false).text('Add Fit Test');
+                }
+            });
+        });
+    }
 
     /* ===============================
-       Driver Log AJAX Submission
+       Driver Log Form Validation & AJAX Submission
     =============================== */
-    $('#driver-log-form').on('submit', function (e) {
-        e.preventDefault();
-
-        let form = $(this);
-        let itemId = form.find('[name="driver_log_item_id"]').val();
-        let logDate = form.find('[name="log_date"]').val();
-
-        if (!itemId) {
-            toastr.error('Please select a log item.');
-            return;
-        }
-
-        if (!logDate) {
-            toastr.error('Please select a date.');
-            return;
-        }
-
-        $.ajax({
-            url: form.attr('action'),
-            type: 'POST',
-            data: form.serialize(),
-
-            success: function (response) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Added',
-                    text: response.message || 'Driver log added successfully.',
-                    showConfirmButton: false,
-                    timer: 2000
-                }).then(() => {
-                    location.reload();
-                });
-            },
-
-            error: function (xhr) {
-                if (xhr.status === 422 && xhr.responseJSON?.errors) {
-                    $.each(xhr.responseJSON.errors, function (field, messages) {
-                        messages.forEach(msg => toastr.error(msg));
-                    });
-                    return;
+    if ($('#driver-log-form').length > 0) {
+        $("#driver-log-form").validate({
+            ignore: [],
+            rules: {
+                driver_log_item_id: {
+                    required: true
+                },
+                log_date: {
+                    required: true
                 }
-
-                toastr.error(
-                    xhr.responseJSON?.message ||
-                    'Something went wrong while adding driver log.'
-                );
+            },
+            messages: {
+                driver_log_item_id: {
+                    required: "Please select a log item."
+                },
+                log_date: {
+                    required: "Please select a date."
+                }
+            },
+            errorElement: 'span',
+            errorClass: 'invalid-feedback d-block',
+            highlight: function (element) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function (element) {
+                $(element).removeClass('is-invalid');
+            },
+            errorPlacement: function (error, element) {
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent());
+                } else {
+                    error.insertAfter(element);
+                }
             }
         });
-    });
+
+        $('#driver-log-form').submit(function (e) {
+            e.preventDefault();
+
+            const $form = $(this);
+            const $submitBtn = $form.find('button[type="submit"]');
+
+            if (!$form.valid()) return;
+
+            $.ajax({
+                url: $form.attr('action'),
+                method: 'POST',
+                data: $form.serialize(),
+
+                beforeSend: function () {
+                    $submitBtn.prop('disabled', true).text('Saving...');
+                },
+
+                success: function (response) {
+                    toastr.success(response.message || 'Driver log added successfully! Redirecting...');
+                    $form[0].reset();
+
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                },
+
+                error: function (xhr) {
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while adding driver log.');
+                    $submitBtn.prop('disabled', false).text('Add Log');
+                }
+            });
+        });
+    }
 
     /* ===============================
-       Driver Suspension Record AJAX Submission
+       Driver Suspension Record Validation & AJAX Submission
     =============================== */
-    $('#driver-suspension-form').on('submit', function (e) {
-        e.preventDefault();
-
-        let form = $(this);
-        let suspendedUntil = form.find('[name="suspended_until"]').val();
-
-        if (!suspendedUntil) {
-            toastr.error('Please select suspension date.');
-            return;
-        }
-
-        $.ajax({
-            url: form.attr('action'),
-            type: 'POST',
-            data: form.serialize(),
-
-            success: function (response) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Added',
-                    text: response.message || 'Driver suspension added successfully.',
-                    showConfirmButton: false,
-                    timer: 2000
-                }).then(() => {
-                    location.reload();
-                });
-            },
-
-            error: function (xhr) {
-                if (xhr.status === 422 && xhr.responseJSON?.errors) {
-                    $.each(xhr.responseJSON.errors, function (field, messages) {
-                        messages.forEach(msg => toastr.error(msg));
-                    });
-                    return;
+    if ($('#driver-suspension-form').length > 0) {
+        $("#driver-suspension-form").validate({
+            ignore: [],
+            rules: {
+                suspended_until: {
+                    required: true
                 }
-
-                toastr.error(
-                    xhr.responseJSON?.message ||
-                    'Something went wrong while adding suspension.'
-                );
+            },
+            messages: {
+                suspended_until: {
+                    required: "Please select suspension date."
+                }
+            },
+            errorElement: 'span',
+            errorClass: 'invalid-feedback d-block',
+            highlight: function (element) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function (element) {
+                $(element).removeClass('is-invalid');
+            },
+            errorPlacement: function (error, element) {
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent());
+                } else {
+                    error.insertAfter(element);
+                }
             }
         });
-    });
+
+        $('#driver-suspension-form').submit(function (e) {
+            e.preventDefault();
+
+            const $form = $(this);
+            const $submitBtn = $form.find('button[type="submit"]');
+
+            if (!$form.valid()) return;
+
+            $.ajax({
+                url: $form.attr('action'),
+                method: 'POST',
+                data: $form.serialize(),
+
+                beforeSend: function () {
+                    $submitBtn.prop('disabled', true).text('Saving...');
+                },
+
+                success: function (response) {
+                    toastr.success(response.message || 'Driver suspension added successfully! Redirecting...');
+                    $form[0].reset();
+
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                },
+
+                error: function (xhr) {
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while adding suspension.');
+                    $submitBtn.prop('disabled', false).text('Add Suspension');
+                }
+            });
+        });
+    }
 
     // Remove photo button
     $('#remove-photo-btn').on('click', function () {
@@ -1256,6 +1318,7 @@
     });
 
     $("#availability-form").validate({  
+        ignore: [],
         rules: {
             start_date: { required: true, date: true },
             end_date: { required: true, date: true },
@@ -1275,37 +1338,64 @@
             avg_hours: "Enter average hours.",
             max_hours: "Enter max hours."
         },
-        submitHandler: function(form, event) {
-            event.preventDefault();
-            const $form = $(form);
-            
-            $.ajax({
-                url: $form.attr('action'),
-                type: 'POST',
-                data: $form.serialize(),
-                success: function (response) {
-                    availabilityModal.hide();
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Saved',
-                        text: response.message || 'Availability record saved successfully.',
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(() => {
-                        location.reload();
+        errorElement: 'span',
+        errorClass: 'invalid-feedback d-block',
+        highlight: function(element) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('is-invalid');
+        },
+        errorPlacement: function(error, element) {
+            if (element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            } else {
+                error.insertAfter(element);
+            }
+        }
+    });
+
+    $('#availability-form').submit(function(e) {
+        e.preventDefault();
+        const $form = $(this);
+        const $submitBtn = $form.find('button[type="submit"]');
+
+        if (!$form.valid()) return;
+
+        $.ajax({
+            url: $form.attr('action'),
+            type: 'POST',
+            data: $form.serialize(),
+            beforeSend: function() {
+                $submitBtn.prop('disabled', true).text('Saving...');
+            },
+            success: function (response) {
+                toastr.success(response.message || 'Availability record saved successfully! Redirecting...');
+                $form[0].reset();
+                $('#availability-modal').modal('hide');
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            },
+            error: function (xhr) {
+                if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                    $.each(xhr.responseJSON.errors, function (field, messages) {
+                        messages.forEach(msg => toastr.error(msg));
                     });
-                },
-                error: function (xhr) {
-                    if (xhr.status === 422 && xhr.responseJSON?.errors) {
-                        $.each(xhr.responseJSON.errors, function (field, messages) {
-                            messages.forEach(msg => toastr.error(msg));
-                        });
-                        return;
-                    }
+                } else {
                     toastr.error(xhr.responseJSON?.message || 'Something went wrong while saving availability.');
                 }
-            });
-        }
+                $submitBtn.prop('disabled', false).text('Save Availability');
+            }
+        });
+    });
+
+    $('#availability-modal').on('hidden.bs.modal', function () {
+        const validator = $("#availability-form").validate();
+        if (validator) validator.resetForm();
+        $('#availability-form')[0].reset();
+        $('#availability-form .is-invalid').removeClass('is-invalid');
+        $('#btn-save-availability').prop('disabled', false).text('Save Availability');
     });
 
 </script>

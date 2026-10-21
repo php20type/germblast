@@ -343,7 +343,7 @@
             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">
 
-                    <form method="POST" action="{{ route('admin.roles.permissions.update') }}">
+                    <form method="POST" action="{{ route('admin.roles.permissions.update') }}" class="role-permission-form">
                         @csrf
 
                         <div class="modal-header d-flex justify-content-between align-items-center">
@@ -435,3 +435,59 @@
     @endforeach
 
 @endsection
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            @if(session('success'))
+                toastr.success("{{ session('success') }}");
+            @endif
+
+            @if(session('error'))
+                toastr.error("{{ session('error') }}");
+            @endif
+
+            // Toggle highlight visual class on checkbox change
+            $(document).on('change', '.role-permission-form .form-check-input', function() {
+                const itemBox = $(this).closest('.perm-item-box');
+                if ($(this).is(':checked')) {
+                    itemBox.addClass('active-granted');
+                } else {
+                    itemBox.removeClass('active-granted');
+                }
+            });
+
+            // Submit Role Permissions form
+            $(document).on('submit', '.role-permission-form', function(e) {
+                e.preventDefault();
+
+                const $form = $(this);
+                const $submitBtn = $form.find('button[type="submit"]');
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    method: 'POST',
+                    data: $form.serialize(),
+
+                    beforeSend: function() {
+                        $submitBtn.prop('disabled', true).text('Saving...');
+                    },
+
+                    success: function() {
+                        toastr.success('Permissions updated successfully! Redirecting...');
+                        $form.closest('.modal').modal('hide');
+
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    },
+
+                    error: function() {
+                        toastr.error('Failed to update permissions.');
+                        $submitBtn.prop('disabled', false).text('Save changes');
+                    }
+                });
+            });
+        });
+    </script>
+@endpush

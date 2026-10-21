@@ -335,3 +335,148 @@
 @endforeach
 
 @endsection
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            @if(session('success'))
+                toastr.success("{{ session('success') }}");
+            @endif
+
+            @if(session('error'))
+                toastr.error("{{ session('error') }}");
+            @endif
+
+            const validationConfig = {
+                ignore: [],
+                rules: {
+                    work_date: {
+                        required: true,
+                        date: true
+                    },
+                    clock_in: {
+                        required: true
+                    },
+                    clock_type: {
+                        required: true
+                    }
+                },
+                messages: {
+                    work_date: {
+                        required: "Please select a work date."
+                    },
+                    clock_in: {
+                        required: "Please enter clock in time."
+                    },
+                    clock_type: {
+                        required: "Please select a clock type."
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            };
+
+            // Initialize validation on all punch forms (add and edit)
+            $('.punch-form').each(function() {
+                $(this).validate({
+                    ignore: [],
+                    rules: {
+                        work_date: {
+                            required: true,
+                            date: true
+                        },
+                        clock_in: {
+                            required: true
+                        },
+                        clock_type: {
+                            required: true
+                        }
+                    },
+                    messages: {
+                        work_date: {
+                            required: "Please select a work date."
+                        },
+                        clock_in: {
+                            required: "Please enter clock in time."
+                        },
+                        clock_type: {
+                            required: "Please select a clock type."
+                        }
+                    },
+                    errorElement: 'span',
+                    errorClass: 'invalid-feedback d-block',
+                    highlight: function(element) {
+                        $(element).addClass('is-invalid');
+                    },
+                    unhighlight: function(element) {
+                        $(element).removeClass('is-invalid');
+                    },
+                    errorPlacement: function(error, element) {
+                        if (element.parent('.input-group').length) {
+                            error.insertAfter(element.parent());
+                        } else {
+                            error.insertAfter(element);
+                        }
+                    }
+                });
+            });
+
+            // Submit Punch form (add & edit)
+            $(document).on('submit', '.punch-form', function(e) {
+                e.preventDefault();
+
+                const $form = $(this);
+                const $submitBtn = $form.find('button[type="submit"]');
+
+                if (!$form.valid()) return;
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    method: 'POST',
+                    data: $form.serialize(),
+
+                    beforeSend: function() {
+                        $submitBtn.prop('disabled', true).text('Saving...');
+                    },
+
+                    success: function() {
+                        toastr.success('Timecard punch saved successfully! Redirecting...');
+                        $form[0].reset();
+                        $form.closest('.modal').modal('hide');
+
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    },
+
+                    error: function() {
+                        toastr.error('Something went wrong while saving punch.');
+                        $submitBtn.prop('disabled', false).text('Save Punch');
+                    }
+                });
+            });
+
+            // Reset add punch modal on hide
+            $('#addPunchModal').on('hidden.bs.modal', function() {
+                const validator = $('#add-punch-form').validate();
+                if (validator) validator.resetForm();
+                $('#add-punch-form')[0].reset();
+                $('#add-punch-form .is-invalid').removeClass('is-invalid');
+                $('#add-punch-form').find('button[type="submit"]').prop('disabled', false).text('Save Punch');
+            });
+        });
+    </script>
+@endpush

@@ -121,7 +121,7 @@
                                                         
                                                         <div class="row mb-3">
                                                             <div class="col-md-12">
-                                                                <label class="form-label">Nominee</label>
+                                                                <label class="form-label">Nominee <span class="text-danger">*</span></label>
                                                                 <select name="nominee_id" class="form-select select2" required>
                                                                     <option value="">-- Select Nominee --</option>
                                                                     @foreach($groupedUsers as $officeName => $users)
@@ -219,11 +219,11 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Title / Survey Name</label>
+                        <label class="form-label">Title / Survey Name <span class="text-danger">*</span></label>
                         <input type="text" name="title" class="form-control" required placeholder="e.g. Survey from Q3 2026">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Start Date</label>
+                        <label class="form-label">Start Date <span class="text-danger">*</span></label>
                         <input type="date" name="start_date" class="form-control" required value="{{ date('Y-m-d') }}">
                     </div>
                 </div>
@@ -240,6 +240,13 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
+        // Initialize select2
+        if ($('.select2').length > 0) {
+            $('.select2').select2({
+                theme: 'bootstrap-5'
+            });
+        }
+
         $('.btn-initiate').click(function() {
             var category = $(this).data('category');
             var title = $(this).data('title');
@@ -248,27 +255,160 @@
             $('#initiateVoteModal').modal('show');
         });
 
-        $('#initiateVoteForm').on('submit', function(e) {
-            e.preventDefault();
-            var form = $(this);
-            var submitBtn = form.find('button[type="submit"]');
-            submitBtn.prop('disabled', true);
-            
-            $.ajax({
-                url: form.attr('action'),
-                type: 'POST',
-                data: form.serialize(),
-                success: function(response) {
-                    toastr.success(response.message);
-                    setTimeout(function() { location.reload(); }, 1000);
+        // 1. Initiate Vote Form Validation
+        $("#initiateVoteForm").validate({
+            ignore: [],
+            rules: {
+                title: {
+                    required: true
                 },
+                start_date: {
+                    required: true
+                }
+            },
+            messages: {
+                title: {
+                    required: "Please enter a survey or vote title."
+                },
+                start_date: {
+                    required: "Please select a start date."
+                }
+            },
+            errorElement: 'span',
+            errorClass: 'invalid-feedback d-block',
+            highlight: function(element) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function(element) {
+                $(element).removeClass('is-invalid');
+            },
+            errorPlacement: function(error, element) {
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent());
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+
+        // Submit Initiate Vote Form
+        $('#initiateVoteForm').submit(function(e) {
+            e.preventDefault();
+
+            const $form = $(this);
+            const $submitBtn = $form.find('button[type="submit"]');
+
+            if (!$form.valid()) return;
+
+            $.ajax({
+                url: $form.attr('action'),
+                method: 'POST',
+                data: $form.serialize(),
+
+                beforeSend: function() {
+                    $submitBtn.prop('disabled', true).text('Initiating...');
+                },
+
+                success: function(response) {
+                    toastr.success(response.message || 'Vote cycle initiated successfully! Redirecting...');
+                    $form[0].reset();
+                    $('#initiateVoteModal').modal('hide');
+
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                },
+
                 error: function(xhr) {
-                    submitBtn.prop('disabled', false);
                     toastr.error(xhr.responseJSON?.message || 'Error initiating vote.');
+                    $submitBtn.prop('disabled', false).text('Initiate');
                 }
             });
         });
 
+        // Reset Initiate Vote Modal
+        $('#initiateVoteModal').on('hidden.bs.modal', function() {
+            var validator = $('#initiateVoteForm').validate();
+            if (validator) validator.resetForm();
+            $('#initiateVoteForm')[0].reset();
+            $('#initiateVoteForm .is-invalid').removeClass('is-invalid');
+            $('#initiateVoteForm').find('button[type="submit"]').prop('disabled', false).text('Initiate');
+        });
+
+        // 2. Vote Form Validation & Submit
+        $('.vote-form').each(function() {
+            const $voteForm = $(this);
+
+            $voteForm.validate({
+                ignore: [],
+                rules: {
+                    nominee_id: {
+                        required: true
+                    }
+                },
+                messages: {
+                    nominee_id: {
+                        required: "Please select a nominee to vote for."
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.hasClass('select2-hidden-accessible')) {
+                        error.insertAfter(element.next('.select2-container'));
+                    } else if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
+
+            $voteForm.submit(function(e) {
+                e.preventDefault();
+
+                const $form = $(this);
+                const $submitBtn = $form.find('button[type="submit"]');
+
+                if (!$form.valid()) return;
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    method: 'POST',
+                    data: $form.serialize(),
+
+                    beforeSend: function() {
+                        $submitBtn.prop('disabled', true).text('Submitting...');
+                    },
+
+                    success: function(response) {
+                        toastr.success(response.message || 'Vote cast successfully!');
+                        $form.find('input, select, textarea, button').prop('disabled', true);
+                        $form.slideUp(500, function() {
+                            $(this).after('<div class="alert alert-success mt-3 py-2">You have successfully cast your vote for this cycle!</div>');
+                        });
+                    },
+
+                    error: function(xhr) {
+                        toastr.error(xhr.responseJSON?.message || 'Error submitting vote.');
+                        $submitBtn.prop('disabled', false).text('Submit Vote');
+                    }
+                });
+            });
+
+            // Revalidate select2 when changed
+            $voteForm.find('select.select2').on('change', function() {
+                $(this).valid();
+            });
+        });
+
+        // Close Voting Cycle
         $('.btn-close-vote').click(function() {
             var id = $(this).data('id');
             Swal.fire({
@@ -286,44 +426,13 @@
                         type: 'POST',
                         data: { _token: '{{ csrf_token() }}' },
                         success: function(response) {
-                            toastr.success(response.message);
+                            toastr.success(response.message || 'Voting cycle closed.');
                             setTimeout(function() { location.reload(); }, 1000);
                         },
                         error: function(xhr) {
                             toastr.error(xhr.responseJSON?.message || 'Error closing vote.');
                         }
                     });
-                }
-            });
-        });
-
-        // Initialize select2
-        if ($('.select2').length > 0) {
-            $('.select2').select2({
-                theme: 'bootstrap-5'
-            });
-        }
-
-        $('.vote-form').on('submit', function(e) {
-            e.preventDefault();
-            var form = $(this);
-            var submitBtn = form.find('button[type="submit"]');
-            submitBtn.prop('disabled', true);
-            
-            $.ajax({
-                url: form.attr('action'),
-                type: 'POST',
-                data: form.serialize(),
-                success: function(response) {
-                    toastr.success(response.message);
-                    form.find('input, select, textarea, button').prop('disabled', true);
-                    form.slideUp(500, function() {
-                        $(this).after('<div class="alert alert-success mt-3 py-2">You have successfully cast your vote for this cycle!</div>');
-                    });
-                },
-                error: function(xhr) {
-                    submitBtn.prop('disabled', false);
-                    toastr.error(xhr.responseJSON?.message || 'Error submitting vote.');
                 }
             });
         });

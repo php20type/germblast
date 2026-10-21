@@ -399,10 +399,50 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
+        // Tasks storing and validation
+        $("#createTaskForm").validate({
+            ignore: [],
+            rules: {
+                title: {
+                    required: true,
+                    maxlength: 255
+                },
+                frequency: {
+                    required: true
+                }
+            },
+            messages: {
+                title: {
+                    required: "Please enter a task title."
+                },
+                frequency: {
+                    required: "Please select a frequency."
+                }
+            },
+            errorElement: 'span',
+            errorClass: 'invalid-feedback d-block',
+            highlight: function(element) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function(element) {
+                $(element).removeClass('is-invalid');
+            },
+            errorPlacement: function(error, element) {
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent());
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+
         // Plus button clicked
         $('.btn-create-task-trigger').on('click', function() {
             $('#createTaskModalLabel').text('Create New Task');
+            const validator = $("#createTaskForm").validate();
+            if (validator) validator.resetForm();
             $('#createTaskForm')[0].reset();
+            $('#createTaskForm .is-invalid').removeClass('is-invalid');
             $('#createTaskForm').attr('action', '{{ route('admin.office-duties.store') }}');
             $('#formMethod').val('POST');
         });
@@ -415,6 +455,10 @@
             let frequency = $(this).data('frequency');
 
             $('#createTaskModalLabel').text('Edit Task');
+            const validator = $("#createTaskForm").validate();
+            if (validator) validator.resetForm();
+            $('#createTaskForm .is-invalid').removeClass('is-invalid');
+
             $('#taskTitle').val(title);
             $('#taskDescription').val(description || '');
             $('#taskFrequency').val(frequency);
@@ -423,29 +467,37 @@
             $('#formMethod').val('PUT');
         });
 
-        // Create/Edit Submit (AJAX)
-        $('#createTaskForm').on('submit', function(e) {
+        // Submit Task form (Create/Edit)
+        $('#createTaskForm').submit(function(e) {
             e.preventDefault();
-            const form = $(this);
-            const submitBtn = form.find('button[type="submit"]');
+
+            const $form = $(this);
+            const $submitBtn = $form.find('button[type="submit"]');
+
+            if (!$form.valid()) return;
 
             $.ajax({
-                url: form.attr('action'),
-                method: 'POST', // standard POST wrapper for Laravel PUT spoofing
-                data: form.serialize(),
+                url: $form.attr('action'),
+                method: 'POST',
+                data: $form.serialize(),
+
                 beforeSend: function() {
-                    submitBtn.prop('disabled', true).text('Saving...');
+                    $submitBtn.prop('disabled', true).text('Saving...');
                 },
-                success: function(response) {
-                    toastr.success(response.message || 'Task saved successfully!');
+
+                success: function() {
+                    toastr.success('Task saved successfully! Redirecting...');
+                    $form[0].reset();
                     $('#createTaskModal').modal('hide');
+
                     setTimeout(() => {
                         window.location.reload();
                     }, 1000);
                 },
-                error: function(xhr) {
-                    toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
-                    submitBtn.prop('disabled', false).text('Save changes');
+
+                error: function() {
+                    toastr.error('Something went wrong while saving the task.');
+                    $submitBtn.prop('disabled', false).text('Save changes');
                 }
             });
         });
@@ -461,31 +513,52 @@
             $('#completeTaskDescription').val('');
         });
 
-        // Complete Submit (AJAX)
-        $('#completeTaskForm').on('submit', function(e) {
+        // Submit Complete Task form
+        $('#completeTaskForm').submit(function(e) {
             e.preventDefault();
-            const form = $(this);
-            const submitBtn = form.find('button[type="submit"]');
+
+            const $form = $(this);
+            const $submitBtn = $form.find('button[type="submit"]');
 
             $.ajax({
-                url: form.attr('action'),
+                url: $form.attr('action'),
                 method: 'POST',
-                data: form.serialize(),
+                data: $form.serialize(),
+
                 beforeSend: function() {
-                    submitBtn.prop('disabled', true).text('Saving...');
+                    $submitBtn.prop('disabled', true).text('Saving...');
                 },
-                success: function(response) {
-                    toastr.success(response.message || 'Task completed successfully!');
+
+                success: function() {
+                    toastr.success('Task completed successfully! Redirecting...');
+                    $form[0].reset();
                     $('#completeTaskModal').modal('hide');
+
                     setTimeout(() => {
                         window.location.reload();
                     }, 1000);
                 },
-                error: function(xhr) {
-                    toastr.error(xhr.responseJSON?.message || 'Something went wrong.');
-                    submitBtn.prop('disabled', false).text('Save changes');
+
+                error: function() {
+                    toastr.error('Something went wrong while completing the task.');
+                    $submitBtn.prop('disabled', false).text('Save changes');
                 }
             });
+        });
+
+        // Reset modals on hidden
+        $('#createTaskModal').on('hidden.bs.modal', function() {
+            const validator = $("#createTaskForm").validate();
+            if (validator) validator.resetForm();
+            $('#createTaskForm')[0].reset();
+            $('#createTaskForm .is-invalid').removeClass('is-invalid');
+            $('#createTaskForm').find('button[type="submit"]').prop('disabled', false).text('Save changes');
+        });
+        });
+
+        $('#completeTaskModal').on('hidden.bs.modal', function() {
+            $('#completeTaskForm')[0].reset();
+            $('#completeTaskForm .is-invalid').removeClass('is-invalid');
         });
 
         // View History button clicked

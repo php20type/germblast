@@ -464,9 +464,10 @@
             });
 
             // ==========================================
-            // Validation & Form Submission (AJAX)
+            // Validation & Form Submission (AJAX) - Add Company Pattern
             // ==========================================
-            let validationConfig = {
+            $("#addInventoryItemForm").validate({
+                ignore: [],
                 rules: {
                     name: { required: true },
                     office: { required: true },
@@ -486,35 +487,126 @@
                     $(element).removeClass('is-invalid');
                 },
                 errorPlacement: function(error, element) {
-                    error.insertAfter(element);
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
                 }
-            };
+            });
 
-            $("#addInventoryItemForm").validate(validationConfig);
-            $("#editInventoryItemForm").validate(validationConfig);
-
-            $('#addInventoryItemForm, #editInventoryItemForm').submit(function(e) {
+            $('#addInventoryItemForm').submit(function(e) {
                 e.preventDefault();
 
-                if (!$(this).valid()) {
-                    return;
-                }
+                const $form = $(this);
+                const $submitBtn = $form.find('button[type="submit"]');
 
-                const modalId = $(this).closest('.modal').attr('id');
+                if (!$form.valid()) return;
 
                 $.ajax({
-                    url: $(this).attr('action'),
+                    url: $form.attr('action'),
                     method: 'POST',
-                    data: $(this).serialize(),
+                    data: $form.serialize(),
+                    beforeSend: function() {
+                        $submitBtn.prop('disabled', true).text('Saving...');
+                    },
                     success: function(response) {
-                        $('#' + modalId).modal('hide');
-                        toastr.success(response.message || 'Saved successfully!');
+                        toastr.success(response.message || 'Item added successfully! Redirecting...');
+                        $form[0].reset();
+                        $('#addInventoryItemModal').modal('hide');
                         setTimeout(() => location.reload(), 1000);
                     },
                     error: function(xhr) {
-                        toastr.error(xhr.responseJSON?.message || 'Something went wrong while saving.');
+                        if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                            $.each(xhr.responseJSON.errors, function(field, messages) {
+                                messages.forEach(msg => toastr.error(msg));
+                            });
+                        } else {
+                            toastr.error(xhr.responseJSON?.message || 'Something went wrong while saving.');
+                        }
+                        $submitBtn.prop('disabled', false).text('Add Item');
                     }
                 });
+            });
+
+            $("#editInventoryItemForm").validate({
+                ignore: [],
+                rules: {
+                    name: { required: true },
+                    office: { required: true },
+                    report_date: { required: true }
+                },
+                messages: {
+                    name: { required: "Please enter item name." },
+                    office: { required: "Please enter office location." },
+                    report_date: { required: "Please enter report date." }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
+
+            $('#editInventoryItemForm').submit(function(e) {
+                e.preventDefault();
+
+                const $form = $(this);
+                const $submitBtn = $form.find('button[type="submit"]');
+
+                if (!$form.valid()) return;
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    method: 'POST',
+                    data: $form.serialize(),
+                    beforeSend: function() {
+                        $submitBtn.prop('disabled', true).text('Saving...');
+                    },
+                    success: function(response) {
+                        toastr.success(response.message || 'Item updated successfully! Redirecting...');
+                        $form[0].reset();
+                        $('#editInventoryItemModal').modal('hide');
+                        setTimeout(() => location.reload(), 1000);
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                            $.each(xhr.responseJSON.errors, function(field, messages) {
+                                messages.forEach(msg => toastr.error(msg));
+                            });
+                        } else {
+                            toastr.error(xhr.responseJSON?.message || 'Something went wrong while saving.');
+                        }
+                        $submitBtn.prop('disabled', false).text('Save changes');
+                    }
+                });
+            });
+
+            // Modal reset on hide
+            $('#addInventoryItemModal').on('hidden.bs.modal', function() {
+                const validator = $('#addInventoryItemForm').validate();
+                if (validator) validator.resetForm();
+                $('#addInventoryItemForm')[0].reset();
+                $('#addInventoryItemForm .is-invalid').removeClass('is-invalid');
+                $('#addInventoryItemForm').find('button[type="submit"]').prop('disabled', false).text('Add Item');
+            });
+
+            $('#editInventoryItemModal').on('hidden.bs.modal', function() {
+                const validator = $('#editInventoryItemForm').validate();
+                if (validator) validator.resetForm();
+                $('#editInventoryItemForm')[0].reset();
+                $('#editInventoryItemForm .is-invalid').removeClass('is-invalid');
+                $('#editInventoryItemForm').find('button[type="submit"]').prop('disabled', false).text('Save changes');
             });
 
             // ==========================================

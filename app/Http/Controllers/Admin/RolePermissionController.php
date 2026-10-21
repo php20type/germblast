@@ -51,6 +51,13 @@ class RolePermissionController extends Controller implements HasMiddleware
         // Sync permissions
         $role->syncPermissions($request->permissions ?? []);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Permissions updated successfully.'
+            ]);
+        }
+
         return redirect()
             ->back()
             ->with('success', 'Permissions updated successfully.');

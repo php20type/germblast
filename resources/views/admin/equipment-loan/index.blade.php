@@ -210,7 +210,7 @@
                     <h1 class="modal-title" id="AddEquipmentModalLabel">Create New Equipment</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{ route('admin.equipment-loan.store') }}" method="POST">
+                <form id="add-equipment-loan-form" action="{{ route('admin.equipment-loan.store') }}" method="POST">
                     @csrf
                     <div class="modal-body">
                         <div class="row mx-0">
@@ -218,14 +218,14 @@
                                 <div class="form-group">
                                     <label class="form-label">Equipment Name</label>
                                     <span class="text-danger">*</span>
-                                    <input type="text" name="name" class="form-control" placeholder="e.g. 5000Pro, Air Oasis" required>
+                                    <input type="text" name="name" class="form-control" placeholder="e.g. 5000Pro, Air Oasis">
                                 </div>
                             </div>
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Serial Number</label>
                                     <span class="text-danger">*</span>
-                                    <input type="text" name="serial_number" class="form-control" placeholder="e.g. 21918004" required>
+                                    <input type="text" name="serial_number" class="form-control" placeholder="e.g. 21918004">
                                 </div>
                             </div>
                         </div>
@@ -261,7 +261,7 @@
                                 <div class="form-group">
                                     <label class="form-label">Select Company</label>
                                     <span class="text-danger">*</span>
-                                    <select id="checkout-company" name="company_id" class="form-select" required>
+                                    <select id="checkout-company" name="company_id" class="form-select">
                                         <option value="">-- Select Company --</option>
                                         @foreach ($companies as $company)
                                             <option value="{{ $company->id }}">{{ $company->name }}</option>
@@ -305,7 +305,7 @@
                                 <div class="form-group">
                                     <label class="form-label">Select Disposition Action</label>
                                     <span class="text-danger">*</span>
-                                    <select name="action" class="form-select" required>
+                                    <select name="action" class="form-select">
                                         <option value="">-- Select Disposition Action --</option>
                                         <option value="check_in">Check In (Returns to Available)</option>
                                         <option value="sell">Sell to Client (Updates to Sold)</option>
@@ -338,11 +338,6 @@
                 toastr.error("{{ session('error') }}");
             @endif
 
-            @if($errors->any())
-                @foreach($errors->all() as $error)
-                    toastr.error("{{ $error }}");
-                @endforeach
-            @endif
             // Initialize DataTable
             $('#equipmentLoanTable').DataTable({
                 pageLength: 10,
@@ -363,6 +358,254 @@
                         next: 'Next'
                     }
                 }
+            });
+
+            // Standard Validation Configuration
+            const validationConfig = {
+                ignore: [],
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            };
+
+            // 1. Add Equipment Validation
+            $("#add-equipment-loan-form").validate({
+                ignore: [],
+                rules: {
+                    name: {
+                        required: true,
+                        maxlength: 255
+                    },
+                    serial_number: {
+                        required: true,
+                        maxlength: 255
+                    }
+                },
+                messages: {
+                    name: {
+                        required: "Please enter equipment name."
+                    },
+                    serial_number: {
+                        required: "Please enter serial number."
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
+
+            // 2. Checkout Validation
+            $("#checkout-form").validate({
+                ignore: [],
+                rules: {
+                    company_id: {
+                        required: true
+                    }
+                },
+                messages: {
+                    company_id: {
+                        required: "Please select a company."
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
+
+            // 3. Disposition Validation
+            $("#disposition-form").validate({
+                ignore: [],
+                rules: {
+                    action: {
+                        required: true
+                    }
+                },
+                messages: {
+                    action: {
+                        required: "Please select a disposition action."
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
+
+            // Submit Add Equipment form
+            $('#add-equipment-loan-form').submit(function(e) {
+                e.preventDefault();
+
+                const $form = $(this);
+                const $submitBtn = $form.find('button[type="submit"]');
+
+                if (!$form.valid()) return;
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    method: 'POST',
+                    data: $form.serialize(),
+
+                    beforeSend: function() {
+                        $submitBtn.prop('disabled', true).text('Saving...');
+                    },
+
+                    success: function() {
+                        toastr.success('Equipment added successfully! Redirecting...');
+                        $form[0].reset();
+                        $('#AddEquipmentModal').modal('hide');
+
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    },
+
+                    error: function() {
+                        toastr.error('Something went wrong while adding the equipment.');
+                        $submitBtn.prop('disabled', false).text('Save');
+                    }
+                });
+            });
+
+            // Submit Checkout form
+            $('#checkout-form').submit(function(e) {
+                e.preventDefault();
+
+                const $form = $(this);
+                const $submitBtn = $form.find('button[type="submit"]');
+
+                if (!$form.valid()) return;
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    method: 'POST',
+                    data: $form.serialize(),
+
+                    beforeSend: function() {
+                        $submitBtn.prop('disabled', true).text('Saving...');
+                    },
+
+                    success: function() {
+                        toastr.success('Equipment checked out successfully! Redirecting...');
+                        $form[0].reset();
+                        $('#CheckoutEquipmentModal').modal('hide');
+
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    },
+
+                    error: function() {
+                        toastr.error('Something went wrong while checking out.');
+                        $submitBtn.prop('disabled', false).text('Checkout');
+                    }
+                });
+            });
+
+            // Submit Disposition form
+            $('#disposition-form').submit(function(e) {
+                e.preventDefault();
+
+                const $form = $(this);
+                const $submitBtn = $form.find('button[type="submit"]');
+
+                if (!$form.valid()) return;
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    method: 'POST',
+                    data: $form.serialize(),
+
+                    beforeSend: function() {
+                        $submitBtn.prop('disabled', true).text('Saving...');
+                    },
+
+                    success: function() {
+                        toastr.success('Equipment disposition updated successfully! Redirecting...');
+                        $form[0].reset();
+                        $('#DispositionEquipmentModal').modal('hide');
+
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    },
+
+                    error: function() {
+                        toastr.error('Something went wrong while updating disposition.');
+                        $submitBtn.prop('disabled', false).text('Save');
+                    }
+                });
+            });
+
+            // Modal reset on hide
+            $('#AddEquipmentModal').on('hidden.bs.modal', function() {
+                const validator = $('#add-equipment-loan-form').validate();
+                if (validator) validator.resetForm();
+                $('#add-equipment-loan-form')[0].reset();
+                $('#add-equipment-loan-form .is-invalid').removeClass('is-invalid');
+                $('#add-equipment-loan-form').find('button[type="submit"]').prop('disabled', false).text('Save');
+            });
+
+            $('#CheckoutEquipmentModal').on('hidden.bs.modal', function() {
+                const validator = $('#checkout-form').validate();
+                if (validator) validator.resetForm();
+                $('#checkout-form')[0].reset();
+                $('#checkout-form .is-invalid').removeClass('is-invalid');
+                $('#checkout-form').find('button[type="submit"]').prop('disabled', false).text('Checkout');
+            });
+
+            $('#DispositionEquipmentModal').on('hidden.bs.modal', function() {
+                const validator = $('#disposition-form').validate();
+                if (validator) validator.resetForm();
+                $('#disposition-form')[0].reset();
+                $('#disposition-form .is-invalid').removeClass('is-invalid');
+                $('#disposition-form').find('button[type="submit"]').prop('disabled', false).text('Save');
             });
 
             // Trigger checkout modal values

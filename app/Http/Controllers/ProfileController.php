@@ -34,7 +34,7 @@ class ProfileController extends Controller
     /**
      * Update the user's profile from admin view.
      */
-    public function adminUpdate(Request $request): RedirectResponse
+    public function adminUpdate(Request $request)
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -43,6 +43,13 @@ class ProfileController extends Controller
         $user = $request->user();
         $user->name = $request->name;
         $user->save();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile updated successfully.'
+            ]);
+        }
 
         return Redirect::route('admin.profile.view')->with('status', 'profile-updated');
     }

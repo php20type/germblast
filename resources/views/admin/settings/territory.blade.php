@@ -209,7 +209,7 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold">Manage Location Rules - <span id="locations_territory_name"></span></h5>
+                    <h5 class="modal-title fw-bold">Manage Location Rules</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form id="update_locations" method="POST">
@@ -221,10 +221,10 @@
                         </div>
 
                         <!-- Add Location Row Template (Hidden) -->
-                        <div class="location-row add-template-row mt-3" style="display: none;">
+                        <div class="location-row add-template-row mt-3 position-relative" style="display: none;">
                             <button type="button" class="btn btn-danger btn-sm remove-location-row"><i class="fas fa-times"></i></button>
                             <div class="row g-3">
-                                <div class="col-md-4" data-type="country">
+                                <div class="col-md-6" data-type="country">
                                     <label class="form-label small text-muted mb-1">Country <span class="text-danger">*</span></label>
                                     <select class="form-select country-select" data-name-template="locations[__INDEX__][country]">
                                         <option value="" disabled selected>Select Country</option>
@@ -233,36 +233,34 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-4" data-type="state">
+                                <div class="col-md-6" data-type="state">
                                     <label class="form-label small text-muted mb-1">State/Province <span class="text-danger">*</span></label>
                                     <select class="form-select state-select" data-name-template="locations[__INDEX__][state_province]">
                                         <option value="">Select State</option>
                                     </select>
                                 </div>
-                                <div class="col-md-4" data-type="city">
+                            </div>
+                            
+                            <div class="row g-3 mt-1">
+                                <div class="col-md-6" data-type="city">
                                     <label class="form-label small text-muted mb-1">City <span class="text-danger">*</span></label>
                                     <select class="form-select city-select" data-name-template="locations[__INDEX__][city]">
                                         <option value="">Select City</option>
                                     </select>
                                 </div>
-                            </div>
-                            
-                            <div class="row g-3 mt-1">
                                 <div class="col-md-6" data-type="postal">
                                     <label class="form-label small text-muted mb-1">Postal Code</label>
                                     <input type="text" class="form-control" data-name-template="locations[__INDEX__][postal_code]" placeholder="Postal Code" />
                                 </div>
+                            </div>
+
+                            <div class="row g-3 mt-1">
                                 <div class="col-md-6" data-type="area">
                                     <label class="form-label small text-muted mb-1">Area Code</label>
                                     <input type="text" class="form-control" data-name-template="locations[__INDEX__][area_code]" placeholder="Area Code" />
                                 </div>
-                            </div>
-                            <div class="row g-3 mt-2 align-items-center" data-type="range">
-                                <div class="col-auto">
-                                    <input type="checkbox" class="form-check-input" checked>
-                                    <span class="distance-label">and within</span>
-                                </div>
-                                <div class="col-auto">
+                                <div class="col-md-6" data-type="range">
+                                    <label class="form-label small text-muted mb-1">Within Radius</label>
                                     <select class="form-select" data-name-template="locations[__INDEX__][range]">
                                         <option value="5">5 mi (8 km)</option>
                                         <option value="25">25 mi (40 km)</option>

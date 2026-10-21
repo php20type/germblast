@@ -696,6 +696,9 @@ class EmployeeController extends Controller implements HasMiddleware
         $workDate = $request->work_date;
 
         if ($clockIn && $clockOut && $clockIn >= $clockOut) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Clock Out time must be after Clock In time.'], 422);
+            }
             return redirect()->back()->withInput()->with('error', 'Clock Out time must be after Clock In time.');
         }
 
@@ -716,6 +719,9 @@ class EmployeeController extends Controller implements HasMiddleware
             ->exists();
 
         if ($overlap) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'The time entered conflicts or overlaps with an existing punch for this date.'], 422);
+            }
             return redirect()->back()->withInput()->with('error', 'The time entered conflicts or overlaps with an existing punch for this date.');
         }
 
@@ -727,6 +733,10 @@ class EmployeeController extends Controller implements HasMiddleware
             'clock_out' => $request->clock_out,
             'clock_type' => $request->clock_type,
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Timecard punch added successfully!']);
+        }
 
         return redirect()->back()->with('success', 'Timecard punch added successfully!');
     }
@@ -754,6 +764,9 @@ class EmployeeController extends Controller implements HasMiddleware
         $workDate = $request->work_date;
 
         if ($clockIn && $clockOut && $clockIn >= $clockOut) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'Clock Out time must be after Clock In time.'], 422);
+            }
             return redirect()->back()->withInput()->with('error', 'Clock Out time must be after Clock In time.');
         }
 
@@ -775,6 +788,9 @@ class EmployeeController extends Controller implements HasMiddleware
             ->exists();
 
         if ($overlap) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'The time entered conflicts or overlaps with an existing punch for this date.'], 422);
+            }
             return redirect()->back()->withInput()->with('error', 'The time entered conflicts or overlaps with an existing punch for this date.');
         }
 
@@ -785,6 +801,10 @@ class EmployeeController extends Controller implements HasMiddleware
             'clock_out' => $request->clock_out,
             'clock_type' => $request->clock_type,
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Timecard punch updated successfully!']);
+        }
 
         return redirect()->back()->with('success', 'Timecard punch updated successfully!');
     }

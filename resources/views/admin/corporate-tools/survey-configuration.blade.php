@@ -250,47 +250,76 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
-    $('.update-config-form').on('submit', function(e) {
-        e.preventDefault();
-        
-        var form = $(this);
-        var route = form.data('route');
-        var btn = form.find('button[type="submit"]');
-        var originalBtnText = btn.text();
-        
-        btn.prop('disabled', true).text('Updating...');
-        $('#response-message').addClass('d-none').removeClass('alert-success alert-danger');
+    $('.update-config-form').each(function() {
+        const $form = $(this);
 
-        $.ajax({
-            url: route,
-            type: 'POST',
-            data: form.serialize(),
-            success: function(response) {
-                if (response.success) {
-                    $('#response-message')
-                        .text(response.message)
-                        .addClass('alert-success')
-                        .removeClass('d-none');
-                }
+        // Validation matching Add Company pattern
+        $form.validate({
+            ignore: [],
+            errorElement: 'span',
+            errorClass: 'invalid-feedback d-block',
+            highlight: function(element) {
+                $(element).addClass('is-invalid');
             },
-            error: function(xhr) {
-                var errorMsg = 'An error occurred while updating.';
-                if (xhr.responseJSON && xhr.responseJSON.message) {
-                    errorMsg = xhr.responseJSON.message;
-                }
-                $('#response-message')
-                    .text(errorMsg)
-                    .addClass('alert-danger')
-                    .removeClass('d-none');
+            unhighlight: function(element) {
+                $(element).removeClass('is-invalid');
             },
-            complete: function() {
-                btn.prop('disabled', false).text(originalBtnText);
-                
-                // Hide message after 3 seconds
-                setTimeout(function() {
-                    $('#response-message').addClass('d-none');
-                }, 3000);
+            errorPlacement: function(error, element) {
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent());
+                } else {
+                    error.insertAfter(element);
+                }
             }
+        });
+
+        // Add rules to inputs
+        $form.find('input[type="text"]').each(function() {
+            $(this).rules('add', {
+                required: true,
+                number: true,
+                min: 0,
+                messages: {
+                    required: "Please enter a value.",
+                    number: "Must be a valid number.",
+                    min: "Value must be 0 or greater."
+                }
+            });
+        });
+
+        // Submit form matching Add Company pattern
+        $form.submit(function(e) {
+            e.preventDefault();
+
+            const $submitBtn = $form.find('button[type="submit"]');
+
+            if (!$form.valid()) return;
+
+            const route = $form.data('route');
+
+            $.ajax({
+                url: route,
+                method: 'POST',
+                data: $form.serialize(),
+
+                beforeSend: function() {
+                    $submitBtn.prop('disabled', true).text('Updating...');
+                },
+
+                success: function(response) {
+                    toastr.success(response.message || 'Updated successfully! Redirecting...');
+                    $submitBtn.prop('disabled', false).text('Update');
+
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                },
+
+                error: function(xhr) {
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while updating.');
+                    $submitBtn.prop('disabled', false).text('Update');
+                }
+            });
         });
     });
 });

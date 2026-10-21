@@ -160,15 +160,15 @@
                                             <h3 class="section-title">Account Details</h3>
                                         </div>
 
-                                        <form action="{{ route('admin.profile.admin.update') }}" method="POST">
+                                        <form id="admin-profile-form" action="{{ route('admin.profile.admin.update') }}" method="POST">
                                             @csrf
 
                                             <div class="row g-3">
                                                 <div class="col-md-12">
-                                                    <label for="name" class="form-label fw-semibold text-dark" style="font-size: 14px;">Full Name</label>
+                                                    <label for="name" class="form-label fw-semibold text-dark" style="font-size: 14px;">Full Name <span class="text-danger">*</span></label>
                                                     <div class="input-group">
                                                         <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                                        <input type="text" id="name" name="name" class="form-control" value="{{ $user->name }}" placeholder="Your full name" required>
+                                                        <input type="text" id="name" name="name" class="form-control" value="{{ $user->name }}" placeholder="Your full name">
                                                     </div>
                                                 </div>
 
@@ -226,3 +226,77 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            @if(session('status') === 'profile-updated')
+                toastr.success("Profile updated successfully.");
+            @endif
+
+            // jQuery Validation
+            $("#admin-profile-form").validate({
+                ignore: [],
+                rules: {
+                    name: {
+                        required: true,
+                        maxlength: 255
+                    }
+                },
+                messages: {
+                    name: {
+                        required: "Please enter your full name."
+                    }
+                },
+                errorElement: 'span',
+                errorClass: 'invalid-feedback d-block',
+                highlight: function(element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element) {
+                    $(element).removeClass('is-invalid');
+                },
+                errorPlacement: function(error, element) {
+                    if (element.parent('.input-group').length) {
+                        error.insertAfter(element.parent());
+                    } else {
+                        error.insertAfter(element);
+                    }
+                }
+            });
+
+            // Submit Admin Profile form
+            $('#admin-profile-form').submit(function(e) {
+                e.preventDefault();
+
+                const $form = $(this);
+                const $submitBtn = $form.find('button[type="submit"]');
+
+                if (!$form.valid()) return;
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    method: 'POST',
+                    data: $form.serialize(),
+
+                    beforeSend: function() {
+                        $submitBtn.prop('disabled', true).text('Saving...');
+                    },
+
+                    success: function() {
+                        toastr.success('Profile updated successfully! Redirecting...');
+
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    },
+
+                    error: function() {
+                        toastr.error('Something went wrong while updating profile.');
+                        $submitBtn.prop('disabled', false).text('Save changes');
+                    }
+                });
+            });
+        });
+    </script>
+@endpush

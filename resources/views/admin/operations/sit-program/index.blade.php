@@ -214,19 +214,54 @@
             $('#enrollUserName').val(button.data('user-name'));
         });
 
-        $('#enroll-form').on('submit', function (e) {
+        // Enrollment validation and submission - Add Company Pattern
+        $("#enroll-form").validate({
+            ignore: [],
+            rules: {
+                user_id: {
+                    required: true
+                }
+            },
+            messages: {
+                user_id: {
+                    required: "Please select a technician to enroll."
+                }
+            },
+            errorElement: 'span',
+            errorClass: 'invalid-feedback d-block',
+            highlight: function (element) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function (element) {
+                $(element).removeClass('is-invalid');
+            },
+            errorPlacement: function (error, element) {
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent());
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+        });
+
+        $('#enroll-form').submit(function (e) {
             e.preventDefault();
-            let btn = $(this).find('button[type="submit"]');
+
+            const $form = $(this);
+            const $submitBtn = $form.find('button[type="submit"]');
+
+            if (!$form.valid()) return;
 
             $.ajax({
                 url: '{{ route("admin.operations.sit-program.store") }}',
                 method: 'POST',
-                data: $(this).serialize(),
+                data: $form.serialize(),
                 beforeSend: function () {
-                    btn.prop('disabled', true).text('Enrolling...');
+                    $submitBtn.prop('disabled', true).text('Saving...');
                 },
                 success: function (res) {
-                    toastr.success(res.message || 'Enrollment successful!');
+                    toastr.success(res.message || 'Enrollment successful! Redirecting...');
+                    $form[0].reset();
                     $('#ConfirmEnrollModal').modal('hide');
                     setTimeout(function() {
                         window.location.href = '{{ route("admin.operations.sit-progress.index") }}';
@@ -238,9 +273,17 @@
                         errorMessage = xhr.responseJSON.message;
                     }
                     toastr.error(errorMessage);
-                    btn.prop('disabled', false).text('Confirm');
+                    $submitBtn.prop('disabled', false).text('Confirm');
                 }
             });
+        });
+
+        $('#ConfirmEnrollModal').on('hidden.bs.modal', function () {
+            const validator = $("#enroll-form").validate();
+            if (validator) validator.resetForm();
+            $('#enroll-form')[0].reset();
+            $('#enroll-form .is-invalid').removeClass('is-invalid');
+            $('#enroll-form').find('button[type="submit"]').prop('disabled', false).text('Confirm');
         });
     });
 </script>

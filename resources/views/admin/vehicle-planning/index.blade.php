@@ -234,34 +234,67 @@
                 toastr.info("{{ session('info') }}");
             @endif
 
-            // AJAX Submission for Assigning Vehicles
-            $('.assign-vehicle-form').on('submit', function(e) {
-                e.preventDefault();
+            // Validation & AJAX Submission for Assigning Vehicles
+            $('.assign-vehicle-form').each(function() {
                 const $form = $(this);
-                const $btn = $form.find('button[type="submit"]');
 
-                if (!$form.find('select').val()) {
-                    toastr.warning('Please select a vehicle to assign.');
-                    return;
-                }
-
-                $.ajax({
-                    url: $form.attr('action'),
-                    method: 'POST',
-                    data: $form.serialize(),
-                    beforeSend: function () {
-                        $btn.prop('disabled', true).text('...');
+                $form.validate({
+                    ignore: [],
+                    rules: {
+                        'vehicle_ids[]': {
+                            required: true
+                        }
                     },
-                    success: function (res) {
-                        toastr.success(res.message || 'Vehicles assigned successfully!');
-                        setTimeout(function() {
-                            location.reload();
-                        }, 500);
+                    messages: {
+                        'vehicle_ids[]': {
+                            required: "Please select a vehicle."
+                        }
                     },
-                    error: function (xhr) {
-                        toastr.error(xhr.responseJSON?.message || 'Something went wrong while assigning.');
-                        $btn.prop('disabled', false).text('Add');
+                    errorElement: 'span',
+                    errorClass: 'invalid-feedback d-block',
+                    highlight: function(element) {
+                        $(element).addClass('is-invalid');
+                    },
+                    unhighlight: function(element) {
+                        $(element).removeClass('is-invalid');
+                    },
+                    errorPlacement: function(error, element) {
+                        if (element.parent('.input-group').length) {
+                            error.insertAfter(element.parent());
+                        } else {
+                            error.insertAfter(element);
+                        }
                     }
+                });
+
+                $form.submit(function(e) {
+                    e.preventDefault();
+
+                    const $btn = $form.find('button[type="submit"]');
+
+                    if (!$form.valid()) return;
+
+                    $.ajax({
+                        url: $form.attr('action'),
+                        method: 'POST',
+                        data: $form.serialize(),
+
+                        beforeSend: function () {
+                            $btn.prop('disabled', true).text('Adding...');
+                        },
+
+                        success: function (res) {
+                            toastr.success(res.message || 'Vehicle assigned successfully! Redirecting...');
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1000);
+                        },
+
+                        error: function (xhr) {
+                            toastr.error(xhr.responseJSON?.message || 'Something went wrong while assigning.');
+                            $btn.prop('disabled', false).text('Add');
+                        }
+                    });
                 });
             });
 

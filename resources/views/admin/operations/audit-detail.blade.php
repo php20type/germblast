@@ -321,6 +321,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Score (1-5)</label>
+                                    <span class="text-danger">*</span>
                                     <select name="score" class="form-select" required>
                                         <option value="5">5 - Excellent</option>
                                         <option value="4">4 - Good</option>
@@ -379,6 +380,7 @@
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-label">Select Image File</label>
+                                    <span class="text-danger">*</span>
                                     <input type="file" name="photo" class="form-control" accept="image/*" required>
                                 </div>
                             </div>
@@ -426,6 +428,7 @@
                             <div class="col-lg-12" id="edit_score_section">
                                 <div class="form-group">
                                     <label class="form-label">Score (1-5)</label>
+                                    <span class="text-danger">*</span>
                                     <select name="score" id="edit_score" class="form-select">
                                         <option value="5">5 - Excellent</option>
                                         <option value="4">4 - Good</option>
@@ -583,10 +586,162 @@
         });
     }
 
-    document.getElementById('editForm').addEventListener('submit', function(e) {
+    // Validation & AJAX Submission - Add Company Pattern
+    $('#standardForm').validate({
+        ignore: [],
+        rules: {
+            score: { required: true, min: 1, max: 5 }
+        },
+        messages: {
+            score: "Please select a score."
+        },
+        errorElement: 'span',
+        errorClass: 'invalid-feedback d-block',
+        highlight: function(element) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('is-invalid');
+        },
+        errorPlacement: function(error, element) {
+            if (element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            } else {
+                error.insertAfter(element);
+            }
+        }
+    });
+
+    $('#standardForm').submit(function(e) {
+        e.preventDefault();
+        const $form = $(this);
+        const $submitBtn = $form.find('button[type="submit"]');
+
+        if (!$form.valid()) return;
+
+        $.ajax({
+            url: "{{ route('admin.operations.audits.submission.store') }}",
+            method: 'POST',
+            data: new FormData(this),
+            processData: false,
+            contentType: false,
+            beforeSend: function() {
+                $submitBtn.prop('disabled', true).text('Saving...');
+            },
+            success: function(response) {
+                toastr.success(response.message || 'Record added successfully!');
+                $form[0].reset();
+                $('#standardModal').modal('hide');
+                setTimeout(() => window.location.reload(), 1000);
+            },
+            error: function(xhr) {
+                if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                    $.each(xhr.responseJSON.errors, function(field, messages) {
+                        messages.forEach(msg => toastr.error(msg));
+                    });
+                } else {
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while saving.');
+                }
+                $submitBtn.prop('disabled', false).text('Save changes');
+            }
+        });
+    });
+
+    $('#photoForm').validate({
+        ignore: [],
+        rules: {
+            photo: { required: true }
+        },
+        messages: {
+            photo: "Please select an image file to upload."
+        },
+        errorElement: 'span',
+        errorClass: 'invalid-feedback d-block',
+        highlight: function(element) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('is-invalid');
+        },
+        errorPlacement: function(error, element) {
+            if (element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            } else {
+                error.insertAfter(element);
+            }
+        }
+    });
+
+    $('#photoForm').submit(function(e) {
+        e.preventDefault();
+        const $form = $(this);
+        const $submitBtn = $form.find('button[type="submit"]');
+
+        if (!$form.valid()) return;
+
+        $.ajax({
+            url: "{{ route('admin.operations.audits.submission.store') }}",
+            method: 'POST',
+            data: new FormData(this),
+            processData: false,
+            contentType: false,
+            beforeSend: function() {
+                $submitBtn.prop('disabled', true).text('Saving...');
+            },
+            success: function(response) {
+                toastr.success(response.message || 'Record added successfully!');
+                $form[0].reset();
+                $('#photoModal').modal('hide');
+                setTimeout(() => window.location.reload(), 1000);
+            },
+            error: function(xhr) {
+                if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                    $.each(xhr.responseJSON.errors, function(field, messages) {
+                        messages.forEach(msg => toastr.error(msg));
+                    });
+                } else {
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while saving.');
+                }
+                $submitBtn.prop('disabled', false).text('Save changes');
+            }
+        });
+    });
+
+    $('#editForm').validate({
+        ignore: [],
+        rules: {
+            score: {
+                required: function() {
+                    return $('#edit_question_type').val() === 'standard';
+                }
+            }
+        },
+        messages: {
+            score: "Please select a score."
+        },
+        errorElement: 'span',
+        errorClass: 'invalid-feedback d-block',
+        highlight: function(element) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('is-invalid');
+        },
+        errorPlacement: function(error, element) {
+            if (element.parent('.input-group').length) {
+                error.insertAfter(element.parent());
+            } else {
+                error.insertAfter(element);
+            }
+        }
+    });
+
+    $('#editForm').submit(function(e) {
         e.preventDefault();
         const $form = $(this);
         const $submitBtn = $('#btnEditSave');
+
+        if (!$form.valid()) return;
 
         $.ajax({
             url: "{{ url('admin/operations/audits/submission') }}/" + document.getElementById('edit_submission_id').value + "/update",
@@ -599,41 +754,46 @@
             },
             success: function(response) {
                 toastr.success(response.message || 'Record updated successfully!');
-                bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
-                setTimeout(() => window.location.reload(), 1500);
+                $form[0].reset();
+                $('#editModal').modal('hide');
+                setTimeout(() => window.location.reload(), 1000);
             },
-            error: function() {
-                toastr.error('Something went wrong while saving.');
+            error: function(xhr) {
+                if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                    $.each(xhr.responseJSON.errors, function(field, messages) {
+                        messages.forEach(msg => toastr.error(msg));
+                    });
+                } else {
+                    toastr.error(xhr.responseJSON?.message || 'Something went wrong while saving.');
+                }
                 $submitBtn.prop('disabled', false).text('Save changes');
             }
         });
     });
 
-    $('#standardForm, #photoForm').on('submit', function(e) {
-        e.preventDefault();
-        const $form = $(this);
-        const $submitBtn = $form.find('button[type="submit"]');
-        
-        $.ajax({
-            url: "{{ route('admin.operations.audits.submission.store') }}",
-            method: 'POST',
-            data: new FormData(this),
-            processData: false,
-            contentType: false,
-            beforeSend: function() {
-                $submitBtn.prop('disabled', true).text('Saving...');
-            },
-            success: function(response) {
-                toastr.success(response.message || 'Record added successfully!');
-                let isPhoto = $form.attr('id') === 'photoForm';
-                bootstrap.Modal.getInstance(document.getElementById(isPhoto ? 'photoModal' : 'standardModal')).hide();
-                setTimeout(() => window.location.reload(), 1500);
-            },
-            error: function() {
-                toastr.error('Something went wrong while saving.');
-                $submitBtn.prop('disabled', false).text('Save Record');
-            }
-        });
+    // Reset modals on hide
+    $('#standardModal').on('hidden.bs.modal', function() {
+        const validator = $('#standardForm').validate();
+        if (validator) validator.resetForm();
+        $('#standardForm')[0].reset();
+        $('#standardForm .is-invalid').removeClass('is-invalid');
+        $('#standardForm').find('button[type="submit"]').prop('disabled', false).text('Save changes');
+    });
+
+    $('#photoModal').on('hidden.bs.modal', function() {
+        const validator = $('#photoForm').validate();
+        if (validator) validator.resetForm();
+        $('#photoForm')[0].reset();
+        $('#photoForm .is-invalid').removeClass('is-invalid');
+        $('#photoForm').find('button[type="submit"]').prop('disabled', false).text('Save changes');
+    });
+
+    $('#editModal').on('hidden.bs.modal', function() {
+        const validator = $('#editForm').validate();
+        if (validator) validator.resetForm();
+        $('#editForm')[0].reset();
+        $('#editForm .is-invalid').removeClass('is-invalid');
+        $('#btnEditSave').prop('disabled', false).text('Save changes');
     });
 
     document.addEventListener("DOMContentLoaded", function() {

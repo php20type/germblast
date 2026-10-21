@@ -40,6 +40,10 @@ class LoanEquipmentController extends Controller
             'status' => 'available',
         ]);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Equipment added successfully and is available for checkout.']);
+        }
+
         return redirect()->back()->with('success', 'Equipment added successfully and is available for checkout.');
     }
 
@@ -55,6 +59,9 @@ class LoanEquipmentController extends Controller
         $equipment = LoanEquipment::findOrFail($id);
 
         if ($equipment->status !== 'available') {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'This equipment is not available for checkout.'], 422);
+            }
             return redirect()->back()->with('error', 'This equipment is not available for checkout.');
         }
 
@@ -68,6 +75,10 @@ class LoanEquipmentController extends Controller
             'processed_date' => $processedDate->toDateString(),
             'due_date' => $dueDate->toDateString(),
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Equipment successfully checked out.']);
+        }
 
         return redirect()->back()->with('success', 'Equipment successfully checked out.');
     }
@@ -84,6 +95,9 @@ class LoanEquipmentController extends Controller
         $equipment = LoanEquipment::findOrFail($id);
 
         if ($equipment->status !== 'processed') {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => 'This equipment is not currently checked out.'], 422);
+            }
             return redirect()->back()->with('error', 'This equipment is not currently checked out.');
         }
 
@@ -114,6 +128,10 @@ class LoanEquipmentController extends Controller
                 ]);
                 $message = 'Equipment status updated to Lost.';
                 break;
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => $message]);
         }
 
         return redirect()->back()->with('success', $message);
