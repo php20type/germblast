@@ -31,10 +31,7 @@
                         <p class="card-text mb-1">{{ $companies->count() }} Total Companies</p>
                         <p class="card-text text-muted" style="font-size: 13px;">{{ $monthly_companies }} new this month</p>
                         <div class="mt-3">
-                            <svg viewBox="0 0 100 30" preserveAspectRatio="none" style="width: 100%; height: 50px;">
-                                <path d="M0,25 C25,10 25,25 50,20 C75,15 75,5 100,15 L100,30 L0,30 Z" fill="rgba(111, 66, 193, 0.1)" />
-                                <path d="M0,25 C25,10 25,25 50,20 C75,15 75,5 100,15" fill="none" stroke="#6f42c1" stroke-width="1.5" />
-                            </svg>
+                            <canvas class="trend-chart" data-trend="company" height="50"></canvas>
                         </div>
                     </div>
                 </div>
@@ -50,10 +47,7 @@
                         <p class="card-text mb-1">{{ $peoples->count() }} Total People</p>
                         <p class="card-text text-muted" style="font-size: 13px;">{{ $monthly_peoples }} new this month</p>
                         <div class="mt-3">
-                            <svg viewBox="0 0 100 30" preserveAspectRatio="none" style="width: 100%; height: 50px;">
-                                <path d="M0,20 C25,5 25,30 50,20 C75,10 75,5 100,10 L100,30 L0,30 Z" fill="rgba(13, 110, 253, 0.1)" />
-                                <path d="M0,20 C25,5 25,30 50,20 C75,10 75,5 100,10" fill="none" stroke="#0d6efd" stroke-width="1.5" />
-                            </svg>
+                            <canvas class="trend-chart" data-trend="person" height="50"></canvas>
                         </div>
                     </div>
                 </div>
@@ -69,10 +63,7 @@
                         <p class="card-text mb-1">{{ $leads->count() }} Total Leads</p>
                         <p class="card-text text-muted" style="font-size: 13px;">{{ $monthly_leads }} new this month</p>
                         <div class="mt-3">
-                            <svg viewBox="0 0 100 30" preserveAspectRatio="none" style="width: 100%; height: 50px;">
-                                <path d="M0,15 C20,25 30,5 50,15 C70,25 80,5 100,10 L100,30 L0,30 Z" fill="rgba(25, 135, 84, 0.1)" />
-                                <path d="M0,15 C20,25 30,5 50,15 C70,25 80,5 100,10" fill="none" stroke="#198754" stroke-width="1.5" />
-                            </svg>
+                            <canvas class="trend-chart" data-trend="lead" height="50"></canvas>
                         </div>
                     </div>
                 </div>
@@ -97,10 +88,7 @@
                         <p class="card-text mb-1">{{ \App\Models\Task::whereNull('completed_time')->count() }} Incomplete Tasks</p>
                         <p class="card-text text-muted" style="font-size: 13px;">{{ $monthly_tasks }} new this month</p>
                         <div class="mt-3">
-                            <svg viewBox="0 0 100 30" preserveAspectRatio="none" style="width: 100%; height: 50px;">
-                                <path d="M0,10 C20,5 30,25 50,15 C70,5 80,25 100,20 L100,30 L0,30 Z" fill="rgba(220, 53, 69, 0.1)" />
-                                <path d="M0,10 C20,5 30,25 50,15 C70,5 80,25 100,20" fill="none" stroke="#dc3545" stroke-width="1.5" />
-                            </svg>
+                            <canvas class="trend-chart" data-trend="task" height="50"></canvas>
                         </div>
                     </div>
                 </div>
@@ -1995,3 +1983,65 @@
 
 
 
+
+@push('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const labels = @json($trend_labels);
+            const trends = @json($trends);
+            const colors = {
+                company: ['#6f42c1', 'rgba(111, 66, 193, 0.1)', 'Companies'],
+                person: ['#0d6efd', 'rgba(13, 110, 253, 0.1)', 'People'],
+                lead: ['#198754', 'rgba(25, 135, 84, 0.1)', 'Leads'],
+                task: ['#dc3545', 'rgba(220, 53, 69, 0.1)', 'Tasks']
+            };
+
+            document.querySelectorAll('.trend-chart').forEach(function(canvas) {
+                const key = canvas.dataset.trend;
+                const [line, fill, name] = colors[key];
+                canvas.parentElement.style.height = '60px';
+
+                new Chart(canvas, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'New ' + name,
+                            data: trends[key],
+                            borderColor: line,
+                            backgroundColor: fill,
+                            borderWidth: 1.5,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            pointHoverRadius: 4,
+                            pointHoverBackgroundColor: line
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: { padding: { top: 4, bottom: 0 } },
+                        interaction: { mode: 'index', intersect: false },
+                        scales: {
+                            x: { display: false },
+                            y: { display: false, beginAtZero: true }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                displayColors: false,
+                                callbacks: {
+                                    label: function(ctx) {
+                                        return ctx.parsed.y + ' new ' + name.toLowerCase();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+@endpush

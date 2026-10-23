@@ -7,6 +7,16 @@
     </div>
     <nav class="sidebar-nav">
         <ul class="list-inline">
+            <li class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                <a href="{{ route('admin.dashboard') }}">
+                    <div class="icon-round">
+                        <img src={{ asset("img/icons/menu-icon20.svg") }} alt="icon" />
+                    </div>
+                    <div class="nav-text ms-3">
+                        Dashboard
+                    </div>
+                </a>
+            </li>
             @if(auth()->user()->isSalesManager() || auth()->user()->isSuperAdmin())
             <li class="{{ request()->routeIs('admin.sales.*', 'admin.equipment-loan.*') ? 'active' : '' }}">
                 <a href="{{ route('admin.sales.index') }}">

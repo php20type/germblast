@@ -46,7 +46,21 @@ class AdminController extends Controller
         $monthly_leads = Lead::whereMonth('created_at', \Carbon\Carbon::now()->month)->count();
         $monthly_tasks = \App\Models\Task::whereMonth('created_at', \Carbon\Carbon::now()->month)->count();
 
+        // Trend data: records created per month for the last 6 months
+        $trend_labels = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $trend_labels[] = \Carbon\Carbon::now()->startOfMonth()->subMonths($i)->format('M Y');
+        }
+        $trends = [
+            'company' => $this->monthlyTrend(Company::class),
+            'person' => $this->monthlyTrend(People::class),
+            'lead' => $this->monthlyTrend(Lead::class),
+            'task' => $this->monthlyTrend(\App\Models\Task::class),
+        ];
+
         return view('admin.dashboard', compact(
+            'trend_labels',
+            'trends',
             'users',
             'company_types',
             'leads',
@@ -67,6 +81,22 @@ class AdminController extends Controller
             'monthly_leads',
             'monthly_tasks'
         ));
+    }
+
+    private function monthlyTrend(string $model, int $months = 6): array
+    {
+        $start = \Carbon\Carbon::now()->startOfMonth()->subMonths($months - 1);
+        $counts = $model::where('created_at', '>=', $start)
+            ->get(['created_at'])
+            ->groupBy(fn ($row) => $row->created_at->format('Y-m'))
+            ->map->count();
+
+        $data = [];
+        for ($i = 0; $i < $months; $i++) {
+            $data[] = $counts[$start->copy()->addMonths($i)->format('Y-m')] ?? 0;
+        }
+
+        return $data;
     }
 
     public function forms()

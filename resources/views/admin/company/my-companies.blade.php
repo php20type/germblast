@@ -103,7 +103,7 @@
                                             </th>
                                             <th>Company name</th>
                                             <th>People</th>
-                                            <th>Created at</th>
+                                            <th>Created</th>
                                             <th>Address</th>
                                             <th>Company type</th>
                                             <th>Tags</th>

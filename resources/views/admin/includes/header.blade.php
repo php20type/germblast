@@ -12,11 +12,41 @@
             <div class="navigation-button">
                 <ul class="list-inline mb-0">
                     <li class="list-inline-item">
-                        <a href="{{ route('admin.dashboard') }}" class="item-nav">
-                            <div class="icon-round" title="Go to dashboard">
+                        <a href="#" class="dropdown item-nav" data-bs-toggle="dropdown">
+                            <div class="icon-round" title="Add new">
                                 <i class="fa-solid fa-plus"></i>
                             </div>
                         </a>
+
+                        <ul class="dropdown-menu shadow" style="width: 220px; border-radius: 10px;">
+                            @can('company.create')
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center py-2 px-3 rounded"
+                                        href="{{ route('admin.company.index') }}">
+                                        <i class="fas fa-building" style="color: #6f42c1; font-size: 20px; width: 35px; text-align: center; margin-right: 12px;"></i>
+                                        <span>Add Company</span>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('people.create')
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center py-2 px-3 rounded"
+                                        href="{{ route('admin.people.index') }}">
+                                        <i class="fas fa-user text-primary" style="font-size: 20px; width: 35px; text-align: center; margin-right: 12px;"></i>
+                                        <span>Add People</span>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('lead.create')
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center py-2 px-3 rounded"
+                                        href="{{ route('admin.lead.index') }}">
+                                        <i class="fas fa-dollar-sign text-success" style="font-size: 20px; width: 35px; text-align: center; margin-right: 12px;"></i>
+                                        <span>Add Lead</span>
+                                    </a>
+                                </li>
+                            @endcan
+                        </ul>
                     </li>
 
                 </ul>
@@ -139,7 +169,7 @@
                                 <form action="{{ route('logout') }}" method="POST" class="m-0">
                                     @csrf
                                     <button type="submit"
-                                        class="dropdown-item d-flex align-items-center py-2 px-3 rounded text-danger bg-transparent border-0 w-100">
+                                        class="dropdown-item d-flex align-items-center py-2 px-3 rounded text-danger border-0 w-100">
                                         <i class="fas fa-sign-out-alt me-3"></i>
                                         <span>{{ __('Log Out') }}</span>
                                     </button>

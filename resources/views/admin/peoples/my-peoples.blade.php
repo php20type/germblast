@@ -102,7 +102,7 @@
                                                             <input type="checkbox" class="form-check-input" id="selectAll">
                                                         </th>
                                                         <th>People name</th>
-                                                        <th>Created at</th>
+                                                        <th>Created</th>
                                                         <th>Email</th>
                                                         <th>Phone</th>
                                                         <th>Address</th>
