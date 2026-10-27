@@ -395,3 +395,18 @@ $(document).on('hidden.bs.modal', '.modal', function () {
         }
     }
 });
+
+// Timeline filters (company, people, lead details): fixed-width Select2 so long option text wraps
+$(function () {
+    if (!$.fn.select2) return;
+
+    var widths = { 'filter-range': '150px', 'filter-activity': '280px', 'filter-user': '180px' };
+
+    $('.company-details-section .filter-section select.dropdown-orange').each(function () {
+        $(this).select2({
+            width: widths[this.id] || '200px',
+            minimumResultsForSearch: Infinity,
+            dropdownCssClass: 'timeline-filter-dropdown'
+        });
+    });
+});
