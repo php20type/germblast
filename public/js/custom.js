@@ -410,3 +410,36 @@ $(function () {
         });
     });
 });
+
+// Multi-select Select2: use the dedicated search box inside the dropdown (like single selects)
+// instead of the inline search field in the selection box
+(function () {
+    if (!$.fn.select2 || !$.fn.select2.amd) return;
+
+    try {
+        var req = $.fn.select2.amd.require;
+        var Utils = req('select2/utils');
+        var Dropdown = req('select2/dropdown');
+        var DropdownSearch = req('select2/dropdown/search');
+        var CloseOnSelect = req('select2/dropdown/closeOnSelect');
+        var AttachBody = req('select2/dropdown/attachBody');
+        var defaults = $.fn.select2.defaults;
+        var applyDefaults = defaults.apply;
+
+        defaults.apply = function (options) {
+            if (options.multiple && options.dropdownAdapter == null) {
+                var adapter = Utils.Decorate(Dropdown, DropdownSearch);
+
+                if (options.closeOnSelect == null || options.closeOnSelect) {
+                    adapter = Utils.Decorate(adapter, CloseOnSelect);
+                }
+
+                options.dropdownAdapter = Utils.Decorate(adapter, AttachBody);
+            }
+
+            return applyDefaults.call(this, options);
+        };
+    } catch (e) {
+        // Fall back to Select2's default multi-select behaviour
+    }
+})();

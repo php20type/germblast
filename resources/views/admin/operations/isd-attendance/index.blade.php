@@ -35,6 +35,21 @@
             z-index: 10;
         }
 
+        /* Section cards, same as Action Plan Overview */
+        .section-card {
+            background: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 16px !important;
+            padding: 25px !important;
+            margin-bottom: 25px !important;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .section-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
+        }
+
         .company-form .form-group {
             margin-bottom: 20px;
         }
@@ -64,6 +79,12 @@
                                 <h3 class="mb-1">ISD ATTENDANCE</h3>
                                 <p class="text-muted mb-0">Select a School District and Campus to view and manage weekly attendance records.</p>
                             </div>
+                            <div class="right-part">
+                                <button type="button" class="btn btn-export" data-bs-toggle="modal" data-bs-target="#AddSchool">
+                                    <i class="fa-solid fa-plus"></i>
+                                    Add School
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Success Alert -->
@@ -78,16 +99,20 @@
 
                         <!-- Content Body -->
                         <div class="px-4 pb-4">
-                            <!-- Filter Section: School Selector -->
-                            <div class="card border-0 shadow-sm rounded-3 p-4 mb-4" style="background: #ffffff; border: 1px solid #e5e7eb;">
-                                <form method="GET" action="{{ route('admin.isd-attendance.index') }}" id="schoolForm">
-                                    <div class="row align-items-center">
-                                        <div class="col-md-7 d-flex align-items-end">
-                                            <div class="flex-grow-1 me-2">
-                                                <label for="school_select" class="form-label font-weight-bold mb-2" style="font-size: 14px; font-weight: 600; color: #374151;">
-                                                    Select School District:
-                                                </label>
-                                                <select name="school_id" id="school_select" class="form-select form-select-lg" onchange="document.getElementById('schoolForm').submit();" style="border-radius: 8px; font-size: 14px; border-color: #d1d5db;">
+                            <!-- Section: School District -->
+                            <div class="section-card">
+                                <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom">
+                                    <div>
+                                        <h4 class="mb-1" style="font-size: 18px; font-weight: 600; color: #111827;">School District</h4>
+                                        <span class="text-muted" style="font-size: 14px;">Choose a district to see its campuses</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <form method="GET" action="{{ route('admin.isd-attendance.index') }}" id="schoolForm">
+                                        <div class="row align-items-end g-3">
+                                            <div class="col-lg-6">
+                                                <label for="school_select" class="form-label text-uppercase text-secondary fw-bold mb-2" style="font-size: 11px; letter-spacing: 0.5px;">Select School District</label>
+                                                <select name="school_id" id="school_select" class="form-select" onchange="document.getElementById('schoolForm').submit();">
                                                     <option value="">-- Select School District --</option>
                                                     @foreach($schools as $school)
                                                         <option value="{{ $school['id'] }}" {{ $selectedSchoolId == $school['id'] ? 'selected' : '' }}>
@@ -96,41 +121,39 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <div>
-                                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#AddSchool" style="white-space: nowrap;">
-                                                    + Add School
-                                                </button>
-                                            </div>
+                                            @if($selectedSchool)
+                                                <div class="col-lg-6 d-flex align-items-center justify-content-lg-end gap-2">
+                                                    <span class="badge bg-light text-dark px-3 py-2 border" style="font-size: 14px;">
+                                                        Selected District: <strong>{{ $selectedSchool['name'] }}</strong>
+                                                    </span>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#EditSchool{{ $selectedSchool['id'] }}">Edit</button>
+                                                </div>
+                                            @endif
                                         </div>
-                                        @if($selectedSchool)
-                                            <div class="col-md-5 text-md-end mt-3 mt-md-0 d-flex align-items-center justify-content-md-end">
-                                                <span class="badge bg-light text-dark px-3 py-2 border me-2" style="font-size: 14px;">
-                                                    Selected District: <strong>{{ $selectedSchool['name'] }}</strong>
-                                                </span>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal" data-bs-target="#EditSchool{{ $selectedSchool['id'] }}">Edit</button>
-                                            </div>
-                                        @endif
-                                    </div>
-                                </form>
+                                    </form>
+                                </div>
                             </div>
 
                             <!-- Campus Listing -->
                             @if(!$selectedSchoolId)
-                                <div class="card border-0 shadow-sm rounded-3 p-5 text-center my-3" style="background: #ffffff; border: 1px solid #e5e7eb;">
+                                <div class="section-card text-center py-5">
                                     <div class="mb-3" style="font-size: 48px;">🏫</div>
                                     <h5 style="font-weight: 600; color: #374151;">No Campuses Found.</h5>
                                     <p class="text-muted mb-0">Please select a School District from the dropdown above to view its campuses.</p>
                                 </div>
                             @else
-                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                <!-- Section: Campuses -->
+                                <div class="section-card">
+                                <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom">
                                     <div>
-                                        <h5 style="font-weight: 600; color: #374151; margin: 0;">
+                                        <h4 class="mb-1" style="font-size: 18px; font-weight: 600; color: #111827;">
                                             Campuses for {{ $selectedSchool['name'] }}
-                                        </h5>
+                                        </h4>
                                         <span class="text-muted" style="font-size: 14px;">Click any campus to manage attendance</span>
                                     </div>
-                                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#AddCampus">
-                                        + Add Campus
+                                    <button type="button" class="btn btn-export btn-sm" data-bs-toggle="modal" data-bs-target="#AddCampus">
+                                        <i class="fa-solid fa-plus"></i>
+                                        Add Campus
                                     </button>
                                 </div>
 
@@ -198,6 +221,7 @@
                                             </div>
                                         </div>
                                     @endforelse
+                                </div>
                                 </div>
                             @endif
 
