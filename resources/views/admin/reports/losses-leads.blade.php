@@ -261,7 +261,7 @@
                             
                             <hr class="mx-4 mb-0 mt-0" style="opacity: 0.1;">
                                 <div class="tab-content" id="reportTabContent">
-                                    <div class="tab-pane fade show active p-0" id="details" role="tabpanel">
+                                    <div class="tab-pane fade show active p-0 pt-4" id="details" role="tabpanel">
                                         <div class="table-responsive">
                                             <table class="table table-hover mb-0 equipment-report-table w-100" id="detailsTable">
                                                 <thead>
