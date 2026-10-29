@@ -175,14 +175,14 @@
                                                                         <div class="form-group">
                                                                             <label class="form-label">ADA (%)</label>
                                                                             <span class="text-danger">*</span>
-                                                                            <input type="number" step="0.01" name="ada" class="form-control" value="{{ number_format($record['ada'], 2) }}" min="0" max="100" required />
+                                                                            <input type="number" step="0.01" name="ada" class="form-control" value="{{ number_format($record['ada'], 2, '.', '') }}" min="0" required />
                                                                         </div>
                                                                     </div>
                                                                     <div class="col-lg-12">
                                                                         <div class="form-group">
                                                                             <label class="form-label">PIA (%)</label>
                                                                             <span class="text-danger">*</span>
-                                                                            <input type="number" step="0.01" name="pia" class="form-control" value="{{ number_format($record['pia'], 2) }}" min="0" max="100" required />
+                                                                            <input type="number" step="0.01" name="pia" class="form-control" value="{{ number_format($record['pia'], 2, '.', '') }}" min="0" required />
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -261,14 +261,14 @@
                             <div class="form-group">
                                 <label class="form-label">ADA (%)</label>
                                 <span class="text-danger">*</span>
-                                <input type="number" step="0.01" name="ada" placeholder="e.g. 96.50" min="0" max="100" class="form-control" required />
+                                <input type="number" step="0.01" name="ada" placeholder="e.g. 96.50" min="0" class="form-control" required />
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label class="form-label">PIA (%)</label>
                                 <span class="text-danger">*</span>
-                                <input type="number" step="0.01" name="pia" placeholder="e.g. 94.20" min="0" max="100" class="form-control" required />
+                                <input type="number" step="0.01" name="pia" placeholder="e.g. 94.20" min="0" class="form-control" required />
                             </div>
                         </div>
                     </div>
@@ -311,14 +311,14 @@
             rules: {
                 school_year: { required: true },
                 week: { required: true, number: true, min: 1, max: 52 },
-                ada: { required: true, number: true, min: 0, max: 100 },
-                pia: { required: true, number: true, min: 0, max: 100 }
+                ada: { required: true, number: true, min: 0 },
+                pia: { required: true, number: true, min: 0 }
             },
             messages: {
                 school_year: { required: "Please select School Year." },
                 week: { required: "Please enter week number.", min: "Week must be at least 1.", max: "Week must be at most 52." },
-                ada: { required: "Please enter ADA (%).", min: "ADA cannot be negative.", max: "ADA cannot exceed 100." },
-                pia: { required: "Please enter PIA (%).", min: "PIA cannot be negative.", max: "PIA cannot exceed 100." }
+                ada: { required: "Please enter ADA (%).", min: "ADA cannot be negative." },
+                pia: { required: "Please enter PIA (%).", min: "PIA cannot be negative." }
             }
         }));
 
@@ -360,12 +360,12 @@
             // Validate Edit Attendance Form
             $("#edit-attendance-form-{{ $record['id'] }}").validate($.extend(true, {}, validationConfig, {
                 rules: {
-                    ada: { required: true, number: true, min: 0, max: 100 },
-                    pia: { required: true, number: true, min: 0, max: 100 }
+                    ada: { required: true, number: true, min: 0 },
+                    pia: { required: true, number: true, min: 0 }
                 },
                 messages: {
-                    ada: { required: "Please enter ADA (%).", min: "ADA cannot be negative.", max: "ADA cannot exceed 100." },
-                    pia: { required: "Please enter PIA (%).", min: "PIA cannot be negative.", max: "PIA cannot exceed 100." }
+                    ada: { required: "Please enter ADA (%).", min: "ADA cannot be negative." },
+                    pia: { required: "Please enter PIA (%).", min: "PIA cannot be negative." }
                 }
             }));
 

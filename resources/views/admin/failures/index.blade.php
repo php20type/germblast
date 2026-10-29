@@ -91,8 +91,8 @@
                                             <div class="border rounded-3 overflow-hidden bg-light">
                                                 @foreach($failure->documentations->sortBy('created_at') as $doc)
                                                     <div class="d-flex justify-content-between align-items-start p-3 border-bottom last-border-0 bg-white">
-                                                        <div class="d-flex align-items-start">
-                                                            <span class="me-3" style="background-color: #ffb400; color: white; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;">
+                                                        <div class="d-flex align-items-start flex-grow-1" style="min-width: 0;">
+                                                            <span class="me-3 flex-shrink-0" style="background-color: #ffb400; color: white; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600;">
                                                                 {{ strtoupper(substr($doc->user->name ?? 'SY', 0, 2)) }}
                                                             </span>
                                                             <div>
@@ -100,7 +100,7 @@
                                                                 <div class="text-muted mt-1" style="font-size: 13px; white-space: pre-wrap; line-height: 1.4; color: #4b5563;">{{ $doc->notes }}</div>
                                                             </div>
                                                         </div>
-                                                        <div class="d-flex align-items-center">
+                                                        <div class="d-flex align-items-center flex-shrink-0 ms-3">
                                                             <span class="text-muted me-3" style="font-size: 11.5px; white-space: nowrap;">
                                                                 {{ $doc->created_at->format('M j, Y g:i A') }}
                                                             </span>

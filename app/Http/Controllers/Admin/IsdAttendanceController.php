@@ -77,8 +77,8 @@ class IsdAttendanceController extends Controller implements HasMiddleware
             'campus_id' => 'required|exists:isd_campuses,id',
             'school_year' => 'required|string',
             'week' => 'required|integer|min:1',
-            'ada' => 'required|numeric|min:0|max:100',
-            'pia' => 'required|numeric|min:0|max:100',
+            'ada' => 'required|numeric|min:0',
+            'pia' => 'required|numeric|min:0',
         ]);
 
         IsdAttendanceRecord::create([
@@ -96,8 +96,8 @@ class IsdAttendanceController extends Controller implements HasMiddleware
     public function update(Request $request, $id)
     {
         $request->validate([
-            'ada' => 'required|numeric|min:0|max:100',
-            'pia' => 'required|numeric|min:0|max:100',
+            'ada' => 'required|numeric|min:0',
+            'pia' => 'required|numeric|min:0',
         ]);
 
         $record = IsdAttendanceRecord::findOrFail($id);
