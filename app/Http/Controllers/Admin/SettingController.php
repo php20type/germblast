@@ -29,7 +29,7 @@ class SettingController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('role:super_admin'),
+            new Middleware('role:super_admin', except: ['getStatesByCountry', 'getCitiesByState']),
         ];
     }
     public function index()
