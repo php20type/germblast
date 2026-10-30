@@ -3,14 +3,14 @@
         <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
             <div class="d-flex flex-column align-items-start">
                 <div class="mb-2">
-                    <span class="status-pill status-pill-info">{{ $order->status ?? 'Pending' }}</span>
+                    <span class="status-pill status-pill-info">{{ \App\Helpers\Helper::statusLabel($order->status, 'Pending') }}</span>
                 </div>
                 <div class="text-muted small mt-1">
                     Created on <span class="fw-semibold text-dark">{{ $order->created_at->format('M d, Y') }}</span>
                 </div>
             </div>
             <div>
-                <a href="{{ route('admin.lead.service.service_dashboard', $order->id) }}" class="btn btn-outline-dark btn-sm fw-bold px-3">
+                <a href="{{ route('admin.lead.service.service_dashboard', $order->id) }}" class="btn btn-outline-dark btn-sm px-3">
                     View Dashboard
                 </a>
             </div>
@@ -53,7 +53,7 @@
                                 <tr>
                                     <td>{{ $slot->scheduled_start_time ? \Carbon\Carbon::parse($slot->scheduled_start_time)->format('M d, Y h:i A') : 'N/A' }}</td>
                                     <td>{{ $slot->scheduled_end_time ? \Carbon\Carbon::parse($slot->scheduled_end_time)->format('M d, Y h:i A') : 'N/A' }}</td>
-                                    <td>{{ $slot->status ?? 'Pending' }}</td>
+                                    <td>{{ \App\Helpers\Helper::statusLabel($slot->status, 'Pending') }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

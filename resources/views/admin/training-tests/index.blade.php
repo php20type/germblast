@@ -97,7 +97,7 @@
                                                     {{ $test->passing_percentage }}%
                                                 </td>
                                                 <td style="text-align: center !important;">
-                                                    {{ $test->status }}
+                                                    {{ \App\Helpers\Helper::statusLabel($test->status) }}
                                                 </td>
                                                 <td style="text-align: right !important; padding: 20px !important; padding-right: 35px !important;">
                                                     <div class="d-flex justify-content-end align-items-center gap-3">

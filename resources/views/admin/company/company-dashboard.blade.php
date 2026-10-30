@@ -378,7 +378,7 @@
                                                                 @endcan
                                                             </td>
                                                             <td>
-                                                                <span class="badge bg-light text-dark border px-2 py-1">{{ $readiness->status }}</span>
+                                                                <span class="badge bg-light text-dark border px-2 py-1">{{ \App\Helpers\Helper::statusLabel($readiness->status) }}</span>
                                                             </td>
                                                             <td>{{ $readiness->length }}</td>
                                                             <td>{{ $readiness->line_total }}</td>

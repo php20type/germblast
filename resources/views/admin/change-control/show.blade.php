@@ -203,7 +203,7 @@
                                 </div>
                                 @endcan
                                 <span class="status-pill status-pill-{{ strtolower($changeRequest->status) }}" id="statusPillBadge">
-                                    {{ $changeRequest->status }}
+                                    {{ \App\Helpers\Helper::statusLabel($changeRequest->status) }}
                                 </span>
                             </div>
                         </div>
@@ -320,7 +320,7 @@
                                                         <td class="text-center">{{ $task->due_date ? \Carbon\Carbon::parse($task->due_date)->format('M d, Y') : '-' }}</td>
                                                         <td class="text-center">
                                                             <span class="badge rounded-pill {{ $task->status === 'Completed' ? 'bg-success' : 'bg-warning text-dark' }}" style="font-size: 11px; padding: 5px 10px;">
-                                                                {{ $task->status }}
+                                                                {{ \App\Helpers\Helper::statusLabel($task->status) }}
                                                             </span>
                                                         </td>
                                                     </tr>
@@ -474,7 +474,7 @@
                         
                         // Update pill classes and text
                         const pill = $('#statusPillBadge');
-                        pill.text(newStatus);
+                        pill.text(newStatus.toUpperCase().replace(/_/g, ' '));
                         pill.removeClass().addClass('status-pill status-pill-' + newStatus.toLowerCase());
                         
                         setTimeout(() => {

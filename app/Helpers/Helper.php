@@ -13,6 +13,25 @@ use App\Models\Timeline;
 class Helper
 {
     // For Countries
+    /**
+     * Display text for a status value in uppercase (e.g. "in_progress" => "IN PROGRESS").
+     * Only changes how the status is shown, never the stored value.
+     */
+    public static function statusLabel($status, string $default = ''): string
+    {
+        $status = trim((string) ($status ?? ''));
+
+        if ($status === '') {
+            return $default;
+        }
+
+        if (strtoupper($status) === 'N/A') {
+            return 'N/A';
+        }
+
+        return strtoupper(str_replace('_', ' ', $status));
+    }
+
     public static function getCountries()
     {
         return app(CountryRepositoryInterface::class)->getAll();

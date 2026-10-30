@@ -103,7 +103,7 @@
                                                 </td>
 
                                                 <td>
-                                                    {{ $meeting->status ?? 'N/A' }}
+                                                    {{ \App\Helpers\Helper::statusLabel($meeting->status, 'N/A') }}
                                                 </td>
 
                                                 <td>

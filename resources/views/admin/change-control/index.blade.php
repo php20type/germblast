@@ -49,7 +49,7 @@
                                     <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
                                         <div class="d-flex flex-column align-items-start">
                                             <div class="d-flex align-items-center gap-2 mb-1">
-                                                <span class="status-pill status-pill-{{ strtolower($request->status) }}">{{ $request->status }}</span>
+                                                <span class="status-pill status-pill-{{ strtolower($request->status) }}">{{ \App\Helpers\Helper::statusLabel($request->status) }}</span>
                                                 <h4 class="mb-0" style="font-size: 18px; color: #111827;">
                                                     {{ $request->title }}
                                                 </h4>

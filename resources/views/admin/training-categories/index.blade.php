@@ -93,7 +93,7 @@
                                                     {{ $category->sort_order }}
                                                 </td>
                                                 <td style="text-align: center !important;">
-                                                    {{ $category->status }}
+                                                    {{ \App\Helpers\Helper::statusLabel($category->status) }}
                                                 </td>
                                                 <td style="text-align: right !important; padding: 20px !important; padding-right: 35px !important;">
                                                     <div class="d-flex justify-content-end align-items-center gap-3">

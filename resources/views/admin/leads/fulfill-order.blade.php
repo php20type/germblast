@@ -814,7 +814,7 @@
                                                 </div>
                                                 <div class="d-flex align-items-center gap-3">
                                                     <span class="badge badge-plan-review-status {{ $order->plan_review_status == 'REVIEWED' ? 'bg-success' : 'bg-warning' }}" style="font-size: 12px; padding: 6px 12px;">
-                                                        {{ $order->plan_review_status ?? 'PENDING' }}
+                                                        {{ \App\Helpers\Helper::statusLabel($order->plan_review_status, 'Pending') }}
                                                     </span>
                                                     <button type="button" class="btn btn-sm btn-plan-review-toggle {{ $order->plan_review_status == 'REVIEWED' ? 'btn-success' : 'btn-outline-success' }}" data-order-id="{{ $order->id }}" style="transition: all 0.3s ease;">
                                                         @if($order->plan_review_status == 'REVIEWED')

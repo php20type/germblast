@@ -892,7 +892,7 @@
                                     <label class="form-label">Assignee</label>
                                     <span class="text-danger">*</span>
                                     <select name="assignee_id" class="form-select">
-                                        <option value="">Select a assingee</option>
+                                        <option value="">Select an assignee</option>
                                         @foreach ($users as $user)
                                             <option value="{{ $user->id }}">{{ $user->name }}</option>
                                         @endforeach

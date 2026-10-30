@@ -205,7 +205,7 @@
                                                         </div>
                                                     </div>
                                                     <div>
-                                                        <span class="badge bg-success px-3 py-2 rounded-pill"><i class="fas fa-check me-1"></i> RESOLVED</span>
+                                                        <span class="badge-customer" style="background-color: #d1fae5; color: #059669; border-color: rgba(5, 150, 105, 0.25); padding: 6px 14px; font-size: 13px;"><i class="fas fa-check me-1"></i> Resolved</span>
                                                     </div>
                                                 </div>
                                                 <div class="mb-4">

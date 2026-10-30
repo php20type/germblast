@@ -38,13 +38,13 @@
         </td>
         <td>
             <span class="badge-customer">
-                {{ strtoupper(str_replace('_', ' ', $employee->role)) }}
+                {{ ucwords(str_replace('_', ' ', $employee->role)) }}
             </span>
         </td>
         <td>
             @if($employee->staff_type)
                 <span class="badge bg-info">
-                    {{ strtoupper($employee->staff_type) }}
+                    {{ ucwords(strtolower(str_replace('_', ' ', $employee->staff_type))) }}
                 </span>
             @else
                 <span class="text-muted">N/A</span>

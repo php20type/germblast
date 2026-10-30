@@ -407,7 +407,7 @@
                                                             }
                                                         @endphp
                                                         <span class="status-pill status-pill-{{ $displayStatus }}">
-                                                            {{ strtoupper(str_replace('_', ' ', $displayStatus)) }}
+                                                            {{ \App\Helpers\Helper::statusLabel($displayStatus) }}
                                                         </span>
                                                             </td>
                                                             <td style="padding: 12px 15px;" class="text-end">

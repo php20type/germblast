@@ -314,7 +314,7 @@
                                                 <td class="text-secondary">{{ $request->reason ?? '—' }}</td>
                                                 <td>
                                                     <span class="status-pill status-pill-{{ $request->status }}">
-                                                        {{ $request->status }}
+                                                        {{ \App\Helpers\Helper::statusLabel($request->status) }}
                                                     </span>
                                                 </td>
                                                 <td class="text-secondary">{{ $request->admin_notes ?? '—' }}</td>
@@ -360,7 +360,7 @@
                                                      <td class="text-secondary">{{ $request->reason ?? '—' }}</td>
                                                      <td>
                                                          <span class="status-pill status-pill-{{ $request->status }}">
-                                                             {{ $request->status }}
+                                                             {{ \App\Helpers\Helper::statusLabel($request->status) }}
                                                          </span>
                                                      </td>
                                                      <td>

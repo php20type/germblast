@@ -221,7 +221,7 @@ class NotificationService
         }
     }
 
-    // This should be sent to assingee only
+    // This should be sent to assignee only
     public function leadAssigned($lead)
     {
         $assignee = $lead->assignee;

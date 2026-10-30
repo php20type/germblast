@@ -43,7 +43,7 @@
             $pillClass = 'status-pill-' . $statusSlug;
         @endphp
         <span class="status-pill {{ $pillClass }}">
-            {{ $report->status ?? 'N/A' }}
+            {{ \App\Helpers\Helper::statusLabel($report->status, 'N/A') }}
         </span>
     </td>
 

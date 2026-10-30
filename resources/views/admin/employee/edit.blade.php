@@ -804,7 +804,7 @@
                                                                                 </div>
                                                                                 <div class="d-flex flex-column text-end">
                                                                                     <span style="font-size: 13px;" class="fw-bold text-success">{{ round($attempt->score, 1) }}%</span>
-                                                                                    <span style="font-size: 11px;" class="fw-bold text-success">{{ $attempt->status }}</span>
+                                                                                    <span style="font-size: 11px;" class="fw-bold text-success">{{ \App\Helpers\Helper::statusLabel($attempt->status) }}</span>
                                                                                 </div>
                                                                                         </a>
                                                                                     @else
@@ -815,7 +815,7 @@
                                                                                 </div>
                                                                                 <div class="d-flex flex-column text-end">
                                                                                     <span style="font-size: 13px;" class="fw-bold text-danger">{{ round($attempt->score, 1) }}%</span>
-                                                                                    <span style="font-size: 11px;" class="fw-bold text-danger">{{ $attempt->status }}</span>
+                                                                                    <span style="font-size: 11px;" class="fw-bold text-danger">{{ \App\Helpers\Helper::statusLabel($attempt->status) }}</span>
                                                                                 </div>
                                                                                         </div>
                                                                                     @endif
