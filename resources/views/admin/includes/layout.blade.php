@@ -29,7 +29,7 @@
     {{-- Tribute js --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tributejs/5.1.3/tribute.css" />
 
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}">
     @stack('styles')
 
 </head>
@@ -74,7 +74,7 @@
     {{-- Tribute js --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tributejs/5.1.3/tribute.min.js"></script>
 
-    <script src="{{ asset('js/custom.js') }}"></script>
+    <script src="{{ asset('js/custom.js') }}?v={{ filemtime(public_path('js/custom.js')) }}"></script>
 
     <script>
         $('#menu-toggle').click(function() {

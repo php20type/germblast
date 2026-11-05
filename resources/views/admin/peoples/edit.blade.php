@@ -143,7 +143,7 @@
                             <div class="mt-2" id="contact-types-badges-container">
                                 @if(!empty($peoples->contact_types))
                                     @foreach ($peoples->contact_types as $type)
-                                        <span class="badge bg-warning text-white mx-1 px-2 py-1 text-uppercase rounded d-inline-block">
+                                        <span class="badge mx-1 d-inline-block" style="background-color: rgba(255, 184, 28, 0.15); color: #d39100; border: 1px solid rgba(255, 184, 28, 0.25); border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; text-transform: capitalize; white-space: nowrap;">
                                             <i class="fas fa-address-card me-1"></i>{{ $type }}
                                         </span>
                                     @endforeach
@@ -3596,7 +3596,7 @@
                         badgesContainer.empty();
                         selectedTypes.forEach(function(type) {
                             badgesContainer.append(`
-                                <span class="badge bg-warning text-dark mx-1 px-2 py-1" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; border-radius: 4px; display: inline-block;">
+                                <span class="badge mx-1 d-inline-block" style="background-color: rgba(255, 184, 28, 0.15); color: #d39100; border: 1px solid rgba(255, 184, 28, 0.25); border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; text-transform: capitalize; white-space: nowrap;">
                                     <i class="fas fa-address-card me-1"></i>${type}
                                 </span>
                             `);

@@ -138,7 +138,8 @@
                 order: [[0, 'desc']], // Sort by Date Won descending
                 responsive: true,
                 language: {
-                    search: "Search exceptions:",
+                    search: "",
+                    searchPlaceholder: "Search...",
                     lengthMenu: "Show _MENU_ exceptions",
                     emptyTable: "No won leads pending a signed contract found."
                 },

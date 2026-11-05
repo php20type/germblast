@@ -69,6 +69,16 @@ a {
     box-shadow: 0 0 0 .25rem rgba(255, 184, 28, 0.2);
 }
 
+/* DataTables entries-per-page value and options stay black when focused/open */
+.dataTables_length select,
+.dataTables_length select:focus,
+.dt-length select,
+.dt-length select:focus,
+.dataTables_length select option,
+.dt-length select option {
+    color: #000000;
+}
+
 /* Text typed into inputs/textareas stays black while focused */
 .form-control:focus {
     color: #000000;
@@ -983,12 +993,31 @@ title {
 .companies-section .sidebar {
     border-radius: 10px;
     background-color: #707372;
-    min-height: 100vh;
+    min-height: calc(100vh - 20px);
+    max-height: calc(100vh - 20px);
+    overflow-y: auto;
     color: #ffffff;
     padding: 14px;
     margin-bottom: 20px;
     position: sticky;
     top: 10px;
+}
+
+/* Thin white scrollbar (same size as the main sidebar's) */
+.companies-section .sidebar::-webkit-scrollbar {
+    width: 4px;
+    border-radius: 8px;
+}
+
+.companies-section .sidebar::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 4px #ffffff;
+    border-radius: 8px;
+}
+
+.companies-section .sidebar::-webkit-scrollbar-thumb {
+    background-color: #ffffff;
+    outline: 1px solid #ffffff;
+    border-radius: 8px;
 }
 
 .companies-section .sidebar .counter-number .nav-link {
@@ -2073,6 +2102,32 @@ title {
     text-decoration: none;
 }
 
+/* Companies listing: wider Company type column, narrower Tags column */
+.company-listing-table th:nth-child(6),
+.company-listing-table td:nth-child(6) {
+    width: 16%;
+    min-width: 150px;
+}
+
+.company-listing-table th:nth-child(7),
+.company-listing-table td:nth-child(7) {
+    width: 18%;
+}
+
+/* Table text links (e.g. Expense Reports employee name): stay blue on hover, with an underline */
+a.table-link:hover,
+a.table-link:focus {
+    color: #0a58ca;
+    text-decoration: underline;
+}
+
+/* Sales dashboard table links (Lead Summary): stay blue on hover, with an underline */
+.sales-dashboard .section-card .table a:hover,
+.sales-dashboard .section-card .table a:focus {
+    color: #0a58ca;
+    text-decoration: underline;
+}
+
 /* Icons that use .text-warning keep their yellow colour (only text links/labels go black) */
 .company-details-section i.text-warning {
     color: #ffc107 !important;
@@ -2550,7 +2605,7 @@ title {
 }
 
 .sales-dashboard .section-card .nav-tabs .nav-link.active {
-    color: #ffc107;
+    color: #000;
     border-bottom: 2px solid #ffc107;
     font-weight: 600;
 }
@@ -3889,6 +3944,13 @@ title {
     color: #000;
 }
 
+/* Channels & Sources "Add ... source" links: stay blue on hover, with an underline */
+a.btn-add-activity:hover,
+a.btn-add-activity:focus {
+    color: #0d6efd;
+    text-decoration: underline;
+}
+
 .activity-table .report-link {
     color: #ffc107;
     text-decoration: none;
@@ -4387,6 +4449,11 @@ div[contenteditable="true"]:focus {
     background-color: rgba(255, 184, 28, 0.15) !important;
     border: none !important;
     box-shadow: 0 0 0 0.2rem rgba(255, 184, 28, 0.25) !important;
+}
+
+/* Leave room for the focus glow so a clipping parent doesn't cut off the top/right edge */
+.dataTables_filter {
+    padding: 5px;
 }
 
 .dataTables_filter label {
@@ -5071,6 +5138,8 @@ select.form-control:not([multiple]):not([size]) {
     .companies-section .sidebar {
         position: static;
         min-height: auto;
+        max-height: none;
+        overflow-y: visible;
     }
 
     .companies-section .main-content {
@@ -5402,4 +5471,99 @@ select.form-control:not([multiple]):not([size]) {
 .select2-dropdown.timeline-filter-dropdown .select2-results__option--selected {
     background-color: #1a66d2;
     color: #ffffff;
+}
+
+/* ------------------------------------------------------------------
+   Datepicker (flatpickr): system look - brand yellow accents, rounded card,
+   page font, black text on selected days
+   ------------------------------------------------------------------ */
+.flatpickr-calendar {
+    font-family: var(--body-font);
+    letter-spacing: normal;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    z-index: 2000;
+}
+
+.flatpickr-calendar:before,
+.flatpickr-calendar:after {
+    display: none;
+}
+
+.flatpickr-months .flatpickr-month,
+.flatpickr-current-month .flatpickr-monthDropdown-months,
+.flatpickr-current-month input.cur-year {
+    color: #000000;
+    fill: #000000;
+    font-weight: 600;
+}
+
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month {
+    color: #000000;
+    fill: #000000;
+}
+
+.flatpickr-months .flatpickr-prev-month:hover svg,
+.flatpickr-months .flatpickr-next-month:hover svg {
+    fill: #FFB81C;
+}
+
+span.flatpickr-weekday {
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.flatpickr-day {
+    color: #212529;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.flatpickr-day:hover,
+.flatpickr-day:focus {
+    background: rgba(255, 184, 28, 0.2);
+    border-color: rgba(255, 184, 28, 0.2);
+}
+
+.flatpickr-day.today {
+    border-color: #FFB81C;
+}
+
+.flatpickr-day.today:hover,
+.flatpickr-day.today:focus {
+    background: rgba(255, 184, 28, 0.2);
+    border-color: #FFB81C;
+    color: #212529;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected:hover,
+.flatpickr-day.selected:focus {
+    background: #FFB81C;
+    border-color: #FFB81C;
+    color: #000000;
+}
+
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.flatpickr-disabled:hover,
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay {
+    color: #adb5bd;
+}
+
+.flatpickr-time input,
+.flatpickr-time .flatpickr-am-pm {
+    color: #212529;
+    font-weight: 600;
+}
+
+.flatpickr-time input:hover,
+.flatpickr-time input:focus,
+.flatpickr-time .flatpickr-am-pm:hover,
+.flatpickr-time .flatpickr-am-pm:focus {
+    background: rgba(255, 184, 28, 0.15);
 }

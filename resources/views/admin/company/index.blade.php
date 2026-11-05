@@ -99,7 +99,7 @@
                         <!-- Table -->
                         <div class="table-responsive">
                             <div class="table-container mt-3">
-                                <table class="table table-hover">
+                                <table class="table table-hover company-listing-table">
                                     <thead>
                                         <tr>
                                             <th class="checkbox-cell">

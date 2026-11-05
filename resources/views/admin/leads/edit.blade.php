@@ -368,7 +368,7 @@
                                                         </div>
 
                                                         <div class="col-md-4 d-flex justify-content-end">
-                                                            <a class="text-warning fw-semibold" href="javascript:void(0);"
+                                                            <a class="text-warning" href="javascript:void(0);"
                                                                 onclick="addForecasting()">
                                                                 Add Forecasting
                                                             </a>
@@ -386,7 +386,7 @@
                                                         </div>
 
                                                         <div class="col-md-4 d-flex justify-content-end">
-                                                            <a class="text-warning fw-semibold"
+                                                            <a class="text-warning"
                                                                 href="{{ route('admin.lead.survey.proposal', $leads->id) }}"
                                                                 target="_blank">
                                                                 Add Proposal

@@ -57,7 +57,7 @@
                                             {{ \Carbon\Carbon::parse($activity_type->created_at)->format('d M Y, H:i') }}
                                         </td>
                                         <td>
-                                            <a href="#" class="btn btn-outline-primary btn-sm btn-edit" 
+                                            <a href="#" class="btn btn-outline-dark btn-sm btn-edit-activity-type"
                                                data-id="{{ $activity_type->id }}"
                                                data-type="{{ $activity_type->type }}"
                                                data-icon="{{ $activity_type->icon }}">
@@ -313,7 +313,7 @@
         });
 
         // Edit functionality
-        $('.btn-edit').click(function(e) {
+        $('.btn-edit-activity-type').click(function(e) {
             e.preventDefault();
             let id = $(this).data('id');
             let name = $(this).data('type');
@@ -321,7 +321,7 @@
 
             $('#editName').val(name);
             $('#editSelectedIcon').val(icon);
-            
+
             // Highlight selected icon
             $('.edit-icon-circle').removeClass('selected');
             $(`.edit-icon-circle[data-icon="${icon}"]`).addClass('selected');

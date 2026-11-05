@@ -244,6 +244,7 @@
                     'admin.hr.praise.*',
                     'admin.hr.rewards.*',
                     'admin.hr.feedback.*',
+                    'admin.hr.nominations.*',
                     'admin.service.labor_analysis'
                 ]);
 

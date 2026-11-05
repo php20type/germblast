@@ -204,7 +204,7 @@ class Helper
                 break;
 
             case 'lead':
-                $lead = \App\Models\Lead::find($entityId);
+                $lead = Lead::find($entityId);
                 $companyId = $lead ? $lead->company_id : null;
                 $peopleIds = $lead ? $lead->peoples()->pluck('people_id') : [];
 

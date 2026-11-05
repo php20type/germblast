@@ -443,3 +443,217 @@ $(function () {
         // Fall back to Select2's default multi-select behaviour
     }
 })();
+
+// Datepicker / timepicker: every standard date and time input uses flatpickr (same as the other date fields).
+// The values stay Y-m-d and H:i, so submitted data, validation and min/max rules behave as before.
+(function () {
+    if (typeof flatpickr === 'undefined') return;
+
+    // jQuery Validate skips hidden inputs; the real (hidden) date-time input must still be validated
+    if ($.validator) {
+        $.validator.setDefaults({ ignore: ':hidden:not(.datepicker-source)' });
+    }
+
+    function initDateInput(input) {
+        if (input._flatpickr || input.dataset.nativeDate !== undefined) return;
+
+        var value = input.value;
+        var options = {
+            dateFormat: 'Y-m-d',
+            allowInput: true,
+            time_24hr: false,
+            onOpen: function (selectedDates, dateStr, instance) {
+                // Pick up values that scripts set directly on the input
+                if (instance.input.value && instance.input.value !== dateStr) {
+                    instance.setDate(instance.input.value, false);
+                }
+            }
+        };
+
+        if (input.getAttribute('min')) options.minDate = input.getAttribute('min');
+        if (input.getAttribute('max')) options.maxDate = input.getAttribute('max');
+
+        input.type = 'text';
+        input.value = value;
+        input.setAttribute('autocomplete', 'off');
+        if (!input.getAttribute('placeholder')) input.setAttribute('placeholder', 'Select date');
+
+        var picker = flatpickr(input, options);
+
+        // Dates are picked from the calendar (not typed), like the existing datepicker fields.
+        // Not readonly, so the required attribute is still enforced on submit.
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Tab' || e.key === 'Escape') return;
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+                e.preventDefault();
+                picker.clear();
+                return;
+            }
+            e.preventDefault();
+        });
+
+        // Keep the calendar limits in step with min/max changes made by page scripts
+        new MutationObserver(function () {
+            picker.set('minDate', input.getAttribute('min') || null);
+            picker.set('maxDate', input.getAttribute('max') || null);
+        }).observe(input, { attributes: true, attributeFilter: ['min', 'max'] });
+    }
+
+    function initTimeInput(input) {
+        if (input._flatpickr || input.dataset.nativeTime !== undefined) return;
+
+        var value = input.value;
+        var options = {
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: 'H:i',
+            time_24hr: true,
+            allowInput: true,
+            onOpen: function (selectedDates, dateStr, instance) {
+                // Pick up values that scripts set directly on the input
+                if (instance.input.value && instance.input.value !== dateStr) {
+                    instance.setDate(instance.input.value, false);
+                }
+            }
+        };
+
+        if (input.getAttribute('min')) options.minTime = input.getAttribute('min');
+        if (input.getAttribute('max')) options.maxTime = input.getAttribute('max');
+
+        // step is in seconds on a time input; the picker steps in minutes
+        var step = parseInt(input.getAttribute('step'), 10);
+        if (step >= 60 && step % 60 === 0) options.minuteIncrement = step / 60;
+
+        input.type = 'text';
+        input.value = value;
+        input.setAttribute('autocomplete', 'off');
+        if (!input.getAttribute('placeholder')) input.setAttribute('placeholder', 'Select time');
+
+        var picker = flatpickr(input, options);
+
+        // Times are picked from the picker (not typed), like the existing datepicker fields.
+        // Not readonly, so the required attribute is still enforced on submit.
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Tab' || e.key === 'Escape') return;
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+                e.preventDefault();
+                picker.clear();
+                return;
+            }
+            e.preventDefault();
+        });
+
+        // Keep the limits in step with min/max changes made by page scripts
+        new MutationObserver(function () {
+            picker.set('minTime', input.getAttribute('min') || null);
+            picker.set('maxTime', input.getAttribute('max') || null);
+        }).observe(input, { attributes: true, attributeFilter: ['min', 'max'] });
+    }
+
+    function initDateTimeInput(input) {
+        if (input._flatpickr || input.dataset.nativeTime !== undefined) return;
+
+        var value = input.value;
+        var options = {
+            enableTime: true,
+            dateFormat: 'Y-m-d\\TH:i', // real value: same format as a datetime-local input
+            altInput: true,
+            altFormat: 'Y-m-d h:i K', // shown value: same as the existing task due date picker
+            time_24hr: false,
+            allowInput: true
+        };
+
+        if (input.getAttribute('min')) options.minDate = input.getAttribute('min');
+        if (input.getAttribute('max')) options.maxDate = input.getAttribute('max');
+
+        input.type = 'text';
+        input.value = value;
+        input.classList.add('datepicker-source');
+        if (!input.getAttribute('placeholder')) input.setAttribute('placeholder', 'Select date & time');
+
+        var picker = flatpickr(input, options);
+        var visible = picker.altInput;
+
+        // Show the visible field first so validation messages appear below it
+        input.parentNode.insertBefore(visible, input);
+        visible.setAttribute('autocomplete', 'off');
+
+        // Picked from the calendar (not typed), like the other picker fields.
+        // Not readonly, so the required attribute is still enforced on submit.
+        visible.addEventListener('keydown', function (e) {
+            if (e.key === 'Tab' || e.key === 'Escape') return;
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+                e.preventDefault();
+                picker.clear();
+                return;
+            }
+            e.preventDefault();
+        });
+
+        // Scripts that set the value directly (e.g. $('#x').val('2026-01-01T10:00')) update the visible field too
+        var nativeValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+        var syncing = false;
+        Object.defineProperty(input, 'value', {
+            configurable: true,
+            get: function () {
+                return nativeValue.get.call(this);
+            },
+            set: function (v) {
+                nativeValue.set.call(this, v);
+                if (syncing) return;
+
+                // Skip when the picker itself is the one setting the value
+                var current = picker.selectedDates[0] ? picker.formatDate(picker.selectedDates[0], options.dateFormat) : '';
+                if ((v || '') === current) return;
+
+                syncing = true;
+                picker.setDate(v || null, false);
+                syncing = false;
+            }
+        });
+
+        // Keep the limits in step with min/max changes made by page scripts
+        new MutationObserver(function () {
+            picker.set('minDate', input.getAttribute('min') || null);
+            picker.set('maxDate', input.getAttribute('max') || null);
+        }).observe(input, { attributes: true, attributeFilter: ['min', 'max'] });
+    }
+
+    function initPickerInput(input) {
+        try {
+            if (input.type === 'time') {
+                initTimeInput(input);
+            } else if (input.type === 'date') {
+                initDateInput(input);
+            } else if (input.type === 'datetime-local') {
+                initDateTimeInput(input);
+            }
+        } catch (e) {
+            // One problem field must not stop the others from being converted
+            console.error('Date/time picker init failed for', input, e);
+        }
+    }
+
+    function initDateInputs(root) {
+        var scope = root && root.querySelectorAll ? root : document;
+
+        var selector = 'input[type="date"], input[type="time"], input[type="datetime-local"]';
+
+        if (scope.matches && scope.matches(selector)) initPickerInput(scope);
+
+        scope.querySelectorAll(selector).forEach(initPickerInput);
+    }
+
+    $(function () {
+        initDateInputs(document);
+
+        // Inputs added later (modals, AJAX-loaded content)
+        new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                mutation.addedNodes.forEach(function (node) {
+                    if (node.nodeType === 1) initDateInputs(node);
+                });
+            });
+        }).observe(document.body, { childList: true, subtree: true });
+    });
+})();

@@ -23,7 +23,7 @@
     <!-- EMPLOYEE -->
     <td>
         @canany(['expense_report.edit', 'expense_report.add'])
-        <a href="{{ route('admin.expense-report.edit', $report->id) }}" class="text-decoration-none">
+        <a href="{{ route('admin.expense-report.edit', $report->id) }}" class="table-link">
             {{ $report->user->name ?? 'N/A' }}
         </a>
         @else
