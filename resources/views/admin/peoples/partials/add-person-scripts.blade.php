@@ -38,22 +38,34 @@
                 ignore: [],
                 rules: {
                     name: {
-                        required: true
+                        required: true,
+                        maxlength: 255
                     },
                     email: {
-                        required: true
+                        required: true,
+                        strictEmail: true,
+                        maxlength: 255
                     },
                     bio: {
-                        required: true
+                        required: true,
+                        maxlength: 5000
                     },
                     company_id: {
                         required: false
                     },
                     phone: {
-                        required: true
+                        required: true,
+                        phoneFormat: true,
+                        maxlength: 50
                     },
-                    address: {
-                        required: true
+                    address_1: {
+                        maxlength: 255
+                    },
+                    address_2: {
+                        maxlength: 255
+                    },
+                    zip: {
+                        zipFormat: true
                     },
                     url: {
                         required: false,
@@ -71,7 +83,7 @@
                 },
                 messages: {
                     name: {
-                        required: "Please enter Company name."
+                        required: "Please enter the person's name."
                     },
                     email: {
                         required: "Please enter the email."
@@ -84,9 +96,6 @@
                     // },
                     phone: {
                         required: "Please enter the phone number."
-                    },
-                    address: {
-                        required: "Please enter the address."
                     },
                     url: {
                         url: "The url field must be a valid URL."
@@ -150,7 +159,11 @@
 
                     error: function(xhr) {
                         console.log(xhr.responseText);
-                        toastr.error('Something went wrong while adding the person.');
+                        var message = 'Something went wrong while adding the person.';
+                        if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                            message = Object.values(xhr.responseJSON.errors)[0][0];
+                        }
+                        toastr.error(message);
                         $submitBtn.prop('disabled', false).text('Submit');
                     }
                 });

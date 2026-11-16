@@ -932,6 +932,27 @@ class PeopleController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => ['nullable', 'max:255', new \App\Rules\StrictEmail()],
+            'bio' => 'nullable|string|max:5000',
+            'company_id' => 'nullable|exists:companies,id',
+            'phone' => ['nullable', 'string', 'max:50', new \App\Rules\PhoneNumber()],
+            'address_1' => 'nullable|string|max:255',
+            'address_2' => 'nullable|string|max:255',
+            'country_id' => 'nullable|exists:countries,id',
+            'state_id' => 'nullable|exists:states,id',
+            'city_id' => 'nullable|exists:cities,id',
+            'zip' => ['nullable', 'string', 'max:20', new \App\Rules\PostalCode()],
+            'url' => 'nullable|url|max:255',
+            'tag_id' => 'nullable|exists:tags,id',
+            'assignee_id' => 'nullable|exists:users,id',
+            'territory_id' => 'nullable|exists:territories,id',
+            'lead_id' => 'nullable|exists:leads,id',
+            'contact_types' => 'nullable|array',
+            'contact_types.*' => 'in:service,scheduling,billing',
+        ]);
+
         $companyName = null;
         if ($request->company_id) {
             $company = Company::find($request->company_id);

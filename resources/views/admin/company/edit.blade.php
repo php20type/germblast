@@ -1343,8 +1343,8 @@
                             <div class="form-group mb-3">
                                 <label class="form-label"><b>SALES REP COMMISSION RATE (%)</b></label>
                                 @can('company.detail.edit')
-                                    <input type="number" step="0.01" min="0" max="100" class="form-control company-update" 
-                                        data-field-name="Sales Rep Commission Rate" data-field="assignee_commission_rate" 
+                                    <input type="number" step="0.01" min="0" max="100" class="form-control company-update"
+                                        data-field-name="Sales Rep Commission Rate" data-field="assignee_commission_rate"
                                         value="{{ $company->assignee_commission_rate }}" placeholder="e.g. 5.5">
                                 @else
                                     <input type="number" class="form-control" value="{{ $company->assignee_commission_rate }}" disabled>
@@ -1960,13 +1960,13 @@
                                             </div>
                                             <div class="col-6">
                                                 <label class="form-label small text-muted mb-1">Qty</label>
-                                                <input type="number" name="quantity[]" placeholder="Quantity" class="form-control" />
+                                                <input type="number" min="1" name="quantity[]" placeholder="Quantity" class="form-control" />
                                             </div>
                                             <div class="col-6">
                                                 <div class="d-flex align-items-end gap-2">
                                                     <div class="flex-grow-1">
                                                         <label class="form-label small text-muted mb-1">Price <span class="fw-light">(USD)</span></label>
-                                                        <input type="number" name="price[]" step="0.01" placeholder="Price" class="form-control" />
+                                                        <input type="number" min="0" name="price[]" step="0.01" placeholder="Price" class="form-control" />
                                                     </div>
                                                     <button type="button" class="btn btn-outline-danger btn-sm remove-product-row" style="height:38px; padding: 0 10px;">
                                                         <i class="fas fa-times"></i>
@@ -1985,7 +1985,7 @@
                                     @error('confidence')
                                         {{ $message }}
                                     @enderror
-                                    <input type="number" name="confidence" placeholder="Confidence %"
+                                    <input type="number" min="0" max="100" name="confidence" placeholder="Confidence %"
                                         class="form-control" />
                                 </div>
                             </div>
@@ -2458,20 +2458,20 @@
             const modal = $('#AddLocation');
             modal.find('.modal-title').text('Add Location');
             modal.find('button[type="submit"]').text('Save Location');
-            
+
             // Reset form action back to create URL
             $('#add-company-location').attr('action', "{{ route('admin.company.location.add', $company->id) }}");
-            
+
             // Reset fields
             $('#add-company-location')[0].reset();
-            
+
             // Preselect US (233) and trigger change to load states
             $('#country_select').val('233').trigger('change');
-            
+
             // Re-disable state and city
             $('#state_select').empty().append('<option value="">Select State</option>').prop('disabled', true).trigger('change.select2');
             $('#city_select').empty().append('<option value="">Select City</option>').prop('disabled', true).trigger('change.select2');
-            
+
             modal.modal('show');
         }
 
@@ -2968,18 +2968,18 @@
             $("#addPersonAjaxForm").validate({
                 ignore: [],
                 rules: {
-                    name: { required: true },
-                    email: { required: true, email: true },
-                    phone: { required: true },
+                    name: { required: true, maxlength: 255 },
+                    email: { required: true, strictEmail: true },
+                    phone: { required: true, phoneFormat: true, maxlength: 50 },
                     address_1: { required: true },
                     tag_id: { required: true },
                     assignee_id: { required: true },
                     territory_id: { required: true },
-                    bio: { required: true }
+                    bio: { required: true, maxlength: 5000 }
                 },
                 messages: {
                     name: { required: "Please enter the person's name." },
-                    email: { required: "Please enter an email address.", email: "Please enter a valid email." },
+                    email: { required: "Please enter an email address.", strictEmail: "Please enter a valid email address." },
                     phone: { required: "Please enter a phone number." },
                     address_1: { required: "Please enter an address." },
                     tag_id: { required: "Please select a tag." },
@@ -3554,10 +3554,10 @@
             $(document).on('click', '.edit-location-btn', function() {
                 const btn = $(this);
                 const modal = $('#AddLocation');
-                
+
                 modal.find('.modal-title').text('Edit Location');
                 modal.find('button[type="submit"]').text('Update Location');
-                
+
                 const updateUrl = `/admin/company/location/${btn.data('id')}/update`;
                 $('#add-company-location').attr('action', updateUrl);
 
@@ -3569,27 +3569,27 @@
                 const countryId = btn.data('country');
                 const stateId = btn.data('state');
                 const cityId = btn.data('city');
-                
+
                 if (countryId) {
                     $('#country_select').val(countryId).trigger('change.select2');
-                    
+
                     $.get(`/states/${countryId}`, function(states) {
                         let stateSelect = $('#state_select');
                         stateSelect.empty().append('<option value="">Select State</option>').prop('disabled', false);
                         $.each(states, function(i, state) {
                             stateSelect.append(`<option value="${state.state_id}">${state.name}</option>`);
                         });
-                        
+
                         if (stateId) {
                             stateSelect.val(stateId).trigger('change.select2');
-                            
+
                             $.get(`/cities/${stateId}`, function(cities) {
                                 let citySelect = $('#city_select');
                                 citySelect.empty().append('<option value="">Select City</option>').prop('disabled', false);
                                 $.each(cities, function(i, city) {
                                     citySelect.append(`<option value="${city.id}">${city.name}</option>`);
                                 });
-                                
+
                                 if (cityId) {
                                     citySelect.val(cityId).trigger('change.select2');
                                 }
@@ -3673,7 +3673,8 @@
                 ignore: [],
                 rules: {
                     name: {
-                        required: true
+                        required: true,
+                        maxlength: 255
                     },
                     assignee_id: {
                         required: true
@@ -3685,13 +3686,20 @@
                         required: true
                     },
                     "quantity[]": {
-                        required: true
+                        required: true,
+                        number: true,
+                        min: 1
                     },
                     "price[]": {
-                        required: true
+                        required: true,
+                        number: true,
+                        min: 0
                     },
                     confidence: {
-                        required: true
+                        required: true,
+                        number: true,
+                        min: 0,
+                        max: 100
                     },
                     "company_id": {
                         required: true
@@ -3784,7 +3792,11 @@
                     },
                     error: function(xhr) {
                         alert(xhr.responseText);
-                        toastr.error('Something went wrong while creating the lead.');
+                        var message = 'Something went wrong while creating the lead.';
+                        if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                            message = Object.values(xhr.responseJSON.errors)[0][0];
+                        }
+                        toastr.error(message);
                     }
                 });
             });
@@ -3990,29 +4002,29 @@
                 let row = $(this).closest('.row');
                 let input = row.find('input[type="text"]');
                 input.prop('disabled', false).focus();
-                
+
                 let actions = $(this).closest('.field-row-actions');
                 actions.find('.field-action-btn').addClass('d-none');
                 actions.find('.btn-save-field, .btn-cancel-field').removeClass('d-none');
             });
-            
+
             $(document).on('click', '.btn-cancel-field', function() {
                 let row = $(this).closest('.row');
                 let input = row.find('input[type="text"]');
                 input.val(input.attr('value')).prop('disabled', true);
-                
+
                 let actions = $(this).closest('.field-row-actions');
                 actions.find('.btn-save-field, .btn-cancel-field').addClass('d-none');
                 actions.find('.field-action-btn').removeClass('d-none');
             });
-            
+
             $(document).on('click', '.btn-save-field', function() {
                 let btn = $(this);
                 let row = btn.closest('.row');
                 let input = row.find('input[type="text"]');
                 let select = row.find('select');
                 let actions = btn.closest('.field-row-actions');
-                
+
                 let editBtn = actions.find('.btn-edit-field');
                 let category = editBtn.data('category');
                 let entityId = editBtn.data('company-id');
@@ -4050,7 +4062,7 @@
                     $(this).closest('.row').find('.btn-cancel-field').click();
                 }
             });
-            
+
             // Delete email, address, phone and url of company
             // ==============================
             $(document).on('click', '.delete-field-btn', function() {
@@ -4103,7 +4115,7 @@
         $.validator.addMethod("greaterThanStart", function(value, element) {
             var startTime = $('#start_time').val();
             if (!value || !startTime) return true; // Skip if either is empty (handled by required)
-            
+
             // Compare times (format is HH:mm)
             return value > startTime;
         }, "End time must be after start time.");
@@ -4770,7 +4782,7 @@
             });
 
 
-            
+
 
         });
     </script>

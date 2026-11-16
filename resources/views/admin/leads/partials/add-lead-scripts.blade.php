@@ -64,7 +64,8 @@
                 ignore: [],
                 rules: {
                     name: {
-                        required: true
+                        required: true,
+                        maxlength: 255
                     },
                     assignee_id: {
                         required: true
@@ -76,13 +77,20 @@
                         required: true
                     },
                     "quantity[]": {
-                        required: true
+                        required: true,
+                        number: true,
+                        min: 1
                     },
                     "price[]": {
-                        required: true
+                        required: true,
+                        number: true,
+                        min: 0
                     },
                     confidence: {
-                        required: true
+                        required: true,
+                        number: true,
+                        min: 0,
+                        max: 100
                     },
                     // "company_id[]": {
                     //     required: true
@@ -191,7 +199,11 @@
 
                     error: function(xhr) {
                         alert(xhr.responseText);
-                        toastr.error('Something went wrong while creating the lead.');
+                        var message = 'Something went wrong while creating the lead.';
+                        if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                            message = Object.values(xhr.responseJSON.errors)[0][0];
+                        }
+                        toastr.error(message);
                         $submitBtn.prop('disabled', false).text('Submit');
                     }
                 });

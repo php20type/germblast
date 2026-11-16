@@ -124,7 +124,7 @@
                                         <h6>Expected to close</h6>
                                         <p>{{ \Carbon\Carbon::parse($leads->close_date)->format('j F Y') }}</p>
                                     </div>
-                                    <div class="info-item"> 
+                                    <div class="info-item">
                                         <h6>Confidence</h6>
                                         <p>{{ $leads->confidence }}%</p>
                                     </div>
@@ -1233,7 +1233,7 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                
+
                                                             </div>
 
                                                         </div>
@@ -3598,18 +3598,18 @@
                         $("#addPersonAjaxForm").validate({
                             ignore: [],
                             rules: {
-                                name: { required: true },
-                                email: { required: true, email: true },
-                                phone: { required: true },
+                                name: { required: true, maxlength: 255 },
+                                email: { required: true, strictEmail: true },
+                                phone: { required: true, phoneFormat: true, maxlength: 50 },
                                 address_1: { required: true },
                                 tag_id: { required: true },
                                 assignee_id: { required: true },
                                 territory_id: { required: true },
-                                bio: { required: true }
+                                bio: { required: true, maxlength: 5000 }
                             },
                             messages: {
                                 name: { required: "Please enter the person's name." },
-                                email: { required: "Please enter an email address.", email: "Please enter a valid email." },
+                                email: { required: "Please enter an email address.", strictEmail: "Please enter a valid email address." },
                                 phone: { required: "Please enter a phone number." },
                                 address_1: { required: "Please enter an address." },
                                 tag_id: { required: "Please select a tag." },
@@ -3879,7 +3879,7 @@
         $.validator.addMethod("greaterThanStart", function(value, element) {
             var startTime = $('#start_time').val();
             if (!value || !startTime) return true; // Skip if either is empty (handled by required)
-            
+
             // Compare times (format is HH:mm)
             return value > startTime;
         }, "End time must be after start time.");
@@ -4496,7 +4496,7 @@
                         });
 
 
-                        
+
 
 
 

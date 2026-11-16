@@ -522,12 +522,14 @@ class LeadController extends Controller
             'name' => 'required|string|max:255',
             'assignee_id' => 'nullable|exists:users,id',
             'close_date' => 'nullable|date',
-            'confidence' => 'nullable|numeric',
+            'confidence' => 'nullable|numeric|min:0|max:100',
 
             'product_id' => 'nullable|array',
             'product_id.*' => 'exists:products,id',
             'quantity' => 'nullable|array',
+            'quantity.*' => 'nullable|numeric|min:1',
             'price' => 'nullable|array',
+            'price.*' => 'nullable|numeric|min:0',
 
             'company_id' => 'required|exists:companies,id',
 
@@ -540,7 +542,7 @@ class LeadController extends Controller
             'competitors_id' => 'nullable|array',
             'competitors_id.*' => 'nullable|exists:competitors,id',
 
-            'tag_id' => 'required',
+            'tag_id' => 'required|exists:tags,id',
         ]);
 
         $lead = null;

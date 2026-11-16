@@ -567,13 +567,13 @@
                                             </div>
                                             <div class="col-6">
                                                 <label class="form-label small text-muted mb-1">Qty</label>
-                                                <input type="number" name="quantity[]" placeholder="Quantity" class="form-control" />
+                                                <input type="number" min="1" name="quantity[]" placeholder="Quantity" class="form-control" />
                                             </div>
                                             <div class="col-6">
                                                 <div class="d-flex align-items-end gap-2">
                                                     <div class="flex-grow-1">
                                                         <label class="form-label small text-muted mb-1">Price <span class="fw-light">(USD)</span></label>
-                                                        <input type="number" name="price[]" step="0.01" placeholder="Price" class="form-control" />
+                                                        <input type="number" min="0" name="price[]" step="0.01" placeholder="Price" class="form-control" />
                                                     </div>
                                                     <button type="button" class="btn btn-outline-danger btn-sm remove-product-row" style="height:38px; padding: 0 10px;">
                                                         <i class="fas fa-times"></i>
@@ -592,7 +592,7 @@
                                     @error('confidence')
                                         {{ $message }}
                                     @enderror
-                                    <input type="number" name="confidence" placeholder="Confidence %"
+                                    <input type="number" min="0" max="100" name="confidence" placeholder="Confidence %"
                                         class="form-control" />
                                 </div>
                             </div>
@@ -1179,7 +1179,8 @@
                 ignore: [],
                 rules: {
                     name: {
-                        required: true
+                        required: true,
+                        maxlength: 255
                     },
                     assignee_id: {
                         required: true
@@ -1191,13 +1192,20 @@
                         required: true
                     },
                     "quantity[]": {
-                        required: true
+                        required: true,
+                        number: true,
+                        min: 1
                     },
                     "price[]": {
-                        required: true
+                        required: true,
+                        number: true,
+                        min: 0
                     },
                     confidence: {
-                        required: true
+                        required: true,
+                        number: true,
+                        min: 0,
+                        max: 100
                     },
                     // "company_id[]": {
                     //     required: true
@@ -1306,7 +1314,11 @@
 
                     error: function(xhr) {
                         alert(xhr.responseText);
-                        toastr.error('Something went wrong while creating the lead.');
+                        var message = 'Something went wrong while creating the lead.';
+                        if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                            message = Object.values(xhr.responseJSON.errors)[0][0];
+                        }
+                        toastr.error(message);
                         $submitBtn.prop('disabled', false).text('Submit');
                     }
                 });
@@ -1318,19 +1330,31 @@
                 ignore: [],
                 rules: {
                     name: {
-                        required: true
+                        required: true,
+                        maxlength: 255
                     },
                     description: {
-                        required: true
+                        required: true,
+                        maxlength: 5000
                     },
                     email: {
-                        required: true
+                        required: true,
+                        strictEmail: true,
+                        maxlength: 255
                     },
                     phone: {
-                        required: true
+                        required: true,
+                        phoneFormat: true,
+                        maxlength: 50
                     },
-                    address: {
-                        required: true
+                    address_1: {
+                        maxlength: 255
+                    },
+                    address_2: {
+                        maxlength: 255
+                    },
+                    zip: {
+                        zipFormat: true
                     },
                     people_id: {
                         required: false
@@ -1367,9 +1391,6 @@
                     },
                     phone: {
                         required: "Please enter the phone number."
-                    },
-                    address: {
-                        required: "Please enter the address."
                     },
                     // people_id: {
                     //     required: "Please select the person."
@@ -1441,8 +1462,12 @@
                         }, 1500);
                     },
 
-                    error: function() {
-                        toastr.error('Something went wrong while creating the company.');
+                    error: function(xhr) {
+                        var message = 'Something went wrong while creating the company.';
+                        if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                            message = Object.values(xhr.responseJSON.errors)[0][0];
+                        }
+                        toastr.error(message);
                         $submitBtn.prop('disabled', false).text('Submit');
                     }
                 });
@@ -1453,22 +1478,34 @@
                 ignore: [],
                 rules: {
                     name: {
-                        required: true
+                        required: true,
+                        maxlength: 255
                     },
                     email: {
-                        required: true
+                        required: true,
+                        strictEmail: true,
+                        maxlength: 255
                     },
                     bio: {
-                        required: true
+                        required: true,
+                        maxlength: 5000
                     },
                     company_id: {
                         required: false
                     },
                     phone: {
-                        required: true
+                        required: true,
+                        phoneFormat: true,
+                        maxlength: 50
                     },
-                    address: {
-                        required: true
+                    address_1: {
+                        maxlength: 255
+                    },
+                    address_2: {
+                        maxlength: 255
+                    },
+                    zip: {
+                        zipFormat: true
                     },
                     url: {
                         required: false,
@@ -1486,7 +1523,7 @@
                 },
                 messages: {
                     name: {
-                        required: "Please enter Company name."
+                        required: "Please enter the person's name."
                     },
                     email: {
                         required: "Please enter the email."
@@ -1499,9 +1536,6 @@
                     // },
                     phone: {
                         required: "Please enter the phone number."
-                    },
-                    address: {
-                        required: "Please enter the address."
                     },
                     url: {
                         url: "The url field must be a valid URL."
@@ -1565,7 +1599,11 @@
 
                     error: function(xhr) {
                         console.log(xhr.responseText);
-                        toastr.error('Something went wrong while adding the person.');
+                        var message = 'Something went wrong while adding the person.';
+                        if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                            message = Object.values(xhr.responseJSON.errors)[0][0];
+                        }
+                        toastr.error(message);
                         $submitBtn.prop('disabled', false).text('Submit');
                     }
                 });

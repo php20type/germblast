@@ -217,9 +217,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 options = arguments[1] || {};
                 options.url = arguments[0];
             }
-            
+
             var method = (options.method || options.type || 'GET').toUpperCase();
-            
+
             // Skip loader for background/search GET requests
             var isSearch = false;
             var url = options.url || '';
@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     isSearch = true;
                 }
             }
-            
+
             // For search GET requests, run immediately without loader/delay
             if (method === 'GET' && isSearch) {
                 // Mock AppLoader to prevent explicit calls in views
@@ -295,12 +295,12 @@ document.addEventListener('DOMContentLoaded', function() {
             var dfd = jQuery.Deferred();
             var self = this;
             var args = arguments;
-            
+
             // Delay 300ms
             setTimeout(function() {
                 // Directly pass the normalized options object instead of args
                 var jqXHR = originalAjax.call(self, options);
-                
+
                 jqXHR.done(function() {
                     if (typeof AppLoader !== 'undefined') {
                         AppLoader.hide(); // Hide if success wasn't in options
@@ -317,7 +317,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var promise = dfd.promise();
             promise.success = promise.done;
             promise.error = promise.fail;
-            
+
             promise.abort = function() {
                 if (typeof AppLoader !== 'undefined') {
                     AppLoader.hide();
@@ -383,12 +383,12 @@ $(document).on('hidden.bs.modal', '.modal', function () {
     if (form.length) {
         // Standard form reset
         form[0].reset();
-        
+
         // Remove validation error classes and messages
         form.find('.is-invalid').removeClass('is-invalid');
         form.find('.invalid-feedback').remove();
-        form.find('.error').text(''); 
-        
+        form.find('.error').text('');
+
         // Reset select2 fields without triggering other change events
         if ($.fn.select2) {
             form.find('.select2, select').trigger('change.select2');
@@ -656,4 +656,28 @@ $(function () {
             });
         }).observe(document.body, { childList: true, subtree: true });
     });
+})();
+
+// Shared jQuery Validate rules for contact details (same limits as the server rules App\Rules\StrictEmail,
+// PhoneNumber and PostalCode). Use them as: email: { strictEmail: true }, phone: { phoneFormat: true }, zip: { zipFormat: true }
+(function () {
+    if (!$.validator) return;
+
+    // name@company.com (jQuery's built-in "email" rule also accepts name@company)
+    $.validator.addMethod('strictEmail', function (value, element) {
+        return this.optional(element) || /^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$/.test(value);
+    }, 'Please enter a valid email address.');
+
+    // 7 to 15 digits; spaces, dashes, dots, brackets and a leading + are allowed
+    $.validator.addMethod('phoneFormat', function (value, element) {
+        if (this.optional(element)) return true;
+        if (!/^\+?[0-9\s().\-]+$/.test(value)) return false;
+        var digits = value.replace(/\D/g, '').length;
+        return digits >= 7 && digits <= 15;
+    }, 'Please enter a valid phone number.');
+
+    // 3 to 10 characters: letters, digits, spaces and dashes
+    $.validator.addMethod('zipFormat', function (value, element) {
+        return this.optional(element) || /^[A-Za-z0-9][A-Za-z0-9 \-]{1,8}[A-Za-z0-9]$/.test(value);
+    }, 'Please enter a valid zip / postal code.');
 })();

@@ -1920,13 +1920,13 @@
                                             </div>
                                             <div class="col-6">
                                                 <label class="form-label small text-muted mb-1">Qty</label>
-                                                <input type="number" name="quantity[]" placeholder="Quantity" class="form-control" />
+                                                <input type="number" min="1" name="quantity[]" placeholder="Quantity" class="form-control" />
                                             </div>
                                             <div class="col-6">
                                                 <div class="d-flex align-items-end gap-2">
                                                     <div class="flex-grow-1">
                                                         <label class="form-label small text-muted mb-1">Price <span class="fw-light">(USD)</span></label>
-                                                        <input type="number" name="price[]" step="0.01" placeholder="Price" class="form-control" />
+                                                        <input type="number" min="0" name="price[]" step="0.01" placeholder="Price" class="form-control" />
                                                     </div>
                                                     <button type="button" class="btn btn-outline-danger btn-sm remove-product-row" style="height:38px; padding: 0 10px;">
                                                         <i class="fas fa-times"></i>
@@ -1945,7 +1945,7 @@
                                     @error('confidence')
                                         <span class="text-danger">* {{ $message }}</span>
                                     @enderror
-                                    <input type="number" name="confidence" placeholder="Confidence %"
+                                    <input type="number" min="0" max="100" name="confidence" placeholder="Confidence %"
                                         class="form-control" />
                                 </div>
                             </div>
@@ -3383,7 +3383,8 @@
                 ignore: [],
                 rules: {
                     name: {
-                        required: true
+                        required: true,
+                        maxlength: 255
                     },
                     assignee_id: {
                         required: true
@@ -3395,13 +3396,20 @@
                         required: true
                     },
                     "quantity[]": {
-                        required: true
+                        required: true,
+                        number: true,
+                        min: 1
                     },
                     "price[]": {
-                        required: true
+                        required: true,
+                        number: true,
+                        min: 0
                     },
                     confidence: {
-                        required: true
+                        required: true,
+                        number: true,
+                        min: 0,
+                        max: 100
                     },
                     "company_id": {
                         required: true
@@ -3495,7 +3503,11 @@
                     },
                     error: function(xhr) {
                         alert(xhr.responseText);
-                        toastr.error('Something went wrong while creating the lead.');
+                        var message = 'Something went wrong while creating the lead.';
+                        if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                            message = Object.values(xhr.responseJSON.errors)[0][0];
+                        }
+                        toastr.error(message);
                     }
                 });
             });

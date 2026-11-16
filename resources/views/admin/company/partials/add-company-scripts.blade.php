@@ -38,19 +38,31 @@
                 ignore: [],
                 rules: {
                     name: {
-                        required: true
+                        required: true,
+                        maxlength: 255
                     },
                     description: {
-                        required: true
+                        required: true,
+                        maxlength: 5000
                     },
                     email: {
-                        required: true
+                        required: true,
+                        strictEmail: true,
+                        maxlength: 255
                     },
                     phone: {
-                        required: true
+                        required: true,
+                        phoneFormat: true,
+                        maxlength: 50
                     },
-                    address: {
-                        required: true
+                    address_1: {
+                        maxlength: 255
+                    },
+                    address_2: {
+                        maxlength: 255
+                    },
+                    zip: {
+                        zipFormat: true
                     },
                     people_id: {
                         required: false
@@ -87,9 +99,6 @@
                     },
                     phone: {
                         required: "Please enter the phone number."
-                    },
-                    address: {
-                        required: "Please enter the address."
                     },
                     // people_id: {
                     //     required: "Please select the person."
@@ -161,8 +170,12 @@
                         }, 1500);
                     },
 
-                    error: function() {
-                        toastr.error('Something went wrong while creating the company.');
+                    error: function(xhr) {
+                        var message = 'Something went wrong while creating the company.';
+                        if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                            message = Object.values(xhr.responseJSON.errors)[0][0];
+                        }
+                        toastr.error(message);
                         $submitBtn.prop('disabled', false).text('Submit');
                     }
                 });
