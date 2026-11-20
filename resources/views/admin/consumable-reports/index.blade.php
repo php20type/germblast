@@ -4,61 +4,7 @@
 
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    <style>
-        tr.row-flagged td {
-            background-color: #ffe5e5 !important;
-            color: #c0392b;
-        }
-
-
-        /* Column specific alignment matching original logic */
-        .equipment-report-table thead th:nth-child(1),
-        .equipment-report-table thead th:nth-child(2),
-        .equipment-report-table thead th:nth-child(3),
-        .equipment-report-table tbody td:nth-child(1):not(.dataTables_empty),
-        .equipment-report-table tbody td:nth-child(2):not(.dataTables_empty),
-        .equipment-report-table tbody td:nth-child(3):not(.dataTables_empty) {
-            text-align: left !important;
-        }
-
-        .dataTables_empty {
-            text-align: center !important;
-            padding: 50px !important;
-            color: #6b7280 !important;
-            font-size: 15px !important;
-        }
-
-        .compliance-wrapper {
-            max-width: 400px;
-            margin-top: 30px;
-        }
-
-        .compliance-wrapper h6 {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: #374151;
-            margin-bottom: 15px;
-            padding-left: 5px;
-        }
-
-        .compliance-table {
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid #f3f4f6;
-        }
-
-        .compliance-table th,
-        .compliance-table td {
-            text-align: center;
-            font-size: 0.85rem;
-            padding: 12px !important;
-        }
-
-        .compliance-table .val-bad {
-            color: #e74c3c;
-            font-weight: 700;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/corporate-tools.css') }}?v={{ filemtime(public_path('css/corporate-tools.css')) }}">
 @endpush
 
 @section('content')
@@ -107,7 +53,7 @@
 
                             {{-- Table Card --}}
                             <div class="px-4 pb-4">
-                                <table id="consumableTable" class="table table-hover w-100 equipment-report-table">
+                                <table id="consumableTable" class="table table-hover w-100 equipment-report-table equipment-report-table-left">
                                     <thead>
                                         <tr>
                                             <th>Customer</th>

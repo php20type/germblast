@@ -3,114 +3,7 @@
 @section('title', 'Evaluations')
 
 @push('styles')
-    <style>
-        .cursor-pointer {
-            cursor: pointer !important;
-        }
-
-        /* Equipment Report Table Boxed Styling from EQ */
-        .equipment-report-table {
-            border: 1px solid #e5e7eb !important;
-            border-radius: 12px !important;
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
-            overflow: hidden !important;
-            background: #fff !important;
-            width: 100% !important;
-            margin-top: 10px !important;
-        }
-
-        .equipment-report-table thead th {
-            background-color: rgba(255, 184, 28, 0.4) !important;
-            border-bottom: 1px solid #e5e7eb !important;
-            color: #374151 !important;
-            font-weight: 600 !important;
-            padding: 18px 20px !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 15px !important;
-            white-space: nowrap;
-        }
-
-        .equipment-report-table thead th:first-child {
-            border-top-left-radius: 12px !important;
-        }
-
-        .equipment-report-table thead th:last-child {
-            border-top-right-radius: 12px !important;
-            border-right: none !important;
-        }
-
-        .equipment-report-table tbody th {
-            font-size: 13px !important;
-            padding: 12px 20px !important;
-        }
-
-        .equipment-report-table td {
-            padding: 14px 20px !important;
-            vertical-align: middle !important;
-            border-bottom: 1px solid #f3f4f6 !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-            color: #4b5563;
-        }
-
-        .equipment-report-table td:last-child {
-            border-right: none !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td {
-            border-bottom: none !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td:first-child {
-            border-bottom-left-radius: 12px !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td:last-child {
-            border-bottom-right-radius: 12px !important;
-        }
-
-        .group-header-row, .group-header-row td {
-            background-color: #fdf6e3 !important;
-            border-bottom: 2px solid #fff !important;
-        }
-        
-        .scores-panel {
-            background-color: #eef9fb;
-            border-radius: 8px;
-            padding: 25px;
-            margin-top: 15px;
-            border: 1px solid #cceef3;
-        }
-
-        .score-user-table {
-            width: 100%;
-            background: transparent;
-            margin-bottom: 15px;
-            border-collapse: collapse;
-        }
-
-        .score-user-table td {
-            padding: 10px;
-            border: 1px solid #cceef3;
-            text-align: center;
-            font-size: 13px;
-        }
-        
-        .score-user-table .user-name {
-            font-weight: 600;
-            text-align: left;
-            width: 20%;
-            background-color: #e3f6fa;
-        }
-
-        .score-user-table .section-header {
-            font-size: 12px;
-            color: #6b7280;
-            border-bottom: 1px solid #cceef3;
-        }
-
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/operations.css') }}?v={{ filemtime(public_path('css/operations.css')) }}">
 @endpush
 
 @section('content')
@@ -142,7 +35,7 @@
                             
                             <!-- Notifications for Evaluations Table -->
                             <div class="table-responsive mt-3">
-                                <table class="table equipment-report-table">
+                                <table class="table equipment-report-table equipment-report-table-nowrap equipment-report-table-compact">
                                     <thead>
                                         <tr>
                                             <th colspan="5">Notifications for Evaluations</th>
@@ -306,7 +199,7 @@
 
                             <!-- SIT Table -->
                             <div class="table-responsive mt-5">
-                                <table class="table equipment-report-table">
+                                <table class="table equipment-report-table equipment-report-table-nowrap equipment-report-table-compact">
                                     <thead>
                                         <tr>
                                             <th>Technicians to evaluate for SIT</th>

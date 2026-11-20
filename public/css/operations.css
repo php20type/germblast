@@ -1,0 +1,811 @@
+/*
+ * Operations
+ * Styles for every page listed under the Operations sidebar and its subpages:
+ * All Schedules, Audit Calendar, Audits, Action Plan Overview, Time Sheets, ISD Attendance, Business Failure, Driver Report, Employee Performance, SIT Program / Progress / Modules, Equipment Manager, Scheduling Calendar, Team Availability, Workforce Coverage, Vehicle Planning, Warehouse, Warehouse Calendar, Training and Evaluations.
+ *
+ * Every class is written once, with plain selectors, so each page of the module gets the same look.
+ * Where a page genuinely needs a variation it has its own modifier class (equipment-report-table-*, navbar-tabs-scroll,
+ * nav-tabs-underline, company-form-warehouse, btn-yellow-pill) instead of a page-scoped selector.
+ * Components that style.css already provides (status pills, calendar navigation buttons, .cursor-pointer, the equipment
+ * report table, the soft tabs, .corp-section-card) are not repeated here.
+ */
+
+/* Section cards, headers and titles - same look as the other modules */
+
+.section-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 16px !important;
+    padding: 25px !important;
+    margin-bottom: 25px !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
+    transition: all 0.3s ease !important;
+}
+
+.section-card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
+}
+
+.section-header {
+    border-bottom: 1px solid #f3f4f6 !important;
+    padding-bottom: 15px !important;
+    margin-bottom: 20px !important;
+}
+
+.section-title {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Calendars (Audit Calendar, Scheduling Calendar, Warehouse Calendar) */
+
+.fc {
+    background: #fff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+    border: 1px solid #f3f4f6 !important;
+}
+
+.fc-col-header-cell {
+    background-color: #fafafa !important;
+    padding: 12px 0 !important;
+}
+
+.fc-col-header-cell-cushion {
+    color: #4b5563 !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    text-decoration: none !important;
+}
+
+.fc-daygrid-day-number {
+    color: #374151 !important;
+    font-weight: 500 !important;
+    padding: 8px !important;
+    text-decoration: none !important;
+    font-size: 13px;
+}
+
+.fc-event {
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 5px 8px !important;
+    margin: 2px 4px !important;
+    font-weight: 600 !important;
+    font-size: 12px !important;
+    cursor: pointer !important;
+    transition: transform 0.15s ease !important;
+    color: #ffffff !important;
+}
+
+.fc-event:hover {
+    transform: scale(1.02);
+}
+
+.event-regular-service {
+    background-color: #0284c7 !important;
+    color: #ffffff !important;
+    border-left: 4px solid #0369a1 !important;
+}
+
+.event-time-off {
+    background-color: #d97706 !important;
+    color: #ffffff !important;
+    border-left: 4px solid #b45309 !important;
+}
+
+.calendar-card {
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 30px !important;
+    margin-bottom: 24px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+/* Equipment report table - modifiers (the table itself is defined in style.css) */
+
+.equipment-report-table-left-first thead th:nth-child(1),
+.equipment-report-table-left-first tbody td:nth-child(1):not(.dataTables_empty) {
+    text-align: left !important;
+}
+
+.equipment-report-table-nowrap thead th {
+    white-space: nowrap;
+}
+
+.equipment-report-table-compact tbody th {
+    font-size: 13px !important;
+    padding: 12px 20px !important;
+}
+
+/* DataTables "no data" row */
+
+.dataTables_empty {
+    text-align: center !important;
+    padding: 50px !important;
+    color: #6b7280 !important;
+    font-size: 15px !important;
+}
+
+/* Tabs - modifiers (the soft tabs are defined in style.css) */
+
+.navbar-tabs-scroll {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 180, 0, 0.4) rgba(0, 0, 0, 0.05);
+    padding-bottom: 6px !important;
+}
+
+.navbar-tabs-scroll::-webkit-scrollbar {
+    height: 5px !important;
+    background-color: rgba(0, 0, 0, 0.02);
+    border-radius: 10px;
+}
+
+.navbar-tabs-scroll::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 180, 0, 0.35);
+    border-radius: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.navbar-tabs-scroll::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 180, 0, 0.7);
+}
+
+.navbar-tabs-scroll::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.02);
+    border-radius: 10px;
+}
+
+.navbar-tabs-scroll .nav-tabs {
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
+}
+
+.navbar-tabs-scroll .nav-link {
+    flex: 1 0 auto !important;
+}
+
+.nav-tabs-underline .nav-link {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.nav-tabs-underline .nav-link.active {
+    color: #111827;
+    font-weight: 700;
+    border-bottom: 2px solid #111827;
+}
+
+/* Forms */
+
+.company-form .form-group {
+    margin-bottom: 20px;
+}
+
+.company-form .form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.company-form-warehouse .form-label {
+    color: #121212 !important;
+    font-size: 14px !important;
+    text-transform: uppercase !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+}
+
+.company-form-warehouse .form-control,
+.company-form-warehouse .form-select {
+    border: 1px solid #CFCFCF !important;
+    background-color: #fff !important;
+    border-radius: 8px !important;
+    padding: 0.8rem 1rem !important;
+    font-size: 14px !important;
+    transition: border-color 0.2s;
+}
+
+.company-form-warehouse .form-control:focus,
+.company-form-warehouse .form-select:focus {
+    border-color: #ffb400 !important;
+    box-shadow: 0 0 0 0.2rem rgba(255, 180, 0, 0.15) !important;
+}
+
+/* Buttons and links */
+
+.btn-yellow-rounded {
+    background: #ffb400;
+    color: #fff;
+    border-radius: 12px;
+    padding: 10px 35px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-yellow-rounded:hover {
+    background: #e6a200;
+    color: #fff;
+}
+
+.btn-yellow-pill {
+    border-radius: 40px !important;
+    padding: 12px 40px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    font-size: 13px !important;
+}
+
+.btn-close-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff8e8;
+    border: none;
+    color: #ffb400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.2s;
+}
+
+.btn-close-circle:hover {
+    background: #ffb400;
+    color: #fff;
+}
+
+.company-link {
+    color: #1a5fb4;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.company-link:hover {
+    text-decoration: underline;
+    color: #0d47a1;
+}
+
+a.text-action {
+    color: #337ab7 !important;
+}
+
+/* Status pills - the states style.css does not define */
+
+.status-pill-due {
+    background-color: rgba(234, 61, 47, 0.12) !important;
+    color: #ea3d2f !important;
+    border-color: rgba(234, 61, 47, 0.2) !important;
+}
+
+.status-pill-completed {
+    background-color: rgba(111, 66, 193, 0.12) !important;
+    color: #6f42c1 !important;
+    border-color: rgba(111, 66, 193, 0.2) !important;
+}
+
+.status-pill-dirty {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.status-pill-ready {
+    background: #eef2ff;
+    color: #4f46e5;
+}
+
+.status-pill-inuse,
+.status-pill-assigned {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-pill-broken {
+    background: #eff6ff;
+    color: #3b82f6;
+}
+
+.status-pill-lost {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.status-pill-decommissioned {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+/* History timeline (Equipment Manager, Warehouse) */
+
+.history-timeline-container {
+    position: relative;
+    padding: 30px 40px;
+    background: #fff;
+}
+
+.history-timeline-line {
+    position: absolute;
+    left: 55px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #ffb400;
+    opacity: 0.3;
+}
+
+.timeline-item {
+    position: relative;
+    display: flex;
+    margin-bottom: 30px;
+    align-items: flex-start;
+}
+
+.timeline-icon {
+    width: 32px;
+    height: 32px;
+    background: #ffb400;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 14px;
+    z-index: 1;
+    flex-shrink: 0;
+    margin-right: 25px;
+    box-shadow: 0 0 0 5px #fff;
+    margin-top: 15px;
+}
+
+.history-card {
+    background: #fff;
+    border: 1px solid #f3f4f6;
+    border-radius: 16px;
+    padding: 20px 25px;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+}
+
+.history-card:hover {
+    border-color: #ffb400;
+    box-shadow: 0 5px 15px rgba(255, 180, 0, 0.05);
+}
+
+.history-date {
+    width: 90px;
+    flex-shrink: 0;
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+.history-content {
+    flex-grow: 1;
+    padding: 0 25px;
+}
+
+.history-note {
+    font-size: 15px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.history-status-change {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+.history-user {
+    width: 150px;
+    text-align: right;
+    font-weight: 600;
+    color: #111827;
+    font-size: 14px;
+}
+
+.history-office,
+.history-category {
+    width: 140px;
+    text-align: center;
+    color: #4b5563;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.history-labels {
+    display: flex;
+    padding: 10px 40px;
+    color: #9ca3af;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Equipment Manager, Warehouse -> history modals */
+
+#equipmentHistoryModal .modal-content,
+#viewNotesModal .modal-content {
+    border-radius: 24px;
+    border: none;
+    overflow: hidden;
+}
+
+#equipmentHistoryModal .modal-header,
+#viewNotesModal .modal-header {
+    padding: 35px 40px 25px 40px;
+    border-bottom: none !important;
+}
+
+#historyModalSubtitle,
+#viewNotesModalSubtitle {
+    font-size: 14px;
+    color: #9ca3af !important;
+    margin-top: 8px;
+    display: block;
+}
+
+/* Audits -> details */
+
+.question-header {
+    font-size: 15px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 10px;
+    margin-top: 30px;
+}
+
+.group-header {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 20px;
+    margin-top: 40px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.group-header-row, .group-header-row td {
+    background-color: #fdf6e3 !important;
+    border-bottom: 2px solid #fff !important;
+}
+
+/* ISD Attendance */
+
+.campus-item-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-decoration: none;
+    color: #1f2937;
+    transition: all 0.2s ease;
+}
+
+.campus-item-card:hover {
+    border-color: #FFB81C;
+    background-color: rgba(255, 184, 28, 0.06);
+    transform: translateY(-2px);
+    color: #1f2937;
+}
+
+.campus-item-card h6 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.campus-actions {
+    z-index: 10;
+}
+
+/* Employee Performance */
+
+.select2-container--default .select2-results__option {
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.table-hover > tbody > tr.category-header-row > td,
+.table-hover > tbody > tr.category-header-row:hover > td {
+    background-color: #fdf6e3 !important;
+    box-shadow: none !important;
+    color: inherit !important;
+}
+
+/* SIT Program, SIT Progress, SIT Modules */
+
+.sit-body {
+    color: #4b5563;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.sit-section {
+    margin-bottom: 16px;
+}
+
+.sit-section strong {
+    color: #374151;
+    font-weight: 700;
+}
+
+.sit-tech-buttons {
+    margin-top: 30px;
+}
+
+.btn-tech {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    padding: 12px 24px;
+    font-size: 15px;
+    margin-right: 12px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-tech:hover {
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
+    color: #111827;
+}
+
+.sit-empty-message {
+    font-size: 22px;
+    font-weight: 300;
+    color: #6b7280;
+}
+
+.badge-active {
+    background-color: #d1fae5;
+    color: #065f46;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.badge-inactive {
+    background-color: #f3f4f6;
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.drag-handle {
+    color: #9ca3af;
+    cursor: grab;
+    font-size: 16px;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+/* iOS-style toggle switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.toggle-slider {
+    position: absolute;
+    inset: 0;
+    background-color: #d1d5db;
+    border-radius: 34px;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+}
+
+.toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.25s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: #22c55e;
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(20px);
+}
+
+.toggle-switch:hover .toggle-slider {
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.15);
+}
+
+/* Training Questions -> questions of a test */
+
+.option-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* Training Report */
+
+.status-badge {
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.status-passed {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-failed {
+    background-color: #f8d7da;
+    color: #842029;
+}
+
+.status-not-started {
+    background-color: #e2e3e5;
+    color: #41464b;
+}
+
+.attempt-item {
+    font-size: 11px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    border: 1px solid #e5e7eb;
+    background: #f8f9fa;
+}
+
+.attempt-item.passed {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+    color: #166534;
+}
+
+.attempt-item.failed {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #991b1b;
+}
+
+/* Evaluations */
+
+.scores-panel {
+    background-color: #eef9fb;
+    border-radius: 8px;
+    padding: 25px;
+    margin-top: 15px;
+    border: 1px solid #cceef3;
+}
+
+.score-user-table {
+    width: 100%;
+    background: transparent;
+    margin-bottom: 15px;
+    border-collapse: collapse;
+}
+
+.score-user-table td {
+    padding: 10px;
+    border: 1px solid #cceef3;
+    text-align: center;
+    font-size: 13px;
+}
+
+.score-user-table .user-name {
+    font-weight: 600;
+    text-align: left;
+    width: 20%;
+    background-color: #e3f6fa;
+}
+
+.score-user-table .section-header {
+    font-size: 12px;
+    color: #6b7280;
+    border-bottom: 1px solid #cceef3;
+}
+
+.score-options label {
+    margin-right: 10px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.score-options input[type="radio"] {
+    margin-top: 0;
+    vertical-align: middle;
+}
+
+.instructions-text {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* Evaluation Questions */
+
+.questions-table {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    overflow: hidden !important;
+    background: #fff !important;
+    width: 100% !important;
+    margin-top: 10px !important;
+}
+
+.questions-table thead th {
+    background-color: rgba(255, 184, 28, 0.4) !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    color: #374151 !important;
+    font-weight: 600 !important;
+    padding: 15px 20px !important;
+    border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+    font-size: 14px !important;
+}
+
+.questions-table td {
+    padding: 12px 20px !important;
+    vertical-align: middle !important;
+    border-bottom: 1px solid #f3f4f6 !important;
+    font-size: 14px !important;
+    color: #4b5563;
+}
+
+.role-header {
+    background-color: #fdf6e3 !important;
+    font-size: 15px !important;
+    font-weight: bold !important;
+    color: #1f2937 !important;
+}

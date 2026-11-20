@@ -3,12 +3,7 @@
 @section('title', 'Change Control')
 
 @push('styles')
-    <style>
-        .cursor-pointer {
-            cursor: pointer !important;
-        }
-
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/corporate-tools.css') }}?v={{ filemtime(public_path('css/corporate-tools.css')) }}">
 @endpush
 
 @section('content')

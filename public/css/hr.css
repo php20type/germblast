@@ -1,0 +1,212 @@
+/*
+ * Human Resources
+ * Styles for the Human Resources pages (Timecards, Labor Analysis, Time Off Request, Team Praise, GB Rewards,
+ * Anonymous Feedback and Nominations Management).
+ *
+ * Every class is written once, with plain selectors, so each page of the module gets the same look.
+ * Components that style.css already provides (calendar navigation buttons, badges, tabs, status pills, metric cards,
+ * tables) are not repeated here.
+ */
+
+/* Section cards, headers and titles - same look as the other modules */
+
+.section-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 16px !important;
+    padding: 25px !important;
+    margin-bottom: 25px !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
+    transition: all 0.3s ease !important;
+}
+
+.section-card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
+}
+
+.section-header {
+    border-bottom: 1px solid #f3f4f6 !important;
+    padding-bottom: 15px !important;
+    margin-bottom: 20px !important;
+}
+
+.section-title {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Status pills - the one state style.css does not define */
+
+.status-pill-submitted {
+    background-color: rgba(255, 184, 28, 0.12) !important;
+    color: #d39100 !important;
+    border-color: rgba(255, 184, 28, 0.25) !important;
+}
+
+/* DataTables "no data" row */
+
+.dataTables_empty {
+    text-align: center !important;
+    padding: 50px !important;
+    color: #6b7280 !important;
+    font-size: 15px !important;
+}
+
+/* Labor Analysis -> tabs: keep every tab on one line and scroll sideways (what style.css does not define) */
+
+.navbar-tabs {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.3s ease;
+    -webkit-overflow-scrolling: touch;
+}
+
+.navbar-tabs:hover {
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+.navbar-tabs::-webkit-scrollbar {
+    height: 5px;
+}
+
+.navbar-tabs::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.navbar-tabs:hover::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+}
+
+.navbar-tabs .nav-tabs {
+    border-bottom: none !important;
+    flex-wrap: nowrap;
+}
+
+/* Time Off Request -> metric cards (the parts style.css does not define) */
+
+.sales-dashboard .metric-card h3 {
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    color: #495057 !important;
+    margin-bottom: 0.5rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.sales-dashboard .metric-card .metric-value {
+    font-size: 2.2rem !important;
+    font-weight: 700 !important;
+    margin: 0.2rem 0 !important;
+    line-height: 1.2 !important;
+}
+
+.sales-dashboard .metric-card.open-leads {
+    background-color: #e6f3ff !important;
+    border-color: #cce7ff !important;
+}
+
+/* Team Praise -> submit praise */
+
+.form-group-praise {
+    margin-bottom: 24px;
+}
+
+.form-label-praise {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.input-praise {
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    padding: 10px 14px;
+    font-size: 14px;
+    width: 100%;
+    outline: none;
+    transition: border-color .15s;
+}
+
+.input-praise:focus {
+    border-color: #3b82f6;
+}
+
+/* Submit buttons (Team Praise, Anonymous Feedback) */
+
+.btn-submit-praise,
+.btn-submit-feedback {
+    background: #ffb81c;
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 10px 32px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .15s;
+}
+
+.btn-submit-praise:hover,
+.btn-submit-feedback:hover {
+    background: #e5a500;
+}
+
+/* GB Rewards */
+
+.btn-delete-reward {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    font-size: 16px;
+    padding: 4px 8px;
+    transition: color 0.15s ease;
+}
+
+.btn-delete-reward:hover {
+    color: #ef4444;
+}
+
+/* Anonymous Feedback */
+
+.status-pill-feedback {
+    background-color: rgba(107, 114, 128, 0.12) !important;
+    color: #4b5563 !important;
+    border-color: rgba(107, 114, 128, 0.2) !important;
+}
+
+/* Nominations Management */
+
+.survey-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #4b5563;
+    margin-top: 24px;
+    margin-bottom: 12px;
+}
+
+.office-title {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.no-votes {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+.results-container {
+    padding-left: 20px;
+    border-left: 2px solid #f3f4f6;
+    margin-top: 20px;
+}

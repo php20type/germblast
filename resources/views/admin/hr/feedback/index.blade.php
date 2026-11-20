@@ -3,43 +3,7 @@
 @section('title', 'Feedback Submissions')
 
 @push('styles')
-<style>
-    /* Status Pills styling */
-    .status-pill {
-        font-size: 11px !important;
-        font-weight: 700 !important;
-        padding: 4px 10px !important;
-        border-radius: 20px !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 4px !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.5px !important;
-        border: 1px solid transparent !important;
-    }
-
-    .status-pill-feedback {
-        background-color: rgba(107, 114, 128, 0.12) !important;
-        color: #4b5563 !important;
-        border-color: rgba(107, 114, 128, 0.2) !important;
-    }
-
-    /* Section Cards */
-    .section-card {
-        background: #ffffff !important;
-        border: 1px solid #e5e7eb !important;
-        border-radius: 16px !important;
-        padding: 25px !important;
-        margin-bottom: 25px !important;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
-        transition: all 0.3s ease !important;
-    }
-
-    .section-card:hover {
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/hr.css') }}?v={{ filemtime(public_path('css/hr.css')) }}">
 @endpush
 
 @section('content')

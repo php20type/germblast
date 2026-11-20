@@ -3,12 +3,7 @@
 @section('title', 'Employee Performance')
 
 @push('styles')
-    <style>
-        .cursor-pointer {
-            cursor: pointer !important;
-        }
-
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/operations.css') }}?v={{ filemtime(public_path('css/operations.css')) }}">
 @endpush
 
 @section('content')
@@ -306,21 +301,6 @@
 @endsection
 
 @push('styles')
-<style>
-    /* Allow Select2 options to wrap */
-    .select2-container--default .select2-results__option {
-        white-space: normal;
-        word-wrap: break-word;
-    }
-    
-    /* Disable hover effect on category header rows */
-    .table-hover > tbody > tr.category-header-row > td,
-    .table-hover > tbody > tr.category-header-row:hover > td {
-        background-color: #fdf6e3 !important;
-        box-shadow: none !important;
-        color: inherit !important;
-    }
-</style>
 @endpush
 
 @push('scripts')

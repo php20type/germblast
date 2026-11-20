@@ -3,24 +3,7 @@
 @section('title', auth()->user()->isSuperAdmin() ? 'GB Rewards Management' : 'My Rewards')
 
 @push('styles')
-    <style>
-
-
-        .btn-delete-reward {
-            background: none;
-            border: none;
-            color: #9ca3af;
-            font-size: 16px;
-            padding: 4px 8px;
-            transition: color 0.15s ease;
-        }
-
-        .btn-delete-reward:hover {
-            color: #ef4444;
-        }
-
-
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/hr.css') }}?v={{ filemtime(public_path('css/hr.css')) }}">
 @endpush
 
 @section('content')

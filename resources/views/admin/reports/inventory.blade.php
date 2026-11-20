@@ -4,34 +4,7 @@
 
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    <style>
-
-
-        /* Report Date Column (light-red/pink background as in image) */
-        .col-report-date {
-            background-color: #fce8e6 !important;
-            color: #c0392b !important;
-            font-weight: 500;
-        }
-
-        /* Actions Needed Warning Cell */
-        .col-actions-warning {
-            background-color: #fce8e6 !important;
-            color: #c0392b !important;
-            font-weight: 500;
-        }
-
-        .item-link {
-            color: #2563eb !important;
-            text-decoration: none;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        .item-link:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/corporate-tools.css') }}?v={{ filemtime(public_path('css/corporate-tools.css')) }}">
 @endpush
 
 @section('content')

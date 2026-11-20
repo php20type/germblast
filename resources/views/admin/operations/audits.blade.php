@@ -3,26 +3,7 @@
 @section('title', 'Audits')
 
 @push('styles')
-    <style>
-        .cursor-pointer {
-            cursor: pointer !important;
-        }
-
-        /* Section Cards from Business Failures */
-        .section-card {
-            background: #ffffff !important;
-            border: 1px solid #e5e7eb !important;
-            border-radius: 16px !important;
-            padding: 25px !important;
-            margin-bottom: 25px !important;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
-            transition: all 0.3s ease !important;
-        }
-
-        .section-card:hover {
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/operations.css') }}?v={{ filemtime(public_path('css/operations.css')) }}">
 @endpush
 
 @section('content')

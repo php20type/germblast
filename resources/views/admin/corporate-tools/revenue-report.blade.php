@@ -4,47 +4,7 @@
 
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    <style>
-        .client-link {
-            color: #1a73e8 !important;
-            font-weight: 500;
-            text-decoration: none;
-        }
-        .client-link:hover {
-            text-decoration: underline;
-        }
-
-        /* Calendar Navigation Button from Job Profitability */
-        .calendar-nav-btn {
-            color: #4b5563 !important;
-            font-size: 11px !important;
-            font-weight: 700 !important;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 8px 16px !important;
-            border-radius: 6px !important;
-            transition: all 0.15s ease;
-            text-decoration: none !important;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .calendar-nav-btn:hover {
-            background-color: #f3f4f6 !important;
-            color: #1f2937 !important;
-        }
-
-        .calendar-nav-btn.btn-today {
-            background-color: #ffb400 !important;
-            color: #ffffff !important;
-            box-shadow: 0 2px 4px rgba(255, 180, 0, 0.15) !important;
-        }
-
-        .calendar-nav-btn.btn-today:hover {
-            background-color: #e6a200 !important;
-            color: #ffffff !important;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/corporate-tools.css') }}?v={{ filemtime(public_path('css/corporate-tools.css')) }}">
 @endpush
 
 @section('content')

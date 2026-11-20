@@ -3,21 +3,7 @@
 @section('title', 'Anonymous Feedback')
 
 @push('styles')
-<style>
-
-    .btn-submit-feedback {
-        background: #ffb81c;
-        color: #fff;
-        font-weight: 700;
-        font-size: 14px;
-        padding: 10px 32px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background .15s;
-    }
-    .btn-submit-feedback:hover { background: #e5a500; }
-</style>
+<link rel="stylesheet" href="{{ asset('css/hr.css') }}?v={{ filemtime(public_path('css/hr.css')) }}">
 @endpush
 
 @section('content')

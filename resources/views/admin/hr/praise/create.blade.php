@@ -3,44 +3,7 @@
 @section('title', 'Core Value Praise Form')
 
 @push('styles')
-<style>
-
-    .form-group-praise {
-        margin-bottom: 24px;
-    }
-    .form-label-praise {
-        font-size: 14px;
-        font-weight: 500;
-        color: #374151;
-        margin-bottom: 8px;
-        display: block;
-    }
-    .input-praise {
-        border-radius: 6px;
-        border: 1px solid #d1d5db;
-        padding: 10px 14px;
-        font-size: 14px;
-        width: 100%;
-        outline: none;
-        transition: border-color .15s;
-    }
-    .input-praise:focus {
-        border-color: #3b82f6;
-    }
-
-    .btn-submit-praise {
-        background: #ffb81c;
-        color: #fff;
-        font-weight: 700;
-        font-size: 14px;
-        padding: 10px 32px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background .15s;
-    }
-    .btn-submit-praise:hover { background: #e5a500; }
-</style>
+<link rel="stylesheet" href="{{ asset('css/hr.css') }}?v={{ filemtime(public_path('css/hr.css')) }}">
 @endpush
 
 @section('content')

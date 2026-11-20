@@ -3,19 +3,7 @@
 @section('title', 'Business Failures')
 
 @push('styles')
-    <style>
-
-
-        /* Fullscreen form styling */
-        .company-form .form-group {
-            margin-bottom: 20px;
-        }
-        .company-form .form-label {
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 6px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/operations.css') }}?v={{ filemtime(public_path('css/operations.css')) }}">
 @endpush
 
 @section('content')

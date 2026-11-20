@@ -5,121 +5,7 @@
 @push('styles')
     <!-- FullCalendar CSS -->
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
-    <style>
-        /* Consistent styles matching other premium calendars in the workspace */
-        .fc {
-            background: #fff !important;
-            border: none !important;
-            border-radius: 12px !important;
-            overflow: hidden !important;
-        }
-
-        .fc-theme-standard td,
-        .fc-theme-standard th {
-            border: 1px solid #f3f4f6 !important;
-        }
-
-        .fc-col-header-cell {
-            background-color: #fafafa !important;
-            padding: 12px 0 !important;
-        }
-
-        .fc-col-header-cell-cushion {
-            color: #4b5563 !important;
-            font-weight: 600 !important;
-            font-size: 13px !important;
-            text-decoration: none !important;
-        }
-
-        .fc-daygrid-day-number {
-            color: #374151 !important;
-            font-weight: 500 !important;
-            padding: 8px !important;
-            text-decoration: none !important;
-            font-size: 13px;
-        }
-
-        .fc-event {
-            border: none !important;
-            border-radius: 6px !important;
-            padding: 5px 8px !important;
-            margin: 2px 4px !important;
-            font-weight: 600 !important;
-            font-size: 12px !important;
-            cursor: pointer !important;
-            transition: transform 0.15s ease !important;
-        }
-
-        .fc-event:hover {
-            transform: scale(1.02);
-        }
-
-        .event-regular-service {
-            background-color: #0284c7 !important;
-            color: #ffffff !important;
-            border-left: 4px solid #0369a1 !important;
-        }
-
-        .event-time-off {
-            background-color: #d97706 !important;
-            color: #ffffff !important;
-            border-left: 4px solid #b45309 !important;
-        }
-
-        /* Gold/Yellow Buttons consistent with Warehouse Maintenance */
-        .btn-yellow-rounded {
-            background: #ffb400 !important;
-            color: #fff !important;
-            border-radius: 40px !important;
-            padding: 12px 40px !important;
-            font-weight: 600 !important;
-            border: none !important;
-            transition: all 0.2s !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.5px !important;
-            font-size: 13px !important;
-        }
-
-        .btn-yellow-rounded:hover {
-            background: #e6a200 !important;
-            color: #fff !important;
-        }
-
-        /* Custom Card layout consistent with site structures */
-        .calendar-card {
-            background: #ffffff !important;
-            border-radius: 12px !important;
-            padding: 30px !important;
-            margin-bottom: 24px !important;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
-            border: 1px solid #e5e7eb !important;
-        }
-
-        /* Consistent form label styling matching standard site forms */
-        .company-form .form-label {
-            color: #121212 !important;
-            font-size: 14px !important;
-            text-transform: uppercase !important;
-            font-weight: 600 !important;
-            letter-spacing: 0.5px !important;
-        }
-
-        .company-form .form-control,
-        .company-form .form-select {
-            border: 1px solid #CFCFCF !important;
-            background-color: #fff !important;
-            border-radius: 8px !important;
-            padding: 0.8rem 1rem !important;
-            font-size: 14px !important;
-            transition: border-color 0.2s;
-        }
-
-        .company-form .form-control:focus,
-        .company-form .form-select:focus {
-            border-color: #ffb400 !important;
-            box-shadow: 0 0 0 0.2rem rgba(255, 180, 0, 0.15) !important;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/operations.css') }}?v={{ filemtime(public_path('css/operations.css')) }}">
 @endpush
 
 @section('content')
@@ -161,7 +47,7 @@
                                         <!-- LEFT COLUMN: CONTROLS FORM -->
                                         @can('warehouse_calendar.edit')
                                         <div class="col-lg-7 border-end pe-lg-5">
-                                            <form id="createScheduleForm" class="company-form">
+                                            <form id="createScheduleForm" class="company-form company-form-warehouse">
                                                 <div class="form-group mb-4">
                                                     <label for="employee_select" class="form-label">Employee <span class="text-danger">*</span></label>
                                                     <select id="employee_select" name="employee" class="form-select" required>
@@ -196,7 +82,7 @@
                                                 </div>
 
                                                 <div class="mt-2">
-                                                    <button type="submit" class="btn btn-yellow-rounded">
+                                                    <button type="submit" class="btn btn-yellow-rounded btn-yellow-pill">
                                                         Add Schedule
                                                     </button>
                                                 </div>

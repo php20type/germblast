@@ -3,23 +3,7 @@
 @section('title', 'All Schedules')
 
 @push('styles')
-    <style>
-
-
-        .section-title {
-            font-size: 18px !important;
-            font-weight: 600 !important;
-            color: #374151 !important;
-            margin-bottom: 0 !important;
-            text-transform: none !important;
-        }
-
-        .section-header {
-            border-bottom: 1px solid #f3f4f6 !important;
-            padding-bottom: 15px !important;
-            margin-bottom: 20px !important;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/operations.css') }}?v={{ filemtime(public_path('css/operations.css')) }}">
 @endpush
 
 @section('content')

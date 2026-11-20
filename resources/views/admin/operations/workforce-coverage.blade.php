@@ -3,12 +3,7 @@
 @section('title', 'Workforce Coverage')
 
 @push('styles')
-    <style>
-        .cursor-pointer {
-            cursor: pointer !important;
-        }
-
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/operations.css') }}?v={{ filemtime(public_path('css/operations.css')) }}">
 @endpush
 
 @section('content')

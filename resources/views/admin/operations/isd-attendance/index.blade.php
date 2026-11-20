@@ -3,62 +3,7 @@
 @section('title', 'ISD Attendance')
 
 @push('styles')
-    <style>
-        .campus-item-card {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 20px 24px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            text-decoration: none;
-            color: #1f2937;
-            transition: all 0.2s ease;
-        }
-
-        .campus-item-card:hover {
-            border-color: #FFB81C;
-            background-color: rgba(255, 184, 28, 0.06);
-            transform: translateY(-2px);
-            color: #1f2937;
-        }
-
-        .campus-item-card h6 {
-            margin: 0;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .campus-actions {
-            z-index: 10;
-        }
-
-        /* Section cards, same as Action Plan Overview */
-        .section-card {
-            background: #ffffff !important;
-            border: 1px solid #e5e7eb !important;
-            border-radius: 16px !important;
-            padding: 25px !important;
-            margin-bottom: 25px !important;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
-            transition: all 0.3s ease !important;
-        }
-
-        .section-card:hover {
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
-        }
-
-        .company-form .form-group {
-            margin-bottom: 20px;
-        }
-        .company-form .form-label {
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 6px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/operations.css') }}?v={{ filemtime(public_path('css/operations.css')) }}">
 @endpush
 
 @section('content')

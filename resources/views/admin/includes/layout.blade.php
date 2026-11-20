@@ -34,7 +34,7 @@
 
 </head>
 
-<body>
+<body @hasSection('body_class') class="@yield('body_class')" @endif>
     <main class="app-wrapper">
 
         @include('admin.includes.loader')

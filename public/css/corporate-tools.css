@@ -1,0 +1,477 @@
+/*
+ * Corporate Tools
+ * Styles for every page listed under the Corporate Tools sidebar and its subpages:
+ * Change Control, Consumable Reports, Expense Report, Inventory Reporting, Job Profitability, QuickBooks Export,
+ * Office Duties, Resource Library, Residential Report, Survey Configuration and Revenue Report.
+ *
+ * Every class is written once, with plain selectors, so each page of the module gets the same look.
+ * Components that style.css already provides (status pills, calendar navigation buttons, .cursor-pointer,
+ * the equipment report table) are not repeated here.
+ */
+
+/* Section cards, headers and titles - same look as the other modules */
+
+.section-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 16px !important;
+    padding: 25px !important;
+    margin-bottom: 25px !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02) !important;
+    transition: all 0.3s ease !important;
+}
+
+.section-card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.04) !important;
+}
+
+.section-header {
+    border-bottom: 1px solid #f3f4f6 !important;
+    padding-bottom: 15px !important;
+    margin-bottom: 20px !important;
+}
+
+.section-title {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Status pills - the states style.css does not define */
+
+.status-pill-submitted {
+    background-color: rgba(255, 184, 28, 0.12) !important;
+    color: #d39100 !important;
+    border-color: rgba(255, 184, 28, 0.25) !important;
+}
+
+.status-pill-filled {
+    background-color: rgba(6, 150, 151, 0.12) !important;
+    color: #069697 !important;
+    border-color: rgba(6, 150, 151, 0.25) !important;
+}
+
+/* DataTables "no data" row */
+
+.dataTables_empty {
+    text-align: center !important;
+    padding: 50px !important;
+    color: #6b7280 !important;
+    font-size: 15px !important;
+}
+
+/* Equipment report table - row headers and the first three columns left-aligned (modifier class) */
+
+.equipment-report-table tbody th {
+    background-color: #fff !important;
+    border-bottom: 1px solid #f3f4f6 !important;
+    color: #374151 !important;
+    font-weight: 600 !important;
+    padding: 15px 20px !important;
+    border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+    font-size: 14px !important;
+    text-align: left !important;
+}
+
+.equipment-report-table tbody tr:last-child th {
+    border-bottom: none !important;
+}
+
+.equipment-report-table tbody tr:last-child th:first-child {
+    border-bottom-left-radius: 12px !important;
+}
+
+.equipment-report-table tbody tr:last-child th:last-child {
+    border-bottom-right-radius: 12px !important;
+}
+
+.equipment-report-table-left thead th:nth-child(1),
+.equipment-report-table-left thead th:nth-child(2),
+.equipment-report-table-left thead th:nth-child(3),
+.equipment-report-table-left tbody td:nth-child(1):not(.dataTables_empty),
+.equipment-report-table-left tbody td:nth-child(2):not(.dataTables_empty),
+.equipment-report-table-left tbody td:nth-child(3):not(.dataTables_empty) {
+    text-align: left !important;
+}
+
+/* Links and inputs */
+
+.client-link {
+    color: #1a73e8 !important;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.client-link:hover {
+    text-decoration: underline;
+}
+
+.item-link {
+    color: #2563eb !important;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.item-link:hover {
+    text-decoration: underline;
+}
+
+.form-control-custom {
+    border: 1px solid #000 !important;
+    border-radius: 0 !important;
+    padding: 4px 8px !important;
+    width: 150px !important;
+    font-size: 14px !important;
+    color: #1f2937 !important;
+}
+
+.status-select {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    padding: 4px 10px !important;
+    cursor: pointer !important;
+    border: 1px solid #ced4da !important;
+    background-color: #ffffff !important;
+    transition: all 0.2s ease !important;
+    outline: none !important;
+}
+
+.status-select:focus {
+    border-color: #FFB81C !important;
+    box-shadow: 0 0 0 0.2rem rgba(255, 184, 28, 0.25) !important;
+}
+
+/* Change Control, Office Duties -> history timeline */
+
+.history-timeline-container {
+    position: relative;
+    padding: 30px 40px;
+    background: #fff;
+}
+
+.history-timeline-line {
+    position: absolute;
+    left: 55px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #ffb400;
+    opacity: 0.3;
+}
+
+.timeline-item {
+    position: relative;
+    display: flex;
+    margin-bottom: 30px;
+    align-items: flex-start;
+}
+
+.timeline-icon {
+    width: 32px;
+    height: 32px;
+    background: #ffb400;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 14px;
+    z-index: 1;
+    flex-shrink: 0;
+    margin-right: 25px;
+    box-shadow: 0 0 0 5px #fff;
+    margin-top: 15px;
+}
+
+.history-card {
+    background: #fff;
+    border: 1px solid #f3f4f6;
+    border-radius: 16px;
+    padding: 20px 25px;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+}
+
+.history-card:hover {
+    border-color: #ffb400;
+    box-shadow: 0 5px 15px rgba(255, 180, 0, 0.05);
+}
+
+.history-date {
+    width: 140px;
+    flex-shrink: 0;
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+.history-content {
+    flex-grow: 1;
+    padding: 0 25px;
+}
+
+.history-note {
+    font-size: 15px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+.history-user {
+    width: 150px;
+    text-align: right;
+    font-weight: 600;
+    color: #111827;
+    font-size: 14px;
+}
+
+.history-labels {
+    display: flex;
+    padding: 10px 40px;
+    color: #9ca3af;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.task-completed {
+    text-decoration: line-through;
+    color: #9ca3af;
+}
+
+/* Office Duties -> history modal */
+
+#historyModal .modal-content {
+    border-radius: 24px;
+    border: none;
+    overflow: hidden;
+}
+
+#historyModal .modal-header {
+    padding: 35px 40px 25px 40px;
+    border-bottom: none !important;
+}
+
+#historyTaskTitle {
+    font-size: 14px;
+    color: #9ca3af !important;
+    margin-top: 8px;
+    display: block;
+    font-weight: normal;
+}
+
+.btn-close-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff8e8;
+    border: none;
+    color: #ffb400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.2s;
+}
+
+.btn-close-circle:hover {
+    background: #ffb400;
+    color: #fff;
+}
+
+.btn-yellow-rounded {
+    background: #ffb400;
+    color: #fff;
+    border-radius: 12px;
+    padding: 10px 35px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-yellow-rounded:hover {
+    background: #e6a200;
+    color: #fff;
+}
+
+/* Consumable Reports */
+
+tr.row-flagged td {
+    background-color: #ffe5e5 !important;
+    color: #c0392b;
+}
+
+.compliance-wrapper {
+    max-width: 400px;
+    margin-top: 30px;
+}
+
+.compliance-wrapper h6 {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #374151;
+    margin-bottom: 15px;
+    padding-left: 5px;
+}
+
+.compliance-table {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #f3f4f6;
+}
+
+.compliance-table th,
+.compliance-table td {
+    text-align: center;
+    font-size: 0.85rem;
+    padding: 12px !important;
+}
+
+.compliance-table .val-bad {
+    color: #e74c3c;
+    font-weight: 700;
+}
+
+/* Expense Report */
+
+.section-search-wrap {
+    position: relative;
+    min-width: 240px;
+}
+
+.section-search-wrap input {
+    padding-left: 15px;
+    font-size: 0.82rem;
+    height: 38px;
+    border-radius: 20px;
+    border: 1px solid #e5e7eb;
+    background: rgba(255, 255, 255, 0.85);
+    transition: all 0.2s ease;
+}
+
+.section-search-wrap input:focus {
+    outline: none;
+    border-color: #ffb400;
+    box-shadow: 0 0 0 2px rgba(255, 180, 0, 0.15);
+    background: #fff;
+}
+
+/* Inventory Reporting */
+
+.col-report-date {
+    background-color: #fce8e6 !important;
+    color: #c0392b !important;
+    font-weight: 500;
+}
+
+.col-actions-warning {
+    background-color: #fce8e6 !important;
+    color: #c0392b !important;
+    font-weight: 500;
+}
+
+/* Job Profitability */
+
+.row-green {
+    background-color: #e2f0d9 !important;
+}
+
+.row-pink {
+    background-color: #fce8e6 !important;
+}
+
+.row-yellow {
+    background-color: #fff2cc !important;
+}
+
+.text-success-custom {
+    color: #2e7d32 !important;
+    font-weight: 600;
+}
+
+.text-danger-custom {
+    color: #c0392b !important;
+    font-weight: 600;
+}
+
+/* QuickBooks Export */
+
+.export-btn {
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 6px;
+}
+
+/* Resource Library */
+
+.resource-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background-color: #ffffff;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.resource-card .card-header {
+    background-color: rgba(255, 184, 28, 0.4);
+    border-bottom: 1px solid #e5e7eb;
+    padding: 18px 24px;
+    border-radius: 12px 12px 0 0 !important;
+}
+
+.resource-card .card-header h5 {
+    color: #374151;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.resource-card .card-body {
+    padding: 24px;
+}
+
+.resource-list {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+.resource-list li {
+    position: relative;
+    padding-left: 16px;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.resource-list li::before {
+    content: "•";
+    color: #9ca3af;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+.resource-list li:last-child {
+    margin-bottom: 0;
+}
+
+.resource-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.resource-link:hover {
+    text-decoration: underline;
+    color: #1d4ed8;
+}

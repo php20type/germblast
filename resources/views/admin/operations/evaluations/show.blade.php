@@ -3,96 +3,7 @@
 @section('title', 'Scores for ' . $user->name)
 
 @push('styles')
-    <style>
-        .equipment-report-table {
-            border: 1px solid #e5e7eb !important;
-            border-radius: 12px !important;
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
-            overflow: hidden !important;
-            background: #fff !important;
-            width: 100% !important;
-            margin-top: 10px !important;
-        }
-
-        .equipment-report-table thead th {
-            background-color: rgba(255, 184, 28, 0.4) !important;
-            border-bottom: 1px solid #e5e7eb !important;
-            color: #374151 !important;
-            font-weight: 600 !important;
-            padding: 18px 20px !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 15px !important;
-            white-space: nowrap;
-        }
-
-        .equipment-report-table thead th:first-child {
-            border-top-left-radius: 12px !important;
-        }
-
-        .equipment-report-table thead th:last-child {
-            border-top-right-radius: 12px !important;
-            border-right: none !important;
-        }
-
-        .equipment-report-table td {
-            padding: 14px 20px !important;
-            vertical-align: middle !important;
-            border-bottom: 1px solid #f3f4f6 !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-            color: #4b5563;
-        }
-
-        .equipment-report-table td:last-child {
-            border-right: none !important;
-        }
-
-        .equipment-report-table tbody tr:last-child td {
-            border-bottom: none !important;
-        }
-
-        /* Modern Soft Tabs Styling */
-        .navbar-tabs .nav-tabs {
-            border-bottom: none !important;
-        }
-
-        .navbar-tabs .nav-link {
-            border: none !important;
-            color: #6b7280 !important;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 13px;
-            padding: 12px 20px 20px 20px !important;
-            background: transparent !important;
-            position: relative;
-            transition: all 0.2s ease;
-        }
-
-        .navbar-tabs .nav-link.active {
-            color: #111827 !important;
-            background-color: #fff8e8 !important;
-            border-radius: 10px 10px 0 0;
-        }
-
-        .navbar-tabs .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background-color: #ffb400;
-        }
-
-        .navbar-tabs .badge {
-            background-color: #6b7280 !important;
-            font-weight: 500;
-            padding: 4px 8px;
-            font-size: 11px;
-            vertical-align: middle;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/operations.css') }}?v={{ filemtime(public_path('css/operations.css')) }}">
 @endpush
 
 @section('content')
@@ -154,7 +65,7 @@
                                              aria-labelledby="eval-tab-{{ $evaluation->id }}">
                                             
                                             <div class="table-responsive mt-3">
-                                                <table class="table equipment-report-table">
+                                                <table class="table equipment-report-table equipment-report-table-nowrap">
                                                     <thead>
                                                         <tr>
                                                             <th>Question</th>

@@ -3,62 +3,7 @@
 @section('title', 'Resource Library')
 
 @push('styles')
-    <style>
-        .resource-card {
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            background-color: #ffffff;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        }
-        .resource-card .card-header {
-            background-color: rgba(255, 184, 28, 0.4);
-            border-bottom: 1px solid #e5e7eb;
-            padding: 18px 24px;
-            border-radius: 12px 12px 0 0 !important;
-        }
-        .resource-card .card-header h5 {
-            color: #374151;
-            font-size: 18px;
-            font-weight: 600;
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .resource-card .card-body {
-            padding: 24px;
-        }
-        .resource-list {
-            list-style: none;
-            padding-left: 0;
-            margin-bottom: 0;
-        }
-        .resource-list li {
-            position: relative;
-            padding-left: 16px;
-            margin-bottom: 8px;
-            font-size: 16px;
-        }
-        .resource-list li::before {
-            content: "•";
-            color: #9ca3af;
-            font-weight: bold;
-            position: absolute;
-            left: 0;
-        }
-        .resource-list li:last-child {
-            margin-bottom: 0;
-        }
-        .resource-link {
-            color: #2563eb;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .resource-link:hover {
-            text-decoration: underline;
-            color: #1d4ed8;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/corporate-tools.css') }}?v={{ filemtime(public_path('css/corporate-tools.css')) }}">
 @endpush
 
 @section('content')

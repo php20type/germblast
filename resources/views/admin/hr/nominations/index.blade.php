@@ -3,69 +3,7 @@
 @section('title', 'Outstanding Nominations Management')
 
 @push('styles')
-<style>
-    .section-card {
-        background: #fff;
-        border: 1px solid #f0f0f0;
-        border-radius: 12px;
-        padding: 24px;
-        margin-bottom: 24px;
-    }
-
-    .section-title {
-        font-size: 16px;
-        font-weight: 700;
-        color: #374151;
-        text-transform: uppercase;
-        letter-spacing: .5px;
-        margin-bottom: 5px;
-    }
-
-    .survey-title {
-        font-size: 16px;
-        font-weight: 600;
-        color: #4b5563;
-        margin-top: 24px;
-        margin-bottom: 12px;
-    }
-    
-    .office-title {
-        color: #6b7280;
-        font-size: 14px;
-        margin-bottom: 12px;
-    }
-
-    .no-votes {
-        font-size: 14px;
-        color: #6b7280;
-        margin-bottom: 20px;
-        font-style: italic;
-    }
-
-    .results-container {
-        padding-left: 20px;
-        border-left: 2px solid #f3f4f6;
-        margin-top: 20px;
-    }
-
-    /* Override table styling to match the rest of the HR module */
-    .equipment-report-table th {
-        background-color: #f9fafb !important;
-        color: #374151 !important;
-        font-weight: 600 !important;
-        font-size: 13px !important;
-        border-bottom: 1px solid #e5e7eb !important;
-        padding: 12px !important;
-    }
-
-    .equipment-report-table td {
-        font-size: 13px !important;
-        color: #4b5563 !important;
-        vertical-align: middle !important;
-        padding: 12px !important;
-        border-bottom: 1px solid #f3f4f6 !important;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/hr.css') }}?v={{ filemtime(public_path('css/hr.css')) }}">
 @endpush
 
 @section('content')

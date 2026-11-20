@@ -4,88 +4,7 @@
 
 @push('styles')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    <style>
-        .section-card {
-            background: #fff;
-            border: 1px solid #f0f0f0;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 24px;
-        }
-        .sit-body {
-            color: #4b5563;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-        .sit-section {
-            margin-bottom: 16px;
-        }
-        .sit-section strong {
-            color: rgba(55, 65, 81, 1);
-            font-weight: 700;
-        }
-        .sit-empty-message {
-            font-size: 22px;
-            font-weight: 300;
-            color: #6b7280;
-        }
-        .nav-tabs .nav-link {
-            color: #6b7280;
-            font-weight: 500;
-        }
-        .nav-tabs .nav-link.active {
-            color: #111827;
-            font-weight: 700;
-            border-bottom: 2px solid #111827;
-        }
-
-        /* Equipment Report Table Boxed Styling */
-        .equipment-report-table {
-            border: 1px solid #e5e7eb !important;
-            border-radius: 12px !important;
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
-            overflow: hidden !important;
-            background: #fff !important;
-            width: 100% !important;
-            margin-top: 10px !important;
-        }
-        .equipment-report-table thead th {
-            background-color: rgba(255, 184, 28, 0.4) !important;
-            border-bottom: 1px solid #e5e7eb !important;
-            color: #374151 !important;
-            font-weight: 600 !important;
-            padding: 18px 20px !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-        }
-        .equipment-report-table thead th:first-child {
-            border-top-left-radius: 12px !important;
-        }
-        .equipment-report-table thead th:last-child {
-            border-top-right-radius: 12px !important;
-            border-right: none !important;
-        }
-        .equipment-report-table td {
-            padding: 15px 20px !important;
-            vertical-align: middle !important;
-            border-bottom: 1px solid #f3f4f6 !important;
-            border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
-            font-size: 14px !important;
-        }
-        .equipment-report-table td:last-child {
-            border-right: none !important;
-        }
-        .equipment-report-table tbody tr:last-child td {
-            border-bottom: none !important;
-        }
-        .equipment-report-table tbody tr:last-child td:first-child {
-            border-bottom-left-radius: 12px !important;
-        }
-        .equipment-report-table tbody tr:last-child td:last-child {
-            border-bottom-right-radius: 12px !important;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/operations.css') }}?v={{ filemtime(public_path('css/operations.css')) }}">
 @endpush
 
 @section('content')
@@ -147,7 +66,7 @@
 
                                 <!-- Tabs -->
                                 <div class="mt-4 pt-4" style="border-top: 1px solid #f3f4f6;">
-                                    <ul class="nav nav-tabs mb-3" id="sitProgressTabs">
+                                    <ul class="nav nav-tabs nav-tabs-underline mb-3" id="sitProgressTabs">
                                         <li class="nav-item">
                                             <button class="nav-link active" id="active-tab" data-bs-toggle="tab" data-bs-target="#activeTrainees" type="button">
                                                 Active Trainees

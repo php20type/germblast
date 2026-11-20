@@ -3,74 +3,7 @@
 @section('title', 'Expense Reports')
 
 @push('styles')
-<style>
-
-
-    /* Custom Premium Status Badges */
-    .status-pill {
-        font-size: 12px !important;
-        font-weight: 600 !important;
-        padding: 6px 14px !important;
-        border-radius: 30px !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 6px !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.5px !important;
-        border: 1px solid transparent !important;
-    }
-
-    .status-pill-open {
-        background-color: rgba(13, 110, 253, 0.12) !important;
-        color: #0d6efd !important;
-        border-color: rgba(13, 110, 253, 0.2) !important;
-    }
-
-    .status-pill-submitted {
-        background-color: rgba(255, 184, 28, 0.12) !important;
-        color: #d39100 !important;
-        border-color: rgba(255, 184, 28, 0.25) !important;
-    }
-
-    .status-pill-filled {
-        background-color: rgba(6, 150, 151, 0.12) !important;
-        color: #069697 !important;
-        border-color: rgba(6, 150, 151, 0.25) !important;
-    }
-
-    .status-pill-approved {
-        background-color: rgba(6, 150, 151, 0.12) !important;
-        color: #069697 !important;
-        border-color: rgba(6, 150, 151, 0.25) !important;
-    }
-
-    .status-pill-rejected {
-        background-color: rgba(234, 61, 47, 0.12) !important;
-        color: #ea3d2f !important;
-        border-color: rgba(234, 61, 47, 0.2) !important;
-    }
-
-    .section-search-wrap {
-        position: relative;
-        min-width: 240px;
-    }
-    .section-search-wrap input {
-        padding-left: 15px;
-        font-size: 0.82rem;
-        height: 38px;
-        border-radius: 20px;
-        border: 1px solid #e5e7eb;
-        background: rgba(255, 255, 255, 0.85);
-        transition: all 0.2s ease;
-    }
-    .section-search-wrap input:focus {
-        outline: none;
-        border-color: #ffb400;
-        box-shadow: 0 0 0 2px rgba(255, 180, 0, 0.15);
-        background: #fff;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/corporate-tools.css') }}?v={{ filemtime(public_path('css/corporate-tools.css')) }}">
 @endpush
 
 @section('content')

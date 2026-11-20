@@ -3,47 +3,7 @@
 @section('title', 'SIT Program')
 
 @push('styles')
-<style>
-    .section-card {
-        background: #fff;
-        border: 1px solid #f0f0f0;
-        border-radius: 12px;
-        padding: 24px;
-        margin-bottom: 24px;
-    }
-    .sit-body {
-        color: #4b5563;
-        font-size: 14px;
-        line-height: 1.6;
-    }
-    .sit-section {
-        margin-bottom: 16px;
-    }
-    .sit-section strong {
-        color: #374151;
-        font-weight: 700;
-    }
-    .sit-tech-buttons {
-        margin-top: 30px;
-    }
-    .btn-tech {
-        background-color: #f9fafb;
-        border: 1px solid #e5e7eb;
-        color: #374151;
-        padding: 12px 24px;
-        font-size: 15px;
-        margin-right: 12px;
-        margin-bottom: 12px;
-        border-radius: 8px;
-        font-weight: 500;
-        transition: all 0.2s;
-    }
-    .btn-tech:hover {
-        background-color: #f3f4f6;
-        border-color: #d1d5db;
-        color: #111827;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/operations.css') }}?v={{ filemtime(public_path('css/operations.css')) }}">
 @endpush
 
 @section('content')

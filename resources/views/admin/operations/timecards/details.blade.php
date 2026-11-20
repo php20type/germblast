@@ -3,23 +3,7 @@
 @section('title', 'Time Sheet Details')
 
 @push('styles')
-    <style>
-
-
-        /* Column specific alignment matching original logic */
-        .equipment-report-table thead th:nth-child(1),
-        .equipment-report-table tbody td:nth-child(1):not(.dataTables_empty) {
-            text-align: left !important;
-        }
-
-        .dataTables_empty {
-            text-align: center !important;
-            padding: 50px !important;
-            color: #6b7280 !important;
-            font-size: 15px !important;
-        }
-
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/operations.css') }}?v={{ filemtime(public_path('css/operations.css')) }}">
 @endpush
 
 @section('content')
@@ -74,7 +58,7 @@
 
                             <div class="px-4 pb-4">
                                 <div class="table-responsive mt-3">
-                                    <table class="table table-hover w-100 equipment-report-table">
+                                    <table class="table table-hover w-100 equipment-report-table equipment-report-table-left-first">
                                         <thead>
                                             <tr>
                                                 <th>Employee</th>
@@ -114,7 +98,7 @@
 
                                 <!-- Detailed Timecard Punches Table -->
                                 <div class="table-responsive mt-4">
-                                    <table class="table table-hover w-100 equipment-report-table">
+                                    <table class="table table-hover w-100 equipment-report-table equipment-report-table-left-first">
                                         <thead>
                                             <tr>
                                                 <th class="text-start">Customer</th>

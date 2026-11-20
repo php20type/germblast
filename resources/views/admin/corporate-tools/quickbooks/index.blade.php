@@ -3,37 +3,7 @@
 @section('title', 'Quickbooks Export')
 
 @push('styles')
-    <style>
-        .section-card {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 1px solid #e5e7eb;
-        }
-        .section-header {
-            border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #374151;
-            margin: 0;
-            display: flex;
-            align-items: center;
-        }
-        .form-control {
-            border-radius: 6px;
-        }
-        .export-btn {
-            font-weight: 500;
-            padding: 10px 20px;
-            border-radius: 6px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/corporate-tools.css') }}?v={{ filemtime(public_path('css/corporate-tools.css')) }}">
 @endpush
 
 @section('content')

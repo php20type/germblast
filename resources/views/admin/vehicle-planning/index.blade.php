@@ -3,20 +3,7 @@
 @section('title', 'Vehicle Planning')
 
 @push('styles')
-    <style>
-        .company-link {
-            color: #1a5fb4;
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
-
-        .company-link:hover {
-            text-decoration: underline;
-            color: #0d47a1;
-        }
-
-
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/operations.css') }}?v={{ filemtime(public_path('css/operations.css')) }}">
 @endpush
 
 @section('content')
