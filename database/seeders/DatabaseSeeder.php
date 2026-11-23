@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -14,6 +13,12 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(10)->create();
+
+        // Roles and permissions (must run before the users, who are assigned roles)
+        $this->call(PermissionSeeder::class);
+        $this->call(RoleSeeder::class);
+
+        // Reference data
         $this->call(ActivityTypeSeeder::class);
         $this->call(CurrencySeeder::class);
         $this->call(ChannelSeeder::class);
@@ -35,17 +40,24 @@ class DatabaseSeeder extends Seeder
         $this->call(MaskTypeSeeder::class);
         $this->call(DriverLogItemSeeder::class);
         $this->call(DisciplinaryIssueSeeder::class);
+
+        // Users, then their availability (without an availability record, employees do not appear
+        // in Staff Assignment under Fulfill Order)
         $this->call(UserSeeder::class);
-        $this->call(LeadSeeder::class);
+        $this->call(UserAvailabilitySeeder::class);
+
         $this->call(ExpenseTypeSeeder::class);
         $this->call(ItemReasonSeeder::class);
         $this->call(EquipmentManagementTypeSeeder::class);
         $this->call(InventoryItemSeeder::class);
-        $this->call(BusinessFailureSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Training (categories first, then the tests, then their questions)
+        $this->call(TrainingCategorySeeder::class);
+        $this->call(TrainingTestSeeder::class);
+        $this->call(TrainingQuestionSeeder::class);
+
+        $this->call(IsdAttendanceSeeder::class);
+        $this->call(EvaluationQuestionsSeeder::class);
+        $this->call(AuditQuestionsSeeder::class);
     }
 }

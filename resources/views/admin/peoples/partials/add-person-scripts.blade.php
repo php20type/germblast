@@ -59,12 +59,23 @@
                         maxlength: 50
                     },
                     address_1: {
+                        required: true,
                         maxlength: 255
                     },
                     address_2: {
                         maxlength: 255
                     },
+                    country_id: {
+                        required: true
+                    },
+                    state_id: {
+                        required: true
+                    },
+                    city_id: {
+                        required: true
+                    },
                     zip: {
+                        required: true,
                         zipFormat: true
                     },
                     url: {
@@ -94,6 +105,21 @@
                     // company_id: {
                     //     required: "Please select the company."
                     // },
+                    address_1: {
+                        required: "Please enter the address line 1."
+                    },
+                    country_id: {
+                        required: "Please select a country."
+                    },
+                    state_id: {
+                        required: "Please select a state."
+                    },
+                    city_id: {
+                        required: "Please select a city."
+                    },
+                    zip: {
+                        required: "Please enter the zip code."
+                    },
                     phone: {
                         required: "Please enter the phone number."
                     },
@@ -123,12 +149,21 @@
                 errorPlacement: function(error, element) {
                     if (element.parent('.input-group').length) {
                         error.insertAfter(element.parent()); // Inserts after the .input-group
+                    } else if (element.hasClass('select2-hidden-accessible')) {
+                        error.insertAfter(element.next('.select2-container')); // Below the select2 box
                     } else {
                         error.insertAfter(element); // Default
                     }
                 }
             });
 
+
+            // select2 fields do not fire the click/blur events jQuery Validate listens to: re-check them on change
+            $('#add-person-form').on('change', '.country_select, .state_select, .city_select', function() {
+                if ($(this).hasClass('is-invalid')) {
+                    $(this).valid();
+                }
+            });
 
             // Submit People form
             $('#add-person-form').submit(function(e) {
@@ -176,12 +211,11 @@
             let stateSelect = modal.find('.state_select');
             let citySelect = modal.find('.city_select');
 
-            stateSelect.empty().append('<option value="">Select State</option>').prop('disabled', true).trigger('change');
-            citySelect.empty().append('<option value="">Select City</option>').prop('disabled', true).trigger('change');
+            stateSelect.empty().append('<option value="">Select State</option>').trigger('change');
+            citySelect.empty().append('<option value="">Select City</option>').trigger('change');
 
             if (!countryId) return;
             $.get(`/states/` + countryId, function(states) {
-                stateSelect.prop('disabled', false);
                 $.each(states, function(i, state) {
                     stateSelect.append(`<option value="` + state.state_id + `">` + state.name + `</option>`);
                 });
@@ -196,10 +230,9 @@
             let modal = $(this).closest('.modal');
             let citySelect = modal.find('.city_select');
 
-            citySelect.empty().append('<option value="">Select City</option>').prop('disabled', true).trigger('change');
+            citySelect.empty().append('<option value="">Select City</option>').trigger('change');
             if (!stateId) return;
             $.get(`/cities/` + stateId, function(cities) {
-                citySelect.prop('disabled', false);
                 $.each(cities, function(i, city) {
                     citySelect.append(`<option value="` + city.id + `">` + city.name + `</option>`);
                 });

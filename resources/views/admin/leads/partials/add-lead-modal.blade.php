@@ -1,3 +1,37 @@
+{{--
+    Add Lead modal - the only Add Lead form in the application.
+
+    Without options it renders the form used on the Leads pages. Pages that need something different pass options:
+
+        @include('admin.leads.partials.add-lead-modal', [
+            'leadCompanies'         => $allCompanies,        // option list for the Companies field (default: $companies)
+            'leadPeoples'           => $peoples,             // option list for the Person field (default: $peoples)
+            'leadTags'              => $companytags,         // option list for the Tags field (default: $leadtags)
+            'leadCompanyMultiple'   => true,                 // Companies is a multi select that posts company_id[] (list pages: "Create lead" for the checked rows)
+            'leadCompanyHidden'     => true,                 // hide the Companies field (Company edit page: the current company)
+            'leadPersonHidden'      => true,                 // hide the Person field (People edit page: the current person)
+            'leadSelectedCompanies' => [$company->id],       // company ids selected when the modal opens
+            'leadSelectedPeoples'   => [$peoples->id],       // person ids selected when the modal opens
+            'leadPersonEmail'       => false,                // show the person's email next to the name (default: true)
+            'leadAfterSave'         => 'close',              // 'redirect' (default: Leads list) | 'close' (hide the modal) | 'reload' (reload the page)
+            'leadOpenOnCreate'      => false,                // open the modal when the page is loaded with ?create=1 (default: true)
+        ])
+
+    The options are read by add-lead-scripts (through the data attributes on the form).
+--}}
+@php
+    $leadCompanyList = $leadCompanies ?? $companies;
+    $leadPeopleList = $leadPeoples ?? $peoples;
+    $leadTagList = $leadTags ?? $leadtags;
+    $leadCompanyMultiple = $leadCompanyMultiple ?? false;
+    $leadCompanyHidden = $leadCompanyHidden ?? false;
+    $leadPersonHidden = $leadPersonHidden ?? false;
+    $leadSelectedCompanies = (array) ($leadSelectedCompanies ?? []);
+    $leadSelectedPeoples = (array) ($leadSelectedPeoples ?? []);
+    $leadPersonEmail = $leadPersonEmail ?? true;
+    $leadAfterSave = $leadAfterSave ?? 'redirect';
+    $leadOpenOnCreate = $leadOpenOnCreate ?? true;
+@endphp
     <div class="modal fade" id="AddLead" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-fullscreen">
             <div class="modal-content">
@@ -10,9 +44,10 @@
                 </div>
                 <div class="modal-body">
 
-                    {{-- <form class="company-form" id="add-lead-form"> --}}
                     <form action="{{ route('admin.lead.store') }}" class="company-form" id="add-lead-form"
-                        method="POST">
+                        method="POST" data-after-save="{{ $leadAfterSave }}"
+                        data-company-multiple="{{ $leadCompanyMultiple ? 1 : 0 }}"
+                        data-open-on-create="{{ $leadOpenOnCreate ? 1 : 0 }}">
                         @csrf
 
                         <div class="row mx-0">
@@ -109,36 +144,31 @@
                                         class="form-control" />
                                 </div>
                             </div>
-                            {{-- <div class="col-lg-12">
+                            <div class="col-lg-12{{ $leadCompanyHidden ? ' d-none' : '' }}">
                                 <div class="form-group">
                                     <label class="form-label">Companies</label>
                                     <span class="text-danger">*</span>
                                     @error('company_id')
                                         {{ $message }}
                                     @enderror
-                                    <select name="company_id[]" id="companySelect" class="form-select select2" multiple>
-                                        @foreach ($companies as $company)
-                                            <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div> --}}
-                            <div class="col-lg-12">
-                                <div class="form-group">
-                                    <label class="form-label">Companies</label>
-                                    <span class="text-danger">*</span>
-                                    @error('company_id')
-                                        {{ $message }}
-                                    @enderror
-                                    <select name="company_id" id="companySelect" class="form-select select2">
-                                        <option value=""></option>
-                                        @foreach ($companies as $company)
-                                            <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                        @endforeach
-                                    </select>
+                                    @if ($leadCompanyMultiple)
+                                        <select name="company_id[]" id="companySelect" class="form-select select2" multiple>
+                                            @foreach ($leadCompanyList as $leadCompany)
+                                                <option value="{{ $leadCompany->id }}">{{ $leadCompany->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    @else
+                                        <select name="company_id" id="companySelect" class="form-select select2">
+                                            <option value=""></option>
+                                            @foreach ($leadCompanyList as $leadCompany)
+                                                <option value="{{ $leadCompany->id }}"
+                                                    {{ in_array($leadCompany->id, $leadSelectedCompanies) ? 'selected' : '' }}>{{ $leadCompany->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    @endif
                                 </div>
                             </div>
-                            <div class="col-lg-12">
+                            <div class="col-lg-12{{ $leadPersonHidden ? ' d-none' : '' }}">
                                 <div class="form-group">
                                     <label class="form-label">Select Person</label>
                                     <span class="text-danger">*</span>
@@ -146,9 +176,11 @@
                                         {{ $message }}
                                     @enderror
                                     <select id="person_select" name="person_id[]" class="form-select select2" multiple>
-                                        @foreach ($peoples as $people)
-                                            <option value="{{ $people->id }}">{{ $people->name }}
-                                                ({{ $people->peopleEmail->email }})
+                                        @foreach ($leadPeopleList as $leadPerson)
+                                            <option value="{{ $leadPerson->id }}"
+                                                {{ in_array($leadPerson->id, $leadSelectedPeoples) ? 'selected' : '' }}>{{ $leadPerson->name }}@if ($leadPersonEmail)
+                                                ({{ $leadPerson->peopleEmail->email }})
+                                            @endif
                                             </option>
                                         @endforeach
                                     </select>
@@ -195,8 +227,8 @@
                                     <span class="text-danger">*</span>
                                     <select name="tag_id" class="form-select">
                                         <option value="">Select tag</option>
-                                        @foreach ($leadtags as $leadtag)
-                                            <option value="{{ $leadtag->id }}">{{ $leadtag->name }}</option>
+                                        @foreach ($leadTagList as $leadTag)
+                                            <option value="{{ $leadTag->id }}">{{ $leadTag->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
