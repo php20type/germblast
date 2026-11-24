@@ -910,6 +910,9 @@ class PeopleController extends Controller
     {
         $request->validate([
             'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
+        ], [
+            'photo.max' => 'The photo may not be larger than 5 MB.',
+            'photo.uploaded' => 'The photo could not be uploaded. The maximum file size is ' . Helper::maxUploadSizeLabel() . '.',
         ]);
 
         $people = \App\Models\People::findOrFail($peopleId);
@@ -1072,7 +1075,8 @@ class PeopleController extends Controller
                 return response()->json([
                     'status' => true,
                     'message' => 'Person created successfully!',
-                    'data' => $people
+                    'data' => $people,
+                    'redirect_url' => route('admin.people.show', $people->id),
                 ]);
             }
 
@@ -1234,6 +1238,9 @@ class PeopleController extends Controller
     {
         $request->validate([
             'file' => 'required|file|max:10240',
+        ], [
+            'file.max' => 'The file may not be larger than 10 MB.',
+            'file.uploaded' => 'The file could not be uploaded. The maximum file size is ' . Helper::maxUploadSizeLabel() . '.',
         ]);
 
         try {

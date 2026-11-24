@@ -493,7 +493,7 @@ class ServiceController extends Controller implements HasMiddleware
                         ->where('start_date', '<=', $slotDateForLimit)
                         ->where('end_date', '>=', $slotDateForLimit)
                         ->first();
-                    
+
                     $maxHoursLimit = $availabilityForLimit ? $availabilityForLimit->max_hours : 40;
                     if ($maxHoursLimit <= 0) {
                         $maxHoursLimit = 40;
@@ -516,7 +516,7 @@ class ServiceController extends Controller implements HasMiddleware
                         'maxHoursLimit' => $maxHoursLimit,
                     ];
                 }
-                
+
                 // For this slot, the employee is scheduled for slot hours
                 $slotHours = $staff->slot_hours ?? 0;
                 $employees[$userId]['totalScheduledHours'] += $slotHours;
@@ -1060,7 +1060,7 @@ class ServiceController extends Controller implements HasMiddleware
             // Check availability
             $slotDate = $slotStart->toDateString();
             $dayOfWeek = strtolower($slotStart->format('D')); // mon, tue, wed, thu, fri, sat, sun
-            
+
             $availability = \App\Models\EmployeeAvailability::where('user_id', $userId)
                 ->where('start_date', '<=', $slotDate)
                 ->where('end_date', '>=', $slotDate)
@@ -1070,26 +1070,26 @@ class ServiceController extends Controller implements HasMiddleware
                 $msg = "{$userName} has no availability records configured for this date ({$slotStart->format('M d, Y')}).";
                 return request()->ajax() ? response()->json(['message' => $msg], 400) : redirect()->back()->with('error', $msg);
             }
-            
+
             $availStartStr = $availability->{$dayOfWeek . '_start'} ?? '00:00';
             $availEndStr = $availability->{$dayOfWeek . '_end'} ?? '23:59';
-            
+
             $baseDate = '2000-01-01 ';
             $availStart = \Carbon\Carbon::parse($baseDate . $availStartStr);
             $availEnd = \Carbon\Carbon::parse($baseDate . $availEndStr);
             if ($availEnd->lessThanOrEqualTo($availStart)) {
                 $availEnd->addDay();
             }
-            
+
             $slotStartTimeStr = $slotStart->format('H:i');
             $slotEndTimeStr = $slotEnd->format('H:i');
-            
+
             $slotStartParsed = \Carbon\Carbon::parse($baseDate . $slotStartTimeStr);
             $slotEndParsed = \Carbon\Carbon::parse($baseDate . $slotEndTimeStr);
             if ($slotEndParsed->lessThanOrEqualTo($slotStartParsed)) {
                 $slotEndParsed->addDay();
             }
-            
+
             if ($slotStartParsed->lessThan($availStart) || $slotEndParsed->greaterThan($availEnd)) {
                 $timeframeRange = $availability->start_date->format('m/d/y') . ' - ' . $availability->end_date->format('m/d/y');
                 $msg = "{$userName} is not available during the scheduled slot ({$slotStart->format('h:i A')} - {$slotEnd->format('h:i A')}). Available time for {$slotStart->format('l')}: {$availStartStr} - {$availEndStr} (within timeframe {$timeframeRange}).";
@@ -1244,12 +1244,12 @@ class ServiceController extends Controller implements HasMiddleware
                         if ($occupiedStart < $existingOccupiedEnd && $occupiedEnd > $existingOccupiedStart) {
                             $vehicle = Vehicle::find($vehicleId);
                             $vehicleName = $vehicle ? ($vehicle->name ?? $vehicle->plate_number) : 'Vehicle';
-                            
+
                             $formattedStart = $existingStart->format('h:i A');
                             $formattedEnd = $existingEnd->format('h:i A');
                             $bufferStart = $existingOccupiedStart->format('h:i A');
                             $bufferEnd = $existingOccupiedEnd->format('h:i A');
-                            
+
                             $errorMsg = "Vehicle '{$vehicleName}' is already booked on this day from {$formattedStart} to {$formattedEnd} (Occupied buffer: {$bufferStart} to {$bufferEnd}).";
                             if ($request->ajax()) {
                                 return response()->json(['message' => $errorMsg], 400);
@@ -1520,7 +1520,7 @@ class ServiceController extends Controller implements HasMiddleware
         $clock->type = $request->type;
         $clock->clocked_in_at = $request->clocked_in_at;
         $clock->clocked_out_at = $request->clocked_out_at;
-        
+
         $clock->save();
 
         if ($clock->clocked_in_at && $clock->clocked_out_at) {
@@ -1811,30 +1811,30 @@ class ServiceController extends Controller implements HasMiddleware
                     ->where('start_date', '<=', $slotDayKey)
                     ->where('end_date', '>=', $slotDayKey)
                     ->first();
-                
+
                 if (!$availability) {
                     continue;
                 }
-                
+
                 $availStartStr = $availability->{$dayOfWeek . '_start'} ?? '00:00';
                 $availEndStr = $availability->{$dayOfWeek . '_end'} ?? '23:59';
-                
+
                 $baseDate = '2000-01-01 ';
                 $availStart = \Carbon\Carbon::parse($baseDate . $availStartStr);
                 $availEnd = \Carbon\Carbon::parse($baseDate . $availEndStr);
                 if ($availEnd->lessThanOrEqualTo($availStart)) {
                     $availEnd->addDay();
                 }
-                
+
                 $slotStartTimeStr = $slotStart->format('H:i');
                 $slotEndTimeStr = $slotEnd->format('H:i');
-                
+
                 $slotStartParsed = \Carbon\Carbon::parse($baseDate . $slotStartTimeStr);
                 $slotEndParsed = \Carbon\Carbon::parse($baseDate . $slotEndTimeStr);
                 if ($slotEndParsed->lessThanOrEqualTo($slotStartParsed)) {
                     $slotEndParsed->addDay();
                 }
-                
+
                 if ($slotStartParsed->lessThan($availStart) || $slotEndParsed->greaterThan($availEnd)) {
                     continue;
                 }
@@ -1963,8 +1963,8 @@ class ServiceController extends Controller implements HasMiddleware
             $processedClockIds = [];
 
             // Get weekly assignments for this employee
-            $assignments = isset($allWeeklyAssignments[$employee->id]) 
-                ? $allWeeklyAssignments[$employee->id] 
+            $assignments = isset($allWeeklyAssignments[$employee->id])
+                ? $allWeeklyAssignments[$employee->id]
                 : collect();
 
             // Get weekly clocks for this employee
@@ -1977,7 +1977,7 @@ class ServiceController extends Controller implements HasMiddleware
                 if (!$assignment->slot) {
                     continue;
                 }
-                
+
                 // Find if there is a clock record for this employee and this slot
                 $slotClock = $clocks->first(function ($clock) use ($assignment) {
                     return $clock->service_order_slot_id === $assignment->service_order_slot_id;
@@ -2365,11 +2365,11 @@ class ServiceController extends Controller implements HasMiddleware
         ]);
 
         $order = ServiceOrder::findOrFail($orderId);
-        
+
         $atpSample = ServiceOrderAtpSample::where('service_order_id', $orderId)
             ->where('id', $request->input('atp_entry_id'))
             ->firstOrFail();
-            
+
         $atpSample->delete();
 
         $updatedRecords = $order->atpSamples()->get();
@@ -2451,9 +2451,9 @@ class ServiceController extends Controller implements HasMiddleware
         }
 
         $order->update(['status' => 'cancelled']);
-        
+
         $order->orderSlots()->update(['status' => 'cancelled']);
-        
+
         // Delete related invoices when order is cancelled
         $order->invoices()->delete();
 
@@ -2528,7 +2528,7 @@ class ServiceController extends Controller implements HasMiddleware
             if (is_array($order->consumables)) {
                 $consumablesQty = array_sum($order->consumables);
                 $prices = $request->input('consumable_prices', []);
-                
+
                 foreach ($order->consumables as $key => $qty) {
                     $price = isset($prices[$key]) ? (float)$prices[$key] : 0.00;
                     $consumablesTotalValue += ($qty * $price);
@@ -2704,15 +2704,15 @@ class ServiceController extends Controller implements HasMiddleware
 
             // CSV Header
             fputcsv($file, [
-                'Invoice Number', 
-                'Order Number', 
-                'Invoice Date', 
-                'Customer Name', 
-                'Item Description', 
-                'Quantity', 
-                'Price', 
-                'Total', 
-                'Amount Due', 
+                'Invoice Number',
+                'Order Number',
+                'Invoice Date',
+                'Customer Name',
+                'Item Description',
+                'Quantity',
+                'Price',
+                'Total',
+                'Amount Due',
                 'Notes'
             ]);
 

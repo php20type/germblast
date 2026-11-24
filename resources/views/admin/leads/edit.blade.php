@@ -1990,6 +1990,7 @@
                                                 id="uploadLeadFileBtn">
                                                 <i class="fas fa-upload me-2"></i>Upload File
                                             </button>
+                                            <p class="text-muted small mt-2 mb-0 text-center upload-limits">All file types are accepted. Maximum file size: {{ \App\Helpers\Helper::maxUploadSizeLabel() }}.</p>
                                         </form>
                                     @endcan
 
@@ -2280,6 +2281,20 @@
 
         @push('scripts')
             <script>
+        // File uploads: size limit and the message for a failed upload (shown with toastr)
+        var maxUploadBytes = {{ \App\Helpers\Helper::maxUploadSizeBytes() }};
+        var maxUploadLabel = "{{ \App\Helpers\Helper::maxUploadSizeLabel() }}";
+
+        function uploadErrorMessage(status, body, fallback) {
+            if (status === 413) {
+                return 'The file is too large. The maximum file size is ' + maxUploadLabel + '.';
+            }
+            if (body && body.errors) {
+                return Object.values(body.errors)[0][0];
+            }
+            return (body && body.message) || fallback || 'Something went wrong while uploading the file.';
+        }
+
                 function confirmAndPost({
                     title,
                     text,
@@ -2771,6 +2786,12 @@
                                 return;
                             }
 
+                            // Too large: tell the user before anything is sent
+                            if (fileInput.files[0].size > maxUploadBytes) {
+                                toastr.error('The file is too large. The maximum file size is ' + maxUploadLabel + '.');
+                                return;
+                            }
+
                             $('#signed_proposal_file').removeClass('is-invalid');
                             $('#signed_proposal_error').hide().text('');
 
@@ -2796,28 +2817,15 @@
                                 success: function(data) {
                                     if (data.success) {
                                         $('#upload-signed-proposal-modal').modal('hide');
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'Success!',
-                                            text: data.message || 'Signed proposal uploaded and stage moved to 5 successfully.',
-                                            timer: 2000,
-                                            showConfirmButton: false
-                                        }).then(() => location.reload());
+                                        toastr.success(data.message || 'Signed proposal uploaded and stage moved to 5 successfully.');
+                                        setTimeout(() => location.reload(), 1500);
                                     } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Upload Failed',
-                                            text: data.message || 'Something went wrong. Please try again.'
-                                        });
+                                        toastr.error(data.message || 'Something went wrong. Please try again.');
                                     }
                                 },
                                 error: function(xhr) {
                                     console.error('Signed proposal upload error:', xhr);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: 'Something went wrong while uploading. Please try again.'
-                                    });
+                                    toastr.error(uploadErrorMessage(xhr.status, xhr.responseJSON, 'Something went wrong while uploading. Please try again.'));
                                 },
                                 complete: function() {
                                     $btn.prop('disabled', false)
@@ -4672,6 +4680,13 @@
                             const file = this.files[0];
                             if (!file) return;
 
+                            // Too large: tell the user before anything is sent
+                            if (file.size > maxUploadBytes) {
+                                toastr.error('The file is too large. The maximum file size is ' + maxUploadLabel + '.');
+                                this.value = "";
+                                return;
+                            }
+
                             let formData = new FormData();
                             formData.append("file", file);
                             formData.append("_token", "{{ csrf_token() }}");
@@ -4682,18 +4697,23 @@
                             fetch(`/admin/lead/${leadId}/files/upload`, {
                                     method: "POST",
                                     body: formData,
+                                    headers: {
+                                        "Accept": "application/json",
+                                        "X-Requested-With": "XMLHttpRequest"
+                                    },
                                 })
-                                .then(res => res.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        location.reload();
+                                .then(res => res.json().catch(() => ({})).then(body => ({ ok: res.ok, status: res.status, body: body })))
+                                .then(({ ok, status, body }) => {
+                                    if (ok && body.success) {
+                                        toastr.success(body.message || 'File uploaded successfully!');
+                                        setTimeout(() => location.reload(), 1000);
                                     } else {
-                                        alert("Upload failed: " + data.message);
+                                        toastr.error(uploadErrorMessage(status, body));
                                     }
                                 })
                                 .catch(err => {
                                     console.error("Upload error:", err);
-                                    alert("Something went wrong while uploading the file.");
+                                    toastr.error("Something went wrong while uploading the file.");
                                 })
                                 .finally(() => {
                                     uploadBtn.disabled = false;

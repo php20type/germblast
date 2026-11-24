@@ -195,13 +195,15 @@
                         $submitBtn.prop('disabled', true).text('Saving...');
                     },
 
-                    success: function() {
+                    success: function(response) {
                         toastr.success('Company created successfully! Redirecting...');
                         $form[0].reset();
 
+                        // The new company's page (the list if the page could not be given)
+                        var redirectUrl = (response && response.redirect_url) || "{{ route('admin.company.index') }}";
+
                         setTimeout(() => {
-                            window.location.href =
-                                "{{ route('admin.company.index') }}";
+                            window.location.href = redirectUrl;
                         }, 1500);
                     },
 

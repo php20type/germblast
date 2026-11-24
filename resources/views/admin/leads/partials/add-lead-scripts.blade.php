@@ -230,13 +230,16 @@
                         $submitBtn.prop('disabled', true).text('Saving...');
                     },
 
-                    success: function() {
+                    success: function(response) {
                         if (afterSave === 'redirect') {
                             toastr.success('Lead created successfully! Redirecting...');
                             $form[0].reset();
 
+                            // The new lead's page (the list if the page could not be given)
+                            var redirectUrl = (response && response.redirect_url) || "{{ route('admin.lead.index') }}";
+
                             setTimeout(function() {
-                                window.location.href = "{{ route('admin.lead.index') }}";
+                                window.location.href = redirectUrl;
                             }, 1500);
                             return;
                         }

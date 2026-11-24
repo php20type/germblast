@@ -445,8 +445,13 @@ $(document).ready(function() {
                 setTimeout(() => location.reload(), 1000);
             },
             error: function(xhr) {
-                alert(xhr.responseText);
-                toastr.error('Something went wrong while adding expense.');
+                var message = 'Something went wrong while adding expense.';
+                if (xhr.status === 413) {
+                    message = 'The receipt is too large. The maximum file size is {{ \App\Helpers\Helper::maxUploadSizeLabel() }}.';
+                } else if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                    message = Object.values(xhr.responseJSON.errors)[0][0];
+                }
+                toastr.error(message);
             }
         });
     });

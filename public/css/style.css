@@ -63,10 +63,15 @@ a {
 .form-check-input:focus,
 .form-select:focus,
 .form-control:focus {
-    color: #FFB81C;
+    color: #000000;
     border-color: #FFB81C;
     outline: 0;
     box-shadow: 0 0 0 .25rem rgba(255, 184, 28, 0.2);
+}
+
+/* Native select text and its option list stay black (also while focused/open) */
+.form-select option {
+    color: #000000;
 }
 
 /* DataTables entries-per-page value and options stay black when focused/open */
@@ -2660,7 +2665,7 @@ a.table-link:focus {
     background-color: rgba(255, 184, 28, 0.1);
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
-    color: #FFB81C;
+    color: #000000;
 }
 
 .company-form .preview-section {
@@ -4629,6 +4634,17 @@ div[contenteditable="true"]:focus {
     padding: 4px 8px !important;
 }
 
+/* Add Task panel (Company, People and Lead pages): fields a little darker so they stand out from the page */
+#addTaskForm .form-control,
+#addTaskForm .form-select {
+    background-color: #e6e6e6;
+}
+
+#addTaskForm .form-control:focus,
+#addTaskForm .form-select:focus {
+    background-color: #e6e6e6;
+}
+
 /* --- Added Subtle Hover Effects for Edit Pages --- */
 .people-card,
 .company-list,
@@ -5316,6 +5332,12 @@ select.form-control:not([multiple]):not([size]) {
     box-shadow: 0 0 0 0.25rem rgba(255, 184, 28, 0.2);
 }
 
+/* Validation error on the underlying select shows on the Select2 box */
+select.is-invalid + .select2-container--default .select2-selection--single,
+select.is-invalid + .select2-container--default .select2-selection--multiple {
+    border: 1px solid #dc3545;
+}
+
 /* Disabled */
 .select2-container--default.select2-container--disabled .select2-selection--single,
 .select2-container--default.select2-container--disabled .select2-selection--multiple {
@@ -5339,19 +5361,19 @@ select.form-control:not([multiple]):not([size]) {
     border-bottom: 1px solid #767676;
 }
 
-/* Native selects show yellow text while focused/open (global .form-select:focus rule),
-   so the open Select2 shows the same */
+/* Native selects keep black text while focused/open (global .form-select:focus rule),
+   so the open Select2 does the same */
 .select2-container--default.select2-container--focus .select2-selection--single .select2-selection__rendered,
 .select2-container--default.select2-container--open .select2-selection--single .select2-selection__rendered,
 .select2-container--default.select2-container--focus .select2-selection--single .select2-selection__placeholder,
 .select2-container--default.select2-container--open .select2-selection--single .select2-selection__placeholder {
-    color: #FFB81C;
+    color: #000000;
 }
 
 .select2-container--default .select2-results__option {
     padding: 4px 16px;
     font-size: 1rem;
-    color: #FFB81C;
+    color: #000000;
     white-space: normal;
     overflow-wrap: anywhere;
 }

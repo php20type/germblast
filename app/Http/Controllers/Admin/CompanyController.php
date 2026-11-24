@@ -296,6 +296,15 @@ class CompanyController extends Controller
             // SEND EMAIL NOTIFICATION
             $notify->companyCreated($company);
 
+            if ($request->ajax()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Company created successfully!',
+                    'data' => $company,
+                    'redirect_url' => route('admin.company.show', $company->id),
+                ]);
+            }
+
             return redirect()->back()->with('success', 'Company created successfully!');
 
         } catch (\Exception $e) {
@@ -803,6 +812,9 @@ class CompanyController extends Controller
     {
         $request->validate([
             'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
+        ], [
+            'photo.max' => 'The photo may not be larger than 5 MB.',
+            'photo.uploaded' => 'The photo could not be uploaded. The maximum file size is ' . Helper::maxUploadSizeLabel() . '.',
         ]);
 
         $company = \App\Models\Company::findOrFail($companyId);
@@ -1139,6 +1151,9 @@ class CompanyController extends Controller
     {
         $request->validate([
             'file' => 'required|file|max:10240',
+        ], [
+            'file.max' => 'The file may not be larger than 10 MB.',
+            'file.uploaded' => 'The file could not be uploaded. The maximum file size is ' . Helper::maxUploadSizeLabel() . '.',
         ]);
 
         try {

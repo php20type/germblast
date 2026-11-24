@@ -101,6 +101,33 @@ class Helper
         return (string) $value;
     }
 
+    /**
+     * The largest file a user can really upload, in bytes: the smaller of the app's own limit
+     * (the max: rule of the upload validation, in KB) and the server's upload_max_filesize / post_max_size.
+     */
+    public static function maxUploadSizeBytes(int $ruleKb = 10240): int
+    {
+        $limits = [$ruleKb * 1024];
+
+        foreach (['upload_max_filesize', 'post_max_size'] as $setting) {
+            $bytes = ini_parse_quantity((string) ini_get($setting));
+
+            if ($bytes > 0) { // 0 means no limit
+                $limits[] = $bytes;
+            }
+        }
+
+        return min($limits);
+    }
+
+    /** The same limit as text, e.g. "10 MB". */
+    public static function maxUploadSizeLabel(int $ruleKb = 10240): string
+    {
+        $mb = self::maxUploadSizeBytes($ruleKb) / 1048576;
+
+        return rtrim(rtrim(number_format($mb, 1), '0'), '.') . ' MB';
+    }
+
     public static function getActivitiesForParticipant(string $entityType, int $entityId)
     {
         $query = Activity::query()->with(['companies', 'peoples', 'leads', 'users', 'activityType', 'mentionCompanies', 'mentionPeoples', 'mentionUsers']);

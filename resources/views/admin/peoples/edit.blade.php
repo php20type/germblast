@@ -1824,6 +1824,7 @@
                                     <button type="button" class="btn btn-outline-secondary w-100" id="uploadPeopleFileBtn">
                                         <i class="fas fa-upload me-2"></i>Upload File
                                     </button>
+                                    <p class="text-muted small mt-2 mb-0 text-center upload-limits">All file types are accepted. Maximum file size: {{ \App\Helpers\Helper::maxUploadSizeLabel() }}.</p>
                                 </form>
                             @endcan
 
@@ -2013,7 +2014,7 @@
                     <div class="sidebar-section">
 
                         {{-- Leads List --}}
-                        @foreach ($related_leads as $related_lead)
+                        @forelse ($related_leads as $related_lead)
                             <div class="company-list d-flex justify-content-between align-items-center mb-3"
                                 id="">
                                 <div class="row">
@@ -2053,7 +2054,9 @@
                                     @endcan
                                 </div>
                             </div>
-                        @endforeach
+                        @empty
+                            <p class="text-muted ps-3">No related leads found.</p>
+                        @endforelse
 
 
                     </div>
@@ -2067,6 +2070,20 @@
 
 @push('scripts')
     <script>
+        // File uploads: size limit and the message for a failed upload (shown with toastr)
+        var maxUploadBytes = {{ \App\Helpers\Helper::maxUploadSizeBytes() }};
+        var maxUploadLabel = "{{ \App\Helpers\Helper::maxUploadSizeLabel() }}";
+
+        function uploadErrorMessage(status, body, fallback) {
+            if (status === 413) {
+                return 'The file is too large. The maximum file size is ' + maxUploadLabel + '.';
+            }
+            if (body && body.errors) {
+                return Object.values(body.errors)[0][0];
+            }
+            return (body && body.message) || fallback || 'Something went wrong while uploading the file.';
+        }
+
         // ==============================
         // Modal Show for lead and activity
         // ==============================
@@ -4303,6 +4320,13 @@
                 const file = this.files[0];
                 if (!file) return;
 
+                // Too large: tell the user before anything is sent
+                if (file.size > maxUploadBytes) {
+                    toastr.error('The file is too large. The maximum file size is ' + maxUploadLabel + '.');
+                    this.value = "";
+                    return;
+                }
+
                 let formData = new FormData();
                 formData.append("file", file);
                 formData.append("_token", "{{ csrf_token() }}");
@@ -4313,18 +4337,23 @@
                 fetch(`/admin/people/${peopleId}/files/upload`, {
                         method: "POST",
                         body: formData,
+                        headers: {
+                            "Accept": "application/json",
+                            "X-Requested-With": "XMLHttpRequest"
+                        },
                     })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            location.reload();
+                    .then(res => res.json().catch(() => ({})).then(body => ({ ok: res.ok, status: res.status, body: body })))
+                    .then(({ ok, status, body }) => {
+                        if (ok && body.success) {
+                            toastr.success(body.message || 'File uploaded successfully!');
+                            setTimeout(() => location.reload(), 1000);
                         } else {
-                            alert("Upload failed: " + data.message);
+                            toastr.error(uploadErrorMessage(status, body));
                         }
                     })
                     .catch(err => {
                         console.error("Upload error:", err);
-                        alert("Something went wrong while uploading the file.");
+                        toastr.error("Something went wrong while uploading the file.");
                     })
                     .finally(() => {
                         uploadBtn.disabled = false;
@@ -4395,6 +4424,13 @@
                 var file = this.files[0];
                 if (!file) return;
 
+                // Too large: tell the user before anything is sent
+                if (file.size > maxUploadBytes) {
+                    toastr.error('The photo is too large. The maximum file size is ' + maxUploadLabel + '.');
+                    this.value = '';
+                    return;
+                }
+
                 var formData = new FormData();
                 formData.append('photo', file);
                 formData.append('_token', '{{ csrf_token() }}');
@@ -4408,21 +4444,11 @@
                     success: function(response) {
                         if (response.status === 'success') {
                             $('#people-profile-photo').attr('src', response.photo_url);
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Updated',
-                                text: response.message,
-                                timer: 1500,
-                                showConfirmButton: false
-                            });
+                            toastr.success(response.message || 'Photo updated successfully!');
                         }
                     },
                     error: function(xhr) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: xhr.responseJSON?.message || 'Error uploading photo'
-                        });
+                        toastr.error(uploadErrorMessage(xhr.status, xhr.responseJSON, 'Error uploading photo'));
                     }
                 });
             });

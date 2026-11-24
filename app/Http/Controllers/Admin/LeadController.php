@@ -602,6 +602,15 @@ class LeadController extends Controller
         // TRIGGER EMAIL 2: Lead Assigned (Delayed 12 sec)
         $notify->leadAssigned($lead);
 
+        if ($request->ajax()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Lead created successfully!',
+                'data' => $lead,
+                'redirect_url' => route('admin.lead.show', $lead->id),
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Lead created successfully!');
     }
 
@@ -1363,6 +1372,9 @@ class LeadController extends Controller
     {
         $request->validate([
             'file' => 'required|file|max:10240',
+        ], [
+            'file.max' => 'The file may not be larger than 10 MB.',
+            'file.uploaded' => 'The file could not be uploaded. The maximum file size is ' . Helper::maxUploadSizeLabel() . '.',
         ]);
 
         try {
@@ -1401,6 +1413,9 @@ class LeadController extends Controller
     {
         $request->validate([
             'signed_proposal' => 'required|file|max:10240',
+        ], [
+            'signed_proposal.max' => 'The signed proposal may not be larger than 10 MB.',
+            'signed_proposal.uploaded' => 'The signed proposal could not be uploaded. The maximum file size is ' . Helper::maxUploadSizeLabel() . '.',
         ]);
 
         try {
