@@ -13,6 +13,7 @@ use App\Models\SurveyEquipmentImage;
 use App\Models\SurveyFacility;
 use App\Models\SurveyFacilityAtp;
 use App\Models\SurveyFacilityMap;
+use App\Models\SurveyParameter;
 use App\Models\SurveyProposal;
 use App\Models\Country;
 use App\Models\State;
@@ -230,9 +231,9 @@ class SurveyProposalController extends Controller
                 $manHours += $hoursForType;
 
                 if ($type->input_name === 'bus_count') {
-                    $manHoursCost += $value * 45.00;
+                    $manHoursCost += $value * SurveyParameter::value('bus_cost');
                 } else {
-                    $manHoursCost += $hoursForType * 28.75;
+                    $manHoursCost += $hoursForType * SurveyParameter::value('hourly_rate');
                 }
             }
 
@@ -411,9 +412,9 @@ class SurveyProposalController extends Controller
                 $manHours += $hoursForType;
 
                 if ($type->input_name === 'bus_count') {
-                    $manHoursCost += $value * 45.00;
+                    $manHoursCost += $value * SurveyParameter::value('bus_cost');
                 } else {
-                    $manHoursCost += $hoursForType * 28.75;
+                    $manHoursCost += $hoursForType * SurveyParameter::value('hourly_rate');
                 }
             }
             
@@ -613,8 +614,8 @@ class SurveyProposalController extends Controller
             // ------------------------------------------
             // COST CALCULATION
             // ------------------------------------------
-            $washCost = $washHours * 28.75;
-            $cleanCost = $cleanHours * 28.75;
+            $washCost = $washHours * SurveyParameter::value('hourly_rate');
+            $cleanCost = $cleanHours * SurveyParameter::value('hourly_rate');
             
             $equipmentData['wash_counts'] = $washCounts;
             $equipmentData['cleaning_counts'] = $cleaningCounts;
@@ -734,8 +735,8 @@ class SurveyProposalController extends Controller
             // ------------------------------------------
             // COST CALCULATION
             // ------------------------------------------
-            $washCost = $washHours * 28.75;
-            $cleanCost = $cleanHours * 28.75;
+            $washCost = $washHours * SurveyParameter::value('hourly_rate');
+            $cleanCost = $cleanHours * SurveyParameter::value('hourly_rate');
 
             $equipmentData['wash_counts'] = $washCounts;
             $equipmentData['cleaning_counts'] = $cleaningCounts;
@@ -807,10 +808,13 @@ class SurveyProposalController extends Controller
         $facilities = SurveyFacility::where('survey_proposal_id', $surveyProposalId)->get();
         $equipments = EquipmentEvaluation::where('survey_proposal_id', $surveyProposalId)->get();
 
+        $surveyParameters = SurveyParameter::values();
+
         return view('admin.leads.survey.add-pricing-proposal', compact(
             'surveyProposal',
             'facilities',
-            'equipments'
+            'equipments',
+            'surveyParameters'
         ));
     }
 
@@ -941,6 +945,7 @@ class SurveyProposalController extends Controller
             'allEquipments' => $allEquipments,      // dropdown options
             'facilities' => $pricing->facilities,   // selected
             'equipments' => $pricing->equipment,    // selected
+            'surveyParameters' => SurveyParameter::values(), // multiplier, percentages and logistics expense
         ]);
     }
 

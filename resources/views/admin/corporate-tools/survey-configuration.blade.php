@@ -35,7 +35,7 @@
                         <div id="response-message" class="alert d-none"></div>
 
                         <!-- SECTION 1: MASTER PARAMETERS -->
-                        <!-- <div class="section-card">
+                        <div class="section-card">
                             <div class="section-header">
                                 <h4 class="section-title">Master Survey Parameters</h4>
                             </div>
@@ -51,10 +51,10 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($parameters as $key => $value)
+                                            @foreach($parameters as $parameter)
                                             <tr>
-                                                <td>{{ preg_replace('/(?<!\ )[A-Z]/', ' $0', $key) }}</td>
-                                                <td><input type="text" class="form-control-custom" name="parameters[{{ $key }}]" value="{{ $value }}"></td>
+                                                <td>{{ $parameter->label }}</td>
+                                                <td><input type="text" class="form-control-custom" name="parameters[{{ $parameter->key }}]" value="{{ \App\Models\SurveyParameter::format($parameter->value) }}"></td>
                                             </tr>
                                             @endforeach
                                             <tr>
@@ -65,7 +65,7 @@
                                     </table>
                                 </div>
                             </form>
-                        </div> -->
+                        </div>
 
                         <!-- SECTION 2: SURVEY FACILITIES -->
                         <div class="section-card">

@@ -34,8 +34,8 @@
                             </div>
                             <div class="card-body">
                                 <ul class="resource-list">
-                                    <li><a href="#" class="resource-link">How to Build Process Documentation</a></li>
-                                    <li><a href="#" class="resource-link">Process Documentation Template</a></li>
+                                    <li><a href="{{ asset('resource-documents/processes-how-to-build-documentation.pdf') }}" class="resource-link" target="_blank">How to Build Process Documentation</a></li>
+                                    <li><a href="{{ asset('resource-documents/processes-documentation-template.docx') }}" class="resource-link" target="_blank">Process Documentation Template</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -47,10 +47,10 @@
                             </div>
                             <div class="card-body">
                                 <ul class="resource-list">
-                                    <li><a href="#" class="resource-link">Preparing to Give Critical Feedback</a></li>
-                                    <li><a href="#" class="resource-link">Job Analysis</a></li>
-                                    <li><a href="#" class="resource-link">The Anatomy of a Job Description</a></li>
-                                    <li><a href="#" class="resource-link">Employee Profile Sheet</a></li>
+                                    <li><a href="{{ asset('resource-documents/hr-preparing-critical-feedback.pdf') }}" class="resource-link" target="_blank">Preparing to Give Critical Feedback</a></li>
+                                    <li><a href="{{ asset('resource-documents/hr-job-analysis.docx') }}" class="resource-link" target="_blank">Job Analysis</a></li>
+                                    <li><a href="{{ asset('resource-documents/hr-anatomy-of-job-description.pdf') }}" class="resource-link" target="_blank">The Anatomy of a Job Description</a></li>
+                                    <li><a href="{{ asset('resource-documents/hr-employee-profile-sheet.pdf') }}" class="resource-link" target="_blank">Employee Profile Sheet</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -62,8 +62,8 @@
                             </div>
                             <div class="card-body">
                                 <ul class="resource-list">
-                                    <li><a href="#" class="resource-link">1 on 1 Check-in Meeting Guide</a></li>
-                                    <li><a href="#" class="resource-link">A Guide for Discussing New Positions in a Team Meeting</a></li>
+                                    <li><a href="{{ asset('resource-documents/corporate-1-on-1-check-in-guide.docx') }}" class="resource-link" target="_blank">1 on 1 Check-in Meeting Guide</a></li>
+                                    <li><a href="{{ asset('resource-documents/corporate-new-positions-meeting-guide.pdf') }}" class="resource-link" target="_blank">A Guide for Discussing New Positions in a Team Meeting</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -75,15 +75,15 @@
                             </div>
                             <div class="card-body">
                                 <ul class="resource-list">
-                                    <li><a href="#" class="resource-link">EOS Tools Model</a></li>
-                                    <li><a href="#" class="resource-link">Get It. Want It. Capacity Guide</a></li>
-                                    <li><a href="#" class="resource-link">Leadership, Management, Accountability Checklist</a></li>
-                                    <li><a href="#" class="resource-link">Clarity Break</a></li>
-                                    <li><a href="#" class="resource-link">Kolbe Profile</a></li>
-                                    <li><a href="#" class="resource-link">Meeting Pulse Example</a></li>
-                                    <li><a href="#" class="resource-link">Meeting Example</a></li>
-                                    <li><a href="#" class="resource-link">The 3-Step Process Documenter</a></li>
-                                    <li><a href="#" class="resource-link">The Issues Solving Track</a></li>
+                                    <li><a href="{{ asset('resource-documents/eos-tools-model.pdf') }}" class="resource-link" target="_blank">EOS Tools Model</a></li>
+                                    <li><a href="{{ asset('resource-documents/eos-get-want-capacity-guide.pdf') }}" class="resource-link" target="_blank">Get It. Want It. Capacity Guide</a></li>
+                                    <li><a href="{{ asset('resource-documents/eos-lma-checklist.pdf') }}" class="resource-link" target="_blank">Leadership, Management, Accountability Checklist</a></li>
+                                    <li><a href="{{ asset('resource-documents/eos-clarity-break.pdf') }}" class="resource-link" target="_blank">Clarity Break</a></li>
+                                    <li><a href="{{ asset('resource-documents/eos-kolbe-profile.pdf') }}" class="resource-link" target="_blank">Kolbe Profile</a></li>
+                                    <li><a href="{{ asset('resource-documents/eos-meeting-pulse-example.pdf') }}" class="resource-link" target="_blank">Meeting Pulse Example</a></li>
+                                    <li><a href="{{ asset('resource-documents/eos-meeting-example.pdf') }}" class="resource-link" target="_blank">Meeting Example</a></li>
+                                    <li><a href="{{ asset('resource-documents/eos-3-step-process-documenter.pdf') }}" class="resource-link" target="_blank">The 3-Step Process Documenter</a></li>
+                                    <li><a href="{{ asset('resource-documents/eos-issues-solving-track.pdf') }}" class="resource-link" target="_blank">The Issues Solving Track</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -95,7 +95,7 @@
                             </div>
                             <div class="card-body">
                                 <ul class="resource-list">
-                                    <li><a href="#" class="resource-link">Gmail Signature</a></li>
+                                    <li><a href="{{ asset('resource-documents/misc-gmail-signature.pdf') }}" class="resource-link" target="_blank">Gmail Signature</a></li>
                                 </ul>
                             </div>
                         </div>

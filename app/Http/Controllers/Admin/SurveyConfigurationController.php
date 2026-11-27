@@ -6,65 +6,78 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\FacilityRoomType;
 use App\Models\EquipmentType;
-use Illuminate\Support\Facades\Log;
+use App\Models\SurveyParameter;
+use Illuminate\Support\Str;
 
 class SurveyConfigurationController extends Controller
 {
     public function index()
     {
-        // Use existing models for Facilities and Equipment
+        // Master parameters, Facilities and Equipment all come from the database
+        $parameters = SurveyParameter::orderBy('sort_order')->get();
         $facilities = FacilityRoomType::all();
         $equipment = EquipmentType::all();
-
-        // Master parameters currently not in a centralized DB table. 
-        // Rendering them dynamically from a controller array so the UI is ready when the DB is added.
-        $parameters = [
-            'TravelBetween' => 0.33,
-            'MilesPerGallon' => 14,
-            'PricePerGallon' => 3.00,
-            'AwarenessPercent' => 0.1000,
-            'EducationPercent' => 0.1000,
-            'TechnologyPercent' => 0.0150,
-            'ResponsePercent' => 0.0900,
-            'SalesRepPercent' => 0.1100,
-            'HourlyRate' => 28.75,
-        ];
 
         return view('admin.corporate-tools.survey-configuration', compact('facilities', 'equipment', 'parameters'));
     }
 
     public function updateParameters(Request $request)
     {
-        // Placeholder for when a generic settings table is implemented
+        $labels = SurveyParameter::pluck('label', 'key');
+        $keys = $labels->keys();
+
+        $rules = ['parameters' => 'required|array'];
+        $attributes = [];
+
+        foreach ($keys as $key) {
+            // Percentages are fractions (0.10 = 10%)
+            $rules["parameters.$key"] = Str::endsWith($key, '_percent') ? 'required|numeric|min:0|max:1' : 'required|numeric|min:0|max:99999999';
+            $attributes["parameters.$key"] = $labels[$key];
+        }
+
+        $request->validate($rules, [], $attributes);
+
+        foreach ($keys as $key) {
+            SurveyParameter::where('key', $key)->update(['value' => $request->parameters[$key]]);
+        }
+
         return response()->json(['success' => true, 'message' => 'Master Parameters updated successfully.']);
     }
 
     public function updateFacilities(Request $request)
     {
-        $request->validate([
-            'facilities' => 'required|array',
-            'facilities.*' => 'numeric|min:0'
-        ]);
-
-        foreach ($request->facilities as $id => $hours) {
-            FacilityRoomType::where('id', $id)->update(['hours_required' => $hours]);
-        }
+        $this->updateHours($request, 'facilities', FacilityRoomType::class, 'Survey Facilities');
 
         return response()->json(['success' => true, 'message' => 'Survey Facilities updated successfully.']);
     }
 
     public function updateEquipment(Request $request)
     {
-        $request->validate([
-            'equipment' => 'required|array',
-            'equipment.*' => 'numeric|min:0'
-        ]);
-
-        // Assuming EquipmentType has hours_required
-        foreach ($request->equipment as $id => $hours) {
-            EquipmentType::where('id', $id)->update(['hours_required' => $hours]);
-        }
+        $this->updateHours($request, 'equipment', EquipmentType::class, 'Survey Equipment');
 
         return response()->json(['success' => true, 'message' => 'Survey Equipment updated successfully.']);
+    }
+
+    /**
+     * Saves the manhours of every row of a table (facilities or equipment).
+     * Every row must come with a value: not empty, a number, not negative.
+     */
+    private function updateHours(Request $request, string $field, string $model, string $label): void
+    {
+        $names = $model::pluck('name', 'id');
+
+        $rules = [$field => 'required|array'];
+        $attributes = [];
+
+        foreach ($names as $id => $name) {
+            $rules["$field.$id"] = 'required|numeric|min:0|max:99999';
+            $attributes["$field.$id"] = $name ?: "$label #$id";
+        }
+
+        $request->validate($rules, [], $attributes);
+
+        foreach ($names->keys() as $id) {
+            $model::where('id', $id)->update(['hours_required' => $request->input("$field.$id")]);
+        }
     }
 }

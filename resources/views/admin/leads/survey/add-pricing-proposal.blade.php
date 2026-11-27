@@ -272,8 +272,8 @@
                                                 <tr>
                                                     <th>Logistics Expense</th>
                                                     <td>
-                                                        28.75
-                                                        <input type="hidden" name="logistics_expense" value="28.75">
+                                                        {{ number_format($surveyParameters['logistics_expense'], 2, '.', '') }}
+                                                        <input type="hidden" name="logistics_expense" value="{{ number_format($surveyParameters['logistics_expense'], 2, '.', '') }}">
                                                     </td>
                                                 </tr>
 
@@ -288,8 +288,8 @@
                                                 --}}
                                                 <tr>
                                                     <th>Multiplier</th>
-                                                    <td id="multiplier" data-value="3.9">
-                                                        3.9
+                                                    <td id="multiplier" data-value="{{ $surveyParameters['pricing_multiplier'] }}">
+                                                        {{ \App\Models\SurveyParameter::format($surveyParameters['pricing_multiplier']) }}
                                                     </td>
                                                 </tr>
 
@@ -467,11 +467,11 @@
 
             $('input[name="pricing_total"]').val(total.toFixed(2));
 
-            let awarenessVal = total / 10;
-            let educationVal = total / 10;
-            let technologyVal = total * 0.015;
-            let responseVal = total * 0.09;
-            let logisticsVal = 28.75;
+            let awarenessVal = total * {{ $surveyParameters['awareness_percent'] }};
+            let educationVal = total * {{ $surveyParameters['education_percent'] }};
+            let technologyVal = total * {{ $surveyParameters['technology_percent'] }};
+            let responseVal = total * {{ $surveyParameters['response_percent'] }};
+            let logisticsVal = {{ $surveyParameters['logistics_expense'] }};
 
             $('input[name="awareness"]').val(awarenessVal.toFixed(2));
             $('input[name="education"]').val(educationVal.toFixed(2));

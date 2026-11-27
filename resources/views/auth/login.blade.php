@@ -59,10 +59,11 @@
                         <button type="submit" class="btn btn-primary rounded-pill w-100">Login</button>
                     </div>
 
-                    {{-- Register --}}
+                    {{-- Register link: switched off for now
                     <div class="forget-password">
                         <p><span> Don't have an account? <a href="{{ route('register') }}" class="theme-color"> Register</a></span></p>
                     </div>
+                    --}}
                 </form>
             </div>
         </div>

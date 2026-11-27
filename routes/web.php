@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\OfficeDutyController;
 use App\Http\Controllers\Admin\InventoryReportController;
 use App\Http\Controllers\Admin\JobProfitabilityController;
 use App\Http\Controllers\Admin\ResidentialReportController;
+use App\Http\Controllers\Admin\ResourceLibraryController;
 use App\Http\Controllers\Admin\RevenueReportController;
 use App\Http\Controllers\Admin\SurveyConfigurationController;
 use App\Http\Controllers\Admin\ChangeControlController;
@@ -184,7 +185,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::get('equipment-management/{id}/history', [EquipmentManagementController::class, 'history'])->name('equipment-management.history');
 
     // Corporate Tools - Resource Library
-    Route::view('corporate-tools/resource-library', 'admin.corporate-tools.resource-library')->name('corporate-tools.resource-library');
+    Route::get('corporate-tools/resource-library', [ResourceLibraryController::class, 'index'])->name('corporate-tools.resource-library');
     Route::get('corporate-tools/residential-report', [ResidentialReportController::class, 'index'])->name('corporate-tools.residential-report');
     Route::get('corporate-tools/residential-report/export/pdf', [ResidentialReportController::class, 'exportPdf'])->name('corporate-tools.residential-report.pdf');
     Route::get('corporate-tools/residential-report/export/csv', [ResidentialReportController::class, 'exportCsv'])->name('corporate-tools.residential-report.csv');
